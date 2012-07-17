@@ -12,6 +12,9 @@ void amrsetup(pfclaw_domain_t *domain)
             pfclaw_patch_t *patch = block->patches + j;
             ClawPatch *cp = new ClawPatch();
             patch->user = cp;
+
+            cp->set_mx(domain->mx);
+            cp->set_my(domain->my);
         }
     }
 }
