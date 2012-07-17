@@ -1,5 +1,6 @@
-#include <ClawPatch.H>
+#include "ClawPatch.H"
 #include "forestclaw.h"
+#include "amr_utils.H"
 
 void amrsetup(pfclaw_domain_t *domain)
 {
@@ -10,8 +11,7 @@ void amrsetup(pfclaw_domain_t *domain)
         {
             pfclaw_patch_t *patch = block->patches + j;
             ClawPatch *cp = new ClawPatch();
-            patch->userdata = cp;
-
+            patch->user = cp;
+        }
     }
-
 }
