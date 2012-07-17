@@ -4,7 +4,7 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 .PHONY: clean
 
-libforestclaw.a: forestclaw2d.o amr_forestclaw.o
+libforestclaw.a: amr_forestclaw.o fclaw2d_convenience.o forestclaw2d.o
 	ar cru $@ $^
 
 .c.o:
