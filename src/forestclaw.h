@@ -24,3 +24,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <p4est.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef void (*pfclaw_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
+				 void *user);
+
+typedef struct pfclaw_patch
+{
+  int			level;		/* 0 is root, increases if refined */
+  double		xlower, xupper;
+  double		ylower, yupper;
+}
+pfclaw_patch_t;
+
+typedef struct pfclaw_block
+{
+  double		xlower, xupper;
+  double		ylower, yupper;
+  pfclaw_mapc2m_t	mapc2m;
+  void			*mapc2m_user;
+  int                   mthbc[P4EST_FACES];	/* >0 for physical bc types */
+  int			num_patches;
+  pfclaw_patch_t	*patches;
+}
+pfclaw_block_t;
+
+typedef struct pfclaw_domain
+{
+  int			mx, my;
+  int			num_blocks;
+  pfclaw_block_t	*blocks;
+}
+pfclaw_domain_t;
+
+/** Return boundary type >0 from pfclaw_block_t, or 0 for neighbor patches.
+ */
+int			pfclaw_patch_boundary_type (pfclaw_domain_t *domain,
+						int blockno, int patchno);
+
+#ifdef __cplusplus
+}
+#endif

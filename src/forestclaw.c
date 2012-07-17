@@ -24,3 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "forestclaw.h"
+
+int
+pfclaw_patch_boundary_type (pfclaw_domain_t *domain, int blockno, int patchno)
+{
+  return 0;
+}
