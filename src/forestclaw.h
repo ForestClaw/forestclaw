@@ -37,6 +37,7 @@ typedef struct pfclaw_patch
   int			level;		/* 0 is root, increases if refined */
   double		xlower, xupper;
   double		ylower, yupper;
+  void			*user;
 }
 pfclaw_patch_t;
 
@@ -49,6 +50,7 @@ typedef struct pfclaw_block
   int                   mthbc[P4EST_FACES];	/* >0 for physical bc types */
   int			num_patches;
   pfclaw_patch_t	*patches;
+  void			*user;
 }
 pfclaw_block_t;
 
@@ -57,6 +59,7 @@ typedef struct pfclaw_domain
   int			mx, my;
   int			num_blocks;
   pfclaw_block_t	*blocks;
+  void			*user;
 }
 pfclaw_domain_t;
 
