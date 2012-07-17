@@ -11,7 +11,7 @@ libforestclaw.a: forestclaw.o amr_forestclaw.o
 	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -c $<
 
 .cpp.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -I$(FORESTCLAW)/AMRLevel/src -c $<
+	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -I$(FORESTCLAW)/AMRClaw/src -I. -c $<
 
 
 clean:
