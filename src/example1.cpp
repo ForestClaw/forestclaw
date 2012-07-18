@@ -49,6 +49,7 @@ main (int argc, char **argv)
   domain = fclaw2d_domain_new_unitsquare (mpicomm, mx, my);
 
   amrsetup(domain);
+  amrrun(domain);
 
   /* put more interesting code here */
 

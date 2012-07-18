@@ -27,6 +27,8 @@ c     timestepping variables
 
       if (mwaves .gt. maxmwaves) then
          write(6,*) 'ERROR : (claw_utils.f) mwaves > maxmwaves'
+         write(6,*) 'mwaves = ', mwaves
+         write(6,*) 'maxmwaves = ', maxmwaves
          stop
       endif
 

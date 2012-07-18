@@ -5,6 +5,7 @@
 
 
 void amrsetup(fclaw2d_domain_t *domain);
+void amrrun(fclaw2d_domain_t *domain);
 
 
 #endif

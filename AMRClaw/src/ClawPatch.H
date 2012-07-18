@@ -395,7 +395,7 @@ public :
     void define(const ClawPatch& a_clawPatch);
     bool isDefined();
 
-    void get_inputParams(global_parms& parms); // Read from input file
+    void get_inputParams(global_parms &parms); // Read from input file
     void print_inputParams();  // Print out for beginning info
 
     void set_mx(int mx);

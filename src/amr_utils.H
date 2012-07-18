@@ -54,7 +54,7 @@ public:
 
     global_parms()
         {
-            int m_maxmwaves = 20;
+            m_maxmwaves = 20;
             m_mthlim = new int[m_maxmwaves];
             m_mthbc = new int[4];
             m_order = new int[2];
