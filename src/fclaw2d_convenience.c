@@ -29,6 +29,8 @@ static fclaw2d_domain_t		*
 fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
 {
   int			i, j;
+  int			face;
+  int			nb;
   p4est_connectivity_t	*conn = wrap->conn;
   p4est_tree_t          *tree;
   p4est_quadrant_t      *quad;
@@ -40,15 +42,21 @@ fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
   domain->mx = mx;
   domain->my = my;
   domain->pp = wrap;
-  domain->num_blocks = (int) conn->num_trees;
+  domain->num_blocks = nb = (int) conn->num_trees;
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
-  for (i = 0; i < domain->num_blocks; ++i) {
+  for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
     block->xlower = 0.;
     block->xupper = 1.;
     block->ylower = 0.;
     block->yupper = 1.;
+    for (face = 0; face < P4EST_FACES; ++face) {
+      if (conn->tree_to_tree[P4EST_FACES * nb + face] != (p4est_topidx_t) i ||
+          conn->tree_to_face[P4EST_FACES * nb + face] != (int8_t) face) {
+        block->mthbc[face] = 1;
+      }
+    }
     block->num_patches = (int) tree->quadrants.elem_count;
     block->patches = P4EST_ALLOC_ZERO (fclaw2d_patch_t, block->num_patches);
     for (j = 0; j < block->num_patches; ++j) {
