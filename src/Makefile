@@ -9,7 +9,8 @@ examples: example1
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
 	$(FORESTCLAW)/AMRClaw/src/limiter.o \
-	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o
+	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
+	$(FORESTCLAW)/AMRClaw/src/ClawPatch.o
 
 
 libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o amr_forestclaw.o $(amrclawobjs)

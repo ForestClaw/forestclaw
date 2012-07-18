@@ -9,6 +9,10 @@ int SpaceDim = 2;
 
 #define Max(a,b)  a
 
+#define pout() std::cout
+
+#define endl std::endl
+
 typedef double Real;
 
 
@@ -24,10 +28,10 @@ extern "C"
                      int& meqn,
                      int& mwaves,
                      int& maxmwaves,
-                     int  *mthlim,
+                     int  mthlim[],
                      int& mbc,
-                     int  *mthbc,
-                     int  *order);
+                     int  mthbc[],
+                     int  order[]);
 }
 
 class global_parms

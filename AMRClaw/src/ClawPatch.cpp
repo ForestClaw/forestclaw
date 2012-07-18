@@ -1,4 +1,5 @@
 #include "ClawPatch.H"
+#include "amr_utils.H"
 
 // This constructors includes all of parameters that are patch independent.
 // All of this could also be in some sort of "set_params" function...
@@ -72,14 +73,117 @@ bool ClawPatch::isDefined()
 
 void ClawPatch::get_inputParams()
 {
-    // Killed everything that included ppclaw
-    // Need to read in new data.
+    global_parms parms;
+
+    // read data using Fortran file
+    inputparms_(parms.m_initial_dt,
+                parms.m_tfinal,
+                parms.m_max_cfl,
+                parms.m_nout,
+                parms.m_src_term,
+                parms.m_mcapa,
+                parms.m_maux,
+                parms.m_meqn,
+                parms.m_mwaves,
+                parms.m_maxmwaves,
+                parms.m_mthlim,
+                parms.m_mbc,
+                parms.m_mthbc,
+                parms.m_order);
+
+    // cp->set_mx(domain->mx_leaf);
+    // cp->set_my(domain->my_leaf);
+
+    set_src(parms.m_src_term);
+    set_mcapa(parms.m_mcapa);
+    set_maux(parms.m_maux);
+    set_mbc(parms.m_mbc);
+    set_meqn(parms.m_meqn);
+    set_mwaves(parms.m_mwaves);
+    set_initial_dt(parms.m_initial_dt);
+
+    set_max_cfl(parms.m_max_cfl);
+
+
+    // Do this nonsense because I used std::vector<int> in ClawPatch.
+    std::vector<int> order(2,0);
+    for(int m = 0; m < 2; m++)
+    {
+        order[m] = parms.m_order[m];
+    }
+    set_order(order);
+
+    std::vector<int> mthlim(parms.m_mwaves,0);
+    for (int m = 0; m < parms.m_mwaves; m++)
+    {
+        mthlim[m] = parms.m_mthlim[m];
+    }
+    set_mthlim(mthlim);
+
+    std::vector<int> mthbc(4,0);
+    for (int m = 0; m < 4; m++)
+    {
+        mthbc[m] = parms.m_mthbc[m];
+    }
+    set_mthbc(mthbc);
 
 }
 
 void ClawPatch::print_inputParams()
 {
     // Killed everything that used "pout()"
+
+  pout() << endl;
+  pout() << "CLAWPACK PARAMETERS : " << endl;
+  pout() << "Initial dt " << m_initial_dt << endl;
+  pout() << "maximum cfl " << m_max_cfl << endl;
+  // pout() << "method(1) (fixed time step)       = " << fixedDt << endl;
+  pout() << "method(2:3) (order of integration) = " << m_method[1] << " " << m_method[2] << endl;
+  pout() << "method(5) (source term splitting) = " << m_method[4] << endl;
+  pout() << "method(6) (mcapa) = " << m_method[5] << endl;
+  pout() << "method(7) (maux) = " << m_method[6] << endl;
+  pout() << endl;
+
+  pout() << "meqn (number of equations) = " << m_meqn << endl;
+  pout() << "maux (number of auxiliary variables) = " << m_maux << endl;
+  pout() << "mcapa (location of capacity function) = " << m_mcapa << endl;
+  pout() << "mwaves (number of waves) = " << m_mwaves << endl;
+
+  pout() << "mthlim(mwaves) (limiters) = ";
+  for(int i = 0; i < m_mwaves; i++)
+    {
+      pout() << m_mthlim[i] << " ";
+    }
+  pout() << endl << endl;
+
+  pout() << "mbc (number of ghost cells) = " << m_mbc << endl;
+
+  pout() << "Domain values " << endl;
+  pout() << "xlower, xupper = " << m_xlower << " " << m_xupper << endl;
+  pout() << "ylower, yupper = " << m_ylower << " " << m_yupper << endl;
+
+#if CH_SPACEDIM == 3
+  pout() << "zlower, zupper = " << m_zlower << " " << m_zupper << endl;
+#endif
+
+  /*
+  pout() << "Auxiliary array type : " << endl;
+  for (int i = 0; i < m_maux; i++)
+    {
+      pout() << "  " << m_auxtype[i] << endl;
+    }
+  pout() << endl;
+  */
+
+
+  pout() << "mthbc(2*dim) (boundary conditions) = ";
+  for(int i = 0; i < 2*SpaceDim; i++)
+    {
+      pout() << m_mthbc[i] << " ";
+    }
+  pout() << endl << endl;
+
+
 }
 
 // clawpack parameters
@@ -608,7 +712,7 @@ Real ClawPatch::ClawPatchIntegrator(FArrayBox& a_phiPatch,
   // This seems to be different from a_patchBox, because phiBox contains
   // ghost cell indexing, which I need to determine if we are near a physical
   // boundary.
-  Box phiBox = a_phiPatch.box();
+  // Box phiBox = a_phiPatch.box();
 
   int *intersectsBoundary = new int[SpaceDim*2];
   for (int i = 0; i < 2*SpaceDim; i++)
