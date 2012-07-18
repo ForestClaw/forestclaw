@@ -37,7 +37,8 @@ fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
   P4EST_ASSERT (0 <= treeid && treeid < conn->num_trees);
 
   p4est_qcoord_to_vertex (conn, treeid,
-  		(p4est_qcoord_t) xyc[0], (p4est_qcoord_t) xyc[1], xyzp);
+  		(p4est_qcoord_t) (xyc[0] * fclaw2d_root_len),
+		(p4est_qcoord_t) (xyc[1] * fclaw2d_root_len), xyzp);
 }
 
 static fclaw2d_domain_t		*
@@ -64,9 +65,9 @@ fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
     block = domain->blocks + i;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
     block->xlower = 0.;
-    block->xupper = (double) P4EST_ROOT_LEN;
+    block->xupper = 1.;
     block->ylower = 0.;
-    block->yupper = (double) P4EST_ROOT_LEN;
+    block->yupper = 1.;
     if (conn->num_vertices > 0) {
       P4EST_ASSERT (conn->vertices != NULL);
       block->mapc2m = fclaw2d_domain_mcp;
@@ -85,10 +86,10 @@ fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
       quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
       patch->level = (int) quad->level;
       qh = P4EST_QUADRANT_LEN (patch->level);
-      patch->xlower = (double) quad->x;
-      patch->xupper = (double) (quad->x + qh);
-      patch->ylower = (double) quad->y;
-      patch->yupper = (double) (quad->y + qh);
+      patch->xlower = quad->x * fclaw2d_smallest_h;
+      patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+      patch->ylower = quad->y * fclaw2d_smallest_h;
+      patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
     }
   }
 

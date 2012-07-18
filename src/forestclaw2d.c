@@ -25,6 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.h"
 
+const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
+const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
+
 int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
                 int blockno, int patchno, int boundaries[P4EST_FACES])

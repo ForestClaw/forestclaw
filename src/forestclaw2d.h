@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+extern const double fclaw2d_root_len;
+extern const double fclaw2d_smallest_h;
+
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
