@@ -33,7 +33,7 @@ amrclawobjs = \
 
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
-libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o amr_forestclaw.o $(amrclawobjs)
+libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o amr_forestclaw.o amr_utils.o $(amrclawobjs)
 	ar cru $@ $^
 
 .c.o:
