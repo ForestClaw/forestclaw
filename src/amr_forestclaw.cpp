@@ -6,6 +6,10 @@ void amrsetup(fclaw2d_domain_t *domain)
     fclaw2d_domain_data_t *dd = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
     domain->user = (void *) dd;
 
+    // Todo: Replace this with proper global parameters
+    dd->mx_leaf = 8;
+    dd->my_leaf = 8;
+
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = domain->blocks + i;
@@ -19,8 +23,8 @@ void amrsetup(fclaw2d_domain_t *domain)
             pd->cp = cp;
 
             // Set stuff from p4est
-            cp->set_mx(domain->mx_leaf);
-            cp->set_my(domain->my_leaf);
+            cp->set_mx(dd->mx_leaf);
+            cp->set_my(dd->my_leaf);
             cp->set_xlower(patch->xlower);
             cp->set_ylower(patch->ylower);
             cp->set_xupper(patch->xupper);

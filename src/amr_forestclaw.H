@@ -6,7 +6,7 @@
 
 typedef struct fclaw2d_domain_data
 {
-  // int		mx_leaf, my_leaf;
+  int		mx_leaf, my_leaf;
 }
 fclaw2d_domain_data_t;
 

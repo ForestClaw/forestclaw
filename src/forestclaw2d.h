@@ -64,7 +64,6 @@ fclaw2d_block_t;
 
 struct fclaw2d_domain
 {
-  int			mx_leaf, my_leaf;
   int			num_blocks;
   fclaw2d_block_t	*blocks;
   p4est_wrap_t          *pp;

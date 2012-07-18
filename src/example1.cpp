@@ -32,7 +32,6 @@ main (int argc, char **argv)
 {
   int			mpiret;
   int			lp;
-  int			mx, my;
   MPI_Comm		mpicomm;
   fclaw2d_domain_t	*domain;
 
@@ -44,9 +43,7 @@ main (int argc, char **argv)
   sc_init (mpicomm, 0, 0, NULL, lp);
   p4est_init (NULL, lp);
 
-  mx = 8;
-  my = 8;
-  domain = fclaw2d_domain_new_unitsquare (mpicomm, mx, my);
+  domain = fclaw2d_domain_new_unitsquare (mpicomm);
 
   amrsetup(domain);
   amrrun(domain);
