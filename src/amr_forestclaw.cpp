@@ -1,5 +1,5 @@
 #include "ClawPatch.H"
-#include "forestclaw.h"
+#include "forestclaw2d.h"
 #include "amr_utils.H"
 
 void amrsetup(pfclaw_domain_t *domain)

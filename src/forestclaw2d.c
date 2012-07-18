@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw.h"
+#include "forestclaw2d.h"
 
 int
 pfclaw_patch_boundary_type (pfclaw_domain_t *domain, int blockno, int patchno)
