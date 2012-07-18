@@ -26,7 +26,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 
 int
-fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain, int blockno, int patchno)
+fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
+                int blockno, int patchno, int boundaries[P4EST_FACES])
 {
-  return 0;
+  int                   face;
+  int                   anyboundary;
+  int8_t                qtf;
+  p4est_locidx_t        totalleaf;
+  p4est_locidx_t        qtq;
+  p4est_t               *p4est;
+  p4est_tree_t          *tree;
+  p4est_mesh_t          *mesh;
+  fclaw2d_block_t       *block;
+
+  anyboundary = 0;
+  p4est = domain->pp->p4est;
+  mesh = domain->pp->match_aux ? domain->pp->mesh_aux : domain->pp->mesh;
+
+  P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+  P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+  P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+
+  block = domain->blocks + blockno;
+  P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+  
+  tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
+  totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
+  P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
+  for (face = 0; face < P4EST_FACES; ++face) {
+    qtq = mesh->quad_to_quad[P4EST_FACES * totalleaf + face];
+    qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + face];
+    if (qtq == totalleaf && qtf == face) {
+      anyboundary = 1;
+      P4EST_ASSERT (block->mthbc[face] > 0);
+      boundaries[face] = block->mthbc[face];
+    }
+    else {
+      boundaries[face] = 0;
+    }
+  }
+
+  return anyboundary;
 }

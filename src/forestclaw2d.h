@@ -64,10 +64,16 @@ typedef struct fclaw2d_domain
 }
 fclaw2d_domain_t;
 
-/** Return boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
+/** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
+ * \param [in]		number of the block within the domain.
+ * \param [in]		number of the patch within the block.
+ * \param [in,out]	boundary types as present in fclaw2d_block_t.
+ *			The order is left, right, bottom, top.
+ * \return		True if at least one patch face is on a boundary.
  */
 int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
-						int blockno, int patchno);
+						int blockno, int patchno,
+						int boundaries[P4EST_FACES]);
 
 #ifdef __cplusplus
 }
