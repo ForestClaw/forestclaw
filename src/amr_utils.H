@@ -5,11 +5,11 @@
 
 #define CH_SPACEDIM 2
 
-int SpaceDim = 2;
+#define SpaceDim 2
 
 #define Max(a,b)  a
 
-#define pout() std::cout
+#define cout std::cout
 
 #define endl std::endl
 

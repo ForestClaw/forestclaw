@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_convenience.h"
+#include "amr_forestclaw.H"
+
 
 int
 main (int argc, char **argv)
@@ -45,15 +47,17 @@ main (int argc, char **argv)
   mx = 8;
   my = 8;
   domain = fclaw2d_domain_new_unitsquare (mpicomm, mx, my);
- 
+
+  amrsetup(domain);
+
   /* put more interesting code here */
 
   fclaw2d_domain_destroy (domain);
 
   sc_finalize ();
-  
+
   mpiret = MPI_Finalize ();
   SC_CHECK_MPI (mpiret);
- 
+
   return 0;
 }

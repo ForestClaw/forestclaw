@@ -23,6 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FORESTCLAW2D_H
+#define FORESTCLAW2D_H
+
 #include <p4est_wrap.h>
 
 #ifdef __cplusplus
@@ -81,4 +84,6 @@ int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

@@ -91,9 +91,6 @@ void ClawPatch::get_inputParams()
                 parms.m_mthbc,
                 parms.m_order);
 
-    // cp->set_mx(domain->mx_leaf);
-    // cp->set_my(domain->my_leaf);
-
     set_src(parms.m_src_term);
     set_mcapa(parms.m_mcapa);
     set_maux(parms.m_maux);
@@ -133,55 +130,55 @@ void ClawPatch::print_inputParams()
 {
     // Killed everything that used "pout()"
 
-  pout() << endl;
-  pout() << "CLAWPACK PARAMETERS : " << endl;
-  pout() << "Initial dt " << m_initial_dt << endl;
-  pout() << "maximum cfl " << m_max_cfl << endl;
-  // pout() << "method(1) (fixed time step)       = " << fixedDt << endl;
-  pout() << "method(2:3) (order of integration) = " << m_method[1] << " " << m_method[2] << endl;
-  pout() << "method(5) (source term splitting) = " << m_method[4] << endl;
-  pout() << "method(6) (mcapa) = " << m_method[5] << endl;
-  pout() << "method(7) (maux) = " << m_method[6] << endl;
-  pout() << endl;
+  cout << endl;
+  cout << "CLAWPACK PARAMETERS : " << endl;
+  cout << "Initial dt " << m_initial_dt << endl;
+  cout << "maximum cfl " << m_max_cfl << endl;
+  // cout << "method(1) (fixed time step)       = " << fixedDt << endl;
+  cout << "method(2:3) (order of integration) = " << m_method[1] << " " << m_method[2] << endl;
+  cout << "method(5) (source term splitting) = " << m_method[4] << endl;
+  cout << "method(6) (mcapa) = " << m_method[5] << endl;
+  cout << "method(7) (maux) = " << m_method[6] << endl;
+  cout << endl;
 
-  pout() << "meqn (number of equations) = " << m_meqn << endl;
-  pout() << "maux (number of auxiliary variables) = " << m_maux << endl;
-  pout() << "mcapa (location of capacity function) = " << m_mcapa << endl;
-  pout() << "mwaves (number of waves) = " << m_mwaves << endl;
+  cout << "meqn (number of equations) = " << m_meqn << endl;
+  cout << "maux (number of auxiliary variables) = " << m_maux << endl;
+  cout << "mcapa (location of capacity function) = " << m_mcapa << endl;
+  cout << "mwaves (number of waves) = " << m_mwaves << endl;
 
-  pout() << "mthlim(mwaves) (limiters) = ";
+  cout << "mthlim(mwaves) (limiters) = ";
   for(int i = 0; i < m_mwaves; i++)
     {
-      pout() << m_mthlim[i] << " ";
+      cout << m_mthlim[i] << " ";
     }
-  pout() << endl << endl;
+  cout << endl << endl;
 
-  pout() << "mbc (number of ghost cells) = " << m_mbc << endl;
+  cout << "mbc (number of ghost cells) = " << m_mbc << endl;
 
-  pout() << "Domain values " << endl;
-  pout() << "xlower, xupper = " << m_xlower << " " << m_xupper << endl;
-  pout() << "ylower, yupper = " << m_ylower << " " << m_yupper << endl;
+  cout << "Domain values " << endl;
+  cout << "xlower, xupper = " << m_xlower << " " << m_xupper << endl;
+  cout << "ylower, yupper = " << m_ylower << " " << m_yupper << endl;
 
 #if CH_SPACEDIM == 3
-  pout() << "zlower, zupper = " << m_zlower << " " << m_zupper << endl;
+  cout << "zlower, zupper = " << m_zlower << " " << m_zupper << endl;
 #endif
 
   /*
-  pout() << "Auxiliary array type : " << endl;
+  cout << "Auxiliary array type : " << endl;
   for (int i = 0; i < m_maux; i++)
     {
-      pout() << "  " << m_auxtype[i] << endl;
+      cout << "  " << m_auxtype[i] << endl;
     }
-  pout() << endl;
+  cout << endl;
   */
 
 
-  pout() << "mthbc(2*dim) (boundary conditions) = ";
+  cout << "mthbc(2*dim) (boundary conditions) = ";
   for(int i = 0; i < 2*SpaceDim; i++)
     {
-      pout() << m_mthbc[i] << " ";
+      cout << m_mthbc[i] << " ";
     }
-  pout() << endl << endl;
+  cout << endl << endl;
 
 
 }

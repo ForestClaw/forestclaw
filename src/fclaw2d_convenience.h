@@ -23,6 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FCLAW2D_CONVENIENCE_H
+#define FCLAW2D_CONVENIENCE_H
+
+
 #include "forestclaw2d.h"
 
 #ifdef __cplusplus
@@ -36,4 +40,6 @@ void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
