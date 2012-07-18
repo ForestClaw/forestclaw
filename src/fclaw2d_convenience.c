@@ -25,6 +25,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_convenience.h"
 
+static void
+fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
+			fclaw2d_domain_t *domain, void *user)
+{
+  p4est_topidx_t	treeid;
+  p4est_connectivity_t	*conn;
+
+  conn = domain->pp->conn;
+  treeid = (p4est_topidx_t) (long) user;
+  P4EST_ASSERT (0 <= treeid && treeid < conn->num_trees);
+
+  p4est_qcoord_to_vertex (conn, treeid,
+  		(p4est_qcoord_t) xyc[0], (p4est_qcoord_t) xyc[1], xyzp);
+}
+
 static fclaw2d_domain_t		*
 fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
 {
@@ -52,6 +67,11 @@ fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
     block->xupper = (double) P4EST_ROOT_LEN;
     block->ylower = 0.;
     block->yupper = (double) P4EST_ROOT_LEN;
+    if (conn->num_vertices > 0) {
+      P4EST_ASSERT (conn->vertices != NULL);
+      block->mapc2m = fclaw2d_domain_mcp;
+      block->mapc2m_user = (void *) (long) i;
+    }
     for (face = 0; face < P4EST_FACES; ++face) {
       if (conn->tree_to_tree[P4EST_FACES * nb + face] != (p4est_topidx_t) i ||
           conn->tree_to_face[P4EST_FACES * nb + face] != (int8_t) face) {

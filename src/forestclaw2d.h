@@ -29,8 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+typedef struct fclaw2d_domain fclaw2d_domain_t;
+
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
-				  void *user);
+				  fclaw2d_domain_t *domain, void *user);
 
 typedef struct fclaw2d_patch
 {
@@ -54,15 +56,14 @@ typedef struct fclaw2d_block
 }
 fclaw2d_block_t;
 
-typedef struct fclaw2d_domain
+struct fclaw2d_domain
 {
   int			mx_leaf, my_leaf;
   int			num_blocks;
   fclaw2d_block_t	*blocks;
   p4est_wrap_t          *pp;
   void			*user;
-}
-fclaw2d_domain_t;
+};
 
 /** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
  * \param [in]		number of the block within the domain.
