@@ -233,7 +233,7 @@ void ClawPatch::set_mthlim(std::vector<int> a_mthlim)
         delete m_mthlim;
     }
     m_mthlim = new int[a_mthlim.size()];
-    for (int i = 0; i < a_mthlim.size(); i++)
+    for (int i = 0; i < (int) a_mthlim.size(); i++)
     {
         m_mthlim[i] = a_mthlim[i];
     }
@@ -419,7 +419,7 @@ void ClawPatch::set_refratios(std::vector<int> a_refratios)
         delete m_refratios;
     }
     m_refratios = new int[a_refratios.size()];
-    for (int i = 0; i < a_refratios.size(); i++)
+    for (int i = 0; i < (int) a_refratios.size(); i++)
     {
         m_refratios[i] = a_refratios[i];
     }
