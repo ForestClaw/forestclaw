@@ -40,8 +40,8 @@ fclaw2d_domain_new (p4est_wrap_t *wrap, int mx, int my)
   fclaw2d_patch_t	*patch;
 
   domain = P4EST_ALLOC_ZERO (fclaw2d_domain_t, 1);
-  domain->mx = mx;
-  domain->my = my;
+  domain->mx_leaf = mx;
+  domain->my_leaf = my;
   domain->pp = wrap;
   domain->num_blocks = nb = (int) conn->num_trees;
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
