@@ -26,64 +26,94 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 
-void amrsetup(fclaw2d_domain_t *domain)
+void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms)
 {
-    fclaw2d_domain_data_t *dd = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
-    domain->user = (void *) dd;
+    fclaw2d_domain_data_t *ddata = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
+    domain->user = (void *) ddata;
 
-    // Todo: Replace this with proper global parameters
-    dd->mx_leaf = 8;
-    dd->my_leaf = 8;
+    ddata->parms = parms;
+}
 
-    for(int i = 0; i < domain->num_blocks; i++)
+global_parms* get_domain_data(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t *ddata;
+    ddata = (fclaw2d_domain_data_t *) domain->user;
+
+    return ddata->parms;
+}
+
+void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
+{
+    fclaw2d_patch_data_t *pdata = P4EST_ALLOC (fclaw2d_patch_data_t, 1);
+    patch->user = (void *) pdata;
+
+    pdata->cp = cp;
+}
+
+ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
+{
+    fclaw2d_patch_data_t *pdata;
+    pdata = (fclaw2d_patch_data_t *) patch->user;
+
+    return pdata->cp;
+}
+
+
+void amrsetup(fclaw2d_domain_t *domain_in)
+{
+    fclaw2d_domain_t &domain = *domain_in;
+    global_parms *parms = new global_parms();
+
+    parms->get_inputParams();
+    parms->print_inputParams();
+
+    set_domain_data(&domain,parms);
+
+    for(int i = 0; i < domain.num_blocks; i++)
     {
-        fclaw2d_block_t *block = domain->blocks + i;
-        for(int j = 0; j < block->num_patches; j++)
+        fclaw2d_block_t &block = domain.blocks[i];
+        for(int j = 0; j < block.num_patches; j++)
         {
-            fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_data_t *pd = P4EST_ALLOC (fclaw2d_patch_data_t, 1);
+            fclaw2d_patch_t &patch = block.patches[j];
             ClawPatch *cp = new ClawPatch();
 
-            patch->user = (void *) pd;
-            pd->cp = cp;
-
             // Set stuff from p4est
-            cp->set_mx(dd->mx_leaf);
-            cp->set_my(dd->my_leaf);
-            cp->set_xlower(patch->xlower);
-            cp->set_ylower(patch->ylower);
-            cp->set_xupper(patch->xupper);
-            cp->set_yupper(patch->yupper);
+            cp->set_mx(parms->m_mx_leaf);
+            cp->set_my(parms->m_my_leaf);
+            cp->set_xlower(patch.xlower);
+            cp->set_ylower(patch.ylower);
+            cp->set_xupper(patch.xupper);
+            cp->set_yupper(patch.yupper);
 
-            // Get the rest of the numerical parameters we need.
-            // Todo: Move global parameters into dd
-            global_parms parms;
-            cp->get_inputParams(parms);
-            cp->print_inputParams();
+            set_patch_data(&patch,cp);
         }
     }
 }
 
-void amrrun(fclaw2d_domain_t *domain)
+void amrrun(fclaw2d_domain_t *domain_in)
 {
-    fclaw2d_domain_data_t *dd;
-    dd = (fclaw2d_domain_data_t *) domain->user;
+    fclaw2d_domain_t &domain = *domain_in;
 
-    global_parms parms;
-    ClawPatch *cp1 = new ClawPatch();
-    cp1->get_inputParams(parms);
-
-    double tfinal = parms.m_tfinal;
+    global_parms *parms = get_domain_data(&domain);
+    double tfinal = parms->m_tfinal;
     cout << "Final time : " << tfinal << endl;
 
-    for(int i = 0; i < domain->num_blocks; i++)
+    for(int i = 0; i < domain.num_blocks; i++)
     {
-        fclaw2d_block_t *block = domain->blocks + i;
-        for(int j = 0; j < block->num_patches; j++)
+        fclaw2d_block_t &block = domain.blocks[i];
+        for(int j = 0; j < block.num_patches; j++)
         {
-            // fclaw2d_patch_t *patch = block->patches + j;
-            // fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t *) patch->user;
-            // ClawPatch *cp = pd->cp;
+            fclaw2d_patch_t &patch = block.patches[j];
+            ClawPatch *cp = get_patch_data(&patch);
+
+            cout << endl;
+            cout << "Clawpatch info for patch number " << j << endl;
+            cout << "cp->get_mx() " << cp->get_mx() << endl;
+            cout << "cp->get_my() " << cp->get_my() << endl;
+            cout << "cp->get_xlower() " << cp->get_xlower() << endl;
+            cout << "cp->get_ylower() " << cp->get_ylower() << endl;
+            cout << "cp->get_xupper() " << cp->get_xupper() << endl;
+            cout << "cp->get_yupper() " << cp->get_yupper() << endl;
         }
     }
 }
