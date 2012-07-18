@@ -29,44 +29,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-typedef void (*pfclaw_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
-				 void *user);
+typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
+				  void *user);
 
-typedef struct pfclaw_patch
+typedef struct fclaw2d_patch
 {
   int			level;		/* 0 is root, increases if refined */
   double		xlower, xupper;
   double		ylower, yupper;
   void			*user;
 }
-pfclaw_patch_t;
+fclaw2d_patch_t;
 
-typedef struct pfclaw_block
+typedef struct fclaw2d_block
 {
   double		xlower, xupper;
   double		ylower, yupper;
-  pfclaw_mapc2m_t	mapc2m;
+  fclaw2d_mapc2m_t	mapc2m;
   void			*mapc2m_user;
   int                   mthbc[P4EST_FACES];	/* >0 for physical bc types */
   int			num_patches;
-  pfclaw_patch_t	*patches;
+  fclaw2d_patch_t	*patches;
   void			*user;
 }
-pfclaw_block_t;
+fclaw2d_block_t;
 
-typedef struct pfclaw_domain
+typedef struct fclaw2d_domain
 {
   int			mx, my;
   int			num_blocks;
-  pfclaw_block_t	*blocks;
+  fclaw2d_block_t	*blocks;
   p4est_wrap_t          *pp;
   void			*user;
 }
-pfclaw_domain_t;
+fclaw2d_domain_t;
 
-/** Return boundary type >0 from pfclaw_block_t, or 0 for neighbor patches.
+/** Return boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
  */
-int			pfclaw_patch_boundary_type (pfclaw_domain_t *domain,
+int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
 						int blockno, int patchno);
 
 #ifdef __cplusplus
