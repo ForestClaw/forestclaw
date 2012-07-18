@@ -24,6 +24,7 @@ void amrsetup(fclaw2d_domain_t *domain)
 
             // Get the rest of the numerical parameters we need.
             cp->get_inputParams();
+            cp->print_inputParams();
         }
     }
 }
