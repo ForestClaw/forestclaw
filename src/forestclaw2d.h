@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <p4est.h>
+#include <p4est_wrap.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,6 +59,7 @@ typedef struct pfclaw_domain
   int			mx, my;
   int			num_blocks;
   pfclaw_block_t	*blocks;
+  p4est_wrap_t          *pp;
   void			*user;
 }
 pfclaw_domain_t;
