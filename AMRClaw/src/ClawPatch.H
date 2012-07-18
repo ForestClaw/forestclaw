@@ -395,9 +395,6 @@ public :
     void define(const ClawPatch& a_clawPatch);
     bool isDefined();
 
-    void get_inputParams(global_parms &parms); // Read from input file
-    void print_inputParams();  // Print out for beginning info
-
     void set_mx(int mx);
     void set_my(int my);
 #if CH_SPACEDIM == 3

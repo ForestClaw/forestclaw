@@ -1,16 +1,21 @@
-      subroutine inputparms(initial_dt, tfinal, max_cfl, nout, src_term,
-     &      mcapa, maux,meqn,mwaves,maxmwaves,mthlim,mbc,mthbc,order)
+      subroutine inputparms(mx_leaf,my_leaf,initial_dt, tfinal,
+     &      max_cfl, nout, src_term, verbose, mcapa, maux,meqn,mwaves,
+     &      maxmwaves,mthlim,mbc,mthbc,order)
       implicit none
 
+      integer mx_leaf, my_leaf
       double precision initial_dt, tfinal, max_cfl
       integer nout, src_term, mcapa, maux, meqn, mwaves
-      integer maxmwaves,mbc
+      integer maxmwaves,mbc, verbose
       integer mthbc(4),mthlim(maxmwaves), order(2)
 
       integer mw, m
 
 
       open(55,file='claw2ez.data')
+
+      read(55,*) mx_leaf
+      read(55,*) my_leaf
 
 c     timestepping variables
       read(55,*) initial_dt
@@ -19,6 +24,7 @@ c     timestepping variables
       read(55,*) nout
 
       read(55,*) src_term
+      read(55,*) verbose
       read(55,*) mcapa
       read(55,*) maux
 

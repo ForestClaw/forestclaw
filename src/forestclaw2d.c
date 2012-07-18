@@ -52,7 +52,7 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
 
   block = domain->blocks + blockno;
   P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
-  
+
   tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
   totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
   P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
