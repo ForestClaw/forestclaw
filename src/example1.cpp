@@ -50,6 +50,7 @@ main (int argc, char **argv)
 
   amrsetup(domain);
   amrrun(domain);
+  amrreset (domain);
 
   /* put more interesting code here */
 

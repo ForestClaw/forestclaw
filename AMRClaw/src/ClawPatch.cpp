@@ -31,7 +31,8 @@ ClawPatch::~ClawPatch()
     if( m_method      != NULL ) { delete [] m_method     ; m_method      = NULL; }
     if( m_mthbc       != NULL ) { delete [] m_mthbc      ; m_mthbc       = NULL; }
     if( m_refratios   != NULL ) { delete [] m_refratios  ; m_refratios   = NULL; }
-    if( m_auxtype_int != NULL ) { delete [] m_auxtype_int; m_auxtype_int = NULL; }
+    // Todo: does not seem to be allocated as of yet
+    // if( m_auxtype_int != NULL ) { delete [] m_auxtype_int; m_auxtype_int = NULL; }
 }
 
 void ClawPatch::define(const ClawPatch& a_clawPatch)
