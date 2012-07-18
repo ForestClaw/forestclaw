@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CONVENIENCE_H
 #define FCLAW2D_CONVENIENCE_H
 
-
 #include "forestclaw2d.h"
 
 #ifdef __cplusplus
@@ -34,6 +33,8 @@ extern "C" {
 #endif
 
 fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm);
+fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm);
+
 void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);
 
 #ifdef __cplusplus
