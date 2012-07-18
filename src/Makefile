@@ -6,14 +6,23 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 examples: example1
 
-libforestclaw.a: amr_forestclaw.o fclaw2d_convenience.o forestclaw2d.o
+amrclawobjs = \
+	$(FORESTCLAW)/AMRClaw/src/philim.o \
+	$(FORESTCLAW)/AMRClaw/src/limiter.o \
+	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o
+
+
+libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o amr_forestclaw.o $(amrclawobjs)
 	ar cru $@ $^
 
 .c.o:
-	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -c $<
+	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -I$(FORESTCLAW)/AMRClaw/src -I. -c $<
+	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -I$(FORESTCLAW)/AMRClaw/src -I. -c $< -o $@
+
+.f.o:
+	$(FC) -c $< -o $@
 
 example1: example1.o libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(P4EST_LIBS) -o $@

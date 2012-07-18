@@ -4,6 +4,24 @@
 
 void amrsetup(fclaw2d_domain_t *domain)
 {
+
+    global_parms parms;
+
+    inputparms_(parms.m_initial_dt,
+                parms.m_tfinal,
+                parms.m_max_cfl,
+                parms.m_nout,
+                parms.m_src_term,
+                parms.m_mcapa,
+                parms.m_maux,
+                parms.m_meqn,
+                parms.m_mwaves,
+                parms.m_maxmwaves,
+                parms.m_mthlim,
+                parms.m_mbc,
+                parms.m_mthbc,
+                parms.m_order);
+
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = domain->blocks + i;
@@ -13,8 +31,8 @@ void amrsetup(fclaw2d_domain_t *domain)
             ClawPatch *cp = new ClawPatch();
             patch->user = cp;
 
-            cp->set_mx(domain->mx);
-            cp->set_my(domain->my);
+            cp->set_mx(domain->mx_leaf);
+            cp->set_my(domain->my_leaf);
         }
     }
 }
