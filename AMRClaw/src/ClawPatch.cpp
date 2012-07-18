@@ -71,10 +71,8 @@ bool ClawPatch::isDefined()
     return m_isDefined;
 }
 
-void ClawPatch::get_inputParams()
+void ClawPatch::get_inputParams(global_parms& parms)
 {
-    global_parms parms;
-
     // read data using Fortran file
     inputparms_(parms.m_initial_dt,
                 parms.m_tfinal,
