@@ -45,8 +45,11 @@ static fclaw2d_domain_t		*
 fclaw2d_domain_new (p4est_wrap_t *wrap)
 {
   int			i, j;
+  int			level;
   int			face;
   int			nb;
+  int			num_patches_all;
+  int			tree_maxlevel, maxlevel_all;
   p4est_qcoord_t	qh;
   p4est_connectivity_t	*conn = wrap->conn;
   p4est_tree_t          *tree;
@@ -54,14 +57,22 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   fclaw2d_domain_t	*domain;
   fclaw2d_block_t	*block;
   fclaw2d_patch_t	*patch;
+  fclaw2d_patch_t	*currentbylevel[P4EST_MAXLEVEL + 1];
 
+#ifdef P4EST_DEBUG
+  memset (currentbylevel, 0,
+  	  sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
+#endif
   domain = P4EST_ALLOC_ZERO (fclaw2d_domain_t, 1);
   domain->pp = wrap;
   domain->num_blocks = nb = (int) conn->num_trees;
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
+  num_patches_all = 0;
+  maxlevel_all = 0;
   for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
+    tree_maxlevel = 0;
     block->xlower = 0.;
     block->xupper = 1.;
     block->ylower = 0.;
@@ -82,14 +93,32 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
     for (j = 0; j < block->num_patches; ++j) {
       patch = block->patches + j;
       quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
-      patch->level = (int) quad->level;
-      qh = P4EST_QUADRANT_LEN (patch->level);
+      patch->level = level = (int) quad->level;
+      P4EST_ASSERT (0 <= level && level <= P4EST_QMAXLEVEL);
+      qh = P4EST_QUADRANT_LEN (level);
       patch->xlower = quad->x * fclaw2d_smallest_h;
       patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
       patch->ylower = quad->y * fclaw2d_smallest_h;
       patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+      if (block->patchbylevel[level] == NULL) {
+        /* this is the first patch of this level in this block */
+	block->patchbylevel[level] = currentbylevel[level] = patch;
+      }
+      else {
+        /* assign next pointer of previous patch by level in this block */
+        P4EST_ASSERT (currentbylevel[level] != NULL);
+        currentbylevel[level]->next = patch;
+	currentbylevel[level] = patch;
+      }
+      ++num_patches_all;
+      tree_maxlevel = SC_MAX (tree_maxlevel, level);
     }
+    P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
+    maxlevel_all = SC_MAX (maxlevel_all, tree_maxlevel);
   }
+  P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
+  domain->num_patches_all = num_patches_all;
+  domain->maxlevel_all = maxlevel_all;
 
   return domain;
 }

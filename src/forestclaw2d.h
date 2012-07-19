@@ -42,11 +42,14 @@ typedef struct fclaw2d_patch fclaw2d_patch_t;
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
 				  fclaw2d_domain_t *domain, void *user);
 
+/* The domain structure gives a processor local view of the grid hierarchy */
+
 struct fclaw2d_patch
 {
   int			level;		/* 0 is root, increases if refined */
   double		xlower, xupper;
   double		ylower, yupper;
+  fclaw2d_patch_t	*next;		/* next patch same level same block */
   void			*user;
 };
 
@@ -58,14 +61,17 @@ struct fclaw2d_block
   void			*mapc2m_user;
   int                   mthbc[P4EST_FACES];	/* >0 for physical bc types */
   int			num_patches;
-  fclaw2d_patch_t	*patches;
+  fclaw2d_patch_t	*patches;		/* allocated storage */
+  fclaw2d_patch_t	*patchbylevel[P4EST_MAXLEVEL + 1];	/* pointers */
   void			*user;
 };
 
 struct fclaw2d_domain
 {
+  int			num_patches_all;	/* sum over all blocks */
+  int			maxlevel_all;		/* maximum over all blocks */
   int			num_blocks;
-  fclaw2d_block_t	*blocks;
+  fclaw2d_block_t	*blocks;		/* allocated storage */
   p4est_wrap_t          *pp;
   void			*user;
 };
