@@ -61,50 +61,50 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 
 void amrsetup(fclaw2d_domain_t *domain_in)
 {
-    fclaw2d_domain_t &domain = *domain_in;
+    fclaw2d_domain_t *domain = domain_in;
     global_parms *parms = new global_parms();
 
     parms->get_inputParams();
     parms->print_inputParams();
 
-    set_domain_data(&domain,parms);
+    set_domain_data(domain,parms);
 
-    for(int i = 0; i < domain.num_blocks; i++)
+    for(int i = 0; i < domain->num_blocks; i++)
     {
-        fclaw2d_block_t &block = domain.blocks[i];
-        for(int j = 0; j < block.num_patches; j++)
+        fclaw2d_block_t *block = domain->blocks + i;
+        for(int j = 0; j < block->num_patches; j++)
         {
-            fclaw2d_patch_t &patch = block.patches[j];
+            fclaw2d_patch_t *patch = block->patches + j;
             ClawPatch *cp = new ClawPatch();
 
             // Set stuff from p4est
             cp->set_mx(parms->m_mx_leaf);
             cp->set_my(parms->m_my_leaf);
-            cp->set_xlower(patch.xlower);
-            cp->set_ylower(patch.ylower);
-            cp->set_xupper(patch.xupper);
-            cp->set_yupper(patch.yupper);
+            cp->set_xlower(patch->xlower);
+            cp->set_ylower(patch->ylower);
+            cp->set_xupper(patch->xupper);
+            cp->set_yupper(patch->yupper);
 
-            set_patch_data(&patch,cp);
+            set_patch_data(patch,cp);
         }
     }
 }
 
 void amrrun(fclaw2d_domain_t *domain_in)
 {
-    fclaw2d_domain_t &domain = *domain_in;
+    fclaw2d_domain_t *domain = domain_in;
 
-    global_parms *parms = get_domain_data(&domain);
+    global_parms *parms = get_domain_data(domain);
     double tfinal = parms->m_tfinal;
     cout << "Final time : " << tfinal << endl;
 
-    for(int i = 0; i < domain.num_blocks; i++)
+    for(int i = 0; i < domain->num_blocks; i++)
     {
-        fclaw2d_block_t &block = domain.blocks[i];
-        for(int j = 0; j < block.num_patches; j++)
+        fclaw2d_block_t *block = domain->blocks + i;
+        for(int j = 0; j < block->num_patches; j++)
         {
-            fclaw2d_patch_t &patch = block.patches[j];
-            ClawPatch *cp = get_patch_data(&patch);
+            fclaw2d_patch_t *patch = block->patches + j;
+            ClawPatch *cp = get_patch_data(patch);
 
             cout << endl;
             cout << "Clawpatch info for patch number " << j << endl;
