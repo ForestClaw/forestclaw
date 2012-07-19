@@ -28,6 +28,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
+void
+fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
+			      fclaw2d_patch_callback_t pcb, void *user)
+{
+  int			i, j;
+  fclaw2d_block_t	*block;
+  fclaw2d_patch_t	*patch;
+
+  P4EST_ASSERT (0 <= level && level <= P4EST_QMAXLEVEL);
+  for (i = 0; i < domain->num_blocks; ++i) {
+    block = domain->blocks + i;
+    for (patch = block->patchbylevel[level];
+    	 patch != NULL; patch = patch->next)
+    {
+      j = (int) (patch - block->patches);
+      P4EST_ASSERT (0 <= j && j < block->num_patches);
+      P4EST_ASSERT (patch->level == level);
+      pcb (domain, patch, i, j, user);
+    }
+  }
+}
+
 int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
                 int blockno, int patchno, int boundaries[P4EST_FACES])
