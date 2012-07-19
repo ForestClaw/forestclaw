@@ -151,3 +151,35 @@ fclaw2d_domain_destroy (fclaw2d_domain_t *domain)
 
   p4est_wrap_destroy (wrap);
 }
+
+static void
+fclaw2d_domain_count_level_callback (fclaw2d_domain_t *domain,
+	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+{
+  P4EST_ASSERT (0 <= block_no && block_no < domain->num_blocks);
+  P4EST_ASSERT (0 <= patch_no &&
+  		patch_no < domain->blocks[block_no].num_patches);
+  P4EST_ASSERT (patch == domain->blocks[block_no].patches + patch_no);
+
+  (*(int *) user)++;
+}
+
+void
+fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
+{
+  int			level;
+  int			count, count_all;
+
+  P4EST_ASSERT (0 <= domain->maxlevel_all &&
+  		domain->maxlevel_all <= P4EST_QMAXLEVEL);
+  P4EST_LOGF (lp, "Maximum level: %2d\n", domain->maxlevel_all);
+  count_all = 0;
+  for (level = 0; level <= domain->maxlevel_all; ++level) {
+    count = 0;
+    fclaw2d_domain_iterate_level (domain, level,
+    		fclaw2d_domain_count_level_callback, &count);
+    P4EST_LOGF (lp, "Patches on level %2d: %9d\n", level, count);
+    count_all += count;
+  }
+  P4EST_ASSERT (count_all == domain->num_patches_all);
+}

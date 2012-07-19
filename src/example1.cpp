@@ -45,11 +45,11 @@ main (int argc, char **argv)
 
   domain = fclaw2d_domain_new_unitsquare (mpicomm);
 
+  fclaw2d_domain_count_levels (domain, lp);
+
   amrsetup(domain);
   amrrun(domain);
   amrreset (domain);
-
-  /* put more interesting code here */
 
   fclaw2d_domain_destroy (domain);
 
