@@ -36,20 +36,21 @@ extern const double fclaw2d_root_len;
 extern const double fclaw2d_smallest_h;
 
 typedef struct fclaw2d_domain fclaw2d_domain_t;
+typedef struct fclaw2d_block fclaw2d_block_t;
+typedef struct fclaw2d_patch fclaw2d_patch_t;
 
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
 				  fclaw2d_domain_t *domain, void *user);
 
-typedef struct fclaw2d_patch
+struct fclaw2d_patch
 {
   int			level;		/* 0 is root, increases if refined */
   double		xlower, xupper;
   double		ylower, yupper;
   void			*user;
-}
-fclaw2d_patch_t;
+};
 
-typedef struct fclaw2d_block
+struct fclaw2d_block
 {
   double		xlower, xupper;
   double		ylower, yupper;
@@ -59,8 +60,7 @@ typedef struct fclaw2d_block
   int			num_patches;
   fclaw2d_patch_t	*patches;
   void			*user;
-}
-fclaw2d_block_t;
+};
 
 struct fclaw2d_domain
 {
