@@ -66,7 +66,7 @@ void amrsetup(fclaw2d_domain_t *domain)
     gparms->get_inputParams();
     gparms->print_inputParams();
 
-    set_domain_data(domain,parms);
+    set_domain_data(domain,gparms);
 
     for(int i = 0; i < domain->num_blocks; i++)
     {
