@@ -248,6 +248,22 @@ extern "C" {
                          Real em[]);
 
 
+    void write_qfile_(const int& maxmx,
+                      const int& maxmy,
+                      const int& meqn,
+                      const int& mbc,
+                      const int& mx,
+                      const int& my,
+                      const Real& xlower,
+                      const Real& ylower,
+                      const Real& dx,
+                      const Real& dy,
+                      Real q[],
+                      const int& iframe,
+                      const int& patch_num,
+                      const int& level);
+
+
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
                const int& meqn,const int& mbc,
@@ -430,6 +446,10 @@ public :
                      const int& a_refratio,
                      const int& a_level);
 
+    void write_patch_data(const int& a_iframe,
+                          const int& a_patch_num,
+                          const int& a_level);
+
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
                              FArrayBox& a_auxPatch,
                              FArrayBox a_fluxp[],
@@ -461,26 +481,17 @@ public :
 
 protected :
 
-    // Parameters needed by Clawpack code.  These are described above.
-    // some options described above may not be available here...
-    // These are the initial m_mx, m_my.  Not the values for an individual patch
-
-
     int  m_mx;
     int  m_my;
 #if CH_SPACEDIM == 3
     int m_mz;
 #endif
 
-    int  m_dx;
-    int  m_dy;
+    Real  m_dx;
+    Real  m_dy;
 #if CH_SPACEDIM == 3
-    int m_dz;
+    Real m_dz;
 #endif
-
-    int m_meqn;
-    int m_maux;
-    int m_mbc;
 
     Real m_xlower;
     Real m_ylower;
@@ -494,20 +505,17 @@ protected :
     Real m_zupper;
 #endif
 
-    bool m_isDefined;
+    // These are global variables, but are needed to dimensions the patch
+    // and auxilliary data correctly, and so are useful to have locally.
+    int m_meqn;
+    int m_maux;
+    int m_mbc;
 
+    // Here is where the data is stored.
     FArrayBox m_griddata;
     FArrayBox m_auxarray;
 
-private :
-#if CH_SPACEDIM ==2
-    void get_clawvars(const Box& a_box, const Real& dx, const Real& dy,
-                      Real& xlower, Real& ylower, int& mx, int& my);
-#elif CH_SPACEDIM == 3
-    void get_clawvars(const Box& a_box, const Real& dx, const Real& dy, const Real& dz,
-                      Real& xlower, Real& ylower, Real& zlower,
-                      int& mx, int& my, int& mz);
-#endif
+    bool m_isDefined;
 
 }; // End class ClawPatch
 

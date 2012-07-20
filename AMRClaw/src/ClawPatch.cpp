@@ -217,10 +217,6 @@ void ClawPatch::setAuxArray(const int& a_maxlevel,
     //       subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
     //      &                  maux,aux)
     // c     ============================================
-
-    // first two arguments are maxmx/maxmy
-    // is it ok to send mx/my for that?  (ndk)
-    // yes - maxmx, maxmy only used for static dimensioning of arrays in Clawpack (DAC).
 #if CH_SPACEDIM == 2
     setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
 #elif CH_SPACEDIM == 3
@@ -443,6 +439,12 @@ Real ClawPatch::ClawPatchIntegrator(FArrayBox& a_phiPatch,
   return cflgrid;
 }
 
+void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)
+{
+    Real *q = m_griddata.dataPtr();
+    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
+}
+
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                                const Box& a_patchBox,
@@ -484,34 +486,3 @@ void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
 #endif
 
 }
-
-/*
-#if CH_SPACEDIM == 2
-void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy,
-                             Real& xlower, Real& ylower, int& mx, int& my)
-{
-    mx = a_box.bigEnd(0) - a_box.smallEnd(0) + 1;
-    my = a_box.bigEnd(1) - a_box.smallEnd(1) + 1;
-
-    // Lower edge of computational domain.
-    xlower = m_xlower + dx*a_box.smallEnd(0);
-    ylower = m_ylower + dy*a_box.smallEnd(1);
-}
-#elif CH_SPACEDIM == 3
-
-void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy, const Real& dz,
-                             Real& xlower, Real& ylower, Real& zlower,
-                             int& mx, int& my, int& mz)
-{
-    mx = a_box.bigEnd(0) - a_box.smallEnd(0) + 1;
-    my = a_box.bigEnd(1) - a_box.smallEnd(1) + 1;
-    mz = a_box.bigEnd(2) - a_box.smallEnd(2) + 1;
-
-    // Lower edge of computational domain.
-    xlower = m_xlower + dx*a_box.smallEnd(0);
-    ylower = m_ylower + dy*a_box.smallEnd(1);
-    zlower = m_zlower + dz*a_box.smallEnd(2);
-}
-
-#endif
-*/

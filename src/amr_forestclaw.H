@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct fclaw2d_domain_data
 {
     global_parms *parms;
+    double curr_time;
 }
 fclaw2d_domain_data_t;
 
@@ -42,14 +43,27 @@ typedef struct fclaw2d_patch_data
 }
 fclaw2d_patch_data_t;
 
+extern "C"
+{
+    void write_tfile_(int *iframe,
+                      double *time,
+                      int *meqn,
+                      int *ngrids,
+                      int *maux);
+}
 
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+double get_domain_time(fclaw2d_domain_t *domain);
+void set_domain_time(fclaw2d_domain_t *domain,double t);
+
+
 
 
 void amrsetup(fclaw2d_domain_t *domain);
 void amrinit(fclaw2d_domain_t *domain);
 void amrrun(fclaw2d_domain_t *domain);
+void amrout(fclaw2d_domain_t *domain, int iframe);
 void amrreset(fclaw2d_domain_t *domain);
 
 #endif

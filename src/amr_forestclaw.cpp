@@ -42,6 +42,21 @@ global_parms* get_domain_data(fclaw2d_domain_t *domain)
     return ddata->parms;
 }
 
+void set_domain_time(fclaw2d_domain_t *domain, double time)
+{
+    fclaw2d_domain_data_t *ddata;
+    ddata = (fclaw2d_domain_data_t *) domain->user;
+    ddata->curr_time = time;
+}
+
+double get_domain_time(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t *ddata;
+    ddata = (fclaw2d_domain_data_t *) domain->user;
+    return ddata->curr_time;
+}
+
+
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 {
     fclaw2d_patch_data_t *pdata = P4EST_ALLOC (fclaw2d_patch_data_t, 1);
@@ -90,6 +105,9 @@ void amrsetup(fclaw2d_domain_t *domain)
 
 void amrinit(fclaw2d_domain_t *domain)
 {
+    double t = 0;
+    set_domain_time(domain,t);
+
     global_parms *gparms = get_domain_data(domain);
     for(int i = 0; i < domain->num_blocks; i++)
     {
@@ -109,10 +127,47 @@ void amrinit(fclaw2d_domain_t *domain)
 
 void amrrun(fclaw2d_domain_t *domain)
 {
-    global_parms *parms = get_domain_data(domain);
-    double tfinal = parms->m_tfinal;
-    cout << "Final time : " << tfinal << endl;
+    // Write out an initial time file
+    int iframe = 0;
+    amrout(domain,iframe);
 
+    // Do fake timestepping
+    for(int iframe = 0; iframe < 5; iframe++)
+    {
+        for(int i = 0; i < domain->num_blocks; i++)
+        {
+            fclaw2d_block_t *block = &domain->blocks[i];
+            for(int j = 0; j < block->num_patches; j++)
+            {
+                fclaw2d_patch_t *patch = &block->patches[j];
+                ClawPatch *cp = get_patch_data(patch);
+
+                // Fake update
+                cout << "Updating solution on patch number " << j << endl;
+            }
+        }
+        amrout(domain,iframe);
+    }
+}
+
+
+void amrout(fclaw2d_domain_t *domain, int iframe)
+{
+    global_parms *gparms = get_domain_data(domain);
+    double time = get_domain_time(domain);
+
+    // Get total number of patches
+    int ngrids = 0;
+    for(int i = 0; i < domain->num_blocks; i++)
+    {
+        fclaw2d_block_t *block = &domain->blocks[i];
+        ngrids += block->num_patches;
+    }
+
+    // Write out header file containing global information for 'iframe'
+    write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);
+
+    // Now write out results from patches
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
@@ -120,15 +175,9 @@ void amrrun(fclaw2d_domain_t *domain)
         {
             fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = get_patch_data(patch);
-
-            cout << endl;
-            cout << "Clawpatch info for patch number " << j << endl;
-            cout << "cp->get_mx() " << cp->get_mx() << endl;
-            cout << "cp->get_my() " << cp->get_my() << endl;
-            cout << "cp->get_xlower() " << cp->get_xlower() << endl;
-            cout << "cp->get_ylower() " << cp->get_ylower() << endl;
-            cout << "cp->get_xupper() " << cp->get_xupper() << endl;
-            cout << "cp->get_yupper() " << cp->get_yupper() << endl;
+            int num = i*domain->num_blocks + j + 1;
+            int level = patch->level + 1;
+            cp->write_patch_data(iframe, num, level);
         }
     }
 }

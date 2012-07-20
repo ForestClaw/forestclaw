@@ -33,7 +33,8 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qad2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/step2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/src2.o
+	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
+	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o
 
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
