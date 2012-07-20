@@ -388,31 +388,18 @@ c     # and not because of some grand software design issue...
 
 c     # This is called from ClawPatch.cpp, in ClawPatch::setAuxArray().
 c     # this same subroutine is also in src2d
-      subroutine set_common_levels(a_maxlevel,a_level,a_refratios)
+      subroutine set_common_levels(a_maxlevel,a_level,a_refratio)
       implicit none
 
 c     # Inputs
-      integer a_level, a_maxlevel, i
-      integer a_refratios(a_maxlevel)
+      integer a_level, a_maxlevel, a_refratio
 
 c     # set common block  that can be seen by setaux.f, for example.
-      integer max_maxlevel
-      parameter(max_maxlevel = 100)
-      integer level, refratios(max_maxlevel), maxlevel
-      common /comlevel/ maxlevel, level, refratios
+      integer com_level, com_maxlevel, com_refratio
+      common /comlevel/ com_maxlevel, com_level, com_refratio
 
-      if (a_maxlevel .gt. max_maxlevel) then
-         write(6,'(A,A)') 'set_common_levels : ',
-     &         'maxlevel >= max_maxlevel '
-         stop
-      endif
-
-      maxlevel = a_maxlevel  !! maximum grid level; maxlevel = 0 --> no refinement
-
-      level = a_level  !! Current level
-
-      do i = 1,maxlevel
-         refratios(i) = a_refratios(i)
-      enddo
+      com_maxlevel = a_maxlevel  !! maximum grid level; maxlevel = 0 --> no refinement
+      com_level = a_level  !! Current level
+      com_refratio = a_refratio
 
       end

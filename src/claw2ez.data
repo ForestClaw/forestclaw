@@ -12,7 +12,7 @@
 1         % verbose
 0         % src_term
 0         % mcapa
-1         % maux
+2         % maux
 
 1         % meqn
 1         % mwaves

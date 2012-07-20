@@ -485,6 +485,7 @@ void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
 
 }
 
+/*
 #if CH_SPACEDIM == 2
 void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy,
                              Real& xlower, Real& ylower, int& mx, int& my)
@@ -497,6 +498,7 @@ void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy,
     ylower = m_ylower + dy*a_box.smallEnd(1);
 }
 #elif CH_SPACEDIM == 3
+
 void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy, const Real& dz,
                              Real& xlower, Real& ylower, Real& zlower,
                              int& mx, int& my, int& mz)
@@ -510,4 +512,6 @@ void ClawPatch::get_clawvars(const Box& a_box, const Real& dx, const Real& dy, c
     ylower = m_ylower + dy*a_box.smallEnd(1);
     zlower = m_zlower + dz*a_box.smallEnd(2);
 }
+
 #endif
+*/

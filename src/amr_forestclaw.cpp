@@ -102,7 +102,6 @@ void amrinit(fclaw2d_domain_t *domain)
             cout << "Initializing patch " << j << " on block " << i << endl;
             cp->initialize();
             cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
-
         }
     }
 }
