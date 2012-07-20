@@ -1,13 +1,15 @@
       subroutine inputparms(mx_leaf,my_leaf,initial_dt, tfinal,
-     &      max_cfl, nout, src_term, verbose, mcapa, maux,meqn,mwaves,
-     &      maxmwaves,mthlim,mbc,mthbc,order)
+     &      max_cfl, desired_cfl,nout, src_term, verbose, mcapa,
+     &      maux,meqn,mwaves,
+     &      maxmwaves,mthlim,mbc,mthbc,order,maxlevel)
       implicit none
 
       integer mx_leaf, my_leaf
-      double precision initial_dt, tfinal, max_cfl
+      double precision initial_dt, tfinal, max_cfl, desired_cfl
       integer nout, src_term, mcapa, maux, meqn, mwaves
       integer maxmwaves,mbc, verbose
       integer mthbc(4),mthlim(maxmwaves), order(2)
+      integer maxlevel
 
       integer mw, m
 
@@ -18,13 +20,16 @@
       read(55,*) my_leaf
 
 c     timestepping variables
-      read(55,*) initial_dt
-      read(55,*) tfinal
-      read(55,*) max_cfl
       read(55,*) nout
+      read(55,*) tfinal
 
-      read(55,*) src_term
+      read(55,*) initial_dt
+      read(55,*) max_cfl
+      read(55,*) desired_cfl
+
+      read(55,*) (order(m),m=1,2)
       read(55,*) verbose
+      read(55,*) src_term
       read(55,*) mcapa
       read(55,*) maux
 
@@ -46,7 +51,7 @@ c     timestepping variables
       read(55,*) mthbc(3)
       read(55,*) mthbc(4)
 
-      read(55,*) (order(m),m=1,2)
+      read(55,*) maxlevel
 
       close(55)
       end

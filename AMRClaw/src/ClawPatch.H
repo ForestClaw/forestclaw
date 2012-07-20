@@ -2,15 +2,7 @@
 #define __CLAWPATCH__
 
 #include <iostream>
-#include <cmath>
-#include <cstdlib>
 #include <vector>
-#include <typeinfo>
-#include <string>
-#include <map>
-#include <list>
-#include <algorithm>
-#include <iostream>
 
 
 using std::ifstream;
@@ -143,7 +135,7 @@ extern "C" {
 
     void set_common_levels_(const int& maxlevel,
                             const int& a_level,
-                            const int* refratios);
+                            const int& refratio);
 
 #if CH_SPACEDIM==2
     void qinit_(const int& maxmx,
@@ -199,8 +191,8 @@ extern "C" {
                      const int& meqn,
                      const int& maux,
                      const int& mbc,
-                     int method[],
-                     int mthlim[],
+                     const int method[],
+                     const int mthlim[],
                      const int& mcapa,
                      const int& mwaves,
                      const int& mx,
@@ -392,78 +384,50 @@ public :
 
     // Do I need this?
     // void define(ProblemDomain& a_domain, const Real& a_dx);
-    void define(const ClawPatch& a_clawPatch);
+
+#if CH_SPACEDIM == 2
+    void define(const Real&  a_xlower,
+                const Real&  a_ylower,
+                const Real&  a_xupper,
+                const Real&  a_yupper,
+                const global_parms *a_gparms);
+#else
+    void define(const Real& xlower,
+                const Real& ylower,
+                const Real& zlower,
+                const Real& xupper,
+                const Real& yupper,
+                const Real& zupper,
+                const global_parms *a_gparms);
+#endif
+
     bool isDefined();
 
-    void set_mx(int mx);
-    void set_my(int my);
-#if CH_SPACEDIM == 3
-    void set_mz(int mz);
-#endif
-    void set_order(std::vector<int> order);
-    void set_src(int src);
-    void set_mcapa(int mcapa);
-    void set_maux(int maux);
-    void set_mbc(int mbc);
-    void set_meqn(int meqn);
-    void set_mwaves(int mwaves);
-    void set_mthlim(std::vector<int> mthlim);
-    void set_mthbc(std::vector<int> mthbc);
-    void set_stateNames(std::vector<std::string> a_stateNames);
-    void set_auxtype(std::vector<std::string> a_auxtype);
-    void set_xlower(Real xlower);
-    void set_ylower(Real ylower);
-#if CH_SPACEDIM == 3
-    void set_zlower(Real zlower);
-#endif
-    void set_xupper(Real xupper);
-    void set_yupper(Real yupper);
-#if CH_SPACEDIM == 3
-    void set_zupper(Real zupper);
-#endif
-
-    void set_initial_dt(Real a_initial_dt);
     int get_mx() const;
     int get_my() const;
 #if CH_SPACEDIM == 3
     int get_mz() const;
 #endif
 
-    Real get_initial_dt() const;
-    int get_meqn() const;
-    int get_mbc() const;
-    int get_maux() const;
-    int get_mcapa() const;
-    int get_mwaves() const;
-    int* get_mthbc() const;
     Real get_xlower() const;
     Real get_ylower() const;
 #if CH_SPACEDIM == 3
     Real get_zlower() const;
 #endif
+
     Real get_xupper() const;
     Real get_yupper() const;
 #if CH_SPACEDIM == 3
     Real get_zupper() const;
 #endif
 
-    void set_refratios(std::vector<int> a_refratios);
-    void set_maxlevel(const int& a_maxlevel);
-    int* get_refratios() const;
-    int get_maxlevel() const;
-
-    Real get_max_cfl() const;
-    void set_max_cfl(const Real& max_cfl);
-
-    std::vector<std::string> get_stateNames() const;
-    std::vector<std::string> get_auxtype() const;
-
     //    void initialize(LevelData<FArrayBox>& a_phi, LevelData<FArrayBox>& a_aux, Real dx);
-    void initialize(FArrayBox& a_phi,FArrayBox& a_aux, const Box& a_box, Real dx);
+    // void initialize(FArrayBox& a_phi,FArrayBox& a_aux, const Box& a_box, const global_parms
+    // &gparms);
+    void initialize();
 
-    void setAuxArray(FArrayBox& a_aux,
-                     const Box& a_box,
-                     Real a_dx,
+    void setAuxArray(const int& a_maxlevel,
+                     const int& a_refratio,
                      const int& a_level);
 
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
@@ -480,7 +444,8 @@ public :
                              const Real& a_time,
                              const Real& a_dt,
                              const Real& a_dx,
-                             const int& refRatio,const int& a_level);
+                             const int& refRatio,const int& a_level,
+                             const global_parms &gparms);
 
     void estimateError(const FArrayBox& a_phiPatch,
                        const Box& a_patchBox,
@@ -491,43 +456,31 @@ public :
                        const int& a_level,
                        const int isBoundary[],
                        const Real& a_refineThresh,
-                       FArrayBox& a_error_measure);
-
+                       FArrayBox& a_error_measure,
+                       const global_parms &gparms);
 
 protected :
 
     // Parameters needed by Clawpack code.  These are described above.
     // some options described above may not be available here...
     // These are the initial m_mx, m_my.  Not the values for an individual patch
+
+
     int  m_mx;
     int  m_my;
 #if CH_SPACEDIM == 3
     int m_mz;
 #endif
-    Real m_initial_dt;
 
-    int  m_mbc;        // Number of ghost cells
+    int  m_dx;
+    int  m_dy;
+#if CH_SPACEDIM == 3
+    int m_dz;
+#endif
 
-    int  m_meqn;       // Number of equations (nComp())
-    int  m_mwaves;     // Number of waves (<= meqn)
-    bool m_mwavesIsSet;
-
-    int *m_mthlim;  // Limiters used for each wave.
-    int *m_method;  // Numerical method to use;
-                                 // Only method(2:3) (.e.g. method[1:2] in C indexing)
-                                 // are use in current implementation.
-
-    int  m_maux;
-    int  m_mcapa;
-    int *m_mthbc; // boundary conditions
-
-    int *m_refratios;
-    int m_maxlevel;
-    bool m_maxlevelIsSet;
-
-    std::vector<std::string> m_stateNames;
-    std::vector<std::string> m_auxtype;
-    int* m_auxtype_int;  // for communication with fortran
+    int m_meqn;
+    int m_maux;
+    int m_mbc;
 
     Real m_xlower;
     Real m_ylower;
@@ -541,9 +494,10 @@ protected :
     Real m_zupper;
 #endif
 
-    Real m_max_cfl;
-
     bool m_isDefined;
+
+    FArrayBox m_griddata;
+    FArrayBox m_auxarray;
 
 private :
 #if CH_SPACEDIM ==2
@@ -554,14 +508,6 @@ private :
                       Real& xlower, Real& ylower, Real& zlower,
                       int& mx, int& my, int& mz);
 #endif
-
-    void set_method(std::vector<int> a_method);
-
-    // These should only be called when we have the dimension
-    void set_method(int* a_method);
-    void set_mthbc(int* mthbc);
-    void set_mthlim(int* mthlim);
-    void set_refratios(int* refratios);
 
 }; // End class ClawPatch
 
