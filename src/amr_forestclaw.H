@@ -48,6 +48,7 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
 
 void amrsetup(fclaw2d_domain_t *domain);
+void amrinit(fclaw2d_domain_t *domain);
 void amrrun(fclaw2d_domain_t *domain);
 void amrreset(fclaw2d_domain_t *domain);
 
