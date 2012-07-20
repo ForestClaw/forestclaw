@@ -37,8 +37,7 @@ using std::vector;
 #define CH_assert(a)
 
 #define CH_SPACEDIM 2
-
-#define SpaceDim 2
+const int SpaceDim = CH_SPACEDIM;
 
 // Needs to be fixed!
 #define Max(a,b)  a
@@ -49,7 +48,6 @@ using std::vector;
 
 typedef double Real;
 
-
 extern "C"
 {
     void inputparms_(int& mx_leaf,
@@ -57,6 +55,7 @@ extern "C"
                      Real& initial_dt,
                      Real& tfinal,
                      Real& max_cfl,
+                     Real& desired_cfl,
                      int& nout,
                      int& src_term,
                      int& verbose,
@@ -68,7 +67,8 @@ extern "C"
                      int  mthlim[],
                      int& mbc,
                      int  mthbc[],
-                     int  order[]);
+                     int  order[],
+                     int& maxlevel);
 }
 
 class global_parms
@@ -77,30 +77,42 @@ public:
     int m_mx_leaf;
     int m_my_leaf;
 
-    double m_initial_dt;
-    double m_tfinal;
-    double m_max_cfl;
+    // Time stepping parameters
+    Real m_initial_dt;
+    Real m_tfinal;
+    Real m_max_cfl;
+    Real m_desired_cfl;
     int m_nout;
-    int m_src_term;
+
+    // 'method' parameters
+#if CH_SPACEDIM == 2
+    int m_order[2];
+#else
+    int m_order[3];
+#endif
     int m_verbose;
+    int m_src_term;
     int m_mcapa;
     int m_maux;
+
+    int m_method[7];
+
+    // Number of equations, waves and limiters
     int m_meqn;
     int m_mwaves;
     int m_maxmwaves;
     int *m_mthlim;
+
+
     int m_mbc;
     int *m_mthbc;
-    int *m_order;
-    int *m_method;
+
+    // AMR parameters
+    int m_refratio;
+    int m_maxlevel;
 
     global_parms();
     ~global_parms();
-    // void set_order(int *a_order);
-    // void set_src(int a_src);
-    // void set_mcapa(int a_mcapa);
-    // void set_maux(int a_maux);
-
     void get_inputParams(); // Read from input file
     void print_inputParams();  // Print out for beginning info
 
@@ -109,15 +121,11 @@ public:
 class Box
 {
 public:
-    int smallEnd(int idir) const
-        {
-            return m_ll[idir];
-        }
-
-    int bigEnd(int idir) const
-        {
-            return m_ur[idir];
-        }
+    Box();
+    Box(const int ll[], const int ur[]);
+    Box(const Box& a_box);
+    int smallEnd(int idir) const;
+    int bigEnd(int idir) const;
 
 private:
     int m_ll[2];
@@ -127,16 +135,12 @@ private:
 class FArrayBox
 {
 public:
-    Real* dataPtr() const
-        {
-            return m_data;
-        }
 
-    Box box()
-        {
-            return m_box;
-        }
-
+    FArrayBox();
+    ~FArrayBox();
+    void define(int a_size, const Box& a_box);
+    Real* dataPtr() const;
+    Box box();
 private:
     Real *m_data;
     Box m_box;
@@ -149,7 +153,6 @@ public:
         {
             return false;
         }
-
 };
 
 #endif

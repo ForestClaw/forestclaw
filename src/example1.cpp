@@ -48,6 +48,7 @@ main (int argc, char **argv)
   fclaw2d_domain_count_levels (domain, lp);
 
   amrsetup(domain);
+  amrinit(domain);
   amrrun(domain);
   amrreset (domain);
 

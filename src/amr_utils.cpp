@@ -29,63 +29,26 @@ global_parms::global_parms()
 {
     m_maxmwaves = 20;
     m_mthlim = new int[m_maxmwaves];
-    m_mthbc = new int[4];
-    m_order = new int[2];
-    m_method = new int[7];
+    m_mthbc = new int[2*SpaceDim];
+    m_refratio = 2;  // hardwired for now.
 }
 
 global_parms::~global_parms()
 {
-    delete [] m_mthlim;
     delete [] m_mthbc;
-    delete [] m_order;
-    delete [] m_method;
+    delete [] m_mthlim;
 }
-
-
-/*
-void global_parms::set_order(int *a_order)
-{
-    m_method[0] = 0; // not used in forestclaw
-    m_method[1] = a_order[0];
-    if (SpaceDim == 2)
-    {
-        m_method[2] = a_order[1];
-    }
-    else
-    {
-        m_method[2] = 10*a_order[1] + a_order[2];
-    }
-}
-
-void global_parms::set_src(int a_src)
-{
-  m_method[4] = a_src;
-}
-
-void global_parms::set_mcapa(int a_mcapa)
-{
-    m_mcapa = a_mcapa;
-    m_method[5] = a_mcapa;
-}
-
-void global_parms::set_maux(int a_maux)
-{
-    m_maux = a_maux;
-    m_method[6] = a_maux;
-}
-*/
 
 
 void global_parms::get_inputParams()
 {
-
     // read data using Fortran file
     inputparms_(m_mx_leaf,
                 m_my_leaf,
                 m_initial_dt,
                 m_tfinal,
                 m_max_cfl,
+                m_desired_cfl,
                 m_nout,
                 m_src_term,
                 m_verbose,
@@ -97,10 +60,12 @@ void global_parms::get_inputParams()
                 m_mthlim,
                 m_mbc,
                 m_mthbc,
-                m_order);
+                m_order,
+                m_maxlevel);
 
-    // set_order(m_order);
+    // Set up arrays needed by clawpack.
     m_method[0] = 0; // not used in forestclaw
+
     m_method[1] = m_order[0];
     if (SpaceDim == 2)
     {
@@ -114,11 +79,6 @@ void global_parms::get_inputParams()
     m_method[4] = m_src_term;
     m_method[5] = m_mcapa;
     m_method[6] = m_maux;
-
-    // set_src(m_src_term);
-    // set_mcapa(m_mcapa);
-    // set_maux(m_maux);
-
 }
 
 
@@ -128,12 +88,15 @@ void global_parms::print_inputParams()
   cout << "CLAWPACK PARAMETERS : " << endl;
   cout << "Initial dt " << m_initial_dt << endl;
   cout << "maximum cfl " << m_max_cfl << endl;
-  // cout << "method(1) (fixed time step)       = " << fixedDt << endl;
+  cout << "desired cfl " << m_desired_cfl << endl;
   cout << "method(2:3) (order of integration) = " << m_method[1] << " " << m_method[2] << endl;
   cout << "method(4) (verbosity) = " << m_method[3] << endl;
   cout << "method(5) (source term splitting) = " << m_method[4] << endl;
   cout << "method(6) (mcapa) = " << m_method[5] << endl;
   cout << "method(7) (maux) = " << m_method[6] << endl;
+  cout << endl;
+
+  cout << "refratio (fixed) = " << m_refratio << endl;
   cout << endl;
 
   cout << "meqn (number of equations) = " << m_meqn << endl;
@@ -149,14 +112,6 @@ void global_parms::print_inputParams()
   cout << endl << endl;
 
   cout << "mbc (number of ghost cells) = " << m_mbc << endl;
-
-  // cout << "Domain values " << endl;
-  // cout << "xlower, xupper = " << m_xlower << " " << m_xupper << endl;
-  // cout << "ylower, yupper = " << m_ylower << " " << m_yupper << endl;
-
-#if CH_SPACEDIM == 3
-  // cout << "zlower, zupper = " << m_zlower << " " << m_zupper << endl;
-#endif
 
   /*
   cout << "Auxiliary array type : " << endl;
@@ -175,5 +130,65 @@ void global_parms::print_inputParams()
     }
   cout << endl << endl;
 
+  cout << "Max level = " << m_maxlevel << endl;
 
+}
+
+
+FArrayBox::FArrayBox()
+{
+    m_data = NULL;
+}
+
+FArrayBox::~FArrayBox()
+{
+    if (m_data != NULL) {delete [] m_data; m_data = NULL;}
+}
+
+void FArrayBox::define(int a_size,const Box& a_box)
+{
+    m_data = new double[a_size];
+    m_box = a_box;
+}
+
+Real* FArrayBox::dataPtr() const
+{
+    return m_data;
+}
+
+Box FArrayBox::box()
+{
+    return m_box;
+}
+
+Box::Box()
+{
+}
+
+Box::Box(const Box& a_box)
+{
+    for(int idir = 0; idir < 2; idir++)
+    {
+        m_ll[idir] = a_box.m_ll[idir];
+        m_ur[idir] = a_box.m_ur[idir];
+    }
+}
+
+Box::Box(const int ll[], const int ur[])
+{
+    for(int idir = 0; idir < 2; idir++)
+    {
+        m_ll[idir] = ll[idir];
+        m_ur[idir] = ur[idir];
+    }
+}
+
+int Box::smallEnd(int idir) const
+{
+    return m_ll[idir];
+}
+
+int Box::bigEnd(int idir) const
+{
+    return m_ur[idir];
 }

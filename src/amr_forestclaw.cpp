@@ -59,51 +59,67 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 }
 
 
-void amrsetup(fclaw2d_domain_t *domain_in)
+void amrsetup(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_t *domain = domain_in;
-    global_parms *parms = new global_parms();
-
-    parms->get_inputParams();
-    parms->print_inputParams();
+    global_parms *gparms = new global_parms();
+    cout << "Global parameters " << endl;
+    gparms->get_inputParams();
+    gparms->print_inputParams();
 
     set_domain_data(domain,parms);
 
     for(int i = 0; i < domain->num_blocks; i++)
     {
-        fclaw2d_block_t *block = domain->blocks + i;
+        fclaw2d_block_t *block = &domain->blocks[i];
         for(int j = 0; j < block->num_patches; j++)
         {
-            fclaw2d_patch_t *patch = block->patches + j;
+            fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = new ClawPatch();
 
             // Set stuff from p4est
-            cp->set_mx(parms->m_mx_leaf);
-            cp->set_my(parms->m_my_leaf);
-            cp->set_xlower(patch->xlower);
-            cp->set_ylower(patch->ylower);
-            cp->set_xupper(patch->xupper);
-            cp->set_yupper(patch->yupper);
 
+            cp->define(patch->xlower,
+                       patch->ylower,
+                       patch->xupper,
+                       patch->yupper,
+                       gparms);
             set_patch_data(patch,cp);
         }
     }
 }
 
-void amrrun(fclaw2d_domain_t *domain_in)
+void amrinit(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_t *domain = domain_in;
+    global_parms *gparms = get_domain_data(domain);
+    for(int i = 0; i < domain->num_blocks; i++)
+    {
+        fclaw2d_block_t *block = &domain->blocks[i];
+        for(int j = 0; j < block->num_patches; j++)
+        {
+            fclaw2d_patch_t *patch = &block->patches[j];
+            ClawPatch *cp = get_patch_data(patch);
 
+            cout << "Initializing patch " << j << " on block " << i << endl;
+            cp->initialize();
+            cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
+
+        }
+    }
+}
+
+
+void amrrun(fclaw2d_domain_t *domain)
+{
     global_parms *parms = get_domain_data(domain);
     double tfinal = parms->m_tfinal;
     cout << "Final time : " << tfinal << endl;
 
     for(int i = 0; i < domain->num_blocks; i++)
     {
-        fclaw2d_block_t *block = domain->blocks + i;
+        fclaw2d_block_t *block = &domain->blocks[i];
         for(int j = 0; j < block->num_patches; j++)
         {
-            fclaw2d_patch_t *patch = block->patches + j;
+            fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = get_patch_data(patch);
 
             cout << endl;
