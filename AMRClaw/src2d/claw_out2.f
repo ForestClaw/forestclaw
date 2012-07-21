@@ -29,6 +29,29 @@
 
       close(matunit2)
 
+      open(unit=matunit1,file=matname1,status='replace')
+      close(matunit1)
+
+      end
+
+      subroutine new_qfile(iframe)
+      implicit none
+
+      integer iframe
+      character*10 matname1
+      integer matunit1, nstp,ipos,idigit
+
+      matname1 = 'fort.qxxxx'
+      matunit1 = 10
+      nstp     = iframe
+      do ipos = 10, 7, -1
+         idigit = mod(nstp,10)
+         matname1(ipos:ipos) = char(ichar('0') + idigit)
+         nstp = nstp / 10
+      enddo
+
+      open(unit=matunit1,file=matname1,status='replace')
+      close(matunit1)
       end
 
 
@@ -56,9 +79,6 @@
          matname1(ipos:ipos) = char(ichar('0') + idigit)
          nstp = nstp / 10
       enddo
-
-      open(unit=matunit1,file=matname1,status='replace')
-      close(matunit1)
 
       open(matunit1,file=matname1,access='append');
 
