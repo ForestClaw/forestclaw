@@ -43,7 +43,7 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
 
 .f.o:
-	$(FC) -Wall -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
+	$(FC) -Wall -Wno-unused-dummy-argument -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
 $(TARGET): $(TARGET).o $(FORESTCLAW)/src/libforestclaw.a $(exampleobjs) $(amrclawobjs)
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \

@@ -64,7 +64,7 @@ PlotGridEdges =  [1 1 1 1 1 1];  % Plot edges of patches of each grid at
 %---------------------------------
 
 % Set to either a scalar, for automatic contours or a vector of contour levels.
-ContourValues = 0.1:0.1:0.9;
+ContourValues = [];
 
 %---------------------------------
 
