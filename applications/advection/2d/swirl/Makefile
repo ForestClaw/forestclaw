@@ -2,6 +2,11 @@
 
 TARGET = swirl
 
+FC = gfortran
+FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
+
+
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 .PHONY: clean $(TARGET)
@@ -33,17 +38,12 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/step2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o
 
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
-
-# .c.o:
-# 	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) -c $< -o $@
-
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
 
 .f.o:
-	$(FC) -Wall -Wno-unused-dummy-argument -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
+	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
 $(TARGET): $(TARGET).o $(FORESTCLAW)/src/libforestclaw.a $(exampleobjs) $(amrclawobjs)
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
