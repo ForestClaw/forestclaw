@@ -172,7 +172,9 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     // Write out header file containing global information for 'iframe'
     write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);
 
-    // Now write out results from patches
+    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
+    // 0010, 0114).
+    int fid = 10;
     new_qfile_(&iframe);
     for(int i = 0; i < domain->num_blocks; i++)
     {
@@ -184,8 +186,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
             int num = i*domain->num_blocks + j + 1;
             int level = patch->level + 1;
 
-            // This opens file 'fort.qXXXX' (where 'XXXX' is the frame number) for append, and
-            // adds data from this patch.
+            // Patch data is appended to fort.qXXXX
             cp->write_patch_data(iframe, num, level);
         }
     }
