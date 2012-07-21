@@ -50,6 +50,8 @@ extern "C"
                       int *meqn,
                       int *ngrids,
                       int *maux);
+
+    void new_qfile_(int* iframe);
 }
 
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
