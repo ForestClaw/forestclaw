@@ -447,14 +447,14 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
 
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
-                               const Box& a_patchBox,
-                               const ProblemDomain& a_domain,
-                               const Real& a_time,
-                               const Real& a_dt,
-                               const Real& a_dx,
-                               const int& a_level,
-                               const int isBoundary[],
-                               const Real& a_refineThresh,
+                              const Box& a_patchBox,
+                              const ProblemDomain& a_domain,
+                              const Real& a_time,
+                              const Real& a_dt,
+                              const Real& a_dx,
+                              const int& a_level,
+                              const int isBoundary[],
+                              const Real& a_refineThresh,
                               FArrayBox& a_error_measure,
                               const global_parms &gparms)
 {

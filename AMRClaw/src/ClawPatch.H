@@ -263,7 +263,6 @@ extern "C" {
                       const int& patch_num,
                       const int& level);
 
-
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
                const int& meqn,const int& mbc,
