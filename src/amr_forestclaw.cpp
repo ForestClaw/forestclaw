@@ -117,7 +117,6 @@ void amrinit(fclaw2d_domain_t *domain)
             fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = get_patch_data(patch);
 
-            cout << "Initializing patch " << j << " on block " << i << endl;
             cp->initialize();
             cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
         }
@@ -131,7 +130,7 @@ void amrrun(fclaw2d_domain_t *domain)
     int iframe = 0;
     amrout(domain,iframe);
 
-    // Do fake timestepping
+    // Do fake timestepping for now
     for(int iframe = 0; iframe < 5; iframe++)
     {
         for(int i = 0; i < domain->num_blocks; i++)
@@ -139,8 +138,8 @@ void amrrun(fclaw2d_domain_t *domain)
             fclaw2d_block_t *block = &domain->blocks[i];
             for(int j = 0; j < block->num_patches; j++)
             {
-                fclaw2d_patch_t *patch = &block->patches[j];
-                ClawPatch *cp = get_patch_data(patch);
+                // fclaw2d_patch_t *patch = &block->patches[j];
+                // ClawPatch *cp = get_patch_data(patch);
 
                 // Fake update
                 cout << "Updating solution on patch number " << j << endl;
@@ -168,6 +167,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);
 
     // Now write out results from patches
+    new_qfile_(&iframe);
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
@@ -177,6 +177,9 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
             ClawPatch *cp = get_patch_data(patch);
             int num = i*domain->num_blocks + j + 1;
             int level = patch->level + 1;
+
+            // This opens file 'fort.qXXXX' (where 'XXXX' is the frame number) for append, and
+            // adds data from this patch.
             cp->write_patch_data(iframe, num, level);
         }
     }
