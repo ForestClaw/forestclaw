@@ -38,30 +38,30 @@ c
 
 c
       do 50 mw=1,mwaves
-	 if (mthlim(mw) .eq. 0) go to 50
-	 dotr = 0.d0
-	 do 40 i = 0, mx+1
-	    wnorm2 = 0.d0
-	    dotl = dotr
-	    dotr = 0.d0
-	    do 20 m=1,meqn
-	       wnorm2 = wnorm2 + wave(i,m,mw)**2
-	       dotr = dotr + wave(i,m,mw)*wave(i+1,m,mw)
-   20          continue
-	    if (i.eq.0) go to 40
+         if (mthlim(mw) .eq. 0) go to 50
+         dotr = 0.d0
+         do 40 i = 0, mx+1
+            wnorm2 = 0.d0
+            dotl = dotr
+            dotr = 0.d0
+            do 20 m=1,meqn
+               wnorm2 = wnorm2 + wave(i,m,mw)**2
+               dotr = dotr + wave(i,m,mw)*wave(i+1,m,mw)
+   20       continue
+            if (i.eq.0) go to 40
             if (wnorm2.eq.0.d0) go to 40
-c
-	    if (s(i,mw) .gt. 0.d0) then
-		wlimitr = philim(wnorm2, dotl, mthlim(mw))
-	      else
-		wlimitr = philim(wnorm2, dotr, mthlim(mw))
-	      endif
-c
-	    do 30 m=1,meqn
+
+            if (s(i,mw) .gt. 0.d0) then
+               wlimitr = philim(wnorm2, dotl, mthlim(mw))
+            else
+               wlimitr = philim(wnorm2, dotr, mthlim(mw))
+            endif
+
+            do 30 m=1,meqn
                wave(i,m,mw) = wlimitr * wave(i,m,mw)
-   30          continue
-   40       continue
-   50    continue
-c
+   30       continue
+   40    continue
+   50 continue
+
       return
       end
