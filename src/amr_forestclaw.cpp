@@ -109,6 +109,12 @@ void amrinit(fclaw2d_domain_t *domain)
     set_domain_time(domain,t);
 
     global_parms *gparms = get_domain_data(domain);
+
+    // Set problem dependent parameters for Riemann solvers, etc.
+    // Values are typically stored in Fortran common blocks, and are not
+    // available outside of Fortran.
+    setprob_();
+
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];

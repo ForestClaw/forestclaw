@@ -69,6 +69,8 @@ extern "C"
                      int  mthbc[],
                      int  order[],
                      int& maxlevel);
+
+    void setprob_();
 }
 
 class global_parms
