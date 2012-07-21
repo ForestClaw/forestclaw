@@ -49,7 +49,7 @@ libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o amr_forestclaw.o amr_utils
 	-I$(FORESTCLAW)/AMRClaw/src -I. -c $< -o $@
 
 .f.o:
-	$(FC) -Wall -c $< -o $@ -I$(FORESTCLAW)/AMRClaw/src2d
+	$(FC) -Wall -Wno-unused-dummy-argument -c $< -o $@ -I$(FORESTCLAW)/AMRClaw/src2d
 
 example1: example1.o libforestclaw.a $(exampleobjs)
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
