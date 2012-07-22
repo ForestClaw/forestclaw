@@ -77,11 +77,11 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 
 // This needs to be defined by p4est
 void get_edge_neighbors(fclaw2d_domain_t *domain,
-                         int this_patch_idx,
                          int this_block_idx,
+                         int this_patch_idx,
                          int iside,
-                         int *neighbor_patches_idx,
                          int *neighbor_block_idx,
+                         int *neighbor_patches_idx,
                          int *relative_refratio)
 {
     // This needs to be defined by p4est
@@ -90,11 +90,11 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
 }
 
 void get_corner_neighbor(fclaw2d_domain_t *domain,
-                         int this_patch_idx,
                          int this_block_idx,
+                         int this_patch_idx,
                          int icorner,
-                         int *corner_patch_idx,
                          int *corner_block_idx,
+                         int *corner_patch_idx,
                          int *relative_refratio)
 {
     // This needs to be defined by p4est
@@ -176,11 +176,11 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                 for (int iside = 2*idir; iside < 2*idir + 1; iside++)
                 {
                     get_edge_neighbors(domain,
-                                       this_patch_idx,
                                        this_block_idx,
+                                       this_patch_idx,
                                        iside,
-                                       neighbor_patch_idx, // Am I passing a pointer?
-                                       &neighbor_block_idx,
+                                       &neighbor_block_idx, // Am I passing a pointer?
+                                       neighbor_patch_idx,
                                        &relative_refratio);
 
                     if (relative_refratio > 0)  // check for valid neighbor patches
@@ -206,11 +206,11 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                     for (int icorner = 0; icorner < num_corners; icorner++)
                     {
                         get_corner_neighbor(domain,
-                                            this_patch_idx,
                                             this_block_idx,
+                                            this_patch_idx,
                                             icorner,
-                                            &corner_patch_idx,
                                             &corner_block_idx,
+                                            &corner_patch_idx,
                                             &relative_refratio);
                         if (relative_refratio >= 0)
                         {
