@@ -204,7 +204,7 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                         this_cp->edge_exchange_step1(idir,relative_refratio,neighbor_cp);
                     } // relative_refratio
 
-                    // Exchange corner ghost cells between patches at the same level
+                    // Exchange corner ghost cells between patches at the same level or finer
                     // Corners ordered (0=ll, 1=lr, 2=ul, 3=ur)
 
                     int corner_block_idx;
