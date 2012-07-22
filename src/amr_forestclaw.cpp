@@ -75,27 +75,42 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 }
 
 
+// This needs to be defined by p4est
 void get_edge_neighbors(fclaw2d_domain_t *domain,
                          int this_patch_idx,
-                         int this_level,
+                         int this_block_idx,
                          int iside,
                          int *neighbor_patches_idx,
                          int *neighbor_block_idx,
                          int *relative_refratio)
 {
+    // This needs to be defined by p4est
     // Only one patch for now, so there are no neighbors
     *relative_refratio = -1;
 }
 
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_patch_idx,
-                         int this_level,
+                         int this_block_idx,
                          int icorner,
                          int *corner_patch_idx,
                          int *corner_block_idx,
                          int *relative_refratio)
 {
+    // This needs to be defined by p4est
     *relative_refratio = -1;
+}
+
+void get_phys_boundary(fclaw2d_domain_t *domain,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       int *intersects_bc)
+{
+    for(int i = 0; i < 2*SpaceDim; i++)
+    {
+        // Again, only works for runs with a single patch.
+        intersects_bc[i] = 1;
+    }
 }
 
 
@@ -108,13 +123,28 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
     // More exotic boundaries conditions involving exchanges between, say,
     // two bottom edges (think : two-patch sphere or cubed sphere) or
     // between blocks with different coordinate orientations,
-    // or even the mobius strip are not handled just yet.
+    // (e.g. the mobius strip) are not handled yet.
 
-    // Trying to write this with 3d in mind, but no guarantees...
+    // Also, I am trying to write this with 3d in mind, but no guarantees...
 
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
 
+    // Step 1 :
+    // Exchange boundary data with neighboring patches that are at 'this_level'
+    // or a finer level.  The current patch should inititiate exchange with
+    // neighbors.
+    //
+    // To avoid duplication of work, if the neighbor level is equal
+    // to 'this_level', then the current patch will only initiate the exchange
+    // with a high side patch. The low side edge will be filled by with
+    // exchanges initiated by the low side patch when it is visited in the patch loop.
+    //
+    // Part of this step also involves exchanging corner ghost cell
+    // information at this level or finer levels.
+    //
+    // Interpolation from coarse to fine grids, as well as physical BCs
+    // will be handled in a later step.
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
@@ -122,25 +152,10 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
         {
             fclaw2d_patch_t *this_patch = &block->patches[j];
             ClawPatch *this_cp = get_patch_data(this_patch);
-            int this_level = this_patch->level;
+            // int this_level = this_patch->level;
+            int this_block_idx = i;
             int this_patch_idx = j;
 
-
-            // Step 1 :
-            // Exchange boundary data with neighboring patches that are at 'this_level'
-            // or a finer level.  The current patch should inititiate exchange with
-            // neighbors.
-            //
-            // To avoid duplication of work, if the neighbor level is equal
-            // to 'this_level', then the current patch will only initiate the exchange
-            // with a high side patch. The low side edge will be filled by with
-            // exchanges initiated by the low side patch when it is visited in the patch loop.
-            //
-            // Part of this step also involves exchanging corner ghost cell
-            // information at this level or finer levels.
-            //
-            // Interpolation from coarse to fine grids, as well as physical BCs
-            // will be handled in a later step.
 
             for (int idir = 0; idir < SpaceDim; idir++)
             {
@@ -162,9 +177,9 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                 {
                     get_edge_neighbors(domain,
                                        this_patch_idx,
-                                       this_level,
+                                       this_block_idx,
                                        iside,
-                                       neighbor_patch_idx, // Not sure on this syntax
+                                       neighbor_patch_idx, // Am I passing a pointer?
                                        &neighbor_block_idx,
                                        &relative_refratio);
 
@@ -192,7 +207,7 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                     {
                         get_corner_neighbor(domain,
                                             this_patch_idx,
-                                            this_level,
+                                            this_block_idx,
                                             icorner,
                                             &corner_patch_idx,
                                             &corner_block_idx,
@@ -202,7 +217,7 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                             fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
                             fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                             ClawPatch *corner_cp = get_patch_data(corner_patch);
-                            corner_cp->corner_exchange_step1(icorner,relative_refratio,corner_cp);
+                            this_cp->corner_exchange_step1(icorner,relative_refratio,corner_cp);
                         }
                     } // loop over corners
                 } // loop over sides (lo --> hi)
@@ -212,40 +227,32 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
 
 
     // Step 2 :
-    // Fill in physical boundary conditions
+    // Set physical boundary conditions.
+    Real curr_time = get_domain_time(domain);
+    Real dt = 1e20;   // I am not sure how this is used in setting boundary conditions
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
         for(int j = 0; j < block->num_patches; j++)
         {
-            // fclaw2d_patch_t *this_patch = &block->patches[j];
-            // ClawPatch *this_cp = get_patch_data(this_patch);
-            // int this_level = this_patch->level;
-            // int this_block_idx = i;
-            // int this_patch_idx = j;
+            fclaw2d_patch_t *this_patch = &block->patches[j];
+            ClawPatch *this_cp = get_patch_data(this_patch);
+            int this_block_idx = i;
+            int this_patch_idx = j;
 
-            // Step 2 :
-            // Physical boundary conditions
+            int intersects_bc[2*SpaceDim];
+            get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
+
+            this_cp->set_physbc(intersects_bc,gparms->m_mthbc,curr_time,dt);
         }
     }
 
-    // Step 3 :
-    // Interpolate coarse grid boundary data to fine grid ghost cells.
-    for(int i = 0; i < domain->num_blocks; i++)
-    {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            // fclaw2d_patch_t *this_patch = &block->patches[j];
-            // ClawPatch *this_cp = get_patch_data(this_patch);
-            // int this_level = this_patch->level;
-            // int this_block_idx = i;
-            // int this_patch_idx = j;
+    // I should probably now handle the few cases where corner ghost cells can be filled in with
+    // ghost cell values from a neighboring patch.
 
-            // Step 2 :
-            // Physical boundary conditions
-        }
-    }
+
+    // Step3 : Interpolate coarse grid data to fine grid ghost cells.
+
 
 }
 
