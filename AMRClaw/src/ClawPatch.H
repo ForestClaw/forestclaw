@@ -263,6 +263,18 @@ extern "C" {
                       const int& patch_num,
                       const int& level);
 
+    void average_ghost_step1_(const int& m_mx,
+                              const int& m_my,
+                              const int& m_mbc,
+                              const int& m_meqn,
+                              Real qcoarse[],
+                              Real qfine[],
+                              const int& a_idir,
+                              const int& a_refratio,
+                              const int& igrid);
+
+
+
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
                const int& meqn,const int& mbc,
@@ -450,7 +462,7 @@ public :
                           const int& a_level);
 
 
-    void edge_exchange_step1(const int& iside,
+    void edge_exchange_step1(const int& idir,
                              const int& refratio,
                              ClawPatch *neighbor_cp[]);
 

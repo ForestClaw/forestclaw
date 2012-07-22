@@ -55,3 +55,80 @@ c     timestepping variables
 
       close(55)
       end
+
+
+c     Average fine grid to coarse grid or copy neighboring coarse grid
+      subroutine average_ghost_step1(mx,my,mbc,meqn,
+     &      qcoarse,qfine,idir,refratio,igrid)
+      implicit none
+
+      integer mx,my,mbc,meqn,refratio,igrid
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision sum
+
+      integer i,j, idir,ibc,jbc,mq,i1,j1, r2,ii,jj
+
+      r2 = refratio*refratio
+
+c     # We only have to consider the case of exchanges on
+c     # the high side of the coarse grid.
+      if (refratio .eq. 1) then
+c        # We only have to copy from one grid to the other.
+         if (idir .eq. 1) then
+            do j = 1,my
+               do ibc = 1,mbc
+                  do mq = 1,meqn
+                     qcoarse(mx+ibc,j,mq) = qfine(ibc,j,mq)
+                  enddo
+               enddo
+            enddo
+         else
+            do i = 1,mx
+               do jbc = 1,mbc
+                  do mq = 1,meqn
+                     qcoarse(i,my+jbc,mq) = qfine(i,jbc,mq)
+                  enddo
+               enddo
+            enddo
+         endif
+      else
+c        # Average fine grid onto coarse grid
+         if (idir .eq. 1) then
+            do j = (igrid-1)*my/refratio,igrid*my/refratio
+               do ibc = 1,mbc
+                  do mq = 1,meqn
+                     sum = 0
+                     do ii = 1,refratio
+                        do jj = 1,refratio
+                           i1 = (ibc-1)*refratio + ii
+                           j1 = (j-1)*refratio + jj
+                           sum = sum + qfine(i1,j1,mq)
+                        enddo
+                     enddo
+                     qcoarse(mx+ibc,j,mq) = sum/r2
+                  enddo
+               enddo
+            enddo
+         else
+            do i = (igrid-1)*mx/refratio+1,igrid*mx/refratio
+               do jbc = 1,mbc
+                  do mq = 1,meqn
+                     sum = 0
+                     do ii = 1,refratio
+                        do jj = 1,refratio
+                           i1 = (i-1)*refratio + ii
+                           j1 = (jbc-1)*refratio + jj
+                           sum = sum + qfine(i1,j1,mq)
+                        enddo
+                     enddo
+                     qcoarse(i,my+jbc,mq) = sum/r2
+                  enddo
+               enddo
+            enddo
+         endif
+      endif
+
+
+
+      end

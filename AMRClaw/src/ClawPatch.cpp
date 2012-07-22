@@ -445,15 +445,21 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
 }
 
-void ClawPatch::edge_exchange_step1(const int& a_iside,
+void ClawPatch::edge_exchange_step1(const int& a_idir,
                                     const int& a_refratio,
                                     ClawPatch *neighbor_cp[])
 {
-    for (int ir = 0; ir < a_refratio; ir++)
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int ir = 0; ir < a_refratio; ir++)
     {
-        cout << "Averaging fine grid " << ir << " onto coarse grid ghost cells" << endl;
+        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        int igrid = ir + 1;
+        /*
+          subroutine average_ghost_step1(mx,my,mbc,meqn,
+        &      qcoarse,qfine,idir,refratio,igrid)
+        */
+        average_ghost_step1_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_refratio,igrid);
     }
-    cout << endl;
 }
 
 void ClawPatch::edge_exchange_step3(const int& a_iside,
