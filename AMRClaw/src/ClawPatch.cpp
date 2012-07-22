@@ -445,17 +445,30 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
 }
 
-void ClawPatch::edge_exchange_step1(const int& iside,
-                                    const int& refratio,
+void ClawPatch::edge_exchange_step1(const int& a_iside,
+                                    const int& a_refratio,
                                     ClawPatch *neighbor_cp[])
 {
-    cout << "Neighboring grid cells" << endl;
-    for (int ir = 0; ir < refratio; ir++)
+    for (int ir = 0; ir < a_refratio; ir++)
     {
-        cout << neighbor_cp[ir]->m_mx << endl;
+        cout << "Averaging fine grid " << ir << " onto coarse grid ghost cells" << endl;
     }
     cout << endl;
 }
+
+void ClawPatch::edge_exchange_step3(const int& a_iside,
+                                    const int& a_refratio,
+                                    ClawPatch *a_neighbor_cp[])
+{
+    for (int ir = 0; ir < a_refratio; ir++)
+    {
+        cout << "Interpolating from coarse grid to fine grid " << ir << endl;
+    }
+    cout << endl;
+
+}
+
+
 
 
 void ClawPatch::corner_exchange_step1(const int& icorner,
@@ -467,7 +480,7 @@ void ClawPatch::corner_exchange_step1(const int& icorner,
     cout << endl;
 }
 
-void ClawPatch::set_physbc(const int a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
+void ClawPatch::set_physbc_step2(const bool a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
 {
     /*
       subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
@@ -481,7 +494,7 @@ void ClawPatch::set_physbc(const int a_intersects_bc[], const int a_mthbc[], con
     int mthbc[2*SpaceDim];
     for(int i = 0; i < 2*SpaceDim; i++)
     {
-        if (a_intersects_bc[i] == 1)
+        if (a_intersects_bc[i])
         {
             mthbc[i] = a_mthbc[i];
         }
@@ -490,6 +503,7 @@ void ClawPatch::set_physbc(const int a_intersects_bc[], const int a_mthbc[], con
             mthbc[i] = -1;
         }
     }
+    cout << "Setting physical boundary conditions " << endl;
     bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
 }
 

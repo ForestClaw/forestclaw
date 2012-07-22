@@ -449,20 +449,23 @@ public :
                           const int& a_patch_num,
                           const int& a_level);
 
+
     void edge_exchange_step1(const int& iside,
                              const int& refratio,
                              ClawPatch *neighbor_cp[]);
 
+    void set_physbc_step2(const bool a_intersects_bc[],
+                          const int a_mthbc[],
+                          const Real& t,
+                          const Real& dt);
+
+    void edge_exchange_step3(const int& a_iside,
+                             const int& a_refratio,
+                             ClawPatch *a_neighbor_cp[]);
+
     void corner_exchange_step1(const int& icorner,
                                const int& refratio,
                                ClawPatch *corner_cp);
-
-    void set_physbc(const int a_intersects_bc[],
-                    const int a_mthbc[],
-                    const Real& t,
-                    const Real& dt);
-
-
 
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
                              FArrayBox& a_auxPatch,
