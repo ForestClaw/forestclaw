@@ -449,6 +449,14 @@ public :
                           const int& a_patch_num,
                           const int& a_level);
 
+    void edge_exchange_step1(const int& iside,
+                             const int& refratio,
+                             ClawPatch *neighbor_cp[]);
+
+    void corner_exchange_step1(const int& icorner,
+                               const int& refratio,
+                               ClawPatch *corner_cp);
+
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
                              FArrayBox& a_auxPatch,
                              FArrayBox a_fluxp[],

@@ -52,15 +52,13 @@ extern "C"
                       int *maux);
 
     void new_qfile_(int* iframe);
+
 }
 
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
-
-
-
 
 void amrsetup(fclaw2d_domain_t *domain);
 void amrinit(fclaw2d_domain_t *domain);

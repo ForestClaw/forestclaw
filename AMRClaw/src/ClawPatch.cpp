@@ -445,6 +445,28 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
 }
 
+void ClawPatch::edge_exchange_step1(const int& iside,
+                                    const int& refratio,
+                                    ClawPatch *neighbor_cp[])
+{
+    cout << "Neighboring grid cells" << endl;
+    for (int ir = 0; ir < refratio; ir++)
+    {
+        cout << neighbor_cp[ir]->m_mx << endl;
+    }
+    cout << endl;
+}
+
+
+void ClawPatch::corner_exchange_step1(const int& icorner,
+                                      const int& refratio,
+                                      ClawPatch *corner_cp)
+{
+    cout << "Neighboring grid cell corners " << endl;
+    cout << corner_cp->m_mx << endl;
+    cout << endl;
+}
+
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                               const Box& a_patchBox,
