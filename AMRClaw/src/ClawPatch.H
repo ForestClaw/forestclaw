@@ -457,6 +457,13 @@ public :
                                const int& refratio,
                                ClawPatch *corner_cp);
 
+    void set_physbc(const int a_intersects_bc[],
+                    const int a_mthbc[],
+                    const Real& t,
+                    const Real& dt);
+
+
+
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
                              FArrayBox& a_auxPatch,
                              FArrayBox a_fluxp[],

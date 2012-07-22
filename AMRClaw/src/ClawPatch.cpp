@@ -467,6 +467,33 @@ void ClawPatch::corner_exchange_step1(const int& icorner,
     cout << endl;
 }
 
+void ClawPatch::set_physbc(const int a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
+{
+    /*
+      subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+     &               dx,dy,q,maux,aux,t,dt,mthbc)
+    */
+
+    Real *q = m_griddata.dataPtr();
+    Real *aux = m_auxarray.dataPtr();
+
+    // Set a local copy of mthbc that can be used for a patch.
+    int mthbc[2*SpaceDim];
+    for(int i = 0; i < 2*SpaceDim; i++)
+    {
+        if (a_intersects_bc[i] == 1)
+        {
+            mthbc[i] = a_mthbc[i];
+        }
+        else
+        {
+            mthbc[i] = -1;
+        }
+    }
+    bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
+}
+
+
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                               const Box& a_patchBox,
