@@ -201,7 +201,7 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                             neighbor_cp[ir] = get_patch_data(neighbor_patch[ir]);
                         }
 
-                        this_cp->edge_exchange_step1(idir,relative_refratio,neighbor_cp);
+                        this_cp->edge_exchange_step1(idir,iside,relative_refratio,neighbor_cp);
                     } // relative_refratio
 
                     // Exchange corner ghost cells between patches at the same level or finer

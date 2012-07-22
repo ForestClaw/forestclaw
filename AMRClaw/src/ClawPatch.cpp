@@ -446,6 +446,7 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
 }
 
 void ClawPatch::edge_exchange_step1(const int& a_idir,
+                                    const int& a_iside,
                                     const int& a_refratio,
                                     ClawPatch *neighbor_cp[])
 {
@@ -458,7 +459,7 @@ void ClawPatch::edge_exchange_step1(const int& a_idir,
           subroutine average_ghost_step1(mx,my,mbc,meqn,
         &      qcoarse,qfine,idir,refratio,igrid)
         */
-        average_ghost_step1_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_refratio,igrid);
+        average_ghost_step1_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,a_refratio,igrid);
     }
 }
 

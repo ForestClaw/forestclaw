@@ -270,6 +270,7 @@ extern "C" {
                               Real qcoarse[],
                               Real qfine[],
                               const int& a_idir,
+                              const int& a_iside,
                               const int& a_refratio,
                               const int& igrid);
 
@@ -462,9 +463,10 @@ public :
                           const int& a_level);
 
 
-    void edge_exchange_step1(const int& idir,
-                             const int& refratio,
-                             ClawPatch *neighbor_cp[]);
+    void edge_exchange_step1(const int& a_idir,
+                             const int& a_iside,
+                             const int& a_refratio,
+                             ClawPatch *a_neighbor_cp[]);
 
     void set_physbc_step2(const bool a_intersects_bc[],
                           const int a_mthbc[],

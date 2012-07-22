@@ -59,23 +59,23 @@ c     timestepping variables
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine average_ghost_step1(mx,my,mbc,meqn,
-     &      qcoarse,qfine,idir,refratio,igrid)
+     &      qcoarse,qfine,idir,iside,refratio,igrid)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,igrid
+      integer mx,my,mbc,meqn,refratio,igrid,idir,iside
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
-      integer i,j, idir,ibc,jbc,mq,i1,j1, r2,ii,jj
+      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
 
       r2 = refratio*refratio
 
-c     # We only have to consider the case of exchanges on
-c     # the high side of the coarse grid.
       if (refratio .eq. 1) then
+c        # We only have to consider the case of exchanges on
+c        # the high side of the coarse grid.
 c        # We only have to copy from one grid to the other.
-         if (idir .eq. 1) then
+         if (idir .eq. 0) then
             do j = 1,my
                do ibc = 1,mbc
                   do mq = 1,meqn
@@ -94,7 +94,7 @@ c        # We only have to copy from one grid to the other.
          endif
       else
 c        # Average fine grid onto coarse grid
-         if (idir .eq. 1) then
+         if (idir .eq. 0) then
             do j = (igrid-1)*my/refratio,igrid*my/refratio
                do ibc = 1,mbc
                   do mq = 1,meqn
@@ -103,10 +103,18 @@ c        # Average fine grid onto coarse grid
                         do jj = 1,refratio
                            i1 = (ibc-1)*refratio + ii
                            j1 = (j-1)*refratio + jj
-                           sum = sum + qfine(i1,j1,mq)
+                           if (iside .eq. 0) then
+                              sum = sum + qfine(mx-i1+1,j1,mq)
+                           else
+                              sum = sum + qfine(i1,j1,mq)
+                           endif
                         enddo
                      enddo
-                     qcoarse(mx+ibc,j,mq) = sum/r2
+                     if (iside .eq. 0) then
+                        qcoarse(1-ibc,j,mq) = sum/r2
+                     else
+                        qcoarse(mx+ibc,j,mq) = sum/r2
+                     endif
                   enddo
                enddo
             enddo
@@ -119,10 +127,18 @@ c        # Average fine grid onto coarse grid
                         do jj = 1,refratio
                            i1 = (i-1)*refratio + ii
                            j1 = (jbc-1)*refratio + jj
-                           sum = sum + qfine(i1,j1,mq)
+                           if (iside .eq. 0) then
+                              sum = sum + qfine(i1,my-j1+1,mq)
+                           else
+                              sum = sum + qfine(i1,j1,mq)
+                           endif
                         enddo
                      enddo
-                     qcoarse(i,my+jbc,mq) = sum/r2
+                     if (iside .eq. 0) then
+                        qcoarse(i,1-jbc,mq) = sum/r2
+                     else
+                        qcoarse(i,my+jbc,mq) = sum/r2
+                     endif
                   enddo
                enddo
             enddo
