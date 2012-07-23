@@ -84,7 +84,15 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
                         int *neighbor_patch_idx,
                         int *relative_refratio)
 {
-    // This needs to be defined by p4est
+    // Arguments :
+    // this_block_idx, this_patch_idx         : (i,j) indices used in looping over blocks and patches.
+    // iside                                  : the side whose neighbor is requested.  Numbering is :
+    //                                             (0,1,2,3)=(left,right,bottom,top).
+    // neighbor_block_idx, neighbor_patch_idx : Block and patch corresponding to neighbor at 'iside'
+    // relative_refratio                      : Ratio of refinement of neighbor to refinement of
+    //                                          'this_patch'.  See below for possible values.
+    //
+
     // Only one patch for now, so there are no neighbors
     *relative_refratio = -1;
 }
@@ -97,6 +105,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int *relative_refratio)
 {
+    // icorner       : corners, numbered in z-order (0,1,2,3)=(ll,lr,ul,ur)
+    //
     // This needs to be defined by p4est
     *relative_refratio = -1;
 }
@@ -106,6 +116,10 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        bool *intersects_bc)
 {
+    // intersects_bc[2*SpaceDim]
+    // The entry intersects_bc[iedge]='true' if 'iedge' is at a physical
+    // boundary and 'false' otherwise.
+
     for(int i = 0; i < 2*SpaceDim; i++)
     {
         // Again, only works for runs with a single patch.
@@ -121,10 +135,12 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
     // Note : Code so far only handles conventional exchanges correctly.
     // More exotic boundaries conditions involving exchanges between, say,
     // two bottom edges (think : two-patch sphere or cubed sphere) or
-    // between blocks with different coordinate orientations,
-    // (e.g. the mobius strip) are not handled yet. Also, I am trying to
-    // write this with 3d in mind, but no guarantees...
+    // or more generally between blocks with different coordinate orientations,
+    // (e.g. the mobius strip) are not handled yet.
     //
+    // I am writing this with 3d in mind, but no guarantees.   No thought
+    // has been given to parallel issues.  In particular, I should really
+    // be passing boundary buffers rather than the entire grid.
     //
     // Steps :
     // Step 1 : Average all fine grids to coarse grid ghost cells;  Exchange values between grids
@@ -136,23 +152,18 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
 
-
-
     // Step 1 :
     // Exchange boundary data with neighboring patches that are at 'this_level'
     // or a finer level.  The current patch should inititiate exchange with
     // neighbors.
     //
-    // To avoid duplication of work, if the neighbor level is equal
+    // To avoid duplicate searches, if the neighbor level is equal
     // to 'this_level', then the current patch will only initiate the exchange
     // with a high side patch. The low side edge will be filled by with
     // exchanges initiated by the low side patch when it is visited in the patch loop.
     //
     // Part of this step also involves exchanging corner ghost cell
     // information at this level or finer levels.
-    //
-    // Interpolation from coarse to fine grids, as well as physical BCs
-    // will be handled in a later step.
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
@@ -236,7 +247,7 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
     // Step 2 :
     // Set physical boundary conditions.
     Real curr_time = get_domain_time(domain);
-    Real dt = 1e20;   // I am not sure how this is used in setting boundary conditions
+    Real dt = 1e20;   // When do we need dt in setting a boundary condition?
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
