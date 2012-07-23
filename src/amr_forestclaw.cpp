@@ -85,10 +85,11 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
                         int *relative_refratio)
 {
     // Arguments :
-    // this_block_idx, this_patch_idx         : (i,j) indices used in looping over blocks and patches.
+    // this_block_idx, this_patch_idx         : Set to the (i,j) indices of the block/patch
+    //                                          currently visited by the patch/block loop.
     // iside                                  : the side whose neighbor is requested.  Numbering is :
     //                                             (0,1,2,3)=(left,right,bottom,top).
-    // neighbor_block_idx, neighbor_patch_idx : Block and patch corresponding to neighbor at 'iside'
+    // neighbor_block_idx, neighbor_patch_idx : (i,j) index of block and patch corresponding to neighbor at 'iside'
     // relative_refratio                      : Ratio of refinement of neighbor to refinement of
     //                                          'this_patch'.  See below for possible values.
     //
@@ -105,7 +106,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int *relative_refratio)
 {
-    // icorner       : corners, numbered in z-order (0,1,2,3)=(ll,lr,ul,ur)
+    // icorner  : corner of 'this_patch' for which neighboring corner is requested. Numbered (0,1,2,3)=(ll,lr,ul,ur)
     //
     // This needs to be defined by p4est
     *relative_refratio = -1;
