@@ -122,7 +122,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t *domain, p4est_mesh_t * mesh,
   }
 }
 
-void
+fclaw2d_face_neighbor_t
 fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
 			int blockno, int patchno, int faceno,
 			int rproc[P4EST_HALF], int rblockno[P4EST_HALF],
@@ -167,6 +167,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
       rpatchno[k] = -1;
     }
     rproc[1] = block->mthbc[faceno];
+    return FCLAW2D_FACE_NEIGHBOR_BOUNDARY;
   }
   else if (qtf < 0) {
     /* half-size face neighbors */
@@ -177,6 +178,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
     }
     *rfaceno = qtf + P4EST_ORIENTATIONS;
     P4EST_ASSERT (*rfaceno >= 0);
+    return FCLAW2D_FACE_NEIGHBOR_HALFSIZE;
   }
   else {
     /* one same-size or double-size neighbor */
@@ -191,6 +193,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
       /* same-size neighbor */
       *rfaceno = (int) qtf;
       P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_ORIENTATIONS);
+      return FCLAW2D_FACE_NEIGHBOR_SAMESIZE;
     }
     else {
       /* double-size neighbor */
@@ -198,6 +201,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
       /* the number of our patch within the bigger neighbor subfaces */
       rproc[1] = (int) qtf / P4EST_ORIENTATIONS - 1;
       P4EST_ASSERT (0 <= rproc[1] && rproc[1] < P4EST_HALF);
+      return FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE;
     }
   }
 }
