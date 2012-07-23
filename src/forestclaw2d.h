@@ -99,6 +99,21 @@ int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
 						int blockno, int patchno,
 						int boundaries[4]);
 
+/** Determine neighbor patch(es) and orientation across a given face.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in] faceno	Number of the patch face: left, right, bottom, top.
+ * \param [in,out] rproc	Processor number of neighbor patches.
+ * \param [in,out] rblockno	Neighbor block number for up to 2 neighbors.
+ * \param [in,out] rpatchno	Neighbor patch number for up to 2 neighbors.
+ * \param [in,out] rfaceno	Neighbor face number and orientation.
+ */
+void			fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
+				int blockno, int patchno, int faceno,
+				int rproc[2], int rblockno[2],
+				int rpatchno[2], int *rfaceno);
+
 #ifdef __cplusplus
 }
 #endif
