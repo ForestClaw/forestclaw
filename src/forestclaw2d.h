@@ -39,7 +39,7 @@ typedef struct fclaw2d_domain fclaw2d_domain_t;
 typedef struct fclaw2d_block fclaw2d_block_t;
 typedef struct fclaw2d_patch fclaw2d_patch_t;
 
-typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[P4EST_DIM],
+typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
 				  fclaw2d_domain_t *domain, void *user);
 
 /* The domain structure gives a processor local view of the grid hierarchy */
@@ -59,8 +59,9 @@ struct fclaw2d_block
   double		ylower, yupper;
   fclaw2d_mapc2m_t	mapc2m;
   void			*mapc2m_user;
-  int                   mthbc[P4EST_FACES];	/* >0 for physical bc types */
-  int			num_patches;
+  int			mthbc[4];	/* >0 for physical bc types */
+  int			num_patches;	/* proc-local patches in this block */
+  int			num_patches_before;	/* in all previous blocks */
   fclaw2d_patch_t	*patches;		/* allocated storage */
   fclaw2d_patch_t	*patchbylevel[P4EST_MAXLEVEL + 1];	/* pointers */
   void			*user;
@@ -68,11 +69,13 @@ struct fclaw2d_block
 
 struct fclaw2d_domain
 {
+  int			mpisize, mpirank;	/* MPI variables */
   int			num_patches_all;	/* sum over all blocks */
   int			maxlevel_all;		/* maximum over all blocks */
   int			num_blocks;
   fclaw2d_block_t	*blocks;		/* allocated storage */
-  p4est_wrap_t          *pp;
+  int			*patch_to_block;	/* allocated storage */
+  p4est_wrap_t		*pp;
   void			*user;
 };
 
@@ -85,15 +88,16 @@ void			fclaw2d_domain_iterate_level
 				 fclaw2d_patch_callback_t pcb, void *user);
 
 /** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
- * \param [in]		number of the block within the domain.
- * \param [in]		number of the patch within the block.
- * \param [in,out]	boundary types as present in fclaw2d_block_t.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in,out] boundaries	Domain boundaries as present in block->mthbc.
  *			The order is left, right, bottom, top.
  * \return		True if at least one patch face is on a boundary.
  */
 int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
 						int blockno, int patchno,
-						int boundaries[P4EST_FACES]);
+						int boundaries[4]);
 
 #ifdef __cplusplus
 }

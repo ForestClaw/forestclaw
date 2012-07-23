@@ -64,13 +64,17 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   	  sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
   domain = P4EST_ALLOC_ZERO (fclaw2d_domain_t, 1);
+  domain->mpisize = wrap->p4est->mpisize;
+  domain->mpirank = wrap->p4est->mpirank;
   domain->pp = wrap;
   domain->num_blocks = nb = (int) conn->num_trees;
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
+  domain->patch_to_block = P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
   num_patches_all = 0;
   maxlevel_all = 0;
   for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
+    block->num_patches_before = num_patches_all;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
     tree_maxlevel = 0;
     block->xlower = 0.;
@@ -110,7 +114,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
         currentbylevel[level]->next = patch;
 	currentbylevel[level] = patch;
       }
-      ++num_patches_all;
+      domain->patch_to_block[num_patches_all++] = i;
       tree_maxlevel = SC_MAX (tree_maxlevel, level);
     }
     P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
@@ -146,6 +150,7 @@ fclaw2d_domain_destroy (fclaw2d_domain_t *domain)
     block = domain->blocks + i;
     P4EST_FREE (block->patches);
   }
+  P4EST_FREE (domain->patch_to_block);
   P4EST_FREE (domain->blocks);
   P4EST_FREE (domain);
 

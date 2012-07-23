@@ -54,7 +54,7 @@ int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
                 int blockno, int patchno, int boundaries[P4EST_FACES])
 {
-  int                   face;
+  int                   faceno;
   int                   anyboundary;
   int8_t                qtf;
   p4est_locidx_t        totalleaf;
@@ -78,16 +78,16 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
   tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
   totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
   P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
-  for (face = 0; face < P4EST_FACES; ++face) {
-    qtq = mesh->quad_to_quad[P4EST_FACES * totalleaf + face];
-    qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + face];
-    if (qtq == totalleaf && qtf == face) {
+  for (faceno = 0; faceno < P4EST_FACES; ++faceno) {
+    qtq = mesh->quad_to_quad[P4EST_FACES * totalleaf + faceno];
+    qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
+    if (qtq == totalleaf && qtf == faceno) {
       anyboundary = 1;
-      P4EST_ASSERT (block->mthbc[face] > 0);
-      boundaries[face] = block->mthbc[face];
+      P4EST_ASSERT (block->mthbc[faceno] > 0);
+      boundaries[faceno] = block->mthbc[faceno];
     }
     else {
-      boundaries[face] = 0;
+      boundaries[faceno] = 0;
     }
   }
 
