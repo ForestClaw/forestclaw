@@ -74,12 +74,13 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       if (refratio .eq. 1) then
 c        # We only have to consider the case of exchanges on
 c        # the high side of the coarse grid.
-c        # We only have to copy from one grid to the other.
+c        # We do need to do a complete exchange, though.
          if (idir .eq. 0) then
             do j = 1,my
                do ibc = 1,mbc
                   do mq = 1,meqn
                      qcoarse(mx+ibc,j,mq) = qfine(ibc,j,mq)
+                     qfine(ibc-mbc,j,mq) = qcoarse(mx-mbc+ibc,j,mq)
                   enddo
                enddo
             enddo
@@ -88,6 +89,7 @@ c        # We only have to copy from one grid to the other.
                do jbc = 1,mbc
                   do mq = 1,meqn
                      qcoarse(i,my+jbc,mq) = qfine(i,jbc,mq)
+                     qfine(i,jbc-mbc,mq) = qcoarse(i,my-mbc+jbc,mq)
                   enddo
                enddo
             enddo
@@ -146,5 +148,62 @@ c        # Average fine grid onto coarse grid
       endif
 
 
+
+      end
+
+c     Average fine grid to coarse grid or copy neighboring coarse grid
+      subroutine average_corner_step1(mx,my,mbc,meqn,
+     &      qcoarse,qfine,icorner,refratio)
+      implicit none
+
+      integer mx,my,mbc,meqn,refratio,icorner
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision sum
+
+      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+
+      r2 = refratio*refratio
+
+      if (refratio .eq. 1) then
+c        # We only need to worry about corners 1 and 3 (lr and ur).
+c        # for the  complete exchange.  The other corners are somebody
+c        # else's (lr,ur) corners.
+         do mq = 1,meqn
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+c                 # Exchange corner information at boundaries.
+                  if (icorner .eq. 1) then
+c                    # Fix this!
+                     qcoarse(mx+ibc,jbc-mbc,mq) =
+     &                     qfine(ibc,my+jbc-mbc,mq)
+                     qfine(ibc-mbc,my+jbc,mq) =
+     &                     qcoarse(mx+ibc-mbc,jbc,mq)
+                  elseif (icorner .eq. 3) then
+                     qcoarse(mx+ibc,my+jbc,mq) =
+     &                     qfine(ibc,jbc,mq)
+                     qfine(ibc-mbc,jbc-mbc,mq) =
+     &                     qcoarse(mx+ibc-mbc,my+jbc-mbc,mq)
+                  endif
+               enddo
+            enddo
+         enddo
+      else
+c        # Average fine grid onto coarse grid
+         write(6,'(A,A)') 'average_corner_step1 : fine grid ',
+     &         ' averaging at corners not yet implemented'
+         stop
+         do mq = 1,meqn
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+                  if (icorner .eq. 0) then
+                  elseif (icorner .eq. 1) then
+                  elseif (icorner .eq. 2) then
+                  else
+                  endif
+               enddo
+            enddo
+         enddo
+      endif
 
       end

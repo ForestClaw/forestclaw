@@ -25,7 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
+
 #include <cmath>
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <iomanip>
+using namespace std;
+
+//using std::ifstream;
+using std::ios;
+
 
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms)
 {
@@ -221,9 +231,14 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
 
                     int corner_block_idx;
                     int corner_patch_idx;
-                    int num_corners = pow(SpaceDim,2);
+                    int num_corners = 1;
+                    for (int i = 0; i < SpaceDim; i++)
+                    {
+                        num_corners *= 2;
+                    }
                     for (int icorner = 0; icorner < num_corners; icorner++)
                     {
+                        // work on this later...
                         get_corner_neighbor(domain,
                                             this_block_idx,
                                             this_patch_idx,
@@ -233,11 +248,13 @@ void patch_exchange_bc(fclaw2d_domain_t *domain)
                                             &relative_refratio);
                         if (relative_refratio >= 0)
                         {
+                            // Corner is not a physical boundary.
                             fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
                             fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                             ClawPatch *corner_cp = get_patch_data(corner_patch);
                             this_cp->corner_exchange_step1(icorner,relative_refratio,corner_cp);
                         }
+
                     } // loop over corners
                 } // loop over sides (lo --> hi)
             } // loop over directions (idir = 0,1,2)
@@ -368,8 +385,13 @@ void amrinit(fclaw2d_domain_t *domain)
             fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = get_patch_data(patch);
 
+            // A restart option would be nice, but perhaps a bit complicated for
+            // AMR...
             cp->initialize();
-            cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
+            if (gparms->m_maux > 0)
+            {
+                cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
+            }
         }
     }
 }
@@ -381,23 +403,96 @@ void amrrun(fclaw2d_domain_t *domain)
     int iframe = 0;
     amrout(domain,iframe);
 
-    // global_parms *gparms = get_domain_data(domain);
-    // int refratio = gparms->m_refratio;
+    global_parms *gparms = get_domain_data(domain);
+    Real final_time = gparms->m_tfinal;
+    int nout = gparms->m_nout;
+    int refratio = gparms->m_refratio;
+    Real t0 = 0; // Should probably have this set by user.
 
-    // Do fake timestepping for now
-    for(int iframe = 1; iframe < 5; iframe++)
+    Real dt_outer = (final_time-t0)/Real(nout);
+
+    int num_levels = gparms->m_maxlevel + 1;
+
+    Real initial_dt = gparms->m_initial_dt;
+    Real dt_cfl = initial_dt;
+    Real t_curr = t0;
+    for(int n = 0; n < nout; n++)
     {
-        // First exchange boundary conditions
-        patch_exchange_bc(domain);
-        for(int i = 0; i < domain->num_blocks; i++)
+        Real tstart = t_curr;
+        Real tend = tstart + dt_outer;
+        int n_inner = 0;
+        while (t_curr < tend)
         {
-            fclaw2d_block_t *block = &domain->blocks[i];
-            for(int j = 0; j < block->num_patches; j++)
+            // Make sure we hit the time step exactly.
+            // Use the tolerance to make sure we don't end up taking a tiny time step just to
+            // hit 'tend'
+            Real dt_inner;
+            Real tol = 1e-8*dt_cfl;
+            if (tend - t_curr - dt_cfl < tol)
             {
-                // Fake update
-                cout << "Updating solution on patch number " << j << endl;
+                // In this case, 'dt_curr' is only set temporarily to a smaller value
+                dt_inner = tend-t_curr;
             }
+            else
+            {
+                // Set 'dt_curr' to 'dt_cfl', a value based on cfl number.
+                dt_inner = dt_cfl;
+            }
+
+            // First exchange boundary conditions at current coarse time level.
+            patch_exchange_bc(domain);
+
+            // Take a time step of 'dt_inner/refratio^level on each grid at level 'level'
+            Real maxcfl = 0;
+            for(int level = 0; level < num_levels; level++)
+            {
+                Real dt_level = dt_inner;
+                for (int ii = 1; ii <= level; ii++)
+                {
+                    dt_inner /= refratio;
+                }
+
+                // update on each level, starting with the coarsest level
+                for(int i = 0; i < domain->num_blocks; i++)
+                {
+                    fclaw2d_block_t *block = &domain->blocks[i];
+                    fclaw2d_patch_t *patch = block->patchbylevel[level];
+                    while(patch != NULL)
+                    {
+                        ClawPatch *cp = get_patch_data(patch);
+                        Real cfl_grid;
+
+                        // We could do this with wave speed as well, but then we need to get
+                        // the coarse dx or dy.  As it is, these are encoded in the cfl number.
+                        cfl_grid = cp->step(level,dt_level);  // Dummy routine for now
+                        maxcfl = max(cfl_grid,maxcfl);
+
+                        patch = patch->next;
+                    } // patch loop
+
+                    // At this point, after a level has been updated, we need to transfer
+                    // information to finer levels via interpolation in time.
+
+                    // For now, let's just assume one patch (or only a set of level 0 patches
+                    // partitioning the domain)
+
+                } // block loop
+
+            } // level loop
+            t_curr = t_curr + dt_inner;
+            printf("Step %5d : dt = %12.4e;   max. Courant number = %8.4f;   final time = %12.4f\n",n_inner,dt_inner,maxcfl, t_curr);
+
+            // New time step, based on max cfl number and desired number.
+            dt_cfl = dt_inner*gparms->m_desired_cfl/maxcfl;
+
+            n_inner += 1;
+
+            // After some number of time steps, we probably need to regrid...
         }
+
+        // Output file at every outer loop iteration
+        iframe = iframe + 1;
+        set_domain_time(domain,t_curr);
         amrout(domain,iframe);
     }
 }
@@ -415,6 +510,8 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         fclaw2d_block_t *block = &domain->blocks[i];
         ngrids += block->num_patches;
     }
+
+    printf("Matlab output Frame %d  at time %12.4f\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
     write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);

@@ -225,6 +225,14 @@ void ClawPatch::setAuxArray(const int& a_maxlevel,
 
 }
 
+Real ClawPatch::step(const int& level,
+                     const Real& dt_level)
+{
+    Real maxwavespeed = 1; // Making this up...
+    Real cfl_grid = dt_level/m_dx*maxwavespeed; //
+    return cfl_grid;
+}
+
 
 Real ClawPatch::ClawPatchIntegrator(FArrayBox& a_phiPatch,
                                     FArrayBox& a_auxPatch,
@@ -463,37 +471,17 @@ void ClawPatch::edge_exchange_step1(const int& a_idir,
     }
 }
 
-void ClawPatch::edge_exchange_step3(const int& a_iside,
-                                    const int& a_refratio,
-                                    ClawPatch *a_neighbor_cp[])
-{
-    for (int ir = 0; ir < a_refratio; ir++)
-    {
-        cout << "Interpolating from coarse grid to fine grid " << ir << endl;
-    }
-    cout << endl;
-
-}
-
-
-
 
 void ClawPatch::corner_exchange_step1(const int& icorner,
                                       const int& refratio,
                                       ClawPatch *corner_cp)
 {
-    cout << "Neighboring grid cell corners " << endl;
-    cout << corner_cp->m_mx << endl;
-    cout << endl;
+
+
 }
 
 void ClawPatch::set_physbc_step2(const bool a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
 {
-    /*
-      subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &               dx,dy,q,maux,aux,t,dt,mthbc)
-    */
-
     Real *q = m_griddata.dataPtr();
     Real *aux = m_auxarray.dataPtr();
 
@@ -510,10 +498,15 @@ void ClawPatch::set_physbc_step2(const bool a_intersects_bc[], const int a_mthbc
             mthbc[i] = -1;
         }
     }
-    cout << "Setting physical boundary conditions " << endl;
     bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
 }
 
+void ClawPatch::edge_exchange_step3(const int& a_iside,
+                                    const int& a_refratio,
+                                    ClawPatch *a_neighbor_cp[])
+{
+    cout << "edge_exchange_step3 : Coarse to fine interpolation not implemented yet." << endl;
+}
 
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,

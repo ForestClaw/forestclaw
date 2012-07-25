@@ -481,6 +481,9 @@ public :
                                const int& refratio,
                                ClawPatch *corner_cp);
 
+    Real step(const int& level,
+              const Real& dt);
+
     Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
                              FArrayBox& a_auxPatch,
                              FArrayBox a_fluxp[],

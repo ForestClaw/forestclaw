@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_utils.H"
+#include "forestclaw2d.h"
+
 
 global_parms::global_parms()
 {
@@ -62,6 +64,15 @@ void global_parms::get_inputParams()
                 m_mthbc,
                 m_order,
                 m_maxlevel);
+
+    // Check maxlevel :
+    if (m_maxlevel > P4EST_MAXLEVEL)
+    {
+        cout << "get_inputParms (amr_utils.f) : User 'maxlevel' > P4EST_MAXLEVEL" << endl;
+        exit(1);
+    }
+
+    cout << "here... 1" << endl;
 
     // Set up arrays needed by clawpack.
     m_method[0] = 0; // not used in forestclaw
