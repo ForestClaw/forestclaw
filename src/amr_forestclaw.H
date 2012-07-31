@@ -30,18 +30,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "ClawPatch.H"
 
+using std::vector;
+
 typedef struct fclaw2d_domain_data
 {
     global_parms *parms;
     double curr_time;
-}
-fclaw2d_domain_data_t;
+} fclaw2d_domain_data_t;
 
 typedef struct fclaw2d_patch_data
 {
-  ClawPatch	*cp;
-}
-fclaw2d_patch_data_t;
+    ClawPatch	*cp;
+} fclaw2d_patch_data_t;
+
+typedef struct fclaw2d_level_time_data
+{
+    Real dt;
+    Real maxcfl;
+    Real t;
+} fclaw2d_level_time_data_t;
+
 
 extern "C"
 {

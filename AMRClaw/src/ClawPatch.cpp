@@ -10,6 +10,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
+    delete m_corners_set;
 }
 
 
@@ -45,6 +46,31 @@ void ClawPatch::define(const Real&  a_xlower,
 
     m_meqn = a_gparms->m_meqn;
     m_maux = a_gparms->m_maux;
+
+    // Corners can be filled in one of three ways :
+    // (1) Direct copying grids at the same level;
+    // (2) Averaging from a finer grid
+    // (3) Interpolation from a coarser grid
+    // Order in which ghost cells are filled in is from a top
+    // down approach :  Starting with the finest level, we do the
+    // following :
+    // (1) Exchange BC data with same level
+    // (2) Average BC data to coarser level
+    // (3) Interpolate data from coarser level.
+    // Order here is important, because if we average first, then
+    // we can be sure that the coarse grids will have enough ghost
+    // cell data to do proper interpolation.
+    int num_corners = 1;
+    for (int i = 0; i < SpaceDim; i++)
+    {
+        num_corners *= 2;
+    }
+    m_corners_set = new bool[num_corners];
+    for (int i = 0; i < num_corners; i++)
+    {
+        m_corners_set[i] = false;
+    }
+
 
     int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc);
     m_griddata.define(gridsize*m_meqn,box);
@@ -225,8 +251,7 @@ void ClawPatch::setAuxArray(const int& a_maxlevel,
 
 }
 
-Real ClawPatch::step(const int& level,
-                     const Real& dt_level)
+Real ClawPatch::step(const Real& dt_level)
 {
     Real maxwavespeed = 1; // Making this up...
     Real cfl_grid = dt_level/m_dx*maxwavespeed; //
@@ -234,125 +259,32 @@ Real ClawPatch::step(const int& level,
 }
 
 
-Real ClawPatch::ClawPatchIntegrator(FArrayBox& a_phiPatch,
-                                    FArrayBox& a_auxPatch,
-                                    FArrayBox a_fluxp[],
-                                    FArrayBox a_fluxm[],
-                                    FArrayBox a_fluxpc[],
-                                    FArrayBox a_fluxmc[],
-                                    FArrayBox& a_phiCoarse,
-                                    FArrayBox& a_auxCoarse,
-                                    FArrayBox a_qadd[],
-                                    const Box& a_patchBox,
-                                    const ProblemDomain& a_domain,
-                                    const Real& a_time,
+Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
                                     const Real& a_dt,
-                                    const Real& a_dx,
                                     const int& a_refRatio,
                                     const int& a_level,
                                     const global_parms& gparms)
 {
 
-    // Since m_meqn is hardwired in the constructor for the ClawPatch,
-    // we should check it here.
-    // CH_assert(a_phiPatch.nComp() == m_meqn);
-
-    /*
-    Real dx = a_dx;
-    Real dy = dx;
-    Real xlower, ylower;
-    int mx, my;
-#if CH_SPACEDIM == 2
-    get_clawvars(a_patchBox,dx,dy,xlower,ylower,mx,my);
-#elif CH_SPACEDIM == 3
-    Real dz = dx;
-    Real zlower;
-    int mz;
-    get_clawvars(a_patchBox,dx,dy,dz,xlower,ylower,zlower,mx,my,mz);
-#endif
-    */
-
-  // needed for qad
-  // const IntVect& v = a_phiCoarse.size();
-  int v[2];
-  int mxc = v[0] - 2;  // since there are only one layer of ghost cells
-  int myc = v[1] - 2;
-
-
-
-#if CH_SPACEDIM == 3
-  int mzc = v[2] - 2;
-#endif
-
-  Real dt = a_dt;
+    // Real dt = a_dt;
 
   // Data for step2 or step3.  This is overwritten by updated values.
-  Real* qold = a_phiPatch.dataPtr();
-  Real* aux = NULL;
-  if (gparms.m_maux > 0)
-  {
-      aux = a_auxPatch.dataPtr();
-  }
+  // Real* qold = m_griddata.dataPtr();
+  // Real* aux = m_auxarray.dataPtr();
 
-  // This is needed for qad
-  Real* qold_coarse = a_phiCoarse.dataPtr();
-
-  Real* auxold_coarse = NULL;
-  if (gparms.m_maux > 0)
-  {
-      auxold_coarse = a_auxCoarse.dataPtr();
-  }
-
-  // This seems to be different from a_patchBox, because phiBox contains
-  // ghost cell indexing, which I need to determine if we are near a physical
-  // boundary.
-  // Box phiBox = a_phiPatch.box();
-
-  int *intersectsBoundary = new int[SpaceDim*2];
-  for (int i = 0; i < 2*SpaceDim; i++)
-  {
-      intersectsBoundary[i] = 0;
-  }
-
-  for(int idir = 0; idir < SpaceDim; idir++)
-  {
-      if (a_domain.isPeriodic(idir))
-      {
-          // Skip this boundary;  don't set any boundary conditions.
-      }
-      else
-      {
-          /*
-          // Don't include this for now, since we don't have routines for adjCellLo and
-          // adjCellHi
-          Box bdryBox[2];
-          bdryBox[0] =  adjCellLo(a_domain,idir,m_meqn);
-          bdryBox[1] =  adjCellHi(a_domain,idir,m_meqn);
-          for(int edge = 0; edge < 2; edge++)
-          {
-              if (phiBox.intersects(bdryBox[edge]))
-              {
-                  // Only keep track of non-periodic physical boundaries
-                  intersectsBoundary[2*idir + edge] = 1;
-              }
-          }
-          */
-      }
-  }
-
-
-  int maxm = Max(m_mx,m_my);
+  // int maxm = max(m_mx,m_my);
 #if CH_SPACEDIM == 3
-  maxm = Max(maxm,mz);
+  maxm = max(maxm,mz);
 #endif
 
   // set common block for level
   set_common_levels_(gparms.m_maxlevel,a_level,gparms.m_refratio);
 
 
-  Real cflgrid;
+  Real cflgrid = 1;
 
 
+  /*
 #if CH_SPACEDIM==2
   int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn + (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
   Real* work = new Real[mwork];
@@ -443,6 +375,7 @@ Real ClawPatch::ClawPatchIntegrator(FArrayBox& a_phiPatch,
 
   // Real maxWaveSpeed = (dx/dt)*cflgrid;
   // return maxWaveSpeed;
+  */
 
   return cflgrid;
 }
@@ -453,34 +386,53 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
 }
 
-void ClawPatch::edge_exchange_step1(const int& a_idir,
-                                    const int& a_iside,
-                                    const int& a_refratio,
-                                    ClawPatch *neighbor_cp[])
+// Copy data from neighbor at same level, or average data to coarser level.
+// In this step, no corner information gets exchanged.
+void ClawPatch::edge_exchange(const int& a_idir,
+                              const int& a_iside,
+                              const int& a_num_neighbors,
+                              ClawPatch **neighbor_cp)
 {
-    Real *qcoarse = m_griddata.dataPtr();
-    for(int ir = 0; ir < a_refratio; ir++)
+    if (a_num_neighbors == 1)
     {
-        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
-        int igrid = ir + 1;
-        /*
-          subroutine average_ghost_step1(mx,my,mbc,meqn,
-        &      qcoarse,qfine,idir,refratio,igrid)
-        */
-        average_ghost_step1_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,a_refratio,igrid);
+        // Data is exchanged with neighboring grid, since both grids are at the
+        // same level
+        Real *qthis = m_griddata.dataPtr();
+        Real *qneighbor = neighbor_cp[0]->m_griddata.dataPtr();
+        copy_ghost_edge_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
+    }
+    else
+    {
+        int refratio = a_num_neighbors;
+        Real *qcoarse = m_griddata.dataPtr();
+        for(int ir = 0; ir < refratio; ir++)
+        {
+            Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+            int igrid = ir; // indicates which grid we are averaging from.
+            average_ghost_edge_(m_mx,m_my,m_mbc,m_meqn,qfine,qcoarse,a_idir,a_iside,refratio,igrid);
+        }
     }
 }
 
 
-void ClawPatch::corner_exchange_step1(const int& icorner,
-                                      const int& refratio,
-                                      ClawPatch *corner_cp)
+// Copy data from neighbor at same level, or average data to coarser level.
+// In this step, no corner information gets exchanged.
+void ClawPatch::edge_interpolate(const int& a_idir,
+                                 const int& a_iside,
+                                 const int& a_num_neighbors,
+                                 ClawPatch **neighbor_cp)
 {
-
-
+    int refratio = a_num_neighbors;
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int ir = 0; ir < refratio; ir++)
+    {
+        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        int igrid = ir; // indicates which grid we are averaging from.
+        interpolate_ghost_edge_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,refratio,igrid);
+    }
 }
 
-void ClawPatch::set_physbc_step2(const bool a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
+void ClawPatch::set_physbc(const bool a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
 {
     Real *q = m_griddata.dataPtr();
     Real *aux = m_auxarray.dataPtr();
@@ -499,13 +451,6 @@ void ClawPatch::set_physbc_step2(const bool a_intersects_bc[], const int a_mthbc
         }
     }
     bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
-}
-
-void ClawPatch::edge_exchange_step3(const int& a_iside,
-                                    const int& a_refratio,
-                                    ClawPatch *a_neighbor_cp[])
-{
-    cout << "edge_exchange_step3 : Coarse to fine interpolation not implemented yet." << endl;
 }
 
 

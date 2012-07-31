@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm);
+    fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,int initial_grid);
 fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm);
 
 void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);

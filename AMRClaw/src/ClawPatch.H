@@ -4,13 +4,15 @@
 #include <iostream>
 #include <vector>
 
-
 using std::ifstream;
 using std::ios;
 using std::vector;
+using std::max;
 
 
 #include "amr_utils.H"
+
+// Think about making 'global_parms' static.
 
 
 // The following are the parameters needed by Clawpack.  Most of these are included
@@ -263,16 +265,35 @@ extern "C" {
                       const int& patch_num,
                       const int& level);
 
-    void average_ghost_step1_(const int& m_mx,
-                              const int& m_my,
-                              const int& m_mbc,
-                              const int& m_meqn,
-                              Real qcoarse[],
-                              Real qfine[],
-                              const int& a_idir,
-                              const int& a_iside,
-                              const int& a_refratio,
-                              const int& igrid);
+    void copy_ghost_edge_(const int& m_mx,
+                          const int& m_my,
+                          const int& m_mbc,
+                          const int& m_meqn,
+                          Real qthis[],
+                          Real qneighbor[],
+                          const int& a_idir);
+
+    void average_ghost_edge_(const int& m_mx,
+                            const int& m_my,
+                            const int& m_mbc,
+                            const int& m_meqn,
+                            Real qthis[],
+                            Real qcoarse[],
+                            const int& a_idir,
+                            const int& a_iside,
+                            const int& a_refratio,
+                            const int& igrid);
+
+    void interpolate_ghost_edge_(const int& m_mx,
+                                 const int& m_my,
+                                 const int& m_mbc,
+                                 const int& m_meqn,
+                                 Real qthis[],
+                                 Real qcoarse[],
+                                 const int& a_idir,
+                                 const int& a_iside,
+                                 const int& a_refratio,
+                                 const int& igrid);
 
 
 
@@ -463,41 +484,25 @@ public :
                           const int& a_level);
 
 
-    void edge_exchange_step1(const int& a_idir,
-                             const int& a_iside,
-                             const int& a_refratio,
-                             ClawPatch *a_neighbor_cp[]);
+    void edge_exchange(const int& a_idir,
+                       const int& a_iside,
+                       const int& a_refratio,
+                       ClawPatch **a_neighbor_cp);
 
-    void set_physbc_step2(const bool a_intersects_bc[],
-                          const int a_mthbc[],
-                          const Real& t,
-                          const Real& dt);
+    void edge_interpolate(const int& a_idir,
+                          const int& a_iside,
+                          const int& a_refratio,
+                          ClawPatch **a_neighbor_cp);
 
-    void edge_exchange_step3(const int& a_iside,
-                             const int& a_refratio,
-                             ClawPatch *a_neighbor_cp[]);
+    void set_physbc(const bool a_intersects_bc[],
+                    const int a_mthbc[],
+                    const Real& t,
+                    const Real& dt);
 
-    void corner_exchange_step1(const int& icorner,
-                               const int& refratio,
-                               ClawPatch *corner_cp);
+    Real step(const Real& dt);
 
-    Real step(const int& level,
-              const Real& dt);
-
-    Real ClawPatchIntegrator(FArrayBox& a_phiPatch,
-                             FArrayBox& a_auxPatch,
-                             FArrayBox a_fluxp[],
-                             FArrayBox a_fluxmc[],
-                             FArrayBox a_fluxpc[],
-                             FArrayBox a_fluxm[],
-                             FArrayBox& a_phiCoarse,
-                             FArrayBox& a_auxCoarse,
-                             FArrayBox a_qadd[],
-                             const Box& a_patchBox,
-                             const ProblemDomain& a_domain,
-                             const Real& a_time,
+    Real ClawPatchIntegrator(const Real& a_time,
                              const Real& a_dt,
-                             const Real& a_dx,
                              const int& refRatio,const int& a_level,
                              const global_parms &gparms);
 
@@ -544,6 +549,8 @@ protected :
     int m_meqn;
     int m_maux;
     int m_mbc;
+
+    bool *m_corners_set;
 
     // Here is where the data is stored.
     FArrayBox m_griddata;

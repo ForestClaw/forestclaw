@@ -63,6 +63,7 @@ void global_parms::get_inputParams()
                 m_mbc,
                 m_mthbc,
                 m_order,
+                m_minlevel,
                 m_maxlevel);
 
     // Check maxlevel :
@@ -71,8 +72,6 @@ void global_parms::get_inputParams()
         cout << "get_inputParms (amr_utils.f) : User 'maxlevel' > P4EST_MAXLEVEL" << endl;
         exit(1);
     }
-
-    cout << "here... 1" << endl;
 
     // Set up arrays needed by clawpack.
     m_method[0] = 0; // not used in forestclaw
@@ -141,6 +140,7 @@ void global_parms::print_inputParams()
     }
   cout << endl << endl;
 
+  cout << "Min level = " << m_minlevel << endl;
   cout << "Max level = " << m_maxlevel << endl;
 
 }
@@ -202,4 +202,145 @@ int Box::smallEnd(int idir) const
 int Box::bigEnd(int idir) const
 {
     return m_ur[idir];
+}
+
+subcycle_manager::subcycle_manager() {}
+subcycle_manager::~subcycle_manager() {}
+
+void subcycle_manager::define(const int& a_maxlevel,
+                              const Real& a_dt_coarse,
+                              const int& a_refratio,
+                              const Real& a_t_curr)
+{
+    m_t_coarse = a_t_curr;
+    m_dt_coarse = a_dt_coarse;
+    m_maxlevel = a_maxlevel;
+    m_refratio = a_refratio;
+
+    m_levels.resize(m_maxlevel+1);
+    for(int level = 0; level <= a_maxlevel; level++)
+    {
+        m_levels[level].define(level,m_dt_coarse,m_refratio);
+    }
+
+}
+
+int subcycle_manager::get_last_step(const int& a_level)
+{
+    return m_levels[a_level].m_last_time_step;
+}
+
+void subcycle_manager::increment_time_step(const int& a_level)
+{
+    m_levels[a_level].m_last_time_step += time_step_inc(a_level);
+}
+
+bool subcycle_manager::is_coarsest(const int& a_level)
+{
+    return a_level == 0;
+}
+
+bool subcycle_manager::is_finest(const int& a_level)
+{
+    return a_level == m_maxlevel;
+}
+
+Real subcycle_manager::get_dt(const int& a_level)
+{
+    return m_levels[a_level].m_dt_level;
+}
+
+bool subcycle_manager::can_advance(const int& a_level, const int& a_from_step)
+{
+    bool b1 = level_exchange_done(a_level, a_from_step);
+    bool b2 = coarse_exchange_done(a_level,a_from_step);
+    bool b3 = fine_exchange_done(a_level,a_from_step);
+    return b1 && b2 && b3;
+}
+
+Real subcycle_manager::current_time(const int& a_level)
+{
+    int rfactor = 1;
+    for(int level = 1; level <= m_maxlevel-a_level; level++)
+    {
+        rfactor *= m_refratio;
+    }
+    Real dt_level = m_levels[a_level].m_dt_level;
+    int last_step = m_levels[a_level].m_last_time_step;
+    return m_t_coarse + dt_level*last_step/rfactor;
+}
+
+bool subcycle_manager::time_step_done(const int& a_level, const int& a_time_step)
+{
+    return m_levels[a_level].m_last_time_step >= a_time_step;
+}
+
+bool subcycle_manager::level_exchange_done(const int& a_level, const int& a_time_step)
+{
+    return m_levels[a_level].m_last_level_exchange == a_time_step;
+}
+
+bool subcycle_manager::coarse_exchange_done(const int& a_level, const int& a_time_step)
+{
+    if (is_coarsest(a_level))
+        return true;
+    else
+        return m_levels[a_level].m_last_coarse_exchange == a_time_step;
+}
+
+bool subcycle_manager::fine_exchange_done(const int& a_level, const int& a_time_step)
+{
+    if (is_finest(a_level))
+        return true;
+    else
+        return m_levels[a_level].m_last_fine_exchange == a_time_step;
+}
+
+void subcycle_manager::set_level_exchange(const int& a_level, const int& a_time_step)
+{
+    m_levels[a_level].m_last_level_exchange = a_time_step;
+}
+void subcycle_manager::set_coarse_exchange(const int& a_level, const int& a_time_step)
+{
+    if (!is_coarsest(a_level))
+        m_levels[a_level].m_last_coarse_exchange = a_time_step;
+}
+
+void subcycle_manager::set_fine_exchange(const int& a_level, const int& a_time_step)
+{
+    if (!is_finest(a_level))
+        m_levels[a_level].m_last_fine_exchange = a_time_step;
+}
+
+int subcycle_manager::time_step_inc(const int& a_level)
+{
+    int inc = 1;
+    for(int level = 0; level < m_maxlevel-a_level; level++)
+    {
+        inc *= m_refratio;
+    }
+    return inc;
+}
+
+
+
+level_data::level_data() { }
+level_data::~level_data() {}
+
+void level_data::define(const int& a_level,
+                        const Real& dt_coarse,
+                        const int& a_refratio)
+{
+    m_level = a_level;
+    m_last_time_step = 0;
+    m_last_level_exchange = 0;   // Assume that the level exchange has been done at subcycled time
+                                 // step 0.
+    m_last_coarse_exchange = 0;
+    m_last_fine_exchange = 0;
+
+    m_dt_level = dt_coarse;
+    for (int ir = 1; ir <= m_level; ir++)
+    {
+        m_dt_level /= a_refratio;
+    }
 }

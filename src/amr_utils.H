@@ -68,10 +68,69 @@ extern "C"
                      int& mbc,
                      int  mthbc[],
                      int  order[],
+                     int& minlevel,
                      int& maxlevel);
 
     void setprob_();
 }
+
+class level_data
+{
+public:
+
+    level_data();
+    ~level_data();
+
+    void define(const int& a_level,
+                const Real& a_dt_coarse,
+                const int& a_refratio);
+
+
+    int m_level;
+    int m_last_time_step;
+    int m_last_level_exchange;
+    int m_last_coarse_exchange;
+    int m_last_fine_exchange;
+    Real m_dt_level;
+};
+
+class subcycle_manager
+{
+public:
+    subcycle_manager();
+    ~subcycle_manager();
+
+    bool time_step_done(const int& a_level, const int& a_time_step);
+    int get_last_step(const int& a_level);
+    void increment_time_step(const int& a_level);
+    bool can_advance(const int& a_level, const int& a_from_step);
+    Real current_time(const int& a_level);
+    int time_step_inc(const int& a_level);
+
+    void define(const int& a_maxlevel,
+                const Real& a_dt_coarse,
+                const int& a_refratio,
+                const Real& a_t_curr);
+
+    bool is_coarsest(const int& a_level);
+    bool is_finest(const int& a_level);
+    Real get_dt(const int& level);
+
+    bool level_exchange_done(const int& a_level, const int& a_time_step);
+    bool coarse_exchange_done(const int& a_level, const int& a_time_step);
+    bool fine_exchange_done(const int& a_level, const int& a_time_step);
+
+    void set_level_exchange(const int& a_level, const int& a_time_step);
+    void set_coarse_exchange(const int& a_level, const int& a_time_step);
+    void set_fine_exchange(const int& a_level, const int& a_time_step);
+
+    vector<level_data> m_levels;
+    int m_maxlevel;
+    int m_refratio;
+    Real m_dt_coarse;
+    Real m_t_coarse;
+};
+
 
 class global_parms
 {
@@ -111,6 +170,7 @@ public:
 
     // AMR parameters
     int m_refratio;
+    int m_minlevel;
     int m_maxlevel;
 
     global_parms();

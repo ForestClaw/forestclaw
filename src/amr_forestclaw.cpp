@@ -53,14 +53,14 @@ global_parms* get_domain_data(fclaw2d_domain_t *domain)
     return ddata->parms;
 }
 
-void set_domain_time(fclaw2d_domain_t *domain, double time)
+void set_domain_time(fclaw2d_domain_t *domain, Real time)
 {
     fclaw2d_domain_data_t *ddata;
     ddata = (fclaw2d_domain_data_t *) domain->user;
     ddata->curr_time = time;
 }
 
-double get_domain_time(fclaw2d_domain_t *domain)
+Real  get_domain_time(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata;
     ddata = (fclaw2d_domain_data_t *) domain->user;
@@ -139,211 +139,284 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 }
 
 
-void patch_exchange_bc(fclaw2d_domain_t *domain)
+// Called from within fclaw2d_domain_iterate_level
+void cb_bc_level_exchange(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
 {
-    // Existing patches should all exchange boundary condition information.
-    //
-    // Note : Code so far only handles conventional exchanges correctly.
-    // More exotic boundaries conditions involving exchanges between, say,
-    // two bottom edges (think : two-patch sphere or cubed sphere) or
-    // or more generally between blocks with different coordinate orientations,
-    // (e.g. the mobius strip) are not handled yet.
-    //
-    // I am writing this with 3d in mind, but no guarantees.   No thought
-    // has been given to parallel issues.  In particular, I should really
-    // be passing boundary buffers rather than the entire grid.
-    //
-    // Steps :
-    // Step 1 : Average all fine grids to coarse grid ghost cells;  Exchange values between grids
-    //          that are at the same level.  Set corner values where no interpolation is required.
-    // Step 2 : Set physical boundary conditions.
-    // Step 3 : Interpolate coarse grid data to fine grid ghost cell values.
-    //
-
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
+    ClawPatch *this_cp = get_patch_data(this_patch);
 
-    // Step 1 :
-    // Exchange boundary data with neighboring patches that are at 'this_level'
-    // or a finer level.  The current patch should inititiate exchange with
-    // neighbors.
-    //
-    // To avoid duplicate searches, if the neighbor level is equal
-    // to 'this_level', then the current patch will only initiate the exchange
-    // with a high side patch. The low side edge will be filled by with
-    // exchanges initiated by the low side patch when it is visited in the patch loop.
-    //
-    // Part of this step also involves exchanging corner ghost cell
-    // information at this level or finer levels.
-    for(int i = 0; i < domain->num_blocks; i++)
+    for (int idir = 0; idir < SpaceDim; idir++)
     {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
+        int iside = 2*idir + 1;  // Look only at high side for level copy.
+
+        // Output arguments
+        int neighbor_block_idx;
+        int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
+        int ref_flag; // = -1, 0, 1
+        get_edge_neighbors(domain,
+                           this_block_idx,
+                           this_patch_idx,
+                           iside,
+                           &neighbor_block_idx,
+                           neighbor_patch_idx,
+                           &ref_flag);
+
+        if (ref_flag == 0)
         {
-            fclaw2d_patch_t *this_patch = &block->patches[j];
-            ClawPatch *this_cp = get_patch_data(this_patch);
-            // int this_level = this_patch->level;
-            int this_block_idx = i;
-            int this_patch_idx = j;
+            // Copy data from patch at the same level;
+            int num_neighbors = 1; // Same level
+            fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+            fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
+            ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
 
-            for (int idir = 0; idir < SpaceDim; idir++)
-            {
-                int neighbor_block_idx;
-                int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
-                int relative_refratio;
+            // Finally, do exchange between 'this_patch' and 'neighbor patch(es)'.
+            this_cp->edge_exchange(idir,iside,num_neighbors,&neighbor_cp);
 
-                // 'relative_refratio' is the refinement ratio of neighbor patch(es) to 'this_patch'
-                //
-                // -1           Neighbor is not valid for this step (either because it is a
-                //                   coarser patch, the boundary is a physical boundary, or the
-                //                   neighbor is a low side patch at 'this_level')
-                // 1            High-side patch is at 'this_level'
-                // 'refratio'   Patch has 'refratio' finer grids.
-                //
-
-                // Loop over low side then high side
-                for (int iside = 2*idir; iside < 2*idir + 1; iside++)
-                {
-                    get_edge_neighbors(domain,
-                                       this_block_idx,
-                                       this_patch_idx,
-                                       iside,
-                                       &neighbor_block_idx, // Am I passing a pointer?
-                                       neighbor_patch_idx,
-                                       &relative_refratio);
-
-                    if (relative_refratio > 0)  // check for valid neighbor patches
-                    {
-                        fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                        fclaw2d_patch_t *neighbor_patch[relative_refratio];
-                        ClawPatch *neighbor_cp[relative_refratio];
-                        for (int ir = 0; ir < relative_refratio; ir++)
-                        {
-                            neighbor_patch[ir]  = &neighbor_block->patches[neighbor_patch_idx[ir]];
-                            neighbor_cp[ir] = get_patch_data(neighbor_patch[ir]);
-                        }
-
-                        this_cp->edge_exchange_step1(idir,iside,relative_refratio,neighbor_cp);
-                    } // relative_refratio
-
-                    // Exchange corner ghost cells between patches at the same level or finer
-                    // Corners ordered (0=ll, 1=lr, 2=ul, 3=ur)
-
-                    int corner_block_idx;
-                    int corner_patch_idx;
-                    int num_corners = 1;
-                    for (int i = 0; i < SpaceDim; i++)
-                    {
-                        num_corners *= 2;
-                    }
-                    for (int icorner = 0; icorner < num_corners; icorner++)
-                    {
-                        // work on this later...
-                        get_corner_neighbor(domain,
-                                            this_block_idx,
-                                            this_patch_idx,
-                                            icorner,
-                                            &corner_block_idx,
-                                            &corner_patch_idx,
-                                            &relative_refratio);
-                        if (relative_refratio >= 0)
-                        {
-                            // Corner is not a physical boundary.
-                            fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                            fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                            ClawPatch *corner_cp = get_patch_data(corner_patch);
-                            this_cp->corner_exchange_step1(icorner,relative_refratio,corner_cp);
-                        }
-
-                    } // loop over corners
-                } // loop over sides (lo --> hi)
-            } // loop over directions (idir = 0,1,2)
-        } // loop over patches on block
-    } // loop over blocks in domain
-
-
-    // Step 2 :
-    // Set physical boundary conditions.
-    Real curr_time = get_domain_time(domain);
-    Real dt = 1e20;   // When do we need dt in setting a boundary condition?
-    for(int i = 0; i < domain->num_blocks; i++)
-    {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *this_patch = &block->patches[j];
-            ClawPatch *this_cp = get_patch_data(this_patch);
-            int this_block_idx = i;
-            int this_patch_idx = j;
-
+            // Now check for any physical boundary conditions
             bool intersects_bc[2*SpaceDim];
+            Real curr_time = get_domain_time(domain);
+            Real dt = 1e20;   // When do we need dt in setting a boundary condition?
             get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
-            this_cp->set_physbc_step2(intersects_bc,gparms->m_mthbc,curr_time,dt);
+            this_cp->set_physbc(intersects_bc,gparms->m_mthbc,curr_time,dt);
         }
-    }
-
-    // I should probably now handle the few cases where  neighboring patches share a common
-    // physical boundary.  In this case, corner ghost cells from each patch will overlap ghost
-    // cells from the neighboring patch.   These corner cells should be properly filled in....
-    // ....
-
-
-    // Step3 : Interpolate coarse grid data to fine grid ghost cells.
-    // Set physical boundary conditions.
-    for(int i = 0; i < domain->num_blocks; i++)
-    {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *this_patch = &block->patches[j];
-            ClawPatch *this_cp = get_patch_data(this_patch);
-            int this_block_idx = i;
-            int this_patch_idx = j;
-            for (int idir = 0; idir < SpaceDim; idir++)
-            {
-                int neighbor_block_idx;
-                int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
-                int relative_refratio;
-
-                // Loop over low side then high side
-                for (int iside = 2*idir; iside < 2*idir + 1; iside++)
-                {
-                    get_edge_neighbors(domain,
-                                       this_block_idx,
-                                       this_patch_idx,
-                                       iside,
-                                       &neighbor_block_idx, // Am I passing a pointer?
-                                       neighbor_patch_idx,
-                                       &relative_refratio);
-
-                    if (relative_refratio == refratio)  // check that we have fine grid neighbors
-                    {
-                        fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                        fclaw2d_patch_t *neighbor_patch[relative_refratio];
-                        ClawPatch *neighbor_cp[relative_refratio];
-                        for (int ir = 0; ir < relative_refratio; ir++)
-                        {
-                            neighbor_patch[ir]  = &neighbor_block->patches[neighbor_patch_idx[ir]];
-                            neighbor_cp[ir] = get_patch_data(neighbor_patch[ir]);
-                        }
-
-                        this_cp->edge_exchange_step3(iside,refratio,neighbor_cp);
-                    } // relative_refratio
-                }
-            }
-        }
-    }
+    } // loop over directions (idir = 0,1,2)
 }
 
 
+void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
+{
+    int user = NULL;
+    fclaw2d_domain_iterate_level(domain, a_level,
+                                  (fclaw2d_patch_callback_t) cb_bc_level_exchange, (void *) user);
+}
+
+void cb_bc_average(fclaw2d_domain_t *domain,
+                   fclaw2d_patch_t *this_patch,
+                   int this_block_idx,
+                   int this_patch_idx,
+                   void *user)
+{
+    // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
+    global_parms *gparms = get_domain_data(domain);
+    int refratio = gparms->m_refratio;
+
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        // Loop over low side and high side
+        for (int iside = 2*idir; iside < 2*idir + 1; iside++)
+        {
+            int neighbor_block_idx;
+            int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
+            int ref_flag; // = -1, 0, 1
+            get_edge_neighbors(domain,
+                               this_block_idx,
+                               this_patch_idx,
+                               iside,
+                               &neighbor_block_idx,
+                               neighbor_patch_idx,
+                               &ref_flag);
+
+            if (ref_flag == 1)  // neighbors are at finer level
+            {
+                // Fill in ghost cells on 'this_patch' by averaging data from finer neighbors
+                int num_neighbors = refratio;
+                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                ClawPatch *neighbor_cp[refratio];
+                for (int ir = 0; ir < refratio; ir++)
+                {
+                    fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
+                    neighbor_cp[ir] = get_patch_data(neighbor_patch);
+                }
+
+                // Average finer grid data to coarser 'this_cp' ghost cells.
+                // This uses the same routine as 'bc_exchange_level', but now
+                // 'num_neighbors = refratio'
+                this_cp->edge_exchange(idir,iside,num_neighbors,neighbor_cp);
+            }
+        } // loop sides (iside = 0,1,2,3)
+    } // loop over directions (idir = 0,1,2)
+}
+
+
+void cb_bc_interpolate(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
+{
+    // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
+    global_parms *gparms = get_domain_data(domain);
+    int refratio = gparms->m_refratio;
+
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        // Loop over low side and high side
+        for (int iside = 2*idir; iside < 2*idir + 1; iside++)
+        {
+            int neighbor_block_idx;
+            int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
+            int ref_flag; // = -1, 0, 1
+            get_edge_neighbors(domain,
+                               this_block_idx,
+                               this_patch_idx,
+                               iside,
+                               &neighbor_block_idx,
+                               neighbor_patch_idx,
+                               &ref_flag);
+
+            if (ref_flag == 1)  // neighbors are at finer level
+            {
+                // Fill in ghost cells on 'neighbor_patch' by interpolating to finer grid
+                int num_neighbors = refratio;
+                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                ClawPatch *neighbor_cp[refratio];
+                for (int ir = 0; ir < refratio; ir++)
+                {
+                    fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
+                    neighbor_cp[ir] = get_patch_data(neighbor_patch);
+                }
+
+                // Average finer grid data to coarser 'this_cp' ghost cells.
+                // This uses the same routine as 'bc_exchange_level', but now
+                // 'num_neighbors = refratio'
+                this_cp->edge_interpolate(idir,iside,num_neighbors,neighbor_cp);
+            }
+        } // loop sides (iside = 0,1,2,3)
+    } // loop over directions (idir = 0,1,2)
+}
+
+
+void bc_coarse_exchange(fclaw2d_domain_t *domain, const int& a_level)
+{
+    // First, average fine grid to coarse grid cells
+    int user = NULL;
+    int coarser_level = a_level - 1;
+    fclaw2d_domain_iterate_level(domain, coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_bc_average,
+                                 (void *) user);
+
+    // Interpolate coarse grid to fine.
+    fclaw2d_domain_iterate_level(domain,coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_bc_interpolate,
+                                 (void *) user);
+}
+
+
+void cb_advance_patch(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      void *user)
+{
+    fclaw2d_block_t *block = &domain->blocks[this_block_idx];
+    fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
+    ClawPatch *cp = get_patch_data(patch);
+    fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
+
+    Real dt = time_data->dt;
+    // Real t = time_data->t;
+    Real maxcfl_grid = cp->step(dt);
+    time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
+}
+
+
+
+Real advance_level(fclaw2d_domain_t *domain,
+                   const int& a_level,
+                   const int& a_from_step,
+                   subcycle_manager& a_time_stepper)
+{
+    // Check BCs
+    Real maxcfl_coarse = 0;
+    if (!a_time_stepper.can_advance(a_level,a_from_step))
+    {
+        if (!a_time_stepper.level_exchange_done(a_level,a_from_step))
+        {
+            printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",a_level,a_from_step);
+            exit(1);
+        }
+        if (!a_time_stepper.coarse_exchange_done(a_level,a_from_step))
+        {
+            int last_coarse_step = a_time_stepper.get_last_step(a_level-1);
+            if (a_from_step > last_coarse_step)
+            {
+                int coarse_level = a_level-1;
+                maxcfl_coarse = advance_level(domain,coarse_level,last_coarse_step,a_time_stepper);
+            }
+
+            // Level 'a_level' grid will be averaged onto coarser grid ghost cells;  Coarser
+            // 'a_level-1' will interpolate to finer grid ghost.
+            // This may also require interpolation in time.
+            // bc_coarse_exchange(domain,a_level,a_from_step);
+            int new_coarse_time = a_time_stepper.get_last_step(a_level-1);
+            a_time_stepper.set_coarse_exchange(a_level,new_coarse_time);
+        }
+    }
+
+    fclaw2d_level_time_data_t time_data;
+
+    time_data.maxcfl = maxcfl_coarse;
+    time_data.dt = a_time_stepper.get_dt(a_level);
+    time_data.t = a_time_stepper.current_time(a_level);
+
+    // Advance this level from 'a_from_time' to 'a_from_time + a_time_stepper.time_step_inc(a_level)'
+    fclaw2d_domain_iterate_level(domain, a_level,
+                                 (fclaw2d_patch_callback_t) cb_advance_patch,
+                                 (void *) &time_data);
+
+    a_time_stepper.increment_time_step(a_level);
+
+    bc_level_exchange(domain,a_level);
+
+    return time_data.maxcfl;  // Maximum from level iteration
+
+}
+
+
+Real advance_all_levels(fclaw2d_domain_t *domain, const Real& dt)
+{
+
+    global_parms *gparms = get_domain_data(domain);
+    int maxlevel = gparms->m_maxlevel;
+    int refratio = gparms->m_refratio;
+
+
+    // Construct time step manager
+    Real t_curr = get_domain_time(domain);
+    subcycle_manager time_stepper;
+    time_stepper.define(maxlevel,dt,refratio,t_curr);
+
+    // Time step increment on coarse grid (level 0 grid) is equal
+    // to the number of time steps we must take on the fine grid.
+    int n_fine_steps = time_stepper.time_step_inc(0);
+
+    // Take 'n_fine_steps' on finest level.  Recursively update coarser levels
+    // as needed.
+    int finest_level = maxlevel;
+    Real maxcfl = 0;
+    for(int nf = 0; nf < n_fine_steps; nf++)
+    {
+        Real cfl_level = advance_level(domain,finest_level,nf,time_stepper);
+        maxcfl = max(cfl_level,maxcfl);
+    }
+    return maxcfl;
+}
+
 void amrsetup(fclaw2d_domain_t *domain)
 {
-    global_parms *gparms = new global_parms();
-    cout << "Global parameters " << endl;
-    gparms->get_inputParams();
+    // Check that the minimum level we have is consistent with what
+    // was in input file.
+    global_parms *gparms = get_domain_data(domain);
     gparms->print_inputParams();
-
-    set_domain_data(domain,gparms);
 
     for(int i = 0; i < domain->num_blocks; i++)
     {
@@ -365,34 +438,41 @@ void amrsetup(fclaw2d_domain_t *domain)
     }
 }
 
+void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
+                int this_block_idx, int this_patch_idx, void *user)
+{
+    global_parms *gparms = get_domain_data(domain);
+    ClawPatch *cp = get_patch_data(this_patch);
+
+    cp->initialize();
+    if (gparms->m_maux > 0)
+    {
+        cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,this_patch->level);
+    }
+}
+
 void amrinit(fclaw2d_domain_t *domain)
 {
-    double t = 0;
+    Real t = 0;
     set_domain_time(domain,t);
 
     global_parms *gparms = get_domain_data(domain);
+    int minlevel = gparms->m_minlevel;
+    int maxlevel = gparms->m_maxlevel;
 
     // Set problem dependent parameters for Riemann solvers, etc.
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
     setprob_();
 
-    for(int i = 0; i < domain->num_blocks; i++)
+    // Don't need to iterate level by level, but saves some coding.
+    int user = NULL;
+    for(int level = minlevel; level <= maxlevel; level++)
     {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *patch = &block->patches[j];
-            ClawPatch *cp = get_patch_data(patch);
-
-            // A restart option would be nice, but perhaps a bit complicated for
-            // AMR...
-            cp->initialize();
-            if (gparms->m_maux > 0)
-            {
-                cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,patch->level);
-            }
-        }
+        fclaw2d_domain_iterate_level(domain, level,
+                                     (fclaw2d_patch_callback_t) cb_amrinit,
+                                     (void *) user);
+        bc_level_exchange(domain,level);
     }
 }
 
@@ -406,12 +486,9 @@ void amrrun(fclaw2d_domain_t *domain)
     global_parms *gparms = get_domain_data(domain);
     Real final_time = gparms->m_tfinal;
     int nout = gparms->m_nout;
-    int refratio = gparms->m_refratio;
-    Real t0 = 0; // Should probably have this set by user.
+    Real t0 = 0; // Should have this set by user.
 
     Real dt_outer = (final_time-t0)/Real(nout);
-
-    int num_levels = gparms->m_maxlevel + 1;
 
     Real initial_dt = gparms->m_initial_dt;
     Real dt_cfl = initial_dt;
@@ -423,76 +500,40 @@ void amrrun(fclaw2d_domain_t *domain)
         int n_inner = 0;
         while (t_curr < tend)
         {
-            // Make sure we hit the time step exactly.
-            // Use the tolerance to make sure we don't end up taking a tiny time step just to
-            // hit 'tend'
+            // Use the tolerance to make sure we don't take a tiny time step just to
+            // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
+            // rather than taking a time step of 'dt_cfl' now, followed a time step of only
+            // 'tol' in the next step.
+            // Of course if 'tend - t_curr < dt_cfl', then we take that time step.
             Real dt_inner;
-            Real tol = 1e-8*dt_cfl;
+            Real tol = 1e-4*dt_cfl;
             if (tend - t_curr - dt_cfl < tol)
             {
                 // In this case, 'dt_curr' is only set temporarily to a smaller value
-                dt_inner = tend-t_curr;
+                dt_inner = tend - t_curr;  // <= 'dt_cfl + tol'
             }
             else
             {
-                // Set 'dt_curr' to 'dt_cfl', a value based on cfl number.
                 dt_inner = dt_cfl;
             }
 
-            // First exchange boundary conditions at current coarse time level.
-            patch_exchange_bc(domain);
+            set_domain_time(domain,t_curr);
+            Real maxcfl = advance_all_levels(domain, dt_inner);
 
-            // Take a time step of 'dt_inner/refratio^level on each grid at level 'level'
-            Real maxcfl = 0;
-            for(int level = 0; level < num_levels; level++)
-            {
-                Real dt_level = dt_inner;
-                for (int ii = 1; ii <= level; ii++)
-                {
-                    dt_inner /= refratio;
-                }
-
-                // update on each level, starting with the coarsest level
-                for(int i = 0; i < domain->num_blocks; i++)
-                {
-                    fclaw2d_block_t *block = &domain->blocks[i];
-                    fclaw2d_patch_t *patch = block->patchbylevel[level];
-                    while(patch != NULL)
-                    {
-                        ClawPatch *cp = get_patch_data(patch);
-                        Real cfl_grid;
-
-                        // We could do this with wave speed as well, but then we need to get
-                        // the coarse dx or dy.  As it is, these are encoded in the cfl number.
-                        cfl_grid = cp->step(level,dt_level);  // Dummy routine for now
-                        maxcfl = max(cfl_grid,maxcfl);
-
-                        patch = patch->next;
-                    } // patch loop
-
-                    // At this point, after a level has been updated, we need to transfer
-                    // information to finer levels via interpolation in time.
-
-                    // For now, let's just assume one patch (or only a set of level 0 patches
-                    // partitioning the domain)
-
-                } // block loop
-
-            } // level loop
             t_curr = t_curr + dt_inner;
-            printf("Step %5d : dt = %12.4e;   max. Courant number = %8.4f;   final time = %12.4f\n",n_inner,dt_inner,maxcfl, t_curr);
+            printf("Level 0 step %5d : dt = %12.4e; maxcfl = %8.4f; Final time = %12.4f\n",n_inner,dt_inner,maxcfl, t_curr);
 
             // New time step, based on max cfl number and desired number.
             dt_cfl = dt_inner*gparms->m_desired_cfl/maxcfl;
 
-            n_inner += 1;
+            n_inner++;
 
             // After some number of time steps, we probably need to regrid...
         }
 
         // Output file at every outer loop iteration
-        iframe = iframe + 1;
         set_domain_time(domain,t_curr);
+        iframe = iframe + 1;
         amrout(domain,iframe);
     }
 }
@@ -501,7 +542,7 @@ void amrrun(fclaw2d_domain_t *domain)
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
     global_parms *gparms = get_domain_data(domain);
-    double time = get_domain_time(domain);
+    Real time = get_domain_time(domain);
 
     // Get total number of patches
     int ngrids = 0;

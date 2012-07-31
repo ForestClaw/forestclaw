@@ -43,9 +43,16 @@ main (int argc, char **argv)
   sc_init (mpicomm, 0, 0, NULL, lp);
   p4est_init (NULL, lp);
 
-  domain = fclaw2d_domain_new_unitsquare (mpicomm);
+  // Put this here so that we can read in the minimum level.
+  global_parms *gparms = new global_parms();
+  gparms->get_inputParams();
+
+  int minlevel = gparms->m_minlevel;
+  domain = fclaw2d_domain_new_unitsquare (mpicomm,minlevel);
 
   fclaw2d_domain_count_levels (domain, lp);
+
+  set_domain_data(domain,gparms);
 
   amrsetup(domain);
   amrinit(domain);

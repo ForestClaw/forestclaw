@@ -1,7 +1,7 @@
       subroutine inputparms(mx_leaf,my_leaf,initial_dt, tfinal,
      &      max_cfl, desired_cfl,nout, src_term, verbose, mcapa,
      &      maux,meqn,mwaves,
-     &      maxmwaves,mthlim,mbc,mthbc,order,maxlevel)
+     &      maxmwaves,mthlim,mbc,mthbc,order,minlevel,maxlevel)
       implicit none
 
       integer mx_leaf, my_leaf
@@ -9,7 +9,7 @@
       integer nout, src_term, mcapa, maux, meqn, mwaves
       integer maxmwaves,mbc, verbose
       integer mthbc(4),mthlim(maxmwaves), order(2)
-      integer maxlevel
+      integer maxlevel, minlevel
 
       integer mw, m
 
@@ -51,108 +51,138 @@ c     timestepping variables
       read(55,*) mthbc(3)
       read(55,*) mthbc(4)
 
+      read(55,*) minlevel
       read(55,*) maxlevel
 
       close(55)
       end
 
 
-c     Average fine grid to coarse grid or copy neighboring coarse grid
-      subroutine average_ghost_step1(mx,my,mbc,meqn,
-     &      qcoarse,qfine,idir,iside,refratio,igrid)
+c     # Exchange edge ghost data with neighboring grid at same level.
+      subroutine copy_ghost_edge(mx,my,mbc,meqn,
+     &      qthis,qneighbor,idir)
+      implicit none
+
+      integer mx,my,mbc,meqn,igrid,idir
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer i,j,ibc,jbc,mq
+
+c     # We only have to consider the case of exchanges on
+c     # the high side of 'this' grid.
+c     # We do need to do a complete exchange, though.
+      if (idir .eq. 0) then
+         do j = 1,my
+            do ibc = 1,mbc
+               do mq = 1,meqn
+c                 # Exchange at high side of 'this' grid in
+c                 # x-direction (idir == 0)
+                  qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
+                  qneighbor(ibc-mbc,j,mq) = qthis(mx-mbc+ibc,j,mq)
+               enddo
+            enddo
+         enddo
+      else
+         do i = 1,mx
+            do jbc = 1,mbc
+               do mq = 1,meqn
+c                 # Exchange at high side of 'this' grid in
+c                 # y-direction (idir == 1)
+                  qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
+                  qneighbor(i,jbc-mbc,mq) = qthis(i,my-mbc+jbc,mq)
+               enddo
+            enddo
+         enddo
+      endif
+      end
+
+
+
+c     # Average fine grid to a coarse grid neighbor or copy from neighboring
+c     # grid at same level.
+      subroutine average_ghost_edge(mx,my,mbc,meqn,
+     &      qfine,qcoarse,idir,iside,refratio,igrid)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iside
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
       integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
 
       r2 = refratio*refratio
 
-      if (refratio .eq. 1) then
-c        # We only have to consider the case of exchanges on
-c        # the high side of the coarse grid.
-c        # We do need to do a complete exchange, though.
-         if (idir .eq. 0) then
-            do j = 1,my
-               do ibc = 1,mbc
-                  do mq = 1,meqn
-                     qcoarse(mx+ibc,j,mq) = qfine(ibc,j,mq)
-                     qfine(ibc-mbc,j,mq) = qcoarse(mx-mbc+ibc,j,mq)
+c     # Average fine grid onto coarse grid
+      if (idir .eq. 0) then
+         do j = (igrid-1)*my/refratio,igrid*my/refratio
+            do ibc = 1,mbc
+               do mq = 1,meqn
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        i1 = (ibc-1)*refratio + ii
+                        j1 = (j-1)*refratio + jj
+                        if (iside .eq. 0) then
+                           sum = sum + qfine(mx-i1+1,j1,mq)
+                        else
+                           sum = sum + qfine(i1,j1,mq)
+                        endif
+                     enddo
                   enddo
+                  if (iside .eq. 0) then
+                     qcoarse(1-ibc,j,mq) = sum/r2
+                  else
+                     qcoarse(mx+ibc,j,mq) = sum/r2
+                  endif
                enddo
             enddo
-         else
-            do i = 1,mx
-               do jbc = 1,mbc
-                  do mq = 1,meqn
-                     qcoarse(i,my+jbc,mq) = qfine(i,jbc,mq)
-                     qfine(i,jbc-mbc,mq) = qcoarse(i,my-mbc+jbc,mq)
-                  enddo
-               enddo
-            enddo
-         endif
+         enddo
       else
-c        # Average fine grid onto coarse grid
-         if (idir .eq. 0) then
-            do j = (igrid-1)*my/refratio,igrid*my/refratio
-               do ibc = 1,mbc
-                  do mq = 1,meqn
-                     sum = 0
-                     do ii = 1,refratio
-                        do jj = 1,refratio
-                           i1 = (ibc-1)*refratio + ii
-                           j1 = (j-1)*refratio + jj
-                           if (iside .eq. 0) then
-                              sum = sum + qfine(mx-i1+1,j1,mq)
-                           else
-                              sum = sum + qfine(i1,j1,mq)
-                           endif
-                        enddo
+         do i = (igrid-1)*mx/refratio+1,igrid*mx/refratio
+            do jbc = 1,mbc
+               do mq = 1,meqn
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        i1 = (i-1)*refratio + ii
+                        j1 = (jbc-1)*refratio + jj
+                        if (iside .eq. 2) then
+                           sum = sum + qfine(i1,my-j1+1,mq)
+                        else
+                           sum = sum + qfine(i1,j1,mq)
+                        endif
                      enddo
-                     if (iside .eq. 0) then
-                        qcoarse(1-ibc,j,mq) = sum/r2
-                     else
-                        qcoarse(mx+ibc,j,mq) = sum/r2
-                     endif
                   enddo
+                  if (iside .eq. 0) then
+                     qcoarse(i,1-jbc,mq) = sum/r2
+                  else
+                     qcoarse(i,my+jbc,mq) = sum/r2
+                  endif
                enddo
             enddo
-         else
-            do i = (igrid-1)*mx/refratio+1,igrid*mx/refratio
-               do jbc = 1,mbc
-                  do mq = 1,meqn
-                     sum = 0
-                     do ii = 1,refratio
-                        do jj = 1,refratio
-                           i1 = (i-1)*refratio + ii
-                           j1 = (jbc-1)*refratio + jj
-                           if (iside .eq. 0) then
-                              sum = sum + qfine(i1,my-j1+1,mq)
-                           else
-                              sum = sum + qfine(i1,j1,mq)
-                           endif
-                        enddo
-                     enddo
-                     if (iside .eq. 0) then
-                        qcoarse(i,1-jbc,mq) = sum/r2
-                     else
-                        qcoarse(i,my+jbc,mq) = sum/r2
-                     endif
-                  enddo
-               enddo
-            enddo
-         endif
+         enddo
       endif
 
+      end
+
+      subroutine interpolate_ghost_edge(mx,my,mbc,meqn,qfine,qcoarse,
+     &      idir,iside,refratio,igrid)
+      implicit none
+      integer mx,my,mbc,meqn,refratio,igrid,idir,iside
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision sum
+
+      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
 
 
       end
 
+
 c     Average fine grid to coarse grid or copy neighboring coarse grid
-      subroutine average_corner_step1(mx,my,mbc,meqn,
+      subroutine average_corner(mx,my,mbc,meqn,
      &      qcoarse,qfine,icorner,refratio)
       implicit none
 

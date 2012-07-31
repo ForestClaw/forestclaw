@@ -24,4 +24,5 @@
 1         % mthbc(3) (lower edge)
 1         % mthbc(4) (upper edge)
 
-0         % Maximum levels of refinement
+2         % Minimum level
+2         % Maximum levels of refinement
