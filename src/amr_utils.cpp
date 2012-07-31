@@ -207,18 +207,20 @@ int Box::bigEnd(int idir) const
 subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 
-void subcycle_manager::define(const int& a_maxlevel,
+void subcycle_manager::define(const int& a_minlevel,
+                              const int& a_maxlevel,
                               const Real& a_dt_coarse,
                               const int& a_refratio,
                               const Real& a_t_curr)
 {
     m_t_coarse = a_t_curr;
     m_dt_coarse = a_dt_coarse;
+    m_minlevel = a_minlevel;
     m_maxlevel = a_maxlevel;
     m_refratio = a_refratio;
 
     m_levels.resize(m_maxlevel+1);
-    for(int level = 0; level <= a_maxlevel; level++)
+    for(int level = a_minlevel; level <= a_maxlevel; level++)
     {
         m_levels[level].define(level,m_dt_coarse,m_refratio);
     }
@@ -237,7 +239,7 @@ void subcycle_manager::increment_time_step(const int& a_level)
 
 bool subcycle_manager::is_coarsest(const int& a_level)
 {
-    return a_level == 0;
+    return a_level == m_minlevel;
 }
 
 bool subcycle_manager::is_finest(const int& a_level)
@@ -261,7 +263,7 @@ bool subcycle_manager::can_advance(const int& a_level, const int& a_from_step)
 Real subcycle_manager::current_time(const int& a_level)
 {
     int rfactor = 1;
-    for(int level = 1; level <= m_maxlevel-a_level; level++)
+    for(int level = m_minlevel+1; level <= m_maxlevel-a_level; level++)
     {
         rfactor *= m_refratio;
     }
@@ -315,7 +317,7 @@ void subcycle_manager::set_fine_exchange(const int& a_level, const int& a_time_s
 int subcycle_manager::time_step_inc(const int& a_level)
 {
     int inc = 1;
-    for(int level = 0; level < m_maxlevel-a_level; level++)
+    for(int level = m_minlevel; level < m_maxlevel-a_level; level++)
     {
         inc *= m_refratio;
     }

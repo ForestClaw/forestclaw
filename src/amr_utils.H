@@ -107,7 +107,8 @@ public:
     Real current_time(const int& a_level);
     int time_step_inc(const int& a_level);
 
-    void define(const int& a_maxlevel,
+    void define(const int& a_minlevel,
+                const int& a_maxlevel,
                 const Real& a_dt_coarse,
                 const int& a_refratio,
                 const Real& a_t_curr);
@@ -126,6 +127,7 @@ public:
 
     vector<level_data> m_levels;
     int m_maxlevel;
+    int m_minlevel;
     int m_refratio;
     Real m_dt_coarse;
     Real m_t_coarse;

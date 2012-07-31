@@ -386,6 +386,7 @@ Real advance_all_levels(fclaw2d_domain_t *domain, const Real& dt)
 {
 
     global_parms *gparms = get_domain_data(domain);
+    int minlevel = gparms->m_minlevel;
     int maxlevel = gparms->m_maxlevel;
     int refratio = gparms->m_refratio;
 
@@ -393,7 +394,7 @@ Real advance_all_levels(fclaw2d_domain_t *domain, const Real& dt)
     // Construct time step manager
     Real t_curr = get_domain_time(domain);
     subcycle_manager time_stepper;
-    time_stepper.define(maxlevel,dt,refratio,t_curr);
+    time_stepper.define(minlevel,maxlevel,dt,refratio,t_curr);
 
     // Time step increment on coarse grid (level 0 grid) is equal
     // to the number of time steps we must take on the fine grid.
