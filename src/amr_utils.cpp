@@ -207,24 +207,40 @@ int Box::bigEnd(int idir) const
 subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 
-void subcycle_manager::define(const int& a_minlevel,
-                              const int& a_maxlevel,
+void subcycle_manager::define(const int& a_maxlevel_fixed,
                               const Real& a_dt_coarse,
                               const int& a_refratio,
-                              const Real& a_t_curr)
+                              const Real& a_t_curr,
+                              int a_patches_at_level[])
 {
     m_t_coarse = a_t_curr;
     m_dt_coarse = a_dt_coarse;
-    m_minlevel = a_minlevel;
-    m_maxlevel = a_maxlevel;
     m_refratio = a_refratio;
 
-    m_levels.resize(m_maxlevel+1);
-    for(int level = a_minlevel; level <= a_maxlevel; level++)
+    m_levels.resize(m_maxlevel + 1); // Too many elements if m_minlevel > 0, but we want to be
+                                     // able to index using full range of indices.
+
+    m_minlevel = 0;
+    for(int level = 0; level <= a_maxlevel_fixed; level++)
     {
-        m_levels[level].define(level,m_dt_coarse,m_refratio);
+        int np = a_patches_at_level[level];
+        if (level == m_minlevel && np == 0)
+            m_minlevel++;
     }
 
+    m_maxlevel = a_maxlevel_fixed;
+    for (int level = a_maxlevel_fixed; level >= 0; level--)
+    {
+        int np = a_patches_at_level[level];
+        if (level == m_maxlevel && np == 0)
+            m_maxlevel--;
+    }
+
+    for (int level = m_minlevel; level <= m_maxlevel; level++)
+    {
+        int np = a_patches_at_level[level];
+        m_levels[level].define(level,m_dt_coarse,m_refratio,np);
+    }
 }
 
 int subcycle_manager::get_last_step(const int& a_level)
@@ -249,7 +265,16 @@ bool subcycle_manager::is_finest(const int& a_level)
 
 Real subcycle_manager::get_dt(const int& a_level)
 {
-    return m_levels[a_level].m_dt_level;
+    if (a_level >= m_minlevel && a_level <= m_maxlevel)
+    {
+        return m_levels[a_level].m_dt_level;
+    }
+    else
+    {
+        printf("Error (get_dt) : level not defined\n");
+        exit(1);
+    }
+
 }
 
 bool subcycle_manager::can_advance(const int& a_level, const int& a_from_step)
@@ -317,7 +342,7 @@ void subcycle_manager::set_fine_exchange(const int& a_level, const int& a_time_s
 int subcycle_manager::time_step_inc(const int& a_level)
 {
     int inc = 1;
-    for(int level = m_minlevel; level < m_maxlevel-a_level; level++)
+    for(int level = 0; level < m_maxlevel-a_level; level++)
     {
         inc *= m_refratio;
     }
@@ -331,7 +356,8 @@ level_data::~level_data() {}
 
 void level_data::define(const int& a_level,
                         const Real& dt_coarse,
-                        const int& a_refratio)
+                        const int& a_refratio,
+                        const int& a_patches_at_level)
 {
     m_level = a_level;
     m_last_time_step = 0;
@@ -345,4 +371,21 @@ void level_data::define(const int& a_level,
     {
         m_dt_level /= a_refratio;
     }
+    m_num_patches = a_patches_at_level;
+}
+
+
+void cb_num_patches(fclaw2d_domain_t *domain,
+	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+{
+  (*(int *) user)++;
+}
+
+int num_patches(fclaw2d_domain_t *domain, int level)
+{
+  int count = 0;
+  fclaw2d_domain_iterate_level(domain, level,
+                               (fclaw2d_patch_callback_t) cb_num_patches,
+                               &count);
+  return count;
 }

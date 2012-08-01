@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
+#include "fclaw2d_convenience.h"
 
 #include <cmath>
 #include <iostream>
@@ -295,7 +296,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
 }
 
 
-void bc_coarse_exchange(fclaw2d_domain_t *domain, const int& a_level)
+void bc_coarse_exchange(fclaw2d_domain_t *domain, const int& a_level, const int& a_at_time)
 {
     // First, average fine grid to coarse grid cells
     int user = NULL;
@@ -303,6 +304,8 @@ void bc_coarse_exchange(fclaw2d_domain_t *domain, const int& a_level)
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  (fclaw2d_patch_callback_t) cb_bc_average,
                                  (void *) user);
+
+    // Interpolate in time, if necessary
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
@@ -335,6 +338,8 @@ Real advance_level(fclaw2d_domain_t *domain,
                    const int& a_from_step,
                    subcycle_manager& a_time_stepper)
 {
+
+    printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.get_dt(a_level));
     // Check BCs
     Real maxcfl_coarse = 0;
     if (!a_time_stepper.can_advance(a_level,a_from_step))
@@ -356,7 +361,7 @@ Real advance_level(fclaw2d_domain_t *domain,
             // Level 'a_level' grid will be averaged onto coarser grid ghost cells;  Coarser
             // 'a_level-1' will interpolate to finer grid ghost.
             // This may also require interpolation in time.
-            // bc_coarse_exchange(domain,a_level,a_from_step);
+            bc_coarse_exchange(domain,a_level,a_from_step);
             int new_coarse_time = a_time_stepper.get_last_step(a_level-1);
             a_time_stepper.set_coarse_exchange(a_level,new_coarse_time);
         }
@@ -374,8 +379,10 @@ Real advance_level(fclaw2d_domain_t *domain,
                                  (void *) &time_data);
 
     a_time_stepper.increment_time_step(a_level);
-
     bc_level_exchange(domain,a_level);
+
+    int new_time = a_time_stepper.get_last_step(a_level);
+    a_time_stepper.set_level_exchange(a_level,new_time);
 
     return time_data.maxcfl;  // Maximum from level iteration
 
@@ -386,15 +393,20 @@ Real advance_all_levels(fclaw2d_domain_t *domain, const Real& dt)
 {
 
     global_parms *gparms = get_domain_data(domain);
-    int minlevel = gparms->m_minlevel;
     int maxlevel = gparms->m_maxlevel;
     int refratio = gparms->m_refratio;
+
+    int patches_at_level[maxlevel+1];
+    for(int level = 0; level <= maxlevel; level++)
+    {
+        patches_at_level[level] = num_patches(domain,level);
+    }
 
 
     // Construct time step manager
     Real t_curr = get_domain_time(domain);
     subcycle_manager time_stepper;
-    time_stepper.define(minlevel,maxlevel,dt,refratio,t_curr);
+    time_stepper.define(maxlevel,dt,refratio,t_curr,patches_at_level);
 
     // Time step increment on coarse grid (level 0 grid) is equal
     // to the number of time steps we must take on the fine grid.

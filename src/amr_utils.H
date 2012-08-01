@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <vector>
 
+#include "fclaw2d_convenience.h"
+
 using std::ifstream;
 using std::ios;
 using std::vector;
@@ -47,6 +49,8 @@ const int SpaceDim = CH_SPACEDIM;
 #define endl std::endl
 
 typedef double Real;
+
+int num_patches(fclaw2d_domain_t *domain, int level);
 
 extern "C"
 {
@@ -83,7 +87,8 @@ public:
 
     void define(const int& a_level,
                 const Real& a_dt_coarse,
-                const int& a_refratio);
+                const int& a_refratio,
+                const int& a_num_patches);
 
 
     int m_level;
@@ -92,6 +97,7 @@ public:
     int m_last_coarse_exchange;
     int m_last_fine_exchange;
     Real m_dt_level;
+    int m_num_patches;
 };
 
 class subcycle_manager
@@ -107,11 +113,11 @@ public:
     Real current_time(const int& a_level);
     int time_step_inc(const int& a_level);
 
-    void define(const int& a_minlevel,
-                const int& a_maxlevel,
+    void define(const int& a_maxlevel_fixed,
                 const Real& a_dt_coarse,
                 const int& a_refratio,
-                const Real& a_t_curr);
+                const Real& a_t_curr,
+                int a_numpatches[]);
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
