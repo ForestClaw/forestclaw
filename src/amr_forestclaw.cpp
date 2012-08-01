@@ -326,8 +326,14 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
 
     Real dt = time_data->dt;
-    // Real t = time_data->t;
-    Real maxcfl_grid = cp->step(dt);
+    Real t = time_data->t;
+
+    global_parms *gparms = get_domain_data(domain);
+    int refratio = gparms->m_refratio;
+    int level = this_patch->level;
+    Real maxcfl_grid = cp->step_noqad(t,dt,refratio,level,*gparms);
+
+    //Real maxcfl_grid = cp->step(dt);
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 
@@ -339,7 +345,7 @@ Real advance_level(fclaw2d_domain_t *domain,
                    subcycle_manager& a_time_stepper)
 {
 
-    printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.get_dt(a_level));
+    // printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.get_dt(a_level));
     // Check BCs
     Real maxcfl_coarse = 0;
     if (!a_time_stepper.can_advance(a_level,a_from_step))
