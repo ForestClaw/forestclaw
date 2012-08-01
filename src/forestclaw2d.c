@@ -51,6 +51,26 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
   }
 }
 
+void
+fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
+			      fclaw2d_patch_callback_t pcb, void *user)
+{
+    int i,j;
+    fclaw2d_block_t	*block;
+    fclaw2d_patch_t	*patch;
+
+  for (i = 0; i < domain->num_blocks; i++)
+  {
+      block = domain->blocks + i;
+      for (j = 0; j < block->num_patches; j++)
+      {
+          patch = block->patches + j;
+          pcb(domain, patch, i, j, user);
+      }
+  }
+}
+
+
 int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
                 int blockno, int patchno, int boundaries[P4EST_FACES])
@@ -146,7 +166,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
 
   block = domain->blocks + blockno;
   P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
-  
+
   tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
   totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
   P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);

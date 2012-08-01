@@ -558,6 +558,23 @@ void amrrun(fclaw2d_domain_t *domain)
 }
 
 
+void cb_amrout(fclaw2d_domain_t *domain,
+               fclaw2d_patch_t *this_patch,
+               int this_block_idx,
+               int this_patch_idx,
+               void *user)
+{
+    int num = this_block_idx*domain->num_blocks + this_patch_idx + 1;
+    int level = this_patch->level + 1;  // Matlab wants levels to start at 1.
+
+    // Patch data is appended to fort.qXXXX
+    ClawPatch *cp = get_patch_data(this_patch);
+    int iframe = *((int *) user);
+
+    cp->write_patch_data(iframe, num, level);[
+}
+
+
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
     global_parms *gparms = get_domain_data(domain);
@@ -579,12 +596,36 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
     // 0010, 0114).
     new_qfile_(&iframe);
+
+
+    // This version uses up all available memory.  Or runs very slowly.  Or returns
+    // with a hard-to-parse error message.  Why?
+    /*
+    fclaw2d_domain_iterate_patches(domain,
+                                   (fclaw2d_patch_callback_t) cb_amrout,
+                                   (void *) &iframe);
+    */
+
+
+    // This version (without call to cb_amrout) is fine. It is also much faster
+    // in the case when the 'iterate' version above works.
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = &block->patches[j];
+
+            // Using this instead uses up all memory as well.
+            // When everything is commented out of 'cb_amrout', code
+            // crashes with error
+            // "terminate called after throwing an instance of 'std::length_error'"
+
+            // cb_amrout(domain,patch,i,j,(void*) &iframe);
+
+
+
+            // Code works fine (or appears to) if this is used instead.
             ClawPatch *cp = get_patch_data(patch);
             int num = i*domain->num_blocks + j + 1;
             int level = patch->level + 1;

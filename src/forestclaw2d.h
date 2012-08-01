@@ -83,9 +83,13 @@ typedef void (*fclaw2d_patch_callback_t)
 			(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
 			 int blockno, int patchno, void *user);
 
-void			fclaw2d_domain_iterate_level
-				(fclaw2d_domain_t *domain, int level,
-				 fclaw2d_patch_callback_t pcb, void *user);
+void fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
+                                   fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_callback_t pcb, void *user);
+
+
 
 /** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
