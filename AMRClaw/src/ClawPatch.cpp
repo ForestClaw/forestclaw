@@ -258,6 +258,56 @@ Real ClawPatch::step(const Real& dt_level)
     return cfl_grid;
 }
 
+#if CH_SPACEDIM == 2
+
+Real ClawPatch::step_noqad(const Real& a_time,
+                           const Real& a_dt,
+                           const int& a_refRatio,
+                           const int& a_level,
+                           const global_parms& gparms)
+{
+
+    Real dt = a_dt;
+
+  // Data for step2 or step3.  This is overwritten by updated values.
+    Real* qold = m_griddata.dataPtr();
+    Real* aux = m_auxarray.dataPtr();
+
+    int maxm = max(m_mx,m_my);
+
+  // set common block for level
+  set_common_levels_(gparms.m_maxlevel,a_level,gparms.m_refratio);
+
+
+  Real cflgrid;
+
+
+  int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn + (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
+  Real* work = new Real[mwork];
+
+  Real* fp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  Real* fm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  Real* gp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  Real* gm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+
+  clawpatch2_(maxm, gparms.m_meqn, gparms.m_maux, gparms.m_mbc, gparms.m_method,
+              gparms.m_mthlim,
+              gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold, aux,
+              m_dx, m_dy, dt, cflgrid, work, mwork,
+              m_xlower, m_ylower,a_level,
+              a_time, fp, fm, gp, gm);
+
+  delete [] fp;
+  delete [] fm;
+  delete [] gp;
+  delete [] gm;
+
+  delete [] work;
+
+  return cflgrid;
+}
+#endif
+
 
 Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
                                     const Real& a_dt,

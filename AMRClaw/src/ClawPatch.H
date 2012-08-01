@@ -189,6 +189,7 @@ extern "C" {
               const Real& dt,
               const int mthbc[]);
 
+
     void clawpatch2_(const int& maxm,
                      const int& meqn,
                      const int& maux,
@@ -207,31 +208,14 @@ extern "C" {
                      const Real& cfl,
                      Real work[],
                      const int& mwork,
-                     Real qold_coarse[],
-                     Real auxold_coarse[],
-                     Real qadd_x[],
-                     Real qadd_y[],
-                     const int auxtype_int[],
                      const Real& xlower,
                      const Real& ylower,
-                     int* intersectsBoundaries,
                      const int& level,
-                     const int mthbc[],
                      const Real& t,
-                     const int& mxc,
-                     const int& myc,
                      Real fp[],
                      Real fm[],
                      Real gp[],
-                     Real gm[],
-                     Real fp_chombo[],
-                     Real fm_chombo[],
-                     Real gp_chombo[],
-                     Real gm_chombo[],
-                     Real fpc_chombo[],
-                     Real fmc_chombo[],
-                     Real gpc_chombo[],
-                     Real gmc_chombo[]);
+                     Real gm[]);
 
 
     void estimate_error2_(const int& mx,
@@ -500,6 +484,12 @@ public :
                     const Real& dt);
 
     Real step(const Real& dt);
+
+    Real step_noqad(const Real& a_time,
+                    const Real& a_dt,
+                    const int& refRatio,const int& a_level,
+                    const global_parms &gparms);
+
 
     Real ClawPatchIntegrator(const Real& a_time,
                              const Real& a_dt,
