@@ -9,7 +9,7 @@ c     # stream function
       double precision x,y,pi
       common /compi/ pi
 
-      psi = ((dsin(pi*x))**2 * (dsin(pi*y))**2) / pi
+      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 
       return
       end

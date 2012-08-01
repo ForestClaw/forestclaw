@@ -13,8 +13,8 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 exampleobjs = \
 	qinit.o \
-	rpn2.o \
-	rpt2.o \
+	rpn2ad1.o \
+	rpt2ad1.o \
 	setaux.o \
 	setprob.o \
 	b4step2.o \
