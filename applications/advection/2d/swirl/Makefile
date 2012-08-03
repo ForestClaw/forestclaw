@@ -53,4 +53,4 @@ clean:
 	rm -f *.o
 
 realclean:
-	rm -f *.o $(amrclawobjs) fort.*
+	rm -f *.o $(amrclawobjs) fort.* $(TARGET)

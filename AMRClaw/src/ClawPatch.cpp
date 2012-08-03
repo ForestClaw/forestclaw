@@ -251,10 +251,14 @@ void ClawPatch::setAuxArray(const int& a_maxlevel,
 
 }
 
-Real ClawPatch::step(const Real& dt_level)
+Real ClawPatch::step(const Real& a_time,
+                     const Real& a_dt,
+                     const int& a_refRatio,
+                     const int& a_level,
+                     const global_parms& gparms)
 {
     Real maxwavespeed = 1; // Making this up...
-    Real cfl_grid = dt_level/m_dx*maxwavespeed; //
+    Real cfl_grid = a_dt/m_dx*maxwavespeed; //
     return cfl_grid;
 }
 

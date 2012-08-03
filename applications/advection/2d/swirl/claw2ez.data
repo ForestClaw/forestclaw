@@ -1,10 +1,10 @@
-32        % mx_leaf
-32        % my_leaf
+64        % mx_leaf
+64        % my_leaf
 
 16        % nout
 4.0       % tfinal
 
-0.01      % Initial time step
+0.009      % Initial time step
 1.0       % maximum cfl
 0.9       % desired cfl
 
@@ -24,5 +24,5 @@
 1         % mthbc(3) (lower edge)
 1         % mthbc(4) (upper edge)
 
-0         % Minimum level
-0         % Maximum levels of refinement
+1         % Minimum level
+1         % Maximum levels of refinement

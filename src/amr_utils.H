@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "fclaw2d_convenience.h"
+#include "forestclaw2d.h"
 
 using std::ifstream;
 using std::ios;
@@ -50,7 +51,10 @@ const int SpaceDim = CH_SPACEDIM;
 
 typedef double Real;
 
+class global_parms;
+
 int num_patches(fclaw2d_domain_t *domain, int level);
+global_parms* get_domain_data(fclaw2d_domain_t *domain);
 
 extern "C"
 {
@@ -86,10 +90,10 @@ public:
     ~level_data();
 
     void define(const int& a_level,
-                const Real& a_dt_coarse,
                 const int& a_refratio,
                 const int& a_num_patches);
 
+    void set_dt_level(const Real& a_dt);
 
     int m_level;
     int m_last_time_step;
@@ -105,23 +109,24 @@ class subcycle_manager
 public:
     subcycle_manager();
     ~subcycle_manager();
+    void define(fclaw2d_domain_t *domain,const Real& a_time);
+
+    bool can_advance(const int& a_level, const int& a_from_step);
 
     bool time_step_done(const int& a_level, const int& a_time_step);
     int get_last_step(const int& a_level);
     void increment_time_step(const int& a_level);
-    bool can_advance(const int& a_level, const int& a_from_step);
     Real current_time(const int& a_level);
     int time_step_inc(const int& a_level);
+    void set_dt_minlevel(const Real& a_dt);
 
-    void define(const int& a_maxlevel_fixed,
-                const Real& a_dt_coarse,
-                const int& a_refratio,
-                const Real& a_t_curr,
-                int a_numpatches[]);
+    int reduce_to_minlevel(const Real& a_dt);
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
     Real get_dt(const int& level);
+    int get_minlevel();
+    int get_maxlevel();
 
     bool level_exchange_done(const int& a_level, const int& a_time_step);
     bool coarse_exchange_done(const int& a_level, const int& a_time_step);
@@ -135,8 +140,8 @@ public:
     int m_maxlevel;
     int m_minlevel;
     int m_refratio;
-    Real m_dt_coarse;
-    Real m_t_coarse;
+    Real m_dt_minlevel;
+    Real m_t_minlevel;
 };
 
 

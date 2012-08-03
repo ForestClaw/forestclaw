@@ -207,40 +207,78 @@ int Box::bigEnd(int idir) const
 subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 
-void subcycle_manager::define(const int& a_maxlevel_fixed,
-                              const Real& a_dt_coarse,
-                              const int& a_refratio,
-                              const Real& a_t_curr,
-                              int a_patches_at_level[])
+void subcycle_manager::define(fclaw2d_domain_t *domain,
+                              const Real& a_t_curr)
 {
-    m_t_coarse = a_t_curr;
-    m_dt_coarse = a_dt_coarse;
-    m_refratio = a_refratio;
+    global_parms *gparms = get_domain_data(domain);
+    m_t_minlevel = a_t_curr;
+    m_refratio = gparms->m_refratio;
 
-    m_levels.resize(m_maxlevel + 1); // Too many elements if m_minlevel > 0, but we want to be
-                                     // able to index using full range of indices.
+    // Finest level we can ever have.  For any particular run, however
+    // the finest level may not be this fine.  This is stored in this->m_maxlevel,
+    // computed below.
+    int maxlevel_fixed = gparms->m_maxlevel;
+
+    // Too many elements if m_minlevel > 0, but we want to be
+    // able to index using full range of indices.
+    m_levels.resize(maxlevel_fixed + 1);
 
     m_minlevel = 0;
-    for(int level = 0; level <= a_maxlevel_fixed; level++)
+    for(int level = 0; level <= maxlevel_fixed; level++)
     {
-        int np = a_patches_at_level[level];
+        int np = num_patches(domain,level);
         if (level == m_minlevel && np == 0)
             m_minlevel++;
     }
 
-    m_maxlevel = a_maxlevel_fixed;
-    for (int level = a_maxlevel_fixed; level >= 0; level--)
+    m_maxlevel = maxlevel_fixed;
+    for (int level = maxlevel_fixed; level >= 0; level--)
     {
-        int np = a_patches_at_level[level];
+        int np = num_patches(domain,level);
         if (level == m_maxlevel && np == 0)
             m_maxlevel--;
     }
 
     for (int level = m_minlevel; level <= m_maxlevel; level++)
     {
-        int np = a_patches_at_level[level];
-        m_levels[level].define(level,m_dt_coarse,m_refratio,np);
+        int np = num_patches(domain,level);
+        m_levels[level].define(level,m_refratio,np);
     }
+}
+
+void subcycle_manager::set_dt_minlevel(const Real& a_dt_minlevel)
+{
+    // Time step for coarsest level that has grids
+    m_dt_minlevel = a_dt_minlevel;
+
+    Real dt_level = a_dt_minlevel;
+    m_levels[m_minlevel].set_dt_level(dt_level);
+    for (int level = m_minlevel+1; level <= m_maxlevel; level++)
+    {
+        dt_level /= m_refratio;
+        m_levels[level].set_dt_level(dt_level);
+    }
+}
+
+int subcycle_manager::reduce_to_minlevel(const Real& a_dt)
+{
+    Real dt_minlevel = a_dt;
+    for (int level = 1; level <= m_minlevel; level++)
+    {
+        dt_minlevel/= m_refratio;
+    }
+    return dt_minlevel;
+}
+
+
+int subcycle_manager::get_minlevel()
+{
+    return m_minlevel;
+}
+
+int subcycle_manager::get_maxlevel()
+{
+    return m_maxlevel;
 }
 
 int subcycle_manager::get_last_step(const int& a_level)
@@ -282,7 +320,8 @@ bool subcycle_manager::can_advance(const int& a_level, const int& a_from_step)
     bool b1 = level_exchange_done(a_level, a_from_step);
     bool b2 = coarse_exchange_done(a_level,a_from_step);
     bool b3 = fine_exchange_done(a_level,a_from_step);
-    return b1 && b2 && b3;
+    bool b4 = time_step_done(a_level,a_from_step);
+    return b1 && b2 && b3 && b4;
 }
 
 Real subcycle_manager::current_time(const int& a_level)
@@ -294,7 +333,7 @@ Real subcycle_manager::current_time(const int& a_level)
     }
     Real dt_level = m_levels[a_level].m_dt_level;
     int last_step = m_levels[a_level].m_last_time_step;
-    return m_t_coarse + dt_level*last_step/rfactor;
+    return m_t_minlevel + dt_level*last_step/rfactor;
 }
 
 bool subcycle_manager::time_step_done(const int& a_level, const int& a_time_step)
@@ -355,7 +394,6 @@ level_data::level_data() { }
 level_data::~level_data() {}
 
 void level_data::define(const int& a_level,
-                        const Real& dt_coarse,
                         const int& a_refratio,
                         const int& a_patches_at_level)
 {
@@ -366,14 +404,13 @@ void level_data::define(const int& a_level,
     m_last_coarse_exchange = 0;
     m_last_fine_exchange = 0;
 
-    m_dt_level = dt_coarse;
-    for (int ir = 1; ir <= m_level; ir++)
-    {
-        m_dt_level /= a_refratio;
-    }
     m_num_patches = a_patches_at_level;
 }
 
+void level_data::set_dt_level(const Real& a_dt_level)
+{
+    m_dt_level = a_dt_level;
+}
 
 void cb_num_patches(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)

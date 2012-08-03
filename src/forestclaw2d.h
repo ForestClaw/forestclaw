@@ -124,9 +124,9 @@ fclaw2d_face_neighbor_t;
  * \return			The Type of face neighbor connection.
  */
 fclaw2d_face_neighbor_t	fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
-				int blockno, int patchno, int faceno,
-				int rproc[2], int rblockno[2],
-				int rpatchno[2], int *rfaceno);
+                                                      int blockno, int patchno, int faceno,
+                                                      int rproc[2], int rblockno[2],
+                                                      int rpatchno[2], int *rfaceno);
 
 #ifdef __cplusplus
 }
