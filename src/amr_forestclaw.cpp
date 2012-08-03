@@ -108,7 +108,9 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
 
     fclaw2d_face_neighbor_t neighbor_type =
         fclaw2d_patch_face_neighbors(domain,
-                                     this_block_idx,this_patch_idx,iside,
+                                     this_block_idx,
+                                     this_patch_idx,
+                                     iside,
                                      rproc,
                                      rblockno,
                                      rpatchno,
@@ -124,7 +126,7 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio; // == P4EST_HALF ??
 
-    *neighbor_block_idx = rblockno[0];  // Can an edge have more than one block as a neighbor?
+    *neighbor_block_idx = rblockno[0];  // Can a patch edge have more than one block as a neighbor?
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
     {
         *ref_flag = 1;  // Neighbors are finer grids
