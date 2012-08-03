@@ -130,15 +130,17 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
 
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
     {
-        *ref_flag = -1;
-        for(int ir = 0; ir < refratio; ir++)
-        {
-            neighbor_patch_idx[ir] = NULL;
-        }
-    }
-    else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
-    {
-        *ref_flag = 1;  // Neighbors are finer grids
+        // Edge is//  a physical boundary
+//         *ref_flag = -1;
+//         for(int ir = 0; ir < refratio; ir++)
+//         {
+//             neighbor_patch_idx[ir] = -1;
+//         }
+//     }
+//     else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
+//     {
+        // Neighbors are finer grids
+        *ref_flag = 1;
         for(int ir = 0; ir < refratio; ir++)
         {
             neighbor_patch_idx[ir] = rpatchno[ir];
