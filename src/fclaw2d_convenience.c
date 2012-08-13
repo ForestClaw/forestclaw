@@ -189,3 +189,46 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   }
   P4EST_ASSERT (count_all == domain->num_patches_all);
 }
+
+typedef struct fclaw2d_domain_list_neighbors
+{
+  int			lp;
+  int			count;
+}
+fclaw2d_domain_list_neighbors_t;
+
+static void
+fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t *domain,
+	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+{
+  fclaw2d_domain_list_neighbors_t	*ln = user;
+  fclaw2d_face_neighbor_t	fnt;
+  int				faceno;
+  int				rproc[2], rblockno[2], rpatchno[2], rfaceno;
+
+  P4EST_ASSERT (0 <= block_no && block_no < domain->num_blocks);
+  P4EST_ASSERT (0 <= patch_no &&
+  		patch_no < domain->blocks[block_no].num_patches);
+  P4EST_ASSERT (patch == domain->blocks[block_no].patches + patch_no);
+
+  for (faceno = 0; faceno < P4EST_FACES; ++faceno) {
+    fnt = fclaw2d_patch_face_neighbors (domain, block_no, patch_no, faceno,
+    			rproc, rblockno, rpatchno, &rfaceno);
+    P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
+    			block_no, patch_no, faceno, fnt);
+  }
+
+  ++ln->count;
+}
+
+void
+fclaw2d_domain_list_neighbors (fclaw2d_domain_t *domain, int lp)
+{
+  fclaw2d_domain_list_neighbors_t ln;
+
+  ln.lp = lp;
+  ln.count = 0;
+  fclaw2d_domain_iterate_patches (domain,
+  		fclaw2d_domain_list_neighbors_callback, &ln);
+  P4EST_ASSERT (ln.count == domain->num_patches_all);
+}

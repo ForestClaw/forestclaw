@@ -32,14 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-    fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,int initial_grid);
+fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,
+						int initial_grid);
 fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm);
 
 void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);
 
 /** Count patches by level on the local processor */
 void			fclaw2d_domain_count_levels (fclaw2d_domain_t *domain,
-						     int log_priority);
+						int log_priority);
+
+/** Print face neighbor status for each face */
+void                    fclaw2d_domain_list_neighbors (fclaw2d_domain_t *domain,
+						int log_priority);
 
 #ifdef __cplusplus
 }
