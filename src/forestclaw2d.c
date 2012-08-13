@@ -180,7 +180,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
     rpatchno[0] = patchno;
     *rfaceno = faceno;
     /* the physical boundary type is encoded in procs[1] for convenience */
-    for (k = 1; k < P4EST_FACES; ++k) {
+    for (k = 1; k < P4EST_HALF; ++k) {
       rproc[k] = -1;
       rblockno[k] = -1;
       rpatchno[k] = -1;
@@ -203,7 +203,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
     /* one same-size or double-size neighbor */
     fclaw2d_patch_encode_neighbor (domain, mesh, qtq,
     				rproc, rblockno, rpatchno);
-    for (k = 1; k < P4EST_FACES; ++k) {
+    for (k = 1; k < P4EST_HALF; ++k) {
       rproc[k] = -1;
       rblockno[k] = -1;
       rpatchno[k] = -1;
