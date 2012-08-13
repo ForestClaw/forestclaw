@@ -102,7 +102,7 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
     // This seems to be messing with memory.  Am I calling it correctly?
 
     int rproc[P4EST_HALF];
-    int rblockno[P4EST_HALF];
+    int rblockno;
     int rpatchno[P4EST_HALF];
     int rfaceno;
 
@@ -112,7 +112,7 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
                                      this_patch_idx,
                                      iside,
                                      rproc,
-                                     rblockno,
+                                     &rblockno,
                                      rpatchno,
                                      &rfaceno);
 
@@ -126,8 +126,8 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio; // == P4EST_HALF ??
 
-    *neighbor_block_idx = rblockno[0];  // Can a patch edge have more than one block as a
-                                        // neighbor?
+    *neighbor_block_idx = rblockno;
+
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
     {
         *ref_flag = -1;
