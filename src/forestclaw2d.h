@@ -128,6 +128,17 @@ fclaw2d_face_neighbor_t	fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
                                                       int rproc[2], int rblockno[2],
                                                       int rpatchno[2], int *rfaceno);
 
+/** Mark a patch for refinement.
+ */
+void			fclaw2d_patch_mark_refine (fclaw2d_domain_t *domain,
+				int blockno, int patchno);
+
+/** Mark a patch for coarsening.
+ * Coarsening will only happen if all sibling patches are marked as well.
+ */
+void			fclaw2d_patch_mark_coarsen (fclaw2d_domain_t *domain,
+				int blockno, int patchno);
+
 #ifdef __cplusplus
 }
 #endif

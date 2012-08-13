@@ -225,3 +225,33 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
     }
   }
 }
+
+void
+fclaw2d_patch_mark_refine (fclaw2d_domain_t *domain, int blockno, int patchno)
+{
+  int			totalpatchno;
+  fclaw2d_block_t	*block;
+
+  P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+  block = domain->blocks + blockno;
+  P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+  totalpatchno = block->num_patches_before + patchno;
+  P4EST_ASSERT (0 <= totalpatchno && totalpatchno < domain->num_patches_all);
+
+  domain->pp->flags[totalpatchno] = P4EST_WRAP_REFINE;
+}
+
+void
+fclaw2d_patch_mark_coarsen (fclaw2d_domain_t *domain, int blockno, int patchno)
+{
+  int			totalpatchno;
+  fclaw2d_block_t	*block;
+
+  P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+  block = domain->blocks + blockno;
+  P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+  totalpatchno = block->num_patches_before + patchno;
+  P4EST_ASSERT (0 <= totalpatchno && totalpatchno < domain->num_patches_all);
+
+  domain->pp->flags[totalpatchno] = P4EST_WRAP_COARSEN;
+}
