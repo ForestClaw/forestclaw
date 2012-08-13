@@ -79,17 +79,33 @@ struct fclaw2d_domain
   void			*user;
 };
 
+/** Callback prototype for the patch iterators.
+ * \param [in] domain	General domain structure.
+ * \param [in] patch	The patch currently processed by the iterator.
+ * \param [in] blockno  Block number of processed patch.
+ * \param [in] patchno  Patch number within block of processed patch.
+ * \param [in,out] user	Data that was passed into the iterator functions.
+ */
 typedef void (*fclaw2d_patch_callback_t)
 			(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
 			 int blockno, int patchno, void *user);
 
+/** Iterate over all patches on a given level.
+ * \param [in] domain	General domain structure.
+ * \param [in] level	Level to iterate.  Ignore patches of other levels.
+ * \param [in] pcb	Function called for each patch of matching level.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
 void fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
 
+/** Iterate over all patches of all levels.
+ * \param [in] domain	General domain structure.
+ * \param [in] pcb	Function called for each patch in the domain.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
 void fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
                                      fclaw2d_patch_callback_t pcb, void *user);
-
-
 
 /** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
@@ -124,9 +140,9 @@ fclaw2d_face_neighbor_t;
  * \return			The Type of face neighbor connection.
  */
 fclaw2d_face_neighbor_t	fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
-                                                      int blockno, int patchno, int faceno,
-                                                      int rproc[2], int rblockno[2],
-                                                      int rpatchno[2], int *rfaceno);
+				int blockno, int patchno, int faceno,
+				int rproc[2], int rblockno[2],
+				int rpatchno[2], int *rfaceno);
 
 /** Mark a patch for refinement.
  */

@@ -70,7 +70,6 @@ fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
   }
 }
 
-
 int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
                 int blockno, int patchno, int boundaries[P4EST_FACES])
