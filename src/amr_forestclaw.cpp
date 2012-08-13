@@ -655,17 +655,17 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
 
     // This version uses up all available memory.  Or runs very slowly.  Or returns
     // with a hard-to-parse error message.  Why?
-    /*
-    fclaw2d_domain_iterate_patches(domain,
-                                   (fclaw2d_patch_callback_t) cb_amrout,
-                                   (void *) &iframe);
-    */
+    // Did it fix itself along with fclaw2d_patch_face_neighbors?
+    fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
 
 
     // This version (without call to cb_amrout) is fine. It is also much faster
     // in the case when the 'iterate' version above works.
     for(int i = 0; i < domain->num_blocks; i++)
     {
+        /* The iterator above seems to work fine now */
+        break;
+
         fclaw2d_block_t *block = &domain->blocks[i];
         for(int j = 0; j < block->num_patches; j++)
         {
