@@ -144,10 +144,11 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t *domain, p4est_mesh_t * mesh,
 fclaw2d_face_neighbor_t
 fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
 			int blockno, int patchno, int faceno,
-			int rproc[P4EST_HALF], int rblockno[P4EST_HALF],
+			int rproc[P4EST_HALF], int *rblockno,
 			int rpatchno[P4EST_HALF], int *rfaceno)
 {
   int			k;
+  int			hblockno[P4EST_HALF];
   int8_t                qtf;
   p4est_locidx_t        totalleaf;
   p4est_locidx_t        qtq, *qth;
@@ -176,13 +177,12 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
   if (qtq == totalleaf && qtf == faceno) {
     /* physical domain boundary encoded by same patch face */
     rproc[0] = domain->mpirank;
-    rblockno[0] = blockno;
+    *rblockno = blockno;
     rpatchno[0] = patchno;
     *rfaceno = faceno;
     /* the physical boundary type is encoded in procs[1] for convenience */
     for (k = 1; k < P4EST_HALF; ++k) {
       rproc[k] = -1;
-      rblockno[k] = -1;
       rpatchno[k] = -1;
     }
     rproc[1] = block->mthbc[faceno];
@@ -193,8 +193,10 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
     qth = (p4est_locidx_t *) sc_array_index (mesh->quad_to_half, qtq);
     for (k = 0; k < P4EST_HALF; ++k) {
       fclaw2d_patch_encode_neighbor (domain, mesh, qth[k],
-		      		rproc + k, rblockno + k, rpatchno + k);
+		      		rproc + k, hblockno + k, rpatchno + k);
+      P4EST_ASSERT (k == 0 || hblockno[k - 1] == hblockno[k]);
     }
+    *rblockno = hblockno[0];
     *rfaceno = qtf + P4EST_ORIENTATIONS;
     P4EST_ASSERT (*rfaceno >= 0);
     return FCLAW2D_FACE_NEIGHBOR_HALFSIZE;
@@ -202,10 +204,9 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
   else {
     /* one same-size or double-size neighbor */
     fclaw2d_patch_encode_neighbor (domain, mesh, qtq,
-    				rproc, rblockno, rpatchno);
+    				rproc, rblockno + 0, rpatchno);
     for (k = 1; k < P4EST_HALF; ++k) {
       rproc[k] = -1;
-      rblockno[k] = -1;
       rpatchno[k] = -1;
     }
     if (qtf < P4EST_ORIENTATIONS) {

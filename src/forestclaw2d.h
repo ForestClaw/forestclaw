@@ -134,14 +134,14 @@ fclaw2d_face_neighbor_t;
  * \param [in] patchno	Number of the patch within the block.
  * \param [in] faceno	Number of the patch face: left, right, bottom, top.
  * \param [in,out] rproc	Processor number of neighbor patches.
- * \param [in,out] rblockno	Neighbor block number for up to 2 neighbors.
- * \param [in,out] rpatchno	Neighbor patch number for up to 2 neighbors.
+ * \param [in,out] rblockno	Neighbor block number.
+ * \param [in,out] rpatchno	Neighbor patch numbers for up to 2 neighbors.
  * \param [in,out] rfaceno	Neighbor face number and orientation.
  * \return			The Type of face neighbor connection.
  */
 fclaw2d_face_neighbor_t	fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
 				int blockno, int patchno, int faceno,
-				int rproc[2], int rblockno[2],
+				int rproc[2], int *rblockno,
 				int rpatchno[2], int *rfaceno);
 
 /** Mark a patch for refinement.
