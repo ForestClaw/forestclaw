@@ -131,14 +131,14 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
     {
         // Edge is//  a physical boundary
-//         *ref_flag = -1;
-//         for(int ir = 0; ir < refratio; ir++)
-//         {
-//             neighbor_patch_idx[ir] = -1;
-//         }
-//     }
-//     else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
-//     {
+         *ref_flag = -1;
+         for(int ir = 0; ir < refratio; ir++)
+         {
+             neighbor_patch_idx[ir] = -1;
+         }
+     }
+     else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
+     {
         // Neighbors are finer grids
         *ref_flag = 1;
         for(int ir = 0; ir < refratio; ir++)
@@ -248,7 +248,7 @@ void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
     fclaw2d_domain_iterate_level(domain, a_level,
                                   (fclaw2d_patch_callback_t) cb_bc_level_exchange, (void *) user);
 
-    exit(1);
+    // exit(1);
 }
 
 void cb_bc_average(fclaw2d_domain_t *domain,

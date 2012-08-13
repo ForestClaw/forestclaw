@@ -260,7 +260,7 @@ void subcycle_manager::set_dt_minlevel(const Real& a_dt_minlevel)
     }
 }
 
-int subcycle_manager::reduce_to_minlevel(const Real& a_dt)
+Real subcycle_manager::reduce_to_minlevel(const Real& a_dt)
 {
     Real dt_minlevel = a_dt;
     for (int level = 1; level <= m_minlevel; level++)

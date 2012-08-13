@@ -120,7 +120,7 @@ public:
     int time_step_inc(const int& a_level);
     void set_dt_minlevel(const Real& a_dt);
 
-    int reduce_to_minlevel(const Real& a_dt);
+    Real reduce_to_minlevel(const Real& a_dt);
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
