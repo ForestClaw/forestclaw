@@ -95,12 +95,11 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
                         int iside,
                         int *neighbor_block_idx,
                         int neighbor_patch_idx[],
-                        int *ref_flag)
+                        int *ref_flag,
+                        bool *is_phys_bc)
 
 
 {
-    // This seems to be messing with memory.  Am I calling it correctly?
-
     int rproc[P4EST_HALF];
     int rblockno;
     int rpatchno[P4EST_HALF];
@@ -130,33 +129,35 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
 
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
     {
-        // Edge is//  a physical boundary
-         *ref_flag = -1;
-         for(int ir = 0; ir < refratio; ir++)
-         {
-             neighbor_patch_idx[ir] = -1;
-         }
+        // Edge is a physical boundary
+        *ref_flag = 0;  // Physical BCs ghost cells are at the same level as 'this_patch'.  Also,
+                        // we can check 'ref_flag' after call to this routine.
+        *is_phys_bc = true;
      }
-     else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
-     {
-        // Neighbors are finer grids
-        *ref_flag = 1;
-        for(int ir = 0; ir < refratio; ir++)
+    else
+    {
+        *is_phys_bc = false;
+        if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
         {
-            neighbor_patch_idx[ir] = rpatchno[ir];
+            // Neighbors are finer grids
+            *ref_flag = 1;
+            for(int ir = 0; ir < refratio; ir++)
+            {
+                neighbor_patch_idx[ir] = rpatchno[ir];
+            }
         }
-    }
-    else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_SAMESIZE)
-    {
-        // Neighbor is at the same level
-        *ref_flag = 0;
-        neighbor_patch_idx[0] = rpatchno[0];
-    }
-    else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE)
-    {
-        // Neighbor is a coarser grid
-        *ref_flag = -1;
-        neighbor_patch_idx[0] = rpatchno[0];
+        else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_SAMESIZE)
+        {
+            // Neighbor is at the same level
+            *ref_flag = 0;
+            neighbor_patch_idx[0] = rpatchno[0];
+        }
+        else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE)
+        {
+            // Neighbor is a coarser grid
+            *ref_flag = -1;
+            neighbor_patch_idx[0] = rpatchno[0];
+        }
     }
 }
 
@@ -211,17 +212,19 @@ void cb_bc_level_exchange(fclaw2d_domain_t *domain,
         int neighbor_block_idx;
         int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
         int ref_flag; // = -1, 0, 1
+        bool is_phys_bc;
         get_edge_neighbors(domain,
                            this_block_idx,
                            this_patch_idx,
                            iside,
                            &neighbor_block_idx,
                            neighbor_patch_idx,
-                           &ref_flag);
+                           &ref_flag,
+                           &is_phys_bc);
 
 
 
-        if (ref_flag == 0)
+        if (!is_phys_bc && ref_flag == 0)
         {
             // Copy data from patch at the same level;
             int num_neighbors = 1; // Same level
@@ -271,6 +274,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
             int neighbor_block_idx;
             int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
             int ref_flag; // = -1, 0, 1
+            bool is_phys_bc;
 
             get_edge_neighbors(domain,
                                this_block_idx,
@@ -278,7 +282,8 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                                iside,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
-                               &ref_flag);
+                               &ref_flag,
+                               &is_phys_bc);
 
             if (ref_flag == 1)  // neighbors are at finer level
             {
@@ -322,6 +327,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
             int neighbor_block_idx;
             int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
             int ref_flag; // = -1, 0, 1
+            bool is_phys_bc;
 
             get_edge_neighbors(domain,
                                this_block_idx,
@@ -329,7 +335,9 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                                iside,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
-                               &ref_flag);
+                               &ref_flag,
+                               &is_phys_bc);
+
             if (ref_flag == 1)  // neighbors are at finer level
             {
                 // Fill in ghost cells on 'neighbor_patch' by interpolating to finer grid
