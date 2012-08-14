@@ -67,9 +67,11 @@ void global_parms::get_inputParams()
                 m_maxlevel);
 
     // Check maxlevel :
-    if (m_maxlevel > P4EST_MAXLEVEL)
+    if (m_maxlevel > fclaw2d_possible_maxlevel)
     {
-        cout << "get_inputParms (amr_utils.f) : User 'maxlevel' > P4EST_MAXLEVEL" << endl;
+        cout
+	  << "get_inputParms (amr_utils.f) : User 'maxlevel' > p4est 'maxlevel'"
+          << endl;
         exit(1);
     }
 

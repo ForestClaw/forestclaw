@@ -98,7 +98,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
       patch = block->patches + j;
       quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
       patch->level = level = (int) quad->level;
-      P4EST_ASSERT (0 <= level && level <= P4EST_QMAXLEVEL);
+      P4EST_ASSERT (0 <= level && level <= fclaw2d_possible_maxlevel);
       qh = P4EST_QUADRANT_LEN (level);
       patch->xlower = quad->x * fclaw2d_smallest_h;
       patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
@@ -177,7 +177,7 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   int			count, count_all;
 
   P4EST_ASSERT (0 <= domain->maxlevel_all &&
-  		domain->maxlevel_all <= P4EST_QMAXLEVEL);
+  		domain->maxlevel_all <= fclaw2d_possible_maxlevel);
   P4EST_LOGF (lp, "Maximum level: %2d\n", domain->maxlevel_all);
   count_all = 0;
   for (level = 0; level <= domain->maxlevel_all; ++level) {
