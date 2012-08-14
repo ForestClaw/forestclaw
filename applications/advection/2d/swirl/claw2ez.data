@@ -1,7 +1,7 @@
-64        % mx_leaf
-64        % my_leaf
+8        % mx_leaf
+8       % my_leaf
 
-16        % nout
+128        % nout
 4.0       % tfinal
 
 0.009      % Initial time step
@@ -16,7 +16,7 @@
 
 1         % meqn
 1         % mwaves
-4         % mthlim
+0         % mthlim
 
 2         % mbc
 1         % mthbc(1) (left edge)
@@ -24,5 +24,5 @@
 1         % mthbc(3) (lower edge)
 1         % mthbc(4) (upper edge)
 
-1         % Minimum level
-1         % Maximum levels of refinement
+3         % Minimum level
+3         % Maximum levels of refinement
