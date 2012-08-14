@@ -34,6 +34,7 @@ extern "C" {
 
 extern const double fclaw2d_root_len;
 extern const double fclaw2d_smallest_h;
+extern const int fclaw2d_possible_maxlevel;
 
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 typedef struct fclaw2d_block fclaw2d_block_t;
