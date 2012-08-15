@@ -89,7 +89,7 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 // This needs to be defined by p4est.  For some reason,  I have to put ref_flag before
 // neighbor_patch_idx.   If not, the p4est call does something (probably because I am not calling
 // it right) which walks on the ref_flag pointer.
-void get_edge_neighbors(fclaw2d_domain_t *domain,
+void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
                         int iside,
@@ -130,8 +130,9 @@ void get_edge_neighbors(fclaw2d_domain_t *domain,
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
     {
         // Edge is a physical boundary
-        *ref_flag = 0;  // Physical BCs ghost cells are at the same level as 'this_patch'.  Also,
-                        // we can check 'ref_flag' after call to this routine.
+        *ref_flag = 0;  // Want to have a valid value for 'ref_flag', so that it can be checked
+                        // outside of this routine. Physical BCs ghost cells are in fact at the
+                        // same  level as 'this_patch', so seems reasonable to set it to 0.
         *is_phys_bc = true;
      }
     else
@@ -213,7 +214,7 @@ void cb_bc_level_exchange(fclaw2d_domain_t *domain,
         int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
         int ref_flag; // = -1, 0, 1
         bool is_phys_bc;
-        get_edge_neighbors(domain,
+        get_face_neighbors(domain,
                            this_block_idx,
                            this_patch_idx,
                            iside,
@@ -275,7 +276,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
             int ref_flag; // = -1, 0, 1
             bool is_phys_bc;
 
-            get_edge_neighbors(domain,
+            get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
                                iside,
@@ -328,7 +329,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
             int ref_flag; // = -1, 0, 1
             bool is_phys_bc;
 
-            get_edge_neighbors(domain,
+            get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
                                iside,
