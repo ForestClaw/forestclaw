@@ -251,7 +251,6 @@ void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
     fclaw2d_domain_iterate_level(domain, a_level,
                                   (fclaw2d_patch_callback_t) cb_bc_level_exchange, (void *) user);
 
-    // exit(1);
 }
 
 void cb_bc_average(fclaw2d_domain_t *domain,
@@ -659,46 +658,10 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);
 
     // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114).
+    // 0010, 0114), and closes the file.
     new_qfile_(&iframe);
 
-
-    // This version uses up all available memory.  Or runs very slowly.  Or returns
-    // with a hard-to-parse error message.  Why?
-    // Did it fix itself along with fclaw2d_patch_face_neighbors?
     fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
-
-
-    // This version (without call to cb_amrout) is fine. It is also much faster
-    // in the case when the 'iterate' version above works.
-    for(int i = 0; i < domain->num_blocks; i++)
-    {
-        /* The iterator above seems to work fine now */
-        break;
-
-        fclaw2d_block_t *block = &domain->blocks[i];
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *patch = &block->patches[j];
-
-            // Using this instead uses up all memory as well.
-            // When everything is commented out of 'cb_amrout', code
-            // crashes with error
-            // "terminate called after throwing an instance of 'std::length_error'"
-
-            // cb_amrout(domain,patch,i,j,(void*) &iframe);
-
-
-
-            // Code works fine (or appears to) if this is used instead.
-            ClawPatch *cp = get_patch_data(patch);
-            int num = i*domain->num_blocks + j + 1;
-            int level = patch->level + 1;
-
-            // Patch data is appended to fort.qXXXX
-            cp->write_patch_data(iframe, num, level);
-        }
-    }
 }
 
 void amrreset(fclaw2d_domain_t *domain)
