@@ -86,9 +86,6 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
 }
 
 
-// This needs to be defined by p4est.  For some reason,  I have to put ref_flag before
-// neighbor_patch_idx.   If not, the p4est call does something (probably because I am not calling
-// it right) which walks on the ref_flag pointer.
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -225,15 +222,15 @@ void cb_bc_level_exchange(fclaw2d_domain_t *domain,
 
 
 
-        if (!is_phys_bc && ref_flag == 0)
+        if (ref_flag == 0 && !is_phys_bc)
         {
-            // Copy data from patch at the same level;
-            int num_neighbors = 1; // Same level
+            // Ghost cells overlap patch at the same level, and so we can do a straight copy.
+            // int num_neighbors = 1; // Same level
             fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
             fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
             ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
             // Finally, do exchange between 'this_patch' and 'neighbor patch(es)'.
-            this_cp->edge_exchange(idir,iside,num_neighbors,&neighbor_cp);
+            this_cp->level_face_exchange(idir,iside,&neighbor_cp);
         }
     } // loop over directions (idir = 0,1,2)
 
@@ -300,7 +297,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                 // Average finer grid data to coarser 'this_cp' ghost cells.
                 // This uses the same routine as 'bc_exchange_level', but now
                 // 'num_neighbors = refratio'
-                this_cp->edge_exchange(idir,iside,num_neighbors,neighbor_cp);
+                this_cp->face_average(idir,iside,num_neighbors,neighbor_cp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
@@ -570,7 +567,6 @@ void amrrun(fclaw2d_domain_t *domain)
     Real dt_outer = (final_time-t0)/Real(nout);
     Real dt_level0 = initial_dt;
     Real t_curr = t0;
-    Real maxcfl = 0;
     for(int n = 0; n < nout; n++)
     {
         Real tstart = t_curr;
@@ -585,31 +581,51 @@ void amrrun(fclaw2d_domain_t *domain)
             // We could just take more times steps on the minlevel grid, but for refined
             // base level grids, this could mean we take many steps before checking the CFL
             // number.  Better to only take a single step on minlevel.
-            Real dt_minlevel = time_stepper.reduce_to_minlevel(dt_level0);
+            // printf("dt_level0   = %16.8e\n",dt_level0);
+            // Real dt_minlevel = time_stepper.reduce_to_minlevel(dt_level0);
+            int reduce_factor = time_stepper.reduce_to_minlevel_factor();
+            Real dt_minlevel = dt_level0/reduce_factor;
 
             // Use the tolerance to make sure we don't take a tiny time step just to
             // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
             // rather than taking a time step of 'dt_minlevel' now, followed a time step of only
             // 'tol' in the next step.
             // Of course if 'tend - t_curr < dt_minlevel', then dt_minlevel doesn't change.
-            Real tol = 1e-4*dt_minlevel;
+            Real tol = 1e-2*dt_minlevel;
+            bool took_small_step = false;
             if (tend - t_curr - dt_minlevel < tol)
             {
                 dt_minlevel = tend - t_curr;  // <= 'dt_minlevel + tol'
+                took_small_step = true;
             }
 
             time_stepper.set_dt_minlevel(dt_minlevel);
 
             Real maxcfl_step = advance_all_levels(domain, &time_stepper);
-            maxcfl = max(maxcfl,maxcfl_step);
-
             t_curr = t_curr + dt_minlevel;
-            printf("Level 0 step %5d : dt = %12.4e; maxcfl = %8.4f; Final time = %12.4f\n",
-                   n_inner,dt_minlevel,maxcfl, t_curr);
+            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
+                   time_stepper.get_minlevel(),
+                   n_inner,dt_minlevel,maxcfl_step, t_curr);
+            if (maxcfl_step > gparms->m_max_cfl)
+            {
+                printf("   WARNING : Maximum CFL exceeded\n");
+            }
+            if (took_small_step)
+            {
+                Real dt0 =  dt_minlevel*reduce_factor;
+                printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",100.0*dt0/dt_level0);
+            }
 
             // New time step, which should give a cfl close to the desired cfl.
-            dt_level0 *= gparms->m_desired_cfl/maxcfl;
-
+            Real dt_new = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+            if (!took_small_step)
+            {
+                dt_level0 = dt_new;
+            }
+            else
+            {
+                // use time step that would have been used had we not taken a small step
+            }
             n_inner++;
 
             // After some number of time steps, we probably need to regrid...

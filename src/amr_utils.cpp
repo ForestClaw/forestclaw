@@ -272,6 +272,16 @@ Real subcycle_manager::reduce_to_minlevel(const Real& a_dt)
     return dt_minlevel;
 }
 
+int subcycle_manager::reduce_to_minlevel_factor()
+{
+    int factor = 1;
+    for (int level = 1; level <= m_minlevel; level++)
+    {
+        factor *= m_refratio;
+    }
+    return factor;
+}
+
 
 int subcycle_manager::get_minlevel()
 {

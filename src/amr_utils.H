@@ -121,6 +121,7 @@ public:
     void set_dt_minlevel(const Real& a_dt);
 
     Real reduce_to_minlevel(const Real& a_dt);
+    int reduce_to_minlevel_factor();
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
