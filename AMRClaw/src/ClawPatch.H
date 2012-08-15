@@ -249,24 +249,24 @@ extern "C" {
                       const int& patch_num,
                       const int& level);
 
-    void copy_ghost_edge_(const int& m_mx,
-                          const int& m_my,
-                          const int& m_mbc,
-                          const int& m_meqn,
-                          Real qthis[],
-                          Real qneighbor[],
-                          const int& a_idir);
+    void ghost_cell_exchange_(const int& m_mx,
+                              const int& m_my,
+                              const int& m_mbc,
+                              const int& m_meqn,
+                              Real qthis[],
+                              Real qneighbor[],
+                              const int& a_idir);
 
-    void average_ghost_edge_(const int& m_mx,
-                            const int& m_my,
-                            const int& m_mbc,
-                            const int& m_meqn,
-                            Real qthis[],
-                            Real qcoarse[],
-                            const int& a_idir,
-                            const int& a_iside,
-                            const int& a_refratio,
-                            const int& igrid);
+    void ghost_cell_average_(const int& m_mx,
+                             const int& m_my,
+                             const int& m_mbc,
+                             const int& m_meqn,
+                             Real qthis[],
+                             Real qcoarse[],
+                             const int& a_idir,
+                             const int& a_iside,
+                             const int& a_refratio,
+                             const int& igrid);
 
     void interpolate_ghost_edge_(const int& m_mx,
                                  const int& m_my,
@@ -468,10 +468,14 @@ public :
                           const int& a_level);
 
 
-    void edge_exchange(const int& a_idir,
-                       const int& a_iside,
-                       const int& a_refratio,
-                       ClawPatch **a_neighbor_cp);
+    void level_face_exchange(const int& a_idir,
+                             const int& a_iside,
+                             ClawPatch **a_neighbor_cp);
+
+    void face_average(const int& a_idir,
+                      const int& a_iside,
+                      const int& a_num_neighbors,
+                      ClawPatch **neighbor_cp);
 
     void edge_interpolate(const int& a_idir,
                           const int& a_iside,

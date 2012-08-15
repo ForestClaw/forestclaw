@@ -442,29 +442,29 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
 
 // Copy data from neighbor at same level, or average data to coarser level.
 // In this step, no corner information gets exchanged.
-void ClawPatch::edge_exchange(const int& a_idir,
-                              const int& a_iside,
-                              const int& a_num_neighbors,
-                              ClawPatch **neighbor_cp)
+void ClawPatch::level_face_exchange(const int& a_idir,
+                                    const int& a_iside,
+                                    ClawPatch **neighbor_cp)
 {
-    if (a_num_neighbors == 1)
+    // Data is exchanged with neighboring grid, since both grids are at the
+    // same level
+    Real *qthis = m_griddata.dataPtr();
+    Real *qneighbor = neighbor_cp[0]->m_griddata.dataPtr();
+    ghost_cell_exchange_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
+}
+
+void ClawPatch::face_average(const int& a_idir,
+                             const int& a_iside,
+                             const int& a_num_neighbors,
+                             ClawPatch **neighbor_cp)
+{
+    int refratio = a_num_neighbors;
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int ir = 0; ir < refratio; ir++)
     {
-        // Data is exchanged with neighboring grid, since both grids are at the
-        // same level
-        Real *qthis = m_griddata.dataPtr();
-        Real *qneighbor = neighbor_cp[0]->m_griddata.dataPtr();
-        copy_ghost_edge_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
-    }
-    else
-    {
-        int refratio = a_num_neighbors;
-        Real *qcoarse = m_griddata.dataPtr();
-        for(int ir = 0; ir < refratio; ir++)
-        {
-            Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
-            int igrid = ir; // indicates which grid we are averaging from.
-            average_ghost_edge_(m_mx,m_my,m_mbc,m_meqn,qfine,qcoarse,a_idir,a_iside,refratio,igrid);
-        }
+        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        int igrid = ir; // indicates which grid we are averaging from.
+        ghost_cell_average_(m_mx,m_my,m_mbc,m_meqn,qfine,qcoarse,a_idir,a_iside,refratio,igrid);
     }
 }
 
