@@ -59,7 +59,7 @@ c     timestepping variables
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine copy_ghost_edge(mx,my,mbc,meqn,
+      subroutine ghost_cell_exchange(mx,my,mbc,meqn,
      &      qthis,qneighbor,idir)
       implicit none
 
@@ -101,7 +101,7 @@ c                 # y-direction (idir == 1)
 
 c     # Average fine grid to a coarse grid neighbor or copy from neighboring
 c     # grid at same level.
-      subroutine average_ghost_edge(mx,my,mbc,meqn,
+      subroutine ghost_cell_average(mx,my,mbc,meqn,
      &      qfine,qcoarse,idir,iside,refratio,igrid)
       implicit none
 
