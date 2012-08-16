@@ -94,17 +94,17 @@ public:
                 const int& a_refratio,
                 const int& a_num_patches,
                 const int& a_maxlevel,
-                const Real& a_time);
+                const Real& a_time,
+                const bool& a_subcycle);
 
     void set_dt(const Real& a_dt);
-    void set_step_inc(const int& a_inc);
 
     void increment_step_counter();
     void increment_time();
     Real current_time();
     Real dt();
 
-    bool level_exchange_done();
+    bool exchanged_with_level();
     bool exchanged_with_coarser();
     bool exchanged_with_finer();
 
@@ -134,27 +134,25 @@ public:
     bool can_advance(const int& a_level, const int& a_from_step);
 
     bool solution_updated(const int& a_level, const int& a_step);
-    bool level_exchange_done(const int& a_level);
+    bool exchanged_with_level(const int& a_level);
     bool exchanged_with_coarser(const int& a_level);
     bool exchanged_with_finer(const int& a_level);
 
     int last_step(const int& a_level);
-    void increment_step_counter(const int& a_level);
     int step_inc(const int& a_level);
+    void increment_step_counter(const int& a_level);
 
-    void set_nosubcycle();
     bool nosubcycle();
 
+    // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
+    // i.e. powers of ref_ratio.
     Real current_time(const int& a_level);
     Real dt(const int& level);
     void increment_time(const int& a_level);
     void set_dt_minlevel(const Real& a_dt);
 
-    Real reduce_to_minlevel(const Real& a_dt);
-    int reduce_to_minlevel_factor();
-
-    Real reduce_to_maxlevel(const Real& a_dt);
-    int reduce_to_maxlevel_factor();
+    int minlevel_factor();
+    int maxlevel_factor();
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);

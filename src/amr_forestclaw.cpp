@@ -391,7 +391,7 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
 
     global_parms *gparms = get_domain_data(domain);
     int level = this_patch->level;
-    Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
+    Real maxcfl_grid = cp->step(t,dt,level,*gparms);
 
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
@@ -411,7 +411,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     {
         printf("Error (advance_level) : Advancing coarser grid (not tested)\n");
         exit(1);
-        if (!a_time_stepper->level_exchange_done(a_level))
+        if (!a_time_stepper->exchanged_with_level(a_level))
         {
             printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",a_level,a_from_step);
             exit(1);
@@ -594,25 +594,17 @@ void amrrun(fclaw2d_domain_t *domain)
             subcycle_manager time_stepper;
             time_stepper.define(domain,t_curr);
 
-            if (!gparms->m_subcycle)
-            {
-                time_stepper.set_nosubcycle();
-            }
-
-            // First, modify dt_minlevel if the base level grid is not a level 0 grid.
-            // We could just take more times steps on the minlevel grid, but for refined
-            // base level grids, this could mean we take many steps before checking the CFL
-            // number.  Better to only take a single step on minlevel.
-            // printf("dt_level0   = %16.8e\n",dt_level0);
-            // Real dt_minlevel = time_stepper.reduce_to_minlevel(dt_level0);
+            // Take a stable level 0 time step and reduce it.
             int reduce_factor;
             if (time_stepper.nosubcycle())
             {
-                reduce_factor = time_stepper.reduce_to_maxlevel_factor();
+                // We want the time step to be the stable time step for the finest level.
+                reduce_factor = time_stepper.maxlevel_factor();
             }
             else
             {
-                reduce_factor = time_stepper.reduce_to_minlevel_factor();
+                // stable time step for the coarsest level that currently has grids.
+                reduce_factor = time_stepper.minlevel_factor();
             }
             Real dt_minlevel = dt_level0/reduce_factor;
 
@@ -629,13 +621,15 @@ void amrrun(fclaw2d_domain_t *domain)
                 took_small_step = true;
             }
 
+            // This also sets the time step on all finer levels.
             time_stepper.set_dt_minlevel(dt_minlevel);
 
             Real maxcfl_step = advance_all_levels(domain, &time_stepper);
-            t_curr = t_curr + dt_minlevel;
+            t_curr += dt_minlevel;
+
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-                   time_stepper.minlevel(),
-                   n_inner,dt_minlevel,maxcfl_step, t_curr);
+                   time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
+
             if (maxcfl_step > gparms->m_max_cfl)
             {
                 printf("   WARNING : Maximum CFL exceeded\n");
