@@ -25,6 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_convenience.h"
 
+const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
+const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
+
 static void
 fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
 			fclaw2d_domain_t *domain, void *user)
