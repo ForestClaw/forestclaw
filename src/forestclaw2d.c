@@ -25,9 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.h"
 
-const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
-const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
-const int fclaw2d_possible_maxlevel = P4EST_QMAXLEVEL;
 #define P4EST_ORIENTATIONS (P4EST_FACES * P4EST_HALF)
 
 void
@@ -38,7 +35,7 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
   fclaw2d_block_t	*block;
   fclaw2d_patch_t	*patch;
 
-  P4EST_ASSERT (0 <= level && level <= fclaw2d_possible_maxlevel);
+  P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
   for (i = 0; i < domain->num_blocks; ++i) {
     block = domain->blocks + i;
     for (patch = block->patchbylevel[level];

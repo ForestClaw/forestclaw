@@ -68,15 +68,6 @@ void global_parms::get_inputParams()
                 m_maxlevel,
                 icycle);
 
-    // Check maxlevel :
-    if (m_maxlevel > fclaw2d_possible_maxlevel)
-    {
-        cout
-	  << "get_inputParms (amr_utils.f) : User 'maxlevel' > p4est 'maxlevel'"
-          << endl;
-        exit(1);
-    }
-
     // Set up arrays needed by clawpack.
     m_method[0] = 0; // not used in forestclaw
 
