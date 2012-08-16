@@ -419,26 +419,25 @@ Real advance_level(fclaw2d_domain_t *domain,
         if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
-            if (a_time_stepper->nosubcycle() || (a_curr_fine_step > last_coarse_step))
+            if (a_time_stepper->nosubcycle())
             {
-                // If we are not subcycling, we this is the only update on the coarser grid that
-                // we will do.  We don't however, need this update for getting fine grid
-                // boundary conditions.
-                // If we are subcycling, 'a_curr_fine_step > last_coarse_step' means that we are trying
-                // to advance on the fine grid but can't because the coarse grid hasn't yet
-                // advanced to a point beyond the current fine grid time.
-                // If we had 'a_curr_fine_step == last_coarse_step', then there would be no need
-                // to advance the coarse grid this time around.
+                // Do the exchange first.  We can do this because both this level and the coarser
+                // level are updated to same step (step = 0).
+                bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
+                a_time_stepper->increment_coarse_exchange_counter(a_level);
+
+                // This is the only advance done on this coarser level.
                 maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
+            else if (a_curr_fine_step > last_coarse_step)
+            {
+                // Here, we have to update first, since we don't have BCs for the finer level.
+                maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
 
-            // Now we can exchange with the coarser grid.
-            // Level 'a_level' grid will be averaged onto coarser grid ghost cells;  Coarser
-            // 'a_level-1' will interpolate to finer grid ghost.
-            // If we are subcycling, this may also require interpolation in time.  If we are not
-            // subcycling, the solution on coarse and fine are updated to the same time level.
-            bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
-            a_time_stepper->increment_coarse_exchange_counter(a_level);
+                // This exchange will involve interpolation in time.
+                bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
+                a_time_stepper->increment_coarse_exchange_counter(a_level);
+            }
         }
     }
 
@@ -583,16 +582,17 @@ void amrrun(fclaw2d_domain_t *domain)
             subcycle_manager time_stepper;
             time_stepper.define(domain,t_curr);
 
-            // Take a stable level 0 time step and reduce it.
+            // Take a stable level 0 time step (use this as the base level time step even if
+            // we have no grids on level 0) and reduce it.
             int reduce_factor;
             if (time_stepper.nosubcycle())
             {
-                // We want the time step to be the stable time step for the finest level.
+                // Take one step of a stable time step for the finest level.
                 reduce_factor = time_stepper.maxlevel_factor();
             }
             else
             {
-                // stable time step for the coarsest level that currently has grids.
+                // Take one step of a stable time step for the coarsest non-empty level.
                 reduce_factor = time_stepper.minlevel_factor();
             }
             Real dt_minlevel = dt_level0/reduce_factor;
