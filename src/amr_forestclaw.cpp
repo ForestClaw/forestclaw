@@ -445,7 +445,7 @@ Real advance_level(fclaw2d_domain_t *domain,
                                  (fclaw2d_patch_callback_t) cb_advance_patch,
                                  (void *) &time_data);
 
-    a_time_stepper->increment_time_step(a_level);
+    a_time_stepper->increment_step_counter(a_level);
     bc_level_exchange(domain,a_level);
 
     int new_time = a_time_stepper->get_last_step(a_level);

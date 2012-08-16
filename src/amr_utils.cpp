@@ -298,7 +298,7 @@ int subcycle_manager::get_last_step(const int& a_level)
     return m_levels[a_level].m_last_time_step;
 }
 
-void subcycle_manager::increment_time_step(const int& a_level)
+void subcycle_manager::increment_step_counter(const int& a_level)
 {
     m_levels[a_level].m_last_time_step += time_step_inc(a_level);
 }

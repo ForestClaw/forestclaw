@@ -115,7 +115,7 @@ public:
 
     bool time_step_done(const int& a_level, const int& a_time_step);
     int get_last_step(const int& a_level);
-    void increment_time_step(const int& a_level);
+    void increment_step_counter(const int& a_level);
     Real current_time(const int& a_level);
     int time_step_inc(const int& a_level);
     void set_dt_minlevel(const Real& a_dt);
