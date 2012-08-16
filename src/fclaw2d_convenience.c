@@ -74,14 +74,15 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   domain->num_blocks = nb = (int) conn->num_trees;
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
   domain->patch_to_block = P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
+  domain->possible_maxlevel = P4EST_QMAXLEVEL;
   num_patches_all = 0;
-  minlevel_all = fclaw2d_possible_maxlevel;
+  minlevel_all = domain->possible_maxlevel;
   maxlevel_all = 0;
   for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
     block->num_patches_before = num_patches_all;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
-    tree_minlevel = fclaw2d_possible_maxlevel;
+    tree_minlevel = domain->possible_maxlevel;
     tree_maxlevel = 0;
     block->xlower = 0.;
     block->xupper = 1.;
@@ -104,7 +105,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
       patch = block->patches + j;
       quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
       patch->level = level = (int) quad->level;
-      P4EST_ASSERT (0 <= level && level <= fclaw2d_possible_maxlevel);
+      P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
       qh = P4EST_QUADRANT_LEN (level);
       patch->xlower = quad->x * fclaw2d_smallest_h;
       patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
@@ -147,9 +148,22 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   return domain;
 }
 
+static void
+fclaw2d_check_initial_level (MPI_Comm mpicomm, int initial_level)
+{
+  int			mpiret;
+  int			rank;
+
+  mpiret = MPI_Comm_rank (mpicomm, &rank);
+  SC_CHECK_MPI (mpiret);
+  SC_CHECK_ABORTF (rank != 0 || initial_level <= P4EST_QMAXLEVEL,
+  		"Initial level %d too fine for p4est", initial_level);
+}
+
 fclaw2d_domain_t		*
 fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 {
+  fclaw2d_check_initial_level (mpicomm, initial_level);
   return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm,
   							initial_level));
 }
@@ -157,6 +171,7 @@ fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 fclaw2d_domain_t		*
 fclaw2d_domain_new_moebius (MPI_Comm mpicomm, int initial_level)
 {
+  fclaw2d_check_initial_level (mpicomm, initial_level);
   return fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, initial_level));
 }
 
@@ -197,9 +212,9 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   int			count, count_all;
 
   P4EST_ASSERT (0 <= domain->minlevel_all &&
-  		domain->minlevel_all <= fclaw2d_possible_maxlevel);
+  		domain->minlevel_all <= domain->possible_maxlevel);
   P4EST_ASSERT (0 <= domain->maxlevel_all &&
-  		domain->maxlevel_all <= fclaw2d_possible_maxlevel);
+  		domain->maxlevel_all <= domain->possible_maxlevel);
   P4EST_ASSERT (domain->minlevel_all <= domain->maxlevel_all);
   P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
   		domain->global_minlevel, domain->global_maxlevel);

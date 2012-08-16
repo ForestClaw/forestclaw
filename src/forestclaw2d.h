@@ -34,7 +34,6 @@ extern "C" {
 
 extern const double fclaw2d_root_len;
 extern const double fclaw2d_smallest_h;
-extern const int fclaw2d_possible_maxlevel;
 
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 typedef struct fclaw2d_block fclaw2d_block_t;
@@ -82,6 +81,7 @@ struct fclaw2d_domain
   int			num_patches_all;	/* sum over all blocks */
   int			minlevel_all, maxlevel_all;	/* proc local */
   int			global_minlevel, global_maxlevel;	/* global */
+  int			possible_maxlevel;	/* theoretical maximum */
   int			num_blocks;
   fclaw2d_block_t	*blocks;		/* allocated storage */
   int			*patch_to_block;	/* allocated storage */
