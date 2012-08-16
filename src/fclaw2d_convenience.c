@@ -44,6 +44,7 @@ fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
 static fclaw2d_domain_t		*
 fclaw2d_domain_new (p4est_wrap_t *wrap)
 {
+  int			mpiret;
   int			i, j;
   int			level;
   int			face;
@@ -51,6 +52,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   int			num_patches_all;
   int			tree_minlevel, minlevel_all;
   int			tree_maxlevel, maxlevel_all;
+  int			levels[2], global_levels[2];
   p4est_qcoord_t	qh;
   p4est_connectivity_t	*conn = wrap->conn;
   p4est_tree_t          *tree;
@@ -65,6 +67,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   	  sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
   domain = P4EST_ALLOC_ZERO (fclaw2d_domain_t, 1);
+  domain->mpicomm = wrap->p4est->mpicomm;
   domain->mpisize = wrap->p4est->mpisize;
   domain->mpirank = wrap->p4est->mpirank;
   domain->pp = wrap;
@@ -130,6 +133,15 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   domain->minlevel = minlevel_all;
   domain->maxlevel = maxlevel_all;
 
+  /* parallel communication of minimum and maximum levels */
+  levels[0] = domain->minlevel;
+  levels[1] = -domain->maxlevel;
+  mpiret = MPI_Allreduce (levels, global_levels, 2, MPI_INT, MPI_MIN,
+  			domain->mpicomm);
+  SC_CHECK_MPI (mpiret);
+  domain->global_minlevel = global_levels[0];
+  domain->global_maxlevel = -global_levels[1];
+
   return domain;
 }
 
@@ -187,6 +199,8 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   P4EST_ASSERT (0 <= domain->maxlevel &&
   		domain->maxlevel <= fclaw2d_possible_maxlevel);
   P4EST_ASSERT (domain->minlevel <= domain->maxlevel);
+  P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
+  		domain->global_minlevel, domain->global_maxlevel);
   P4EST_LOGF (lp, "Minimum/maximum levels: %2d %2d\n",
   		domain->minlevel, domain->maxlevel);
   count_all = 0;

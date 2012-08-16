@@ -76,9 +76,11 @@ struct fclaw2d_block
 
 struct fclaw2d_domain
 {
+  MPI_Comm		mpicomm;		/* MPI communicator */
   int			mpisize, mpirank;	/* MPI variables */
   int			num_patches_all;	/* sum over all blocks */
   int			minlevel, maxlevel;	/* local over all blocks */
+  int			global_minlevel, global_maxlevel;
   int			num_blocks;
   fclaw2d_block_t	*blocks;		/* allocated storage */
   int			*patch_to_block;	/* allocated storage */
