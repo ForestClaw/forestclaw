@@ -29,7 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_wrap.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
 #endif
 
 typedef struct fclaw2d_domain fclaw2d_domain_t;
@@ -37,7 +41,7 @@ typedef struct fclaw2d_block fclaw2d_block_t;
 typedef struct fclaw2d_patch fclaw2d_patch_t;
 
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
-				  fclaw2d_domain_t *domain, void *user);
+                                  fclaw2d_domain_t * domain, void *user);
 
 /*
  * The domain structure gives a processor local view of the grid hierarchy.
@@ -49,41 +53,41 @@ typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
 
 struct fclaw2d_patch
 {
-  int			level;		/* 0 is root, increases if refined */
-  double		xlower, xupper;
-  double		ylower, yupper;
-  fclaw2d_patch_t	*next;		/* next patch same level same block */
-  void			*user;
+    int level;                  /* 0 is root, increases if refined */
+    double xlower, xupper;
+    double ylower, yupper;
+    fclaw2d_patch_t *next;      /* next patch same level same block */
+    void *user;
 };
 
 struct fclaw2d_block
 {
-  double		xlower, xupper;
-  double		ylower, yupper;
-  fclaw2d_mapc2m_t	mapc2m;
-  void			*mapc2m_user;
-  int			mthbc[4];	/* >0 for physical bc types */
-  int			num_patches;	/* local patches in this block */
-  int			num_patches_before;	/* in all previous blocks */
-  int			minlevel, maxlevel;	/* local over this block */
-  fclaw2d_patch_t	*patches;		/* allocated storage */
-  fclaw2d_patch_t	*patchbylevel[P4EST_MAXLEVEL + 1];	/* pointers */
-  void			*user;
+    double xlower, xupper;
+    double ylower, yupper;
+    fclaw2d_mapc2m_t mapc2m;
+    void *mapc2m_user;
+    int mthbc[4];               /* >0 for physical bc types */
+    int num_patches;            /* local patches in this block */
+    int num_patches_before;     /* in all previous blocks */
+    int minlevel, maxlevel;     /* local over this block */
+    fclaw2d_patch_t *patches;   /* allocated storage */
+    fclaw2d_patch_t *patchbylevel[P4EST_MAXLEVEL + 1];  /* pointers */
+    void *user;
 };
 
 struct fclaw2d_domain
 {
-  MPI_Comm		mpicomm;		/* MPI communicator */
-  int			mpisize, mpirank;	/* MPI variables */
-  int			num_patches_all;	/* sum over all blocks */
-  int			minlevel_all, maxlevel_all;	/* proc local */
-  int			global_minlevel, global_maxlevel;	/* global */
-  int			possible_maxlevel;	/* theoretical maximum */
-  int			num_blocks;
-  fclaw2d_block_t	*blocks;		/* allocated storage */
-  int			*patch_to_block;	/* allocated storage */
-  p4est_wrap_t		*pp;
-  void			*user;
+    MPI_Comm mpicomm;           /* MPI communicator */
+    int mpisize, mpirank;       /* MPI variables */
+    int num_patches_all;        /* sum over all blocks */
+    int minlevel_all, maxlevel_all;     /* proc local */
+    int global_minlevel, global_maxlevel;       /* global */
+    int possible_maxlevel;      /* theoretical maximum */
+    int num_blocks;
+    fclaw2d_block_t *blocks;    /* allocated storage */
+    int *patch_to_block;        /* allocated storage */
+    p4est_wrap_t *pp;
+    void *user;
 };
 
 /** Callback prototype for the patch iterators.
@@ -94,8 +98,8 @@ struct fclaw2d_domain
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
 typedef void (*fclaw2d_patch_callback_t)
-			(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
-			 int blockno, int patchno, void *user);
+    (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+     int blockno, int patchno, void *user);
 
 /** Iterate over all patches on a given level.
  * \param [in] domain	General domain structure.
@@ -103,7 +107,7 @@ typedef void (*fclaw2d_patch_callback_t)
  * \param [in] pcb	Function called for each patch of matching level.
  * \param [in,out] user	Data is passed to the pcb callback.
  */
-void fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
+void fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
 
 /** Iterate over all patches of all levels.
@@ -111,8 +115,9 @@ void fclaw2d_domain_iterate_level (fclaw2d_domain_t *domain, int level,
  * \param [in] pcb	Function called for each patch in the domain.
  * \param [in,out] user	Data is passed to the pcb callback.
  */
-void fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
-                                     fclaw2d_patch_callback_t pcb, void *user);
+void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
+                                     fclaw2d_patch_callback_t pcb,
+                                     void *user);
 
 /** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
@@ -122,16 +127,15 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t *domain,
  *			The order is left, right, bottom, top.
  * \return		True if at least one patch face is on a boundary.
  */
-int			fclaw2d_patch_boundary_type (fclaw2d_domain_t *domain,
-						int blockno, int patchno,
-						int boundaries[4]);
+int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
+                                 int blockno, int patchno, int boundaries[4]);
 
 typedef enum fclaw2d_face_neighbor
 {
-  FCLAW2D_FACE_NEIGHBOR_BOUNDARY,
-  FCLAW2D_FACE_NEIGHBOR_HALFSIZE,
-  FCLAW2D_FACE_NEIGHBOR_SAMESIZE,
-  FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
+    FCLAW2D_FACE_NEIGHBOR_BOUNDARY,
+    FCLAW2D_FACE_NEIGHBOR_HALFSIZE,
+    FCLAW2D_FACE_NEIGHBOR_SAMESIZE,
+    FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
 }
 fclaw2d_face_neighbor_t;
 
@@ -146,23 +150,30 @@ fclaw2d_face_neighbor_t;
  * \param [in,out] rfaceno	Neighbor face number and orientation.
  * \return			The Type of face neighbor connection.
  */
-fclaw2d_face_neighbor_t	fclaw2d_patch_face_neighbors (fclaw2d_domain_t *domain,
-				int blockno, int patchno, int faceno,
-				int rproc[2], int *rblockno,
-				int rpatchno[2], int *rfaceno);
+fclaw2d_face_neighbor_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
+                                                      domain, int blockno,
+                                                      int patchno,
+                                                      int faceno,
+                                                      int rproc[2],
+                                                      int *rblockno,
+                                                      int rpatchno[2],
+                                                      int *rfaceno);
 
 /** Mark a patch for refinement.
  */
-void			fclaw2d_patch_mark_refine (fclaw2d_domain_t *domain,
-				int blockno, int patchno);
+void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,
+                                int blockno, int patchno);
 
 /** Mark a patch for coarsening.
  * Coarsening will only happen if all sibling patches are marked as well.
  */
-void			fclaw2d_patch_mark_coarsen (fclaw2d_domain_t *domain,
-				int blockno, int patchno);
+void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
+                                 int blockno, int patchno);
 
 #ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
 }
 #endif
 

@@ -29,25 +29,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
 #endif
 
-fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,
-						int initial_level);
-fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm,
-						int initial_level);
+fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,
+                                                 int initial_level);
+fclaw2d_domain_t *fclaw2d_domain_new_moebius (MPI_Comm mpicomm,
+                                              int initial_level);
 
-void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);
+void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 
 /** COLLECTIVE: Print patch number by level on all processors */
-void			fclaw2d_domain_count_levels (fclaw2d_domain_t *domain,
-						int log_priority);
+void fclaw2d_domain_count_levels (fclaw2d_domain_t * domain,
+                                  int log_priority);
 
 /** Print face neighbor status for each face */
-void                    fclaw2d_domain_list_neighbors (fclaw2d_domain_t *domain,
-						int log_priority);
+void fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain,
+                                    int log_priority);
 
 #ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
 }
 #endif
 

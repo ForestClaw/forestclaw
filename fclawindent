@@ -1,0 +1,5 @@
+#! /bin/sh
+
+for FILE in "$@"; do
+        indent -i4 -bli0 -nut "$FILE"
+done
