@@ -211,7 +211,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     global_parms *gparms = get_domain_data(domain);
     m_t_minlevel = a_t_curr;
     m_refratio = gparms->m_refratio;
-   
+
     /* query the levels that exist on this processor */
     m_minlevel = domain->minlevel_all;
     m_maxlevel = domain->maxlevel_all;
@@ -310,9 +310,9 @@ Real subcycle_manager::dt(const int& a_level)
     return m_levels[a_level].dt();
 }
 
-bool subcycle_manager::can_advance(const int& a_level, const int& a_from_step)
+bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
 {
-    bool b1 = solution_updated(a_level,a_from_step);
+    bool b1 = solution_updated(a_level,a_curr_step);
     bool b2 = exchanged_with_level(a_level);
     bool b3 = exchanged_with_coarser(a_level);
     bool b4 = exchanged_with_finer(a_level);  // This may not be needed.

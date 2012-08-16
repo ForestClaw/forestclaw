@@ -426,11 +426,13 @@ Real advance_level(fclaw2d_domain_t *domain,
                 // boundary conditions.
                 // If we are subcycling, 'a_curr_fine_step > last_coarse_step' means that we are trying
                 // to advance on the fine grid but can't because the coarse grid hasn't yet
-                // advanced to a point beyond the current fine grid time.  Otherwise, we wouldn't
-                // need to advance the coarse grid just to get BCs if a_from_step == last_coarse_step.
+                // advanced to a point beyond the current fine grid time.
+                // If we had 'a_curr_fine_step == last_coarse_step', then there would be no need
+                // to advance the coarse grid this time around.
                 maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
 
+            // Now we can exchange with the coarser grid.
             // Level 'a_level' grid will be averaged onto coarser grid ghost cells;  Coarser
             // 'a_level-1' will interpolate to finer grid ghost.
             // If we are subcycling, this may also require interpolation in time.  If we are not
@@ -446,7 +448,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     time_data.dt = a_time_stepper->dt(a_level);
     time_data.t = a_time_stepper->current_time(a_level);
 
-    // Advance this level from 'a_curr_step' to 'a_curr_step + a_time_stepper.step_inc(a_level)'
+    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + a_time_stepper.step_inc(a_level)'
     fclaw2d_domain_iterate_level(domain, a_level,
                                  (fclaw2d_patch_callback_t) cb_advance_patch,
                                  (void *) &time_data);
@@ -465,20 +467,18 @@ Real advance_level(fclaw2d_domain_t *domain,
 Real advance_all_levels(fclaw2d_domain_t *domain,
                         subcycle_manager *a_time_stepper)
 {
-    // Time step increment on coarse grid (level 0 grid) is equal
-    // to the number of time steps we must take on the fine grid to get
-    // one step on 'minlevel'.
+    // step_inc(minlevel) is the number of steps we must take on the finest level to equal one
+    // step on the coarsest non-empty level, i.e. minlevel.
     int minlevel = a_time_stepper->minlevel();
-    int n_fine_steps = a_time_stepper->step_inc(minlevel);
+    int n_fine_steps = a_time_stepper->step_inc(minlevel); // equal 1 in the non-subcycled case.
 
-    // Take 'n_fine_steps' on finest level.  Recursively update coarser levels
-    // as needed.
+    // Take 'n_fine_steps' on finest level.  Coarser levels will be updated recursively as needed.
     int maxlevel = a_time_stepper->maxlevel();
     Real maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
-        Real cfl_level = advance_level(domain,maxlevel,nf,a_time_stepper);
-        maxcfl = max(cfl_level,maxcfl);
+        Real cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
+        maxcfl = max(cfl_step,maxcfl);
     }
     return maxcfl;
 }
