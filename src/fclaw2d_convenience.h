@@ -33,12 +33,13 @@ extern "C" {
 #endif
 
 fclaw2d_domain_t	*fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,
-						int initial_grid);
-fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm);
+						int initial_level);
+fclaw2d_domain_t	*fclaw2d_domain_new_moebius (MPI_Comm mpicomm,
+						int initial_level);
 
 void			fclaw2d_domain_destroy (fclaw2d_domain_t *domain);
 
-/** Count patches by level on the local processor */
+/** Print patch number by level on the local processor */
 void			fclaw2d_domain_count_levels (fclaw2d_domain_t *domain,
 						int log_priority);
 

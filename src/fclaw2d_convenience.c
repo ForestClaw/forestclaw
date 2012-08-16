@@ -128,16 +128,16 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
 }
 
 fclaw2d_domain_t		*
-    fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,int initial_level)
+fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 {
-
-  return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm, initial_level));
+  return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm,
+  							initial_level));
 }
 
 fclaw2d_domain_t		*
-fclaw2d_domain_new_moebius (MPI_Comm mpicomm)
+fclaw2d_domain_new_moebius (MPI_Comm mpicomm, int initial_level)
 {
-  return fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, 0));
+  return fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, initial_level));
 }
 
 void
