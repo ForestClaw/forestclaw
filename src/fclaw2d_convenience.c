@@ -127,15 +127,17 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
     P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
     minlevel_all = SC_MIN (minlevel_all, tree_minlevel);
     maxlevel_all = SC_MAX (maxlevel_all, tree_maxlevel);
+    block->minlevel = tree_minlevel;
+    block->maxlevel = tree_maxlevel;
   }
   P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
   domain->num_patches_all = num_patches_all;
-  domain->minlevel = minlevel_all;
-  domain->maxlevel = maxlevel_all;
+  domain->minlevel_all = minlevel_all;
+  domain->maxlevel_all = maxlevel_all;
 
   /* parallel communication of minimum and maximum levels */
-  levels[0] = domain->minlevel;
-  levels[1] = -domain->maxlevel;
+  levels[0] = domain->minlevel_all;
+  levels[1] = -domain->maxlevel_all;
   mpiret = MPI_Allreduce (levels, global_levels, 2, MPI_INT, MPI_MIN,
   			domain->mpicomm);
   SC_CHECK_MPI (mpiret);
@@ -194,17 +196,17 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   int			level;
   int			count, count_all;
 
-  P4EST_ASSERT (0 <= domain->minlevel &&
-  		domain->minlevel <= fclaw2d_possible_maxlevel);
-  P4EST_ASSERT (0 <= domain->maxlevel &&
-  		domain->maxlevel <= fclaw2d_possible_maxlevel);
-  P4EST_ASSERT (domain->minlevel <= domain->maxlevel);
+  P4EST_ASSERT (0 <= domain->minlevel_all &&
+  		domain->minlevel_all <= fclaw2d_possible_maxlevel);
+  P4EST_ASSERT (0 <= domain->maxlevel_all &&
+  		domain->maxlevel_all <= fclaw2d_possible_maxlevel);
+  P4EST_ASSERT (domain->minlevel_all <= domain->maxlevel_all);
   P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
   		domain->global_minlevel, domain->global_maxlevel);
   P4EST_LOGF (lp, "Minimum/maximum levels: %2d %2d\n",
-  		domain->minlevel, domain->maxlevel);
+  		domain->minlevel_all, domain->maxlevel_all);
   count_all = 0;
-  for (level = domain->minlevel; level <= domain->maxlevel; ++level) {
+  for (level = domain->minlevel_all; level <= domain->maxlevel_all; ++level) {
     count = 0;
     fclaw2d_domain_iterate_level (domain, level,
     		fclaw2d_domain_count_level_callback, &count);

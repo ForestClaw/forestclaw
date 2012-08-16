@@ -69,6 +69,7 @@ struct fclaw2d_block
   int			mthbc[4];	/* >0 for physical bc types */
   int			num_patches;	/* local patches in this block */
   int			num_patches_before;	/* in all previous blocks */
+  int			minlevel, maxlevel;	/* local over this block */
   fclaw2d_patch_t	*patches;		/* allocated storage */
   fclaw2d_patch_t	*patchbylevel[P4EST_MAXLEVEL + 1];	/* pointers */
   void			*user;
@@ -79,8 +80,8 @@ struct fclaw2d_domain
   MPI_Comm		mpicomm;		/* MPI communicator */
   int			mpisize, mpirank;	/* MPI variables */
   int			num_patches_all;	/* sum over all blocks */
-  int			minlevel, maxlevel;	/* local over all blocks */
-  int			global_minlevel, global_maxlevel;
+  int			minlevel_all, maxlevel_all;	/* proc local */
+  int			global_minlevel, global_maxlevel;	/* global */
   int			num_blocks;
   fclaw2d_block_t	*blocks;		/* allocated storage */
   int			*patch_to_block;	/* allocated storage */
