@@ -406,10 +406,10 @@ Real advance_level(fclaw2d_domain_t *domain,
 
     // printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.dt(a_level));
     // Check BCs
-    Real maxcfl_minlevel = 0;
+    Real maxcfl = 0;
     if (!a_time_stepper->can_advance(a_level,a_from_step))
     {
-        printf("Advancing coarser grid\n");
+        printf("Error (advance_level) : Advancing coarser grid (not tested)\n");
         exit(1);
         if (!a_time_stepper->level_exchange_done(a_level))
         {
@@ -421,20 +421,39 @@ Real advance_level(fclaw2d_domain_t *domain,
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
             if (a_from_step > last_coarse_step)
             {
-                maxcfl_minlevel = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                // We should only end up here if we are subcycling.
+                if (a_time_stepper->nosubcycle())
+                {
+                    printf("Error (advance_level) : No need to advance coarse here if we are not subcycline\n");
+                    exit(1);
+                }
+                maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
 
             // Level 'a_level' grid will be averaged onto coarser grid ghost cells;  Coarser
             // 'a_level-1' will interpolate to finer grid ghost.
             // This may also require interpolation in time.
+            // Even if we are not subcycling, we may need to do this.
             bc_coarse_exchange(domain,a_level,a_from_step);
             a_time_stepper->increment_coarse_exchange_counter(a_level);
         }
     }
+    else if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
+    {
+        // This is just a recursive call to advance the next coarsest level since
+        // advance won't get triggered in the above branch of this conditional.
+        int last_coarse_step = a_time_stepper->last_step(a_level-1);
+        if (last_coarse_step != 0)
+        {
+            printf("Error (advance_level) : Last coarse step should be zero\n");
+            exit(1);
+        }
+        maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+    }
 
     fclaw2d_level_time_data_t time_data;
 
-    time_data.maxcfl = maxcfl_minlevel;
+    time_data.maxcfl = maxcfl;
     time_data.dt = a_time_stepper->dt(a_level);
     time_data.t = a_time_stepper->current_time(a_level);
 
@@ -575,13 +594,26 @@ void amrrun(fclaw2d_domain_t *domain)
             subcycle_manager time_stepper;
             time_stepper.define(domain,t_curr);
 
+            if (!gparms->m_subcycle)
+            {
+                time_stepper.set_nosubcycle();
+            }
+
             // First, modify dt_minlevel if the base level grid is not a level 0 grid.
             // We could just take more times steps on the minlevel grid, but for refined
             // base level grids, this could mean we take many steps before checking the CFL
             // number.  Better to only take a single step on minlevel.
             // printf("dt_level0   = %16.8e\n",dt_level0);
             // Real dt_minlevel = time_stepper.reduce_to_minlevel(dt_level0);
-            int reduce_factor = time_stepper.reduce_to_minlevel_factor();
+            int reduce_factor;
+            if (time_stepper.nosubcycle())
+            {
+                reduce_factor = time_stepper.reduce_to_maxlevel_factor();
+            }
+            else
+            {
+                reduce_factor = time_stepper.reduce_to_minlevel_factor();
+            }
             Real dt_minlevel = dt_level0/reduce_factor;
 
             // Use the tolerance to make sure we don't take a tiny time step just to

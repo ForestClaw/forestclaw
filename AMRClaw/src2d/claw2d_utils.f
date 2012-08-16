@@ -1,7 +1,8 @@
       subroutine inputparms(mx_leaf,my_leaf,initial_dt, tfinal,
      &      max_cfl, desired_cfl,nout, src_term, verbose, mcapa,
      &      maux,meqn,mwaves,
-     &      maxmwaves,mthlim,mbc,mthbc,order,minlevel,maxlevel)
+     &      maxmwaves,mthlim,mbc,mthbc,order,minlevel,maxlevel,
+     &      icycle)
       implicit none
 
       integer mx_leaf, my_leaf
@@ -9,7 +10,8 @@
       integer nout, src_term, mcapa, maux, meqn, mwaves
       integer maxmwaves,mbc, verbose
       integer mthbc(4),mthlim(maxmwaves), order(2)
-      integer maxlevel, minlevel
+      integer maxlevel, minlevel, icycle
+      logical subcycle
 
       integer mw, m
 
@@ -53,6 +55,14 @@ c     timestepping variables
 
       read(55,*) minlevel
       read(55,*) maxlevel
+
+      read(55,*) subcycle
+      if (subcycle) then
+         icycle = 1
+      else
+         icycle = 0
+      endif
+
 
       close(55)
       end

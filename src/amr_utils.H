@@ -77,7 +77,8 @@ extern "C"
                      int  mthbc[],
                      int  order[],
                      int& minlevel,
-                     int& maxlevel);
+                     int& maxlevel,
+                     int& icycle);
 
     void setprob_();
 }
@@ -96,6 +97,7 @@ public:
                 const Real& a_time);
 
     void set_dt(const Real& a_dt);
+    void set_step_inc(const int& a_inc);
 
     void increment_step_counter();
     void increment_time();
@@ -140,6 +142,9 @@ public:
     void increment_step_counter(const int& a_level);
     int step_inc(const int& a_level);
 
+    void set_nosubcycle();
+    bool nosubcycle();
+
     Real current_time(const int& a_level);
     Real dt(const int& level);
     void increment_time(const int& a_level);
@@ -147,6 +152,9 @@ public:
 
     Real reduce_to_minlevel(const Real& a_dt);
     int reduce_to_minlevel_factor();
+
+    Real reduce_to_maxlevel(const Real& a_dt);
+    int reduce_to_maxlevel_factor();
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
@@ -163,6 +171,7 @@ public:
     int m_refratio;
     Real m_dt_minlevel;
     Real m_t_minlevel;
+    bool m_nosubcycle;
 };
 
 
@@ -206,6 +215,7 @@ public:
     int m_refratio;
     int m_minlevel;
     int m_maxlevel;
+    bool m_subcycle;
 
     global_parms();
     ~global_parms();

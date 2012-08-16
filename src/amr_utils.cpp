@@ -45,6 +45,7 @@ global_parms::~global_parms()
 void global_parms::get_inputParams()
 {
     // read data using Fortran file
+    int icycle;
     inputparms_(m_mx_leaf,
                 m_my_leaf,
                 m_initial_dt,
@@ -64,7 +65,8 @@ void global_parms::get_inputParams()
                 m_mthbc,
                 m_order,
                 m_minlevel,
-                m_maxlevel);
+                m_maxlevel,
+                icycle);
 
     // Check maxlevel :
     if (m_maxlevel > fclaw2d_possible_maxlevel)
@@ -91,6 +93,9 @@ void global_parms::get_inputParams()
     m_method[4] = m_src_term;
     m_method[5] = m_mcapa;
     m_method[6] = m_maux;
+
+    // I should just figure out how bool and Fortran 'logical' vars can be passed around.
+    m_subcycle = icycle == 1;
 }
 
 
@@ -215,6 +220,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     global_parms *gparms = get_domain_data(domain);
     m_t_minlevel = a_t_curr;
     m_refratio = gparms->m_refratio;
+    m_nosubcycle = false;
 
     // Finest level we can ever have.  For any particular run, however
     // the finest level may not be this fine.  This is stored in this->m_maxlevel,
@@ -248,6 +254,23 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     }
 }
 
+void subcycle_manager::set_nosubcycle()
+{
+    m_nosubcycle = true;
+    Real dt = m_levels[m_maxlevel].dt(); // Take time step needed for smallest level.
+    for(int level = m_minlevel; level <= m_maxlevel; level++)
+    {
+        m_levels[level].set_step_inc(1);
+        m_levels[level].set_dt(dt);
+    }
+}
+
+bool subcycle_manager::nosubcycle()
+{
+    return m_nosubcycle;
+}
+
+
 void subcycle_manager::set_dt_minlevel(const Real& a_dt_minlevel)
 {
     // Time step for coarsest level that has grids
@@ -276,6 +299,26 @@ int subcycle_manager::reduce_to_minlevel_factor()
 {
     int factor = 1;
     for (int level = 1; level <= m_minlevel; level++)
+    {
+        factor *= m_refratio;
+    }
+    return factor;
+}
+
+Real subcycle_manager::reduce_to_maxlevel(const Real& a_dt)
+{
+    Real dt_maxlevel = a_dt;
+    for (int level = 1; level <= m_maxlevel; level++)
+    {
+        dt_maxlevel/= m_refratio;
+    }
+    return dt_maxlevel;
+}
+
+int subcycle_manager::reduce_to_maxlevel_factor()
+{
+    int factor = 1;
+    for (int level = 1; level <= m_maxlevel; level++)
     {
         factor *= m_refratio;
     }
@@ -441,6 +484,11 @@ void level_data::define(const int& a_level,
 void level_data::set_dt(const Real& a_dt_level)
 {
     m_dt = a_dt_level;
+}
+
+void level_data::set_step_inc(const int& a_inc)
+{
+    m_step_inc = a_inc;
 }
 
 Real level_data::dt()
