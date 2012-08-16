@@ -44,12 +44,15 @@ fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
 static fclaw2d_domain_t		*
 fclaw2d_domain_new (p4est_wrap_t *wrap)
 {
+  int			mpiret;
   int			i, j;
   int			level;
   int			face;
   int			nb;
   int			num_patches_all;
+  int			tree_minlevel, minlevel_all;
   int			tree_maxlevel, maxlevel_all;
+  int			levels[2], global_levels[2];
   p4est_qcoord_t	qh;
   p4est_connectivity_t	*conn = wrap->conn;
   p4est_tree_t          *tree;
@@ -64,6 +67,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   	  sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
   domain = P4EST_ALLOC_ZERO (fclaw2d_domain_t, 1);
+  domain->mpicomm = wrap->p4est->mpicomm;
   domain->mpisize = wrap->p4est->mpisize;
   domain->mpirank = wrap->p4est->mpirank;
   domain->pp = wrap;
@@ -71,11 +75,13 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
   domain->patch_to_block = P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
   num_patches_all = 0;
+  minlevel_all = fclaw2d_possible_maxlevel;
   maxlevel_all = 0;
   for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
     block->num_patches_before = num_patches_all;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
+    tree_minlevel = fclaw2d_possible_maxlevel;
     tree_maxlevel = 0;
     block->xlower = 0.;
     block->xupper = 1.;
@@ -115,29 +121,43 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
 	currentbylevel[level] = patch;
       }
       domain->patch_to_block[num_patches_all++] = i;
+      tree_minlevel = SC_MIN (tree_minlevel, level);
       tree_maxlevel = SC_MAX (tree_maxlevel, level);
     }
     P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
+    minlevel_all = SC_MIN (minlevel_all, tree_minlevel);
     maxlevel_all = SC_MAX (maxlevel_all, tree_maxlevel);
+    block->minlevel = tree_minlevel;
+    block->maxlevel = tree_maxlevel;
   }
   P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
   domain->num_patches_all = num_patches_all;
+  domain->minlevel_all = minlevel_all;
   domain->maxlevel_all = maxlevel_all;
+
+  /* parallel communication of minimum and maximum levels */
+  levels[0] = domain->minlevel_all;
+  levels[1] = -domain->maxlevel_all;
+  mpiret = MPI_Allreduce (levels, global_levels, 2, MPI_INT, MPI_MIN,
+  			domain->mpicomm);
+  SC_CHECK_MPI (mpiret);
+  domain->global_minlevel = global_levels[0];
+  domain->global_maxlevel = -global_levels[1];
 
   return domain;
 }
 
 fclaw2d_domain_t		*
-    fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,int initial_level)
+fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 {
-
-  return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm, initial_level));
+  return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm,
+  							initial_level));
 }
 
 fclaw2d_domain_t		*
-fclaw2d_domain_new_moebius (MPI_Comm mpicomm)
+fclaw2d_domain_new_moebius (MPI_Comm mpicomm, int initial_level)
 {
-  return fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, 0));
+  return fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, initial_level));
 }
 
 void
@@ -176,11 +196,17 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   int			level;
   int			count, count_all;
 
+  P4EST_ASSERT (0 <= domain->minlevel_all &&
+  		domain->minlevel_all <= fclaw2d_possible_maxlevel);
   P4EST_ASSERT (0 <= domain->maxlevel_all &&
   		domain->maxlevel_all <= fclaw2d_possible_maxlevel);
-  P4EST_LOGF (lp, "Maximum level: %2d\n", domain->maxlevel_all);
+  P4EST_ASSERT (domain->minlevel_all <= domain->maxlevel_all);
+  P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
+  		domain->global_minlevel, domain->global_maxlevel);
+  P4EST_LOGF (lp, "Minimum/maximum levels: %2d %2d\n",
+  		domain->minlevel_all, domain->maxlevel_all);
   count_all = 0;
-  for (level = 0; level <= domain->maxlevel_all; ++level) {
+  for (level = domain->minlevel_all; level <= domain->maxlevel_all; ++level) {
     count = 0;
     fclaw2d_domain_iterate_level (domain, level,
     		fclaw2d_domain_count_level_callback, &count);
