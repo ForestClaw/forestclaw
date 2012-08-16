@@ -26,3 +26,5 @@
 
 0         % Minimum level
 0         % Maximum levels of refinement
+
+T         % T = use subcycling; F = no subcycling.
