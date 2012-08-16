@@ -138,8 +138,8 @@ void global_parms::print_inputParams()
     }
   cout << endl << endl;
 
-  cout << "Min level = " << m_minlevel << endl;
-  cout << "Max level = " << m_maxlevel << endl;
+  cout << "Min configured level = " << m_minlevel << endl;
+  cout << "Max configured level = " << m_maxlevel << endl;
 
 }
 
@@ -211,31 +211,11 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     global_parms *gparms = get_domain_data(domain);
     m_t_minlevel = a_t_curr;
     m_refratio = gparms->m_refratio;
-
-    // Finest level we can ever have.  For any particular run, however
-    // the finest level may not be this fine.  This is stored in this->m_maxlevel,
-    // computed below.
-    int maxlevel_fixed = gparms->m_maxlevel;
-
-    // Too many elements if m_minlevel > 0, but we want to be
-    // able to index using full range of indices.
-    m_levels.resize(maxlevel_fixed + 1);
-
-    m_minlevel = 0;
-    for(int level = 0; level <= maxlevel_fixed; level++)
-    {
-        int np = num_patches(domain,level);
-        if (level == m_minlevel && np == 0)
-            m_minlevel++;
-    }
-
-    m_maxlevel = maxlevel_fixed;
-    for (int level = maxlevel_fixed; level >= 0; level--)
-    {
-        int np = num_patches(domain,level);
-        if (level == m_maxlevel && np == 0)
-            m_maxlevel--;
-    }
+   
+    /* query the levels that exist on this processor */
+    m_minlevel = domain->minlevel_all;
+    m_maxlevel = domain->maxlevel_all;
+    m_levels.resize(m_maxlevel + 1);
 
     bool subcycle = gparms->m_subcycle;
     m_nosubcycle = !subcycle;
