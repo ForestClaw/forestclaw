@@ -49,6 +49,7 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   int			face;
   int			nb;
   int			num_patches_all;
+  int			tree_minlevel, minlevel_all;
   int			tree_maxlevel, maxlevel_all;
   p4est_qcoord_t	qh;
   p4est_connectivity_t	*conn = wrap->conn;
@@ -71,11 +72,13 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
   domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
   domain->patch_to_block = P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
   num_patches_all = 0;
+  minlevel_all = fclaw2d_possible_maxlevel;
   maxlevel_all = 0;
   for (i = 0; i < nb; ++i) {
     block = domain->blocks + i;
     block->num_patches_before = num_patches_all;
     tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
+    tree_minlevel = fclaw2d_possible_maxlevel;
     tree_maxlevel = 0;
     block->xlower = 0.;
     block->xupper = 1.;
@@ -115,14 +118,17 @@ fclaw2d_domain_new (p4est_wrap_t *wrap)
 	currentbylevel[level] = patch;
       }
       domain->patch_to_block[num_patches_all++] = i;
+      tree_minlevel = SC_MIN (tree_minlevel, level);
       tree_maxlevel = SC_MAX (tree_maxlevel, level);
     }
     P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
+    minlevel_all = SC_MIN (minlevel_all, tree_minlevel);
     maxlevel_all = SC_MAX (maxlevel_all, tree_maxlevel);
   }
   P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
   domain->num_patches_all = num_patches_all;
-  domain->maxlevel_all = maxlevel_all;
+  domain->minlevel = minlevel_all;
+  domain->maxlevel = maxlevel_all;
 
   return domain;
 }
@@ -176,11 +182,15 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t *domain, int lp)
   int			level;
   int			count, count_all;
 
-  P4EST_ASSERT (0 <= domain->maxlevel_all &&
-  		domain->maxlevel_all <= fclaw2d_possible_maxlevel);
-  P4EST_LOGF (lp, "Maximum level: %2d\n", domain->maxlevel_all);
+  P4EST_ASSERT (0 <= domain->minlevel &&
+  		domain->minlevel <= fclaw2d_possible_maxlevel);
+  P4EST_ASSERT (0 <= domain->maxlevel &&
+  		domain->maxlevel <= fclaw2d_possible_maxlevel);
+  P4EST_ASSERT (domain->minlevel <= domain->maxlevel);
+  P4EST_LOGF (lp, "Minimum/maximum levels: %2d %2d\n",
+  		domain->minlevel, domain->maxlevel);
   count_all = 0;
-  for (level = 0; level <= domain->maxlevel_all; ++level) {
+  for (level = domain->minlevel; level <= domain->maxlevel; ++level) {
     count = 0;
     fclaw2d_domain_iterate_level (domain, level,
     		fclaw2d_domain_count_level_callback, &count);
