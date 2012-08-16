@@ -489,13 +489,11 @@ public :
 
     Real step(const Real& a_time,
               const Real& a_dt,
-              const int& refRatio,
               const int& a_level,
               const global_parms &gparms);
 
     Real step_noqad(const Real& a_time,
                     const Real& a_dt,
-                    const int& refRatio,
                     const int& a_level,
                     const global_parms &gparms);
 

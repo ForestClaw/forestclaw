@@ -390,9 +390,8 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     Real t = time_data->t;
 
     global_parms *gparms = get_domain_data(domain);
-    int refratio = gparms->m_refratio;
     int level = this_patch->level;
-    Real maxcfl_grid = cp->step_noqad(t,dt,refratio,level,*gparms);
+    Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
 
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
@@ -405,21 +404,21 @@ Real advance_level(fclaw2d_domain_t *domain,
                    subcycle_manager* a_time_stepper)
 {
 
-    // printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.get_dt(a_level));
+    // printf("Advancing level %d by dt = %16.4e\n",a_level,a_time_stepper.dt(a_level));
     // Check BCs
     Real maxcfl_minlevel = 0;
     if (!a_time_stepper->can_advance(a_level,a_from_step))
     {
         printf("Advancing coarser grid\n");
         exit(1);
-        if (!a_time_stepper->level_exchange_done(a_level,a_from_step))
+        if (!a_time_stepper->level_exchange_done(a_level))
         {
             printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",a_level,a_from_step);
             exit(1);
         }
-        if (!a_time_stepper->coarse_exchange_done(a_level,a_from_step))
+        if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
-            int last_coarse_step = a_time_stepper->get_last_step(a_level-1);
+            int last_coarse_step = a_time_stepper->last_step(a_level-1);
             if (a_from_step > last_coarse_step)
             {
                 maxcfl_minlevel = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
@@ -429,27 +428,26 @@ Real advance_level(fclaw2d_domain_t *domain,
             // 'a_level-1' will interpolate to finer grid ghost.
             // This may also require interpolation in time.
             bc_coarse_exchange(domain,a_level,a_from_step);
-            int new_coarse_time = a_time_stepper->get_last_step(a_level-1);
-            a_time_stepper->set_coarse_exchange(a_level,new_coarse_time);
+            a_time_stepper->increment_coarse_exchange_counter(a_level);
         }
     }
 
     fclaw2d_level_time_data_t time_data;
 
     time_data.maxcfl = maxcfl_minlevel;
-    time_data.dt = a_time_stepper->get_dt(a_level);
+    time_data.dt = a_time_stepper->dt(a_level);
     time_data.t = a_time_stepper->current_time(a_level);
 
-    // Advance this level from 'a_from_time' to 'a_from_time + a_time_stepper.time_step_inc(a_level)'
+    // Advance this level from 'a_from_time' to 'a_from_time + a_time_stepper.step_inc(a_level)'
     fclaw2d_domain_iterate_level(domain, a_level,
                                  (fclaw2d_patch_callback_t) cb_advance_patch,
                                  (void *) &time_data);
 
     a_time_stepper->increment_step_counter(a_level);
-    bc_level_exchange(domain,a_level);
+    a_time_stepper->increment_time(a_level);
 
-    int new_time = a_time_stepper->get_last_step(a_level);
-    a_time_stepper->set_level_exchange(a_level,new_time);
+    bc_level_exchange(domain,a_level);
+    a_time_stepper->increment_level_exchange_counter(a_level);
 
     return time_data.maxcfl;  // Maximum from level iteration
 
@@ -462,12 +460,12 @@ Real advance_all_levels(fclaw2d_domain_t *domain,
     // Time step increment on coarse grid (level 0 grid) is equal
     // to the number of time steps we must take on the fine grid to get
     // one step on 'minlevel'.
-    int minlevel = a_time_stepper->get_minlevel();
-    int n_fine_steps = a_time_stepper->time_step_inc(minlevel);
+    int minlevel = a_time_stepper->minlevel();
+    int n_fine_steps = a_time_stepper->step_inc(minlevel);
 
     // Take 'n_fine_steps' on finest level.  Recursively update coarser levels
     // as needed.
-    int maxlevel = a_time_stepper->get_maxlevel();
+    int maxlevel = a_time_stepper->maxlevel();
     Real maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
@@ -604,7 +602,7 @@ void amrrun(fclaw2d_domain_t *domain)
             Real maxcfl_step = advance_all_levels(domain, &time_stepper);
             t_curr = t_curr + dt_minlevel;
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-                   time_stepper.get_minlevel(),
+                   time_stepper.minlevel(),
                    n_inner,dt_minlevel,maxcfl_step, t_curr);
             if (maxcfl_step > gparms->m_max_cfl)
             {

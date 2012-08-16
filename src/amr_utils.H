@@ -91,17 +91,35 @@ public:
 
     void define(const int& a_level,
                 const int& a_refratio,
-                const int& a_num_patches);
+                const int& a_num_patches,
+                const int& a_maxlevel,
+                const Real& a_time);
 
-    void set_dt_level(const Real& a_dt);
+    void set_dt(const Real& a_dt);
+
+    void increment_step_counter();
+    void increment_time();
+    Real current_time();
+    Real dt();
+
+    bool level_exchange_done();
+    bool exchanged_with_coarser();
+    bool exchanged_with_finer();
+
+    void increment_level_exchange_counter();
+    void increment_coarse_exchange_counter();
+    void increment_fine_exchange_counter();
 
     int m_level;
-    int m_last_time_step;
+    int m_last_step;
     int m_last_level_exchange;
     int m_last_coarse_exchange;
     int m_last_fine_exchange;
-    Real m_dt_level;
+    int m_step_inc;
     int m_num_patches;
+
+    Real m_time;
+    Real m_dt;
 };
 
 class subcycle_manager
@@ -113,11 +131,18 @@ public:
 
     bool can_advance(const int& a_level, const int& a_from_step);
 
-    bool time_step_done(const int& a_level, const int& a_time_step);
-    int get_last_step(const int& a_level);
+    bool solution_updated(const int& a_level, const int& a_step);
+    bool level_exchange_done(const int& a_level);
+    bool exchanged_with_coarser(const int& a_level);
+    bool exchanged_with_finer(const int& a_level);
+
+    int last_step(const int& a_level);
     void increment_step_counter(const int& a_level);
+    int step_inc(const int& a_level);
+
     Real current_time(const int& a_level);
-    int time_step_inc(const int& a_level);
+    Real dt(const int& level);
+    void increment_time(const int& a_level);
     void set_dt_minlevel(const Real& a_dt);
 
     Real reduce_to_minlevel(const Real& a_dt);
@@ -125,17 +150,12 @@ public:
 
     bool is_coarsest(const int& a_level);
     bool is_finest(const int& a_level);
-    Real get_dt(const int& level);
-    int get_minlevel();
-    int get_maxlevel();
+    int minlevel();
+    int maxlevel();
 
-    bool level_exchange_done(const int& a_level, const int& a_time_step);
-    bool coarse_exchange_done(const int& a_level, const int& a_time_step);
-    bool fine_exchange_done(const int& a_level, const int& a_time_step);
-
-    void set_level_exchange(const int& a_level, const int& a_time_step);
-    void set_coarse_exchange(const int& a_level, const int& a_time_step);
-    void set_fine_exchange(const int& a_level, const int& a_time_step);
+    void increment_level_exchange_counter(const int& a_level);
+    void increment_coarse_exchange_counter(const int& a_level);
+    void increment_fine_exchange_counter(const int& a_level);
 
     vector<level_data> m_levels;
     int m_maxlevel;
