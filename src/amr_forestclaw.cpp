@@ -413,30 +413,38 @@ Real advance_level(fclaw2d_domain_t *domain,
         exit(1);
         if (!a_time_stepper->exchanged_with_level(a_level))
         {
+            // Level exchange should have been done right after solution update.
             printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",a_level,a_curr_fine_step);
             exit(1);
         }
         if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
-            if (a_time_stepper->nosubcycle())
+            if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
             {
-                // Do the exchange first.  We can do this because both this level and the coarser
-                // level are updated to same step (step = 0).
+                // We cannot advance the coarser grid without averaging fine grid to coarser
+                // grid ghost cells.  This is all done at the same time step.
                 bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
+                a_time_stepper->increment_fine_exchange_counter(a_level-1);
 
-                // This is the only advance done on this coarser level.
+                // This is the only advance done on this coarser level.  This advance will
+                // recursively call coarser advances until the coarsest non-empty level is
+                // reached.
+                // We don't need this to advance the current level, however (unlike in the
+                // subcycling case (below) where a_curr_fine_step > last_coarse_step)
                 maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
             else if (a_curr_fine_step > last_coarse_step)
             {
-                // Here, we have to update first, since we don't have BCs for the finer level.
+                // Here, we have to update the coarse grid so that it catches up to the fine grid
+                // time step.
                 maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
 
                 // This exchange will involve interpolation in time.
                 bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
+                a_time_stepper->increment_fine_exchange_counter(a_level-1);
             }
         }
     }
@@ -466,12 +474,10 @@ Real advance_level(fclaw2d_domain_t *domain,
 Real advance_all_levels(fclaw2d_domain_t *domain,
                         subcycle_manager *a_time_stepper)
 {
-    // step_inc(minlevel) is the number of steps we must take on the finest level to equal one
+    // 'n_fine_steps' is the number of steps we must take on the finest level to equal one
     // step on the coarsest non-empty level, i.e. minlevel.
     int minlevel = a_time_stepper->minlevel();
     int n_fine_steps = a_time_stepper->step_inc(minlevel); // equal 1 in the non-subcycled case.
-
-    // Take 'n_fine_steps' on finest level.  Coarser levels will be updated recursively as needed.
     int maxlevel = a_time_stepper->maxlevel();
     Real maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
@@ -601,7 +607,7 @@ void amrrun(fclaw2d_domain_t *domain)
             // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
             // rather than taking a time step of 'dt_minlevel' now, followed a time step of only
             // 'tol' in the next step.
-            // Of course if 'tend - t_curr < dt_minlevel', then dt_minlevel doesn't change.
+            // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
             Real tol = 1e-2*dt_minlevel;
             bool took_small_step = false;
             if (tend - t_curr - dt_minlevel < tol)
