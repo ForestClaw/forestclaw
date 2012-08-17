@@ -159,6 +159,17 @@ fclaw2d_face_neighbor_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
                                                       int rpatchno[2],
                                                       int *rfaceno);
 
+/** Determine neighbor patch(es) and orientation across a given corner.
+ * The current version only looks for same-proc same-tree same-size neighbors.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in] cornerno	Number of the patch corner: bl, br, tl, tr.
+ * \return			The patch number in blockno or -1 if not found.
+ */
+int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
+                                    int blockno, int patchno, int cornerno);
+
 /** Mark a patch for refinement.
  */
 void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,

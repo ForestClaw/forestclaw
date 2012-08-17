@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "forestclaw2d.h"
+#include <p4est_bits.h>
 
 #define P4EST_ORIENTATIONS (P4EST_FACES * P4EST_HALF)
 
@@ -241,6 +242,35 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             return FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE;
         }
     }
+}
+
+int
+fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
+                                int blockno, int patchno, int cornerno)
+{
+    const p4est_quadrant_t *q;
+    p4est_quadrant_t r;
+    p4est_t *p4est;
+    p4est_tree_t *tree;
+    fclaw2d_block_t *block;
+
+    p4est = domain->pp->p4est;
+
+    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+
+    block = domain->blocks + blockno;
+    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+
+    tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
+    q = p4est_quadrant_array_index (&tree->quadrants, patchno);
+
+    P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+    p4est_quadrant_corner_neighbor (q, cornerno, &r);
+
+    return
+        (int) sc_array_bsearch (&tree->quadrants, &r, p4est_quadrant_compare);
 }
 
 void
