@@ -177,7 +177,7 @@ c     # Average fine grid onto coarse grid
 
       end
 
-      subroutine interpolate_ghost_edge(mx,my,mbc,meqn,qfine,qcoarse,
+      subroutine interpolate_face_ghost(mx,my,mbc,meqn,qfine,qcoarse,
      &      idir,iside,refratio,igrid)
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iside

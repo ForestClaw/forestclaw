@@ -165,13 +165,13 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
-                         int *relative_refratio)
+                         int *ref_flag)
 {
-    // icorner  : corner of 'this_patch' for which neighboring corner is requested. Numbered (0,1,2,3)=(ll,lr,ul,ur)
-    //
-    // This needs to be defined by p4est
+    int neighbor_corner = fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx, icorner);
 
-    *relative_refratio = -1;
+    *corner_block_idx = this_block_idx;
+    *corner_patch_idx = neighbor_corner;
+    *ref_flag = 0; // only return patches at the same level for now
 }
 
 void get_phys_boundary(fclaw2d_domain_t *domain,
@@ -192,11 +192,11 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 
 
 // Called from within fclaw2d_domain_iterate_level
-void cb_bc_level_exchange(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
+void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               void *user)
 {
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
@@ -221,16 +221,14 @@ void cb_bc_level_exchange(fclaw2d_domain_t *domain,
                            &is_phys_bc);
 
 
-
         if (ref_flag == 0 && !is_phys_bc)
         {
             // Ghost cells overlap patch at the same level, and so we can do a straight copy.
-            // int num_neighbors = 1; // Same level
             fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
             fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
             ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
             // Finally, do exchange between 'this_patch' and 'neighbor patch(es)'.
-            this_cp->level_face_exchange(idir,iside,&neighbor_cp);
+            this_cp->exchange_face_ghost(idir,neighbor_cp);
         }
     } // loop over directions (idir = 0,1,2)
 
@@ -239,16 +237,147 @@ void cb_bc_level_exchange(fclaw2d_domain_t *domain,
     Real curr_time = get_domain_time(domain);
     Real dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
-    this_cp->set_physbc(intersects_bc,gparms->m_mthbc,curr_time,dt);
+    this_cp->set_phys_face_ghost(intersects_bc,gparms->m_mthbc,curr_time,dt);
+
 }
+
+void cb_level_corner_exchange(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              void *user)
+{
+    global_parms *gparms = get_domain_data(domain);
+
+    bool intersects_bc[2*SpaceDim];
+    get_phys_boundary(domain,this_block_idx,this_patch_idx,
+                      intersects_bc);
+
+    for (int icorner = 0; icorner < 2*SpaceDim; icorner++)
+    {
+        // Get faces that intersect 'icorner'
+        // There must be a clever way to do this...
+        int faces[2];
+        if (icorner == 0)
+        {
+            faces[0] = 0;
+            faces[1] = 2;
+        }
+        else if (icorner == 1)
+        {
+            faces[0] = 1;
+            faces[1] = 2;
+        }
+        else if (icorner == 2)
+        {
+            faces[0] = 0;
+            faces[1] = 3;
+        }
+        else if (icorner == 3)
+        {
+            faces[0] = 1;
+            faces[1] = 3;
+        }
+
+        // Both faces are at a physical boundary
+        bool is_phys_corner = intersects_bc[faces[0]] && intersects_bc[faces[1]];
+
+        // Corner lies in interior of physical boundary edge.
+        bool corner_on_phys_face = !is_phys_corner && (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
+
+        ClawPatch *this_cp = get_patch_data(this_patch);
+        if (is_phys_corner)
+        {
+            // This corner has no neighbor patches;  try to do something sensible using only what
+            // we know about this physical boundary conditions at this corner
+            fclaw2d_block_t *block = &domain->blocks[this_block_idx];
+            Real curr_time = get_domain_time(domain);
+            Real dt = 1e20;   // When do we need dt in setting a boundary condition?
+            this_cp->set_phys_corner_ghost(icorner,block->mthbc,curr_time,dt);
+        }
+        else if (corner_on_phys_face)
+        {
+            // Corners lies some where along a physical edge, but not at a physical corner.
+            int iside;
+            if (intersects_bc[faces[0]])
+            {
+                iside = faces[1];
+            }
+            else
+            {
+                iside = faces[0];
+            }
+            if (iside % 2 == 1) // hi-side face
+            {
+                // only initiate exchange with a hi-side neighbor
+                int refratio = gparms->m_refratio;
+                int neighbor_block_idx;
+                int neighbor_patch_idx[refratio];  // Be prepared to store 1 or more patch indices.
+                int ref_flag; // = -1, 0, 1
+                bool is_phys_bc;
+                get_face_neighbors(domain,
+                                   this_block_idx,
+                                   this_patch_idx,
+                                   iside,
+                                   &neighbor_block_idx,
+                                   neighbor_patch_idx,
+                                   &ref_flag,
+                                   &is_phys_bc);
+                if (ref_flag == 0)
+                {
+                    // Only doing a level exchange now
+                    fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                    fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
+                    ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
+                    this_cp->exchange_phys_corner_ghost(icorner,iside, neighbor_cp);
+                }
+            }
+            else
+            {
+                // Only initiate exchange if we are at a high side corner
+                if (icorner % 2 == 1) // only exchange with high side corners (corners 1, 3, 5 or 7)
+                {
+                    int corner_block_idx;
+                    int corner_patch_idx;
+                    int ref_flag;
+
+
+                    get_corner_neighbor(domain,
+                                        this_block_idx,
+                                        this_patch_idx,
+                                        icorner,
+                                        &corner_block_idx,
+                                        &corner_patch_idx,
+                                        &ref_flag);
+
+                    if (ref_flag == 0)
+                    {
+                        // Only consider case in which neighbor is at same level of refinement
+                        fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
+                        fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
+                        ClawPatch *corner_cp = get_patch_data(corner_patch);
+
+                        // Upper right of 'this_cp' exchanges with lower left of 'corner_cp' or
+                        // lower right of 'this_cp' exchanges with upper left of 'corner_cp'
+                        this_cp->exchange_corner_ghost(icorner,corner_cp);
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
 {
     int user = NULL;
     fclaw2d_domain_iterate_level(domain, a_level,
-                                  (fclaw2d_patch_callback_t) cb_bc_level_exchange, (void *) user);
+                                  cb_bc_level_face_exchange, (void *) user);
 
+    // Do corner exchange only after physical boundary conditions have been set on all patches,
+    // since corners may overlap phyical ghost cell region of neighboring patch.
+    fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) user);
 }
 
 void cb_bc_average(fclaw2d_domain_t *domain,
@@ -297,7 +426,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                 // Average finer grid data to coarser 'this_cp' ghost cells.
                 // This uses the same routine as 'bc_exchange_level', but now
                 // 'num_neighbors = refratio'
-                this_cp->face_average(idir,iside,num_neighbors,neighbor_cp);
+                this_cp->average_face_ghost(idir,iside,num_neighbors,neighbor_cp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
@@ -350,7 +479,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                 // Average finer grid data to coarser 'this_cp' ghost cells.
                 // This uses the same routine as 'bc_exchange_level', but now
                 // 'num_neighbors = refratio'
-                this_cp->edge_interpolate(idir,iside,num_neighbors,neighbor_cp);
+                this_cp->interpolate_face_ghost(idir,iside,num_neighbors,neighbor_cp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
@@ -433,6 +562,8 @@ Real advance_level(fclaw2d_domain_t *domain,
                 // reached.
                 // We don't need this to advance the current level, however (unlike in the
                 // subcycling case (below) where a_curr_fine_step > last_coarse_step)
+                // We do this advance here just so that we be sure to advance all levels in the
+                // non-subcycled case.
                 maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
             else if (a_curr_fine_step > last_coarse_step)

@@ -268,7 +268,7 @@ extern "C" {
                              const int& a_refratio,
                              const int& igrid);
 
-    void interpolate_ghost_edge_(const int& m_mx,
+    void interpolate_face_ghost_(const int& m_mx,
                                  const int& m_my,
                                  const int& m_mbc,
                                  const int& m_meqn,
@@ -467,36 +467,53 @@ public :
                           const int& a_patch_num,
                           const int& a_level);
 
-
-    void level_face_exchange(const int& a_idir,
+    // Routines dealing with boundary condition exchanges
+    // Exchange ghost cells at faces between patches at the same level
+    void exchange_face_ghost(const int& a_idir,
                              ClawPatch *a_neighbor_cp);
 
-    void face_average(const int& a_idir,
-                      const int& a_iside,
-                      const int& a_num_neighbors,
-                      ClawPatch **neighbor_cp);
+    // Average finer grid values onto coarser grid ghost cells
+    void average_face_ghost(const int& a_idir,
+                            const int& a_iside,
+                            const int& a_num_neighbors,
+                            ClawPatch **neighbor_cp);
 
-    void edge_interpolate(const int& a_idir,
-                          const int& a_iside,
-                          const int& a_refratio,
-                          ClawPatch **a_neighbor_cp);
+    // Interpoalte coarser values onto fine grid ghost
+    void interpolate_face_ghost(const int& a_idir,
+                                const int& a_iside,
+                                const int& a_refratio,
+                                ClawPatch **a_neighbor_cp);
 
-    void set_physbc(const bool a_intersects_bc[],
-                    const int a_mthbc[],
-                    const Real& t,
-                    const Real& dt);
+    // Set physical boundary conditions in ghost cells
+    void set_phys_face_ghost(const bool a_intersects_bc[],
+                             const int a_mthbc[],
+                             const Real& t,
+                             const Real& dt);
 
+    // Set ghost values at physical corners
+    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
+
+    // Set ghost values in corner cells at physical boundary
+    void exchange_phys_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
+
+    // Exchange corner ghost cells with neighboring corner patch at the same level.
+    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp);
+
+
+    // Dummy step routine useful for trying out subcycling without anything too terrible happening
     Real step(const Real& a_time,
               const Real& a_dt,
               const int& a_level,
               const global_parms &gparms);
 
+    // Actual step routine with no conservative fix-up
     Real step_noqad(const Real& a_time,
                     const Real& a_dt,
                     const int& a_level,
                     const global_parms &gparms);
 
 
+    // Full time step routine with conservative fix-up (not yet implemented)
     Real ClawPatchIntegrator(const Real& a_time,
                              const Real& a_dt,
                              const int& refRatio,const int& a_level,
