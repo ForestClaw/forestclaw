@@ -469,7 +469,7 @@ public :
 
 
     void level_face_exchange(const int& a_idir,
-                             ClawPatch **a_neighbor_cp);
+                             ClawPatch *a_neighbor_cp);
 
     void face_average(const int& a_idir,
                       const int& a_iside,
