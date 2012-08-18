@@ -437,7 +437,6 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
 // Copy data from neighbor at same level, or average data to coarser level.
 // In this step, no corner information gets exchanged.
 void ClawPatch::level_face_exchange(const int& a_idir,
-                                    const int& a_iside,
                                     ClawPatch **neighbor_cp)
 {
     // Data is exchanged with neighboring grid, since both grids are at the
