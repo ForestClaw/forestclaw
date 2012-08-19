@@ -755,12 +755,14 @@ void amrrun(fclaw2d_domain_t *domain)
         Real tstart = t_curr;
         Real tend = tstart + dt_outer;
         int n_inner = 0;
-        save_time_step(domain);
         while (t_curr < tend)
         {
 
             subcycle_manager time_stepper;
             time_stepper.define(domain,t_curr);
+
+            // In case we have to reject this step
+            save_time_step(domain);
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.
@@ -802,11 +804,13 @@ void amrrun(fclaw2d_domain_t *domain)
             {
                 printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
                 restore_time_step(domain);
+
+                // Modify dt_level0 from step used.
                 dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+
+                // Got back to start of loop, without incrementing step counter.
                 continue;
             }
-            save_time_step(domain);
-
 
             t_curr += dt_minlevel;
 
