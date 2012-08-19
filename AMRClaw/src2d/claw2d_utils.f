@@ -273,6 +273,8 @@ c     # Do something here....
 
       integer ibc, jbc, mq
 
+c     # Fill in corner ghost cells that overlap the physical boundary. In this
+c     case, the corner ghost cells are copied from a face neighbor.
       do mq = 1,meqn
          do ibc = 1,mbc
             do jbc = 1,mbc
@@ -320,6 +322,8 @@ c     # Do something here....
 
       integer mq, ibc, jbc
 
+c     # NOTE : qneighbor is not yet a valid pointer.
+
 c     # Only exchanging high side corners
 
 c     # We only need to worry about corners 1 and 3 (lr and ur).
@@ -329,8 +333,8 @@ c     # else's (lr,ur) corners.
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Exchange corner information at boundaries.
+c              # Do this until we get the corner ids fixed
                if (icorner .eq. 1) then
-c                 # Fix this!
                   qthis(mx+ibc,jbc-mbc,mq) =
      &                  qneighbor(ibc,my+jbc-mbc,mq)
                   qneighbor(ibc-mbc,my+jbc,mq) =

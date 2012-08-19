@@ -147,16 +147,33 @@ void global_parms::print_inputParams()
 FArrayBox::FArrayBox()
 {
     m_data = NULL;
+    m_size = 0;
+}
+
+// copy constructor
+void FArrayBox::operator=(const FArrayBox& fbox)
+{
+    Real *copy = fbox.m_data;
+    if (m_data != NULL) {delete [] m_data; m_data = NULL;}
+    m_data = new Real[fbox.m_size];
+    m_box = fbox.m_box;
+    m_size = fbox.m_size;
+    for (int i = 0; i < fbox.m_size; i++)
+    {
+        m_data[i] = copy[i];
+    }
 }
 
 FArrayBox::~FArrayBox()
 {
     if (m_data != NULL) {delete [] m_data; m_data = NULL;}
+    m_size = 0;
 }
 
 void FArrayBox::define(int a_size,const Box& a_box)
 {
     m_data = new double[a_size];
+    m_size = a_size;
     m_box = a_box;
 }
 
@@ -168,6 +185,11 @@ Real* FArrayBox::dataPtr() const
 Box FArrayBox::box()
 {
     return m_box;
+}
+
+int FArrayBox::size()
+{
+    return m_size;
 }
 
 Box::Box()

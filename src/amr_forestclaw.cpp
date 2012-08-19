@@ -85,6 +85,44 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
     return pdata->cp;
 }
 
+void cb_restore_time_step(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
+    this_cp->restore_step();
+}
+
+
+void restore_time_step(fclaw2d_domain_t *domain)
+{
+    int user = NULL;
+    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) user);
+}
+
+void cb_save_time_step(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
+{
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    // Copy grid data (m_griddata) on each patch to temporary storage (m_griddata_tmp <== m_griddata);
+    this_cp->save_step();
+}
+
+
+void save_time_step(fclaw2d_domain_t *domain)
+{
+    int user = NULL;
+    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) user);
+}
+
 
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
@@ -94,8 +132,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int neighbor_patch_idx[],
                         int *ref_flag,
                         bool *is_phys_bc)
-
-
 {
     int rproc[P4EST_HALF];
     int rblockno;
@@ -353,13 +389,17 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
                     if (ref_flag == 0)
                     {
-                        // Only consider case in which neighbor is at same level of refinement
-                        fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                        fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                        ClawPatch *corner_cp = get_patch_data(corner_patch);
-
                         // Upper right of 'this_cp' exchanges with lower left of 'corner_cp' or
                         // lower right of 'this_cp' exchanges with upper left of 'corner_cp'
+
+                        // Only consider case in which neighbor is at same level of refinement
+                        // fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
+                        // fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
+                        // ClawPatch *corner_cp = get_patch_data(corner_patch);
+
+                        // Set this like this until we get the corner ids working.
+                        ClawPatch *corner_cp = this_cp;
+
                         this_cp->exchange_corner_ghost(icorner,corner_cp);
                     }
                 }
@@ -715,8 +755,10 @@ void amrrun(fclaw2d_domain_t *domain)
         Real tstart = t_curr;
         Real tend = tstart + dt_outer;
         int n_inner = 0;
+        save_time_step(domain);
         while (t_curr < tend)
         {
+
             subcycle_manager time_stepper;
             time_stepper.define(domain,t_curr);
 
@@ -752,15 +794,22 @@ void amrrun(fclaw2d_domain_t *domain)
             time_stepper.set_dt_minlevel(dt_minlevel);
 
             Real maxcfl_step = advance_all_levels(domain, &time_stepper);
-            t_curr += dt_minlevel;
 
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
 
             if (maxcfl_step > gparms->m_max_cfl)
             {
-                printf("   WARNING : Maximum CFL exceeded\n");
+                printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                restore_time_step(domain);
+                dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+                continue;
             }
+            save_time_step(domain);
+
+
+            t_curr += dt_minlevel;
+
             if (took_small_step)
             {
                 Real dt0 =  dt_minlevel*reduce_factor;

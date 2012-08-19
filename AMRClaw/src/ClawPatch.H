@@ -306,6 +306,14 @@ extern "C" {
                                 Real neighbor_q[],
                                 const int& a_corner);
 
+    void copy_farray_(const int& mx,
+                      const int& my,
+                      const int& mbc,
+                      const int& meqn,
+                      Real q[],
+                      Real qcopy[]);
+
+
 
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
@@ -525,6 +533,8 @@ public :
     // Exchange corner ghost cells with neighboring corner patch at the same level.
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp);
 
+    void save_step();
+    void restore_step();
 
     // Dummy step routine useful for trying out subcycling without anything too terrible happening
     Real step(const Real& a_time,
@@ -593,6 +603,7 @@ protected :
 
     // Here is where the data is stored.
     FArrayBox m_griddata;
+    FArrayBox m_griddata_tmp;
     FArrayBox m_auxarray;
 
     bool m_isDefined;

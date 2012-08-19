@@ -263,6 +263,17 @@ Real ClawPatch::step(const Real& a_time,
 
 #if CH_SPACEDIM == 2
 
+void ClawPatch::save_step()
+{
+    // Store a backup in case the CFL doesn't work out.
+    m_griddata_tmp = m_griddata;
+}
+
+void ClawPatch::restore_step()
+{
+    m_griddata = m_griddata_tmp;
+}
+
 Real ClawPatch::step_noqad(const Real& a_time,
                            const Real& a_dt,
                            const int& a_level,
@@ -271,7 +282,6 @@ Real ClawPatch::step_noqad(const Real& a_time,
 
     Real dt = a_dt;
 
-    // Data for step2 or step3.  This is overwritten by updated values.
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
@@ -492,17 +502,15 @@ void ClawPatch::exchange_phys_corner_ghost(const int& a_corner, const int& a_sid
     Real *this_q = m_griddata.dataPtr();
     Real *neighbor_q = cp->m_griddata.dataPtr();
 
-    // No code yet
     exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q, a_corner, a_side);
 }
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 {
-    Real *this_q = m_griddata.dataPtr();
-    Real *corner_q = cp_corner->m_griddata.dataPtr();
+    Real *qthis = m_griddata.dataPtr();
+    Real *qcorner = cp_corner->m_griddata.dataPtr();
 
-    // No code yet
-    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, corner_q, a_corner);
+    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
 
 }
 
@@ -527,6 +535,7 @@ void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mt
     }
     bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
 }
+
 
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,

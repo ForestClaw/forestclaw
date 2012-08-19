@@ -68,6 +68,9 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
 
+void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level);
+
+
 void amrsetup(fclaw2d_domain_t *domain);
 void amrinit(fclaw2d_domain_t *domain);
 void amrrun(fclaw2d_domain_t *domain);
