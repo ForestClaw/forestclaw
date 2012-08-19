@@ -69,8 +69,8 @@ c     timestepping variables
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine ghost_cell_exchange(mx,my,mbc,meqn,
-     &      qthis,qneighbor,idir)
+      subroutine exchange_face_ghost(mx,my,mbc,meqn, qthis,qneighbor,
+     &      idir)
       implicit none
 
       integer mx,my,mbc,meqn,igrid,idir
@@ -245,5 +245,105 @@ c        # Average fine grid onto coarse grid
             enddo
          enddo
       endif
+
+      end
+
+
+      subroutine set_phys_corner_ghost(mx,my,mbc,meqn,q,icorner,t,dt,
+     &      mthbc)
+      implicit none
+
+      integer mx,my,mbc,meqn,icorner, mthbc(4)
+      double precision t,dt
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer i,j
+
+c     # Do something here....
+
+      end
+
+
+      subroutine exchange_phys_corner_ghost(mx,my,mbc,meqn,
+     &      qthis, qneighbor, icorner, iside)
+      implicit none
+
+      integer mx, my, mbc, meqn, iside, icorner
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer ibc, jbc, mq
+
+      do mq = 1,meqn
+         do ibc = 1,mbc
+            do jbc = 1,mbc
+               if (iside .eq. 1) then
+                  if (icorner .eq. 1) then
+                     qthis(mx+ibc,jbc-mbc,mq) =
+     &                     qneighbor(ibc,jbc-mbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc-mbc,jbc-mbc,mq)
+                  elseif(icorner .eq. 3) then
+                     qthis(mx+ibc,my+jbc,mq) =
+     &                     qneighbor(ibc,my+jbc,mq)
+                     qneighbor(ibc-mbc,my+jbc,mq) =
+     &                     qthis(mx+ibc-mbc,my+jbc,mq)
+                  endif
+               elseif (iside .eq. 3) then
+                  if (icorner .eq. 2) then
+                     qthis(ibc-mbc,my+jbc,mq) =
+     &                     qneighbor(ibc-mbc,jbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(ibc-mbc,my+jbc-mbc,mq)
+                  elseif(icorner .eq. 3) then
+                     qthis(mx+ibc,my+jbc,mq) =
+     &                     qneighbor(mx+ibc,jbc,mq)
+                     qneighbor(mx+ibc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc,my+jbc-mbc,mq)
+                  endif
+               endif
+            enddo
+         enddo
+      enddo
+
+
+
+      end
+
+
+      subroutine exchange_corner_ghost(mx,my,mbc,meqn,
+     &      qthis, qneighbor, icorner)
+      implicit none
+
+      integer mx, my, mbc, meqn, icorner
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer mq, ibc, jbc
+
+c     # Only exchanging high side corners
+
+c     # We only need to worry about corners 1 and 3 (lr and ur).
+c     # for the  complete exchange.  The other corners are somebody
+c     # else's (lr,ur) corners.
+      do mq = 1,meqn
+         do ibc = 1,mbc
+            do jbc = 1,mbc
+c              # Exchange corner information at boundaries.
+               if (icorner .eq. 1) then
+c                 # Fix this!
+                  qthis(mx+ibc,jbc-mbc,mq) =
+     &                  qneighbor(ibc,my+jbc-mbc,mq)
+                  qneighbor(ibc-mbc,my+jbc,mq) =
+     &                  qthis(mx+ibc-mbc,jbc,mq)
+               elseif (icorner .eq. 3) then
+                  qthis(mx+ibc,my+jbc,mq) =
+     &                  qneighbor(ibc,jbc,mq)
+                  qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                  qthis(mx+ibc-mbc,my+jbc-mbc,mq)
+               endif
+            enddo
+         enddo
+      enddo
+
 
       end

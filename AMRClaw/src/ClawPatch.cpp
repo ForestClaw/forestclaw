@@ -443,7 +443,7 @@ void ClawPatch::exchange_face_ghost(const int& a_idir,
     // same level
     Real *qthis = m_griddata.dataPtr();
     Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
-    ghost_cell_exchange_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
+    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
 }
 
 void ClawPatch::average_face_ghost(const int& a_idir,
@@ -481,16 +481,29 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
 
 void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt)
 {
-    // Do something here
+    Real *q = m_griddata.dataPtr();
+
+    // No code yet
+    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
 }
 
-void ClawPatch::exchange_phys_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp)
+void ClawPatch::exchange_phys_corner_ghost(const int& a_corner, const int& a_side, ClawPatch* cp)
 {
+    Real *this_q = m_griddata.dataPtr();
+    Real *neighbor_q = cp->m_griddata.dataPtr();
 
+    // No code yet
+    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q, a_corner, a_side);
 }
 
-void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp)
+void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 {
+    Real *this_q = m_griddata.dataPtr();
+    Real *corner_q = cp_corner->m_griddata.dataPtr();
+
+    // No code yet
+    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, corner_q, a_corner);
+
 }
 
 

@@ -249,7 +249,7 @@ extern "C" {
                       const int& patch_num,
                       const int& level);
 
-    void ghost_cell_exchange_(const int& m_mx,
+    void exchange_face_ghost_(const int& m_mx,
                               const int& m_my,
                               const int& m_mbc,
                               const int& m_meqn,
@@ -279,6 +279,32 @@ extern "C" {
                                  const int& a_refratio,
                                  const int& igrid);
 
+    void set_phys_corner_ghost_(const int& mx,
+                                const int& my,
+                                const int& mbc,
+                                const int& meqn,
+                                Real q[],
+                                const int& icorner,
+                                const Real &t,
+                                const Real& dt,
+                                const int mthbc[]);
+
+    void exchange_phys_corner_ghost_(const int& mx,
+                                const int& my,
+                                const int& mbc,
+                                const int& meqn,
+                                Real this_q[],
+                                Real neighbor_q[],
+                                const int& a_corner,
+                                const int& a_side);
+
+    void exchange_corner_ghost_(const int& mx,
+                                const int& my,
+                                const int& mbc,
+                                const int& meqn,
+                                Real this_q[],
+                                Real neighbor_q[],
+                                const int& a_corner);
 
 
 #elif CH_SPACEDIM==3

@@ -55,7 +55,7 @@ c
 c     # zero-order extrapolation:
       do 115 m=1,meqn
          do 115 ibc=1,mbc
-            do 115 j = 1-mbc, my+mbc
+            do 115 j = 1,my
                q(1-ibc,j,m) = q(1,j,m)
   115       continue
       go to 199
@@ -101,7 +101,7 @@ c     # user-specified boundary conditions go here in place of error output
 c     # zero-order extrapolation:
       do 215 m=1,meqn
          do 215 ibc=1,mbc
-            do 215 j = 1-mbc, my+mbc
+            do 215 j = 1,my
                q(mx+ibc,j,m) = q(mx,j,m)
   215       continue
       go to 299
@@ -147,7 +147,7 @@ c
 c     # zero-order extrapolation:
       do 315 m=1,meqn
          do 315 jbc=1,mbc
-            do 315 i = 1-mbc, mx+mbc
+            do 315 i = 1,mx
                q(i,1-jbc,m) = q(i,1,m)
   315       continue
       go to 399
@@ -165,7 +165,7 @@ c     # periodic:
 c     # solid wall (assumes 3'rd component is velocity or momentum in y):
       do 335 m=1,meqn
          do 335 jbc=1,mbc
-            do 335 i = 1-mbc, mx+mbc
+            do 335 i = 1,mx
                q(i,1-jbc,m) = q(i,jbc,m)
   335       continue
 c     # negate the normal velocity:
@@ -193,7 +193,7 @@ c     # user-specified boundary conditions go here in place of error output
 c     # zero-order extrapolation:
       do 415 m=1,meqn
          do 415 jbc=1,mbc
-            do 415 i = 1-mbc, mx+mbc
+            do 415 i = 1,mx
                q(i,my+jbc,m) = q(i,my,m)
   415       continue
       go to 499
