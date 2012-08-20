@@ -286,46 +286,33 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 {
     global_parms *gparms = get_domain_data(domain);
 
-    bool intersects_bc[2*SpaceDim];
+    const int num_corners = fclaw2d_domain_num_corners (domain);
+    const int num_faces = fclaw2d_domain_num_faces (domain);
+
+    bool intersects_bc[num_faces];
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    for (int icorner = 0; icorner < 2*SpaceDim; icorner++)
+    for (int icorner = 0; icorner < num_corners; icorner++)
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
-        int faces[2];
-        if (icorner == 0)
-        {
-            faces[0] = 0;
-            faces[1] = 2;
-        }
-        else if (icorner == 1)
-        {
-            faces[0] = 1;
-            faces[1] = 2;
-        }
-        else if (icorner == 2)
-        {
-            faces[0] = 0;
-            faces[1] = 3;
-        }
-        else if (icorner == 3)
-        {
-            faces[0] = 1;
-            faces[1] = 3;
-        }
+        int faces[SpaceDim];
+        fclaw2d_domain_corner_faces (domain, icorner, faces);
 
         // Both faces are at a physical boundary
-        bool is_phys_corner = intersects_bc[faces[0]] && intersects_bc[faces[1]];
+        bool is_phys_corner =
+                intersects_bc[faces[0]] && intersects_bc[faces[1]];
 
         // Corner lies in interior of physical boundary edge.
-        bool corner_on_phys_face = !is_phys_corner && (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
+        bool corner_on_phys_face = !is_phys_corner &&
+                (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
 
         ClawPatch *this_cp = get_patch_data(this_patch);
         if (is_phys_corner)
         {
-            // This corner has no neighbor patches;  try to do something sensible using only what
+            // This corner has no neighbor patches;
+            // try to do something sensible using only what
             // we know about this physical boundary conditions at this corner
             fclaw2d_block_t *block = &domain->blocks[this_block_idx];
             Real curr_time = get_domain_time(domain);
@@ -334,7 +321,8 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
         else if (corner_on_phys_face)
         {
-            // Corners lies some where along a physical edge, but not at a physical corner.
+            // Corners lies some where along a physical edge,
+            // but not at a physical corner.
             int iside;
             if (intersects_bc[faces[0]])
             {
@@ -363,14 +351,18 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                 if (ref_flag == 0)
                 {
                     // Only doing a level exchange now
-                    fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                    fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
+                    fclaw2d_block_t *neighbor_block =
+                        &domain->blocks[neighbor_block_idx];
+                    fclaw2d_patch_t *neighbor_patch =
+                        &neighbor_block->patches[neighbor_patch_idx[0]];
                     ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
-                    this_cp->exchange_phys_corner_ghost(icorner,iside, neighbor_cp);
+                    this_cp->exchange_phys_corner_ghost(icorner,iside,
+                        neighbor_cp);
                 }
             }
-            else
+            else /* low-side face */
             {
+                // CB: Don't understand: missing logic for low-side face?
                 // Only initiate exchange if we are at a high side corner
                 if (icorner % 2 == 1) // only exchange with high side corners (corners 1, 3, 5 or 7)
                 {
