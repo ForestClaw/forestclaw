@@ -232,7 +232,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     if (neighbor_corner == -1)
     {
-        printf("What'dya know! Neighbor_corner = -1\n");
+        printf("Patch %d at corner %d does not have any corner neighbors\n",this_patch_idx,icorner);
         exit(1);
     }
 
@@ -391,46 +391,52 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                     this_cp->exchange_phys_corner_ghost(icorner,iside,
                         neighbor_cp);
                 }
-            }
-            else /* low-side face */
+            }   /* This brace was missing !! */
+        }
+        else /* interior corner */
+        {
+            // CB: Don't understand: missing logic for low-side face?
+            // DAC : The hi-side faces above are only those faces with an endpoint on the
+            // physical boundary, i.e. which intersect a corner that lies on an physical
+            // boundary.  Each one of these corners is on the 'hi-side' of another patch
+            // face.
+            //
+            // Only initiate exchange if we are at a high side corner
+            if (icorner % 2 == 1) // only exchange with high side corners (corners 1, 3, 5 or 7)
             {
-                // CB: Don't understand: missing logic for low-side face?
-                // Only initiate exchange if we are at a high side corner
-                if (icorner % 2 == 1) // only exchange with high side corners (corners 1, 3, 5 or 7)
+                int corner_block_idx;
+                int corner_patch_idx;
+                int ref_flag;
+
+
+                get_corner_neighbor(domain,
+                                    this_block_idx,
+                                    this_patch_idx,
+                                    icorner,
+                                    &corner_block_idx,
+                                    &corner_patch_idx,
+                                    &ref_flag);
+
+                if (ref_flag == 0)
                 {
-                    int corner_block_idx;
-                    int corner_patch_idx;
-                    int ref_flag;
+                    // Upper right of 'this_cp' exchanges with lower left of 'corner_cp' or
+                    // lower right of 'this_cp' exchanges with upper left of 'corner_cp'
 
+                    // Only consider case in which neighbor is at same level of refinement
+                    fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
+                    fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
+                    ClawPatch *corner_cp = get_patch_data(corner_patch);
 
-                    get_corner_neighbor(domain,
-                                        this_block_idx,
-                                        this_patch_idx,
-                                        icorner,
-                                        &corner_block_idx,
-                                        &corner_patch_idx,
-                                        &ref_flag);
+                    // Set this like this until we get the corner ids working.
+                    // ClawPatch *corner_cp = this_cp;
 
-                    if (ref_flag == 0)
-                    {
-                        // Upper right of 'this_cp' exchanges with lower left of 'corner_cp' or
-                        // lower right of 'this_cp' exchanges with upper left of 'corner_cp'
-
-                        // Only consider case in which neighbor is at same level of refinement
-                        // fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                        // fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                        // ClawPatch *corner_cp = get_patch_data(corner_patch);
-
-                        // Set this like this until we get the corner ids working.
-                        ClawPatch *corner_cp = this_cp;
-
-                        this_cp->exchange_corner_ghost(icorner,corner_cp);
-                    }
+                    this_cp->exchange_corner_ghost(icorner,corner_cp);
                 }
             }
         }
     }
 }
+
 
 
 
