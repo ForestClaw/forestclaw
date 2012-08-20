@@ -90,8 +90,10 @@ struct fclaw2d_domain
     void *user;
 };
 
+int fclaw2d_domain_dimension (fclaw2d_domain_t * domain);
 int fclaw2d_domain_num_faces (fclaw2d_domain_t * domain);
 int fclaw2d_domain_num_corners (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_face_corners (fclaw2d_domain_t * domain);
 void fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 

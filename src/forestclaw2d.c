@@ -29,15 +29,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define P4EST_ORIENTATIONS (P4EST_FACES * P4EST_HALF)
 
 int
+fclaw2d_domain_dimension (fclaw2d_domain_t * domain)
+{
+    return P4EST_DIM;           /* space dimension */
+}
+
+int
 fclaw2d_domain_num_faces (fclaw2d_domain_t * domain)
 {
-    return P4EST_FACES;
+    return P4EST_FACES;         /* 2 * DIM; number of cube faces */
 }
 
 int
 fclaw2d_domain_num_corners (fclaw2d_domain_t * domain)
 {
-    return P4EST_CHILDREN;
+    return P4EST_CHILDREN;      /* 2 ** DIM; number of cube corners */
+}
+
+int
+fclaw2d_domain_num_face_corners (fclaw2d_domain_t * domain)
+{
+    return P4EST_HALF;          /* 2 ** (DIM - 1); corners per face */
 }
 
 void

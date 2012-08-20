@@ -133,9 +133,10 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int *ref_flag,
                         bool *is_phys_bc)
 {
-    int rproc[P4EST_HALF];
+    const int face_corners = fclaw2d_domain_num_face_corners (domain);
+    int rproc[face_corners];
     int rblockno;
-    int rpatchno[P4EST_HALF];
+    int rpatchno[face_corners];
     int rfaceno;
 
     fclaw2d_face_neighbor_t neighbor_type =
@@ -156,7 +157,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     // FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
 
     global_parms *gparms = get_domain_data(domain);
-    int refratio = gparms->m_refratio; // == P4EST_HALF ??
+    int refratio = gparms->m_refratio;
 
     *neighbor_block_idx = rblockno;
 
@@ -216,12 +217,12 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        bool *intersects_bc)
 {
+    const int num_faces = fclaw2d_domain_num_faces (domain);
 
-
-    int bdry[2*SpaceDim]; // 2*SpaceDim == P4EST_FACES
+    int bdry[num_faces];
     fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
 
-    for(int i = 0; i < 2*SpaceDim; i++)
+    for(int i = 0; i < num_faces; i++)
     {
         intersects_bc[i] = bdry[i] > 0;
     }
@@ -235,6 +236,8 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user)
 {
+    const int num_faces = fclaw2d_domain_num_faces (domain);
+
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
     ClawPatch *this_cp = get_patch_data(this_patch);
@@ -270,7 +273,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     } // loop over directions (idir = 0,1,2)
 
     // Now check for any physical boundary conditions on this patch
-    bool intersects_bc[2*SpaceDim];
+    bool intersects_bc[num_faces];
     Real curr_time = get_domain_time(domain);
     Real dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
