@@ -444,6 +444,14 @@ void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, co
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
 }
 
+Real ClawPatch::compute_sum()
+{
+    Real *q = m_griddata.dataPtr();
+    Real sum;
+    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
+    return sum;
+}
+
 // Copy data from neighbor at same level, or average data to coarser level.
 // In this step, no corner information gets exchanged.
 void ClawPatch::exchange_face_ghost(const int& a_idir,

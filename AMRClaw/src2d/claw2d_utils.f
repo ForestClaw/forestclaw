@@ -73,7 +73,7 @@ c     # Exchange edge ghost data with neighboring grid at same level.
      &      idir)
       implicit none
 
-      integer mx,my,mbc,meqn,igrid,idir
+      integer mx,my,mbc,meqn,idir
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -89,7 +89,7 @@ c     # We do need to do a complete exchange, though.
 c                 # Exchange at high side of 'this' grid in
 c                 # x-direction (idir == 0)
                   qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
-                  qneighbor(ibc-mbc,j,mq) = qthis(mx-mbc+ibc,j,mq)
+                  qneighbor(ibc-mbc,j,mq) = qthis(mx+ibc-mbc,j,mq)
                enddo
             enddo
          enddo
@@ -346,6 +346,26 @@ c              # Do this until we get the corner ids fixed
      &                  qthis(mx+ibc-mbc,my+jbc-mbc,mq)
                endif
             enddo
+         enddo
+      enddo
+
+
+      end
+
+
+      subroutine compute_sum(mx,my,mbc,meqn,dx,dy,q,sum)
+      implicit none
+
+      integer mx,my,mbc,meqn
+      double precision dx, dy, sum
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer i,j
+
+      sum = 0
+      do i = 1,mx
+         do j = 1,my
+            sum = sum + q(i,j,1)*dx*dy
          enddo
       enddo
 

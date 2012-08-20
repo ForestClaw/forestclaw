@@ -306,14 +306,14 @@ extern "C" {
                                 Real neighbor_q[],
                                 const int& a_corner);
 
-    void copy_farray_(const int& mx,
+    void compute_sum_(const int& mx,
                       const int& my,
                       const int& mbc,
                       const int& meqn,
+                      const Real& dx,
+                      const Real& dy,
                       Real q[],
-                      Real qcopy[]);
-
-
+                      Real& sum);
 
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
@@ -500,6 +500,8 @@ public :
     void write_patch_data(const int& a_iframe,
                           const int& a_patch_num,
                           const int& a_level);
+
+    Real compute_sum();
 
     // Routines dealing with boundary condition exchanges
     // Exchange ghost cells at faces between patches at the same level

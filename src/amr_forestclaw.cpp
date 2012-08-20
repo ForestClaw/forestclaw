@@ -85,6 +85,29 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
     return pdata->cp;
 }
 
+void cb_check_conservation(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           void *user)
+{
+    ClawPatch *this_cp = get_patch_data(this_patch);
+    Real *sum = (Real*) user;
+
+    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
+    *sum += this_cp->compute_sum();
+}
+
+
+void check_conservation(fclaw2d_domain_t *domain)
+{
+    Real sum = 0;
+    fclaw2d_domain_iterate_patches(domain,cb_check_conservation,(void *) &sum);
+
+    printf("Total sum = %24.16f\n",sum);
+}
+
+
 void cb_restore_time_step(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
@@ -204,8 +227,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int *ref_flag)
 {
-    int neighbor_corner = 0;
-    // int neighbor_corner = fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx, icorner);
+    // int neighbor_corner = 0;
+    int neighbor_corner = fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx, icorner);
+
+    if (neighbor_corner == -1)
+    {
+        printf("What'dya know! Neighbor_corner = -1\n");
+        exit(1);
+    }
 
     *corner_block_idx = this_block_idx;
     *corner_patch_idx = neighbor_corner;
@@ -758,6 +787,7 @@ void amrrun(fclaw2d_domain_t *domain)
 
             // In case we have to reject this step
             save_time_step(domain);
+            check_conservation(domain);
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.
