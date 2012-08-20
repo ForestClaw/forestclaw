@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include <p4est_bits.h>
 
-#define P4EST_ORIENTATIONS (P4EST_FACES * P4EST_HALF)
-
 int
 fclaw2d_domain_dimension (fclaw2d_domain_t * domain)
 {
@@ -50,6 +48,12 @@ int
 fclaw2d_domain_num_face_corners (fclaw2d_domain_t * domain)
 {
     return P4EST_HALF;          /* 2 ** (DIM - 1); corners per face */
+}
+
+int
+fclaw2d_domain_num_orientations (fclaw2d_domain_t * domain)
+{
+    return P4EST_FACES * P4EST_HALF;
 }
 
 void
@@ -189,6 +193,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
                               int rproc[P4EST_HALF], int *rblockno,
                               int rpatchno[P4EST_HALF], int *rfaceno)
 {
+    const int num_orientations = fclaw2d_domain_num_orientations (domain);
     int k;
     int hblockno[P4EST_HALF];
     int8_t qtf;
@@ -244,7 +249,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             P4EST_ASSERT (k == 0 || hblockno[k - 1] == hblockno[k]);
         }
         *rblockno = hblockno[0];
-        *rfaceno = qtf + P4EST_ORIENTATIONS;
+        *rfaceno = qtf + num_orientations;
         P4EST_ASSERT (*rfaceno >= 0);
         return FCLAW2D_FACE_NEIGHBOR_HALFSIZE;
     }
@@ -258,19 +263,19 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             rproc[k] = -1;
             rpatchno[k] = -1;
         }
-        if (qtf < P4EST_ORIENTATIONS)
+        if (qtf < num_orientations)
         {
             /* same-size neighbor */
             *rfaceno = (int) qtf;
-            P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_ORIENTATIONS);
+            P4EST_ASSERT (0 <= *rfaceno && *rfaceno < num_orientations);
             return FCLAW2D_FACE_NEIGHBOR_SAMESIZE;
         }
         else
         {
             /* double-size neighbor */
-            *rfaceno = (int) qtf % P4EST_ORIENTATIONS;
+            *rfaceno = (int) qtf % num_orientations;
             /* the number of our patch within the bigger neighbor subfaces */
-            rproc[1] = (int) qtf / P4EST_ORIENTATIONS - 1;
+            rproc[1] = (int) qtf / num_orientations - 1;
             P4EST_ASSERT (0 <= rproc[1] && rproc[1] < P4EST_HALF);
             return FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE;
         }
