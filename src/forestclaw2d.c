@@ -28,6 +28,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define P4EST_ORIENTATIONS (P4EST_FACES * P4EST_HALF)
 
+int
+fclaw2d_domain_num_faces (fclaw2d_domain_t * domain)
+{
+    return P4EST_FACES;
+}
+
+int
+fclaw2d_domain_num_corners (fclaw2d_domain_t * domain)
+{
+    return P4EST_CHILDREN;
+}
+
+void
+fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
+                             int icorner, int faces[2])
+{
+    P4EST_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
+    faces[0] = p4est_corner_faces[icorner][0];
+    faces[1] = p4est_corner_faces[icorner][1];
+}
+
 void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)

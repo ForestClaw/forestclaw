@@ -90,6 +90,11 @@ struct fclaw2d_domain
     void *user;
 };
 
+int fclaw2d_domain_num_faces (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_corners (fclaw2d_domain_t * domain);
+void fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
+                                  int icorner, int faces[2]);
+
 /** Callback prototype for the patch iterators.
  * \param [in] domain	General domain structure.
  * \param [in] patch	The patch currently processed by the iterator.
