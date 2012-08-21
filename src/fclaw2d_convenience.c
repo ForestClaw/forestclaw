@@ -212,9 +212,9 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 }
 
 static void
-fclaw2d_domain_count_level_callback (fclaw2d_domain_t * domain,
-                                     fclaw2d_patch_t * patch, int block_no,
-                                     int patch_no, void *user)
+fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
+                                    fclaw2d_patch_t * patch, int block_no,
+                                    int patch_no, void *user)
 {
     P4EST_ASSERT (0 <= block_no && block_no < domain->num_blocks);
     P4EST_ASSERT (0 <= patch_no &&
@@ -225,7 +225,7 @@ fclaw2d_domain_count_level_callback (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_domain_count_levels (fclaw2d_domain_t * domain, int lp)
+fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
 {
     int level;
     int count, count_all;
@@ -244,7 +244,7 @@ fclaw2d_domain_count_levels (fclaw2d_domain_t * domain, int lp)
     {
         count = 0;
         fclaw2d_domain_iterate_level (domain, level,
-                                      fclaw2d_domain_count_level_callback,
+                                      fclaw2d_domain_list_level_callback,
                                       &count);
         P4EST_LOGF (lp, "Patches on level %2d: %9d\n", level, count);
         count_all += count;
@@ -276,18 +276,18 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
 
     for (faceno = 0; faceno < P4EST_FACES; ++faceno)
     {
-        fnt =
-            fclaw2d_patch_face_neighbors (domain, block_no, patch_no, faceno,
-                                          rproc, &rblockno, rpatchno,
-                                          &rfaceno);
+        fnt = fclaw2d_patch_face_neighbors (domain, block_no, patch_no,
+                                            faceno, rproc, &rblockno,
+                                            rpatchno, &rfaceno);
         P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
                     block_no, patch_no, faceno, fnt);
     }
-    for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno) {
+    for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
+    {
         rpatchno[0] = fclaw2d_patch_corner_neighbors (domain, block_no,
-				patch_no, cornerno);
-	P4EST_LOGF (ln->lp, "              corner %d neighbor %d\n",
-				cornerno, rpatchno[0]);
+                                                      patch_no, cornerno);
+        P4EST_LOGF (ln->lp, "Block %d patch %d corner %d neighbor %d\n",
+                    block_no, patch_no, cornerno, rpatchno[0]);
     }
 
     ++ln->count;

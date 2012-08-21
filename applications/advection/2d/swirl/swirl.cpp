@@ -50,7 +50,7 @@ main (int argc, char **argv)
   int minlevel = gparms->m_minlevel;
   domain = fclaw2d_domain_new_unitsquare (mpicomm,minlevel);
 
-  fclaw2d_domain_count_levels (domain, lp);
+  fclaw2d_domain_list_levels (domain, lp);
   fclaw2d_domain_list_neighbors (domain, lp);
   printf("\n\n");
 
