@@ -232,7 +232,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     if (neighbor_corner == -1)
     {
-        printf("Patch %d at corner %d does not have any corner neighbors\n",this_patch_idx,icorner);
+        printf("Patch %d at corner %d does not have any corner neighbors\n",
+               this_patch_idx,icorner);
         exit(1);
     }
 
@@ -329,6 +330,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
+        // p4est has tons of lookup table like this, can be exposed similarly
         int faces[SpaceDim];
         fclaw2d_domain_corner_faces (domain, icorner, faces);
 
@@ -391,12 +393,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                     this_cp->exchange_phys_corner_ghost(icorner,iside,
                         neighbor_cp);
                 }
-            }   /* This brace was missing !! */
+            }
         }
         else /* interior corner */
         {
-            // CB: Don't understand: missing logic for low-side face?
-            // DAC : The hi-side faces above are only those faces with an endpoint on the
+            // The hi-side faces above are only those faces with an endpoint on the
             // physical boundary, i.e. which intersect a corner that lies on an physical
             // boundary.  Each one of these corners is on the 'hi-side' of another patch
             // face.
@@ -436,8 +437,6 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
     }
 }
-
-
 
 
 void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
