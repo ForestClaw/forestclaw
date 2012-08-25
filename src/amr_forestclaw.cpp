@@ -342,6 +342,8 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
 
+        bool interior_corner = !corner_on_phys_face && !is_phys_corner;
+
         ClawPatch *this_cp = get_patch_data(this_patch);
         if (is_phys_corner)
         {
@@ -395,7 +397,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                 }
             }
         }
-        else /* interior corner */
+        else if (interior_corner)
         {
             // The hi-side faces above are only those faces with an endpoint on the
             // physical boundary, i.e. which intersect a corner that lies on an physical
@@ -427,9 +429,6 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                     fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
                     fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                     ClawPatch *corner_cp = get_patch_data(corner_patch);
-
-                    // Set this like this until we get the corner ids working.
-                    // ClawPatch *corner_cp = this_cp;
 
                     this_cp->exchange_corner_ghost(icorner,corner_cp);
                 }
