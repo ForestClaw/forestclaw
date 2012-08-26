@@ -41,6 +41,7 @@ using std::vector;
 
 #define CH_SPACEDIM 2
 const int SpaceDim = CH_SPACEDIM;
+const int NumFaces = P4EST_FACES;
 
 // Needs to be fixed!
 #define Max(a,b)  a
@@ -49,9 +50,12 @@ const int SpaceDim = CH_SPACEDIM;
 
 #define endl std::endl
 
+
 typedef double Real;
 
 class global_parms;
+
+
 
 int num_patches(fclaw2d_domain_t *domain, int level);
 global_parms* get_domain_data(fclaw2d_domain_t *domain);
