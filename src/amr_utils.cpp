@@ -335,7 +335,7 @@ Real subcycle_manager::dt(const int& a_level)
 bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
 {
     bool b1 = solution_updated(a_level,a_curr_step);
-    bool b2 = exchanged_with_level(a_level);
+    bool b2 = level_exchange_done(a_level);
     bool b3 = exchanged_with_coarser(a_level);
     bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
     return b1 && b2 && b3 && b4;
@@ -351,9 +351,9 @@ bool subcycle_manager::solution_updated(const int& a_level, const int& a_step)
     return m_levels[a_level].m_last_step >= a_step;
 }
 
-bool subcycle_manager::exchanged_with_level(const int& a_level)
+bool subcycle_manager::level_exchange_done(const int& a_level)
 {
-    return m_levels[a_level].exchanged_with_level();
+    return m_levels[a_level].level_exchange_done();
 }
 
 bool subcycle_manager::exchanged_with_coarser(const int& a_level)
@@ -473,7 +473,7 @@ void level_data::increment_fine_exchange_counter()
 }
 
 
-bool level_data::exchanged_with_level()
+bool level_data::level_exchange_done()
 {
     return m_last_level_exchange == m_last_step;
 }

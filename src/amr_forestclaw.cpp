@@ -605,7 +605,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     {
         printf("Error (advance_level) : Advancing coarser grid (not tested)\n");
         exit(1);
-        if (!a_time_stepper->exchanged_with_level(a_level))
+        if (!a_time_stepper->level_exchange_done(a_level))
         {
             // Level exchange should have been done right after solution update.
             printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",a_level,a_curr_fine_step);

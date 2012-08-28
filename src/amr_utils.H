@@ -108,7 +108,7 @@ public:
     Real current_time();
     Real dt();
 
-    bool exchanged_with_level();
+    bool level_exchange_done();
     bool exchanged_with_coarser();
     bool exchanged_with_finer();
 
@@ -138,7 +138,7 @@ public:
     bool can_advance(const int& a_level, const int& a_from_step);
 
     bool solution_updated(const int& a_level, const int& a_step);
-    bool exchanged_with_level(const int& a_level);
+    bool level_exchange_done(const int& a_level);
     bool exchanged_with_coarser(const int& a_level);
     bool exchanged_with_finer(const int& a_level);
 
