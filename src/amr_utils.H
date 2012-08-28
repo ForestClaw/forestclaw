@@ -41,7 +41,7 @@ using std::vector;
 
 #define CH_SPACEDIM 2
 const int SpaceDim = CH_SPACEDIM;
-const int NumFaces = P4EST_FACES;
+const int p4est_refineFactor = P4EST_FACES;
 
 // Needs to be fixed!
 #define Max(a,b)  a

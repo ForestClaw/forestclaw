@@ -10,7 +10,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
-    delete m_corners_set;
+    // delete m_corners_set;
 }
 
 
@@ -46,31 +46,6 @@ void ClawPatch::define(const Real&  a_xlower,
 
     m_meqn = a_gparms->m_meqn;
     m_maux = a_gparms->m_maux;
-
-    // Corners can be filled in one of three ways :
-    // (1) Direct copying grids at the same level;
-    // (2) Averaging from a finer grid
-    // (3) Interpolation from a coarser grid
-    // Order in which ghost cells are filled in is from a top
-    // down approach :  Starting with the finest level, we do the
-    // following :
-    // (1) Exchange BC data with same level
-    // (2) Average BC data to coarser level
-    // (3) Interpolate data from coarser level.
-    // Order here is important, because if we average first, then
-    // we can be sure that the coarse grids will have enough ghost
-    // cell data to do proper interpolation.
-    int num_corners = 1;
-    for (int i = 0; i < SpaceDim; i++)
-    {
-        num_corners *= 2;
-    }
-    m_corners_set = new bool[num_corners];
-    for (int i = 0; i < num_corners; i++)
-    {
-        m_corners_set[i] = false;
-    }
-
 
     int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc);
     m_griddata.define(gridsize*m_meqn,box);
@@ -192,6 +167,9 @@ Real ClawPatch::get_zupper() const
 }
 #endif
 
+// ----------------------------------------------------------------
+// Time stepping routines
+// ----------------------------------------------------------------
 
 void ClawPatch::initialize()
 {
@@ -200,27 +178,8 @@ void ClawPatch::initialize()
     Real* q = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
-    //  c     =====================================================
-    //         subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-    //       &                   dx,dy,q,maux,aux)
-    //  c     =====================================================
-
-    // first two arguments are maxmx/maxmy
-    // is it ok to send mx/my for that?  (ndk)
 #if CH_SPACEDIM == 2
-    qinit_(m_mx,
-           m_my,
-           m_meqn,
-           m_mbc,
-           m_mx,
-           m_my,
-           m_xlower,
-           m_ylower,
-           m_dx,
-           m_dy,
-           q,
-           m_maux,
-           aux);
+    qinit_(m_mx, m_my, m_meqn, m_mbc, m_mx, m_my, m_xlower, m_ylower, m_dx, m_dy, q, m_maux, aux);
 #elif CH_SPACEDIM == 3
     qinit_(mx,my,mz,m_meqn,m_mbc,mx,my,mz,xlower,ylower,zlower,
            dx,dy,dz,q,m_maux,aux);
@@ -238,11 +197,6 @@ void ClawPatch::setAuxArray(const int& a_maxlevel,
 
     Real* aux = m_auxarray.dataPtr();
 
-    // Default setaux.f routine.  (2d version)
-    // c     ============================================
-    //       subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-    //      &                  maux,aux)
-    // c     ============================================
 #if CH_SPACEDIM == 2
     setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
 #elif CH_SPACEDIM == 3
@@ -262,17 +216,6 @@ Real ClawPatch::step(const Real& a_time,
 }
 
 #if CH_SPACEDIM == 2
-
-void ClawPatch::save_step()
-{
-    // Store a backup in case the CFL doesn't work out.
-    m_griddata_tmp = m_griddata;
-}
-
-void ClawPatch::restore_step()
-{
-    m_griddata = m_griddata_tmp;
-}
 
 Real ClawPatch::step_noqad(const Real& a_time,
                            const Real& a_dt,
@@ -315,6 +258,18 @@ Real ClawPatch::step_noqad(const Real& a_time,
     return cflgrid;
 }
 #endif
+
+void ClawPatch::save_step()
+{
+    // Store a backup in case the CFL number is too large doesn't work out.
+    m_griddata_tmp = m_griddata;
+}
+
+void ClawPatch::restore_step()
+{
+    m_griddata = m_griddata_tmp;
+}
+
 
 
 Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
@@ -438,79 +393,16 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
   return cflgrid;
 }
 
-void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)
-{
-    Real *q = m_griddata.dataPtr();
-    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
-}
 
-Real ClawPatch::compute_sum()
-{
-    Real *q = m_griddata.dataPtr();
-    Real sum;
-    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
-    return sum;
-}
+// ----------------------------------------------------------------
+// Single level exchanges
+// ----------------------------------------------------------------
 
-// Copy data from neighbor at same level, or average data to coarser level.
-// In this step, no corner information gets exchanged.
-void ClawPatch::exchange_face_ghost(const int& a_idir,
-                                    ClawPatch *neighbor_cp)
+void ClawPatch::exchange_face_ghost(const int& a_idir, ClawPatch *neighbor_cp)
 {
-    // Data is exchanged with neighboring grid, since both grids are at the
-    // same level
     Real *qthis = m_griddata.dataPtr();
     Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
-}
-
-void ClawPatch::average_face_ghost(const int& a_idir,
-                                   const int& a_iside,
-                                   const int& a_num_neighbors,
-                                   ClawPatch **neighbor_cp)
-{
-    int refratio = a_num_neighbors;
-    Real *qcoarse = m_griddata.dataPtr();
-    for(int ir = 0; ir < refratio; ir++)
-    {
-        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
-        int igrid = ir; // indicates which grid we are averaging from.
-        ghost_cell_average_(m_mx,m_my,m_mbc,m_meqn,qfine,qcoarse,a_idir,a_iside,refratio,igrid);
-    }
-}
-
-
-// Copy data from neighbor at same level, or average data to coarser level.
-// In this step, no corner information gets exchanged.
-void ClawPatch::interpolate_face_ghost(const int& a_idir,
-                                       const int& a_iside,
-                                       const int& a_num_neighbors,
-                                       ClawPatch **neighbor_cp)
-{
-    int refratio = a_num_neighbors;
-    Real *qcoarse = m_griddata.dataPtr();
-    for(int ir = 0; ir < refratio; ir++)
-    {
-        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
-        int igrid = ir; // indicates which grid we are averaging from.
-        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,refratio,igrid);
-    }
-}
-
-void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt)
-{
-    Real *q = m_griddata.dataPtr();
-
-    // No code yet
-    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
-}
-
-void ClawPatch::exchange_phys_corner_ghost(const int& a_corner, const int& a_side, ClawPatch* cp)
-{
-    Real *this_q = m_griddata.dataPtr();
-    Real *neighbor_q = cp->m_griddata.dataPtr();
-
-    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q, a_corner, a_side);
 }
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
@@ -521,7 +413,6 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
 
 }
-
 
 void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mthbc[], const Real& t, const Real& dt)
 {
@@ -545,7 +436,60 @@ void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mt
 }
 
 
+void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt)
+{
+    Real *q = m_griddata.dataPtr();
 
+    // No code yet
+    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
+}
+
+void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side, ClawPatch* cp)
+{
+    Real *this_q = m_griddata.dataPtr();
+    Real *neighbor_q = cp->m_griddata.dataPtr();
+
+    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q, a_corner, a_side);
+}
+
+// ----------------------------------------------------------------
+// Multi-level operations
+// ----------------------------------------------------------------
+void ClawPatch::average_face_ghost(const int& a_idir,
+                                   const int& a_iside,
+                                   const int& a_num_neighbors,
+                                   const int& a_refratio,
+                                   ClawPatch **neighbor_cp)
+{
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int ir = 0; ir < a_num_neighbors; ir++)
+    {
+        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        int igrid = ir; // indicates which grid in the neighbor list we are averaging from.
+        average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qfine,qcoarse,a_idir,a_iside,a_num_neighbors,a_refratio,igrid);
+    }
+}
+
+
+void ClawPatch::interpolate_face_ghost(const int& a_idir,
+                                       const int& a_iside,
+                                       const int& a_num_neighbors,
+                                       const int& a_refratio,
+                                       ClawPatch **neighbor_cp)
+{
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int ir = 0; ir < a_num_neighbors; ir++)
+    {
+        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        int igrid = ir; // indicates which grid we are averaging from.
+        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,a_num_neighbors,a_refratio,igrid);
+    }
+}
+
+
+// ----------------------------------------------------------------
+// Output and diagnostics
+// ----------------------------------------------------------------
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                               const Box& a_patchBox,
                               const ProblemDomain& a_domain,
@@ -585,4 +529,19 @@ void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                      dx,dy,dz,a_time, a_level, isBoundary, tol, q, em);
 #endif
 
+}
+
+
+void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)
+{
+    Real *q = m_griddata.dataPtr();
+    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
+}
+
+Real ClawPatch::compute_sum()
+{
+    Real *q = m_griddata.dataPtr();
+    Real sum;
+    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
+    return sum;
 }

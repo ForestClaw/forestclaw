@@ -140,180 +140,60 @@ extern "C" {
                             const int& refratio);
 
 #if CH_SPACEDIM==2
-    void qinit_(const int& maxmx,
-                 const int& maxmy,
-                 const int& meqn,
-                 const int& mbc,
-                 const int& mx,
-                 const int& my,
-                 const Real& xlower,
-                 const Real& ylower,
-                 const Real& dx,
-                 const Real& dy,
-                 Real q[],
-                 const int& maux,
-                 Real aux[]);
+    void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+                const int& mx, const int& my, const Real& xlower, const Real& ylower,
+                const Real& dx, const Real& dy, Real q[], const int& maux, Real aux[]);
 
-
-        //       subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-        //      &                  maux,aux)
-
-    void setaux_(const int& maxmx,
-                 const int& maxmy,
-                 const int& mbc,
-                 const int& mx,
-                 const int& my,
-                 const Real& xlower,
-                 const Real& ylower,
-                 const Real& dx,
-                 const Real& dy,
-                 const int& maux,
-                 Real aux[]);
+    void setaux_(const int& maxmx, const int& maxmy, const int& mbc, const int& mx, const int& my,
+                 const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
+                 const int& maux, Real aux[]);
 
     void setprob_();
 
-    void bc2_(const int& maxmx,
-              const int& maxmy,
-              const int& meqn,
-              const int& mbc,
-              const int& mx,
-              const int& my,
-              const Real& xlower,
-              const Real& ylower,
-              const Real& dx,
-              const Real& dy,
-              const Real q[],
-              const int& maux,
-              const Real aux[],
-              const Real& t,
-              const Real& dt,
-              const int mthbc[]);
+    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc, const int& mx, const int& my,
+              const Real& xlower, const Real& ylower, const Real& dx, const Real& dy, const Real q[], const int& maux,
+              const Real aux[], const Real& t, const Real& dt, const int mthbc[]);
 
 
-    void clawpatch2_(const int& maxm,
-                     const int& meqn,
-                     const int& maux,
-                     const int& mbc,
-                     const int method[],
-                     const int mthlim[],
-                     const int& mcapa,
-                     const int& mwaves,
-                     const int& mx,
-                     const int& my,
-                     Real qold[],
-                     Real auxold[],
-                     const Real& dx,
-                     const Real& dy,
-                     const Real& dt,
-                     const Real& cfl,
-                     Real work[],
-                     const int& mwork,
-                     const Real& xlower,
-                     const Real& ylower,
-                     const int& level,
-                     const Real& t,
-                     Real fp[],
-                     Real fm[],
-                     Real gp[],
-                     Real gm[]);
+    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc, const int method[],
+                     const int mthlim[], const int& mcapa, const int& mwaves, const int& mx, const int& my,
+                     Real qold[], Real auxold[], const Real& dx, const Real& dy, const Real& dt, const Real& cfl,
+                     Real work[], const int& mwork, const Real& xlower, const Real& ylower, const int& level,
+                     const Real& t, Real fp[], Real fm[], Real gp[], Real gm[]);
 
 
-    void estimate_error2_(const int& mx,
-                         const int& my,
-                         const int& mbc,
-                         const int& meqn,
-                         const Real& xlower,
-                         const Real& ylower,
-                         const Real& dx,
-                         const Real& dy,
-                         const Real& t,
-                         const int& level,
-                         const int isBoundary[],
-                         const Real& a_refineThresh,
-                         const Real *q,
-                         Real em[]);
+    void estimate_error2_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                          const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
+                          const Real& t, const int& level, const int isBoundary[],
+                          const Real& a_refineThresh, const Real *q, Real em[]);
 
-
-    void write_qfile_(const int& maxmx,
-                      const int& maxmy,
-                      const int& meqn,
-                      const int& mbc,
-                      const int& mx,
-                      const int& my,
-                      const Real& xlower,
-                      const Real& ylower,
-                      const Real& dx,
-                      const Real& dy,
-                      Real q[],
-                      const int& iframe,
-                      const int& patch_num,
+    void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+                      const int& mx, const int& my, const Real& xlower, const Real& ylower,
+                      const Real& dx, const Real& dy, Real q[], const int& iframe, const int& patch_num,
                       const int& level);
 
-    void exchange_face_ghost_(const int& m_mx,
-                              const int& m_my,
-                              const int& m_mbc,
-                              const int& m_meqn,
-                              Real qthis[],
-                              Real qneighbor[],
-                              const int& a_idir);
+    void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
+                              Real qneighbor[], const int& a_idir);
 
-    void ghost_cell_average_(const int& m_mx,
-                             const int& m_my,
-                             const int& m_mbc,
-                             const int& m_meqn,
-                             Real qthis[],
-                             Real qcoarse[],
-                             const int& a_idir,
-                             const int& a_iside,
-                             const int& a_refratio,
-                             const int& igrid);
+    void average_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
+                             Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
+                             const int& refratio, const int& igrid);
 
-    void interpolate_face_ghost_(const int& m_mx,
-                                 const int& m_my,
-                                 const int& m_mbc,
-                                 const int& m_meqn,
-                                 Real qthis[],
-                                 Real qcoarse[],
-                                 const int& a_idir,
-                                 const int& a_iside,
-                                 const int& a_refratio,
-                                 const int& igrid);
+    void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
+                                 Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
+                                 const int& refratio, const int& igrid);
 
-    void set_phys_corner_ghost_(const int& mx,
-                                const int& my,
-                                const int& mbc,
-                                const int& meqn,
-                                Real q[],
-                                const int& icorner,
-                                const Real &t,
-                                const Real& dt,
-                                const int mthbc[]);
+    void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real q[],
+                                const int& icorner, const Real &t, const Real& dt, const int mthbc[]);
 
-    void exchange_phys_corner_ghost_(const int& mx,
-                                const int& my,
-                                const int& mbc,
-                                const int& meqn,
-                                Real this_q[],
-                                Real neighbor_q[],
-                                const int& a_corner,
-                                const int& a_side);
+    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
+                                     Real neighbor_q[], const int& a_corner, const int& a_side);
 
-    void exchange_corner_ghost_(const int& mx,
-                                const int& my,
-                                const int& mbc,
-                                const int& meqn,
-                                Real this_q[],
-                                Real neighbor_q[],
-                                const int& a_corner);
+    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
+                                Real neighbor_q[], const int& a_corner);
 
-    void compute_sum_(const int& mx,
-                      const int& my,
-                      const int& mbc,
-                      const int& meqn,
-                      const Real& dx,
-                      const Real& dy,
-                      Real q[],
-                      Real& sum);
+    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                      const Real& dx, const Real& dy, Real q[], Real& sum);
 
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
@@ -449,9 +329,6 @@ public :
     ClawPatch();
     ~ClawPatch();
 
-    // Do I need this?
-    // void define(ProblemDomain& a_domain, const Real& a_dx);
-
 #if CH_SPACEDIM == 2
     void define(const Real&  a_xlower,
                 const Real&  a_ylower,
@@ -488,55 +365,15 @@ public :
     Real get_zupper() const;
 #endif
 
-    //    void initialize(LevelData<FArrayBox>& a_phi, LevelData<FArrayBox>& a_aux, Real dx);
-    // void initialize(FArrayBox& a_phi,FArrayBox& a_aux, const Box& a_box, const global_parms
-    // &gparms);
+    // ----------------------------------------------------------------
+    // Time stepping routines
+    // ----------------------------------------------------------------
+    // Initialize solution on AMR hierarchy
     void initialize();
 
     void setAuxArray(const int& a_maxlevel,
                      const int& a_refratio,
                      const int& a_level);
-
-    void write_patch_data(const int& a_iframe,
-                          const int& a_patch_num,
-                          const int& a_level);
-
-    Real compute_sum();
-
-    // Routines dealing with boundary condition exchanges
-    // Exchange ghost cells at faces between patches at the same level
-    void exchange_face_ghost(const int& a_idir,
-                             ClawPatch *a_neighbor_cp);
-
-    // Average finer grid values onto coarser grid ghost cells
-    void average_face_ghost(const int& a_idir,
-                            const int& a_iside,
-                            const int& a_num_neighbors,
-                            ClawPatch **neighbor_cp);
-
-    // Interpoalte coarser values onto fine grid ghost
-    void interpolate_face_ghost(const int& a_idir,
-                                const int& a_iside,
-                                const int& a_refratio,
-                                ClawPatch **a_neighbor_cp);
-
-    // Set physical boundary conditions in ghost cells
-    void set_phys_face_ghost(const bool a_intersects_bc[],
-                             const int a_mthbc[],
-                             const Real& t,
-                             const Real& dt);
-
-    // Set ghost values at physical corners
-    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
-
-    // Set ghost values in corner cells at physical boundary
-    void exchange_phys_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
-
-    // Exchange corner ghost cells with neighboring corner patch at the same level.
-    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp);
-
-    void save_step();
-    void restore_step();
 
     // Dummy step routine useful for trying out subcycling without anything too terrible happening
     Real step(const Real& a_time,
@@ -557,6 +394,51 @@ public :
                              const int& refRatio,const int& a_level,
                              const global_parms &gparms);
 
+    void save_step();
+    void restore_step();
+
+    // ----------------------------------------------------------------
+    // Single level exchanges
+    // ----------------------------------------------------------------
+    void exchange_face_ghost(const int& a_idir,ClawPatch *a_neighbor_cp);
+
+    // Exchange corner ghost cells with interior neighbor (interior to the domain)
+    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp);
+
+    // Boundary condition routines that don't require neighbors
+    void set_phys_face_ghost(const bool a_intersects_bc[],
+                             const int a_mthbc[],
+                             const Real& t,
+                             const Real& dt);
+
+    // Corners that lie on a physical face - data has to be exchanged in a particular way
+    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
+
+
+
+    // Exchange corner ghost with boundary neighbor
+    void exchange_phys_face_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
+
+    // ----------------------------------------------------------------
+    // Multi-level operations
+    // ----------------------------------------------------------------
+    // Average finer grid values onto coarser grid ghost cells
+    void average_face_ghost(const int& a_idir,
+                            const int& a_iside,
+                            const int& a_num_neighbors,
+                            const int& a_refratio,
+                            ClawPatch **neighbor_cp);
+
+    // Interpoalte coarser values onto fine grid ghost
+    void interpolate_face_ghost(const int& a_idir,
+                                const int& a_iside,
+                                const int& a_num_neighbors,
+                                const int& a_refratio,
+                                ClawPatch **a_neighbor_cp);
+
+    // ----------------------------------------------------------------
+    // Output and diagnostics
+    // ----------------------------------------------------------------
     void estimateError(const FArrayBox& a_phiPatch,
                        const Box& a_patchBox,
                        const ProblemDomain& a_domain,
@@ -568,6 +450,13 @@ public :
                        const Real& a_refineThresh,
                        FArrayBox& a_error_measure,
                        const global_parms &gparms);
+
+
+    void write_patch_data(const int& a_iframe,
+                          const int& a_patch_num,
+                          const int& a_level);
+
+    Real compute_sum();
 
 protected :
 
@@ -601,7 +490,7 @@ protected :
     int m_maux;
     int m_mbc;
 
-    bool *m_corners_set;
+    // bool *m_corners_set;
 
     // Here is where the data is stored.
     FArrayBox m_griddata;

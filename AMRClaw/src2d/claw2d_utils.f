@@ -111,11 +111,11 @@ c                 # y-direction (idir == 1)
 
 c     # Average fine grid to a coarse grid neighbor or copy from neighboring
 c     # grid at same level.
-      subroutine ghost_cell_average(mx,my,mbc,meqn,
-     &      qfine,qcoarse,idir,iside,refratio,igrid)
+      subroutine average_face_ghost(mx,my,mbc,meqn,
+     &      qfine,qcoarse,idir,iside,num_neighbors,refratio,igrid)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,igrid,idir,iside
+      integer mx,my,mbc,meqn,refratio,igrid,idir,iside, num_neighbors
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
@@ -178,9 +178,9 @@ c     # Average fine grid onto coarse grid
       end
 
       subroutine interpolate_face_ghost(mx,my,mbc,meqn,qfine,qcoarse,
-     &      idir,iside,refratio,igrid)
+     &      idir,iside,num_neighbors,refratio,igrid)
       implicit none
-      integer mx,my,mbc,meqn,refratio,igrid,idir,iside
+      integer mx,my,mbc,meqn,refratio,igrid,idir,iside,num_neighbors
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
