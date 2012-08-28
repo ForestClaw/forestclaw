@@ -161,7 +161,6 @@ extern "C" {
                      Real work[], const int& mwork, const Real& xlower, const Real& ylower, const int& level,
                      const Real& t, Real fp[], Real fm[], Real gp[], Real gm[]);
 
-
     void estimate_error2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                           const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
                           const Real& t, const int& level, const int isBoundary[],
@@ -203,21 +202,11 @@ extern "C" {
                const Real& dx, const Real& dy, const Real& dz,
                Real q[], const int& maux, Real aux[]);
 
-    void setaux_(const int& maxmx,
-                 const int& maxmy,
-                 const int& maxmz,
-                 const int& mbc,
-                 const int& mx,
-                 const int& my,
-                 const int& mz,
-                 const Real& xlower,
-                 const Real& ylower,
-                 const Real& zlower,
-                 const Real& dx,
-                 const Real& dy,
-                 const Real& dz,
-                 const int& maux,
-                 Real aux[]);
+    void setaux_(const int& maxmx, const int& maxmy, const int& maxmz, const int& mbc,
+                 const int& mx, const int& my,  const int& mz,
+                 const Real& xlower, const Real& ylower, const Real& zlower,
+                 const Real& dx, const Real& dy, const Real& dz,
+                 const int& maux, Real aux[]);
 
     void setprob_();
 
