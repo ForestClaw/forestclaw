@@ -213,7 +213,7 @@ typedef void (*fclaw2d_match_refined_callback_t)
 /* Iterate over patches which have been refined */
 void
 fclaw2d_domain_iterate_refined(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
-                             fclaw2d_match_refined_callback_t cb_user);
+                               fclaw2d_match_refined_callback_t cb_user, void *user);
 
 
 /* Four new patches are passed in, which must be initialized by interpolation from old patch. */
@@ -225,7 +225,7 @@ typedef void (*fclaw2d_match_coarsened_callback_t)
 /* Iterate over patches which have been coarsened */
 void
 fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
-                               fclaw2d_match_coarsened_callback_t cb_user);
+                                 fclaw2d_match_coarsened_callback_t cb_user, void *user);
 
 #ifdef __cplusplus
 #if 0
