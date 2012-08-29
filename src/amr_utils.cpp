@@ -172,6 +172,10 @@ FArrayBox::~FArrayBox()
 
 void FArrayBox::define(int a_size,const Box& a_box)
 {
+    if (m_data != NULL)
+    {
+        delete [] m_data;
+    }
     m_data = new double[a_size];
     m_size = a_size;
     m_box = a_box;
