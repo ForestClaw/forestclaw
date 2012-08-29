@@ -138,6 +138,8 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
 int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
                                  int blockno, int patchno, int boundaries[4]);
 
+
+
 typedef enum fclaw2d_face_neighbor
 {
     FCLAW2D_FACE_NEIGHBOR_BOUNDARY,
@@ -188,6 +190,42 @@ void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,
  */
 void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
                                  int blockno, int patchno);
+
+
+
+/* We don't need very much, since we only copy the user data from old patch to the new patch */
+typedef void (*fclaw2d_match_unchanged_callback_t)
+    (fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
+     fclaw2d_patch_t * old_patch, fclaw2d_patch_t *new_patch, void *user);
+
+/* Iterate over patches at level 'level' that didn't change upon regridding */
+/* 'level' here refers to the level of the old patch */
+void
+fclaw2d_domain_iterate_unchanged(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
+                               fclaw2d_match_unchanged_callback_t cb_user, void *user);
+
+
+/* Four new patches are passed in, which must be initialized by interpolation from old patch. */
+typedef void (*fclaw2d_match_refined_callback_t)
+    (fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
+     fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user);
+
+/* Iterate over patches which have been refined */
+void
+fclaw2d_domain_iterate_refined(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
+                             fclaw2d_match_refined_callback_t cb_user);
+
+
+/* Four new patches are passed in, which must be initialized by interpolation from old patch. */
+/* For this, it would be easiest if all four siblings were passed in at the same time */
+typedef void (*fclaw2d_match_coarsened_callback_t)
+    (fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
+     fclaw2d_patch_t **old_patch, fclaw2d_patch_t *new_patch, void *user);
+
+/* Iterate over patches which have been coarsened */
+void
+fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
+                               fclaw2d_match_coarsened_callback_t cb_user);
 
 #ifdef __cplusplus
 #if 0
