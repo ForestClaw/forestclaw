@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_convenience.h"
+#include "amr_options.h"
 #include "amr_forestclaw.H"
 
 
@@ -33,7 +34,9 @@ main (int argc, char **argv)
   int			mpiret;
   int			lp;
   MPI_Comm		mpicomm;
+  sc_options_t          *options;
   fclaw2d_domain_t	*domain;
+  amr_options_t         samr_options, *amr_options = &samr_options;
 
   mpiret = MPI_Init (&argc, &argv);
   SC_CHECK_MPI (mpiret);
@@ -42,6 +45,12 @@ main (int argc, char **argv)
 
   sc_init (mpicomm, 0, 0, NULL, lp);
   p4est_init (NULL, lp);
+
+  /* propose option handling as present in p4est/libsc */
+  /* the option values live in amr_options, see amr_options.h */
+  options = sc_options_new (argv[0]);
+  amr_options_register (options, amr_options);
+  amr_options_parse (options, argc, argv, lp);  /* exits on option error */
 
   // Put this here so that we can read in the minimum level.
   global_parms *gparms = new global_parms();
@@ -63,6 +72,7 @@ main (int argc, char **argv)
 
   fclaw2d_domain_destroy (domain);
 
+  sc_options_destroy (options);
   sc_finalize ();
 
   mpiret = MPI_Finalize ();
