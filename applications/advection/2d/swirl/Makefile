@@ -45,12 +45,13 @@ amrclawobjs = \
 .f.o:
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
-$(TARGET): $(TARGET).o $(FORESTCLAW)/src/libforestclaw.a $(exampleobjs) $(amrclawobjs)
+$(TARGET): $(TARGET).o $(exampleobjs) $(amrclawobjs) \
+                $(FORESTCLAW)/src/libforestclaw.a 
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
 	$(P4EST_LIBS) -o $@
 
 clean:
-	rm -f *.o
+	rm -f *.o $(TARGET)
 
 realclean:
 	rm -f *.o $(amrclawobjs) fort.* $(TARGET)
