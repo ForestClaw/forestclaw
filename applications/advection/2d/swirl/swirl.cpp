@@ -65,10 +65,9 @@ main (int argc, char **argv)
 
   set_domain_data(domain,gparms);
 
-  amrsetup(domain);
   amrinit(domain);
   amrrun(domain);
-  amrreset (domain);
+  amrreset(domain);
 
   fclaw2d_domain_destroy (domain);
 
