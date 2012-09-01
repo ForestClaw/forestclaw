@@ -26,6 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "forestclaw2d.h"
 
+int pow_int(int a, int n)
+{
+    int b = a;
+    for(int i = 0; i < n-1; i++)
+    {
+        b *= a;
+    }
+    return b;
+}
+
 
 global_parms::global_parms()
 {
@@ -153,11 +163,18 @@ FArrayBox::FArrayBox()
 // copy constructor
 void FArrayBox::operator=(const FArrayBox& fbox)
 {
+    if (fbox.m_size != m_size)
+    {
+        if (m_data != NULL)
+        {
+            delete [] m_data;
+            m_data = NULL;
+        }
+        m_data = new Real[fbox.m_size];
+        m_size = fbox.m_size;
+    }
     Real *copy = fbox.m_data;
-    if (m_data != NULL) {delete [] m_data; m_data = NULL;}
-    m_data = new Real[fbox.m_size];
     m_box = fbox.m_box;
-    m_size = fbox.m_size;
     for (int i = 0; i < fbox.m_size; i++)
     {
         m_data[i] = copy[i];
@@ -166,7 +183,11 @@ void FArrayBox::operator=(const FArrayBox& fbox)
 
 FArrayBox::~FArrayBox()
 {
-    if (m_data != NULL) {delete [] m_data; m_data = NULL;}
+    if (m_data != NULL)
+    {
+        delete [] m_data;
+        m_data = NULL;
+    }
     m_size = 0;
 }
 

@@ -60,6 +60,8 @@ class global_parms;
 int num_patches(fclaw2d_domain_t *domain, int level);
 global_parms* get_domain_data(fclaw2d_domain_t *domain);
 
+int pow_int(int a, int n);
+
 extern "C"
 {
     void inputparms_(int& mx_leaf,

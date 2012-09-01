@@ -1,8 +1,7 @@
       subroutine inputparms(mx_leaf,my_leaf,initial_dt, tfinal,
      &      max_cfl, desired_cfl,nout, src_term, verbose, mcapa,
-     &      maux,meqn,mwaves,
-     &      maxmwaves,mthlim,mbc,mthbc,order,minlevel,maxlevel,
-     &      icycle)
+     &      maux,meqn,mwaves, maxmwaves,mthlim,mbc,mthbc,order,
+     &      minlevel,maxlevel,icycle)
       implicit none
 
       integer mx_leaf, my_leaf
@@ -120,24 +119,28 @@ c     # grid at same level.
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
-      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+      integer mq,r2
+      integer i, i1, i2, ibc, ii, ii1
+      integer j, j1, j2, jbc, jj, jj1
 
       r2 = refratio*refratio
 
 c     # Average fine grid onto coarse grid
       if (idir .eq. 0) then
-         do j = (igrid-1)*my/refratio,igrid*my/refratio
+         j1 = igrid*my/num_neighbors+1
+         j2 = (igrid+1)*my/num_neighbors
+         do j = j1, j2
             do ibc = 1,mbc
                do mq = 1,meqn
                   sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
-                        i1 = (ibc-1)*refratio + ii
-                        j1 = (j-1)*refratio + jj
+                        ii1 = (ibc-1)*refratio + ii
+                        jj1 = (j-1)*refratio + jj
                         if (iside .eq. 0) then
-                           sum = sum + qfine(mx-i1+1,j1,mq)
+                           sum = sum + qfine(mx-ii1+1,jj1,mq)
                         else
-                           sum = sum + qfine(i1,j1,mq)
+                           sum = sum + qfine(ii1,jj1,mq)
                         endif
                      enddo
                   enddo
@@ -150,18 +153,20 @@ c     # Average fine grid onto coarse grid
             enddo
          enddo
       else
-         do i = (igrid-1)*mx/refratio+1,igrid*mx/refratio
+         i1 = igrid*mx/num_neighbors+1
+         i2 = (igrid+1)*mx/refratio
+         do i = i1,i2
             do jbc = 1,mbc
                do mq = 1,meqn
                   sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
-                        i1 = (i-1)*refratio + ii
-                        j1 = (jbc-1)*refratio + jj
+                        ii1 = (i-1)*refratio + ii
+                        jj1 = (jbc-1)*refratio + jj
                         if (iside .eq. 2) then
-                           sum = sum + qfine(i1,my-j1+1,mq)
+                           sum = sum + qfine(ii1,my-jj1+1,mq)
                         else
-                           sum = sum + qfine(i1,j1,mq)
+                           sum = sum + qfine(ii1,jj1,mq)
                         endif
                      enddo
                   enddo
@@ -183,9 +188,55 @@ c     # Average fine grid onto coarse grid
       integer mx,my,mbc,meqn,refratio,igrid,idir,iside,num_neighbors
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision sum
 
-      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+      integer mq,r2
+      integer i, i1, i2, ibc, ii, ii1
+      integer j, j1, j2, jbc, jj, jj1
+
+
+c     # Assign values to fine grid ghost.  For now, just copy coarse grid
+c     values; Get linear part later.
+      if (idir .eq. 0) then
+         j1 = igrid*my/num_neighbors+1
+         j2 = (igrid+1)*my/num_neighbors
+         do j = j1, j2
+            do ibc = 1,mbc
+               do mq = 1,meqn
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ii1 = (ibc-1)*refratio + ii
+                        jj1 = (j-1)*refratio + jj
+                        if (iside .eq. 0) then
+                           qfine(ii1-mbc,jj1,mq) = qcoarse(ibc,j,mq)
+                        elseif (iside .eq. 1) then
+                           qfine(mx+ii1,jj1,mq) = qcoarse(mx+ibc,j,mq)
+                        endif
+                     enddo
+                  enddo
+               enddo
+            enddo
+         enddo
+      else
+         i1 = igrid*mx/num_neighbors+1
+         i2 = (igrid+1)*mx/refratio
+         do i = i1,i2
+            do jbc = 1,mbc
+               do mq = 1,meqn
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ii1 = (i-1)*refratio + ii
+                        jj1 = (jbc-1)*refratio + jj
+                        if (iside .eq. 2) then
+                           qfine(ii1,jj1-mbc,mq) = qcoarse(i,jbc,mq)
+                        elseif (iside .eq. 3) then
+                           qfine(ii1,my+jj1,mq) = qcoarse(i,my+jbc,mq)
+                        endif
+                     enddo
+                  enddo
+               enddo
+            enddo
+         enddo
+      endif
 
 
       end
@@ -368,6 +419,110 @@ c              # Do this until we get the corner ids fixed
             sum = sum + q(i,j,1)*dx*dy
          enddo
       enddo
+      end
+
+
+c     # Conservative intepolation to fine grid patch
+      subroutine interpolate_to_fine_patch(mx,my,mbc,meqn, qcoarse,
+     &      qfine, p4est_refineFactor,refratio,fine_patch_idx)
+      implicit none
+
+      integer mx,my,mbc,meqn,p4est_refineFactor,refratio
+      integer fine_patch_idx
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
+      double precision qc, shiftx, shifty, sl, sr, gradx, grady
+      double precision compute_slopes
+
+
+c     # Use limiting done in AMRClaw.
+      mth = 5
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(fine_patch_idx,refratio)
+      jg = (fine_patch_idx-ig)/refratio
+
+      i1 = ig*mx/p4est_refineFactor + 1
+      i2 = (ig+1)*mx/p4est_refineFactor
+
+      j1 = jg*my/p4est_refineFactor + 1
+      j2 = (jg+1)*my/p4est_refineFactor
+
+      do mq = 1,meqn
+         do i = i1,i2
+            do j = j1,j2
+               qc = qcoarse(i,j,mq)
+
+c              # Compute limited slopes in both x and y. Note we are not
+c              # really computing slopes, but rather just differences.
+c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
+               sl = (qc - qcoarse(i-1,j,mq))
+               sr = (qcoarse(i+1,j,mq) - qc)
+               gradx = compute_slopes(sl,sr,mth)
+               sl = (qc - qcoarse(i,j-1,mq))
+               sr = (qcoarse(i,j+1,mq) - qc)
+               grady = compute_slopes(sl,sr,mth)
+
+c              # Fill in refined values on coarse grid cell (i,j)
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+                     qfine((i-1)*refratio + ii,(j-1)*refratio + jj,mq)
+     &                     = qc + shiftx*gradx + shifty*grady
+                  enddo
+               enddo
+            enddo
+         enddo
+      enddo
+
+      end
+
+      double precision function compute_slopes(sl,sr,mth)
+      implicit none
+
+      double precision sl,sr, s, sc, limiter, slim
+      integer mth
+
+c     # ------------------------------------------------
+c     # Slope limiting done in amrclaw - see filpatch.f
+c       dupc = valp10 - valc
+c       dumc = valc   - valm10
+c       ducc = valp10 - valm10
+c       du   = dmin1(dabs(dupc),dabs(dumc))        <--
+c       du   = dmin1(2.d0*du,.5d0*dabs(ducc))      <-- Not quite sure I follow
+c
+c       fu = dmax1(0.d0,dsign(1.d0,dupc*dumc))
+c
+c       dvpc = valp01 - valc
+c       dvmc = valc   - valm01
+c       dvcc = valp01 - valm01
+c       dv   = dmin1(dabs(dvpc),dabs(dvmc))
+c       dv   = dmin1(2.d0*dv,.5d0*dabs(dvcc))
+c       fv = dmax1(0.d0,dsign(1.d0,dvpc*dvmc))
+c
+c       valint = valc + eta1*du*dsign(1.d0,ducc)*fu
+c      .      + eta2*dv*dsign(1.d0,dvcc)*fv
+c     # ------------------------------------------------
+
+c     # ------------------------------------------------
+c     # To see what Chombo does, look in InterpF.ChF
+c     # (in Chombo/lib/src/AMRTools) for routine 'interplimit'
+c     # Good luck.
+c     # ------------------------------------------------
+
+      if (mth .le. 4) then
+c        # Use minmod, superbee, etc.
+         slim = limiter(sl,sr,mth)
+         compute_slopes = slim*sl
+      else
+c        # Use AMRClaw slopes
+         sc = (sl + sr)/2.d0
+         compute_slopes = min(abs(sl),abs(sr),abs(sc))*
+     &         max(0.d0,sign(1.d0,sl*sr))*sign(1.d0,sc)
+      endif
 
 
       end

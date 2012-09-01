@@ -182,6 +182,12 @@ extern "C" {
                                  Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
                                  const int& refratio, const int& igrid);
 
+    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
+                                    Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
+                                    const int& refratio, const int& patch_idx);
+
+
+
     void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real q[],
                                 const int& icorner, const Real &t, const Real& dt, const int mthbc[]);
 
@@ -332,7 +338,9 @@ public :
                 const Real& yupper,
                 const Real& zupper,
                 const global_parms *a_gparms);
+
 #endif
+    void copy(ClawPatch *a_cp);
 
     bool isDefined();
 
@@ -425,9 +433,17 @@ public :
                                 const int& a_refratio,
                                 ClawPatch **a_neighbor_cp);
 
+    void interpolate_to_fine_patch(ClawPatch* a_fine,
+                                   const int& a_igrid,
+                                   const int& a_num_neighbors,
+                                   const int& a_refratio);
+
+
     // ----------------------------------------------------------------
     // Output and diagnostics
     // ----------------------------------------------------------------
+    bool tag_for_refinement();
+
     void estimateError(const FArrayBox& a_phiPatch,
                        const Box& a_patchBox,
                        const ProblemDomain& a_domain,

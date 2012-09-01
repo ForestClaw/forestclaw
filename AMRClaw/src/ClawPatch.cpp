@@ -48,6 +48,8 @@ void ClawPatch::define(const Real&  a_xlower,
     m_maux = a_gparms->m_maux;
 
     int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc);
+
+    // This will destroy any existing memory n m_griddata.
     m_griddata.define(gridsize*m_meqn,box);
     if (m_maux > 0)
     {
@@ -109,12 +111,32 @@ void ClawPatch::define(const Real& a_xlower,
 }
 #endif
 
+void ClawPatch::copy(ClawPatch *a_cp)
+{
+    m_mx = a_cp->m_mx;
+    m_my = a_cp->m_my;
+    m_mbc = a_cp->m_mbc;
+
+    m_xlower = a_cp->m_xlower;
+    m_ylower = a_cp->m_ylower;
+    m_xupper = a_cp->m_xupper;
+    m_yupper = a_cp->m_yupper;
+
+    m_dx = a_cp->m_dx;
+    m_dy = a_cp->m_dy;
+
+    m_griddata = a_cp->m_griddata;
+    m_auxarray = a_cp->m_auxarray;
+}
+
+
 bool ClawPatch::isDefined()
 {
     return m_isDefined;
 }
 
 
+/*
 int ClawPatch::get_mx() const
 {
     return m_mx;
@@ -167,6 +189,8 @@ Real ClawPatch::get_zupper() const
 }
 #endif
 
+*/
+
 // ----------------------------------------------------------------
 // Time stepping routines
 // ----------------------------------------------------------------
@@ -181,8 +205,7 @@ void ClawPatch::initialize()
 #if CH_SPACEDIM == 2
     qinit_(m_mx, m_my, m_meqn, m_mbc, m_mx, m_my, m_xlower, m_ylower, m_dx, m_dy, q, m_maux, aux);
 #elif CH_SPACEDIM == 3
-    qinit_(mx,my,mz,m_meqn,m_mbc,mx,my,mz,xlower,ylower,zlower,
-           dx,dy,dz,q,m_maux,aux);
+    qinit_(mx,my,mz,m_meqn,m_mbc,mx,my,mz,xlower,ylower,zlower,dx,dy,dz,q,m_maux,aux);
 #endif
 }
 
@@ -470,26 +493,41 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     }
 }
 
-
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_iside,
-                                       const int& a_num_neighbors,
+                                       const int& a_p4est_refineFactor,
                                        const int& a_refratio,
                                        ClawPatch **neighbor_cp)
 {
     Real *qcoarse = m_griddata.dataPtr();
-    for(int ir = 0; ir < a_num_neighbors; ir++)
+    for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
         Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
         int igrid = ir; // indicates which grid we are averaging from.
-        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,a_num_neighbors,a_refratio,igrid);
+        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,a_p4est_refineFactor,a_refratio,igrid);
     }
+}
+
+void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
+                                          const int& a_patch_idx,
+                                          const int& a_num_neighbors,
+                                          const int& a_refratio)
+{
+    Real *qcoarse = this->m_griddata.dataPtr();
+    Real *qfine = a_fine->m_griddata.dataPtr();
+    interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_num_neighbors,a_refratio,a_patch_idx);
 }
 
 
 // ----------------------------------------------------------------
 // Output and diagnostics
 // ----------------------------------------------------------------
+bool ClawPatch::tag_for_refinement()
+{
+    // Just refine for now
+    return true;
+}
+
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
                               const Box& a_patchBox,
                               const ProblemDomain& a_domain,

@@ -345,8 +345,6 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     domain->pp->flags[totalpatchno] = P4EST_WRAP_COARSEN;
 }
 
-
-
 /* Iterate over patches at level 'level' that didn't change upon regridding */
 /* 'level' here refers to the level of the old patch */
 void
@@ -367,4 +365,12 @@ void
 fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
                                  fclaw2d_match_coarsened_callback_t cb_user, void *user)
 {
+}
+
+
+// Doesn't do anything yet.
+fclaw2d_domain_t* fclaw2d_domain_adapt(fclaw2d_domain_t *domain)
+{
+    // Don't reset old domain in this routine.
+    return domain;
 }

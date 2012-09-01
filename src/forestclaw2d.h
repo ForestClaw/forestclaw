@@ -205,7 +205,8 @@ fclaw2d_domain_iterate_unchanged(fclaw2d_domain_t *old_domain, fclaw2d_domain_t 
                                fclaw2d_match_unchanged_callback_t cb_user, void *user);
 
 
-/* Four new patches are passed in, which must be initialized by interpolation from old patch. */
+/* Four new patches are passed in, which must be initialized by interpolation from the old patch,
+ or, in the case of initialization, by calling the initialization function. */
 typedef void (*fclaw2d_match_refined_callback_t)
     (fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
      fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user);
@@ -216,7 +217,7 @@ fclaw2d_domain_iterate_refined(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *n
                                fclaw2d_match_refined_callback_t cb_user, void *user);
 
 
-/* Four new patches are passed in, which must be initialized by interpolation from old patch. */
+/* Four new patches are passed in, which must be initialized by interpolation from old patch */
 /* For this, it would be easiest if all four siblings were passed in at the same time */
 typedef void (*fclaw2d_match_coarsened_callback_t)
     (fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
@@ -226,6 +227,9 @@ typedef void (*fclaw2d_match_coarsened_callback_t)
 void
 fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
                                  fclaw2d_match_coarsened_callback_t cb_user, void *user);
+
+
+fclaw2d_domain_t* fclaw2d_domain_adapt(fclaw2d_domain_t *domain);
 
 #ifdef __cplusplus
 #if 0

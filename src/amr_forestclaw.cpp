@@ -38,6 +38,10 @@ using namespace std;
 using std::ios;
 
 
+// -----------------------------------------------------------------
+// Setting data in domain and patches
+// -----------------------------------------------------------------
+
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms)
 {
     fclaw2d_domain_data_t *ddata = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
@@ -85,6 +89,10 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
     return pdata->cp;
 }
 
+
+// -----------------------------------------------------------------
+// Diagnostics
+// -----------------------------------------------------------------
 void cb_check_conservation(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -108,45 +116,11 @@ void check_conservation(fclaw2d_domain_t *domain)
 }
 
 
-void cb_restore_time_step(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
-{
-    ClawPatch *this_cp = get_patch_data(this_patch);
-
-    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
-    this_cp->restore_step();
-}
 
 
-void restore_time_step(fclaw2d_domain_t *domain)
-{
-    int user = NULL;
-    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) user);
-}
-
-void cb_save_time_step(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       void *user)
-{
-    ClawPatch *this_cp = get_patch_data(this_patch);
-
-    // Copy grid data (m_griddata) on each patch to temporary storage (m_griddata_tmp <== m_griddata);
-    this_cp->save_step();
-}
-
-
-void save_time_step(fclaw2d_domain_t *domain)
-{
-    int user = NULL;
-    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) user);
-}
-
-
+// -----------------------------------------------------------------
+// Get face and corner neighbors
+// -----------------------------------------------------------------
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -259,7 +233,9 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 }
 
 
-// Called from within fclaw2d_domain_iterate_level
+// -----------------------------------------------------------------
+// Exchange corner and face information
+// -----------------------------------------------------------------
 void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -449,7 +425,11 @@ void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
 }
 
 
-/* Average fine grid ghost to coarse grid ghost */
+// -----------------------------------------------------------------
+// Multi-level ghost cell operations
+//   -- average fine grid ghost cells to coarse grid
+//   -- interpolate coarse grid to fine grid ghost cells
+// -----------------------------------------------------------------
 void cb_bc_average(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
                    int this_block_idx,
@@ -492,7 +472,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                     neighbor_cp[ir] = get_patch_data(neighbor_patch);
                 }
 
-                // Average finer grid data to coarser 'this_cp' ghost cells.
+                // Fill in ghost cells on 'this_patch' by averaging from finer grid
                 this_cp->average_face_ghost(idir,iside,p4est_refineFactor,refratio,neighbor_cp);
             }
         } // loop sides (iside = 0,1,2,3)
@@ -533,8 +513,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
 
             if (ref_flag == 1)  // neighbors are at finer level
             {
-                // Fill in ghost cells on 'neighbor_patch' by interpolating to finer grid
-                // int num_neighbors = refratio;
+                // Fill in ghost cells on 'neighbor_patch' by interpolation
                 fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
                 ClawPatch *neighbor_cp[p4est_refineFactor];
                 for (int ir = 0; ir < p4est_refineFactor; ir++)
@@ -543,7 +522,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                     neighbor_cp[ir] = get_patch_data(neighbor_patch);
                 }
 
-                // Average finer grid data to coarser 'this_cp' ghost cells.
+                // Fill in fine grid ghost by interpolating from 'this_patch'
                 this_cp->interpolate_face_ghost(idir,iside,p4est_refineFactor,refratio,neighbor_cp);
             }
         } // loop sides (iside = 0,1,2,3)
@@ -569,21 +548,68 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level, const
 }
 
 
+// -----------------------------------------------------------------
+// Time stepping
+//   -- saving time steps
+//   -- restoring time steps
+//   -- advancing levels
+// -----------------------------------------------------------------
+void cb_restore_time_step(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
+    this_cp->restore_step();
+}
+
+
+void restore_time_step(fclaw2d_domain_t *domain)
+{
+    int user = NULL;
+    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) user);
+}
+
+void cb_save_time_step(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
+{
+    ClawPatch *this_cp = get_patch_data(this_patch);
+
+    // Copy grid data (m_griddata) on each patch to temporary storage (m_griddata_tmp <== m_griddata);
+    this_cp->save_step();
+}
+
+
+void save_time_step(fclaw2d_domain_t *domain)
+{
+    int user = NULL;
+    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) user);
+}
+
+
 void cb_advance_patch(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx,
                       void *user)
 {
-    fclaw2d_block_t *block = &domain->blocks[this_block_idx];
-    fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
-    ClawPatch *cp = get_patch_data(patch);
+    global_parms *gparms = get_domain_data(domain);
+
+    // fclaw2d_block_t *block = &domain->blocks[this_block_idx];
+    // fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
+
+    ClawPatch *cp = get_patch_data(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
 
     Real dt = time_data->dt;
     Real t = time_data->t;
 
-    global_parms *gparms = get_domain_data(domain);
     int level = this_patch->level;
     Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
 
@@ -684,10 +710,39 @@ Real advance_all_levels(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
-void amrsetup(fclaw2d_domain_t *domain)
+
+// -----------------------------------------------------------------
+// Regridding
+//   -- Initialization routines
+//   -- cell tagging
+//   -- interpolating/coarsening as needed
+// -----------------------------------------------------------------
+
+void cb_tag_patch(fclaw2d_domain_t *domain,
+                  fclaw2d_patch_t *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx,
+                  void *user)
 {
-    // Check that the minimum level we have is consistent with what
-    // was in input file.
+    // fclaw2d_block_t *block = &domain->blocks[this_block_idx];
+    // fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
+
+    ClawPatch *cp = get_patch_data(this_patch);
+
+    bool level_refined = *((bool *) user);
+    bool patch_refined = cp->tag_for_refinement();
+
+    if (patch_refined)
+    {
+        fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+    }
+
+    level_refined = patch_refined || level_refined;
+}
+
+
+void amr_set_base_level(fclaw2d_domain_t *domain)
+{
     global_parms *gparms = get_domain_data(domain);
     gparms->print_inputParams();
 
@@ -697,6 +752,7 @@ void amrsetup(fclaw2d_domain_t *domain)
 
         for(int m = 0; m < 2*SpaceDim; m++)
         {
+            // Once we got to multi-block, this will have to change
             block->mthbc[m] = gparms->m_mthbc[m];
         }
 
@@ -705,8 +761,6 @@ void amrsetup(fclaw2d_domain_t *domain)
             fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = new ClawPatch();
 
-            // Set stuff from p4est
-
             cp->define(patch->xlower,
                        patch->ylower,
                        patch->xupper,
@@ -714,23 +768,72 @@ void amrsetup(fclaw2d_domain_t *domain)
                        gparms);
             set_patch_data(patch,cp);
         }
-        printf("\n");
     }
 }
 
+void cb_match_unchanged(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
+                        fclaw2d_patch_t * old_patch, fclaw2d_patch_t *new_patch, void *user)
+{
+    // global_parms *gparms = get_domain_data(old_domain);
+    ClawPatch *cp_old = get_patch_data(old_patch);
+
+    ClawPatch *cp_new = new ClawPatch();
+    cp_new->copy(cp_old);  // Copy grid data and aux data
+    set_patch_data(new_patch,cp_new);
+}
+
+void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
+     fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user)
+{
+    global_parms *gparms = get_domain_data(old_domain);
+    ClawPatch *cp_old = get_patch_data(old_patch);
+
+    int num_siblings = pow_int(p4est_refineFactor,SpaceDim);
+    for (int patch_idx = 0; patch_idx < num_siblings; patch_idx++)
+    {
+        ClawPatch *cp_new = new ClawPatch();
+
+        cp_new->define(new_patch[patch_idx]->xlower,
+                       new_patch[patch_idx]->ylower,
+                       new_patch[patch_idx]->xupper,
+                       new_patch[patch_idx]->yupper,
+                       gparms);
+
+        bool init_grid = *(bool *) user;
+        if (init_grid)
+        {
+            if (gparms->m_maux > 0)
+            {
+                cp_new->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,new_patch[patch_idx]->level);
+            }
+            cp_new->initialize();
+        }
+        else
+        {
+            cp_old->interpolate_to_fine_patch(cp_new,patch_idx,p4est_refineFactor,gparms->m_refratio);
+        }
+        set_patch_data(new_patch[patch_idx],cp_new);
+    }
+}
+
+
+// -----------------------------------------------------------------
+// Initial grid
+// -----------------------------------------------------------------
 void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
                 int this_block_idx, int this_patch_idx, void *user)
 {
     global_parms *gparms = get_domain_data(domain);
     ClawPatch *cp = get_patch_data(this_patch);
 
-    cp->initialize();
     if (gparms->m_maux > 0)
     {
         cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,this_patch->level);
     }
+    cp->initialize();
 }
 
+// Initialize a base level of grids
 void amrinit(fclaw2d_domain_t *domain)
 {
     Real t = 0;
@@ -745,18 +848,63 @@ void amrinit(fclaw2d_domain_t *domain)
     // available outside of Fortran.
     setprob_();
 
-    // Don't need to iterate level by level, but saves some coding.
-    int user = NULL;
-    for(int level = minlevel; level <= maxlevel; level++)
+
+    // Set up storage for base level grids so we can initialize them
+    amr_set_base_level(domain);
+
+    // Initialize base level grid
+    int user_null = NULL;
+    fclaw2d_domain_iterate_level(domain, minlevel,
+                                 (fclaw2d_patch_callback_t) cb_amrinit,
+                                 (void *) user_null);
+
+    // Exchange boundary data at the base level
+    bc_level_exchange(domain,minlevel);
+
+    // Refine as needed.
+    for (int level = minlevel; level < maxlevel; level++)
     {
+        bool level_refined = false;
         fclaw2d_domain_iterate_level(domain, level,
-                                     (fclaw2d_patch_callback_t) cb_amrinit,
-                                     (void *) user);
-        bc_level_exchange(domain,level);
+                                     (fclaw2d_patch_callback_t) cb_tag_patch,
+                                     (void *) &level_refined);
+        if (level_refined)
+        {
+            // Rebuild domain (nothing happens yet)
+            fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(domain);
+
+            // Copy all old domain patches that didn't change on refinement
+            fclaw2d_domain_iterate_unchanged(domain, new_domain, level,
+                                             (fclaw2d_match_unchanged_callback_t) cb_match_unchanged,
+                                             (void *) &user_null);
+
+
+            // Re-initialize all new refined patches.   Set 'init_flag' = true so that the
+            // initialization routine is called.
+            bool init_flag = true;
+            fclaw2d_domain_iterate_refined(domain,new_domain,level,
+                                           (fclaw2d_match_refined_callback_t) cb_match_refine,
+                                           (void *) &init_flag);
+
+            // Exchange boundary data at the the new level
+            bc_level_exchange(new_domain,level+1);
+
+            // Deallocate old domain
+            amrreset(domain);
+            domain = new_domain;
+        }
+        else
+        {
+            // exit loop;  we are done refining
+            break;
+        }
     }
 }
 
 
+// -----------------------------------------------------------------
+// Run - with or without subcycling
+// -----------------------------------------------------------------
 void amrrun(fclaw2d_domain_t *domain)
 {
     // Write out an initial time file
@@ -833,7 +981,7 @@ void amrrun(fclaw2d_domain_t *domain)
                 // Modify dt_level0 from step used.
                 dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
-                // Got back to start of loop, without incrementing step counter.
+                // Got back to start of loop, without incrementing step counter or time level
                 continue;
             }
 
@@ -856,6 +1004,8 @@ void amrrun(fclaw2d_domain_t *domain)
                 // use time step that would have been used had we not taken a small step
             }
             n_inner++;
+
+            // regrid(domain);
 
             // After some number of time steps, we probably need to regrid...
         }
