@@ -4,10 +4,12 @@
 #include <iostream>
 #include <vector>
 
-using std::ifstream;
-using std::ios;
-using std::vector;
-using std::max;
+using namespace std;
+
+// using std::ifstream;
+// using std::ios;
+// using std::vector;
+// using std::max;
 
 
 #include "amr_utils.H"

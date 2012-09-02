@@ -33,29 +33,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_convenience.h"
 #include "forestclaw2d.h"
 
-using std::ifstream;
-using std::ios;
-using std::vector;
+using namespace std;
+
+// using std::ifstream;
+// using std::ios;
+// using std::vector;
 
 #define CH_assert(a)
 
 #define CH_SPACEDIM 2
-const int SpaceDim = CH_SPACEDIM;
+
 const int p4est_refineFactor = P4EST_FACES;
 
-// Needs to be fixed!
-#define Max(a,b)  a
 
-#define cout std::cout
-
-#define endl std::endl
-
+#if CH_SPACEDIM == 2
+const int SpaceDim = 2;
+const int NumFaces = 2;
+const int NumCorners = 4;
+#else
+const int SpaceDim = 3;
+const int NumFaces = 6;
+const int NumCorners = 8;
+#endif
 
 typedef double Real;
 
 class global_parms;
 
-
+// void set_global_constants(fclaw2d_domain_t *domain);
 
 int num_patches(fclaw2d_domain_t *domain, int level);
 global_parms* get_domain_data(fclaw2d_domain_t *domain);

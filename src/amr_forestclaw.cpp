@@ -32,10 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <cstdlib>
 #include <iomanip>
-using namespace std;
 
-//using std::ifstream;
-using std::ios;
+// using std::ios;
 
 class ClawPatch;
 
@@ -103,7 +101,6 @@ void cb_check_conservation(fclaw2d_domain_t *domain,
     ClawPatch *this_cp = get_patch_data(this_patch);
     Real *sum = (Real*) user;
 
-    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
     *sum += this_cp->compute_sum();
 }
 
@@ -154,9 +151,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     // FCLAW2D_FACE_NEIGHBOR_SAMESIZE,
     // FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
 
-    // global_parms *gparms = get_domain_data(domain);
-    // int refratio = gparms->m_refratio;
-
     *neighbor_block_idx = rblockno;
 
     if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
@@ -202,7 +196,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int *ref_flag)
 {
-    // int neighbor_corner = 0;
     int neighbor_corner = fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx, icorner);
 
     if (neighbor_corner == -1)
@@ -222,12 +215,10 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        bool *intersects_bc)
 {
-    const int num_faces = fclaw2d_domain_num_faces (domain);
-
-    int bdry[num_faces];
+    int bdry[NumFaces];
     fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
 
-    for(int i = 0; i < num_faces; i++)
+    for(int i = 0; i < NumFaces; i++)
     {
         intersects_bc[i] = bdry[i] > 0;
     }
@@ -243,8 +234,6 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user)
 {
-    global_parms *gparms = get_domain_data(domain);
-    // int refratio = gparms->m_refratio;
     ClawPatch *this_cp = get_patch_data(this_patch);
 
     for (int idir = 0; idir < SpaceDim; idir++)
@@ -272,18 +261,19 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
             fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
             ClawPatch *neighbor_cp = get_patch_data(neighbor_patch);
-            // Finally, do exchange between 'this_patch' and 'neighbor patch(es)'.
+
+            // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
             this_cp->exchange_face_ghost(idir,neighbor_cp);
         }
     } // loop over directions (idir = 0,1,2)
 
     // Now check for any physical boundary conditions on this patch
-    const int num_faces = fclaw2d_domain_num_faces (domain);
-    bool intersects_bc[num_faces];
+    bool intersects_bc[NumFaces];
     Real curr_time = get_domain_time(domain);
     Real dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
-    this_cp->set_phys_face_ghost(intersects_bc,gparms->m_mthbc,curr_time,dt);
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    this_cp->set_phys_face_ghost(intersects_bc,this_block->mthbc,curr_time,dt);
 
 }
 
@@ -293,22 +283,18 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               int this_patch_idx,
                               void *user)
 {
-    // global_parms *gparms = get_domain_data(domain);
-
-    const int num_corners = fclaw2d_domain_num_corners (domain);
-    const int num_faces = fclaw2d_domain_num_faces (domain);
-    bool intersects_bc[num_faces];
+    bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    for (int icorner = 0; icorner < num_corners; icorner++)
+    for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
         // p4est has tons of lookup table like this, can be exposed similarly
         int faces[SpaceDim];
-        fclaw2d_domain_corner_faces (domain, icorner, faces);
+        fclaw2d_domain_corner_faces(domain, icorner, faces);
 
         // Both faces are at a physical boundary
         bool is_phys_corner =
@@ -436,7 +422,9 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
+    // We may need to average onto a time interpolated grid, not the actual solution.
     fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
+    bool do_time_interp = step_info->do_time_interp;
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     global_parms *gparms = get_domain_data(domain);
@@ -476,7 +464,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
 
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
                 this_cp->average_face_ghost(idir,iside,p4est_refineFactor,
-                                            refratio,fine_neighbor_cp,step_info->do_time_interp);
+                                            refratio,fine_neighbor_cp,do_time_interp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)

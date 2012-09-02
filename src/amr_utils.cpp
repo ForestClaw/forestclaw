@@ -41,7 +41,7 @@ global_parms::global_parms()
 {
     m_maxmwaves = 20;
     m_mthlim = new int[m_maxmwaves];
-    m_mthbc = new int[2*SpaceDim];
+    m_mthbc = new int[NumFaces];
     m_refratio = 2;  // hardwired for now.
 }
 
