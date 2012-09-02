@@ -28,18 +28,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 amr_options_register (sc_options_t * opt, amr_options_t * amropt)
 {
-    sc_options_add_int (opt, 0, "mx-leaf", &amropt->mx_leaf, 32,
+    sc_options_add_int (opt, 0, "mx", &amropt->mx_leaf, 32,
                         "Subdivision of each patch in x");
-    sc_options_add_int (opt, 0, "my-leaf", &amropt->my_leaf, 32,
+
+    sc_options_add_int (opt, 0, "my", &amropt->my_leaf, 32,
                         "Subdivision of each patch in y");
-    sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 4.,
+
+    sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 4.0,
                            "Final time");
+
     sc_options_add_string (opt, 0, "subcycling", &amropt->subcycling,
-                           "T", "Subcyclingy type");
-    sc_options_add_inifile (opt, 'F', "inifile",
+                           "T", "Subcycling type");
+
+    sc_options_add_inifile (opt, 'F', "new_datafile",
                             "Read options from this file");
 }
-  
+
 void
 amr_options_parse (sc_options_t * opt, int argc, char ** argv, int log_priority)
 {

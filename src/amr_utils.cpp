@@ -359,7 +359,8 @@ Real subcycle_manager::dt(const int& a_level)
 
 bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
 {
-    bool b1 = solution_updated(a_level,a_curr_step);
+    bool b1 = solution_updated(a_level,a_curr_step); // do we need this?  We shouldn't be here if
+                                                     // we have not taken a time step to 'a_curr_step'
     bool b2 = level_exchange_done(a_level);
     bool b3 = exchanged_with_coarser(a_level);
     bool b4 = exchanged_with_finer(a_level);  // This may not be needed.

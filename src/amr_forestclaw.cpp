@@ -415,13 +415,12 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
 void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level)
 {
-    int user = NULL;
     fclaw2d_domain_iterate_level(domain, a_level,
-                                  cb_bc_level_face_exchange, (void *) user);
+                                  cb_bc_level_face_exchange, (void *) NULL);
 
     // Do corner exchange only after physical boundary conditions have been set on all patches,
     // since corners may overlap phyical ghost cell region of neighboring patch.
-    fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) user);
+    fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) NULL);
 }
 
 
@@ -436,6 +435,8 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
+    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
+
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
@@ -465,15 +466,16 @@ void cb_bc_average(fclaw2d_domain_t *domain,
             {
                 // Fill in ghost cells on 'this_patch' by averaging data from finer neighbors
                 fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                ClawPatch *neighbor_cp[p4est_refineFactor];
+                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
                 for (int ir = 0; ir < p4est_refineFactor; ir++)
                 {
                     fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
-                    neighbor_cp[ir] = get_patch_data(neighbor_patch);
+                    fine_neighbor_cp[ir] = get_patch_data(neighbor_patch);
                 }
 
-                // Fill in ghost cells on 'this_patch' by averaging from finer grid
-                this_cp->average_face_ghost(idir,iside,p4est_refineFactor,refratio,neighbor_cp);
+                // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
+                this_cp->average_face_ghost(idir,iside,p4est_refineFactor,
+                                            refratio,fine_neighbor_cp,step_info->do_time_interp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
@@ -486,6 +488,8 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
+
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
@@ -498,7 +502,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
         for (int iside = 2*idir; iside < 2*idir + 1; iside++)
         {
             int neighbor_block_idx;
-            int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
+            int neighbor_patch_idx[p4est_refineFactor];
             int ref_flag; // = -1, 0, 1
             bool is_phys_bc;
 
@@ -515,36 +519,80 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
             {
                 // Fill in ghost cells on 'neighbor_patch' by interpolation
                 fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                ClawPatch *neighbor_cp[p4est_refineFactor];
+                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
                 for (int ir = 0; ir < p4est_refineFactor; ir++)
                 {
                     fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
-                    neighbor_cp[ir] = get_patch_data(neighbor_patch);
+                    fine_neighbor_cp[ir] = get_patch_data(neighbor_patch);
                 }
 
-                // Fill in fine grid ghost by interpolating from 'this_patch'
-                this_cp->interpolate_face_ghost(idir,iside,p4est_refineFactor,refratio,neighbor_cp);
+                // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
+                // doing time interpolation if necessary
+                this_cp->interpolate_face_ghost(idir,iside,p4est_refineFactor,
+                                                refratio,fine_neighbor_cp,step_info->do_time_interp);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
 }
 
+void cb_setup_time_interp(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{
+    // construct all coarse level time interpolated intermediate grids.  Interpolate ghost
+    // values as well, even though neighboring fine grids may overwrite some ghost values
+    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
 
-void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level, const int& a_at_time)
+    ClawPatch *cp = get_patch_data(this_patch);
+    cp->time_interpolate(step_info->fine_step, step_info->coarse_step, step_info->refratio);
+}
+
+void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level, const int& a_coarse_step,
+                                         const int& a_fine_step,const int& a_refratio)
 {
     // First, average fine grid to coarse grid cells
-    int user = NULL;
+    fclaw2d_subcycle_info step_info;
+    step_info.coarse_step = a_coarse_step;
+    step_info.fine_step = a_fine_step;
+    step_info.refratio = a_refratio;
+    step_info.do_time_interp = true;
+
+    // Set up patch data for time interpolation.
     int coarser_level = a_level - 1;
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_bc_average,
-                                 (void *) user);
+                                 (fclaw2d_patch_callback_t) cb_setup_time_interp,
+                                 (void *) &step_info);
 
-    // Interpolate in time, if necessary
+
+    // Average onto time interpolated 'virtual' data so that we can use these averaged ghost
+    // values in the interpolation step below.
+    fclaw2d_domain_iterate_level(domain, coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_bc_average,
+                                 (void *) &step_info);
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  (fclaw2d_patch_callback_t) cb_bc_interpolate,
-                                 (void *) user);
+                                 (void *) &step_info);
+}
+
+void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
+{
+    // Simple exchange - no time interpolation needed
+    fclaw2d_subcycle_info step_info;
+    step_info.do_time_interp = false;
+
+    int coarser_level = a_level - 1;
+    fclaw2d_domain_iterate_level(domain, coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_bc_average,
+                                 (void *) &step_info);
+
+    // Interpolate coarse grid to fine.  This may require time interpolation
+    fclaw2d_domain_iterate_level(domain,coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_bc_interpolate,
+                                 (void *) &step_info);
 }
 
 
@@ -569,8 +617,7 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
 
 void restore_time_step(fclaw2d_domain_t *domain)
 {
-    int user = NULL;
-    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) user);
+    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) NULL);
 }
 
 void cb_save_time_step(fclaw2d_domain_t *domain,
@@ -588,8 +635,7 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
 
 void save_time_step(fclaw2d_domain_t *domain)
 {
-    int user = NULL;
-    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) user);
+    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) NULL);
 }
 
 
@@ -600,9 +646,6 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
                       void *user)
 {
     global_parms *gparms = get_domain_data(domain);
-
-    // fclaw2d_block_t *block = &domain->blocks[this_block_idx];
-    // fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
 
     ClawPatch *cp = get_patch_data(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
@@ -629,8 +672,6 @@ Real advance_level(fclaw2d_domain_t *domain,
     Real maxcfl = 0;
     if (!a_time_stepper->can_advance(a_level,a_curr_fine_step))
     {
-        printf("Error (advance_level) : Advancing coarser grid (not tested)\n");
-        exit(1);
         if (!a_time_stepper->level_exchange_done(a_level))
         {
             // Level exchange should have been done right after solution update.
@@ -640,33 +681,47 @@ Real advance_level(fclaw2d_domain_t *domain,
         if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
-            if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
+            if (a_curr_fine_step == last_coarse_step)
             {
-                // We cannot advance the coarser grid without averaging fine grid to coarser
-                // grid ghost cells.  This is all done at the same time step.
-                bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
+                // Levels are time synchronized and we can do a simple coarse/fine
+                // exchange without time interpolation or advancing the coarser level
+                bc_exchange_with_coarse(domain,a_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
-
-                // This is the only advance done on this coarser level.  This advance will
-                // recursively call coarser advances until the coarsest non-empty level is
-                // reached.
-                // We don't need this to advance the current level, however (unlike in the
-                // subcycling case (below) where a_curr_fine_step > last_coarse_step)
-                // We do this advance here just so that we be sure to advance all levels in the
-                // non-subcycled case.
-                maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
             }
-            else if (a_curr_fine_step > last_coarse_step)
+            else
             {
-                // Here, we have to update the coarse grid so that it catches up to the fine grid
-                // time step.
-                maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                if ((a_curr_fine_step > last_coarse_step) ||
+                    (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level)))
+                {
+                    // (1) subcycled case : a_curr_fine_step will only be greater than
+                    // last_coarse_step if we haven't yet advanced the coarse grid to a time level
+                    // beyond the current fine grid level.
+                    //
+                    // (2) non-subcycled case : this advance is a bit gratuitous, because we
+                    // don't need it to advance the fine grid;  rather, we put this advance
+                    // here as a way to get advances on the coarser levels.
+                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                }
+                if (!a_time_stepper->nosubcycle())
+                {
+                    global_parms *gparms = get_domain_data(domain);
+                    int refratio = gparms->m_refratio;
 
-                // This exchange will involve interpolation in time.
-                bc_exchange_with_coarse(domain,a_level,a_curr_fine_step);
-                a_time_stepper->increment_coarse_exchange_counter(a_level);
-                a_time_stepper->increment_fine_exchange_counter(a_level-1);
+                    // (1) a_curr_fine_step > last_coarse_step : we just advanced the coarse grid
+                    // and can now apply time interpolated boundary conditions, or
+                    //
+                    // (2) a_curr_fine_step < last_coarse_step : we advanced the coarse
+                    // grid in a previous step but we still have to do time interpolation (this
+                    // can only happen if refratio > 2)
+
+                    bc_exchange_with_coarse_time_interp(domain,a_level,last_coarse_step,a_curr_fine_step,refratio);
+                    a_time_stepper->increment_coarse_exchange_counter(a_level);
+
+                    // Don't increment the fine_exchange_counter, since in the time interpolated case,
+                    // there is no coarse time data at time step a_curr_fine_step.
+                    // a_time_stepper->increment_fine_exchange_counter(a_level-1);
+                }
             }
         }
     }
@@ -853,10 +908,9 @@ void amrinit(fclaw2d_domain_t *domain)
     amr_set_base_level(domain);
 
     // Initialize base level grid
-    int user_null = NULL;
     fclaw2d_domain_iterate_level(domain, minlevel,
                                  (fclaw2d_patch_callback_t) cb_amrinit,
-                                 (void *) user_null);
+                                 (void *) NULL);
 
     // Exchange boundary data at the base level
     bc_level_exchange(domain,minlevel);
@@ -876,7 +930,7 @@ void amrinit(fclaw2d_domain_t *domain)
             // Copy all old domain patches that didn't change on refinement
             fclaw2d_domain_iterate_unchanged(domain, new_domain, level,
                                              (fclaw2d_match_unchanged_callback_t) cb_match_unchanged,
-                                             (void *) &user_null);
+                                             (void *) NULL);
 
 
             // Re-initialize all new refined patches.   Set 'init_flag' = true so that the

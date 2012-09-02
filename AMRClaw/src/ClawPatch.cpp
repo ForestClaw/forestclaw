@@ -102,6 +102,7 @@ void ClawPatch::define(const Real& a_xlower,
 
     int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc)*(m_mz+2*m_mbc);
     m_griddata.define(gridsize*m_meqn,box);
+    m_griddata_last.define(gridsize*m_meqn,box);
     if (m_maux > 0)
     {
         m_auxarray.define(gridsize*m_maux,box);
@@ -251,10 +252,11 @@ Real ClawPatch::step_noqad(const Real& a_time,
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
+    m_griddata_last = m_griddata; // Copy for time interpolation
+
     int maxm = max(m_mx,m_my);
 
     Real cflgrid;
-
 
     int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn + (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
     Real* work = new Real[mwork];
@@ -265,10 +267,8 @@ Real ClawPatch::step_noqad(const Real& a_time,
     Real* gm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
 
     clawpatch2_(maxm, gparms.m_meqn, gparms.m_maux, gparms.m_mbc, gparms.m_method,
-                gparms.m_mthlim,
-                gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold, aux,
-                m_dx, m_dy, dt, cflgrid, work, mwork,
-                m_xlower, m_ylower,a_level,
+                gparms.m_mthlim, gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold,
+                aux, m_dx, m_dy, dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
                 a_time, fp, fm, gp, gm);
 
     delete [] fp;
@@ -281,18 +281,6 @@ Real ClawPatch::step_noqad(const Real& a_time,
     return cflgrid;
 }
 #endif
-
-void ClawPatch::save_step()
-{
-    // Store a backup in case the CFL number is too large doesn't work out.
-    m_griddata_tmp = m_griddata;
-}
-
-void ClawPatch::restore_step()
-{
-    m_griddata = m_griddata_tmp;
-}
-
 
 
 Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
@@ -417,6 +405,36 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
 }
 
 
+void ClawPatch::save_step()
+{
+    // Store a backup in case the CFL number is too large doesn't work out.
+    m_griddata_last = m_griddata;
+}
+
+void ClawPatch::restore_step()
+{
+    m_griddata = m_griddata_last;
+}
+
+
+void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_step, const int& a_refratio)
+{
+    Real alpha = Real(a_fine_step)/Real(a_refratio);
+
+    Real *qlast = m_griddata_last.dataPtr();
+    Real *qcurr = m_griddata.dataPtr();
+    Real *qtimeinterp = m_griddata_time_interp.dataPtr();
+    int size = m_griddata.size();
+
+    // This works, even when we have a system (meqn > 1).  Note that all ghost values will be interpolated.
+    for(int i = 0; i < size; i++)
+    {
+        // There is surely a BLAS routine that does this...
+        qtimeinterp[i] = qlast[i] + alpha*qcurr[i];
+    }
+}
+
+
 // ----------------------------------------------------------------
 // Single level exchanges
 // ----------------------------------------------------------------
@@ -482,9 +500,18 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_iside,
                                    const int& a_num_neighbors,
                                    const int& a_refratio,
-                                   ClawPatch **neighbor_cp)
+                                   ClawPatch **neighbor_cp,
+                                   bool a_time_interp)
 {
-    Real *qcoarse = m_griddata.dataPtr();
+    Real *qcoarse;
+    if (a_time_interp)
+    {
+        qcoarse = m_griddata_time_interp.dataPtr();
+    }
+    else
+    {
+        qcoarse = m_griddata.dataPtr();
+    }
     for(int ir = 0; ir < a_num_neighbors; ir++)
     {
         Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
@@ -497,9 +524,19 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_iside,
                                        const int& a_p4est_refineFactor,
                                        const int& a_refratio,
-                                       ClawPatch **neighbor_cp)
+                                       ClawPatch **neighbor_cp,
+                                       bool a_time_interp)
 {
-    Real *qcoarse = m_griddata.dataPtr();
+    Real *qcoarse;
+    if (a_time_interp)
+    {
+        qcoarse = m_griddata_time_interp.dataPtr();
+    }
+    else
+    {
+        qcoarse = m_griddata.dataPtr();
+    }
+
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
         Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
@@ -508,6 +545,10 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
     }
 }
 
+// ----------------------------------------------------------------
+// Tagging, refining and coarsening
+// ----------------------------------------------------------------
+
 void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                           const int& a_patch_idx,
                                           const int& a_num_neighbors,
@@ -515,17 +556,22 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
 {
     Real *qcoarse = this->m_griddata.dataPtr();
     Real *qfine = a_fine->m_griddata.dataPtr();
+
+    // Use linear interpolation with limiters.
     interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_num_neighbors,a_refratio,a_patch_idx);
 }
 
-
-// ----------------------------------------------------------------
-// Output and diagnostics
-// ----------------------------------------------------------------
 bool ClawPatch::tag_for_refinement()
 {
-    // Just refine for now
-    return true;
+    // Refine center for now
+    if (m_xlower >= 0.25 && m_xupper <= 0.85)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
@@ -568,6 +614,11 @@ void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
 #endif
 
 }
+
+
+// ----------------------------------------------------------------
+// Output and diagnostics
+// ----------------------------------------------------------------
 
 
 void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)

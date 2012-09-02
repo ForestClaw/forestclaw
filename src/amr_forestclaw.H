@@ -50,6 +50,14 @@ typedef struct fclaw2d_level_time_data
     Real t;
 } fclaw2d_level_time_data_t;
 
+typedef struct fclaw2d_subcycle_info
+{
+    int coarse_step;
+    int fine_step;
+    int refratio;
+    bool do_time_interp;  // We may not always need to do time interpolation.
+} fclaw2d_subcycle_info_t;
+
 
 extern "C"
 {

@@ -249,11 +249,11 @@ public:
     FArrayBox();
     ~FArrayBox();
     // FArrayBox(const FArrayBox& fbox);
-    void operator=(const FArrayBox& fbox);
     void define(int a_size, const Box& a_box);
     Real* dataPtr() const;
     Box box();
     int size();
+    void operator=(const FArrayBox& fbox);
 private:
     Real *m_data;
     int m_size;

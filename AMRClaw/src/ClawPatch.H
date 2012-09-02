@@ -394,6 +394,8 @@ public :
     void save_step();
     void restore_step();
 
+    void time_interpolate(const int& a_fine_step, const int& a_coarse_step, const int& a_step_inc);
+
     // ----------------------------------------------------------------
     // Single level exchanges
     // ----------------------------------------------------------------
@@ -424,14 +426,16 @@ public :
                             const int& a_iside,
                             const int& a_num_neighbors,
                             const int& a_refratio,
-                            ClawPatch **neighbor_cp);
+                            ClawPatch **neighbor_cp,
+                            bool a_time_interp);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
                                 const int& a_iside,
                                 const int& a_num_neighbors,
                                 const int& a_refratio,
-                                ClawPatch **a_neighbor_cp);
+                                ClawPatch **a_neighbor_cp,
+                                bool a_time_interp);
 
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
@@ -499,7 +503,8 @@ protected :
 
     // Here is where the data is stored.
     FArrayBox m_griddata;
-    FArrayBox m_griddata_tmp;
+    FArrayBox m_griddata_time_interp;
+    FArrayBox m_griddata_last;  // stores previous time step for interpolation in time
     FArrayBox m_auxarray;
 
     bool m_isDefined;
