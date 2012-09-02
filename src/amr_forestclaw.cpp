@@ -37,6 +37,7 @@ using namespace std;
 //using std::ifstream;
 using std::ios;
 
+class ClawPatch;
 
 // -----------------------------------------------------------------
 // Setting data in domain and patches
@@ -989,7 +990,7 @@ void amrrun(fclaw2d_domain_t *domain)
 
             // In case we have to reject this step
             save_time_step(domain);
-            // check_conservation(domain);
+            check_conservation(domain);
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.

@@ -104,7 +104,7 @@ c        # Format statement 109 below will not work.
       do j = 1,my
          do i = 1,mx
             do mq = 1,meqn
-               if (q(i,j,mq) .lt. 1d-99) then
+               if (abs(q(i,j,mq)) .lt. 1d-99) then
                   q(i,j,mq) = 0.d0
                endif
             enddo
