@@ -43,6 +43,15 @@ fclaw2d_domain_t *fclaw2d_domain_new_moebius (MPI_Comm mpicomm,
 
 void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 
+/** Create a new domain based on refine and coarsen marks set previously.
+ * \param [in,out] domain       Current domain with set adaptation markers.
+ *                              It stays alive because it is needed to
+ *                              project numerical values to the adapted domain.
+ *                              However, no queries are allowed afterwards.
+ * \return                      Adapted domain.
+ */
+fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t *domain);
+
 /** Print patch number by level on all processors */
 void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);
 

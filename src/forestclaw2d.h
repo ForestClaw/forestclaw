@@ -87,6 +87,7 @@ struct fclaw2d_domain
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */
     p4est_wrap_t *pp;
+    int pp_owned;               /* The pp member is owned by this domain */
     void *user;
 };
 
@@ -225,9 +226,6 @@ typedef void (*fclaw2d_match_coarsened_callback_t)
 void
 fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
                                  fclaw2d_match_coarsened_callback_t cb_user, void *user);
-
-
-fclaw2d_domain_t* fclaw2d_domain_adapt(fclaw2d_domain_t *domain);
 
 #ifdef __cplusplus
 #if 0

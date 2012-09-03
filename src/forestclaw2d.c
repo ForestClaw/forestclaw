@@ -122,6 +122,7 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     p4est_mesh_t *mesh;
     fclaw2d_block_t *block;
 
+    P4EST_ASSERT (domain->pp_owned);
     anyboundary = 0;
     p4est = domain->pp->p4est;
     mesh = domain->pp->match_aux ? domain->pp->mesh_aux : domain->pp->mesh;
@@ -162,6 +163,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
 {
     p4est_quadrant_t *ghost;
 
+    P4EST_ASSERT (domain->pp_owned);
     P4EST_ASSERT (0 <= qtq);
     P4EST_ASSERT (qtq <
                   mesh->local_num_quadrants + mesh->ghost_num_quadrants);
@@ -204,6 +206,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     p4est_mesh_t *mesh;
     fclaw2d_block_t *block;
 
+    P4EST_ASSERT (domain->pp_owned);
     p4est = domain->pp->p4est;
     mesh = domain->pp->match_aux ? domain->pp->mesh_aux : domain->pp->mesh;
 
@@ -291,6 +294,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_tree_t *tree;
     fclaw2d_block_t *block;
 
+    P4EST_ASSERT (domain->pp_owned);
     p4est = domain->pp->p4est;
 
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
@@ -317,6 +321,7 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
     int totalpatchno;
     fclaw2d_block_t *block;
 
+    P4EST_ASSERT (domain->pp_owned);
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
     block = domain->blocks + blockno;
     P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
@@ -334,6 +339,7 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     int totalpatchno;
     fclaw2d_block_t *block;
 
+    P4EST_ASSERT (domain->pp_owned);
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
     block = domain->blocks + blockno;
     P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
@@ -364,12 +370,4 @@ void
 fclaw2d_domain_iterate_coarsened(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain, int level,
                                  fclaw2d_match_coarsened_callback_t cb_user, void *user)
 {
-}
-
-
-// Doesn't do anything yet.
-fclaw2d_domain_t* fclaw2d_domain_adapt(fclaw2d_domain_t *domain)
-{
-    // Don't reset old domain in this routine.
-    return domain;
 }

@@ -45,6 +45,8 @@ fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
                             xyzp);
 }
 
+/** Domain constructor takes ownership of wrap.
+ */
 static fclaw2d_domain_t *
 fclaw2d_domain_new (p4est_wrap_t * wrap)
 {
@@ -75,6 +77,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpisize = wrap->p4est->mpisize;
     domain->mpirank = wrap->p4est->mpirank;
     domain->pp = wrap;
+    domain->pp_owned = 1;
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->patch_to_block =
@@ -196,7 +199,6 @@ void
 fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 {
     int i;
-    p4est_wrap_t *wrap = domain->pp;
     fclaw2d_block_t *block;
 
     for (i = 0; i < domain->num_blocks; ++i)
@@ -206,9 +208,25 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     }
     P4EST_FREE (domain->patch_to_block);
     P4EST_FREE (domain->blocks);
-    P4EST_FREE (domain);
 
-    p4est_wrap_destroy (wrap);
+    if (domain->pp_owned) {
+        p4est_wrap_destroy (domain->pp);
+    }
+    P4EST_FREE (domain);
+}
+
+fclaw2d_domain_t *
+fclaw2d_domain_adapt (fclaw2d_domain_t *domain)
+{
+    p4est_wrap_t *wrap = domain->pp;
+    fclaw2d_domain_t *adapt;
+
+    P4EST_ASSERT (domain->pp_owned);
+    domain->pp_owned = 0;
+    p4est_wrap_refine (wrap);
+    adapt = fclaw2d_domain_new (wrap);
+
+    return adapt;
 }
 
 static void
