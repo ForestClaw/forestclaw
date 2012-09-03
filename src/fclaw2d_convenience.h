@@ -50,7 +50,7 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  *                              However, no queries are allowed afterwards.
  * \return                      Adapted domain.
  */
-fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t *domain);
+fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 
 /** Print patch number by level on all processors */
 void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);

@@ -209,14 +209,15 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     P4EST_FREE (domain->patch_to_block);
     P4EST_FREE (domain->blocks);
 
-    if (domain->pp_owned) {
+    if (domain->pp_owned)
+    {
         p4est_wrap_destroy (domain->pp);
     }
     P4EST_FREE (domain);
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_adapt (fclaw2d_domain_t *domain)
+fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 {
     p4est_wrap_t *wrap = domain->pp;
     fclaw2d_domain_t *adapt;
