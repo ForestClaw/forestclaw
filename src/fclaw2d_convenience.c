@@ -103,9 +103,9 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         }
         for (face = 0; face < P4EST_FACES; ++face)
         {
-            if (conn->tree_to_tree[P4EST_FACES * i + face] !=
+            if (conn->tree_to_tree[P4EST_FACES * i + face] ==
                 (p4est_topidx_t) i
-                || conn->tree_to_face[P4EST_FACES * i + face] !=
+                && conn->tree_to_face[P4EST_FACES * i + face] ==
                 (int8_t) face)
             {
                 block->mthbc[face] = 1;
