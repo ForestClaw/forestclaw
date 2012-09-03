@@ -38,7 +38,7 @@ extern "C"
 
 typedef struct amr_options
 {
-    int mx_leaf, my_leaf;
+    int mx, my;
     double tfinal;
     const char *subcycling;
 }
@@ -48,7 +48,7 @@ amr_options_t;
 void amr_options_register (sc_options_t * opt, amr_options_t * amropt);
 
 /* parse options and populate values in registered amr_options structure */
-void amr_options_parse (sc_options_t * opt, int argc, char ** argv,
+void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
 
 #ifdef __cplusplus

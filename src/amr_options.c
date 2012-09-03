@@ -25,13 +25,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_options.h"
 
+/* Proposed naming convention:
+ * Parameter names in config file (= long option names) identical to the
+ * C variable members of amr_options_t, except "-" in parameter name
+ * corresponds to "_" in C variable.
+ * For example the short option would be -F <filename> and the long option
+ * --new-datafile=<Filename>.
+ */
+
 void
 amr_options_register (sc_options_t * opt, amr_options_t * amropt)
 {
-    sc_options_add_int (opt, 0, "mx", &amropt->mx_leaf, 32,
+    sc_options_add_int (opt, 0, "mx", &amropt->mx, 32,
                         "Subdivision of each patch in x");
 
-    sc_options_add_int (opt, 0, "my", &amropt->my_leaf, 32,
+    sc_options_add_int (opt, 0, "my", &amropt->my, 32,
                         "Subdivision of each patch in y");
 
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 4.0,
@@ -40,24 +48,27 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_string (opt, 0, "subcycling", &amropt->subcycling,
                            "T", "Subcycling type");
 
-    sc_options_add_inifile (opt, 'F', "new_datafile",
+    sc_options_add_inifile (opt, 'F', "new-datafile",
                             "Read options from this file");
 }
 
 void
-amr_options_parse (sc_options_t * opt, int argc, char ** argv, int log_priority)
+amr_options_parse (sc_options_t * opt, int argc, char **argv,
+                   int log_priority)
 {
-  int                   retval;
+    int retval;
 
-  retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
-  if (retval < 0) {
-    sc_options_print_usage (sc_package_id, log_priority, opt, NULL);
-    sc_abort_collective ("Option parsing failed");
-  }
-  sc_options_print_summary (sc_package_id, log_priority, opt);
-  if (sc_is_root ()) {
-    retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
-                              "clawez.data.used");
-    SC_CHECK_ABORT (!retval, "Option save failed");
-  }
+    retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
+    if (retval < 0)
+    {
+        sc_options_print_usage (sc_package_id, log_priority, opt, NULL);
+        sc_abort_collective ("Option parsing failed");
+    }
+    sc_options_print_summary (sc_package_id, log_priority, opt);
+    if (sc_is_root ())
+    {
+        retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
+                                  "claw2ez.data.used");
+        SC_CHECK_ABORT (!retval, "Option save failed");
+    }
 }
