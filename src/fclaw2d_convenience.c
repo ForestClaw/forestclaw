@@ -108,7 +108,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
                 && conn->tree_to_face[P4EST_FACES * i + face] ==
                 (int8_t) face)
             {
-                block->mthbc[face] = 1;
+                block->is_boundary[face] = 1;
             }
         }
         block->num_patches = (int) tree->quadrants.elem_count;

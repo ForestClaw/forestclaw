@@ -66,7 +66,7 @@ struct fclaw2d_block
     double ylower, yupper;
     fclaw2d_mapc2m_t mapc2m;
     void *mapc2m_user;
-    int mthbc[4];               /* >0 for physical bc types */
+    int is_boundary[4];         /* physical boundary flag */
     int num_patches;            /* local patches in this block */
     int num_patches_before;     /* in all previous blocks */
     int minlevel, maxlevel;     /* local over this block */
@@ -127,18 +127,16 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
                                      fclaw2d_patch_callback_t pcb,
                                      void *user);
 
-/** Determine boundary type >0 from fclaw2d_block_t, or 0 for neighbor patches.
+/** Determine physical boundary status as 1, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
  * \param [in] blockno	Number of the block within the domain.
  * \param [in] patchno	Number of the patch within the block.
- * \param [in,out] boundaries	Domain boundaries as present in block->mthbc.
+ * \param [in,out] boundaries	Domain boundary boolean flags.
  *			The order is left, right, bottom, top.
  * \return		True if at least one patch face is on a boundary.
  */
 int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
                                  int blockno, int patchno, int boundaries[4]);
-
-
 
 typedef enum fclaw2d_face_neighbor
 {

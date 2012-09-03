@@ -40,6 +40,11 @@ typedef struct fclaw2d_domain_data
     double curr_time;
 } fclaw2d_domain_data_t;
 
+typedef struct fclaw2d_block_data
+{
+    int mthbc[4];               /* >0 for physical bc types */
+} fclaw2d_block_data_t;
+
 typedef struct fclaw2d_patch_data
 {
     ClawPatch	*cp;
@@ -76,6 +81,8 @@ extern "C"
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
+
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
 
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 

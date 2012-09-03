@@ -50,16 +50,17 @@ class ClawPatch;
  * Functions called *destroy* do a reset and then destroy the object itself.
  */
 
+/* domain data */
+
 static void init_domain_data(fclaw2d_domain_t *domain,
                              global_parms *parms,
                              const amr_options_t *amropts)
 {
-    fclaw2d_domain_data_t *ddata = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
+    fclaw2d_domain_data_t *ddata = P4EST_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
     ddata->parms = parms;
     ddata->amropts = amropts;
-    ddata->curr_time = 0.;
 }
 
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain)
@@ -79,6 +80,21 @@ Real  get_domain_time(fclaw2d_domain_t *domain)
     return ddata->curr_time;
 }
 
+/* block data */
+
+static void init_block_data(fclaw2d_domain_t * domain, 
+                            fclaw2d_block_t *block)
+{
+    fclaw2d_block_data_t *bdata = P4EST_ALLOC_ZERO (fclaw2d_block_data_t, 1);
+    block->user = (void *) bdata;
+}
+
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
+{
+    return (fclaw2d_block_data_t *) block->user;
+}
+
+/* patch data */
 
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 {
@@ -228,7 +244,7 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 
     for(int i = 0; i < NumFaces; i++)
     {
-        intersects_bc[i] = bdry[i] > 0;
+        intersects_bc[i] = bdry[i];
     }
 }
 
@@ -281,7 +297,8 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     Real dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    this_cp->set_phys_face_ghost(intersects_bc,this_block->mthbc,curr_time,dt);
+    fclaw2d_block_data_t *bdata = get_block_data (this_block);
+    this_cp->set_phys_face_ghost(intersects_bc,bdata->mthbc,curr_time,dt);
 
 }
 
@@ -321,9 +338,10 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             // try to do something sensible using only what
             // we know about this physical boundary conditions at this corner
             fclaw2d_block_t *block = &domain->blocks[this_block_idx];
+            fclaw2d_block_data_t *bdata = get_block_data (block);
             Real curr_time = get_domain_time(domain);
             Real dt = 1e20;   // When do we need dt in setting a boundary condition?
-            this_cp->set_phys_corner_ghost(icorner,block->mthbc,curr_time,dt);
+            this_cp->set_phys_corner_ghost(icorner,bdata->mthbc,curr_time,dt);
         }
         else if (corner_on_phys_face)
         {
@@ -806,11 +824,13 @@ void amr_set_base_level(fclaw2d_domain_t *domain)
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = &domain->blocks[i];
+        init_block_data (domain, block);
+        fclaw2d_block_data_t *bdata = get_block_data (block);
 
         for(int m = 0; m < 2*SpaceDim; m++)
         {
             // Once we got to multi-block, this will have to change
-            block->mthbc[m] = gparms->m_mthbc[m];
+            bdata->mthbc[m] = gparms->m_mthbc[m];
         }
 
         for(int j = 0; j < block->num_patches; j++)
@@ -913,6 +933,7 @@ void amrinit(fclaw2d_domain_t *domain,
 
 
     // Set up storage for base level grids so we can initialize them
+    // Allocates per-block and per-patch user data
     amr_set_base_level(domain);
 
     // Initialize base level grid
@@ -1132,6 +1153,8 @@ void amrreset(fclaw2d_domain_t *domain)
     for(int i = 0; i < domain->num_blocks; i++)
     {
         fclaw2d_block_t *block = domain->blocks + i;
+        fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
+
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = block->patches + j;
@@ -1142,6 +1165,9 @@ void amrreset(fclaw2d_domain_t *domain)
             P4EST_FREE (pd);
             patch->user = NULL;
         }
+
+        P4EST_FREE (bd);
+        block->user = NULL;
     }
     P4EST_FREE (dd);
     domain->user = NULL;
