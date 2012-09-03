@@ -366,7 +366,7 @@ fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
     else if (newsize == FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE)
     {
         /* coarsening */
-        level = new_patch->level - 1;
+        level = new_patch->level + 1;
         P4EST_ASSERT (old_patchno + P4EST_CHILDREN <=
                       old_domain->blocks[blockno].num_patches);
         for (k = 0; k < P4EST_CHILDREN; ++k) {
