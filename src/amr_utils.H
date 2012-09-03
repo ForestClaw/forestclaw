@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_convenience.h"
 #include "forestclaw2d.h"
+#include "amr_options.h"
 
 using namespace std;
 
@@ -63,7 +64,6 @@ class global_parms;
 // void set_global_constants(fclaw2d_domain_t *domain);
 
 int num_patches(fclaw2d_domain_t *domain, int level);
-global_parms* get_domain_data(fclaw2d_domain_t *domain);
 
 int pow_int(int a, int n);
 
@@ -140,7 +140,10 @@ class subcycle_manager
 public:
     subcycle_manager();
     ~subcycle_manager();
-    void define(fclaw2d_domain_t *domain,const Real& a_time);
+    void define(fclaw2d_domain_t *domain,
+                global_parms *gparms,
+                const amr_options_t *amropts,
+                const Real& a_time);
 
     bool can_advance(const int& a_level, const int& a_from_step);
 

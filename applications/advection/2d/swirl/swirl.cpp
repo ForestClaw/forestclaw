@@ -63,9 +63,7 @@ main (int argc, char **argv)
   fclaw2d_domain_list_neighbors (domain, lp);
   printf("\n\n");
 
-  set_domain_data(domain,gparms);
-
-  amrinit(domain);
+  amrinit(domain, gparms, amr_options);
   amrrun(domain);
   amrreset(domain);
 

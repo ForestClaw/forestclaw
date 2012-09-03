@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_FORESTCLAW_H
 
 #include "forestclaw2d.h"
+#include "amr_options.h"
 #include "amr_utils.H"
 #include "ClawPatch.H"
 
@@ -35,6 +36,7 @@ using std::vector;
 typedef struct fclaw2d_domain_data
 {
     global_parms *parms;
+    const amr_options_t *amropts;
     double curr_time;
 } fclaw2d_domain_data_t;
 
@@ -71,17 +73,19 @@ extern "C"
 
 }
 
-void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
+
+void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
 void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level);
 
 void initial_grid(fclaw2d_domain_t *domain);
 
 void amrsetup(fclaw2d_domain_t *domain);
-void amrinit(fclaw2d_domain_t *domain);
+void amrinit(fclaw2d_domain_t *domain,
+             global_parms *parms, const amr_options_t * amropts);
 void amrrun(fclaw2d_domain_t *domain);
 void amrout(fclaw2d_domain_t *domain, int iframe);
 void amrreset(fclaw2d_domain_t *domain);

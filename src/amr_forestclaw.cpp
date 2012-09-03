@@ -41,33 +41,41 @@ class ClawPatch;
 // Setting data in domain and patches
 // -----------------------------------------------------------------
 
-void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms)
+/* Proposed naming convention:
+ * Functions called *init* allocate memory inside an object.
+ * Functions called *new* create a new object and then do an init.
+ * Functions called *set* update a memory location without allocating.
+ * Functions called *get* return a memory location without (de)allocating.
+ * Functions called *reset* deallocate memory in a given object.
+ * Functions called *destroy* do a reset and then destroy the object itself.
+ */
+
+static void init_domain_data(fclaw2d_domain_t *domain,
+                             global_parms *parms,
+                             const amr_options_t *amropts)
 {
     fclaw2d_domain_data_t *ddata = P4EST_ALLOC (fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
     ddata->parms = parms;
+    ddata->amropts = amropts;
+    ddata->curr_time = 0.;
 }
 
-global_parms* get_domain_data(fclaw2d_domain_t *domain)
+fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata;
-    ddata = (fclaw2d_domain_data_t *) domain->user;
-
-    return ddata->parms;
+    return (fclaw2d_domain_data_t *) domain->user;
 }
 
 void set_domain_time(fclaw2d_domain_t *domain, Real time)
 {
-    fclaw2d_domain_data_t *ddata;
-    ddata = (fclaw2d_domain_data_t *) domain->user;
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->curr_time = time;
 }
 
 Real  get_domain_time(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata;
-    ddata = (fclaw2d_domain_data_t *) domain->user;
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     return ddata->curr_time;
 }
 
@@ -427,7 +435,8 @@ void cb_bc_average(fclaw2d_domain_t *domain,
     bool do_time_interp = step_info->do_time_interp;
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    global_parms *gparms = ddata->parms;
     int refratio = gparms->m_refratio;
 
     ClawPatch *this_cp = get_patch_data(this_patch);
@@ -480,7 +489,8 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
     fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    global_parms *gparms = ddata->parms;
     int refratio = gparms->m_refratio;
 
     ClawPatch *this_cp = get_patch_data(this_patch);
@@ -634,7 +644,8 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
                       int this_patch_idx,
                       void *user)
 {
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    global_parms *gparms = ddata->parms;
 
     ClawPatch *cp = get_patch_data(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
@@ -694,7 +705,8 @@ Real advance_level(fclaw2d_domain_t *domain,
                 }
                 if (!a_time_stepper->nosubcycle())
                 {
-                    global_parms *gparms = get_domain_data(domain);
+                    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+                    global_parms *gparms = ddata->parms;
                     int refratio = gparms->m_refratio;
 
                     // (1) a_curr_fine_step > last_coarse_step : we just advanced the coarse grid
@@ -787,7 +799,8 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
 
 void amr_set_base_level(fclaw2d_domain_t *domain)
 {
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    global_parms *gparms = ddata->parms;
     gparms->print_inputParams();
 
     for(int i = 0; i < domain->num_blocks; i++)
@@ -829,7 +842,8 @@ void cb_match_unchanged(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_do
 void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
      fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user)
 {
-    global_parms *gparms = get_domain_data(old_domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (old_domain);
+    global_parms *gparms = ddata->parms;
     ClawPatch *cp_old = get_patch_data(old_patch);
 
     int num_siblings = pow_int(p4est_refineFactor,SpaceDim);
@@ -867,7 +881,8 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
 void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
                 int this_block_idx, int this_patch_idx, void *user)
 {
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = ddata->parms;
     ClawPatch *cp = get_patch_data(this_patch);
 
     if (gparms->m_maux > 0)
@@ -878,12 +893,16 @@ void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
 }
 
 // Initialize a base level of grids
-void amrinit(fclaw2d_domain_t *domain)
+void amrinit(fclaw2d_domain_t *domain,
+             global_parms *parms, const amr_options_t * amropts)
 {
     Real t = 0;
+
+    init_domain_data (domain, parms, amropts);
     set_domain_time(domain,t);
 
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = ddata->parms;
     int minlevel = gparms->m_minlevel;
     int maxlevel = gparms->m_maxlevel;
 
@@ -954,7 +973,8 @@ void amrrun(fclaw2d_domain_t *domain)
     int iframe = 0;
     amrout(domain,iframe);
 
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = ddata->parms;
 
     Real final_time = gparms->m_tfinal;
     int nout = gparms->m_nout;
@@ -974,7 +994,7 @@ void amrrun(fclaw2d_domain_t *domain)
         {
 
             subcycle_manager time_stepper;
-            time_stepper.define(domain,t_curr);
+            time_stepper.define(domain,gparms,ddata->amropts,t_curr);
 
             // In case we have to reject this step
             save_time_step(domain);
@@ -1080,7 +1100,8 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
-    global_parms *gparms = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = ddata->parms;
     Real time = get_domain_time(domain);
 
     // Get total number of patches

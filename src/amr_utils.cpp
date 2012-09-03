@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_utils.H"
-#include "forestclaw2d.h"
 
 int pow_int(int a, int n)
 {
@@ -253,9 +252,10 @@ subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 
 void subcycle_manager::define(fclaw2d_domain_t *domain,
+                              global_parms *gparms,
+                              const amr_options_t *amropts,
                               const Real& a_t_curr)
 {
-    global_parms *gparms = get_domain_data(domain);
     m_t_minlevel = a_t_curr;
     m_refratio = gparms->m_refratio;
 
