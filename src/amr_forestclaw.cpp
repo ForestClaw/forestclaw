@@ -953,7 +953,7 @@ void amrinit(fclaw2d_domain_t *domain,
                                      (void *) &level_refined);
         if (level_refined)
         {
-            // Rebuild domain (nothing happens yet)
+            // Rebuild domain
             fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(domain);
 
             // Copy all old domain patches that didn't change on refinement
@@ -974,6 +974,7 @@ void amrinit(fclaw2d_domain_t *domain,
 
             // Deallocate old domain
             amrreset(domain);
+            fclaw2d_domain_destroy (domain);
             domain = new_domain;
         }
         else
