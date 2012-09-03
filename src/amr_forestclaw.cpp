@@ -956,6 +956,9 @@ void amrinit(fclaw2d_domain_t *domain,
             // Rebuild domain
             fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(domain);
 
+            // This is just for fun; remove when it gets annoying.
+            // fclaw2d_domain_list_adapted (domain, new_domain, SC_LP_STATISTICS);
+
             // Copy all old domain patches that didn't change on refinement
             fclaw2d_domain_iterate_unchanged(domain, new_domain, level,
                                              (fclaw2d_match_unchanged_callback_t) cb_match_unchanged,

@@ -324,3 +324,72 @@ fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
                                     &ln);
     P4EST_ASSERT (ln.count == domain->num_patches_all);
 }
+
+static void
+fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
+                                      fclaw2d_patch_t * old_patch,
+                                      fclaw2d_domain_t * new_domain,
+                                      fclaw2d_patch_t * new_patch,
+                                      fclaw2d_face_neighbor_t newsize,
+                                      int blockno,
+                                      int old_patchno, int new_patchno,
+                                      void *user)
+{
+    int lp = *(int *) user;
+    int level;
+    int k;
+
+    P4EST_ASSERT (old_domain->pp == new_domain->pp);
+    P4EST_ASSERT (old_domain->num_blocks == new_domain->num_blocks);
+    P4EST_ASSERT (0 <= blockno && blockno < old_domain->num_blocks);
+    P4EST_ASSERT (0 <= old_patchno &&
+                  old_patchno < old_domain->blocks[blockno].num_patches);
+    P4EST_ASSERT (0 <= new_patchno &&
+                  new_patchno < new_domain->blocks[blockno].num_patches);
+    P4EST_ASSERT (old_patch ==
+                  old_domain->blocks[blockno].patches + old_patchno);
+    P4EST_ASSERT (new_patch ==
+                  new_domain->blocks[blockno].patches + new_patchno);
+
+    if (newsize == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
+    {
+        /* refinement */
+        level = old_patch->level + 1;
+        P4EST_ASSERT (new_patchno + P4EST_CHILDREN <=
+                      new_domain->blocks[blockno].num_patches);
+        for (k = 0; k < P4EST_CHILDREN; ++k) {
+            P4EST_ASSERT (new_patch[k].level == level);
+        }
+        P4EST_LOGF (lp, "Block %d refinement %d to %d\n",
+                    blockno, old_patchno, new_patchno);
+    }
+    else if (newsize == FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE)
+    {
+        /* coarsening */
+        level = new_patch->level - 1;
+        P4EST_ASSERT (old_patchno + P4EST_CHILDREN <=
+                      old_domain->blocks[blockno].num_patches);
+        for (k = 0; k < P4EST_CHILDREN; ++k) {
+            P4EST_ASSERT (old_patch[k].level == level);
+        }
+        P4EST_LOGF (lp, "Block %d coarsening %d to %d\n",
+                    blockno, old_patchno, new_patchno);
+    }
+    else
+    {
+        /* noop */
+        P4EST_ASSERT (newsize == FCLAW2D_FACE_NEIGHBOR_SAMESIZE);
+        P4EST_ASSERT (old_patch->level == new_patch->level);
+        P4EST_LOGF (lp, "Block %d noop patch %d and %d\n",
+                    blockno, old_patchno, new_patchno);
+    }
+}
+
+void
+fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
+                             fclaw2d_domain_t * new_domain, int log_priority)
+{
+    fclaw2d_domain_iterate_adapted (old_domain, new_domain,
+                                    fclaw2d_domain_list_adapted_callback,
+                                    (void *) &log_priority);
+}

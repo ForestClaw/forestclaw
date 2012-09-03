@@ -59,6 +59,11 @@ void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);
 void fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain,
                                     int log_priority);
 
+/** Print information on adapted patches */
+void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
+                                  fclaw2d_domain_t * new_domain,
+                                  int log_priority);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
