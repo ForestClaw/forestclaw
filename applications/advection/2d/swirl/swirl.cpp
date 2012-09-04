@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "amr_forestclaw.H"
 
+// This needs to go away.  The p4est namespace should not be used directly.
+#include <p4est.h>
+
 
 int
 main (int argc, char **argv)

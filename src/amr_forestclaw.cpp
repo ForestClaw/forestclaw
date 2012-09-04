@@ -152,10 +152,10 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int *ref_flag,
                         bool *is_phys_bc)
 {
-    const int face_corners = fclaw2d_domain_num_face_corners (domain);
-    int rproc[face_corners];
+    const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
+    int rproc[num_face_corners];
     int rblockno;
-    int rpatchno[face_corners];
+    int rpatchno[num_face_corners];
     int rfaceno;
 
     fclaw2d_patch_relation_t neighbor_type =
@@ -192,7 +192,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         {
             // Neighbors are finer grids
             *ref_flag = 1;
-            for(int ir = 0; ir < p4est_refineFactor; ir++)
+            for(int ir = 0; ir < num_face_corners; ir++)
             {
                 neighbor_patch_idx[ir] = rpatchno[ir];
             }
@@ -262,6 +262,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user)
 {
+    const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
     ClawPatch *this_cp = get_patch_data(this_patch);
 
     for (int idir = 0; idir < SpaceDim; idir++)
@@ -270,7 +271,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
 
         // Output arguments
         int neighbor_block_idx;
-        int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
+        int neighbor_patch_idx[num_face_corners];  // Be prepared to store 1 or more patch indices.
         int ref_flag; // = -1, 0, 1
         bool is_phys_bc;
         get_face_neighbors(domain,
@@ -312,6 +313,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               int this_patch_idx,
                               void *user)
 {
+    const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
     bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
@@ -365,7 +367,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                 // only initiate exchange with a hi-side neighbor
                 // int refratio = gparms->m_refratio;
                 int neighbor_block_idx;
-                int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
+                int neighbor_patch_idx[num_face_corners];  // Be prepared to store 1 or more patch indices.
                 int ref_flag; // = -1, 0, 1
                 bool is_phys_bc;
                 get_face_neighbors(domain,
@@ -457,6 +459,8 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
+    const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
+
     // We may need to average onto a time interpolated grid, not the actual solution.
     fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
     bool do_time_interp = step_info->do_time_interp;
@@ -474,7 +478,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
         for (int iside = 2*idir; iside < 2*idir + 1; iside++)
         {
             int neighbor_block_idx;
-            int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
+            int neighbor_patch_idx[num_face_corners];  // Be prepared to store 1 or more patch indices.
             int ref_flag; // = -1, 0, 1
             bool is_phys_bc;
 
@@ -491,15 +495,15 @@ void cb_bc_average(fclaw2d_domain_t *domain,
             {
                 // Fill in ghost cells on 'this_patch' by averaging data from finer neighbors
                 fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
-                for (int ir = 0; ir < p4est_refineFactor; ir++)
+                ClawPatch *fine_neighbor_cp[num_face_corners];
+                for (int ir = 0; ir < num_face_corners; ir++)
                 {
                     fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
                     fine_neighbor_cp[ir] = get_patch_data(neighbor_patch);
                 }
 
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
-                this_cp->average_face_ghost(idir,iside,p4est_refineFactor,
+                this_cp->average_face_ghost(idir,iside,num_face_corners,
                                             refratio,fine_neighbor_cp,do_time_interp);
             }
         } // loop sides (iside = 0,1,2,3)
@@ -513,6 +517,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
     fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
@@ -528,7 +533,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
         for (int iside = 2*idir; iside < 2*idir + 1; iside++)
         {
             int neighbor_block_idx;
-            int neighbor_patch_idx[p4est_refineFactor];
+            int neighbor_patch_idx[num_face_corners];
             int ref_flag; // = -1, 0, 1
             bool is_phys_bc;
 
@@ -545,8 +550,8 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
             {
                 // Fill in ghost cells on 'neighbor_patch' by interpolation
                 fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
-                for (int ir = 0; ir < p4est_refineFactor; ir++)
+                ClawPatch *fine_neighbor_cp[num_face_corners];
+                for (int ir = 0; ir < num_face_corners; ir++)
                 {
                     fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
                     fine_neighbor_cp[ir] = get_patch_data(neighbor_patch);
@@ -554,7 +559,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
 
                 // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
                 // doing time interpolation if necessary
-                this_cp->interpolate_face_ghost(idir,iside,p4est_refineFactor,
+                this_cp->interpolate_face_ghost(idir,iside,num_face_corners,
                                                 refratio,fine_neighbor_cp,step_info->do_time_interp);
             }
         } // loop sides (iside = 0,1,2,3)
@@ -871,11 +876,12 @@ void cb_match_unchanged(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_do
 void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
      fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user)
 {
+    const int num_siblings = fclaw2d_domain_num_corners (old_domain);
+    const int num_faces = fclaw2d_domain_num_faces (old_domain);
     fclaw2d_domain_data_t *ddata = get_domain_data (old_domain);
     global_parms *gparms = ddata->parms;
     ClawPatch *cp_old = get_patch_data(old_patch);
 
-    int num_siblings = pow_int(p4est_refineFactor,SpaceDim);
     for (int patch_idx = 0; patch_idx < num_siblings; patch_idx++)
     {
         ClawPatch *cp_new = new ClawPatch();
@@ -897,7 +903,7 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
         }
         else
         {
-            cp_old->interpolate_to_fine_patch(cp_new,patch_idx,p4est_refineFactor,gparms->m_refratio);
+            cp_old->interpolate_to_fine_patch(cp_new,patch_idx,num_faces,gparms->m_refratio);
         }
         set_patch_data(new_patch[patch_idx],cp_new);
     }
