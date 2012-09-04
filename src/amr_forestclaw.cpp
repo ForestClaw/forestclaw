@@ -209,6 +209,10 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             *ref_flag = -1;
             neighbor_patch_idx[0] = rpatchno[0];
         }
+        else
+        {
+            *(int *) 0 = 0;     // This must not happen
+        }
     }
 }
 
@@ -374,6 +378,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                    &is_phys_bc);
                 if (ref_flag == 0)
                 {
+                    if (is_phys_bc) {
+        fprintf (stderr, "ERROR: For phys bc faces patch_idx is undefined\n");
+        exit (1);
+                    }
+
                     // Only doing a level exchange now
                     fclaw2d_block_t *neighbor_block =
                         &domain->blocks[neighbor_block_idx];
