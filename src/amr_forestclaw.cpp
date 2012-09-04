@@ -56,7 +56,7 @@ static void init_domain_data(fclaw2d_domain_t *domain,
                              global_parms *parms,
                              const amr_options_t *amropts)
 {
-    fclaw2d_domain_data_t *ddata = P4EST_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
+    fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
     ddata->parms = parms;
@@ -85,7 +85,7 @@ Real  get_domain_time(fclaw2d_domain_t *domain)
 static void init_block_data(fclaw2d_domain_t * domain, 
                             fclaw2d_block_t *block)
 {
-    fclaw2d_block_data_t *bdata = P4EST_ALLOC_ZERO (fclaw2d_block_data_t, 1);
+    fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
     block->user = (void *) bdata;
 }
 
@@ -98,7 +98,7 @@ fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
 
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 {
-    fclaw2d_patch_data_t *pdata = P4EST_ALLOC (fclaw2d_patch_data_t, 1);
+    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC (fclaw2d_patch_data_t, 1);
     patch->user = (void *) pdata;
 
     pdata->cp = cp;
@@ -1166,13 +1166,13 @@ void amrreset(fclaw2d_domain_t *domain)
             ClawPatch *cp = pd->cp;
 
             delete cp;
-            P4EST_FREE (pd);
+            FCLAW2D_FREE (pd);
             patch->user = NULL;
         }
 
-        P4EST_FREE (bd);
+        FCLAW2D_FREE (bd);
         block->user = NULL;
     }
-    P4EST_FREE (dd);
+    FCLAW2D_FREE (dd);
     domain->user = NULL;
 }

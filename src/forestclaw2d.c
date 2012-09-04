@@ -66,6 +66,30 @@ fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
     faces[1] = p4est_corner_faces[icorner][1];
 }
 
+void *
+fclaw2d_alloc (size_t size)
+{
+    return sc_malloc (p4est_package_id, size);
+}
+
+void *
+fclaw2d_calloc (size_t nmemb, size_t size)
+{
+    return sc_calloc (p4est_package_id, nmemb, size);
+}
+
+void *
+fclaw2d_realloc (void *ptr, size_t size)
+{
+    return sc_realloc (p4est_package_id, ptr, size);
+}
+
+void
+fclaw2d_free (void *ptr)
+{
+    sc_free (p4est_package_id, ptr);
+}
+
 void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)

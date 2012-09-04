@@ -99,6 +99,15 @@ int fclaw2d_domain_num_orientations (fclaw2d_domain_t * domain);
 void fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 
+void *fclaw2d_alloc (size_t size);
+void *fclaw2d_calloc (size_t nmemb, size_t size);
+void *fclaw2d_realloc (void *ptr, size_t size);
+void fclaw2d_free (void *ptr);
+#define FCLAW2D_ALLOC(t,n)      (t *) fclaw2d_alloc ((n) * sizeof (t))
+#define FCLAW2D_ALLOC_ZERO(t,n) (t *) fclaw2d_calloc ((n), sizeof (t))
+#define FCLAW2D_REALLOC(p,t,n)  (t *) fclaw2d_realloc ((p), (n) * sizeof (t))
+#define FCLAW2D_FREE(p)         fclaw2d_free (p)
+
 /** Callback prototype for the patch iterators.
  * \param [in] domain	General domain structure.
  * \param [in] patch	The patch currently processed by the iterator.
