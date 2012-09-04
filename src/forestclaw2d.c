@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.h"
 #include <p4est_bits.h>
+#include <p4est_wrap.h>
 
 int
 fclaw2d_domain_dimension (fclaw2d_domain_t * domain)
@@ -112,20 +113,19 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
                              int blockno, int patchno,
                              int boundaries[P4EST_FACES])
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     int faceno;
     int anyboundary;
     int8_t qtf;
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq;
-    p4est_t *p4est;
     p4est_tree_t *tree;
-    p4est_mesh_t *mesh;
     fclaw2d_block_t *block;
 
     P4EST_ASSERT (domain->pp_owned);
     anyboundary = 0;
-    p4est = domain->pp->p4est;
-    mesh = domain->pp->match_aux ? domain->pp->mesh_aux : domain->pp->mesh;
 
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
     P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
@@ -161,6 +161,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
                                p4est_locidx_t qtq, int *proc, int *blockno,
                                int *patchno)
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_quadrant_t *ghost;
 
     P4EST_ASSERT (domain->pp_owned);
@@ -179,10 +180,9 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
         /* off-processor ghost neighbor */
         qtq -= mesh->local_num_quadrants;
         *proc = mesh->ghost_to_proc[qtq];
-        ghost = p4est_quadrant_array_index (&domain->pp->ghost->ghosts, qtq);
+        ghost = p4est_quadrant_array_index (&wrap->ghost->ghosts, qtq);
         P4EST_ASSERT (0 <= ghost->p.piggy3.which_tree);
-        P4EST_ASSERT (ghost->p.piggy3.which_tree <
-                      domain->pp->conn->num_trees);
+        P4EST_ASSERT (ghost->p.piggy3.which_tree < wrap->conn->num_trees);
         *blockno = (int) ghost->p.piggy3.which_tree;
         *patchno = (int) ghost->p.piggy3.local_num;
         P4EST_ASSERT (*patchno == (int) mesh->ghost_to_index[qtq]);
@@ -196,19 +196,18 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
                               int rpatchno[P4EST_HALF], int *rfaceno)
 {
     const int num_orientations = fclaw2d_domain_num_orientations (domain);
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     int k;
     int hblockno[P4EST_HALF];
     int8_t qtf;
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq, *qth;
-    p4est_t *p4est;
     p4est_tree_t *tree;
-    p4est_mesh_t *mesh;
     fclaw2d_block_t *block;
 
     P4EST_ASSERT (domain->pp_owned);
-    p4est = domain->pp->p4est;
-    mesh = domain->pp->match_aux ? domain->pp->mesh_aux : domain->pp->mesh;
 
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
     P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
@@ -288,14 +287,14 @@ int
 fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                 int blockno, int patchno, int cornerno)
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
     const p4est_quadrant_t *q;
     p4est_quadrant_t r;
-    p4est_t *p4est;
     p4est_tree_t *tree;
     fclaw2d_block_t *block;
 
     P4EST_ASSERT (domain->pp_owned);
-    p4est = domain->pp->p4est;
 
     P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
     P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
@@ -318,6 +317,7 @@ void
 fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
                            int patchno)
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     int totalpatchno;
     fclaw2d_block_t *block;
 
@@ -329,13 +329,14 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
     P4EST_ASSERT (0 <= totalpatchno
                   && totalpatchno < domain->num_patches_all);
 
-    domain->pp->flags[totalpatchno] = P4EST_WRAP_REFINE;
+    wrap->flags[totalpatchno] = P4EST_WRAP_REFINE;
 }
 
 void
 fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
                             int patchno)
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     int totalpatchno;
     fclaw2d_block_t *block;
 
@@ -347,7 +348,7 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     P4EST_ASSERT (0 <= totalpatchno
                   && totalpatchno < domain->num_patches_all);
 
-    domain->pp->flags[totalpatchno] = P4EST_WRAP_COARSEN;
+    wrap->flags[totalpatchno] = P4EST_WRAP_COARSEN;
 }
 
 /* Iterate over patches at level 'level' that didn't change upon regridding */

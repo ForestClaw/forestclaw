@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW2D_H
 #define FORESTCLAW2D_H
 
-#include <p4est_wrap.h>
+#include <sc.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -71,7 +71,7 @@ struct fclaw2d_block
     int num_patches_before;     /* in all previous blocks */
     int minlevel, maxlevel;     /* local over this block */
     fclaw2d_patch_t *patches;   /* allocated storage */
-    fclaw2d_patch_t *patchbylevel[P4EST_MAXLEVEL + 1];  /* pointers */
+    fclaw2d_patch_t **patchbylevel;     /* array of pointers */
     void *user;
 };
 
@@ -86,7 +86,7 @@ struct fclaw2d_domain
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */
-    p4est_wrap_t *pp;
+    void *pp;                   /* opaque backend data */
     int pp_owned;               /* The pp member is owned by this domain */
     void *user;
 };

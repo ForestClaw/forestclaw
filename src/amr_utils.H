@@ -34,6 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
+// This is atemporary solution and has to go away
+// The idea is that amr_* does not use anything from the p4est namespace
+#include <p4est.h>
+
 using namespace std;
 
 // using std::ifstream;

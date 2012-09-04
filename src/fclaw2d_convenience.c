@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_convenience.h"
+#include <p4est_wrap.h>
 
 const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -32,10 +33,10 @@ static void
 fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
                     fclaw2d_domain_t * domain, void *user)
 {
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_connectivity_t *conn = wrap->conn;
     p4est_topidx_t treeid;
-    p4est_connectivity_t *conn;
 
-    conn = domain->pp->conn;
     treeid = (p4est_topidx_t) (long) user;
     P4EST_ASSERT (0 <= treeid && treeid < conn->num_trees);
 
@@ -76,7 +77,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpicomm = wrap->p4est->mpicomm;
     domain->mpisize = wrap->p4est->mpisize;
     domain->mpirank = wrap->p4est->mpirank;
-    domain->pp = wrap;
+    domain->pp = (void *) wrap;
     domain->pp_owned = 1;
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
@@ -117,6 +118,9 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         block->num_patches = (int) tree->quadrants.elem_count;
         block->patches =
             P4EST_ALLOC_ZERO (fclaw2d_patch_t, block->num_patches);
+        block->patchbylevel =
+            P4EST_ALLOC_ZERO (fclaw2d_patch_t *,
+                              domain->possible_maxlevel + 1);
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
@@ -205,13 +209,15 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     {
         block = domain->blocks + i;
         P4EST_FREE (block->patches);
+        P4EST_FREE (block->patchbylevel);
     }
     P4EST_FREE (domain->patch_to_block);
     P4EST_FREE (domain->blocks);
 
     if (domain->pp_owned)
     {
-        p4est_wrap_destroy (domain->pp);
+        p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+        p4est_wrap_destroy (wrap);
     }
     P4EST_FREE (domain);
 }
@@ -219,7 +225,7 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 fclaw2d_domain_t *
 fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 {
-    p4est_wrap_t *wrap = domain->pp;
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     fclaw2d_domain_t *adapt;
 
     P4EST_ASSERT (domain->pp_owned);
