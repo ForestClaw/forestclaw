@@ -189,7 +189,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     }
 }
 
-fclaw2d_face_neighbor_t
+fclaw2d_patch_relation_t
 fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
                               int blockno, int patchno, int faceno,
                               int rproc[P4EST_HALF], int *rblockno,
@@ -237,7 +237,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             rproc[k] = -1;
             rpatchno[k] = -1;
         }
-        return FCLAW2D_FACE_NEIGHBOR_BOUNDARY;
+        return FCLAW2D_PATCH_BOUNDARY;
     }
     else if (qtf < 0)
     {
@@ -253,7 +253,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
         *rblockno = hblockno[0];
         *rfaceno = qtf + num_orientations;
         P4EST_ASSERT (*rfaceno >= 0);
-        return FCLAW2D_FACE_NEIGHBOR_HALFSIZE;
+        return FCLAW2D_PATCH_HALFSIZE;
     }
     else
     {
@@ -270,7 +270,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             /* same-size neighbor */
             *rfaceno = (int) qtf;
             P4EST_ASSERT (0 <= *rfaceno && *rfaceno < num_orientations);
-            return FCLAW2D_FACE_NEIGHBOR_SAMESIZE;
+            return FCLAW2D_PATCH_SAMESIZE;
         }
         else
         {
@@ -279,7 +279,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             /* the number of our patch within the bigger neighbor subfaces */
             rproc[1] = (int) qtf / num_orientations - 1;
             P4EST_ASSERT (0 <= rproc[1] && rproc[1] < P4EST_HALF);
-            return FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE;
+            return FCLAW2D_PATCH_DOUBLESIZE;
         }
     }
 }
@@ -381,14 +381,13 @@ fclaw2d_domain_iterate_coarsened (fclaw2d_domain_t * old_domain,
 void
 fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                 fclaw2d_domain_t * new_domain,
-                                fclaw2d_match_callback_t mcb,
-                                void * user)
+                                fclaw2d_match_callback_t mcb, void *user)
 {
     int i, oj, nj;
-    int oskip, nskip; 
+    int oskip, nskip;
     fclaw2d_block_t *old_block, *new_block;
     fclaw2d_patch_t *old_patch, *new_patch;
-    fclaw2d_face_neighbor_t newsize;
+    fclaw2d_patch_relation_t newsize;
 
     P4EST_ASSERT (!old_domain->pp_owned);
     P4EST_ASSERT (new_domain->pp_owned);
@@ -398,27 +397,30 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
     {
         old_block = old_domain->blocks + i;
         new_block = new_domain->blocks + i;
-        for (oj = nj = 0; oj < old_block->num_patches; )
+        for (oj = nj = 0; oj < old_block->num_patches;)
         {
             P4EST_ASSERT (nj < new_block->num_patches);
             old_patch = old_block->patches + oj;
             new_patch = new_block->patches + nj;
             P4EST_ASSERT (abs (old_patch->level - new_patch->level) <= 1);
-            if (old_patch->level < new_patch->level) {
+            if (old_patch->level < new_patch->level)
+            {
                 /* refinement */
-                newsize = FCLAW2D_FACE_NEIGHBOR_HALFSIZE;
+                newsize = FCLAW2D_PATCH_HALFSIZE;
                 oskip = 1;
                 nskip = P4EST_CHILDREN;
             }
-            else if (old_patch->level > new_patch->level) {
+            else if (old_patch->level > new_patch->level)
+            {
                 /* coarsening */
-                newsize = FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE;
+                newsize = FCLAW2D_PATCH_DOUBLESIZE;
                 oskip = P4EST_CHILDREN;
                 nskip = 1;
             }
-            else {
+            else
+            {
                 /* noop */
-                newsize = FCLAW2D_FACE_NEIGHBOR_SAMESIZE;
+                newsize = FCLAW2D_PATCH_SAMESIZE;
                 oskip = nskip = 1;
             }
             mcb (old_domain, old_patch, new_domain, new_patch,

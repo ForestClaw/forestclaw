@@ -141,12 +141,12 @@ int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
 
 typedef enum fclaw2d_face_neighbor
 {
-    FCLAW2D_FACE_NEIGHBOR_BOUNDARY,
-    FCLAW2D_FACE_NEIGHBOR_HALFSIZE,
-    FCLAW2D_FACE_NEIGHBOR_SAMESIZE,
-    FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
+    FCLAW2D_PATCH_BOUNDARY,
+    FCLAW2D_PATCH_HALFSIZE,
+    FCLAW2D_PATCH_SAMESIZE,
+    FCLAW2D_PATCH_DOUBLESIZE
 }
-fclaw2d_face_neighbor_t;
+fclaw2d_patch_relation_t;
 
 /** Determine neighbor patch(es) and orientation across a given face.
  * \param [in] domain	Valid domain structure.
@@ -159,14 +159,14 @@ fclaw2d_face_neighbor_t;
  * \param [in,out] rfaceno	Neighbor face number and orientation.
  * \return			The Type of face neighbor connection.
  */
-fclaw2d_face_neighbor_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
-                                                      domain, int blockno,
-                                                      int patchno,
-                                                      int faceno,
-                                                      int rproc[2],
-                                                      int *rblockno,
-                                                      int rpatchno[2],
-                                                      int *rfaceno);
+fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
+                                                       domain, int blockno,
+                                                       int patchno,
+                                                       int faceno,
+                                                       int rproc[2],
+                                                       int *rblockno,
+                                                       int rpatchno[2],
+                                                       int *rfaceno);
 
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only looks for same-proc same-tree same-size neighbors.
@@ -245,10 +245,10 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
                                           fclaw2d_patch_t * old_patch,
                                           fclaw2d_domain_t * new_domain,
                                           fclaw2d_patch_t * new_patch,
-                                          fclaw2d_face_neighbor_t newsize,
+                                          fclaw2d_patch_relation_t newsize,
                                           int blockno,
                                           int old_patchno, int new_patchno,
-                                          void * user);
+                                          void *user);
 
 /** Iterate over the previous and the adapted domain simultaneously.
  * \param [in,out] old_domain   Domain before adaptation.
@@ -258,7 +258,7 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
 void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_domain_t * new_domain,
                                      fclaw2d_match_callback_t mcb,
-                                     void * user);
+                                     void *user);
 
 #ifdef __cplusplus
 #if 0

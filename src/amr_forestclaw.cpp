@@ -158,7 +158,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     int rpatchno[face_corners];
     int rfaceno;
 
-    fclaw2d_face_neighbor_t neighbor_type =
+    fclaw2d_patch_relation_t neighbor_type =
         fclaw2d_patch_face_neighbors(domain,
                                      this_block_idx,
                                      this_patch_idx,
@@ -170,14 +170,14 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
 
     // neighbor_type is one of :
-    // FCLAW2D_FACE_NEIGHBOR_BOUNDARY,
-    // FCLAW2D_FACE_NEIGHBOR_HALFSIZE,
-    // FCLAW2D_FACE_NEIGHBOR_SAMESIZE,
-    // FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE
+    // FCLAW2D_PATCH_BOUNDARY,
+    // FCLAW2D_PATCH_HALFSIZE,
+    // FCLAW2D_PATCH_SAMESIZE,
+    // FCLAW2D_PATCH_DOUBLESIZE
 
     *neighbor_block_idx = rblockno;
 
-    if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_BOUNDARY)
+    if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
     {
         // Edge is a physical boundary
         *ref_flag = 0;  // Want to have a valid value for 'ref_flag', so that it can be checked
@@ -188,7 +188,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     else
     {
         *is_phys_bc = false;
-        if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_HALFSIZE)
+        if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
         {
             // Neighbors are finer grids
             *ref_flag = 1;
@@ -197,13 +197,13 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                 neighbor_patch_idx[ir] = rpatchno[ir];
             }
         }
-        else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_SAMESIZE)
+        else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
         {
             // Neighbor is at the same level
             *ref_flag = 0;
             neighbor_patch_idx[0] = rpatchno[0];
         }
-        else if (neighbor_type == FCLAW2D_FACE_NEIGHBOR_DOUBLESIZE)
+        else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
         {
             // Neighbor is a coarser grid
             *ref_flag = -1;
