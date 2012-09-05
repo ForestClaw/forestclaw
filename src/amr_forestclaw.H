@@ -82,15 +82,11 @@ extern "C"
 
 }
 
-<<<<<<< HEAD
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-=======
-global_parms* get_domain_data(fclaw2d_domain_t *domain);
 void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 ClawPatch* get_patch_data(fclaw2d_patch_t *patch);
 
->>>>>>> Added more code to handle coarsening and refining
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
 

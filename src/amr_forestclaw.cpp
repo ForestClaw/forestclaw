@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <iomanip>
 
-// using std::ios;
-
 class ClawPatch;
 
 // -----------------------------------------------------------------
@@ -43,7 +41,7 @@ class ClawPatch;
 
 /* Proposed naming convention:
  * Functions called *init* allocate memory inside an object.
- * Functions called *new* create a new object and then do an init.
+ * Functions called *new* create a new object and then does an init.
  * Functions called *set* update a memory location without allocating.
  * Functions called *get* return a memory location without (de)allocating.
  * Functions called *reset* deallocate memory in a given object.
@@ -82,7 +80,7 @@ Real  get_domain_time(fclaw2d_domain_t *domain)
 
 /* block data */
 
-static void init_block_data(fclaw2d_domain_t * domain, 
+static void init_block_data(fclaw2d_domain_t * domain,
                             fclaw2d_block_t *block)
 {
     fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
@@ -211,7 +209,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         }
         else
         {
-            *(int *) 0 = 0;     // This must not happen
+            // This didn't compile for me...
+            // *(int *) 0 = 0;     // This must not happen
         }
     }
 }
@@ -248,11 +247,7 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 
     for(int i = 0; i < NumFaces; i++)
     {
-<<<<<<< HEAD
-        intersects_bc[i] = bdry[i];
-=======
         intersects_bc[i] = bdry[i] >= 0;
->>>>>>> Added more code to handle coarsening and refining
     }
 }
 
@@ -384,9 +379,10 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                    &is_phys_bc);
                 if (ref_flag == 0)
                 {
-                    if (is_phys_bc) {
-        fprintf (stderr, "ERROR: For phys bc faces patch_idx is undefined\n");
-        exit (1);
+                    if (is_phys_bc)
+                    {
+                        fprintf (stderr, "ERROR: For phys bc faces patch_idx is undefined\n");
+                        exit (1);
                     }
 
                     // Only doing a level exchange now
@@ -522,10 +518,10 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                        void *user)
 {
     const int num_face_corners = fclaw2d_domain_num_face_corners (domain);
-    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
+    fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     global_parms *gparms = ddata->parms;
     int refratio = gparms->m_refratio;
 
@@ -578,7 +574,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 {
     // construct all coarse level time interpolated intermediate grids.  Interpolate ghost
     // values as well, even though neighboring fine grids may overwrite some ghost values
-    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
+    fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
 
     ClawPatch *cp = get_patch_data(this_patch);
     cp->time_interpolate(step_info->fine_step, step_info->coarse_step, step_info->refratio);
@@ -588,7 +584,7 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
                                          const int& a_fine_step,const int& a_refratio)
 {
     // First, average fine grid to coarse grid cells
-    fclaw2d_subcycle_info step_info;
+    fclaw2d_subcycle_info_t step_info;
     step_info.coarse_step = a_coarse_step;
     step_info.fine_step = a_fine_step;
     step_info.refratio = a_refratio;
@@ -616,7 +612,7 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
 void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
 {
     // Simple exchange - no time interpolation needed
-    fclaw2d_subcycle_info step_info;
+    fclaw2d_subcycle_info_t step_info;
     step_info.do_time_interp = false;
 
     int coarser_level = a_level - 1;
@@ -880,23 +876,15 @@ void cb_match_unchanged(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_do
 void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
      fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user)
 {
-<<<<<<< HEAD
     const int num_siblings = fclaw2d_domain_num_corners (old_domain);
-    const int num_faces = fclaw2d_domain_num_faces (old_domain);
     fclaw2d_domain_data_t *ddata = get_domain_data (old_domain);
     global_parms *gparms = ddata->parms;
     ClawPatch *cp_old = get_patch_data(old_patch);
 
-    for (int patch_idx = 0; patch_idx < num_siblings; patch_idx++)
-=======
-    global_parms *gparms = get_domain_data(old_domain);
     int refratio = gparms->m_refratio;
     int maxlevel = gparms->m_maxlevel;
 
-    ClawPatch *cp_old = get_patch_data(old_patch);
-
-    for (int patch_idx = 0; patch_idx < NumSiblings; patch_idx++)
->>>>>>> Added more code to handle coarsening and refining
+    for (int patch_idx = 0; patch_idx < num_siblings; patch_idx++)
     {
         ClawPatch *cp_new = new ClawPatch();
 
@@ -917,11 +905,7 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
         }
         else
         {
-<<<<<<< HEAD
-            cp_old->interpolate_to_fine_patch(cp_new,patch_idx,num_faces,gparms->m_refratio);
-=======
             cp_old->interpolate_to_fine_patch(cp_new,patch_idx,p4est_refineFactor,refratio);
->>>>>>> Added more code to handle coarsening and refining
         }
         set_patch_data(new_patch[patch_idx],cp_new);
     }
@@ -934,16 +918,12 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
 void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
                 int this_block_idx, int this_patch_idx, void *user)
 {
-<<<<<<< HEAD
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     global_parms *gparms = ddata->parms;
-=======
-    global_parms *gparms = get_domain_data(domain);
     int refratio = gparms->m_refratio;
     int maxlevel = gparms->m_maxlevel;
     int maux = gparms->m_maux;
 
->>>>>>> Added more code to handle coarsening and refining
     ClawPatch *cp = get_patch_data(this_patch);
 
     if (maux > 0)
@@ -1138,7 +1118,6 @@ void amrrun(fclaw2d_domain_t *domain)
                 // After some number of time steps, we probably need to regrid...
                 // regrid(domain);
             }
-
         }
 
         // Output file at every outer loop iteration
