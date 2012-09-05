@@ -34,31 +34,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
+
 using namespace std;
 
-// using std::ifstream;
-// using std::ios;
-// using std::vector;
+int pow_int(int a, int n);
 
 #define CH_assert(a)
 
 #define CH_SPACEDIM 2
-
-#if CH_SPACEDIM == 2
-const int SpaceDim = 2;
-const int NumFaces = 2;
-const int NumCorners = 4;
-#else
-const int SpaceDim = 3;
-const int NumFaces = 6;
-const int NumCorners = 8;
-#endif
-
 typedef double Real;
 
-class global_parms;
+// There might be a p4est way to get this.
+const int p4est_refineFactor = 2;
 
-// void set_global_constants(fclaw2d_domain_t *domain);
+const int SpaceDim = CH_SPACEDIM;
+const int NumFaces = 2*SpaceDim;
+const int NumCorners = pow_int(SpaceDim,2);
+const int NumSiblings = pow_int(p4est_refineFactor,SpaceDim);
+
+class global_parms;
 
 int num_patches(fclaw2d_domain_t *domain, int level);
 

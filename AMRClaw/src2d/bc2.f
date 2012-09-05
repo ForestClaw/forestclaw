@@ -1,6 +1,3 @@
-
-c
-c
 c     =====================================================
       subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
      &               dx,dy,q,maux,aux,t,dt,mthbc)
@@ -55,7 +52,7 @@ c
 c     # zero-order extrapolation:
       do 115 m=1,meqn
          do 115 ibc=1,mbc
-            do 115 j = 1,my
+            do 115 j = 1-mbc,my+mbc
                q(1-ibc,j,m) = q(1,j,m)
   115       continue
       go to 199
@@ -101,7 +98,7 @@ c     # user-specified boundary conditions go here in place of error output
 c     # zero-order extrapolation:
       do 215 m=1,meqn
          do 215 ibc=1,mbc
-            do 215 j = 1,my
+            do 215 j = 1-mbc,my+mbc
                q(mx+ibc,j,m) = q(mx,j,m)
   215       continue
       go to 299
@@ -193,7 +190,7 @@ c     # user-specified boundary conditions go here in place of error output
 c     # zero-order extrapolation:
       do 415 m=1,meqn
          do 415 jbc=1,mbc
-            do 415 i = 1,mx
+            do 415 i = 1-mbc,mx+mbc
                q(i,my+jbc,m) = q(i,my,m)
   415       continue
       go to 499

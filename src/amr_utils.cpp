@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_utils.H"
+#include "forestclaw2d.h"
+#include "amr_forestclaw.H"
 
 int pow_int(int a, int n)
 {

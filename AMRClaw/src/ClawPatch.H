@@ -6,142 +6,20 @@
 
 using namespace std;
 
-// using std::ifstream;
-// using std::ios;
-// using std::vector;
-// using std::max;
-
-
 #include "amr_utils.H"
 
-// Think about making 'global_parms' static.
+// Think about making ClawPatch members all static
 
-
-// The following are the parameters needed by Clawpack.  Most of these are included
-// as member data items in the class ClawPatch, defined below.  Several are not used
-// in the current implemenation, but are put in for future use (e.g. aux and maux).
-//
-//  c    meqn is the number of equations in the system of
-//  c         conservation laws.
-//  c
-//  c    mwaves is the number of waves that result from the
-//  c           solution of each Riemann problem.  Often mwaves = meqn but
-//  c           for some problems these may be different, e.g. for the Euler
-//  c           equations meqn = 5 but mwaves =  since there are only 3
-//  c           distinct wave speeds.
-//  c
-//  c    mbc is the number of "ghost cells" that must be added on to each
-//  c       side of the domain to handle boundary conditions.  The cells
-//  c       actually in the physical domain are labelled from 1 to mx in x,
-//  c       from 1 to my in y, and from 1 to mz in z.
-//  c       The arrays are dimensioned actually indexed
-//  c       from 1-mbc to mx+mbc, from 1-mbc to my+mbc and from 1-mbc
-//  c       to mz+mbc.
-//  c       For the methods currently implemented, mbc = 2 should be used.
-//  c       If the user implements another method that has a larger stencil and
-//  c       hence requires more ghost cells, a larger value of mbc could be used.
-//  c       q is extended from the physical domain to the ghost cells by the
-//  c       user-supplied routine bc2.
-//  c
-//  c    method(1:7) = array of values specifying the numerical method to use
-//  c                  and also indicating whether source terms, capacity
-//  c                  function, auxiliary variables are present in the equation.
-//
-//  c
-//  c         method(1) = 0 if fixed size time steps are to be taken.
-//  c                       In this case, dt = dtv(1) in all steps.
-//  c                   = 1 if variable time steps are to be used.
-//  c
-//  c         method(2) = 1 if only first order increment waves are to be used.
-//  c                   = 2 if second order correction terms are to be added, with
-//  c                       a flux limiter as specified by mthlim.
-//  c
-//  c         method(3) <  0 Gives dimensional splitting using Godunov
-//  c                        splitting, i.e. formally first order
-//  c                        accurate.
-//  c                      0 Gives the Donor cell method. No transverse
-//  c                        propagation of neither the increment wave
-//  c                        nor the correction wave.
-//  c                   = 10 Transverse propagation of the increment wave
-//  c                        as in 2D. Note that method (2,10) is
-//  c                        unconditionally unstable.
-//  c                   = 11 Corner transport upwind of the increment
-//  c                        wave. Note that method (2,11) also is
-//  c                        unconditionally unstable.
-//  c                   = 20 Both the increment wave and the correction
-//  c                        wave propagate as in the 2D case. Only to
-//  c                        be used with method(2) = 2.
-//  c                   = 21 Corner transport upwind of the increment wave,
-//  c                        and the correction wave propagates as in 2D.
-//  c                        Only to be used with method(2) = 2.
-//  c                   = 22 3D propagation of both the increment wave and
-//  c                        the correction wave. Only to be used with
-//  c                        method(2) = 2.
-//  c
-//  c         method(4) = 0 to suppress printing
-//  c                   = 1 to print dt and Courant number every time step
-//  c
-//  c         method(5) = 0 if there is no source term psi.  In this case
-//  c                       the subroutine src2 is never called so a dummy
-//  c                       parameter can be given.
-//  c                   = 1 if there is a source term.  In this case
-//  c                       the subroutine src2 must be provided.
-//  c
-//  c         method(6) = 0 if there is no capacity function capa.
-//  c                   = mcapa > 0 if there is a capacity function.  In this case
-//  c                       aux(i,j,k,mcapa) is the capacity of cell (i,j,k)
-//  c                       and you must also specify method(7) .ge. mcapa
-//  c                       and set aux.
-//  c
-//  c         method(7) = 0 if there is no aux array used.
-//  c                   = maux > 0  if there are maux auxiliary variables.
-//  c
-//  c         The recommended choice of methods for most problems is
-//  c            method(1) = 1,  method(2) = 2,  method(3) = 22.
-//  c
-//  c    mthlim(1:mwaves) = array of values specifying the flux limiter to be used
-//  c                     in each wave family mw.  Often the same value will be used
-//  c                     for each value of mw, but in some cases it may be
-//  c                     desirable to use different limiters.  For example,
-//  c                     for the Euler equations the superbee limiter might be
-//  c                     used for the contact discontinuity (mw=2) while another
-//  c                     limiter is used for the nonlinear waves.  Several limiters
-//  c                     are built in and others can be added by modifying the
-//  c                     subroutine philim.
-//  c
-//  c        mthlim(mw) = 0 for no limiter
-//  c                   = 1 for minmod
-//  c                   = 2 for superbee
-//  c                   = 3 for van Leer
-//  c                   = 4 for monotonized centered
-//  c
-//  c    aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, 1-mbc:maxmy+mbc,maux)
-//  c        Array of auxiliary variables that are used in specifying the problem.
-//  c        If method(7) = 0 then there are no auxiliary variables and aux
-//  c                         can be a dummy variable.
-//  c        If method(7) = maux > 0 then there are maux auxiliary variables
-//  c                         and aux must be dimensioned as above.
-//  c
-//  c        Capacity functions are one particular form of auxiliary variable.
-//  c        These arise in some applications, e.g. the
-//  c        determinant of the Jacobian if a mapped grid is used, or a density
-//  c        or porosity function in some advection problems.
-//  c        See Clawpack Note # 5 for examples.
-//  c
-//  c        If method(6) = 0 then there is no capacity function.
-//  c        If method(6) = mcapa > 0  then there is a capacity function and
-//  c            capa(i,j,k), the "capacity" of the (i,j,k) cell, is assumed to be
-//  c            stored in aux(i,j,k,mcapa).
-//  c            In this case we require method(7).ge.mcapa.
-//  c
 
 extern "C" {
 
-    void set_common_levels_(const int& maxlevel,
-                            const int& a_level,
-                            const int& refratio);
+    void set_common_levels_(const int& maxlevel,const int& a_level,const int& refratio);
 
 #if CH_SPACEDIM==2
+
+    // ----------------------------------------------------------------------------------
+    // Initialization routines
+    // ----------------------------------------------------------------------------------
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                 const int& mx, const int& my, const Real& xlower, const Real& ylower,
                 const Real& dx, const Real& dy, Real q[], const int& maux, Real aux[]);
@@ -152,31 +30,13 @@ extern "C" {
 
     void setprob_();
 
-    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc, const int& mx, const int& my,
-              const Real& xlower, const Real& ylower, const Real& dx, const Real& dy, const Real q[], const int& maux,
-              const Real aux[], const Real& t, const Real& dt, const int mthbc[]);
-
-
-    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc, const int method[],
-                     const int mthlim[], const int& mcapa, const int& mwaves, const int& mx, const int& my,
-                     Real qold[], Real auxold[], const Real& dx, const Real& dy, const Real& dt, const Real& cfl,
-                     Real work[], const int& mwork, const Real& xlower, const Real& ylower, const int& level,
-                     const Real& t, Real fp[], Real fm[], Real gp[], Real gm[]);
-
-    void estimate_error2_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                          const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
-                          const Real& t, const int& level, const int isBoundary[],
-                          const Real& a_refineThresh, const Real *q, Real em[]);
-
-    void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-                      const int& mx, const int& my, const Real& xlower, const Real& ylower,
-                      const Real& dx, const Real& dy, Real q[], const int& iframe, const int& patch_num,
-                      const int& level);
-
+    // ----------------------------------------------------------------------------------
+    // Internal boundary conditions
+    // ----------------------------------------------------------------------------------
     void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
                               Real qneighbor[], const int& a_idir);
 
-    void average_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
+    void average_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qfine[],
                              Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
                              const int& refratio, const int& igrid);
 
@@ -184,23 +44,65 @@ extern "C" {
                                  Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
                                  const int& refratio, const int& igrid);
 
-    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
-                                    Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
-                                    const int& refratio, const int& patch_idx);
+    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
+                                Real neighbor_q[], const int& a_corner);
 
+    void average_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
+                               Real neighbor_q[], const int& a_corner);
 
+    void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
+                                Real neighbor_q[], const int& a_corner);
+
+    // ----------------------------------------------------------------------------------
+    // Physical boundary conditions
+    // ----------------------------------------------------------------------------------
+    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc, const int& mx, const int& my,
+              const Real& xlower, const Real& ylower, const Real& dx, const Real& dy, const Real q[], const int& maux,
+              const Real aux[], const Real& t, const Real& dt, const int mthbc[]);
 
     void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real q[],
                                 const int& icorner, const Real &t, const Real& dt, const int mthbc[]);
 
-    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
-                                     Real neighbor_q[], const int& a_corner, const int& a_side);
+    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
+                                     Real qneighbor[], const int& icorner, const int& iside);
 
-    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
-                                Real neighbor_q[], const int& a_corner);
+    // void set_phys_interior_corner_ghost_(const int&mx, const int& my, const int& mbc, const int& meqn, Real q[],
+    //                                  const int& icorner, const int& iside, const int mthbc[]);
+    // ----------------------------------------------------------------------------------
+    // Time stepping
+    // ----------------------------------------------------------------------------------
+    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc, const int method[],
+                     const int mthlim[], const int& mcapa, const int& mwaves, const int& mx, const int& my,
+                     Real qold[], Real auxold[], const Real& dx, const Real& dy, const Real& dt, const Real& cfl,
+                     Real work[], const int& mwork, const Real& xlower, const Real& ylower, const int& level,
+                     const Real& t, Real fp[], Real fm[], Real gp[], Real gm[]);
 
-    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                      const Real& dx, const Real& dy, Real q[], Real& sum);
+    // ----------------------------------------------------------------------------------
+    // Tagging for refinement/coarsening
+    // ----------------------------------------------------------------------------------
+    void tag_for_refinement_(const int& mx,const int& my,const int& mbc,
+                             const int& meqn, const Real& xlower,
+                             const Real& ylower, const Real& dx, const Real& dy,
+                             Real q[], int& tag_patch);
+
+    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
+                                    Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
+                                    const int& refratio, const int& igrid);
+
+    void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
+                                  Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
+                                  const int& refratio, const int& igrid);
+
+    // ----------------------------------------------------------------------------------
+    // Output and diagnostics
+    // ----------------------------------------------------------------------------------
+    void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+                      const int& mx, const int& my, const Real& xlower, const Real& ylower,
+                      const Real& dx, const Real& dy, Real q[], const int& iframe, const int& patch_idx,
+                      const int& level);
+
+    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,const Real& dx,
+                      const Real& dy, Real q[], Real& sum);
 
 #elif CH_SPACEDIM==3
     void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
@@ -218,104 +120,30 @@ extern "C" {
 
     void setprob_();
 
-    void bc3_(const int& maxmx,
-              const int& maxmy,
-              const int& maxmz,
-              const int& meqn,
-              const int& mbc,
-              const int& mx,
-              const int& my,
-              const int& mz,
-              const Real& xlower,
-              const Real& ylower,
-              const Real& zlower,
-              const Real& dx,
-              const Real& dy,
-              const Real& dz,
-              const Real q[],
-              const int& maux,
-              const Real aux[],
-              const Real& t,
-              const Real& dt,
-              const int mthbc[]);
+    void bc3_(const int& maxmx, const int& maxmy, const int& maxmz,const int& meqn, const int& mbc,
+              const int& mx,const int& my,const int& mz,const Real& xlower,const Real& ylower,
+              const Real& zlower,const Real& dx,const Real& dy,const Real& dz,const Real q[],
+              const int& maux,const Real aux[],const Real& t,const Real& dt,const int mthbc[]);
 
-    void clawpatch3_(const int& maxm,
-                     const int& meqn,
-                     const int& maux,
-                     const int& mbc,
-                     int method[],
-                     int mthlim[],
-                     const int& mcapa,
-                     const int& mwaves,
-                     const int& mx,
-                     const int& my,
-                     const int& mz,
-                     Real qold[],
-                     Real aux[],
-                     const Real& dx,
-                     const Real& dy,
-                     const Real& dz,
-                     const Real& dt,
-                     const Real& cfl,
-                     Real work[],
-                     const int& mwork,
-                     Real qold_coarse[],
-                     Real auxold_coarse[],
-                     Real qadd_x[],
-                     Real qadd_y[],
-                     Real qadd_z[],
-                     const int auxtype_int[],
-                     const Real& xlower,
-                     const Real& ylower,
-                     const Real& zlower,
-                     int* intersectsBoundaries,
-                     const int& level,
-                     const int mthbc[],
-                     const Real& t,
-                     const int& mxc,
-                     const int& myc,
-                     const int& mzc,
-                     Real fp[],
-                     Real fm[],
-                     Real gp[],
-                     Real gm[],
-                     Real hm[],
-                     Real hp[],
-                     Real fp_chombo[],
-                     Real fm_chombo[],
-                     Real gp_chombo[],
-                     Real gm_chombo[],
-                     Real hp_chombo[],
-                     Real hm_chombo[],
-                     Real fpc_chombo[],
-                     Real fmc_chombo[],
-                     Real gpc_chombo[],
-                     Real gmc_chombo[],
-                     Real hpc_chombo[],
-                     Real hmc_chombo[]);
+    void clawpatch3_(const int& maxm,const int& meqn,const int& maux,const int& mbc, int method[],
+                     int mthlim[],const int& mcapa,const int& mwaves,const int& mx,const int& my,
+                     const int& mz,Real qold[],Real aux[],const Real& dx,const Real& dy,const Real& dz,
+                     const Real& dt,const Real& cfl,Real work[],const int& mwork,Real qold_coarse[],
+                     Real auxold_coarse[],Real qadd_x[],Real qadd_y[],Real qadd_z[],const int auxtype_int[],
+                     const Real& xlower,const Real& ylower,const Real& zlower,int* intersectsBoundaries,
+                     const int& level,const int mthbc[],const Real& t,const int& mxc,const int& myc,
+                     const int& mzc,Real fp[],Real fm[],Real gp[],Real gm[],Real hm[],Real hp[],
+                     Real fp_chombo[],Real fm_chombo[],Real gp_chombo[],Real gm_chombo[],Real hp_chombo[],
+                     Real hm_chombo[],Real fpc_chombo[],Real fmc_chombo[],Real gpc_chombo[],Real gmc_chombo[],
+                     Real hpc_chombo[],Real hmc_chombo[]);
 
 
-    void estimate_error3_(const int& mx,
-                         const int& my,
-                         const int& mz,
-                         const int& mbc,
-                         const int& meqn,
-                         const Real& xlower,
-                         const Real& ylower,
-                         const Real& zlower,
-                         const Real& dx,
-                         const Real& dy,
-                         const Real& dz,
-                         const Real& t,
-                         const int& level,
-                         const int isBoundary[],
-                         const Real& a_refineThresh,
-                         const Real* q,
-                         Real em[]);
+    void estimate_error3_(const int& mx,const int& my,const int& mz,const int& mbc,const int& meqn,
+                          const Real& xlower,const Real& ylower,const Real& zlower,const Real& dx,
+                          const Real& dy,const Real& dz,const Real& t,const int& level,const int isBoundary[],
+                          const Real& a_refineThresh,const Real* q,Real em[]);
 
 #endif
-
-
 
 }
 
@@ -346,33 +174,18 @@ public :
 
     bool isDefined();
 
-    int get_mx() const;
-    int get_my() const;
-#if CH_SPACEDIM == 3
-    int get_mz() const;
-#endif
-
-    Real get_xlower() const;
-    Real get_ylower() const;
-#if CH_SPACEDIM == 3
-    Real get_zlower() const;
-#endif
-
-    Real get_xupper() const;
-    Real get_yupper() const;
-#if CH_SPACEDIM == 3
-    Real get_zupper() const;
-#endif
-
-    // ----------------------------------------------------------------
-    // Time stepping routines
-    // ----------------------------------------------------------------
-    // Initialize solution on AMR hierarchy
+    // ----------------------------------------------------------------------------------
+    // Initialization routines
+    // ----------------------------------------------------------------------------------
     void initialize();
 
     void setAuxArray(const int& a_maxlevel,
                      const int& a_refratio,
                      const int& a_level);
+
+    // ----------------------------------------------------------------
+    // Time stepping routines
+    // ----------------------------------------------------------------
 
     // Dummy step routine useful for trying out subcycling without anything too terrible happening
     Real step(const Real& a_time,
@@ -399,30 +212,10 @@ public :
     void time_interpolate(const int& a_fine_step, const int& a_coarse_step, const int& a_step_inc);
 
     // ----------------------------------------------------------------
-    // Single level exchanges
+    // Internal boundary conditions
     // ----------------------------------------------------------------
     void exchange_face_ghost(const int& a_idir,ClawPatch *a_neighbor_cp);
 
-    // Exchange corner ghost cells with interior neighbor (interior to the domain)
-    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp);
-
-    // Boundary condition routines that don't require neighbors
-    void set_phys_face_ghost(const bool a_intersects_bc[],
-                             const int a_mthbc[],
-                             const Real& t,
-                             const Real& dt);
-
-    // Corners that lie on a physical face - data has to be exchanged in a particular way
-    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
-
-
-
-    // Exchange corner ghost with boundary neighbor
-    void exchange_phys_face_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
-
-    // ----------------------------------------------------------------
-    // Multi-level operations
-    // ----------------------------------------------------------------
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
                             const int& a_iside,
@@ -439,34 +232,44 @@ public :
                                 ClawPatch **a_neighbor_cp,
                                 bool a_time_interp);
 
+    // Exchange corner ghost cells with interior neighbor (interior to the domain)
+    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
+    void average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine, bool a_time_interp);
+    void interpolate_corner_ghost(const int& a_corner, ClawPatch *cp_fine, bool a_time_interp);
+
+    // ----------------------------------------------------------------------------------
+    // Physical boundary conditions
+    // ----------------------------------------------------------------------------------
+
+    // Boundary condition routines that don't require neighbors
+    void set_phys_face_ghost(const bool a_intersects_bc[],
+                             const int a_mthbc[],
+                             const Real& t,
+                             const Real& dt);
+
+    // Corners that lie on a physical face - data has to be exchanged in a particular way
+    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
+
+    // Exchange corner ghost with boundary neighbor
+    void exchange_phys_face_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
+
+    // ----------------------------------------------------------------
+    // Tagging, refining and coarsening
+    // ----------------------------------------------------------------
+    bool tag_for_refinement();
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
                                    const int& a_num_neighbors,
                                    const int& a_refratio);
 
+    void coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid, const int& a_num_neighbors,const int& a_refratio);
 
     // ----------------------------------------------------------------
     // Output and diagnostics
     // ----------------------------------------------------------------
-    bool tag_for_refinement();
-
-    void estimateError(const FArrayBox& a_phiPatch,
-                       const Box& a_patchBox,
-                       const ProblemDomain& a_domain,
-                       const Real& a_time,
-                       const Real& a_dt,
-                       const Real& a_dx,
-                       const int& a_level,
-                       const int isBoundary[],
-                       const Real& a_refineThresh,
-                       FArrayBox& a_error_measure,
-                       const global_parms &gparms);
-
-
     void write_patch_data(const int& a_iframe,
                           const int& a_patch_num,
                           const int& a_level);
-
     Real compute_sum();
 
 protected :
@@ -507,6 +310,7 @@ protected :
     FArrayBox m_griddata;
     FArrayBox m_griddata_time_interp;
     FArrayBox m_griddata_last;  // stores previous time step for interpolation in time
+
     FArrayBox m_auxarray;
 
     bool m_isDefined;

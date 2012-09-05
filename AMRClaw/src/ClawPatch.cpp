@@ -136,62 +136,6 @@ bool ClawPatch::isDefined()
     return m_isDefined;
 }
 
-
-/*
-int ClawPatch::get_mx() const
-{
-    return m_mx;
-}
-
-int ClawPatch::get_my() const
-{
-    return m_my;
-}
-
-#if CH_SPACEDIM == 3
-int ClawPatch::get_mz() const
-{
-    return m_mz;
-}
-#endif
-
-Real ClawPatch::get_xlower() const
-{
-    return m_xlower;
-}
-
-Real ClawPatch::get_ylower() const
-{
-    return m_ylower;
-}
-
-#if CH_SPACEDIM == 3
-Real ClawPatch::get_zlower() const
-{
-    return m_zlower;
-}
-#endif
-
-
-Real ClawPatch::get_xupper() const
-{
-    return m_xupper;
-}
-
-Real ClawPatch::get_yupper() const
-{
-    return m_yupper;
-}
-
-#if CH_SPACEDIM==3
-Real ClawPatch::get_zupper() const
-{
-    return m_zupper;
-}
-#endif
-
-*/
-
 // ----------------------------------------------------------------
 // Time stepping routines
 // ----------------------------------------------------------------
@@ -493,6 +437,7 @@ void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& 
     exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q, a_corner, a_side);
 }
 
+
 // ----------------------------------------------------------------
 // Multi-level operations
 // ----------------------------------------------------------------
@@ -563,57 +508,12 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
 
 bool ClawPatch::tag_for_refinement()
 {
-    // Refine center for now
-    if (m_xlower >= 0.25 && m_xupper <= 0.85)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    Real *q = m_griddata.dataPtr();
+    int tag_patch;  // == 0 or 1
+    tag_for_refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx, m_dy,q,tag_patch);
+    return tag_patch == 1;
 }
 
-void ClawPatch::estimateError(const FArrayBox& a_phiPatch,
-                              const Box& a_patchBox,
-                              const ProblemDomain& a_domain,
-                              const Real& a_time,
-                              const Real& a_dt,
-                              const Real& a_dx,
-                              const int& a_level,
-                              const int isBoundary[],
-                              const Real& a_refineThresh,
-                              FArrayBox& a_error_measure,
-                              const global_parms &gparms)
-{
-    /*
-      Real dx = a_dx;
-      Real dy = dx;
-      Real xlower, ylower;
-      int mx, my;
-      #if CH_SPACEDIM == 2
-      get_clawvars(a_patchBox,dx,dy,xlower,ylower,mx,my);
-      #elif CH_SPACEDIM == 3
-      Real dz = dx;
-      Real zlower;
-      int mz;
-      get_clawvars(a_patchBox,dx,dy,dz,xlower,ylower,zlower,mx,my,mz);
-      #endif
-    */
-
-    const Real* q = a_phiPatch.dataPtr();
-    Real* em = a_error_measure.dataPtr();
-    Real tol = a_refineThresh;
-
-#if CH_SPACEDIM == 2
-    estimate_error2_(m_mx,m_my,gparms.m_mbc,gparms.m_meqn,m_xlower, m_ylower,m_dx,m_dy,
-                     a_time,a_level,isBoundary, tol, q,em);
-#else
-    estimate_error3_(mx,my,mz,m_mbc,m_meqn,xlower, ylower, zlower,
-                     dx,dy,dz,a_time, a_level, isBoundary, tol, q, em);
-#endif
-
-}
 
 
 // ----------------------------------------------------------------

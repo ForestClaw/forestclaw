@@ -248,7 +248,11 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 
     for(int i = 0; i < NumFaces; i++)
     {
+<<<<<<< HEAD
         intersects_bc[i] = bdry[i];
+=======
+        intersects_bc[i] = bdry[i] >= 0;
+>>>>>>> Added more code to handle coarsening and refining
     }
 }
 
@@ -841,7 +845,7 @@ void amr_set_base_level(fclaw2d_domain_t *domain)
         init_block_data (domain, block);
         fclaw2d_block_data_t *bdata = get_block_data (block);
 
-        for(int m = 0; m < 2*SpaceDim; m++)
+        for(int m = 0; m < NumFaces; m++)
         {
             // Once we got to multi-block, this will have to change
             bdata->mthbc[m] = gparms->m_mthbc[m];
@@ -876,6 +880,7 @@ void cb_match_unchanged(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_do
 void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domain,
      fclaw2d_patch_t * old_patch, fclaw2d_patch_t **new_patch, void *user)
 {
+<<<<<<< HEAD
     const int num_siblings = fclaw2d_domain_num_corners (old_domain);
     const int num_faces = fclaw2d_domain_num_faces (old_domain);
     fclaw2d_domain_data_t *ddata = get_domain_data (old_domain);
@@ -883,6 +888,15 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
     ClawPatch *cp_old = get_patch_data(old_patch);
 
     for (int patch_idx = 0; patch_idx < num_siblings; patch_idx++)
+=======
+    global_parms *gparms = get_domain_data(old_domain);
+    int refratio = gparms->m_refratio;
+    int maxlevel = gparms->m_maxlevel;
+
+    ClawPatch *cp_old = get_patch_data(old_patch);
+
+    for (int patch_idx = 0; patch_idx < NumSiblings; patch_idx++)
+>>>>>>> Added more code to handle coarsening and refining
     {
         ClawPatch *cp_new = new ClawPatch();
 
@@ -897,13 +911,17 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
         {
             if (gparms->m_maux > 0)
             {
-                cp_new->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,new_patch[patch_idx]->level);
+                cp_new->setAuxArray(maxlevel,refratio,new_patch[patch_idx]->level);
             }
             cp_new->initialize();
         }
         else
         {
+<<<<<<< HEAD
             cp_old->interpolate_to_fine_patch(cp_new,patch_idx,num_faces,gparms->m_refratio);
+=======
+            cp_old->interpolate_to_fine_patch(cp_new,patch_idx,p4est_refineFactor,refratio);
+>>>>>>> Added more code to handle coarsening and refining
         }
         set_patch_data(new_patch[patch_idx],cp_new);
     }
@@ -916,13 +934,21 @@ void cb_match_refine(fclaw2d_domain_t * old_domain, fclaw2d_domain_t * new_domai
 void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
                 int this_block_idx, int this_patch_idx, void *user)
 {
+<<<<<<< HEAD
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     global_parms *gparms = ddata->parms;
+=======
+    global_parms *gparms = get_domain_data(domain);
+    int refratio = gparms->m_refratio;
+    int maxlevel = gparms->m_maxlevel;
+    int maux = gparms->m_maux;
+
+>>>>>>> Added more code to handle coarsening and refining
     ClawPatch *cp = get_patch_data(this_patch);
 
-    if (gparms->m_maux > 0)
+    if (maux > 0)
     {
-        cp->setAuxArray(gparms->m_maxlevel,gparms->m_refratio,this_patch->level);
+        cp->setAuxArray(maxlevel,refratio,this_patch->level);
     }
     cp->initialize();
 }
@@ -945,7 +971,6 @@ void amrinit(fclaw2d_domain_t *domain,
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
     setprob_();
-
 
     // Set up storage for base level grids so we can initialize them
     // Allocates per-block and per-patch user data
@@ -1032,13 +1057,12 @@ void amrrun(fclaw2d_domain_t *domain)
         int n_inner = 0;
         while (t_curr < tend)
         {
-
             subcycle_manager time_stepper;
             time_stepper.define(domain,gparms,ddata->amropts,t_curr);
 
             // In case we have to reject this step
             save_time_step(domain);
-            check_conservation(domain);
+            // check_conservation(domain);
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.
@@ -1108,9 +1132,13 @@ void amrrun(fclaw2d_domain_t *domain)
             }
             n_inner++;
 
-            // regrid(domain);
+            int regrid_step = 4;  // Will eventually read this in as a parameter.
+            if (n_inner % regrid_step == 0)
+            {
+                // After some number of time steps, we probably need to regrid...
+                // regrid(domain);
+            }
 
-            // After some number of time steps, we probably need to regrid...
         }
 
         // Output file at every outer loop iteration
@@ -1119,7 +1147,6 @@ void amrrun(fclaw2d_domain_t *domain)
         amrout(domain,iframe);
     }
 }
-
 
 void cb_amrout(fclaw2d_domain_t *domain,
                fclaw2d_patch_t *this_patch,
