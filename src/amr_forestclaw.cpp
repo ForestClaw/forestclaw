@@ -110,6 +110,12 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch)
     return pdata->cp;
 }
 
+void set_problem_parameters()
+{
+    setprob_();
+}
+
+
 
 // -----------------------------------------------------------------
 // Diagnostics
@@ -247,7 +253,7 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 
     for(int i = 0; i < NumFaces; i++)
     {
-        intersects_bc[i] = bdry[i] >= 0;
+        intersects_bc[i] = bdry[i] > 0;
     }
 }
 
@@ -266,7 +272,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
 
     for (int idir = 0; idir < SpaceDim; idir++)
     {
-        int iside = 2*idir + 1;  // Look only at high side for level copy.
+        int iface = 2*idir + 1;  // Look only at high side for level copy.
 
         // Output arguments
         int neighbor_block_idx;
@@ -276,7 +282,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
         get_face_neighbors(domain,
                            this_block_idx,
                            this_patch_idx,
-                           iside,
+                           iface,
                            &neighbor_block_idx,
                            neighbor_patch_idx,
                            &ref_flag,
@@ -304,6 +310,8 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     fclaw2d_block_data_t *bdata = get_block_data (this_block);
     this_cp->set_phys_face_ghost(intersects_bc,bdata->mthbc,curr_time,dt);
 
+    // Do this twice to get corners correctly.
+    this_cp->set_phys_face_ghost(intersects_bc,bdata->mthbc,curr_time,dt);
 }
 
 void cb_level_corner_exchange(fclaw2d_domain_t *domain,
@@ -641,7 +649,7 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
 {
     ClawPatch *this_cp = get_patch_data(this_patch);
 
-    // Copy tmp data to grid data. (m_griddata <== m_griddata_tmp)
+    // Copy most current time step data to grid data. (m_griddata <== m_griddata_last)
     this_cp->restore_step();
 }
 
@@ -686,11 +694,11 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     Real t = time_data->t;
 
     int level = this_patch->level;
+
     Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
 
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
-
 
 
 Real advance_level(fclaw2d_domain_t *domain,
@@ -712,6 +720,8 @@ Real advance_level(fclaw2d_domain_t *domain,
         }
         if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
+            printf("For uniform refinement, I should not be here!\n");
+            exit(1);
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
             if (a_curr_fine_step == last_coarse_step)
             {
@@ -812,9 +822,6 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
-    // fclaw2d_block_t *block = &domain->blocks[this_block_idx];
-    // fclaw2d_patch_t *patch = &block->patches[this_patch_idx];
-
     ClawPatch *cp = get_patch_data(this_patch);
 
     bool level_refined = *((bool *) user);
@@ -950,7 +957,7 @@ void amrinit(fclaw2d_domain_t *domain,
     // Set problem dependent parameters for Riemann solvers, etc.
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
-    setprob_();
+    set_problem_parameters();
 
     // Set up storage for base level grids so we can initialize them
     // Allocates per-block and per-patch user data
@@ -992,7 +999,7 @@ void amrinit(fclaw2d_domain_t *domain,
                                            (fclaw2d_match_refined_callback_t) cb_match_refine,
                                            (void *) &init_flag);
 
-            // Exchange boundary data at the the new level
+            // Exchange boundary data at the new level
             bc_level_exchange(new_domain,level+1);
 
             // Deallocate old domain
@@ -1051,7 +1058,7 @@ void amrrun(fclaw2d_domain_t *domain)
             int reduce_factor;
             if (time_stepper.nosubcycle())
             {
-                // Take one step of a stable time step for the finest level.
+                // Take one step of a stable time step for the finest non-emtpy level.
                 reduce_factor = time_stepper.maxlevel_factor();
             }
             else
@@ -1137,12 +1144,12 @@ void cb_amrout(fclaw2d_domain_t *domain,
 {
     int iframe = *((int *) user);
     int num = this_block_idx*domain->num_blocks + this_patch_idx + 1;
-    int level = this_patch->level + 1;  // Matlab wants levels to start at 1.
+    int matlab_level = this_patch->level + 1;  // Matlab wants levels to start at 1.
 
     // Patch data is appended to fort.qXXXX
     ClawPatch *cp = get_patch_data(this_patch);
 
-    cp->write_patch_data(iframe, num, level);
+    cp->write_patch_data(iframe, num, matlab_level);
 }
 
 
