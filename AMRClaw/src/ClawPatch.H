@@ -93,11 +93,11 @@ extern "C" {
                              Real q[], int& tag_patch);
 
     void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
-                                    Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
+                                    Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
                                     const int& refratio, const int& igrid);
 
     void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
-                                  Real qcoarse[],Real qfine[],const int& a_p4est_refineFactor,
+                                  Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
                                   const int& refratio, const int& igrid);
 
     // ----------------------------------------------------------------------------------
@@ -258,7 +258,7 @@ public :
     void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
 
     // Exchange corner ghost with boundary neighbor
-    void exchange_phys_face_corner_ghost(const int& a_corner, const int& iside, ClawPatch* cp);
+    void exchange_phys_face_corner_ghost(const int& a_corner, const int& a_iface, ClawPatch* cp);
 
     // ----------------------------------------------------------------
     // Tagging, refining and coarsening
@@ -266,10 +266,11 @@ public :
     bool tag_for_refinement();
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
-                                   const int& a_num_neighbors,
+                                   const int& a_p4est_refineFactor,
                                    const int& a_refratio);
 
-    void coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid, const int& a_num_neighbors,const int& a_refratio);
+    void coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
+                                 const int& a_p4est_refineFactor, const int& a_refratio);
 
     // ----------------------------------------------------------------
     // Output and diagnostics

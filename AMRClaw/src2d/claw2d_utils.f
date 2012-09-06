@@ -511,10 +511,6 @@ c    # ---------------------------------------------------------------------
 
       end
 
-
-
-
-
 c     # Conservative intepolation to fine grid patch
       subroutine interpolate_to_fine_patch(mx,my,mbc,meqn, qcoarse,
      &      qfine, p4est_refineFactor,refratio,igrid)

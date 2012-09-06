@@ -46,7 +46,7 @@ typedef struct fclaw2d_domain_data
 
 typedef struct fclaw2d_block_data
 {
-    int mthbc[4];               /* >0 for physical bc types */
+    int mthbc[4];               /* >=0 for physical bc types */
 } fclaw2d_block_data_t;
 
 typedef struct fclaw2d_patch_data
@@ -90,16 +90,17 @@ ClawPatch* get_patch_data(fclaw2d_patch_t *patch);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
 
+void set_block_data(fclaw2d_block_t *block,int mthbc[]);
 fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
 
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
-void bc_level_exchange(fclaw2d_domain_t *domain, const int& a_level);
+void bc_level_exchange(fclaw2d_domain_t *domain, int a_level);
 
 void initial_grid(fclaw2d_domain_t *domain);
 
 void amrsetup(fclaw2d_domain_t *domain);
-void amrinit(fclaw2d_domain_t *domain,
+void amrinit(fclaw2d_domain_t **domain,
              global_parms *parms, const amr_options_t * amropts);
 void amrrun(fclaw2d_domain_t *domain);
 void amrout(fclaw2d_domain_t *domain, int iframe);

@@ -506,6 +506,15 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
     interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_num_neighbors,a_refratio,a_patch_idx);
 }
 
+void ClawPatch::coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
+                                   const int& a_p4est_refineFactor, const int& a_refratio)
+{
+    Real *qfine = a_fine->m_griddata.dataPtr();
+    Real *qcoarse = this->m_griddata.dataPtr();
+
+    average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,p4est_refineFactor,a_refratio,a_igrid);
+}
+
 bool ClawPatch::tag_for_refinement()
 {
     Real *q = m_griddata.dataPtr();
