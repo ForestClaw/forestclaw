@@ -33,38 +33,45 @@ extern "C" {
     // ----------------------------------------------------------------------------------
     // Internal boundary conditions
     // ----------------------------------------------------------------------------------
-    void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
-                              Real qneighbor[], const int& a_idir);
+    void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                              Real qthis[],Real qneighbor[], const int& a_idir);
 
-    void average_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qfine[],
-                             Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
+    void average_face_ghost_(const int& mx, const int& my, const int& mbc,
+                             const int& meqn, Real qfine[],Real qcoarse[],
+                             const int& idir, const int& iside, const int& num_neighbors,
                              const int& refratio, const int& igrid);
 
-    void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
-                                 Real qcoarse[], const int& idir, const int& iside, const int& num_neighbors,
-                                 const int& refratio, const int& igrid);
+    void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                 Real qthis[],Real qcoarse[], const int& idir, const int& iside,
+                                 const int& num_neighbors,const int& refratio, const int& igrid);
 
-    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
-                                Real neighbor_q[], const int& a_corner);
+    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real this_q[],Real neighbor_q[],
+                                const int& a_corner);
 
-    void average_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
-                               Real neighbor_q[], const int& a_corner);
+    void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                               const int& meqn, Real this_q[],Real neighbor_q[],
+                               const int& a_corner);
 
-    void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real this_q[],
-                                Real neighbor_q[], const int& a_corner);
+    void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                   const int& meqn, Real this_q[],Real neighbor_q[],
+                                   const int& a_corner);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------
-    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc, const int& mx, const int& my,
-              const Real& xlower, const Real& ylower, const Real& dx, const Real& dy, const Real q[], const int& maux,
+    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+              const int& mx, const int& my, const Real& xlower, const Real& ylower,
+              const Real& dx, const Real& dy, const Real q[], const int& maux,
               const Real aux[], const Real& t, const Real& dt, const int mthbc[]);
 
-    void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real q[],
-                                const int& icorner, const Real &t, const Real& dt, const int mthbc[]);
+    void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real q[],const int& icorner,
+                                const Real &t, const Real& dt, const int mthbc[]);
 
-    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn, Real qthis[],
-                                     Real qneighbor[], const int& icorner, const int& iside);
+    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                     const int& meqn, Real qthis[],Real qneighbor[],
+                                     const int& icorner, const int& iside);
 
     // void set_phys_interior_corner_ghost_(const int&mx, const int& my, const int& mbc, const int& meqn, Real q[],
     //                                  const int& icorner, const int& iside, const int mthbc[]);
@@ -272,6 +279,8 @@ public :
                           const int& a_level);
     Real compute_sum();
 
+    void dump();
+
 protected :
 
     int  m_mx;
@@ -310,6 +319,7 @@ protected :
     FArrayBox m_griddata;
     FArrayBox m_griddata_time_interp;
     FArrayBox m_griddata_last;  // stores previous time step for interpolation in time
+    FArrayBox m_griddata_save;
 
     FArrayBox m_auxarray;
 

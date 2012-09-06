@@ -352,12 +352,12 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
 void ClawPatch::save_step()
 {
     // Store a backup in case the CFL number is too large doesn't work out.
-    m_griddata_last = m_griddata;
+    m_griddata_save = m_griddata;
 }
 
 void ClawPatch::restore_step()
 {
-    m_griddata = m_griddata_last;
+    m_griddata = m_griddata_save;
 }
 
 
@@ -533,4 +533,19 @@ Real ClawPatch::compute_sum()
     Real sum;
     compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
     return sum;
+}
+
+void ClawPatch::dump()
+{
+    Real *q = m_griddata.dataPtr();
+    int k = 0;
+    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
+    {
+        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
+        {
+            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
+            k++;
+        }
+        printf("\n");
+    }
 }

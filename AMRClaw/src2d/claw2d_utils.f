@@ -90,7 +90,7 @@ c     # 'qneighbor'
 c                 # Exchange at high side of 'this' grid in
 c                 # x-direction (idir == 0)
                   qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
-                  qneighbor(ibc-mbc,j,mq) = qthis(mx+ibc-mbc,j,mq)
+                  qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
                enddo
             enddo
          enddo
