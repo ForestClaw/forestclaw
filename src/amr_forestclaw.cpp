@@ -1020,8 +1020,10 @@ void amrrun(fclaw2d_domain_t *domain)
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     global_parms *gparms = ddata->parms;
+    const amr_options_t *amropts = ddata->amropts;
 
-    Real final_time = gparms->m_tfinal;
+    // Real final_time = gparms->m_tfinal;
+    Real final_time = amropts->tfinal;
     int nout = gparms->m_nout;
     Real initial_dt = gparms->m_initial_dt;
 
