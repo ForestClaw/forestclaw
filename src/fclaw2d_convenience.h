@@ -48,7 +48,7 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  *                              It stays alive because it is needed to
  *                              project numerical values to the adapted domain.
  *                              However, no queries are allowed afterwards.
- * \return                      Adapted domain.
+ * \return                      Adapted domain if refinement occurred, or NULL.
  */
 fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 

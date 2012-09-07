@@ -226,14 +226,17 @@ fclaw2d_domain_t *
 fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    fclaw2d_domain_t *adapt;
 
     P4EST_ASSERT (domain->pp_owned);
-    domain->pp_owned = 0;
-    p4est_wrap_refine (wrap);
-    adapt = fclaw2d_domain_new (wrap);
-
-    return adapt;
+    if (p4est_wrap_refine (wrap))
+    {
+        domain->pp_owned = 0;
+        return fclaw2d_domain_new (wrap);
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 static void
