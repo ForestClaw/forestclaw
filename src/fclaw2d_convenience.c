@@ -239,6 +239,32 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     }
 }
 
+fclaw2d_domain_t *
+fclaw2d_domain_partition (fclaw2d_domain_t * domain)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    P4EST_ASSERT (domain->pp_owned);
+    if (p4est_wrap_partition (wrap))
+    {
+        domain->pp_owned = 0;
+        return fclaw2d_domain_new (wrap);
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+void
+fclaw2d_domain_complete (fclaw2d_domain_t * domain)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    P4EST_ASSERT (domain->pp_owned);
+    p4est_wrap_complete (wrap);
+}
+
 static void
 fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
                                     fclaw2d_patch_t * patch, int block_no,

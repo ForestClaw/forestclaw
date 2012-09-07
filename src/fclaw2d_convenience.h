@@ -47,10 +47,24 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  * \param [in,out] domain       Current domain with set adaptation markers.
  *                              It stays alive because it is needed to
  *                              project numerical values to the adapted domain.
- *                              However, no queries are allowed afterwards.
+ *                              If adapted, no queries are allowed afterwards.
  * \return                      Adapted domain if refinement occurred, or NULL.
  */
 fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
+
+/** Create a repartitioned domain after fclaw2d_domain_adapt returned non-NULL.
+ * \param [in,out] domain       Current domain that was adapted previously.
+ *                              It stays alive because it is needed to
+ *                              transfer numerical values to the new partition.
+ *                              If partitioned, no queries allowed afterwards.
+ * \return                      Partitioned domain if different, or NULL.
+ */
+fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain);
+
+/** Clean up after fclaw2d_domain_partition returned non-NULL.
+ * \param [in,out] domain       Current domain that was partitioned.
+ */
+void fclaw2d_domain_complete (fclaw2d_domain_t * domain);
 
 /** Print patch number by level on all processors */
 void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);
