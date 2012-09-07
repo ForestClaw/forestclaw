@@ -1047,6 +1047,7 @@ void amrinit(fclaw2d_domain_t **domain,
     bc_level_exchange(*domain,minlevel);
 
     // Refine as needed.
+    fclaw2d_domain_t *new_domain;
     for (int level = minlevel; level < maxlevel; level++)
     {
         bool level_refined = false;
@@ -1057,11 +1058,11 @@ void amrinit(fclaw2d_domain_t **domain,
         {
             // Rebuild domain
             cout << "Adapting domain " << endl;
-            fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-            cout << "Done " << endl << endl;
+            new_domain = fclaw2d_domain_adapt(*domain);
 
             // This is just for fun; remove when it gets annoying.
-            // fclaw2d_domain_list_adapted (*domain, new_domain, SC_LP_STATISTICS);
+            fclaw2d_domain_list_adapted (*domain, new_domain, SC_LP_STATISTICS);
+            cout << "Done " << endl << endl;
 
             bool init_flag = true;
             fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
