@@ -1044,10 +1044,12 @@ void amrinit(fclaw2d_domain_t **domain,
         if (level_refined)
         {
             // Rebuild domain
+            cout << "Adapting domain " << endl;
             fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+            cout << "Done " << endl << endl;
 
             // This is just for fun; remove when it gets annoying.
-            fclaw2d_domain_list_adapted (*domain, new_domain, SC_LP_STATISTICS);
+            // fclaw2d_domain_list_adapted (*domain, new_domain, SC_LP_STATISTICS);
 
             bool init_flag = true;
             fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
@@ -1076,7 +1078,6 @@ void amrinit(fclaw2d_domain_t **domain,
             break;
         }
     }
-    cout << "domain (amrinit, end) " << domain << endl;
 }
 
 
@@ -1086,10 +1087,7 @@ void amrinit(fclaw2d_domain_t **domain,
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    cout << "domain (amrrun) " << domain << endl;
-
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    cout << "ddata = " << ddata << endl;
 
     // Write out an initial time file
     int iframe = 0;
