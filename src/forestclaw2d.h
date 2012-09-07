@@ -284,6 +284,31 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
+/* ADAPTATION PROCEDURE */
+#ifdef THIS_IS_JUST_FOR_DOCUMENTATION_PURPOSES
+domain_adapted = fclaw2d_domain_adapt (domain);
+if (domain_adapted != NULL) {
+  /* use this function to project/interpolate numerical values */
+  domain_iterate_adapted (domain, domain_adapted, ...);
+
+  /* then the old domain is no longer necessary */
+  domain_destroy (domain);
+  domain = domain_adapted;
+
+  domain_partitioned = fclaw2d_domain_partition (domain);
+  if (domain_partitioned != NULL) {
+    /* use a function (yet to be written) to transfer values in parallel */
+
+    /* then the old domain is no longer necessary */
+    domain_destroy (domain);
+    domain = domain_partitioned;
+
+    /* internal clean up */
+    fclaw2d_domain_complete (domain);
+  }
+}
+#endif
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
