@@ -193,15 +193,22 @@ fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
                                                        int *rfaceno);
 
 /** Determine neighbor patch(es) and orientation across a given corner.
- * The current version only looks for same-proc same-tree same-size neighbors.
- * \param [in] domain	Valid domain structure.
- * \param [in] blockno	Number of the block within the domain.
- * \param [in] patchno	Number of the patch within the block.
+ * The current version only supports one neighbor, i.e. no true multi-block.
+ * A query across a corner in the middle of a longer face returns the boundary.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
  * \param [in] cornerno	Number of the patch corner: bl, br, tl, tr.
- * \return			The patch number in blockno or -1 if not found.
+ * \param [out] rproc   Processor number of neighbor patch.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch number.
+ * \param [out] neighbor_size   The relative patch size of the neighbor.
+ * \return			True if at least one corner neighbor exists.
  */
 int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
-                                    int blockno, int patchno, int cornerno);
+                                    int blockno, int patchno, int cornerno,
+                                    int *rproc, int *rblockno, int *rpatchno,
+                                    fclaw2d_patch_relation_t * neighbor_size);
 
 /** Mark a patch for refinement.
  */

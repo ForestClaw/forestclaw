@@ -255,18 +255,30 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int *ref_flag)
 {
-    int neighbor_corner = fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx, icorner);
+    fclaw2d_patch_relation_t neighbor_type;
+    int rproc;
+    int has_corner_neighbor =
+      fclaw2d_patch_corner_neighbors (domain, this_block_idx, this_patch_idx,
+        icorner, &rproc, corner_block_idx, corner_patch_idx, &neighbor_type);
 
-    if (neighbor_corner == -1)
+    if (!has_corner_neighbor)
     {
         printf("Patch %d at corner %d does not have any corner neighbors\n",
                this_patch_idx,icorner);
         exit(1);
     }
-
-    *corner_block_idx = this_block_idx;
-    *corner_patch_idx = neighbor_corner;
-    *ref_flag = 0; // only return patches at the same level for now
+    else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+    {
+      *ref_flag = 1;
+    }
+    else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+    {
+      *ref_flag = 0;
+    }
+    else
+    {
+      *ref_flag = -1;
+    }
 }
 
 void get_phys_boundary(fclaw2d_domain_t *domain,
