@@ -366,6 +366,22 @@ bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
     bool b2 = level_exchange_done(a_level);
     bool b3 = exchanged_with_coarser(a_level);
     bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
+    if (!b1)
+    {
+        cout << " --> (can_advance) Solution at level " << a_level << " has not been updated at step " << a_curr_step << endl;
+    }
+    if (!b2)
+    {
+        cout << " --> (can_advance) Level exchange at level " << a_level << " has not been done at step " << a_curr_step << endl;
+    }
+    if (!b3)
+    {
+        cout << " --> (can_advance) Exchange with coarse grid at level " << a_level-1 << " not done at step " << a_curr_step << endl;
+    }
+    if (!b4)
+    {
+        cout << " --> (can_advance) Exchange with finer grid at level " << a_level+1 << " not done at step " << a_curr_step << endl;
+    }
     return b1 && b2 && b3 && b4;
 }
 
@@ -438,9 +454,6 @@ void level_data::define(const int& a_level,
     m_last_step = 0;
     m_last_level_exchange = 0;   // Assume that the level exchange has been done at subcycled time
                                  // step 0.
-    m_last_coarse_exchange = 0;
-    m_last_fine_exchange = 0;
-
     m_num_patches = a_patches_at_level;
     m_time = a_time;
 
@@ -458,6 +471,9 @@ void level_data::define(const int& a_level,
             m_step_inc *= a_refratio;
         }
     }
+    m_last_coarse_exchange = -m_step_inc;
+    m_last_fine_exchange = -m_step_inc;
+
 }
 
 void level_data::set_dt(const Real& a_dt_level)

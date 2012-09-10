@@ -1,4 +1,4 @@
-axis('square')
+axis('square');
 
 yrbcolormap;
 

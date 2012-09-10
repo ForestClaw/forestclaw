@@ -49,7 +49,7 @@ const int p4est_refineFactor = 2;
 
 const int SpaceDim = CH_SPACEDIM;
 const int NumFaces = 2*SpaceDim;
-const int NumCorners = pow_int(SpaceDim,2);
+// const int NumCorners = pow_int(SpaceDim,2);
 const int NumSiblings = pow_int(p4est_refineFactor,SpaceDim);
 
 class global_parms;

@@ -82,22 +82,31 @@ extern "C"
 
 }
 
-fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms);
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
-ClawPatch* get_patch_data(fclaw2d_patch_t *patch);
 
+// ------------------------------------------------------------
+// Getting and setting user data in domain, blocks and patches
+// ------------------------------------------------------------
+static void init_domain_data(fclaw2d_domain_t *domain);
+static void init_block_data(fclaw2d_block_t *block);
+static void init_patch_data(fclaw2d_patch_t *patch);
+
+fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
+fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
+
+void set_domain_data(fclaw2d_domain_t *domain, global_parms *parms, const amr_options_t *amropts);
+void set_block_data(fclaw2d_block_t *block, int* mthbc);
+void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+
+ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
 
-void set_block_data(fclaw2d_block_t *block,int mthbc[]);
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
 
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
-
+// There are many more of these functions that should probably have prototypes
 void bc_level_exchange(fclaw2d_domain_t *domain, int a_level);
 
-void initial_grid(fclaw2d_domain_t *domain);
+// void initial_grid(fclaw2d_domain_t *domain);
 
 void amrsetup(fclaw2d_domain_t *domain);
 void amrinit(fclaw2d_domain_t **domain,

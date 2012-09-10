@@ -50,12 +50,12 @@ extern "C" {
                                 const int& a_corner);
 
     void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                               const int& meqn, Real this_q[],Real neighbor_q[],
-                               const int& a_corner);
+                               const int& meqn, const int& a_refratio, Real this_q[],
+                               Real neighbor_q[],const int& a_corner);
 
     void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                   const int& meqn, Real this_q[],Real neighbor_q[],
-                                   const int& a_corner);
+                                   const int& meqn, const int& a_refratio, Real this_q[],
+                                   Real neighbor_q[], const int& a_corner);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
@@ -242,7 +242,8 @@ public :
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
     void average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine, bool a_time_interp);
-    void interpolate_corner_ghost(const int& a_corner, ClawPatch *cp_fine, bool a_time_interp);
+    void interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine, bool a_time_interp);
+
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions

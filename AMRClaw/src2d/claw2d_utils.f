@@ -111,8 +111,8 @@ c                 # y-direction (idir == 1)
 
 c     # average ghost cells from 'igrid' neighbor 'qfine' (igrid = 0,1)
 c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
-      subroutine average_face_ghost(mx,my,mbc,meqn,qfine,
-     &      qcoarse,idir,iface_coarse,num_neighbors,refratio,igrid)
+      subroutine average_face_ghost(mx,my,mbc,meqn,qcoarse,
+     &      qfine,idir,iface_coarse,num_neighbors,refratio,igrid)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
@@ -122,8 +122,8 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
       double precision sum
 
       integer mq,r2
-      integer i, i1, i2, ibc, ii, ifine
-      integer j, j1, j2, jbc, jj, jfine
+      integer i, i1, ibc, ii, ifine
+      integer j, j1, jbc, jj, jfine
 
 c     # 'iface' is relative to the coarse grid
 
@@ -131,13 +131,12 @@ c     # 'iface' is relative to the coarse grid
 
 c     # Average fine grid onto coarse grid
       if (idir .eq. 0) then
-         j1 = igrid*my/num_neighbors+1
-         j2 = (igrid+1)*my/num_neighbors
-         do j = j1, j2
-            do ibc = 1,mbc
-c              # ibc = 1 corresponds to first layer of ghost cells, and
-c              # ibc = 2 corresponds to the second layer
-               do mq = 1,meqn
+         j1 = igrid*my/num_neighbors
+         do mq = 1,meqn
+            do j = 1,my/num_neighbors
+               do ibc = 1,mbc
+c                 # ibc = 1 corresponds to first layer of ghost cells, and
+c                 # ibc = 2 corresponds to the second layer
                   sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
@@ -151,17 +150,16 @@ c              # ibc = 2 corresponds to the second layer
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
-                     qcoarse(1-ibc,j,mq) = sum/r2
+                     qcoarse(1-ibc,j+j1,mq) = sum/r2
                   else
-                     qcoarse(mx+ibc,j,mq) = sum/r2
+                     qcoarse(mx+ibc,j+j1,mq) = sum/r2
                   endif
                enddo
             enddo
          enddo
       else
-         i1 = igrid*mx/num_neighbors+1
-         i2 = (igrid+1)*mx/refratio
-         do i = i1,i2
+         i1 = igrid*mx/num_neighbors
+         do i = 1,mx/num_neighbors
             do jbc = 1,mbc
                do mq = 1,meqn
                   sum = 0
@@ -177,9 +175,9 @@ c              # ibc = 2 corresponds to the second layer
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
-                     qcoarse(i,1-jbc,mq) = sum/r2
+                     qcoarse(i+i1,1-jbc,mq) = sum/r2
                   else
-                     qcoarse(i,my+jbc,mq) = sum/r2
+                     qcoarse(i+i1,my+jbc,mq) = sum/r2
                   endif
                enddo
             enddo
@@ -188,7 +186,7 @@ c              # ibc = 2 corresponds to the second layer
 
       end
 
-      subroutine interpolate_face_ghost(mx,my,mbc,meqn,qfine,qcoarse,
+      subroutine interpolate_face_ghost(mx,my,mbc,meqn,qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid)
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
@@ -197,8 +195,8 @@ c              # ibc = 2 corresponds to the second layer
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2
-      integer i, i1, i2, ibc, ii, ii1, ifine
-      integer j, j1, j2, jbc, jj, jj1, jfine
+      integer i, i1, i2, ibc, ii, ii1, ifine,ibc_fine
+      integer j, j1, j2, jbc, jj, jj1, jfine,jbc_fine
       integer linear_terms
 
 c     # To be figured out later
@@ -210,45 +208,43 @@ c     # 'iface_coarse is relative to the coarse grid
 c     # Assign values to fine grid ghost.  For now, just copy coarse grid
 c     # values; Get linear part later.
       if (idir .eq. 0) then
-         j1 = igrid*my/num_neighbors+1
-         j2 = (igrid+1)*my/num_neighbors
-         do j = j1, j2
-            do ibc = 1,mbc
-               do mq = 1,meqn
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (ibc-1)*refratio + ii
-                        jfine = (j-1)*refratio + jj
-                        if (iface_coarse .eq. 0) then
-                           qfine(1-ifine,jfine,mq) = qcoarse(ibc,j,mq) +
-     &                           linear_terms
-                        elseif (iface_coarse .eq. 1) then
-                           qfine(mx+ifine,jfine,mq) =
-     &                           qcoarse(mx+ibc,j,mq) + linear_terms
-                        endif
-                     enddo
+         j1 = igrid*my/num_neighbors
+         do mq = 1,meqn
+            do j = 1,my/num_neighbors
+               do ibc_fine = 1,mbc
+                  do jj = 1,refratio
+                     ifine = ibc_fine
+                     jfine = (j-1)*refratio + jj
+                     if (iface_coarse .eq. 0) then
+c                       # qfine is at left edge of coarse grid
+                        qfine(mx+ifine,jfine,mq) =
+     &                        qcoarse(1,j+j1,mq) + linear_terms
+                     elseif (iface_coarse .eq. 1) then
+c                       # qfine is at right edge of coarse grid
+                        qfine(1-ifine,jfine,mq) =
+     &                        qcoarse(mx,j+j1,mq) + linear_terms
+                     endif
                   enddo
                enddo
             enddo
          enddo
       else
-         i1 = igrid*mx/num_neighbors+1
-         i2 = (igrid+1)*mx/refratio
-         do i = i1,i2
-            do jbc = 1,mbc
-               do mq = 1,meqn
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (i-1)*refratio + ii
-                        jfine = (jbc-1)*refratio + jj
-                        if (iface_coarse .eq. 2) then
-                           qfine(ifine,1-jfine,mq) =
-     &                           qcoarse(i,jbc,mq) + linear_terms
-                        elseif (iface_coarse .eq. 3) then
-                           qfine(ifine,my+jfine,mq) =
-     &                           qcoarse(i,my+jbc,mq)
-                        endif
-                     enddo
+         i1 = igrid*mx/num_neighbors
+         do mq = 1,meqn
+            do i =1,mx/num_neighbors
+               do ii = 1,refratio
+                  do jbc_fine = 1,mbc
+                     ifine = (i-1)*refratio + ii
+                     jfine = jbc_fine
+                     if (iface_coarse .eq. 2) then
+c                       # qfine is at bottom edge of coarse grid
+                        qfine(ifine,my+jfine,mq) =
+     &                        qcoarse(i+i1,1,mq)
+                     else if (iface_coarse .eq. 3) then
+c                       # qfine is at top edge of coarse grid
+                        qfine(ifine,1-jfine,mq) =
+     &                        qcoarse(i+i1,my,mq) + linear_terms
+                     endif
                   enddo
                enddo
             enddo
@@ -294,8 +290,8 @@ c              # Exchange initiated only at high side (1,3) corners
 
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
-      subroutine average_corner_ghost_(mx,my,mbc,meqn,
-     &      qcoarse,qfine,icorner_coarse,refratio)
+      subroutine average_corner_ghost(mx,my,mbc,meqn,
+     &      refratio,qcoarse,qfine,icorner_coarse)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,icorner_coarse
@@ -328,13 +324,13 @@ c              # Average fine grid corners onto coarse grid ghost corners
                   enddo
                enddo
                if (icorner_coarse .eq. 0) then
-                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+                  qcoarse(1-ibc,1-jbc,mq) = 0*sum/r2
                elseif (icorner_coarse .eq. 1) then
-                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+                  qcoarse(mx+ibc,1-jbc,mq) = 0*sum/r2
                elseif (icorner_coarse .eq. 2) then
-                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+                  qcoarse(1-ibc,my+jbc,mq) = 0*sum/r2
                elseif (icorner_coarse .eq. 3) then
-                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+                  qcoarse(mx+ibc,my+jbc,mq) = 0*sum/r2
                endif
             enddo
          enddo
@@ -342,7 +338,7 @@ c              # Average fine grid corners onto coarse grid ghost corners
 
       end
 
-      subroutine interpolate_corner_ghost_(mx,my,mbc,meqn,qcoarse,qfine,
+      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,qcoarse,qfine,
      &      icorner_coarse,refratio)
       implicit none
 
@@ -392,7 +388,7 @@ c              # Fill in interpolated values on fine grid cell
                shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
                shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
                qfine((ic-1)*refratio + ii,(jc-1)*refratio + jj,mq)
-     &               = qc + shiftx*gradx + shifty*grady
+     &               = 0*(qc + shiftx*gradx + shifty*grady)
             enddo
          enddo
       enddo
@@ -502,9 +498,8 @@ c    # ---------------------------------------------------------------------
          do j = 1,my
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            if (xc .gt. 0.25d0 .and. xc .lt. 0.75d0) then
+            if (abs(xc - 0.5d0) < dx) then
                tag_patch = 1
-               return
             endif
          enddo
       enddo
