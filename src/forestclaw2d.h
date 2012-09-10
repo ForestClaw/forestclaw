@@ -173,15 +173,15 @@ typedef enum fclaw2d_face_neighbor
 fclaw2d_patch_relation_t;
 
 /** Determine neighbor patch(es) and orientation across a given face.
- * \param [in] domain	Valid domain structure.
- * \param [in] blockno	Number of the block within the domain.
- * \param [in] patchno	Number of the patch within the block.
- * \param [in] faceno	Number of the patch face: left, right, bottom, top.
- * \param [in,out] rproc	Processor number of neighbor patches.
- * \param [in,out] rblockno	Neighbor block number.
- * \param [in,out] rpatchno	Neighbor patch numbers for up to 2 neighbors.
- * \param [in,out] rfaceno	Neighbor face number and orientation.
- * \return			The Type of face neighbor connection.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
+ * \param [in] faceno   Number of the patch face: left, right, bottom, top.
+ * \param [out] rproc   Processor number of neighbor patches.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
+ * \param [out] rfaceno Neighbor face number and orientation.
+ * \return              The relative patch size of the face neighbor.
  */
 fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
                                                        domain, int blockno,
@@ -287,29 +287,31 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
 /* ADAPTATION PROCEDURE */
 #ifdef THIS_IS_JUST_FOR_DOCUMENTATION_PURPOSES
 domain_adapted = fclaw2d_domain_adapt (domain);
-if (domain_adapted != NULL) {
-  amrinit (domain_adapted, ...);
-  /* use this function to project/interpolate numerical values */
-  domain_iterate_adapted (domain, domain_adapted, ...);
-
-  /* then the old domain is no longer necessary */
-  amrreset (domain);
-  domain_destroy (domain);
-  domain = domain_adapted;
-
-  domain_partitioned = fclaw2d_domain_partition (domain);
-  if (domain_partitioned != NULL) {
-    amrinit (domain_partitioned);
-    /* use a function (yet to be written) to transfer values in parallel */
+if (domain_adapted != NULL)
+{
+    amrinit (domain_adapted,...);
+    /* use this function to project/interpolate numerical values */
+    domain_iterate_adapted (domain, domain_adapted,...);
 
     /* then the old domain is no longer necessary */
     amrreset (domain);
     domain_destroy (domain);
-    domain = domain_partitioned;
+    domain = domain_adapted;
 
-    /* internal clean up */
-    fclaw2d_domain_complete (domain);
-  }
+    domain_partitioned = fclaw2d_domain_partition (domain);
+    if (domain_partitioned != NULL)
+    {
+        amrinit (domain_partitioned);
+        /* use a function (yet to be written) to transfer values in parallel */
+
+        /* then the old domain is no longer necessary */
+        amrreset (domain);
+        domain_destroy (domain);
+        domain = domain_partitioned;
+
+        /* internal clean up */
+        fclaw2d_domain_complete (domain);
+    }
 }
 #endif
 
