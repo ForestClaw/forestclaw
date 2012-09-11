@@ -197,6 +197,7 @@ c                 # ibc = 2 corresponds to the second layer
       integer mq,r2
       integer i, i1, i2, ibc, ii, ii1, ifine,ibc_fine
       integer j, j1, j2, jbc, jj, jj1, jfine,jbc_fine
+      integer ic_add, jc_add
       integer linear_terms
 
 c     # To be figured out later
@@ -208,7 +209,7 @@ c     # 'iface_coarse is relative to the coarse grid
 c     # Assign values to fine grid ghost.  For now, just copy coarse grid
 c     # values; Get linear part later.
       if (idir .eq. 0) then
-         j1 = igrid*my/num_neighbors
+         jc_add = igrid*my/num_neighbors
          do mq = 1,meqn
             do j = 1,my/num_neighbors
                do ibc_fine = 1,mbc
@@ -218,18 +219,18 @@ c     # values; Get linear part later.
                      if (iface_coarse .eq. 0) then
 c                       # qfine is at left edge of coarse grid
                         qfine(mx+ifine,jfine,mq) =
-     &                        qcoarse(1,j+j1,mq) + linear_terms
+     &                        qcoarse(1,j+jc_add,mq) + linear_terms
                      elseif (iface_coarse .eq. 1) then
 c                       # qfine is at right edge of coarse grid
                         qfine(1-ifine,jfine,mq) =
-     &                        qcoarse(mx,j+j1,mq) + linear_terms
+     &                        qcoarse(mx,j+jc_add,mq) + linear_terms
                      endif
                   enddo
                enddo
             enddo
          enddo
       else
-         i1 = igrid*mx/num_neighbors
+         ic_add = igrid*mx/num_neighbors
          do mq = 1,meqn
             do i =1,mx/num_neighbors
                do ii = 1,refratio
@@ -239,11 +240,11 @@ c                       # qfine is at right edge of coarse grid
                      if (iface_coarse .eq. 2) then
 c                       # qfine is at bottom edge of coarse grid
                         qfine(ifine,my+jfine,mq) =
-     &                        qcoarse(i+i1,1,mq)
+     &                        qcoarse(i+ic_add,1,mq)
                      else if (iface_coarse .eq. 3) then
 c                       # qfine is at top edge of coarse grid
                         qfine(ifine,1-jfine,mq) =
-     &                        qcoarse(i+i1,my,mq) + linear_terms
+     &                        qcoarse(i+ic_add,my,mq) + linear_terms
                      endif
                   enddo
                enddo
