@@ -1,7 +1,7 @@
-32        % mx_leaf
-32       % my_leaf
+16        % mx_leaf
+16        % my_leaf
 
-4        % nout
+32        % nout
 4.0       % tfinal
 
 0.02      % Initial time step
@@ -24,7 +24,7 @@
 1         % mthbc(3) (lower edge)
 1         % mthbc(4) (upper edge)
 
-0         % Minimum level
-0         % Maximum levels of refinement
+2         % Minimum level
+3         % Maximum levels of refinement
 
-T         % T = use subcycling; F = no subcycling.
+T         % subcycle in time ( = T or F).
