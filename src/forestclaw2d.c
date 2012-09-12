@@ -353,19 +353,22 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     }
     else if (q->level < P4EST_QMAXLEVEL &&
              (p4est_quadrant_half_corner_neighbor (q, cornerno, &r),
-              p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr, qarr)))
+              p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr,
+                                     qarr)))
     {
         prel = FCLAW2D_PATCH_HALFSIZE;
     }
     else if (q->level > 0 && p4est_quadrant_child_id (q) == cornerno &&
              (p4est_quadrant_parent (q, &r),
               p4est_quadrant_corner_neighbor (&r, cornerno, &r),
-              p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr, qarr)))
+              p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr,
+                                     qarr)))
     {
         prel = FCLAW2D_PATCH_DOUBLESIZE;
     }
 
-    if (prel != FCLAW2D_PATCH_BOUNDARY) {
+    if (prel != FCLAW2D_PATCH_BOUNDARY)
+    {
         P4EST_ASSERT (rparr->elem_count == 1);
         P4EST_ASSERT (qarr->elem_count == 1);
         *rproc = *(int *) sc_array_index (rparr, 0);
