@@ -1285,10 +1285,9 @@ void amrinit(fclaw2d_domain_t **domain,
                 fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
                 if (domain_partitioned != NULL)
                 {
-                    // I am not sure why I need to call amrinit again here....
-
-                    // amrinit (domain_partitioned);
-                    /* use a function (yet to be written) to transfer values in parallel */
+                    // TODO: allocate patch memory for domain_partitioned
+                    
+                    // TODO: use a function (yet to be written) to transfer values in parallel */
 
                     /* then the old domain is no longer necessary */
                     amrreset(*domain);
