@@ -93,26 +93,26 @@ struct fclaw2d_domain
 };
 
 /** Return the space dimension. */
-int fclaw2d_domain_dimension (fclaw2d_domain_t * domain);
+int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
 
 /** Return the number of faces of a cube: 4 in 2D, 6 in 3D. */
-int fclaw2d_domain_num_faces (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_faces (const fclaw2d_domain_t * domain);
 
 /** Return the number of corners of a cube: 4 in 2D, 8 in 3D.
  * This is the same as the number of siblings in a refined tree. */
-int fclaw2d_domain_num_corners (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_corners (const fclaw2d_domain_t * domain);
 
 /** Return the number of corners of a cube face: 2 in 2D, 4 in 3D.
  * This is the same as the number of refined (smaller) face neighbors. */
-int fclaw2d_domain_num_face_corners (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_face_corners (const fclaw2d_domain_t * domain);
 
 /** Return the number of possible orientations of a cube face.
  * This is mostly used for internal encodings.
  */
-int fclaw2d_domain_num_orientations (fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain);
 
 /** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
-void fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
+void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 
 /** Return the dimension of a corner.

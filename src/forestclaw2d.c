@@ -28,37 +28,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_wrap.h>
 
 int
-fclaw2d_domain_dimension (fclaw2d_domain_t * domain)
+fclaw2d_domain_dimension (const fclaw2d_domain_t * domain)
 {
     return P4EST_DIM;           /* space dimension */
 }
 
 int
-fclaw2d_domain_num_faces (fclaw2d_domain_t * domain)
+fclaw2d_domain_num_faces (const fclaw2d_domain_t * domain)
 {
     return P4EST_FACES;         /* 2 * DIM; number of cube faces */
 }
 
 int
-fclaw2d_domain_num_corners (fclaw2d_domain_t * domain)
+fclaw2d_domain_num_corners (const fclaw2d_domain_t * domain)
 {
     return P4EST_CHILDREN;      /* 2 ** DIM; number of cube corners */
 }
 
 int
-fclaw2d_domain_num_face_corners (fclaw2d_domain_t * domain)
+fclaw2d_domain_num_face_corners (const fclaw2d_domain_t * domain)
 {
     return P4EST_HALF;          /* 2 ** (DIM - 1); corners per face */
 }
 
 int
-fclaw2d_domain_num_orientations (fclaw2d_domain_t * domain)
+fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain)
 {
     return P4EST_FACES * P4EST_HALF;
 }
 
 void
-fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
+fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                              int icorner, int faces[2])
 {
     P4EST_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
