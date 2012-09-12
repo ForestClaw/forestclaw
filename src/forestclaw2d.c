@@ -345,6 +345,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
      * Then neighbors on multiple levels may exist simultaneously.
      * The if-else construct below must be reworked. */
 
+    prel = FCLAW2D_PATCH_BOUNDARY;
     if (p4est_quadrant_corner_neighbor (q, cornerno, &r),
         p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr, qarr))
     {
@@ -363,24 +364,22 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     {
         prel = FCLAW2D_PATCH_DOUBLESIZE;
     }
-    else {
-        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
-        return 0;
-    }
 
-    P4EST_ASSERT (rparr->elem_count == 1);
-    P4EST_ASSERT (qarr->elem_count == 1);
-    *rproc = *(int *) sc_array_index (rparr, 0);
-    rq = p4est_quadrant_array_index (qarr, 0);
-    *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
-    *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;
-    *neighbor_size = prel;
+    if (prel != FCLAW2D_PATCH_BOUNDARY) {
+        P4EST_ASSERT (rparr->elem_count == 1);
+        P4EST_ASSERT (qarr->elem_count == 1);
+        *rproc = *(int *) sc_array_index (rparr, 0);
+        rq = p4est_quadrant_array_index (qarr, 0);
+        *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
+        *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;
+        *neighbor_size = prel;
+    }
 
     sc_array_reset (earr);
     sc_array_reset (rparr);
     sc_array_reset (qarr);
 
-    return 1;
+    return prel != FCLAW2D_PATCH_BOUNDARY;
 }
 
 void
