@@ -66,6 +66,16 @@ fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
     faces[1] = p4est_corner_faces[icorner][1];
 }
 
+int
+fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
+{
+    P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+
+    return (patch->level == 0 ||
+            cornerno == patch->childid ||
+            cornerno == P4EST_CHILDREN - 1 - patch->childid) ? 0 : 1;
+}
+
 void *
 fclaw2d_alloc (size_t size)
 {

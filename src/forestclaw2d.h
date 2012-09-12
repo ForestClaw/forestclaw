@@ -115,6 +115,16 @@ int fclaw2d_domain_num_orientations (fclaw2d_domain_t * domain);
 void fclaw2d_domain_corner_faces (fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 
+/** Return the dimension of a corner.
+ * \param [in] patch    A patch with properly set member variables.
+ * \param [in] cornerno A corner number in 0..3.
+ * \return              0 if the corner is always at a fourfold intersection,
+ *                      1 if the corner would end up in the middle of a face
+ *                      when there is a coarser neighbor.
+ */
+int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
+                                    int cornerno);
+
 void *fclaw2d_alloc (size_t size);
 void *fclaw2d_calloc (size_t nmemb, size_t size);
 void *fclaw2d_realloc (void *ptr, size_t size);
