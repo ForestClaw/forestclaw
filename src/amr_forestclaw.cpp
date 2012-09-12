@@ -1245,58 +1245,62 @@ void amrinit(fclaw2d_domain_t **domain,
 
     for (int level = minlevel; level < maxlevel; level++)
     {
+        // TODO: don't use level_refined since it is not agreed upon in parallel
+        // the fclaw2d_domain_adapt and _partition calls work fine in parallel
+
         bool level_refined = false;
         fclaw2d_domain_iterate_level(*domain, level,
                                      (fclaw2d_patch_callback_t) cb_tag_patch,
                                      (void *) &level_refined);
-        if (level_refined)
+
+        // Rebuild domain if necessary
+        cout << "Adapting domain " << endl;
+        fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+
+        if (new_domain != NULL)
         {
-            // Rebuild domain
-            cout << "Adapting domain " << endl;
-            fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+            // This is just for fun; remove when it gets annoying.
+            fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+
+            // Allocate some memory
             allocate_user_data(new_domain);
 
-            if (new_domain != NULL)
+            bool init_flag = true;
+            fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
+
+            // Assume only one block, since we are assuming mthbc
+            set_domain_data(new_domain, gparms, amropts);
+            set_domain_time(new_domain,t);
+
+            // Physical BCs are needed in boundary level exchange
+            fclaw2d_block_t *block = &new_domain->blocks[0];
+            set_block_data(block,gparms->m_mthbc);
+
+            int new_level = level+1;
+            bc_level_exchange(new_domain,new_level);
+            bc_exchange_with_coarse(new_domain,new_level);
+
+            // Deallocate old domain
+            amrreset(*domain);
+            fclaw2d_domain_destroy(*domain);
+            *domain = new_domain;
+
+            fclaw2d_domain_t *domain_partitioned =
+                fclaw2d_domain_partition (*domain);
+
+            if (domain_partitioned != NULL)
             {
-                // This is just for fun; remove when it gets annoying.
-                fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+                // TODO: allocate patch and block etc. memory for domain_partitioned
+                
+                // TODO: write a function to transfer values in parallel */
 
-                bool init_flag = true;
-                fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
-
-                // Assume only one block, since we are assuming mthbc
-                set_domain_data(new_domain, gparms, amropts);
-                set_domain_time(new_domain,t);
-
-                // Physical BCs are needed in boundary level exchange
-                fclaw2d_block_t *block = &new_domain->blocks[0];
-                set_block_data(block,gparms->m_mthbc);
-
-                int new_level = level+1;
-                bc_level_exchange(new_domain,new_level);
-                bc_exchange_with_coarse(new_domain,new_level);
-
-
-                // Deallocate old domain
+                /* then the old domain is no longer necessary */
                 amrreset(*domain);
                 fclaw2d_domain_destroy(*domain);
-                *domain = new_domain;
+                *domain = domain_partitioned;
 
-                fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
-                if (domain_partitioned != NULL)
-                {
-                    // TODO: allocate patch memory for domain_partitioned
-                    
-                    // TODO: use a function (yet to be written) to transfer values in parallel */
-
-                    /* then the old domain is no longer necessary */
-                    amrreset(*domain);
-                    fclaw2d_domain_destroy(*domain);
-                    *domain = domain_partitioned;
-
-                    /* internal clean up */
-                    fclaw2d_domain_complete(*domain);
-                }
+                /* internal clean up */
+                fclaw2d_domain_complete(*domain);
             }
         }
         else
