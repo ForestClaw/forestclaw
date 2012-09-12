@@ -296,7 +296,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
-                         int *ref_flag_ptr)
+                         int **ref_flag_ptr)
 {
     fclaw2d_patch_relation_t neighbor_type;
     int rproc;
@@ -308,19 +308,19 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     {
         // printf("get_corner_neighbors : Patch %d at corner %d does not have any "
         //        "corner neighbors\n",this_patch_idx,icorner);
-        ref_flag_ptr = NULL;
+        *ref_flag_ptr = NULL;
     }
     else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
     {
-      *ref_flag_ptr = 1;
+      **ref_flag_ptr = 1;
     }
     else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
     {
-      *ref_flag_ptr = 0;
+      **ref_flag_ptr = 0;
     }
     else
     {
-      *ref_flag_ptr = -1;
+      **ref_flag_ptr = -1;
     }
 }
 
@@ -466,7 +466,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                     icorner,
                                     &corner_block_idx,
                                     &corner_patch_idx,
-                                    ref_flag_ptr);
+                                    &ref_flag_ptr);
 
                 if (ref_flag_ptr == NULL)
                 {
@@ -545,7 +545,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                ref_flag_ptr);
+                                &ref_flag_ptr);
 
             if (ref_flag_ptr == NULL)
             {
@@ -627,7 +627,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                ref_flag_ptr);
+                                &ref_flag_ptr);
 
             if (ref_flag_ptr == NULL)
             {
