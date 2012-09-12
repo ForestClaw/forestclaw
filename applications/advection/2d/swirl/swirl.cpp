@@ -72,6 +72,7 @@ main (int argc, char **argv)
 
   fclaw2d_domain_destroy (domain);
 
+  delete gparms;
   sc_options_destroy (options);
   sc_finalize ();
 
