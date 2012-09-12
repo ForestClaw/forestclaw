@@ -54,6 +54,7 @@ typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
 struct fclaw2d_patch
 {
     int level;                  /* 0 is root, increases if refined */
+    int childid;                /* child number within its parent */
     double xlower, xupper;
     double ylower, yupper;
     fclaw2d_patch_t *next;      /* next patch same level same block */

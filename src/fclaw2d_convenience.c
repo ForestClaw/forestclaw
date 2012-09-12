@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_convenience.h"
+#include <p4est_bits.h>
 #include <p4est_wrap.h>
 
 const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
@@ -126,6 +127,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
             patch = block->patches + j;
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->level = level = (int) quad->level;
+            patch->childid = p4est_quadrant_child_id (quad);
             P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
             qh = P4EST_QUADRANT_LEN (level);
             patch->xlower = quad->x * fclaw2d_smallest_h;
