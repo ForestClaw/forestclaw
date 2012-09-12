@@ -355,7 +355,6 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
      * Then neighbors on multiple levels may exist simultaneously.
      * The if-else construct below must be reworked. */
 
-    prel = FCLAW2D_PATCH_BOUNDARY;
     if (p4est_quadrant_corner_neighbor (q, cornerno, &r),
         p4est_quadrant_exists (p4est, ghost, nt, &r, earr, rparr, qarr))
     {
@@ -376,6 +375,11 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     {
         prel = FCLAW2D_PATCH_DOUBLESIZE;
     }
+    else
+    {
+        prel = FCLAW2D_PATCH_BOUNDARY;
+    }
+    *neighbor_size = prel;
 
     if (prel != FCLAW2D_PATCH_BOUNDARY)
     {
@@ -385,7 +389,6 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         rq = p4est_quadrant_array_index (qarr, 0);
         *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
         *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;
-        *neighbor_size = prel;
     }
 
     sc_array_reset (earr);
