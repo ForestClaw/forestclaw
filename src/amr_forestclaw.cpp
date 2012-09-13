@@ -1360,10 +1360,6 @@ void amrinit(fclaw2d_domain_t **domain,
             int new_level = level+1;
             bc_level_exchange(new_domain,new_level);
             bc_exchange_with_coarse(new_domain,new_level);
-
-            int new_level = level+1;
-            bc_level_exchange(new_domain,new_level);
-            bc_exchange_with_coarse(new_domain,new_level);
             bc_set_phys(new_domain,new_level,t);
 
             fclaw2d_domain_t *domain_partitioned =
