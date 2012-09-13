@@ -386,7 +386,7 @@ void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_ste
     for(int i = 0; i < size; i++)
     {
         // There is surely a BLAS routine that does this...
-        qtimeinterp[i] = qlast[i] + alpha*qcurr[i];
+        qtimeinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
     }
 }
 
@@ -528,7 +528,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
 
 }
 
-void ClawPatch::interpolate_corner_ghost(const int& a_fine_corner, const int& a_refratio,
+void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
                                          ClawPatch *cp_corner, bool a_time_interp)
 {
     Real *qcoarse;
@@ -542,9 +542,9 @@ void ClawPatch::interpolate_corner_ghost(const int& a_fine_corner, const int& a_
     }
 
     // qcorner is the finer level.
-    Real *qcorner = cp_corner->m_griddata.dataPtr();
+    Real *qfine = cp_corner->m_griddata.dataPtr();
 
-    interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio,qcoarse, qcorner, a_fine_corner);
+    interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
 }
 
 
@@ -605,7 +605,40 @@ Real ClawPatch::compute_sum()
 
 void ClawPatch::dump()
 {
-    Real *q = m_griddata.dataPtr();
+    Real *q;
+    q = m_griddata.dataPtr();
+    int k = 0;
+    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
+    {
+        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
+        {
+            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
+            k++;
+        }
+        printf("\n");
+    }
+}
+
+void ClawPatch::dump_last()
+{
+    Real *q;
+    q = m_griddata_last.dataPtr();
+    int k = 0;
+    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
+    {
+        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
+        {
+            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
+            k++;
+        }
+        printf("\n");
+    }
+}
+
+void ClawPatch::dump_time_interp()
+{
+    Real *q;
+    q = m_griddata_time_interp.dataPtr();
     int k = 0;
     for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
     {

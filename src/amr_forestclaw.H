@@ -67,6 +67,7 @@ typedef struct fclaw2d_subcycle_info
     int fine_step;
     int refratio;
     bool do_time_interp;  // We may not always need to do time interpolation.
+    Real level_time;
 } fclaw2d_subcycle_info_t;
 
 

@@ -195,8 +195,8 @@ c                 # ibc = 2 corresponds to the second layer
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2
-      integer i, i1, i2, ibc, ii, ii1, ifine,ibc_fine
-      integer j, j1, j2, jbc, jj, jj1, jfine,jbc_fine
+      integer i, i1, i2, ibc, ii, ii1, ifine
+      integer j, j1, j2, jbc, jj, jj1, jfine
       integer ic_add, jc_add
       integer linear_terms
 
@@ -208,13 +208,15 @@ c     # 'iface_coarse is relative to the coarse grid
 
 c     # Assign values to fine grid ghost.  For now, just copy coarse grid
 c     # values; Get linear part later.
-      if (idir .eq. 0) then
-         jc_add = igrid*my/num_neighbors
-         do mq = 1,meqn
-            do j = 1,my/num_neighbors
-               do ibc_fine = 1,mbc
+      do mq = 1,meqn
+         if (idir .eq. 0) then
+            jc_add = igrid*my/num_neighbors
+c           # Need to also get corners that are at the center of a coarse
+c           # face
+            do j = (1-igrid),my/num_neighbors + (1-igrid)*mbc
+               do ibc = 1,mbc
                   do jj = 1,refratio
-                     ifine = ibc_fine
+                     ifine = ibc
                      jfine = (j-1)*refratio + jj
                      if (iface_coarse .eq. 0) then
 c                       # qfine is at left edge of coarse grid
@@ -228,19 +230,17 @@ c                       # qfine is at right edge of coarse grid
                   enddo
                enddo
             enddo
-         enddo
-      else
-         ic_add = igrid*mx/num_neighbors
-         do mq = 1,meqn
-            do i =1,mx/num_neighbors
+         else
+            ic_add = igrid*mx/num_neighbors
+            do i =(1-igrid),mx/num_neighbors + (1-igrid)*mbc
                do ii = 1,refratio
-                  do jbc_fine = 1,mbc
+                  do jbc = 1,mbc
                      ifine = (i-1)*refratio + ii
-                     jfine = jbc_fine
+                     jfine = jbc
                      if (iface_coarse .eq. 2) then
 c                       # qfine is at bottom edge of coarse grid
                         qfine(ifine,my+jfine,mq) =
-     &                        qcoarse(i+ic_add,1,mq)
+     &                        qcoarse(i+ic_add,1,mq) + linear_terms
                      else if (iface_coarse .eq. 3) then
 c                       # qfine is at top edge of coarse grid
                         qfine(ifine,1-jfine,mq) =
@@ -249,15 +249,15 @@ c                       # qfine is at top edge of coarse grid
                   enddo
                enddo
             enddo
-         enddo
-      endif
+         endif
+      enddo
       end
 
       subroutine exchange_corner_ghost(mx,my,mbc,meqn,
-     &      qthis, qneighbor, icorner_coarse)
+     &      qthis, qneighbor, icorner_this)
       implicit none
 
-      integer mx, my, mbc, meqn, icorner_coarse
+      integer mx, my, mbc, meqn, icorner_this
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -272,12 +272,12 @@ c     # else's (lr,ur) corners.
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Exchange initiated only at high side (1,3) corners
-               if (icorner_coarse .eq. 1) then
+               if (icorner_this .eq. 1) then
                   qthis(mx+ibc,1-jbc,mq) =
      &                  qneighbor(ibc,my+1-jbc,mq)
                   qneighbor(1-ibc,my+jbc,mq) =
      &                  qthis(mx+1-ibc,jbc,mq)
-               elseif (icorner_coarse .eq. 3) then
+               elseif (icorner_this .eq. 3) then
                   qthis(mx+ibc,my+jbc,mq) =
      &                  qneighbor(ibc,jbc,mq)
                   qneighbor(1-ibc,1-jbc,mq) =
@@ -325,13 +325,13 @@ c              # Average fine grid corners onto coarse grid ghost corners
                   enddo
                enddo
                if (icorner_coarse .eq. 0) then
-                  qcoarse(1-ibc,1-jbc,mq) = 0*sum/r2
+                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
                elseif (icorner_coarse .eq. 1) then
-                  qcoarse(mx+ibc,1-jbc,mq) = 0*sum/r2
+                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
                elseif (icorner_coarse .eq. 2) then
-                  qcoarse(1-ibc,my+jbc,mq) = 0*sum/r2
+                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
                elseif (icorner_coarse .eq. 3) then
-                  qcoarse(mx+ibc,my+jbc,mq) = 0*sum/r2
+                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
                endif
             enddo
          enddo
@@ -339,17 +339,17 @@ c              # Average fine grid corners onto coarse grid ghost corners
 
       end
 
-      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,qcoarse,qfine,
-     &      icorner_coarse,refratio)
+      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,refratio,
+     &      qcoarse,qfine,icorner_coarse)
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
-      double precision qcoarse(1-mx:mbc+mx,1-mbc:my+mbc,meqn)
-      double precision qfine(1-mx:mbc+mx,1-mbc:my+mbc,meqn)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer ic, jc, mq, ii, jj, mth
+      integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady, shiftx, shifty
-      double precision compute_slopes
+      double precision compute_slopes, value
 
       mth = 5
 
@@ -367,12 +367,11 @@ c              # Average fine grid corners onto coarse grid ghost corners
          jc = my
       endif
 
-
       do mq = 1,meqn
          qc = qcoarse(ic,jc,mq)
 c        # Interpolate coarse grid corners to fine grid corner ghost cells
-         do ii = 1,refratio
-            do jj = 1,refratio
+         do ibc = 1,mbc
+            do jbc = 1,mbc
 
 c              # Compute limited slopes in both x and y. Note we are not
 c              # really computing slopes, but rather just differences.
@@ -386,10 +385,19 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                grady = compute_slopes(sl,sr,mth)
 
 c              # Fill in interpolated values on fine grid cell
-               shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-               shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-               qfine((ic-1)*refratio + ii,(jc-1)*refratio + jj,mq)
-     &               = 0*(qc + shiftx*gradx + shifty*grady)
+               shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+               shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+
+               value = (qc + shiftx*gradx + shifty*grady)
+               if (icorner_coarse .eq. 0) then
+                  qfine(mx+ibc,my+jbc,mq) = value
+               elseif (icorner_coarse .eq. 1) then
+                  qfine(mx+ibc,1-jbc,mq) = value
+               elseif (icorner_coarse .eq. 2) then
+                  qfine(1-ibc,my+jbc,mq) = value
+               else
+                  qfine(1-ibc,1-jbc,mq) = value
+               endif
             enddo
          enddo
       enddo

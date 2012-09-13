@@ -16,14 +16,15 @@ c     #     0.1  otherwise
        double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
        integer i, j
-       double precision xi, yj
+       double precision xi, yj, s
 
-       do i = 1,mx
+       do i = 1-mbc,mx+mbc
           xi = xlower + (i-0.5d0)*dx
-          do j = 1,my
+          do j = 1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
 
-             if (xi .lt. 0.5d0) then
+             s = 0.5d0
+             if (xi .lt. s) then
                 q(i,j,1) = 1.d0
              else
                 q(i,j,1) = 0.d0

@@ -144,7 +144,7 @@ c
 c     # zero-order extrapolation:
       do 315 m=1,meqn
          do 315 jbc=1,mbc
-            do 315 i = 1,mx
+            do 315 i = 1-mbc,mx+mbc
                q(i,1-jbc,m) = q(i,1,m)
   315       continue
       go to 399

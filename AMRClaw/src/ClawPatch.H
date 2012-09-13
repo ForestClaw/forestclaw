@@ -282,6 +282,8 @@ public :
     Real compute_sum();
 
     void dump();
+    void dump_last();
+    void dump_time_interp();
 
 protected :
 
