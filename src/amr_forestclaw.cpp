@@ -706,13 +706,6 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
 void bc_set_phys(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
 {
     fclaw2d_domain_iterate_level(domain, a_level,
-                                 cb_bc_level_face_exchange, (void *) NULL);
-
-    // Do corner exchange only after physical boundary conditions have been set on all patches,
-    // since corners may overlap phyical ghost cell region of neighboring patch.
-    fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) NULL);
-
-    fclaw2d_domain_iterate_level(domain, a_level,
                                  (fclaw2d_patch_callback_t) cb_set_phys_bc,
                                  (void *) &a_level_time);
 }
@@ -725,11 +718,9 @@ void bc_level_exchange(fclaw2d_domain_t *domain, int a_level)
     step_info.level_time = get_domain_time(domain);
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_bc_level_face_exchange, (void *) NULL);
-
     // Do corner exchange only after physical boundary conditions have been set on all patches,
     // since corners may overlap phyical ghost cell region of neighboring patch.
     fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) NULL);
-
 }
 
 
@@ -890,7 +881,6 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
                                  (fclaw2d_patch_callback_t) cb_setup_time_interp,
                                  (void *) &step_info);
 
-    cout << "bc_average (time _interp)" << endl;
     // Average onto time interpolated 'virtual' data so that we can use these averaged ghost
     // values in the interpolation step below.
     fclaw2d_domain_iterate_level(domain, coarser_level,
@@ -898,14 +888,15 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
                                  (void *) &step_info);
 
 
+    fclaw2d_domain_iterate_level(domain, coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_corner_average,
+                                 (void *) &step_info);
+
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  (fclaw2d_patch_callback_t) cb_bc_interpolate,
                                  (void *) &step_info);
 
-    fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_corner_average,
-                                 (void *) &step_info);
 
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  (fclaw2d_patch_callback_t) cb_corner_interpolate,
@@ -926,11 +917,20 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
                                  (fclaw2d_patch_callback_t) cb_bc_average,
                                  (void *) &step_info);
 
-    // Interpolate coarse grid to fine.  This may require time interpolation
+    // Average fine grid corners to the coarse grid ghost cells
+    fclaw2d_domain_iterate_level(domain,coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_corner_average,
+                                 (void *) &step_info);
+
+    // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  (fclaw2d_patch_callback_t) cb_bc_interpolate,
                                  (void *) &step_info);
 
+    // Interpolate coarse grid to fine grid ghost cells.
+    fclaw2d_domain_iterate_level(domain,coarser_level,
+                                 (fclaw2d_patch_callback_t) cb_corner_interpolate,
+                                 (void *) &step_info);
 }
 
 
@@ -995,7 +995,6 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     int level = this_patch->level;
 
     Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
-
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 
@@ -1013,8 +1012,6 @@ Real advance_level(fclaw2d_domain_t *domain,
         cout << endl;
         cout << "Advancing level " << a_level << " from step " <<
             a_curr_fine_step << endl;
-        // dump_patch(domain,10);
-        // exit(1);
     }
 
     if (!a_time_stepper->can_advance(a_level,a_curr_fine_step))
@@ -1042,21 +1039,28 @@ Real advance_level(fclaw2d_domain_t *domain,
                 bc_set_phys(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
+
+                if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
+                {
+                    // non-subcycled case : this advance is a bit gratuitous, because we
+                    // don't need it to advance the fine grid;  rather, we put this advance
+                    // here as a way to get advances on the coarser levels.
+                    cout << " ----> Non-subcycled case " << endl;
+                    cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
+                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                    cout << " ----> Returning from recursive call at level " << a_level << endl;
+                }
             }
             else
             {
                 cout << " --> Coarse and fine level are not time synchronized; doing exchange "
                      "with time interpolation" << endl;
-                if ((a_curr_fine_step > last_coarse_step) ||
-                    (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level)))
+                if ((a_curr_fine_step > last_coarse_step))
                 {
-                    // (1) subcycled case : a_curr_fine_step will only be greater than
+                    // subcycled case : a_curr_fine_step will only be greater than
                     // last_coarse_step if we haven't yet advanced the coarse grid to a time level
                     // beyond the current fine grid level.
-                    //
-                    // (2) non-subcycled case : this advance is a bit gratuitous, because we
-                    // don't need it to advance the fine grid;  rather, we put this advance
-                    // here as a way to get advances on the coarser levels.
+                    cout << " ----> Subcycled case " << endl;
                     cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
                     cout << " ----> Returning from recursive call at level " << a_level << endl;
@@ -1098,7 +1102,6 @@ Real advance_level(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain, a_level,
                                  (fclaw2d_patch_callback_t) cb_advance_patch,
                                  (void *) &time_data);
-
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
 
@@ -1290,7 +1293,8 @@ void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
 
 // Initialize a base level of grids
 void amrinit(fclaw2d_domain_t **domain,
-                     global_parms *gparms, const amr_options_t * amropts)
+             global_parms *gparms,
+             const amr_options_t * amropts)
 {
     Real t = 0;
 
@@ -1299,8 +1303,6 @@ void amrinit(fclaw2d_domain_t **domain,
     set_domain_data(*domain, gparms, amropts);
     set_domain_time(*domain,t);
 
-    // fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    // global_parms *gparms = ddata->parms;
     int minlevel = gparms->m_minlevel;
     int maxlevel = gparms->m_maxlevel;
 
@@ -1318,8 +1320,6 @@ void amrinit(fclaw2d_domain_t **domain,
                                  (fclaw2d_patch_callback_t) cb_amrinit,
                                  (void *) NULL);
 
-    // Exchange boundary data at the base level
-    // bc_level_exchange(*domain,minlevel);
     bc_set_phys(*domain,minlevel,t);
 
     // Refine as needed.
@@ -1349,18 +1349,20 @@ void amrinit(fclaw2d_domain_t **domain,
             bool init_flag = true;
             fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
 
-            // Assume only one block, since we are assuming mthbc
             set_domain_data(new_domain, gparms, amropts);
             set_domain_time(new_domain,t);
 
             // Physical BCs are needed in boundary level exchange
+            // Assume only one block, since we are assuming mthbc
             fclaw2d_block_t *block = &new_domain->blocks[0];
             set_block_data(block,gparms->m_mthbc);
 
             int new_level = level+1;
-            bc_level_exchange(new_domain,new_level);
-            bc_exchange_with_coarse(new_domain,new_level);
             bc_set_phys(new_domain,new_level,t);
+
+            amrreset(*domain);
+            fclaw2d_domain_destroy(*domain);
+            *domain = new_domain;
 
             fclaw2d_domain_t *domain_partitioned =
                 fclaw2d_domain_partition (*domain);
@@ -1389,6 +1391,12 @@ void amrinit(fclaw2d_domain_t **domain,
     }
 }
 
+void amrregrid(fclaw2d_domain_t **domain)
+{
+
+}
+
+
 
 // -----------------------------------------------------------------
 // Run - with or without subcycling
@@ -1396,7 +1404,7 @@ void amrinit(fclaw2d_domain_t **domain,
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    int outstyle = 3;
+    int outstyle = 1;
 
     if (outstyle == 1)
     {
@@ -1537,8 +1545,8 @@ void explicit_step(fclaw2d_domain_t *domain)
 
     Real t0 = 0;
 
-    int nstep_outer = 100;  // Take this many steps in total
-    int nstep_inner = 10;   // Every 'nstep_inner', write out file.
+    int nstep_outer = 2;  // Take this many steps in total
+    int nstep_inner = 1;   // Every 'nstep_inner', write out file.
 
     Real dt_level0 = initial_dt;
     Real t_curr = t0;
@@ -1615,7 +1623,7 @@ void cb_amrout(fclaw2d_domain_t *domain,
 {
     int iframe = *((int *) user);
     int num = this_block_idx*domain->num_blocks + this_patch_idx + 1;
-    int matlab_level = this_patch->level;  // Matlab wants levels to start at 1.
+    int matlab_level = this_patch->level + 1;  // Matlab wants levels to start at 1.
 
     // Patch data is appended to fort.qXXXX
     ClawPatch *cp = get_clawpatch(this_patch);

@@ -174,6 +174,14 @@ void FArrayBox::operator=(const FArrayBox& fbox)
         m_data = new Real[fbox.m_size];
         m_size = fbox.m_size;
     }
+    if (m_data == NULL)
+    {
+        if (m_size == fbox.m_size)
+        {
+            printf("FArrayBox::operator=() : sizes are equal, but m_data == NULL\n");
+            exit(1);
+        }
+    }
     Real *copy = fbox.m_data;
     m_box = fbox.m_box;
     for (int i = 0; i < fbox.m_size; i++)
@@ -187,8 +195,8 @@ FArrayBox::~FArrayBox()
     if (m_data != NULL)
     {
         delete [] m_data;
-        m_data = NULL;
     }
+    m_data = NULL;
     m_size = 0;
 }
 
@@ -198,7 +206,7 @@ void FArrayBox::define(int a_size,const Box& a_box)
     {
         delete [] m_data;
     }
-    m_data = new double[a_size];
+    m_data = new Real[a_size];
     m_size = a_size;
     m_box = a_box;
 }

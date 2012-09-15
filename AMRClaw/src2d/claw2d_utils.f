@@ -195,56 +195,103 @@ c                 # ibc = 2 corresponds to the second layer
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2
-      integer i, i1, i2, ibc, ii, ii1, ifine
-      integer j, j1, j2, jbc, jj, jj1, jfine
-      integer ic_add, jc_add
-      integer linear_terms
+      integer i, i1, i2, ibc, ii, ifine
+      integer j, j1, j2, jbc, jj, jfine
+      integer ic_add, jc_add, ic, jc, mth
+      double precision linear_terms
+      double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
+      double precision compute_slopes
 
 c     # To be figured out later
       linear_terms = 0
+      mth = 5
 
 c     # 'iface_coarse is relative to the coarse grid
 
-
-c     # Assign values to fine grid ghost.  For now, just copy coarse grid
-c     # values; Get linear part later.
       do mq = 1,meqn
          if (idir .eq. 0) then
+c           # this ensures that we get 'hanging' corners
+            j1 = 1-igrid*mbc
+            j2 = my/num_neighbors + (1-igrid)*mbc
+
             jc_add = igrid*my/num_neighbors
-c           # Need to also get corners that are at the center of a coarse
-c           # face
-            do j = (1-igrid),my/num_neighbors + (1-igrid)*mbc
+            if (iface_coarse .eq. 0) then
+               ic = 1
+            elseif (iface_coarse .eq. 1) then
+               ic = mx
+            endif
+            do jc = j1, j2
+               qc = qcoarse(ic,jc + jc_add,mq)
+c              # Compute limited slopes in both x and y. Note we are not
+c              # really computing slopes, but rather just differences.
+c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
+               sl = (qc - qcoarse(ic-1,jc,mq))
+               sr = (qcoarse(ic+1,jc,mq) - qc)
+               gradx = compute_slopes(sl,sr,mth)
+
+               sl = (qc - qcoarse(ic,jc-1,mq))
+               sr = (qcoarse(ic,jc+1,mq) - qc)
+               grady = compute_slopes(sl,sr,mth)
+
                do ibc = 1,mbc
                   do jj = 1,refratio
+c                    # Fill in interpolated values on fine grid cell
+                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+
+                     value = qc + shiftx*gradx + shifty*grady
+
                      ifine = ibc
-                     jfine = (j-1)*refratio + jj
+                     jfine = (jc-1)*refratio + jj
                      if (iface_coarse .eq. 0) then
 c                       # qfine is at left edge of coarse grid
-                        qfine(mx+ifine,jfine,mq) =
-     &                        qcoarse(1,j+jc_add,mq) + linear_terms
+                        qfine(mx+ifine,jfine,mq) = value
                      elseif (iface_coarse .eq. 1) then
 c                       # qfine is at right edge of coarse grid
-                        qfine(1-ifine,jfine,mq) =
-     &                        qcoarse(mx,j+jc_add,mq) + linear_terms
+                        qfine(1-ifine,jfine,mq) = value
                      endif
                   enddo
                enddo
             enddo
          else
             ic_add = igrid*mx/num_neighbors
-            do i =(1-igrid),mx/num_neighbors + (1-igrid)*mbc
-               do ii = 1,refratio
-                  do jbc = 1,mbc
-                     ifine = (i-1)*refratio + ii
+c           # this ensures that we get 'hanging' corners
+            i1 = 1-igrid*mbc
+            i2 = mx/num_neighbors + (1-igrid)*mbc
+
+            if (iface_coarse .eq. 2) then
+               jc = 1
+            elseif (iface_coarse .eq. 3) then
+               jc = my
+            endif
+            do ic = i1, i2
+               qc = qcoarse(ic + ic_add,jc,mq)
+
+               sl = (qc - qcoarse(ic-1,jc,mq))
+               sr = (qcoarse(ic+1,jc,mq) - qc)
+               gradx = compute_slopes(sl,sr,mth)
+
+               sl = (qc - qcoarse(ic,jc-1,mq))
+               sr = (qcoarse(ic,jc+1,mq) - qc)
+               grady = compute_slopes(sl,sr,mth)
+
+
+               do jbc = 1,mbc
+                  do ii = 1,refratio
+c                    # Fill in interpolated values on fine grid cell
+                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+
+                     value = (qc + shiftx*gradx + shifty*grady)
+
+                     ifine = (ic-1)*refratio + ii
                      jfine = jbc
                      if (iface_coarse .eq. 2) then
 c                       # qfine is at bottom edge of coarse grid
-                        qfine(ifine,my+jfine,mq) =
-     &                        qcoarse(i+ic_add,1,mq) + linear_terms
+                        qfine(ifine,my+jfine,mq) = value
                      else if (iface_coarse .eq. 3) then
 c                       # qfine is at top edge of coarse grid
-                        qfine(ifine,1-jfine,mq) =
-     &                        qcoarse(i+ic_add,my,mq) + linear_terms
+                        qfine(ifine,1-jfine,mq) = value
                      endif
                   enddo
                enddo
@@ -369,32 +416,34 @@ c              # Average fine grid corners onto coarse grid ghost corners
 
       do mq = 1,meqn
          qc = qcoarse(ic,jc,mq)
+
 c        # Interpolate coarse grid corners to fine grid corner ghost cells
+
+c        # Compute limited slopes in both x and y. Note we are not
+c        # really computing slopes, but rather just differences.
+c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
+         sl = (qc - qcoarse(ic-1,jc,mq))
+         sr = (qcoarse(ic+1,jc,mq) - qc)
+         gradx = compute_slopes(sl,sr,mth)
+
+         sl = (qc - qcoarse(ic,jc-1,mq))
+         sr = (qcoarse(ic,jc+1,mq) - qc)
+         grady = compute_slopes(sl,sr,mth)
+
+c        # Loop over fine grid ghost cells
          do ibc = 1,mbc
             do jbc = 1,mbc
-
-c              # Compute limited slopes in both x and y. Note we are not
-c              # really computing slopes, but rather just differences.
-c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(ic-1,jc,mq))
-               sr = (qcoarse(ic+1,jc,mq) - qc)
-               gradx = compute_slopes(sl,sr,mth)
-
-               sl = (qc - qcoarse(ic,jc-1,mq))
-               sr = (qcoarse(ic,jc+1,mq) - qc)
-               grady = compute_slopes(sl,sr,mth)
-
 c              # Fill in interpolated values on fine grid cell
                shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
                shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
 
-               value = (qc + shiftx*gradx + shifty*grady)
+               value = qc + shiftx*gradx + shifty*grady
                if (icorner_coarse .eq. 0) then
                   qfine(mx+ibc,my+jbc,mq) = value
                elseif (icorner_coarse .eq. 1) then
-                  qfine(mx+ibc,1-jbc,mq) = value
-               elseif (icorner_coarse .eq. 2) then
                   qfine(1-ibc,my+jbc,mq) = value
+               elseif (icorner_coarse .eq. 2) then
+                  qfine(mx+ibc,1-jbc,mq) = value
                else
                   qfine(1-ibc,1-jbc,mq) = value
                endif

@@ -206,6 +206,8 @@ Real ClawPatch::step_noqad(const Real& a_time,
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
+    // Mysterious bug in this call when mx=my=4 and levels are (2,3).
+    // m_griddata_last.dataPtr() == NULL, for some reason.
     m_griddata_last = m_griddata; // Copy for time interpolation
 
     int maxm = max(m_mx,m_my);
