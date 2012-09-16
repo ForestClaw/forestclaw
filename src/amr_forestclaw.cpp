@@ -31,7 +31,7 @@ class ClawPatch;
 class global_parms;
 
 void explicit_step_fixed_output(fclaw2d_domain_t *domain);
-void explicit_step(fclaw2d_domain_t *domain);
+void explicit_step(fclaw2d_domain_t *domain, int nstep, int nplot);
 
 // -----------------------------------------------------------------
 // Setting data in domain and patches
@@ -872,10 +872,11 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
     step_info.refratio = a_refratio;
     step_info.do_time_interp = true;
 
+    Real level_time = get_domain_time(domain);
+
 
     // Set up patch data for time interpolation.
 
-    cout << "setting up for time interpolation" << endl;
     int coarser_level = a_level - 1;
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  (fclaw2d_patch_callback_t) cb_setup_time_interp,
@@ -891,6 +892,9 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  (fclaw2d_patch_callback_t) cb_corner_average,
                                  (void *) &step_info);
+
+    // This is needed so that interpolation below works near boundary.
+    bc_set_phys(domain,coarser_level,level_time);
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
@@ -908,7 +912,8 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
 {
     // Simple exchange - no time interpolation needed
     fclaw2d_subcycle_info_t step_info;
-    step_info.level_time = get_domain_time(domain);
+    Real level_time = get_domain_time(domain);
+    step_info.level_time = level_time;
     step_info.do_time_interp = false;
 
     // Iterate over coarser level and average from finer neighbors to coarse.
@@ -921,6 +926,8 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  (fclaw2d_patch_callback_t) cb_corner_average,
                                  (void *) &step_info);
+
+    bc_set_phys(domain,coarser_level,level_time);
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
@@ -1004,7 +1011,8 @@ Real advance_level(fclaw2d_domain_t *domain,
                    const int& a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
-    bool verbose = true;
+    bool verbose = false;
+    Real t_level = a_time_stepper->current_time(a_level);
 
     Real maxcfl = 0;
     if (verbose)
@@ -1026,16 +1034,21 @@ Real advance_level(fclaw2d_domain_t *domain,
         if (!a_time_stepper->exchanged_with_coarser(a_level))
         {
             int last_coarse_step = a_time_stepper->last_step(a_level-1);
-            cout << " --> Exchange between fine level " << a_level <<
-                " and coarse level " << a_level-1 << " not done at step " << a_curr_fine_step << endl;
+            if (verbose)
+            {
+                cout << " --> Exchange between fine level " << a_level <<
+                    " and coarse level " << a_level-1 << " not done at step " << a_curr_fine_step << endl;
+            }
             if (a_curr_fine_step == last_coarse_step)
             {
                 // Levels are time synchronized and we can do a simple coarse/fine
                 // exchange without time interpolation or advancing the coarser level
-                cout << " ----> Coarse and fine level are time synchronized; doing exchange"
-                    " without time interpolation" << endl;
+                if (verbose)
+                {
+                    cout << " ----> Coarse and fine level are time synchronized; doing exchange"
+                        " without time interpolation" << endl;
+                }
                 bc_exchange_with_coarse(domain,a_level);
-                Real t_level = a_time_stepper->current_time(a_level);
                 bc_set_phys(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
@@ -1045,29 +1058,47 @@ Real advance_level(fclaw2d_domain_t *domain,
                     // non-subcycled case : this advance is a bit gratuitous, because we
                     // don't need it to advance the fine grid;  rather, we put this advance
                     // here as a way to get advances on the coarser levels.
-                    cout << " ----> Non-subcycled case " << endl;
-                    cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
+                    if (verbose)
+                    {
+                        cout << " ----> Non-subcycled case " << endl;
+                        cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
+                    }
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
-                    cout << " ----> Returning from recursive call at level " << a_level << endl;
+                    if (verbose)
+                    {
+                        cout << " ----> Returning from recursive call at level " << a_level << endl;
+                    }
                 }
             }
             else
             {
-                cout << " --> Coarse and fine level are not time synchronized; doing exchange "
-                     "with time interpolation" << endl;
+                if (verbose)
+                {
+                    cout << " --> Coarse and fine level are not time synchronized; doing exchange "
+                        "with time interpolation" << endl;
+                }
                 if ((a_curr_fine_step > last_coarse_step))
                 {
                     // subcycled case : a_curr_fine_step will only be greater than
                     // last_coarse_step if we haven't yet advanced the coarse grid to a time level
                     // beyond the current fine grid level.
-                    cout << " ----> Subcycled case " << endl;
-                    cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
+                    if (verbose)
+                    {
+                        cout << " ----> Subcycled case " << endl;
+                        cout << " ----> Making recursive call to advance_level for level " << a_level-1 << endl;
+                    }
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
-                    cout << " ----> Returning from recursive call at level " << a_level << endl;
+                    if (verbose)
+                    {
+                        cout << " ----> Returning from recursive call at level " << a_level << endl;
+                    }
                 }
                 if (!a_time_stepper->nosubcycle())
                 {
-                    cout << " --> Doing time interpolatation from coarse grid at level " << a_level-1 << endl;
+                    if (verbose)
+                    {
+                        cout << " --> Doing time interpolatation from coarse grid at level " << a_level-1 << endl;
+                    }
                     int refratio = get_refratio(domain);
 
                     // (1) a_curr_fine_step > last_coarse_step : we just advanced the coarse grid
@@ -1077,7 +1108,6 @@ Real advance_level(fclaw2d_domain_t *domain,
                     // grid in a previous step but we still have to do time interpolation (this
                     // can only happen if refratio > 2)
 
-                    Real t_level = a_time_stepper->current_time(a_level);
                     bc_exchange_with_coarse_time_interp(domain,a_level,last_coarse_step,
                                                         a_curr_fine_step,refratio);
                     bc_set_phys(domain,a_level,t_level);
@@ -1090,13 +1120,16 @@ Real advance_level(fclaw2d_domain_t *domain,
             }
         }
     }
-    cout << "Taking step on level " << a_level << endl;
+    if (verbose)
+    {
+        cout << "Taking step on level " << a_level << endl;
+    }
 
     fclaw2d_level_time_data_t time_data;
 
     time_data.maxcfl = maxcfl;
     time_data.dt = a_time_stepper->dt(a_level);
-    time_data.t = a_time_stepper->current_time(a_level);
+    time_data.t = t_level;
 
     // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + a_time_stepper.step_inc(a_level)'
     fclaw2d_domain_iterate_level(domain, a_level,
@@ -1106,9 +1139,14 @@ Real advance_level(fclaw2d_domain_t *domain,
     a_time_stepper->increment_time(a_level);
 
     bc_level_exchange(domain,a_level);
+
+    bc_set_phys(domain,a_level,t_level);
     a_time_stepper->increment_level_exchange_counter(a_level);
 
-    cout << "Advance on level " << a_level << " done" << endl << endl;
+    if (verbose)
+    {
+        cout << "Advance on level " << a_level << " done" << endl << endl;
+    }
 
     return time_data.maxcfl;  // Maximum from level iteration
 }
@@ -1145,18 +1183,44 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
+
+    bool init_flag = *((bool *) user);
+    global_parms *gparms = get_domain_parms(domain);
+    int maxlevel = gparms->m_maxlevel;
+    int minlevel = gparms->m_minlevel;
+    int refratio = gparms->m_refratio;
+    bool patch_refined = false;
+    bool patch_coarsened = false;
+
     ClawPatch *cp = get_clawpatch(this_patch);
 
-    bool level_refined = *((bool *) user);
-    bool patch_refined = cp->tag_for_refinement();
-
-    if (patch_refined)
+    int level = this_patch->level;
+    if (level < maxlevel)
     {
-        fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+        patch_refined = cp->tag_for_refinement(init_flag);
+
+        if (patch_refined)
+        {
+            fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+        }
     }
 
-    (*(bool *) user) =  level_refined || patch_refined;
+    // If a patch has been tagged for refinement, then we shouldn't coarsen it.
+    if (level > minlevel && !init_flag && !patch_refined)
+    {
+        patch_coarsened = cp->tag_for_coarsening(refratio);
+        if (patch_coarsened)
+        {
+            fclaw2d_patch_mark_coarsen(domain, this_block_idx, this_patch_idx);
+        }
+    }
+    if (patch_refined && patch_coarsened)
+    {
+        printf("Patch tagged for both refinement and coarsening\n");
+        exit(1);
+    }
 }
+
 
 
 void amr_set_base_level(fclaw2d_domain_t *domain)
@@ -1186,6 +1250,7 @@ void amr_set_base_level(fclaw2d_domain_t *domain)
 }
 
 
+
 void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      fclaw2d_patch_t * old_patch,
                      fclaw2d_domain_t * new_domain,
@@ -1208,7 +1273,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined.
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
         ClawPatch *cp_new = new ClawPatch();
-        cp_new->copy(cp_old);  // Copy grid data and aux data
+        cp_new->copyFrom(cp_old);  // Copy grid data and aux data
         set_patch_data(&new_patch[0],cp_new);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
@@ -1225,13 +1290,12 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            new_patch[igrid].xupper,
                            new_patch[igrid].yupper,
                            gparms);
-
+            if (gparms->m_maux > 0)
+            {
+                cp_new->setAuxArray(maxlevel,refratio,new_patch[igrid].level);
+            }
             if (init_grid)
             {
-                if (gparms->m_maux > 0)
-                {
-                    cp_new->setAuxArray(maxlevel,refratio,new_patch[igrid].level);
-                }
                 cp_new->initialize();
             }
             else
@@ -1251,6 +1315,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        new_patch[0].xupper,
                        new_patch[0].yupper,
                        gparms);
+
         set_patch_data(&new_patch[0],cp_new);
 
         for(int igrid = 0; igrid < num_siblings; igrid++)
@@ -1259,6 +1324,10 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             // Assume that we will never coarsen when we are initializing the grids.
             ClawPatch *cp_old = get_clawpatch(&old_patch[igrid]);
             cp_new->coarsen_from_fine_patch(cp_old, igrid, p4est_refineFactor,refratio);
+        }
+        if (gparms->m_maux > 0)
+        {
+            cp_new->setAuxArray(maxlevel,refratio,new_patch[0].level);
         }
     }
     else
@@ -1313,6 +1382,8 @@ void amrinit(fclaw2d_domain_t **domain,
 
     // Set up storage for base level grids so we can initialize them
     // Allocates per-block and per-patch user data
+
+    // This function is redundant, and should be made more general.
     amr_set_base_level(*domain);
 
     // Initialize base level grid
@@ -1324,31 +1395,32 @@ void amrinit(fclaw2d_domain_t **domain,
 
     // Refine as needed.
 
+    bool init_flag = true;
     for (int level = minlevel; level < maxlevel; level++)
     {
         // TODO: don't use level_refined since it is not agreed upon in parallel
         // the fclaw2d_domain_adapt and _partition calls work fine in parallel
 
-        bool level_refined = false;
         fclaw2d_domain_iterate_level(*domain, level,
                                      (fclaw2d_patch_callback_t) cb_tag_patch,
-                                     (void *) &level_refined);
+                                     (void *) &init_flag);
 
         // Rebuild domain if necessary
-        cout << "Adapting domain " << endl;
         fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
         if (new_domain != NULL)
         {
             // This is just for fun; remove when it gets annoying.
-            fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+            // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
 
-            // Allocate some memory
+            // Allocate memory for user data types (but they don't get set)
             allocate_user_data(new_domain);
 
-            bool init_flag = true;
+            // Initialize new grids.  Assume that all ghost cells are filled in by qinit.
             fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
 
+            // Set some of the user data types.  Some of this is done in 'amr_set_base_level',
+            // I should probably come up with a more general way to do this.
             set_domain_data(new_domain, gparms, amropts);
             set_domain_time(new_domain,t);
 
@@ -1358,6 +1430,8 @@ void amrinit(fclaw2d_domain_t **domain,
             set_block_data(block,gparms->m_mthbc);
 
             int new_level = level+1;
+            // Upon initialization, we don't do any ghost cell exchanges, because we assume
+            // that the initial conditions have set all internal ghost cells.
             bc_set_phys(new_domain,new_level,t);
 
             amrreset(*domain);
@@ -1387,15 +1461,85 @@ void amrinit(fclaw2d_domain_t **domain,
             // exit loop;  we are done refining
             break;
         }
-        cout << "Done with adapting level " << level << endl << endl;
     }
+    cout << "Done with building initial grid structure " << endl;
 }
 
 void amrregrid(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    global_parms *gparms = ddata->parms;
+    const amr_options_t *amropts = ddata->amropts;
+    Real t = get_domain_time(*domain);
 
+    bool init_flag = false;
+
+    int minlevel = gparms->m_minlevel;
+    int maxlevel = gparms->m_maxlevel;
+
+    // Unlike the initial case, where we refine level by level, here, we only visit each tag
+    // once and decide whether to refine or coarsen that patch.
+    fclaw2d_domain_iterate_patches(*domain,
+                                   (fclaw2d_patch_callback_t) cb_tag_patch,
+                                   (void *) &init_flag);
+
+    // Rebuild domain if necessary
+    // Will return be NULL if no refining was done?
+    fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+
+    if (new_domain != NULL)
+    {
+        // This is just for fun; remove when it gets annoying.
+        // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+
+        // Allocate memory for user data types (but they don't get set)
+        allocate_user_data(new_domain);
+
+        // Average or interpolate to new grids.
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
+
+        // Set some of the user data types.  Some of this is done in 'amr_set_base_level',
+        // I should probably come up with a more general way to do this.
+        set_domain_data(new_domain, gparms, amropts);
+        set_domain_time(new_domain,t);
+
+        // Physical BCs are needed in boundary level exchange
+        // Assume only one block, since we are assuming mthbc
+        fclaw2d_block_t *block = &new_domain->blocks[0];
+        set_block_data(block,gparms->m_mthbc);
+
+        // Level stuff to make sure all
+        for (int level = minlevel; level <= maxlevel; level++)
+        {
+            // Only do a level exchange;  Coarse and fine grid exchanges will happen
+            // during time stepping as needed.
+            bc_level_exchange(new_domain,level);
+            bc_set_phys(new_domain,level,t);
+        }
+
+        amrreset(*domain);
+        fclaw2d_domain_destroy(*domain);
+        *domain = new_domain;
+
+        fclaw2d_domain_t *domain_partitioned =
+            fclaw2d_domain_partition (*domain);
+
+        if (domain_partitioned != NULL)
+        {
+            // TODO: allocate patch and block etc. memory for domain_partitioned
+
+            // TODO: write a function to transfer values in parallel */
+
+            /* then the old domain is no longer necessary */
+            amrreset(*domain);
+            fclaw2d_domain_destroy(*domain);
+            *domain = domain_partitioned;
+
+            /* internal clean up */
+            fclaw2d_domain_complete(*domain);
+        }
+    }
 }
-
 
 
 // -----------------------------------------------------------------
@@ -1404,7 +1548,7 @@ void amrregrid(fclaw2d_domain_t **domain)
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    int outstyle = 1;
+    int outstyle = 3;
 
     if (outstyle == 1)
     {
@@ -1412,7 +1556,9 @@ void amrrun(fclaw2d_domain_t *domain)
     }
     else if (outstyle == 3)
     {
-        explicit_step(domain);
+        int nstep = 200;  // Take 'nstep' steps
+        int nplot = 1;   // Plot every 'nplot' steps
+        explicit_step(domain,nstep,nplot);
     }
 }
 
@@ -1517,11 +1663,11 @@ void explicit_step_fixed_output(fclaw2d_domain_t *domain)
             }
             n_inner++;
 
-            int regrid_step = 4;  // Will eventually read this in as a parameter.
+            int regrid_step = 1;  // Will eventually read this in as a parameter.
             if (n_inner % regrid_step == 0)
             {
                 // After some number of time steps, we probably need to regrid...
-                // regrid(domain);
+                amrregrid(&domain);
             }
         }
 
@@ -1533,7 +1679,7 @@ void explicit_step_fixed_output(fclaw2d_domain_t *domain)
 }
 
 
-void explicit_step(fclaw2d_domain_t *domain)
+void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
 {
     // Write out an initial time file
     int iframe = 0;
@@ -1545,12 +1691,13 @@ void explicit_step(fclaw2d_domain_t *domain)
 
     Real t0 = 0;
 
-    int nstep_outer = 2;  // Take this many steps in total
-    int nstep_inner = 1;   // Every 'nstep_inner', write out file.
+    // int nstep_outer = 2;  // Take this many steps in total
+    // int nstep_inner = 1;   // Every 'nstep_inner', write out file.
 
     Real dt_level0 = initial_dt;
     Real t_curr = t0;
-    for(int n = 0; n < nstep_outer; n++)
+    int n = 0;
+    while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
         time_stepper.define(domain,gparms,ddata->amropts,t_curr);
@@ -1595,16 +1742,19 @@ void explicit_step(fclaw2d_domain_t *domain)
             continue;
         }
 
+
         t_curr += dt_minlevel;
+        n++;
 
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
-        int regrid_step = 4;  // Will eventually read this in as a parameter.
+        int regrid_step = 1;  // Will eventually read this in as a parameter.
         if (n % regrid_step == 0)
         {
             // After some number of time steps, we probably need to regrid...
-            // regrid(domain);
+            cout << "regridding at step " << n << endl;
+            amrregrid(&domain);
         }
 
         if (n % nstep_inner == 0)

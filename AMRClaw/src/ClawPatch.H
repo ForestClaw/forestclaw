@@ -90,7 +90,11 @@ extern "C" {
     void tag_for_refinement_(const int& mx,const int& my,const int& mbc,
                              const int& meqn, const Real& xlower,
                              const Real& ylower, const Real& dx, const Real& dy,
-                             Real q[], int& tag_patch);
+                             Real q[], const int& init_flag, int& tag_patch);
+
+    void coarsen_(const int& mx,const int& my, const int& mbc, const int& meqn,
+                  const int& refratio, Real q[], Real qcoarse[]);
+
 
     void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
                                     Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
@@ -177,7 +181,7 @@ public :
                 const global_parms *a_gparms);
 
 #endif
-    void copy(ClawPatch *a_cp);
+    void copyFrom(ClawPatch *a_cp);
 
     bool isDefined();
 
@@ -264,7 +268,9 @@ public :
     // ----------------------------------------------------------------
     // Tagging, refining and coarsening
     // ----------------------------------------------------------------
-    bool tag_for_refinement();
+    bool tag_for_refinement(bool init_flag);
+    bool tag_for_coarsening(const int& a_refratio);
+
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
                                    const int& a_p4est_refineFactor,

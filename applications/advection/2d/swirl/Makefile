@@ -18,6 +18,7 @@ exampleobjs = \
 	setaux.o \
 	setprob.o \
 	b4step2.o \
+	tag4refinement.o \
 	psi.o
 
 amrclawobjs = \
@@ -46,7 +47,7 @@ amrclawobjs = \
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
 $(TARGET): $(TARGET).o $(exampleobjs) $(amrclawobjs) \
-                $(FORESTCLAW)/src/libforestclaw.a 
+                $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
 	$(P4EST_LIBS) -o $@
 

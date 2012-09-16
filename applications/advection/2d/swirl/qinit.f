@@ -25,7 +25,6 @@ c     #     0.1  otherwise
 
              s = 79.d0/128.d0
              s = 0.5d0
-c             s = 5.d0/8.d0 + 1.d0/128.d0
              if (xi .lt. s) then
                 q(i,j,1) = 1.d0
              else

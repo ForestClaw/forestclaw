@@ -369,26 +369,34 @@ Real subcycle_manager::dt(const int& a_level)
 
 bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
 {
+    bool verbose = false;
     bool b1 = solution_updated(a_level,a_curr_step); // do we need this?  We shouldn't be here if
                                                      // we have not taken a time step to 'a_curr_step'
     bool b2 = level_exchange_done(a_level);
     bool b3 = exchanged_with_coarser(a_level);
     bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
-    if (!b1)
+    if (verbose)
     {
-        cout << " --> (can_advance) Solution at level " << a_level << " has not been updated at step " << a_curr_step << endl;
-    }
-    if (!b2)
-    {
-        cout << " --> (can_advance) Level exchange at level " << a_level << " has not been done at step " << a_curr_step << endl;
-    }
-    if (!b3)
-    {
-        cout << " --> (can_advance) Exchange with coarse grid at level " << a_level-1 << " not done at step " << a_curr_step << endl;
-    }
-    if (!b4)
-    {
-        cout << " --> (can_advance) Exchange with finer grid at level " << a_level+1 << " not done at step " << a_curr_step << endl;
+        if (!b1)
+        {
+            cout << " --> (can_advance) Solution at level " << a_level <<
+                " has not been updated at step " << a_curr_step << endl;
+        }
+        if (!b2)
+        {
+            cout << " --> (can_advance) Level exchange at level " << a_level <<
+                " has not been done at step " << a_curr_step << endl;
+        }
+        if (!b3)
+        {
+            cout << " --> (can_advance) Exchange with coarse grid at level " << a_level-1 <<
+                " not done at step " << a_curr_step << endl;
+        }
+        if (!b4)
+        {
+            cout << " --> (can_advance) Exchange with finer grid at level " << a_level+1 <<
+                " not done at step " << a_curr_step << endl;
+        }
     }
     return b1 && b2 && b3 && b4;
 }

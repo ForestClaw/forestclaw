@@ -122,17 +122,17 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
       double precision sum
 
       integer mq,r2
-      integer i, i1, ibc, ii, ifine
-      integer j, j1, jbc, jj, jfine
+      integer i, ic_add, ibc, ii, ifine
+      integer j, jc_add, jbc, jj, jfine
 
 c     # 'iface' is relative to the coarse grid
 
       r2 = refratio*refratio
 
 c     # Average fine grid onto coarse grid
-      if (idir .eq. 0) then
-         j1 = igrid*my/num_neighbors
-         do mq = 1,meqn
+      do mq = 1,meqn
+         if (idir .eq. 0) then
+            jc_add = igrid*my/num_neighbors
             do j = 1,my/num_neighbors
                do ibc = 1,mbc
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
@@ -150,18 +150,16 @@ c                 # ibc = 2 corresponds to the second layer
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
-                     qcoarse(1-ibc,j+j1,mq) = sum/r2
+                     qcoarse(1-ibc,j+jc_add,mq) = sum/r2
                   else
-                     qcoarse(mx+ibc,j+j1,mq) = sum/r2
+                     qcoarse(mx+ibc,j+jc_add,mq) = sum/r2
                   endif
                enddo
             enddo
-         enddo
-      else
-         i1 = igrid*mx/num_neighbors
-         do i = 1,mx/num_neighbors
-            do jbc = 1,mbc
-               do mq = 1,meqn
+         else
+            ic_add = igrid*mx/num_neighbors
+            do i = 1,mx/num_neighbors
+               do jbc = 1,mbc
                   sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
@@ -174,15 +172,15 @@ c                 # ibc = 2 corresponds to the second layer
                         endif
                      enddo
                   enddo
-                  if (iface_coarse .eq. 0) then
-                     qcoarse(i+i1,1-jbc,mq) = sum/r2
+                  if (iface_coarse .eq. 2) then
+                     qcoarse(i+ic_add,1-jbc,mq) = sum/r2
                   else
-                     qcoarse(i+i1,my+jbc,mq) = sum/r2
+                     qcoarse(i+ic_add,my+jbc,mq) = sum/r2
                   endif
                enddo
             enddo
-         enddo
-      endif
+         endif
+      enddo
 
       end
 
@@ -198,12 +196,10 @@ c                 # ibc = 2 corresponds to the second layer
       integer i, i1, i2, ibc, ii, ifine
       integer j, j1, j2, jbc, jj, jfine
       integer ic_add, jc_add, ic, jc, mth
-      double precision linear_terms
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
 
 c     # To be figured out later
-      linear_terms = 0
       mth = 5
 
 c     # 'iface_coarse is relative to the coarse grid
@@ -211,8 +207,8 @@ c     # 'iface_coarse is relative to the coarse grid
       do mq = 1,meqn
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
-            j1 = 1-igrid*mbc
-            j2 = my/num_neighbors + (1-igrid)*mbc
+            j1 = 1-igrid
+            j2 = my/num_neighbors + (1-igrid)
 
             jc_add = igrid*my/num_neighbors
             if (iface_coarse .eq. 0) then
@@ -220,8 +216,9 @@ c           # this ensures that we get 'hanging' corners
             elseif (iface_coarse .eq. 1) then
                ic = mx
             endif
-            do jc = j1, j2
-               qc = qcoarse(ic,jc + jc_add,mq)
+            do j = j1, j2
+               jc = j + jc_add
+               qc = qcoarse(ic,jc,mq)
 c              # Compute limited slopes in both x and y. Note we are not
 c              # really computing slopes, but rather just differences.
 c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
@@ -242,7 +239,7 @@ c                    # Fill in interpolated values on fine grid cell
                      value = qc + shiftx*gradx + shifty*grady
 
                      ifine = ibc
-                     jfine = (jc-1)*refratio + jj
+                     jfine = (j-1)*refratio + jj
                      if (iface_coarse .eq. 0) then
 c                       # qfine is at left edge of coarse grid
                         qfine(mx+ifine,jfine,mq) = value
@@ -256,16 +253,17 @@ c                       # qfine is at right edge of coarse grid
          else
             ic_add = igrid*mx/num_neighbors
 c           # this ensures that we get 'hanging' corners
-            i1 = 1-igrid*mbc
-            i2 = mx/num_neighbors + (1-igrid)*mbc
+            i1 = 1-igrid
+            i2 = mx/num_neighbors + (1-igrid)
 
             if (iface_coarse .eq. 2) then
                jc = 1
             elseif (iface_coarse .eq. 3) then
                jc = my
             endif
-            do ic = i1, i2
-               qc = qcoarse(ic + ic_add,jc,mq)
+            do i = i1, i2
+               ic = i + ic_add
+               qc = qcoarse(ic,jc,mq)
 
                sl = (qc - qcoarse(ic-1,jc,mq))
                sr = (qcoarse(ic+1,jc,mq) - qc)
@@ -284,7 +282,7 @@ c                    # Fill in interpolated values on fine grid cell
 
                      value = (qc + shiftx*gradx + shifty*grady)
 
-                     ifine = (ic-1)*refratio + ii
+                     ifine = (i-1)*refratio + ii
                      jfine = jbc
                      if (iface_coarse .eq. 2) then
 c                       # qfine is at bottom edge of coarse grid
@@ -540,29 +538,6 @@ c    # ---------------------------------------------------------------------
 c    # Tagging for refinement/coarsening
 c    # ---------------------------------------------------------------------
 
-      subroutine tag_for_refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      q,tag_patch)
-      implicit none
-
-      integer mx,my, mbc, meqn, tag_patch
-      double precision xlower, ylower, dx, dy
-      double precision q(1-mx:mx+mbc,1-mbc:my+mbc,meqn)
-
-      integer i,j
-      double precision xc,yc
-
-      tag_patch = 0
-      do i = 1,mx
-         do j = 1,my
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-            if (abs(xc - 0.5d0) < dx) then
-               tag_patch = 1
-            endif
-         enddo
-      enddo
-
-      end
 
 c     # Conservative intepolation to fine grid patch
       subroutine interpolate_to_fine_patch(mx,my,mbc,meqn, qcoarse,
@@ -575,6 +550,7 @@ c     # Conservative intepolation to fine grid patch
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
+      integer ic,jc,ic_add, jc_add
       double precision qc, shiftx, shifty, sl, sr, gradx, grady
       double precision compute_slopes
 
@@ -586,26 +562,30 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
       jg = (igrid-ig)/refratio
 
-      i1 = ig*mx/p4est_refineFactor + 1
-      i2 = (ig+1)*mx/p4est_refineFactor
+      i1 = 1-ig
+      i2 = mx/p4est_refineFactor + (1-ig)
+      ic_add = ig*mx/p4est_refineFactor
 
-      j1 = jg*my/p4est_refineFactor + 1
-      j2 = (jg+1)*my/p4est_refineFactor
+      j1 = 1-jg
+      j2 = my/p4est_refineFactor + (1-jg)
+      jc_add = jg*my/p4est_refineFactor
 
       do mq = 1,meqn
          do i = i1,i2
             do j = j1,j2
-               qc = qcoarse(i,j,mq)
+               ic = i + ic_add
+               jc = j + jc_add
+               qc = qcoarse(ic,jc,mq)
 
 c              # Compute limited slopes in both x and y. Note we are not
 c              # really computing slopes, but rather just differences.
 c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(i-1,j,mq))
-               sr = (qcoarse(i+1,j,mq) - qc)
+               sl = (qc - qcoarse(ic-1,jc,mq))
+               sr = (qcoarse(ic+1,jc,mq) - qc)
                gradx = compute_slopes(sl,sr,mth)
 
-               sl = (qc - qcoarse(i,j-1,mq))
-               sr = (qcoarse(i,j+1,mq) - qc)
+               sl = (qc - qcoarse(ic,jc-1,mq))
+               sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
 c              # Fill in refined values on coarse grid cell (i,j)
@@ -678,7 +658,7 @@ c        # Use AMRClaw slopes
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, ig, jg, i1, i2, j1, j2, ii, jj, ifine, jfine
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
       integer mq
       double precision sum, r2
 
@@ -687,16 +667,13 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       jg = (igrid-ig)/refratio
 
 c     # Get rectangle in coarse grid for fine grid.
-      i1 = ig*mx/p4est_refineFactor + 1
-      i2 = (ig+1)*mx/p4est_refineFactor
-
-      j1 = jg*my/p4est_refineFactor + 1
-      j2 = (jg+1)*my/p4est_refineFactor
+      ic_add = ig*mx/p4est_refineFactor
+      jc_add = jg*mx/p4est_refineFactor
 
       r2 = refratio*refratio
       do mq = 1,meqn
-         do j = j1,j2
-            do i = i1,i2
+         do j = 1,my/p4est_refineFactor
+            do i = 1,mx/p4est_refineFactor
                sum = 0
                do ii = 1,refratio
                   do jj = 1,refratio
@@ -705,12 +682,46 @@ c     # Get rectangle in coarse grid for fine grid.
                      sum = sum + qfine(ifine,jfine,mq)
                   enddo
                enddo
-               qcoarse(i,j,mq) = sum/r2
+               qcoarse(i+ic_add,j + jc_add,mq) = sum/r2
             enddo
          enddo
       enddo
       end
 
+      subroutine coarsen(mx,my,mbc,meqn,refratio, q, qcoarse)
+      implicit none
+
+      integer mx,my,mbc,meqn, refratio
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(1-mbc:mx/refratio+mbc,
+     &      1-mbc:my/refratio+mbc,meqn)
+
+      integer i,j,ii,jj, ifine,jfine, r2, mq
+      double precision sum
+
+      r2 = refratio**2
+
+      do mq = 1,meqn
+         do i = 1,mx/refratio
+            do j = 1,my/refratio
+               sum = 0
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     ifine = (i - 1)*refratio + ii
+                     jfine = (j - 1)*refratio + jj
+                     sum = sum + q(ifine,jfine,mq)
+                  enddo
+               enddo
+               qcoarse(i,j,mq) = sum/r2
+            enddo
+         enddo
+c     # Coarsen ghost cells
+
+      enddo
+
+
+
+      end
 
 c    # ----------------------------------------------------------------------------------
 c    # Output and diagnostics
