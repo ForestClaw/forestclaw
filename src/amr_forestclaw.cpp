@@ -1225,9 +1225,9 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
 
 void amr_set_base_level(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    global_parms *gparms = ddata->parms;
-    gparms->print_inputParams();
+    global_parms *gparms = get_domain_parms(domain);
+    int refratio = gparms->m_refratio;
+    int maxlevel = gparms->m_maxlevel;
 
     for(int i = 0; i < domain->num_blocks; i++)
     {
@@ -1238,12 +1238,14 @@ void amr_set_base_level(fclaw2d_domain_t *domain)
         {
             fclaw2d_patch_t *patch = &block->patches[j];
             ClawPatch *cp = new ClawPatch();
+            int level = block->patches[j].level;
 
             cp->define(patch->xlower,
                        patch->ylower,
                        patch->xupper,
                        patch->yupper,
                        gparms);
+            cp->setup_patch(level, maxlevel, refratio);
             set_patch_data(patch,cp);
         }
     }
@@ -1273,7 +1275,9 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined.
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
         ClawPatch *cp_new = new ClawPatch();
+        int level = old_patch[0].level;
         cp_new->copyFrom(cp_old);  // Copy grid data and aux data
+        cp_new->setup_patch(level,maxlevel, refratio);
         set_patch_data(&new_patch[0],cp_new);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
@@ -1290,10 +1294,9 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            new_patch[igrid].xupper,
                            new_patch[igrid].yupper,
                            gparms);
-            if (gparms->m_maux > 0)
-            {
-                cp_new->setAuxArray(maxlevel,refratio,new_patch[igrid].level);
-            }
+
+            int level = new_patch[igrid].level;
+            cp_new->setup_patch(level, maxlevel, refratio);
             if (init_grid)
             {
                 cp_new->initialize();
@@ -1316,8 +1319,8 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        new_patch[0].yupper,
                        gparms);
 
-        set_patch_data(&new_patch[0],cp_new);
-
+        int level = new_patch[0].level;
+        cp_new->setup_patch(level, maxlevel, refratio);
         for(int igrid = 0; igrid < num_siblings; igrid++)
         {
             // Get one of the older finer grids and average to new coarse grid.
@@ -1325,10 +1328,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             ClawPatch *cp_old = get_clawpatch(&old_patch[igrid]);
             cp_new->coarsen_from_fine_patch(cp_old, igrid, p4est_refineFactor,refratio);
         }
-        if (gparms->m_maux > 0)
-        {
-            cp_new->setAuxArray(maxlevel,refratio,new_patch[0].level);
-        }
+        set_patch_data(&new_patch[0],cp_new);
     }
     else
     {
@@ -1345,18 +1345,8 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
                 int this_block_idx, int this_patch_idx, void *user)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    global_parms *gparms = ddata->parms;
-    int refratio = gparms->m_refratio;
-    int maxlevel = gparms->m_maxlevel;
-    int maux = gparms->m_maux;
-
     ClawPatch *cp = get_clawpatch(this_patch);
 
-    if (maux > 0)
-    {
-        cp->setAuxArray(maxlevel,refratio,this_patch->level);
-    }
     cp->initialize();
 }
 
@@ -1366,6 +1356,8 @@ void amrinit(fclaw2d_domain_t **domain,
              const amr_options_t * amropts)
 {
     Real t = 0;
+
+    // gparms->print_inputParams();
 
     allocate_user_data(*domain);
 
@@ -1384,12 +1376,18 @@ void amrinit(fclaw2d_domain_t **domain,
     // Allocates per-block and per-patch user data
 
     // This function is redundant, and should be made more general.
+    cout << "Setting base level " << endl;
     amr_set_base_level(*domain);
+
+    cout << "Done with amr_set_base_level " << endl;
+
 
     // Initialize base level grid
     fclaw2d_domain_iterate_level(*domain, minlevel,
                                  (fclaw2d_patch_callback_t) cb_amrinit,
                                  (void *) NULL);
+
+    cout << "Done with domain adaptation " << endl;
 
     bc_set_phys(*domain,minlevel,t);
 
@@ -1548,7 +1546,7 @@ void amrregrid(fclaw2d_domain_t **domain)
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    int outstyle = 3;
+    int outstyle = 1;
 
     if (outstyle == 1)
     {
@@ -1556,7 +1554,7 @@ void amrrun(fclaw2d_domain_t *domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 200;  // Take 'nstep' steps
+        int nstep = 10;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }

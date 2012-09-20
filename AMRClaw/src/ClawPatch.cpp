@@ -47,15 +47,16 @@ void ClawPatch::define(const Real&  a_xlower,
     Box box(ll,ur);
 
 
-    int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc);
-
     // This will destroy any existing memory n m_griddata.
-    m_griddata.define(gridsize*m_meqn,box);
-    m_griddata_time_interp.define(gridsize*m_meqn,box);
+    m_griddata.define(box, m_meqn);
+    m_griddata_time_interp.define(box, m_meqn);
     if (m_maux > 0)
     {
-        m_auxarray.define(gridsize*m_maux,box);
+        m_auxarray.define(box,m_maux);
     }
+
+    m_mapped = a_gparms->m_mapped;
+    m_manifold = a_gparms->m_manifold;
 
     m_isDefined = true;
 }
@@ -100,13 +101,14 @@ void ClawPatch::define(const Real& a_xlower,
 
     m_meqn = a_gparms->m_meqn;
     m_maux = a_gparms->m_maux;
+    m_mapped = a_gparms->m_mapped;
+    m_manifold = a_gparms->m_manifold;
 
-    int gridsize = (m_mx+2*m_mbc)*(m_my+2*m_mbc)*(m_mz+2*m_mbc);
-    m_griddata.define(gridsize*m_meqn,box);
-    m_griddata_last.define(gridsize*m_meqn,box);
+    m_griddata.define(box, m_meqn);
+    m_griddata_last.define(box,m_meqn);
     if (m_maux > 0)
     {
-        m_auxarray.define(gridsize*m_maux,box);
+        m_auxarray.define(box,m_maux);
     }
 
     m_isDefined = true;
@@ -120,6 +122,8 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
     m_mbc = a_cp->m_mbc;
     m_meqn = a_cp->m_meqn;
     m_maux = a_cp->m_maux;
+    m_mapped = a_cp->m_mapped;
+    m_manifold = a_cp->m_manifold;
 
     m_xlower = a_cp->m_xlower;
     m_ylower = a_cp->m_ylower;
@@ -132,9 +136,8 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
     m_griddata = a_cp->m_griddata;
     m_auxarray = a_cp->m_auxarray;
 
-    int gridsize = m_griddata.size();
     Box box = m_griddata.box();
-    m_griddata_time_interp.define(gridsize*m_meqn,box);
+    m_griddata_time_interp.define(box,m_meqn);
 
     // m_griddata_save and m_griddata_last will get allocated when we set them equal to
     // current time steps.
@@ -150,37 +153,59 @@ bool ClawPatch::isDefined()
 // Time stepping routines
 // ----------------------------------------------------------------
 
+void ClawPatch::setup_patch(const int& level, const int& maxlevel, const int& refratio)
+{
+    if (m_maux > 0)
+    {
+        if (m_manifold)
+        {
+            setup_manifold(level, maxlevel, refratio);
+        }
+        setAuxArray();
+    }
+    // Anything else to do?
+}
+
+
 void ClawPatch::initialize()
 {
-    CH_assert(m_isDefined);
-
     Real* q = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
 #if CH_SPACEDIM == 2
-    qinit_(m_mx, m_my, m_meqn, m_mbc, m_mx, m_my, m_xlower, m_ylower, m_dx, m_dy, q, m_maux, aux);
+    if (m_manifold)
+    {
+        qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,
+               m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(), q, m_maux, aux);
+    }
+    else
+    {
+        qinit_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux);
+    }
 #elif CH_SPACEDIM == 3
     qinit_(mx,my,mz,m_meqn,m_mbc,mx,my,mz,xlower,ylower,zlower,dx,dy,dz,q,m_maux,aux);
 #endif
 }
 
-void ClawPatch::setAuxArray(const int& a_maxlevel,
-                            const int& a_refratio,
-                            const int& a_level)
+void ClawPatch::setAuxArray()
 {
-    CH_assert(m_isDefined);
-
-    // set common block for level
-    set_common_levels_(a_maxlevel,a_level,a_refratio);
-
     Real* aux = m_auxarray.dataPtr();
 
 #if CH_SPACEDIM == 2
-    setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
+    if (m_manifold)
+    {
+        setaux_mapped_(m_mx,m_my,m_mbc,m_dx,m_dy,
+                       m_xp.dataPtr(),m_yp.dataPtr(),m_zp.dataPtr(),
+                       m_xd.dataPtr(),m_yd.dataPtr(),m_zd.dataPtr(),
+                       m_area.dataPtr(), m_maux,aux);
+    }
+    else
+    {
+        setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
+    }
 #elif CH_SPACEDIM == 3
     setaux_(m_mx,m_my,m_mz,m_mbc,m_mx,m_my,m_mz,m_xlower,m_ylower,m_zlower,m_dx,m_dy,m_dz,m_maux,aux);
 #endif
-
 }
 
 Real ClawPatch::step(const Real& a_time,
@@ -200,9 +225,6 @@ Real ClawPatch::step_noqad(const Real& a_time,
                            const int& a_level,
                            const global_parms& gparms)
 {
-
-    Real dt = a_dt;
-
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
@@ -210,21 +232,33 @@ Real ClawPatch::step_noqad(const Real& a_time,
     // m_griddata_last.dataPtr() == NULL, for some reason.
     m_griddata_last = m_griddata; // Copy for time interpolation
 
+    // We also call a 'b4step2' in clawpath2, below.  But it won't
+    // do anything in the mapped case.
+    if (m_manifold)
+    {
+        /*
+        b4step2_mapped_(m_mx,m_my, m_mbc,m_meqn,qold, m_dx,m_dy,
+                        m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(),
+                        m_xd.dataPtr(), m_yd.dataPtr(), m_zd.dataPtr(),
+                        a_time, a_dt, m_maux, aux);
+        */
+    }
+
     int maxm = max(m_mx,m_my);
 
     Real cflgrid;
 
-    int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn + (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
+    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms.m_mwaves + 3*m_maux + 2);
     Real* work = new Real[mwork];
 
-    Real* fp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-    Real* fm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-    Real* gp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-    Real* gm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+    Real* fp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    Real* fm = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    Real* gp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    Real* gm = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
 
-    clawpatch2_(maxm, gparms.m_meqn, gparms.m_maux, gparms.m_mbc, gparms.m_method,
+    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms.m_method,
                 gparms.m_mthlim, gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold,
-                aux, m_dx, m_dy, dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
+                aux, m_dx, m_dy, a_dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
                 a_time, fp, fm, gp, gm);
 
     delete [] fp;
@@ -478,8 +512,20 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
     {
         Real *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
-        average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
-                            a_p4est_refineFactor,a_refratio,igrid);
+        if (m_manifold)
+        {
+            Real *auxcoarse = m_auxarray.dataPtr();
+            Real *auxfine = neighbor_cp[igrid]->m_auxarray.dataPtr();
+            average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+                                       auxcoarse, auxfine, m_maux,
+                                       a_idir,a_iface_coarse,
+                                       a_p4est_refineFactor,a_refratio,igrid);
+        }
+        else
+        {
+            average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
+                                a_p4est_refineFactor,a_refratio,igrid);
+        }
     }
 }
 
@@ -556,15 +602,24 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
 
 void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                           const int& a_igrid,
-                                          const int& a_num_neighbors,
+                                          const int& a_p4est_refineFactor,
                                           const int& a_refratio)
 {
     Real *qcoarse = this->m_griddata.dataPtr();
     Real *qfine = a_fine->m_griddata.dataPtr();
 
     // Use linear interpolation with limiters.
-    interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_num_neighbors,
+    interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_p4est_refineFactor,
                                a_refratio,a_igrid);
+    if (m_manifold)
+    {
+        /* Doesn't quite work
+        Real *auxcoarse = m_griddata.dataPtr();
+        Real *auxfine = a_fine->m_griddata.dataPtr();
+        fixcapaq2_(m_mx, m_my, m_mbc, m_meqn,qcoarse, qfine, auxcoarse, auxfine,
+                   m_maux, a_p4est_refineFactor, a_refratio, a_igrid);
+        */
+    }
 }
 
 void ClawPatch::coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
@@ -573,7 +628,18 @@ void ClawPatch::coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
     Real *qfine = a_fine->m_griddata.dataPtr();
     Real *qcoarse = this->m_griddata.dataPtr();
 
-    average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,p4est_refineFactor,a_refratio,a_igrid);
+    if (m_manifold)
+    {
+        Real *auxcoarse = m_auxarray.dataPtr();
+        Real *auxfine = a_fine->m_auxarray.dataPtr();
+        average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
+                                  auxcoarse, auxfine, m_maux, p4est_refineFactor,
+                                  a_refratio, a_igrid);
+    }
+    else
+    {
+        average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,p4est_refineFactor,a_refratio,a_igrid);
+    }
 }
 
 bool ClawPatch::tag_for_refinement(bool a_init_flag)
@@ -614,6 +680,58 @@ bool ClawPatch::tag_for_coarsening(const int& a_refratio)
     return tag_patch == 0;
 }
 
+
+// ----------------------------------------------------------------
+// Mapped grids
+// ----------------------------------------------------------------
+
+void ClawPatch::setup_manifold(const int& a_level, const int& a_maxlevel, const int& a_refratio)
+{
+
+    // This is a generic routine that sets all things related to the mapping.
+    set_maptype_();
+    // Do we really ever use the "box"?
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -m_mbc;
+    }
+    ur[0] = m_mx + m_mbc + 1;
+    ur[1] = m_my + m_mbc + 1;
+
+    Box box_p(ll,ur);
+
+    // Mesh cell centers of physical mesh
+    m_xp.define(box_p,1);
+    m_yp.define(box_p,1);
+    m_zp.define(box_p,1);
+
+    // Compute area of the mesh cell.
+    m_area.define(box_p,1);
+
+    // Mesh cell corners of physical mesh
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -m_mbc;
+    }
+    ur[0] = m_mx + m_mbc + 2;
+    ur[1] = m_my + m_mbc + 2;
+    Box box_d(ll,ur);
+
+    m_xd.define(box_d,1);
+    m_yd.define(box_d,1);
+    m_zd.define(box_d,1);
+
+    // Compute centers and corners of mesh cell
+    setup_mesh_(m_mx,m_my,m_mbc,m_xlower,m_ylower,m_dx,m_dy,
+                m_xp.dataPtr(),m_yp.dataPtr(),m_zp.dataPtr(),
+                m_xd.dataPtr(),m_yd.dataPtr(),m_zd.dataPtr());
+
+
+    compute_area_(m_mx, m_my, m_mbc, m_dx, m_dy,m_xlower, m_ylower,
+                  m_area.dataPtr(), a_level, a_maxlevel, a_refratio);
+}
 
 
 // ----------------------------------------------------------------

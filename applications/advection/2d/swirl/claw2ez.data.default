@@ -24,6 +24,8 @@
 1         % mthbc(3) (lower edge)
 1         % mthbc(4) (upper edge)
 
+F         % Use mapping/manifold
+
 3         % Minimum level
 6         % Maximum levels of refinement
 

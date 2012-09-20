@@ -20,15 +20,44 @@ extern "C" {
     // ----------------------------------------------------------------------------------
     // Initialization routines
     // ----------------------------------------------------------------------------------
+    void setprob_();
+
+    void set_maptype_();
+
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                 const int& mx, const int& my, const Real& xlower, const Real& ylower,
                 const Real& dx, const Real& dy, Real q[], const int& maux, Real aux[]);
+
+    void qinit_mapped_(const int& mx, const int& my, const int& meqn, const int& mbc,
+                       Real xp[], Real yp[], Real zp[], Real q[], const int& maux,
+                       Real aux[]);
 
     void setaux_(const int& maxmx, const int& maxmy, const int& mbc, const int& mx, const int& my,
                  const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
                  const int& maux, Real aux[]);
 
-    void setprob_();
+    void setaux_mapped_(const int& mx, const int& my, const int& mbc,
+                        const Real& dx, const Real& dy,
+                        Real xp[], Real yp[], Real zp[],
+                        Real xd[], Real yd[], Real zd[], Real area[],
+                        const int& maux, Real aux[]);
+
+    void b4step2_mapped_(const int& mx, const int& my, const int& mbc,
+                         const int& meqn, Real q[], const Real& dx, const Real& dy,
+                         Real xp[], Real yp[], Real zp[],
+                         Real xd[], Real yd[], Real zd[], const Real& t,
+                         const Real& dt, const int& maux, Real aux[]);
+
+    void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
+                                    const int& meqn, Real qfine[],Real qcoarse[],
+                                    const Real auxcoarse[], const Real auxfine[], const int& maux,
+                                    const int& idir, const int& iside, const int& num_neighbors,
+                                    const int& refratio, const int& igrid);
+
+    void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                    Real qcoarse[], Real qfine[], Real auxcoarse[], Real auxfine[],
+                    const int& maux,
+                    const int& p4est_refineFactor, const int& refratio, const int& igrid);
 
     // ----------------------------------------------------------------------------------
     // Internal boundary conditions
@@ -73,16 +102,16 @@ extern "C" {
                                      const int& meqn, Real qthis[],Real qneighbor[],
                                      const int& icorner, const int& iside);
 
-    // void set_phys_interior_corner_ghost_(const int&mx, const int& my, const int& mbc, const int& meqn, Real q[],
-    //                                  const int& icorner, const int& iside, const int mthbc[]);
     // ----------------------------------------------------------------------------------
     // Time stepping
     // ----------------------------------------------------------------------------------
-    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc, const int method[],
-                     const int mthlim[], const int& mcapa, const int& mwaves, const int& mx, const int& my,
-                     Real qold[], Real auxold[], const Real& dx, const Real& dy, const Real& dt, const Real& cfl,
-                     Real work[], const int& mwork, const Real& xlower, const Real& ylower, const int& level,
-                     const Real& t, Real fp[], Real fm[], Real gp[], Real gm[]);
+    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc,
+                     const int method[], const int mthlim[], const int& mcapa,
+                     const int& mwaves, const int& mx, const int& my, Real qold[],
+                     Real auxold[], const Real& dx, const Real& dy, const Real& dt,
+                     const Real& cfl, Real work[], const int& mwork, const Real& xlower,
+                     const Real& ylower, const int& level, const Real& t, Real fp[],
+                     Real fm[], Real gp[], Real gm[]);
 
     // ----------------------------------------------------------------------------------
     // Tagging for refinement/coarsening
@@ -103,6 +132,25 @@ extern "C" {
     void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
                                   Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
                                   const int& refratio, const int& igrid);
+
+    void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
+                                   const int& meqn, Real qcoarse[], Real qfine[],
+                                   const Real auxcoarse[], const Real auxfine[],
+                                   const int& maux, const int& p4est_refineFactor,
+                                   const int& refratio, const int& igrid);
+
+// ----------------------------------------------------------------------------------
+// Mapped grids
+// ----------------------------------------------------------------------------------
+    void setup_mesh_(const int& mx, const int& my, const int& mbc,
+                     const Real& xlower, const Real& ylower,
+                     const Real& dx, const Real& dy,
+                     Real xp[], Real yp[], Real zp[], Real xd[], Real yd[], Real zd[]);
+
+    void compute_area_(const int& mx, const int& my, const int& mbc,
+                       const Real& m_dx, const Real& m_dy,const Real& m_xlower,
+                       const Real& m_ylower, Real area[],
+                       const int& level, const int& maxlevel, const int& refratio);
 
     // ----------------------------------------------------------------------------------
     // Output and diagnostics
@@ -190,9 +238,9 @@ public :
     // ----------------------------------------------------------------------------------
     void initialize();
 
-    void setAuxArray(const int& a_maxlevel,
-                     const int& a_refratio,
-                     const int& a_level);
+    void setup_patch(const int& level, const int& maxlevel, const int& refratio);
+
+    void setAuxArray();
 
     // ----------------------------------------------------------------
     // Time stepping routines
@@ -279,6 +327,12 @@ public :
     void coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
                                  const int& a_p4est_refineFactor, const int& a_refratio);
 
+
+    // ----------------------------------------------------------------
+    // Mapped grids
+    // ----------------------------------------------------------------
+    void setup_manifold(const int& a_level, const int& a_maxlevel, const int& a_refratio);
+
     // ----------------------------------------------------------------
     // Output and diagnostics
     // ----------------------------------------------------------------
@@ -290,6 +344,8 @@ public :
     void dump();
     void dump_last();
     void dump_time_interp();
+
+
 
 protected :
 
@@ -323,7 +379,8 @@ protected :
     int m_maux;
     int m_mbc;
 
-    // bool *m_corners_set;
+    int m_manifold;
+    int m_mapped;
 
     // Here is where the data is stored.
     FArrayBox m_griddata;
@@ -332,6 +389,16 @@ protected :
     FArrayBox m_griddata_save;
 
     FArrayBox m_auxarray;
+
+    bool m_ismapped;
+    FArrayBox m_xp;
+    FArrayBox m_yp;
+    FArrayBox m_zp;
+
+    FArrayBox m_xd;
+    FArrayBox m_yd;
+    FArrayBox m_zd;
+    FArrayBox m_area;
 
     bool m_isDefined;
 

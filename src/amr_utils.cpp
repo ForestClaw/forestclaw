@@ -57,6 +57,7 @@ void global_parms::get_inputParams()
 {
     // read data using Fortran file
     int icycle;
+    int imanifold;
     inputparms_(m_mx_leaf,
                 m_my_leaf,
                 m_initial_dt,
@@ -77,7 +78,8 @@ void global_parms::get_inputParams()
                 m_order,
                 m_minlevel,
                 m_maxlevel,
-                icycle);
+                icycle,
+                imanifold);
 
     // Set up arrays needed by clawpack.
     m_method[0] = 0; // not used in forestclaw
@@ -98,6 +100,8 @@ void global_parms::get_inputParams()
 
     // I should just figure out how bool and Fortran 'logical' vars can be passed around.
     m_subcycle = icycle == 1;
+    m_manifold = imanifold == 1;
+    m_mapped = false;
 }
 
 
@@ -131,6 +135,8 @@ void global_parms::print_inputParams()
   cout << endl << endl;
 
   cout << "mbc (number of ghost cells) = " << m_mbc << endl;
+  cout << "subcycling " << (m_subcycle ? "Yes" : "No") << endl;
+  cout << "Manifold " << (m_manifold ? "Yes" : "No") << endl;
 
   /*
   cout << "Auxiliary array type : " << endl;
@@ -141,7 +147,6 @@ void global_parms::print_inputParams()
   cout << endl;
   */
 
-
   cout << "mthbc(2*dim) (boundary conditions) = ";
   for(int i = 0; i < 2*SpaceDim; i++)
     {
@@ -151,7 +156,6 @@ void global_parms::print_inputParams()
 
   cout << "Min configured level = " << m_minlevel << endl;
   cout << "Max configured level = " << m_maxlevel << endl;
-
 }
 
 
@@ -160,6 +164,34 @@ FArrayBox::FArrayBox()
     m_data = NULL;
     m_size = 0;
 }
+
+FArrayBox::~FArrayBox()
+{
+    if (m_data != NULL)
+    {
+        delete [] m_data;
+    }
+    m_data = NULL;
+    m_size = 0;
+}
+
+void FArrayBox::define(int a_size,const Box& a_box)
+{
+    if (m_data != NULL)
+    {
+        delete [] m_data;
+    }
+    m_data = new Real[a_size];
+    m_size = a_size;
+    m_box = a_box;
+}
+
+void FArrayBox::define(const Box& a_box, int a_fields)
+{
+    int box_size = (a_box.bigEnd(0) - a_box.smallEnd(0) + 1)*(a_box.bigEnd(1) - a_box.smallEnd(1) + 1);
+    define(box_size*a_fields,a_box);
+}
+
 
 // copy constructor
 void FArrayBox::operator=(const FArrayBox& fbox)
@@ -190,28 +222,8 @@ void FArrayBox::operator=(const FArrayBox& fbox)
     }
 }
 
-FArrayBox::~FArrayBox()
-{
-    if (m_data != NULL)
-    {
-        delete [] m_data;
-    }
-    m_data = NULL;
-    m_size = 0;
-}
 
-void FArrayBox::define(int a_size,const Box& a_box)
-{
-    if (m_data != NULL)
-    {
-        delete [] m_data;
-    }
-    m_data = new Real[a_size];
-    m_size = a_size;
-    m_box = a_box;
-}
-
-Real* FArrayBox::dataPtr() const
+Real* FArrayBox::dataPtr()
 {
     return m_data;
 }

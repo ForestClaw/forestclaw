@@ -80,7 +80,8 @@ extern "C"
                      int  order[],
                      int& minlevel,
                      int& maxlevel,
-                     int& icycle);
+                     int& icycle,
+                     int& manifold);
 
     void setprob_();
 }
@@ -214,6 +215,9 @@ public:
     int m_mbc;
     int *m_mthbc;
 
+    bool m_manifold;
+    bool m_mapped;
+
     // AMR parameters
     int m_refratio;
     int m_minlevel;
@@ -249,7 +253,9 @@ public:
     ~FArrayBox();
     // FArrayBox(const FArrayBox& fbox);
     void define(int a_size, const Box& a_box);
-    Real* dataPtr() const;
+    void define(const Box& a_box, int a_fields);
+
+    Real* dataPtr();
     Box box();
     int size();
     void operator=(const FArrayBox& fbox);
