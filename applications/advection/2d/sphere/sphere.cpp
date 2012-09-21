@@ -60,7 +60,7 @@ main (int argc, char **argv)
   gparms->get_inputParams();
 
   int minlevel = gparms->m_minlevel;
-  domain = fclaw2d_domain_new_pillow (mpicomm,minlevel);
+  domain = fclaw2d_domain_new_twosphere (mpicomm,minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);

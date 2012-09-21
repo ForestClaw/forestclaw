@@ -194,7 +194,7 @@ fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_pillow (MPI_Comm mpicomm, int initial_level)
+fclaw2d_domain_new_twosphere (MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return
