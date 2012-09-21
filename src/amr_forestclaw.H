@@ -87,9 +87,12 @@ extern "C"
 // ------------------------------------------------------------
 // Getting and setting user data in domain, blocks and patches
 // ------------------------------------------------------------
+/*
+ * Either make the functions non-static, or remove these declarations.
 static void init_domain_data(fclaw2d_domain_t *domain);
 static void init_block_data(fclaw2d_block_t *block);
 static void init_patch_data(fclaw2d_patch_t *patch);
+*/
 
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
 fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
