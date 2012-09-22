@@ -26,6 +26,7 @@ exampleobjs = \
 	setaux_mapped.o \
 	b4step2_mapped.o \
 	setprob_advection.o \
+	ghost_twopatch.o \
 	rpn2noncons.o \
 	rpt2noncons.o \
 	init_routines.o \
@@ -42,6 +43,7 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setaux.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qinit.o \
+	$(FORESTCLAW)/AMRClaw/src2d/input_parms.o \
 	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
@@ -57,9 +59,10 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils_mapped.o \
+	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_sphere.o
+	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
 
 ifeq ($(GEO),sphere)
    GeoFiles := \

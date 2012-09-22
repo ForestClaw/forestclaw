@@ -56,12 +56,12 @@
 
 
       subroutine write_qfile(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &      dx,dy,q,iframe,patch_num,level)
+     &      dx,dy,q,iframe,patch_num,level,blockno)
 
       implicit none
 
       integer maxmx, maxmy,meqn,mbc,mx,my
-      integer iframe,patch_num, level
+      integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
 
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
@@ -82,11 +82,13 @@
 
       open(matunit1,file=matname1,access='append');
 
-      write(matunit1,1001) patch_num, level, mx, my
+      write(matunit1,1001) patch_num, level, blockno, mx, my
  1001 format(i5,'                 grid_number',/,
      &       i5,'                 AMR_level',/,
+     &       i5,'                 block_number',/,
      &       i5,'                 mx',/,
      &       i5,'                 my')
+
 
       write(matunit1,1002) xlower,ylower,dx,dy
  1002 format(e24.16,'    xlow', /,

@@ -19,11 +19,13 @@ void ClawPatch::define(const Real&  a_xlower,
                        const Real&  a_ylower,
                        const Real&  a_xupper,
                        const Real&  a_yupper,
+                       const int& a_blockno,
                        const global_parms* a_gparms)
 {
     m_mx = a_gparms->m_mx_leaf;
     m_my = a_gparms->m_my_leaf;
     m_mbc = a_gparms->m_mbc;
+    m_blockno = a_blockno;
 
     m_xlower = a_xlower;
     m_ylower = a_ylower;
@@ -122,6 +124,7 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
     m_mbc = a_cp->m_mbc;
     m_meqn = a_cp->m_meqn;
     m_maux = a_cp->m_maux;
+    m_blockno = a_cp->m_blockno;
     m_mapped = a_cp->m_mapped;
     m_manifold = a_cp->m_manifold;
 
@@ -153,13 +156,13 @@ bool ClawPatch::isDefined()
 // Time stepping routines
 // ----------------------------------------------------------------
 
-void ClawPatch::setup_patch(const int& level, const int& maxlevel, const int& refratio)
+void ClawPatch::setup_patch(const int& a_level, const int& a_maxlevel, const int& a_refratio)
 {
     if (m_maux > 0)
     {
         if (m_manifold)
         {
-            setup_manifold(level, maxlevel, refratio);
+            setup_manifold(a_level, a_maxlevel, a_refratio);
         }
         setAuxArray();
     }
@@ -172,10 +175,12 @@ void ClawPatch::initialize()
     Real* q = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
+    set_block_(m_blockno);
+
 #if CH_SPACEDIM == 2
     if (m_manifold)
     {
-        qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,
+        qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,m_xlower, m_ylower, m_dx, m_dy,
                m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(), q, m_maux, aux);
     }
     else
@@ -438,6 +443,13 @@ void ClawPatch::exchange_face_ghost(const int& a_idir, ClawPatch *neighbor_cp)
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
 }
 
+void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
+{
+    Real *qthis = m_griddata.dataPtr();
+    Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
+    mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface);
+}
+
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 {
     Real *qthis = m_griddata.dataPtr();
@@ -685,11 +697,17 @@ bool ClawPatch::tag_for_coarsening(const int& a_refratio)
 // Mapped grids
 // ----------------------------------------------------------------
 
-void ClawPatch::setup_manifold(const int& a_level, const int& a_maxlevel, const int& a_refratio)
+void ClawPatch::setup_manifold(const int& a_level,
+                               const int& a_maxlevel, const int& a_refratio)
 {
 
     // This is a generic routine that sets all things related to the mapping.
-    set_maptype_();
+    //    set_maptype_();
+
+    // Set fortran common block
+    set_block_(m_blockno);
+
+
     // Do we really ever use the "box"?
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -728,7 +746,6 @@ void ClawPatch::setup_manifold(const int& a_level, const int& a_maxlevel, const 
                 m_xp.dataPtr(),m_yp.dataPtr(),m_zp.dataPtr(),
                 m_xd.dataPtr(),m_yd.dataPtr(),m_zd.dataPtr());
 
-
     compute_area_(m_mx, m_my, m_mbc, m_dx, m_dy,m_xlower, m_ylower,
                   m_area.dataPtr(), a_level, a_maxlevel, a_refratio);
 }
@@ -742,7 +759,8 @@ void ClawPatch::setup_manifold(const int& a_level, const int& a_maxlevel, const 
 void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)
 {
     Real *q = m_griddata.dataPtr();
-    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,a_iframe,a_patch_num,a_level);
+    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,
+                 a_iframe,a_patch_num,a_level,m_blockno);
 }
 
 Real ClawPatch::compute_sum()

@@ -3,23 +3,24 @@ s = 1e-2;
 axis image;
 daspect([1 1 1]);
 axis off;
-% yrbcolormap;
-colormap(jet);
+yrbcolormap;
+% colormap(jet);
 
 cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
-% caxis([0 1]);
+caxis([0 1]);
 
 showgridlines(3:5)
 setpatchborderprops(4:6,'linewidth',2);
 hidepatchborders(7);
 
 % hidepatchborders;
-% hidegridlines;
+hidegridlines;
 
 % view([-121.5 30]);
 setviews;
-% view(3);
+view(3);
+% view(vback);
 
 NoQuery = 0;
 MaxFrames = 192;
@@ -36,3 +37,4 @@ end;
 
 clear afterframe;
 clear mapc2m;
+clear mapc2m_new;

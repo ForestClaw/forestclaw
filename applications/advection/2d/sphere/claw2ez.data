@@ -4,7 +4,7 @@
 20        % nout
 5.0       % tfinal
 
-0.02      % Initial time step
+0.5      % Initial time step
 1.0       % maximum cfl
 0.9       % desired cfl
 
@@ -19,15 +19,15 @@
 4         % mthlim
 
 2         % mbc
-1         % mthbc(1) (left edge)
-1         % mthbc(2) (right edge)
-1         % mthbc(3) (lower edge)
-1         % mthbc(4) (upper edge)
+0         % mthbc(1) (left edge)
+0         % mthbc(2) (right edge)
+0         % mthbc(3) (lower edge)
+0         % mthbc(4) (upper edge)
 
 T         % Manifold
 
 
 2         % Minimum level
-6         % Maximum levels of refinement
+2         % Maximum levels of refinement
 
 T         % subcycle in time ( = T or F).

@@ -2,7 +2,7 @@
      &      xp,yp,zp,xd,yd,zd)
       implicit none
 
-      integer mx,my, mbc
+      integer mx,my, mbc, blockno
       double precision dx,dy,xlower,ylower
 
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)

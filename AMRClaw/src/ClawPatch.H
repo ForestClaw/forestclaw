@@ -23,12 +23,14 @@ extern "C" {
     void setprob_();
 
     void set_maptype_();
+    void set_block_(const int& a_blockno);
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                 const int& mx, const int& my, const Real& xlower, const Real& ylower,
                 const Real& dx, const Real& dy, Real q[], const int& maux, Real aux[]);
 
     void qinit_mapped_(const int& mx, const int& my, const int& meqn, const int& mbc,
+                       const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
                        Real xp[], Real yp[], Real zp[], Real q[], const int& maux,
                        Real aux[]);
 
@@ -58,6 +60,10 @@ extern "C" {
                     Real qcoarse[], Real qfine[], Real auxcoarse[], Real auxfine[],
                     const int& maux,
                     const int& p4est_refineFactor, const int& refratio, const int& igrid);
+
+    void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                 Real qthis[], Real qneighbor[], const int& iface);
+
 
     // ----------------------------------------------------------------------------------
     // Internal boundary conditions
@@ -158,7 +164,7 @@ extern "C" {
     void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                       const int& mx, const int& my, const Real& xlower, const Real& ylower,
                       const Real& dx, const Real& dy, Real q[], const int& iframe, const int& patch_idx,
-                      const int& level);
+                      const int& level,const int& blockno);
 
     void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,const Real& dx,
                       const Real& dy, Real q[], Real& sum);
@@ -218,6 +224,7 @@ public :
                 const Real&  a_ylower,
                 const Real&  a_xupper,
                 const Real&  a_yupper,
+                const int& a_blockno,
                 const global_parms *a_gparms);
 #else
     void define(const Real& xlower,
@@ -238,7 +245,7 @@ public :
     // ----------------------------------------------------------------------------------
     void initialize();
 
-    void setup_patch(const int& level, const int& maxlevel, const int& refratio);
+    void setup_patch(const int& a_level, const int& a_maxlevel, const int& a_refratio);
 
     void setAuxArray();
 
@@ -274,6 +281,8 @@ public :
     // Internal boundary conditions
     // ----------------------------------------------------------------
     void exchange_face_ghost(const int& a_idir,ClawPatch *a_neighbor_cp);
+
+    void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
@@ -331,6 +340,7 @@ public :
     // ----------------------------------------------------------------
     // Mapped grids
     // ----------------------------------------------------------------
+
     void setup_manifold(const int& a_level, const int& a_maxlevel, const int& a_refratio);
 
     // ----------------------------------------------------------------
@@ -379,8 +389,9 @@ protected :
     int m_maux;
     int m_mbc;
 
-    int m_manifold;
-    int m_mapped;
+    bool m_manifold;
+    bool m_mapped;
+    int m_blockno; // This determines which mapping to use for this patch
 
     // Here is where the data is stored.
     FArrayBox m_griddata;
@@ -390,7 +401,6 @@ protected :
 
     FArrayBox m_auxarray;
 
-    bool m_ismapped;
     FArrayBox m_xp;
     FArrayBox m_yp;
     FArrayBox m_zp;

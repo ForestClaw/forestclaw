@@ -220,7 +220,8 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
     int dump_patch = *((int *) user);
-    if (patch_no == dump_patch)
+    int numb4 = domain->blocks[block_no].num_patches_before;
+    if (patch_no == dump_patch-numb4)
     {
         ClawPatch *cp = get_clawpatch(patch);
         cp->dump();
@@ -239,7 +240,8 @@ void cb_dump_last_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
     int dump_patch = *((int *) user);
-    if (patch_no == dump_patch)
+    int numb4 = domain->blocks[block_no].num_patches_before;
+    if (patch_no == dump_patch-numb4)
     {
         ClawPatch *cp = get_clawpatch(patch);
         cp->dump_last();
@@ -256,7 +258,8 @@ void cb_dump_time_interp_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
     int dump_patch = *((int *) user);
-    if (patch_no == dump_patch)
+    int numb4 = domain->blocks[block_no].num_patches_before;
+    if (patch_no == dump_patch-numb4)
     {
         ClawPatch *cp = get_clawpatch(patch);
         cp->dump_time_interp();
@@ -408,10 +411,9 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     // const int numfaces = get_faces_per_patch(domain);
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
-    for (int idir = 0; idir < SpaceDim; idir++)
+    int numfaces = get_faces_per_patch(domain);
+    for (int iface = 0; iface < numfaces; iface++)
     {
-        int iface = 2*idir + 1;  // Look only at high side for level copy.
-
         // Output arguments
         int neighbor_block_idx;
         int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
@@ -428,20 +430,39 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
 
         if (ref_flag_ptr == NULL)
         {
-            // No neighbors
-            // physical boundary
+            // No neighbors - we are at a physical boundary
         }
         else if (ref_flag == 0)
         {
-            // Ghost cells overlap patch at the same level, and so we can do a straight copy.
-            fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-            fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
-            ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
-
-            // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
-            this_cp->exchange_face_ghost(idir,neighbor_cp);
+            // We have a neighbor patch at the same level
+            if (this_block_idx == neighbor_block_idx)
+            {
+                if (iface % 2 == 1)
+                {
+                    fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                    int nidx = neighbor_patch_idx[0] - neighbor_block->num_patches_before;
+                    fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[nidx];
+                    ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
+                    // Do high side exchange only
+                    int idir = iface/2;   // this rounds down, right?  1/2 = 0; 3/2 = 1, etc.
+                    // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
+                    this_cp->exchange_face_ghost(idir,neighbor_cp);
+                }
+            }
+            else if (this_block_idx == 0)
+            {
+                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                int nidx = neighbor_patch_idx[0] - neighbor_block->num_patches_before;
+                fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[nidx];
+                ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
+                if (this_block_idx == 0)
+                {
+                    // Initiate exchange from block 1
+                    this_cp->mb_exchange_face_ghost(iface,neighbor_cp);
+                }
+            }
         }
-    } // loop over directions (idir = 0,1,2)
+    } // loop over faces
 }
 
 void cb_level_corner_exchange(fclaw2d_domain_t *domain,
@@ -489,31 +510,39 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
         else if (interior_corner)
         {
-            if (icorner % 2 == 1) // only exchange with high side corners (corners 1, 3)
+            int corner_block_idx;
+            int corner_patch_idx;
+            int ref_flag;
+            int *ref_flag_ptr = &ref_flag;
+
+            get_corner_neighbor(domain,
+                                this_block_idx,
+                                this_patch_idx,
+                                icorner,
+                                &corner_block_idx,
+                                &corner_patch_idx,
+                                &ref_flag_ptr);
+
+            if (ref_flag_ptr == NULL)
             {
-                int corner_block_idx;
-                int corner_patch_idx;
-                int ref_flag;
-                int *ref_flag_ptr = &ref_flag;
-
-                get_corner_neighbor(domain,
-                                    this_block_idx,
-                                    this_patch_idx,
-                                    icorner,
-                                    &corner_block_idx,
-                                    &corner_patch_idx,
-                                    &ref_flag_ptr);
-
-                if (ref_flag_ptr == NULL)
+                // We don't have a corner neighbor
+            }
+            else if (ref_flag == 0)
+            {
+                if (this_block_idx == corner_block_idx)
                 {
-                    // We don't have a corner neighbor
-                }
-                else if (ref_flag == 0)
-                {
-                    fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                    fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                    ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                    this_cp->exchange_corner_ghost(icorner,corner_cp);
+                    if (icorner % 2 == 1)
+                    {
+                        // This is all I can handle so far
+                        fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
+                        fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
+                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                        this_cp->exchange_corner_ghost(icorner,corner_cp);
+                    }
+                    else if (this_block_idx == 0)
+                    {
+                        // Do a corner exchange
+                    }
                 }
             }
         }
@@ -716,6 +745,7 @@ void bc_level_exchange(fclaw2d_domain_t *domain, int a_level)
 {
     fclaw2d_subcycle_info step_info;
     step_info.level_time = get_domain_time(domain);
+
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_bc_level_face_exchange, (void *) NULL);
     // Do corner exchange only after physical boundary conditions have been set on all patches,
@@ -1131,7 +1161,8 @@ Real advance_level(fclaw2d_domain_t *domain,
     time_data.dt = a_time_stepper->dt(a_level);
     time_data.t = t_level;
 
-    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + a_time_stepper.step_inc(a_level)'
+    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step +
+    // a_time_stepper.step_inc(a_level)'
     fclaw2d_domain_iterate_level(domain, a_level,
                                  (fclaw2d_patch_callback_t) cb_advance_patch,
                                  (void *) &time_data);
@@ -1147,6 +1178,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     {
         cout << "Advance on level " << a_level << " done" << endl << endl;
     }
+    // dump_patch(domain,1);
 
     return time_data.maxcfl;  // Maximum from level iteration
 }
@@ -1222,33 +1254,38 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
 }
 
 
-
-void amr_set_base_level(fclaw2d_domain_t *domain)
+void cb_init_base(fclaw2d_domain_t *domain,
+                  fclaw2d_patch_t *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx,
+                  void *user)
 {
     global_parms *gparms = get_domain_parms(domain);
+    ClawPatch *cp = new ClawPatch();
+
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               this_block_idx,
+               gparms);
+
+    int level  = this_patch->level;
     int refratio = gparms->m_refratio;
     int maxlevel = gparms->m_maxlevel;
 
-    for(int i = 0; i < domain->num_blocks; i++)
-    {
-        fclaw2d_block_t *block = &domain->blocks[i];
-        set_block_data(block,gparms->m_mthbc);
+    cp->setup_patch(level, maxlevel, refratio);
+    set_patch_data(this_patch,cp);
+}
 
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *patch = &block->patches[j];
-            ClawPatch *cp = new ClawPatch();
-            int level = block->patches[j].level;
 
-            cp->define(patch->xlower,
-                       patch->ylower,
-                       patch->xupper,
-                       patch->yupper,
-                       gparms);
-            cp->setup_patch(level, maxlevel, refratio);
-            set_patch_data(patch,cp);
-        }
-    }
+void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
+{
+    global_parms *gparms = get_domain_parms(domain);
+
+    fclaw2d_domain_iterate_level(domain, level,
+                                 (fclaw2d_patch_callback_t) cb_init_base,
+                                 (void *) gparms);
 }
 
 
@@ -1293,6 +1330,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            new_patch[igrid].ylower,
                            new_patch[igrid].xupper,
                            new_patch[igrid].yupper,
+                           blockno,
                            gparms);
 
             int level = new_patch[igrid].level;
@@ -1317,6 +1355,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        new_patch[0].ylower,
                        new_patch[0].xupper,
                        new_patch[0].yupper,
+                       blockno,
                        gparms);
 
         int level = new_patch[0].level;
@@ -1342,8 +1381,11 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 // -----------------------------------------------------------------
 // Initial grid
 // -----------------------------------------------------------------
-void cb_amrinit(fclaw2d_domain_t *domain,fclaw2d_patch_t *this_patch,
-                int this_block_idx, int this_patch_idx, void *user)
+void cb_amrinit(fclaw2d_domain_t *domain,
+                fclaw2d_patch_t *this_patch,
+                int this_block_idx,
+                int this_patch_idx,
+                void *user)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
 
@@ -1377,12 +1419,12 @@ void amrinit(fclaw2d_domain_t **domain,
 
     // This function is redundant, and should be made more general.
     cout << "Setting base level " << endl;
-    amr_set_base_level(*domain);
+    amr_set_base_level(*domain,minlevel);
 
     cout << "Done with amr_set_base_level " << endl;
 
 
-    // Initialize base level grid
+    // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel,
                                  (fclaw2d_patch_callback_t) cb_amrinit,
                                  (void *) NULL);
@@ -1424,8 +1466,15 @@ void amrinit(fclaw2d_domain_t **domain,
 
             // Physical BCs are needed in boundary level exchange
             // Assume only one block, since we are assuming mthbc
-            fclaw2d_block_t *block = &new_domain->blocks[0];
-            set_block_data(block,gparms->m_mthbc);
+
+            int num = new_domain->num_blocks;
+            for (int i = 0; i < num; i++)
+            {
+                fclaw2d_block_t *block = &new_domain->blocks[i];
+                // This is kind of dumb for now, since block won't in general
+                // have the same physical boundary conditions types.
+                set_block_data(block,gparms->m_mthbc);
+            }
 
             int new_level = level+1;
             // Upon initialization, we don't do any ghost cell exchanges, because we assume
@@ -1546,7 +1595,7 @@ void amrregrid(fclaw2d_domain_t **domain)
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    int outstyle = 1;
+    int outstyle = 3;
 
     if (outstyle == 1)
     {
@@ -1554,7 +1603,7 @@ void amrrun(fclaw2d_domain_t *domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 10;  // Take 'nstep' steps
+        int nstep = 20;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }
@@ -1694,6 +1743,7 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
 
     Real dt_level0 = initial_dt;
     Real t_curr = t0;
+    set_domain_time(domain,t_curr);
     int n = 0;
     while (n < nstep_outer)
     {
@@ -1701,7 +1751,6 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
         time_stepper.define(domain,gparms,ddata->amropts,t_curr);
 
         // In case we have to reject this step
-        set_domain_time(domain,t_curr);
         save_time_step(domain);
         // check_conservation(domain);
 
@@ -1744,6 +1793,8 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
         t_curr += dt_minlevel;
         n++;
 
+        set_domain_time(domain,t_curr);
+
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
@@ -1752,7 +1803,7 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
         {
             // After some number of time steps, we probably need to regrid...
             cout << "regridding at step " << n << endl;
-            amrregrid(&domain);
+            // amrregrid(&domain);
         }
 
         if (n % nstep_inner == 0)
@@ -1770,7 +1821,8 @@ void cb_amrout(fclaw2d_domain_t *domain,
                void *user)
 {
     int iframe = *((int *) user);
-    int num = this_block_idx*domain->num_blocks + this_patch_idx + 1;
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int num = this_block->num_patches_before + this_patch_idx + 1;
     int matlab_level = this_patch->level + 1;  // Matlab wants levels to start at 1.
 
     // Patch data is appended to fort.qXXXX
@@ -1782,8 +1834,7 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    global_parms *gparms = ddata->parms;
+    global_parms *gparms = get_domain_parms(domain);
     Real time = get_domain_time(domain);
 
     // Get total number of patches

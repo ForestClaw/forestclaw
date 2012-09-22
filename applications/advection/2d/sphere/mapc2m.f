@@ -9,13 +9,13 @@
 
       if (iscart()) then
          call mapc2m_cart(xc1,yc1,xp,yp,zp)
-         xp = 0.5*xp
-         yp = 0.5*yp
-         zp = 0.5*zp
       elseif (isdisk()) then
          call mapc2m_disk(xc1,yc1,xp,yp,zp)
       elseif (issphere()) then
          call mapc2m_sphere(xc1,yc1,xp,yp,zp)
       endif
+
+      call scale_map(xp,yp,zp)
+      call rotate_map(xp,yp,zp)
 
       end

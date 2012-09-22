@@ -1,3 +1,16 @@
+      subroutine setup_mappedgrid(rot_angle,scale)
+      implicit none
+      double precision rot_angle(2), scale
+
+c     This calls maptype function that was compiled in at run time
+c     It also call set_map_defaults()
+      call set_maptype()
+
+      call set_scale(scale)
+      call set_rotation(rot_angle)
+
+      end
+
       subroutine set_map_defaults()
       implicit none
       double precision rot_angle(2), scale

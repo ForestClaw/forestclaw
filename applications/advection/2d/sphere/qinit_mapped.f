@@ -1,8 +1,9 @@
-      subroutine qinit_mapped(mx,my,meqn,mbc,xp, yp, zp, q_claw,
-     &      maux,aux)
+      subroutine qinit_mapped(mx,my,meqn,mbc,xlower, ylower, dx, dy,
+     &      xp, yp, zp, q_claw,maux,aux)
       implicit none
 
       integer mx,my,meqn,mbc, maux
+      double precision xlower, ylower, dx, dy
       double precision q_claw(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision    aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
@@ -15,6 +16,7 @@
       double precision t,x,y,z
       double precision gaussian_sum, cosine_bell_sum
       double precision slotted_disk_sum
+      integer get_block, blockno
 
       ichoice = get_init_choice()
 
@@ -26,25 +28,39 @@
       a = -0.8d0
       b = 0.9d0
 
+      blockno = get_block()
+
       t = 0
       do j = 0,my+1
          do i = 0,mx+1
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
-c            if (x .le. 0) then
-c               q_claw(i,j,1) = 1.d0
-c            else
-c               q_claw(i,j,1) = 0.d0
+c            q_claw(i,j,1) = 0
+c            if (blockno .eq. 0) then
+c               if (abs(xlower) < 1e-8 .and.
+c     &               abs(ylower-0.25d0) < 1e-8) then
+c                  if ((i .ge. 1 .and. i .le. mx) .and.
+c     &                  (j .ge. 1 .and. j .le. my)) then
+c                     q_claw(i,j,1) = 1.d0
+c                  endif
+c               endif
 c            endif
-            if (ichoice .eq. 1) then
-               q1 = gaussian_sum(x,y,z)
-            elseif (ichoice .eq. 2 .or. ichoice .eq. 3) then
-               q1 = cosine_bell_sum(x,y,z)
-            elseif (ichoice .eq. 4) then
-               q1 = slotted_disk_sum(x,y,z)
+
+            if (y .le. 0) then
+               q_claw(i,j,1) = 1.d0
+            else
+               q_claw(i,j,1) = 0.d0
             endif
-            q_claw(i,j,1) = q1
+
+c            if (ichoice .eq. 1) then
+c               q1 = gaussian_sum(x,y,z)
+c            elseif (ichoice .eq. 2 .or. ichoice .eq. 3) then
+c               q1 = cosine_bell_sum(x,y,z)
+c            elseif (ichoice .eq. 4) then
+c               q1 = slotted_disk_sum(x,y,z)
+c            endif
+c            q_claw(i,j,1) = q1
 
             if (ichoice .eq. 3) then
                q2 = a*q1**2 + b

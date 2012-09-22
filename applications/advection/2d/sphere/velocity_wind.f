@@ -40,9 +40,6 @@ c     # Sign difference from Benchmark problem
 
       common /compi/ pi
 
-c      kappa = 2.d0
-c      Tfinal = 5.d0
-
       call get_wind_parms(kappa,Tfinal)
 
       call map2polar(xp,yp,zp,l,th)

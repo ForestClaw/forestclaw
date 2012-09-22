@@ -14,6 +14,8 @@ c     # ------------------------------------------------------------------
       double precision xc,yc, x2
       double precision tol, rp2, rp
 
+      integer blockno, get_block
+
 
 c     # Map ghost cells to interior of the domain
       tol = 0
@@ -73,6 +75,11 @@ c     # distance
       xp = xp/sqrt(2.d0)
       yp = yp/sqrt(2.d0)
       zp = zp/sqrt(2.d0)
+
+      blockno = get_block()
+      if (blockno .eq. 1) then
+         zp = -zp
+      endif
 
       return
       end

@@ -10,6 +10,12 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 %    http://www.amath.washington.edu/~rjl/pubs/circles
 
 
+[xp,yp,zp] = mapc2m_new(xc1,yc1);
+
+return;
+
+blockno = getblocknumber();
+
 maptype = 'sphere';
 
 xc = 2*xc1 - 1;
@@ -65,6 +71,9 @@ case {'hemisphere','sphere'}
   zp(ijlower) = -zp(ijlower);          % negate z in lower hemisphere
 end;
 
+if (blockno == 1)
+  zp = -zp;
+end;
 
 return;
 

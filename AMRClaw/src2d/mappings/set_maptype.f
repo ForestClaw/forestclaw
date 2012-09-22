@@ -24,7 +24,6 @@ c     # ----------------------------
       subroutine set_cart()
       implicit none
       call set_map_value(1)
-      call set_map_defaults()
       end
 
       logical function iscart()
@@ -39,7 +38,6 @@ c     # ----------------------------
       subroutine set_diamond()
       implicit none
       call set_map_value(2)
-      call set_map_defaults()
       end
 
       logical function isdiamond()
@@ -54,7 +52,6 @@ c     # ----------------------------
       subroutine set_disk()
       implicit none
       call set_map_value(3)
-      call set_map_defaults()
       end
 
       logical function isdisk()
@@ -69,7 +66,6 @@ c     # ----------------------------
       subroutine set_hemisphere()
       implicit none
       call set_map_value(4)
-      call set_map_defaults()
       end
 
       logical function ishemisphere()
@@ -84,7 +80,6 @@ c     # ----------------------------
       subroutine set_sphere()
       implicit none
       call set_map_value(5)
-      call set_map_defaults()
       end
 
       logical function issphere()
@@ -99,7 +94,6 @@ c     # ----------------------------
       subroutine set_rotsq()
       implicit none
       call set_map_value(6)
-      call set_map_defaults()
       end
 
       logical function isrotsq()
@@ -114,7 +108,6 @@ c     # ----------------------------
       subroutine set_biquad()
       implicit none
       call set_map_value(7)
-      call set_map_defaults()
       end
 
       logical function isbiquad()

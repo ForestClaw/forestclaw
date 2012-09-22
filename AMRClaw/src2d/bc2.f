@@ -1,27 +1,5 @@
-c     =====================================================
       subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
      &               dx,dy,q,maux,aux,t,dt,mthbc)
-c     =====================================================
-c
-c     # Standard boundary condition choices for claw2
-c
-c     # At each boundary  k = 1 (left),  2 (right),  3 (top), 4 (bottom):
-c     #   mthbc(k) =  0  for user-supplied BC's (must be inserted!)
-c     #            =  1  for zero-order extrapolation
-c     #            =  2  for periodic boundary coniditions
-c     #            =  3  for solid walls, assuming this can be implemented
-c     #                  by reflecting the data about the boundary and then
-c     #                  negating the 2'nd (for k=1,2) or 3'rd (for k=3,4)
-c     #                  component of q.
-c     ------------------------------------------------
-c
-c     # Extend the data from the interior cells (1:mx, 1:my)
-c     # to the ghost cells outside the region:
-c     #   (i, 1-jbc)   for jbc = 1,mbc,  i = 1-mbc, mx+mbc
-c     #   (i, my+jbc)  for jbc = 1,mbc,  i = 1-mbc, mx+mbc
-c     #   (1-ibc, j)   for ibc = 1,mbc,  j = 1-mbc, my+mbc
-c     #   (mx+ibc, j)  for ibc = 1,mbc,  j = 1-mbc, my+mbc
-c
       implicit none
 
       integer maxmx, maxmy, meqn, mbc, mx, my, maux, mthbc(4)
@@ -33,13 +11,12 @@ c
       integer m, i, j, ibc, jbc
 
 c
-c
 c-------------------------------------------------------
 c     # left boundary:
 c-------------------------------------------------------
       go to (100,110,120,130) mthbc(1)+1
 c     this is how we skip over this side... if (mthbc(1)+1
-c     not 1,2,3 or 4, then the goto above falls through to here...
+c     is not 1,2,3 or 4, then the goto above falls through to here...
       goto 199
 
   100 continue
