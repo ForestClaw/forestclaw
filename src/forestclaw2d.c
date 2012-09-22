@@ -197,6 +197,8 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_quadrant_t *ghost;
+    p4est_topidx_t nt;
+    fclaw2d_block_t *block;
 
     P4EST_ASSERT (domain->pp_owned);
     P4EST_ASSERT (0 <= qtq);
@@ -207,6 +209,12 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
         /* processor-local neighbor */
         *proc = domain->mpirank;
         *blockno = domain->patch_to_block[qtq];
+        nt = (p4est_topidx_t) *blockno;
+        P4EST_ASSERT (wrap->p4est->first_local_tree <= nt);
+        P4EST_ASSERT (nt <= wrap->p4est->last_local_tree);
+        block = domain->blocks + *blockno;
+        qtq -= block->num_patches_before;
+        P4EST_ASSERT (0 <= qtq && qtq < block->num_patches);
         *patchno = (int) qtq;   /* patch number within the block as usual */
     }
     else
