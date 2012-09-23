@@ -80,6 +80,10 @@ c           # Hemisphere
       integer i,j
       double precision vn
 
+      integer blockno, get_block
+      blockno = get_block()
+
+
       do i = 1-mbc,mx+mbc+1
          do j = 1-mbc,my+mbc
 c           # x-faces
@@ -92,6 +96,9 @@ c           # x-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dy,vn,t)
+            if (blockno == 1) then
+               vn = -vn
+            endif
             aux(i,j,2) = vn
          enddo
       enddo
@@ -108,6 +115,9 @@ c           # y-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dx,vn,t)
+            if (blockno == 1) then
+               vn = -vn
+            endif
 
             aux(i,j,3) = -vn
          enddo

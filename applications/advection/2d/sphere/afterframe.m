@@ -17,10 +17,13 @@ hidepatchborders(7);
 % hidepatchborders;
 hidegridlines;
 
-% view([-121.5 30]);
 setviews;
 view(3);
-% view(vback);
+% view(vleft);
+% view([-157.5 30]);
+axis on;
+set(gca,'box','on');
+grid on;
 
 NoQuery = 0;
 MaxFrames = 192;

@@ -32,7 +32,7 @@ extern "C" {
     void qinit_mapped_(const int& mx, const int& my, const int& meqn, const int& mbc,
                        const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
                        Real xp[], Real yp[], Real zp[], Real q[], const int& maux,
-                       Real aux[]);
+                       Real aux[], const int& blockno);
 
     void setaux_(const int& maxmx, const int& maxmy, const int& mbc, const int& mx, const int& my,
                  const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
@@ -56,14 +56,16 @@ extern "C" {
                                     const int& idir, const int& iside, const int& num_neighbors,
                                     const int& refratio, const int& igrid);
 
+    void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real qfine[],Real qcoarse[],
+                                const Real auxcoarse[], const Real auxfine[], const int& maux,
+                                const int& idir, const int& iside, const int& num_neighbors,
+                                const int& refratio, const int& igrid);
+
     void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                     Real qcoarse[], Real qfine[], Real auxcoarse[], Real auxfine[],
                     const int& maux,
                     const int& p4est_refineFactor, const int& refratio, const int& igrid);
-
-    void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                                 Real qthis[], Real qneighbor[], const int& iface);
-
 
     // ----------------------------------------------------------------------------------
     // Internal boundary conditions
@@ -80,6 +82,7 @@ extern "C" {
                                  Real qthis[],Real qcoarse[], const int& idir, const int& iside,
                                  const int& num_neighbors,const int& refratio, const int& igrid);
 
+
     void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                 const int& meqn, Real this_q[],Real neighbor_q[],
                                 const int& a_corner);
@@ -91,6 +94,22 @@ extern "C" {
     void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                    const int& meqn, const int& a_refratio, Real this_q[],
                                    Real neighbor_q[], const int& a_corner);
+
+    void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                 Real qthis[], Real qneighbor[], const int& iface,
+                                 const int& iblock);
+
+    void mb_exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                   Real qthis[], Real qneighbor[], const int& icorner,
+                                   int bdry[], const int& iblock);
+
+    void mb_exchange_block_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                         Real qthis[], Real qneighbor[], const int& icorner,
+                                         const int& iblock);
+
+    void mb_interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                    Real qthis[],Real qcoarse[], const int& idir, const int& iside,
+                                    const int& num_neighbors,const int& refratio, const int& igrid);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
@@ -284,13 +303,16 @@ public :
 
     void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 
+    void mb_exchange_corner_ghost(const int& a_icorner, bool a_intersects_block[],
+                                  ClawPatch *a_neighbor_cp, const bool& a_is_block_corner);
+
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
                             const int& a_iside,
                             const int& a_num_neighbors,
                             const int& a_refratio,
                             ClawPatch **neighbor_cp,
-                            bool a_time_interp);
+                            bool a_time_interp, bool a_block_boundary);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
@@ -298,7 +320,8 @@ public :
                                 const int& a_num_neighbors,
                                 const int& a_refratio,
                                 ClawPatch **a_neighbor_cp,
-                                bool a_time_interp);
+                                bool a_time_interp,
+                                bool a_block_boundary);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);

@@ -1,5 +1,5 @@
-8        % mx_leaf
-8       % my_leaf
+16        % mx_leaf
+16       % my_leaf
 
 20        % nout
 5.0       % tfinal
@@ -28,6 +28,6 @@ T         % Manifold
 
 
 2         % Minimum level
-2         % Maximum levels of refinement
+4         % Maximum levels of refinement
 
 T         % subcycle in time ( = T or F).

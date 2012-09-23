@@ -124,6 +124,7 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
     m_mbc = a_cp->m_mbc;
     m_meqn = a_cp->m_meqn;
     m_maux = a_cp->m_maux;
+
     m_blockno = a_cp->m_blockno;
     m_mapped = a_cp->m_mapped;
     m_manifold = a_cp->m_manifold;
@@ -181,7 +182,8 @@ void ClawPatch::initialize()
     if (m_manifold)
     {
         qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,m_xlower, m_ylower, m_dx, m_dy,
-               m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(), q, m_maux, aux);
+                      m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(), q, m_maux, aux,
+                      m_blockno);
     }
     else
     {
@@ -230,6 +232,8 @@ Real ClawPatch::step_noqad(const Real& a_time,
                            const int& a_level,
                            const global_parms& gparms)
 {
+    set_block_(m_blockno);
+
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
@@ -241,12 +245,12 @@ Real ClawPatch::step_noqad(const Real& a_time,
     // do anything in the mapped case.
     if (m_manifold)
     {
-        /*
+
         b4step2_mapped_(m_mx,m_my, m_mbc,m_meqn,qold, m_dx,m_dy,
                         m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(),
                         m_xd.dataPtr(), m_yd.dataPtr(), m_zd.dataPtr(),
                         a_time, a_dt, m_maux, aux);
-        */
+
     }
 
     int maxm = max(m_mx,m_my);
@@ -447,7 +451,7 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
 {
     Real *qthis = m_griddata.dataPtr();
     Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
-    mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface);
+    mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
@@ -457,6 +461,33 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
 
+}
+
+void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, bool a_intersects_block[],
+                                         ClawPatch *cp_corner, const bool& a_is_block_corner)
+{
+    Real *qthis = m_griddata.dataPtr();
+    Real *qcorner = cp_corner->m_griddata.dataPtr();
+
+    if (a_is_block_corner)
+    {
+        // We know we are at a block corner, which is handled differently than a corner that is
+        // only at an edge, but not at a corner.
+        mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
+                                        a_corner, m_blockno);
+    }
+    else
+    {
+        int numfaces = 2*SpaceDim;
+        int bdry[numfaces];
+        for(int m = 0; m < numfaces; m++)
+        {
+            bdry[m] = a_intersects_block[m] ? 1 : 0;
+        }
+        mb_exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
+                                  a_corner, bdry, m_blockno);
+
+    }
 }
 
 void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mthbc[],
@@ -510,7 +541,8 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_p4est_refineFactor,
                                    const int& a_refratio,
                                    ClawPatch **neighbor_cp,
-                                   bool a_time_interp)
+                                   bool a_time_interp,
+                                   bool a_block_boundary)
 {
     Real *qcoarse;
     if (a_time_interp)
@@ -528,10 +560,20 @@ void ClawPatch::average_face_ghost(const int& a_idir,
         {
             Real *auxcoarse = m_auxarray.dataPtr();
             Real *auxfine = neighbor_cp[igrid]->m_auxarray.dataPtr();
-            average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+            if (a_block_boundary)
+            {
+                mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
                                        auxcoarse, auxfine, m_maux,
                                        a_idir,a_iface_coarse,
                                        a_p4est_refineFactor,a_refratio,igrid);
+            }
+            else
+            {
+                average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+                                           auxcoarse, auxfine, m_maux,
+                                           a_idir,a_iface_coarse,
+                                           a_p4est_refineFactor,a_refratio,igrid);
+            }
         }
         else
         {
@@ -546,7 +588,8 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_p4est_refineFactor,
                                        const int& a_refratio,
                                        ClawPatch **neighbor_cp,
-                                       bool a_time_interp)
+                                       bool a_time_interp,
+                                       bool a_block_boundary)
 {
     Real *qcoarse;
     if (a_time_interp)
@@ -562,8 +605,16 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
     {
         Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
         int igrid = ir; // indicates which grid we are averaging from.
-        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                                a_p4est_refineFactor,a_refratio,igrid);
+        if (a_block_boundary)
+        {
+            mb_interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                                              a_p4est_refineFactor,a_refratio,igrid);
+        }
+        else
+        {
+            interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                                    a_p4est_refineFactor,a_refratio,igrid);
+        }
     }
 }
 

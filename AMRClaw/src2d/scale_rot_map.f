@@ -31,8 +31,7 @@ c     It also call set_map_defaults()
       double precision xp,yp,zp
       double precision v(3), vrot(3)
       integer i,k
-      double precision rrot(3,3),s
-      double precision get_scale
+      double precision rrot(3,3)
 
       v(1) = xp
       v(2) = yp
@@ -82,7 +81,6 @@ c     # Rotate mapping
       double precision th, phi
       integer i,j,k
 
-      logical isdisk, ishemisphere, issphere, iscart
       logical isflat
 
       double precision rrot_com(3,3)

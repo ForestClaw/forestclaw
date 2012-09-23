@@ -1,8 +1,8 @@
       subroutine qinit_mapped(mx,my,meqn,mbc,xlower, ylower, dx, dy,
-     &      xp, yp, zp, q_claw,maux,aux)
+     &      xp, yp, zp, q_claw,maux,aux,blockno)
       implicit none
 
-      integer mx,my,meqn,mbc, maux
+      integer mx,my,meqn,mbc, maux, blockno
       double precision xlower, ylower, dx, dy
       double precision q_claw(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision    aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
@@ -16,7 +16,6 @@
       double precision t,x,y,z
       double precision gaussian_sum, cosine_bell_sum
       double precision slotted_disk_sum
-      integer get_block, blockno
 
       ichoice = get_init_choice()
 
@@ -28,26 +27,14 @@
       a = -0.8d0
       b = 0.9d0
 
-      blockno = get_block()
-
       t = 0
       do j = 0,my+1
          do i = 0,mx+1
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
-c            q_claw(i,j,1) = 0
-c            if (blockno .eq. 0) then
-c               if (abs(xlower) < 1e-8 .and.
-c     &               abs(ylower-0.25d0) < 1e-8) then
-c                  if ((i .ge. 1 .and. i .le. mx) .and.
-c     &                  (j .ge. 1 .and. j .le. my)) then
-c                     q_claw(i,j,1) = 1.d0
-c                  endif
-c               endif
-c            endif
 
-            if (y .le. 0) then
+            if (x .le. 0) then
                q_claw(i,j,1) = 1.d0
             else
                q_claw(i,j,1) = 0.d0

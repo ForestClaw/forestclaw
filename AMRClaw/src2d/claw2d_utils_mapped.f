@@ -134,7 +134,6 @@ c                 # ibc = 2 corresponds to the second layer
 
       end
 
-
       subroutine fixcapaq2(mx,my,mbc,meqn,qcoarse,qfine,
      &      auxcoarse,auxfine,maux, p4est_refineFactor,
      &      refratio,igrid)
