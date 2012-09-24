@@ -125,6 +125,12 @@ void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
                                     int cornerno);
 
+/** Return the number of a patch with respect to its parent in the tree.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              The child id is a number in 0..3.
+ */
+int fclaw2d_patch_get_childid (const fclaw2d_patch_t * patch);
+
 void *fclaw2d_alloc (size_t size);
 void *fclaw2d_calloc (size_t nmemb, size_t size);
 void *fclaw2d_realloc (void *ptr, size_t size);

@@ -69,11 +69,21 @@ fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 int
 fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 {
+    const int childid = fclaw2d_patch_get_childid (patch);
+
     P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
 
     return (patch->level == 0 ||
-            cornerno == patch->childid ||
-            cornerno == P4EST_CHILDREN - 1 - patch->childid) ? 0 : 1;
+            cornerno == childid ||
+            cornerno == P4EST_CHILDREN - 1 - childid) ? 0 : 1;
+}
+
+int
+fclaw2d_patch_get_childid (const fclaw2d_patch_t * patch)
+{
+    P4EST_ASSERT (0 <= patch->childid && patch->childid < P4EST_CHILDREN);
+
+    return patch->childid;
 }
 
 void *
