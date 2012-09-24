@@ -25,7 +25,7 @@ c     #     0.1  otherwise
 
              s = 79.d0/128.d0
              s = 0.5d0
-             if (yj .lt. s) then
+             if (xi .lt. s) then
                 q(i,j,1) = 1.d0
              else
                 q(i,j,1) = 0.d0

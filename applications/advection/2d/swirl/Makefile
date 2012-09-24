@@ -31,8 +31,7 @@ exampleobjs = \
 	rpn2ad1.o \
 	rpt2ad1.o \
 	init_routines.o \
-	tag4refinement.o \
-	mapc2m.o
+	tag4refinement.o
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
@@ -57,6 +56,7 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
+	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
