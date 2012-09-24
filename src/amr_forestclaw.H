@@ -107,9 +107,9 @@ double get_domain_time(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain,double t);
 
 
-// There are many more of these functions that should probably have prototypes
-void bc_level_exchange(fclaw2d_domain_t *domain, int a_level);
-
+// There are many more of these functions that should have prototypes
+// but only if they are used outside of amr_forestclaw.cpp
+// void bc_level_exchange(fclaw2d_domain_t *domain, int a_level);
 // void initial_grid(fclaw2d_domain_t *domain);
 
 void amrsetup(fclaw2d_domain_t *domain);

@@ -30,8 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ClawPatch;
 class global_parms;
 
+/*
 void explicit_step_fixed_output(fclaw2d_domain_t *domain);
 void explicit_step(fclaw2d_domain_t *domain, int nstep, int nplot);
+*/
 
 // -----------------------------------------------------------------
 // Setting data in domain and patches
@@ -118,7 +120,7 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 // -----------------------------------------------------------------
 // Some lazy helper functions that really do make things easier..
 // -----------------------------------------------------------------
-void allocate_user_data(fclaw2d_domain_t *domain)
+static void allocate_user_data(fclaw2d_domain_t *domain)
 {
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
@@ -137,7 +139,7 @@ void allocate_user_data(fclaw2d_domain_t *domain)
     }
 }
 
-
+static
 global_parms* get_domain_parms(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
@@ -165,25 +167,28 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
 }
 /* end of helper functions */
 
+static
 const int get_refratio(fclaw2d_domain_t *domain)
 {
     global_parms *gparms = get_domain_parms(domain);
     return gparms->m_refratio;
 }
 
+static
 const int get_corners_per_patch(fclaw2d_domain_t *domain)
 {
     // Number of patch corners, not the number of corners in the domain!
     return fclaw2d_domain_num_corners(domain);
 }
 
+static
 const int get_faces_per_patch(fclaw2d_domain_t *domain)
 {
     // Number of faces per patch, not the total number of faces in the domain!
     return fclaw2d_domain_num_faces(domain);
 }
 
-
+static
 void set_problem_parameters()
 {
     setprob_();
@@ -194,6 +199,8 @@ void set_problem_parameters()
 // -----------------------------------------------------------------
 // Diagnostics
 // -----------------------------------------------------------------
+#if 0 /* reenable as needed */
+static
 void cb_check_conservation(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -206,7 +213,7 @@ void cb_check_conservation(fclaw2d_domain_t *domain,
     *sum += this_cp->compute_sum();
 }
 
-
+static
 void check_conservation(fclaw2d_domain_t *domain)
 {
     Real sum = 0;
@@ -216,6 +223,7 @@ void check_conservation(fclaw2d_domain_t *domain)
 }
 
 // Dump current patch
+static
 void cb_dump_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
@@ -228,6 +236,7 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (current) %d\n",dump_patch);
@@ -235,6 +244,7 @@ void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 }
 
 // Dump last patch
+static
 void cb_dump_last_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
@@ -247,12 +257,15 @@ void cb_dump_last_patch(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (last) %d\n",dump_patch);
     fclaw2d_domain_iterate_patches(domain, cb_dump_last_patch,
                                    &dump_patch);
 }
+
+static
 void cb_dump_time_interp_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
@@ -265,6 +278,7 @@ void cb_dump_time_interp_patch(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (time_interp) %d\n",dump_patch);
@@ -272,11 +286,13 @@ void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
                                    cb_dump_time_interp_patch,
                                    &dump_patch);
 }
+#endif /* 0 */
 
 
 // -----------------------------------------------------------------
 // Get face and corner neighbors
 // -----------------------------------------------------------------
+static
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -347,6 +363,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
@@ -381,7 +398,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     }
 }
 
-
+static
 void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -423,6 +440,7 @@ void get_block_boundary(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx,
@@ -442,6 +460,8 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 // -----------------------------------------------------------------
 // Exchange corner and face information at same level
 // -----------------------------------------------------------------
+
+static
 void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -504,6 +524,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     } // loop over faces
 }
 
+static
 void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
@@ -605,6 +626,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
 
 // this routine can probably be combined with cb_level_corner_exchange
+static
 void cb_corner_average(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
@@ -686,6 +708,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 }
 
 // this routine can probably be combined with cb_level_corner_exchange
+static
 void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -767,6 +790,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
     }
 }
 
+static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
                    int this_block_idx,
@@ -786,6 +810,7 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
     this_cp->set_phys_face_ghost(intersects_bc,bdata->mthbc,curr_time,dt);
 }
 
+static
 void bc_set_phys(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
 {
     fclaw2d_domain_iterate_level(domain, a_level,
@@ -793,6 +818,7 @@ void bc_set_phys(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
                                  (void *) &a_level_time);
 }
 
+static
 void bc_level_exchange(fclaw2d_domain_t *domain, int a_level)
 {
     fclaw2d_subcycle_info step_info;
@@ -811,6 +837,7 @@ void bc_level_exchange(fclaw2d_domain_t *domain, int a_level)
 //   -- average fine grid ghost cells to coarse grid
 //   -- interpolate coarse grid to fine grid ghost cells
 // -----------------------------------------------------------------
+static
 void cb_bc_average(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
                    int this_block_idx,
@@ -872,6 +899,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
 
 
 // Iterator over patches looking for finer neighbors
+static
 void cb_bc_interpolate(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
@@ -930,7 +958,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
 }
 
 
-
+static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
@@ -945,6 +973,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     cp->time_interpolate(step_info->fine_step, step_info->coarse_step, step_info->refratio);
 }
 
+static
 void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
                                          const int& a_coarse_step, const int& a_fine_step,
                                          const int& a_refratio)
@@ -992,6 +1021,7 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
 
 }
 
+static
 void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
 {
     // Simple exchange - no time interpolation needed
@@ -1031,6 +1061,7 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
 //   -- restoring time steps
 //   -- advancing levels
 // -----------------------------------------------------------------
+static
 void cb_restore_time_step(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
@@ -1043,12 +1074,13 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
     this_cp->restore_step();
 }
 
-
+static
 void restore_time_step(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) NULL);
 }
 
+static
 void cb_save_time_step(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
@@ -1061,13 +1093,13 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
     this_cp->save_step();
 }
 
-
+static
 void save_time_step(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) NULL);
 }
 
-
+static
 void cb_advance_patch(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
@@ -1089,7 +1121,7 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 
-
+static
 Real advance_level(fclaw2d_domain_t *domain,
                    const int& a_level,
                    const int& a_curr_fine_step,
@@ -1236,7 +1268,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     return time_data.maxcfl;  // Maximum from level iteration
 }
 
-
+static
 Real advance_all_levels(fclaw2d_domain_t *domain,
                         subcycle_manager *a_time_stepper)
 {
@@ -1262,6 +1294,7 @@ Real advance_all_levels(fclaw2d_domain_t *domain,
 //   -- interpolating/coarsening as needed
 // -----------------------------------------------------------------
 
+static
 void cb_tag_patch(fclaw2d_domain_t *domain,
                   fclaw2d_patch_t *this_patch,
                   int this_block_idx,
@@ -1306,7 +1339,7 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
     }
 }
 
-
+static
 void cb_init_base(fclaw2d_domain_t *domain,
                   fclaw2d_patch_t *this_patch,
                   int this_block_idx,
@@ -1331,7 +1364,7 @@ void cb_init_base(fclaw2d_domain_t *domain,
     set_patch_data(this_patch,cp);
 }
 
-
+static
 void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
 {
     global_parms *gparms = get_domain_parms(domain);
@@ -1342,7 +1375,7 @@ void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
 }
 
 
-
+static
 void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      fclaw2d_patch_t * old_patch,
                      fclaw2d_domain_t * new_domain,
@@ -1443,6 +1476,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 // -----------------------------------------------------------------
 // Initial grid
 // -----------------------------------------------------------------
+static
 void cb_amrinit(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *this_patch,
                 int this_block_idx,
@@ -1678,24 +1712,8 @@ void amrregrid(fclaw2d_domain_t **domain)
 // -----------------------------------------------------------------
 // Run - with or without subcycling
 // -----------------------------------------------------------------
-void amrrun(fclaw2d_domain_t *domain)
-{
 
-    int outstyle = 3;
-
-    if (outstyle == 1)
-    {
-        explicit_step_fixed_output(domain);
-    }
-    else if (outstyle == 3)
-    {
-        int nstep = 20;  // Take 'nstep' steps
-        int nplot = 1;   // Plot every 'nplot' steps
-        explicit_step(domain,nstep,nplot);
-    }
-}
-
-void explicit_step_fixed_output(fclaw2d_domain_t *domain)
+static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
 {
     // Write out an initial time file
     int iframe = 0;
@@ -1811,11 +1829,12 @@ void explicit_step_fixed_output(fclaw2d_domain_t *domain)
     }
 }
 
-
-void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
+static void explicit_step(fclaw2d_domain_t *domain,
+                          int nstep_outer, int nstep_inner)
 {
     // Write out an initial time file
     int iframe = 0;
+
     amrout(domain,iframe);
 
     global_parms *gparms = get_domain_parms(domain);
@@ -1900,6 +1919,24 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
     }
 }
 
+void amrrun(fclaw2d_domain_t *domain)
+{
+
+    int outstyle = 3;
+
+    if (outstyle == 1)
+    {
+        explicit_step_fixed_output(domain);
+    }
+    else if (outstyle == 3)
+    {
+        int nstep = 20;  // Take 'nstep' steps
+        int nplot = 1;   // Plot every 'nplot' steps
+        explicit_step(domain,nstep,nplot);
+    }
+}
+
+static
 void cb_amrout(fclaw2d_domain_t *domain,
                fclaw2d_patch_t *this_patch,
                int this_block_idx,
@@ -1916,7 +1953,6 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
     cp->write_patch_data(iframe, num, matlab_level);
 }
-
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
