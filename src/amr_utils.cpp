@@ -177,6 +177,12 @@ FArrayBox::~FArrayBox()
 
 void FArrayBox::define(int a_size,const Box& a_box)
 {
+    if (a_size == 0)
+    {
+        printf("FArrayBox::define(int a_size, const Box& a_box \n");
+        exit(1);
+    }
+
     if (m_data != NULL)
     {
         delete [] m_data;

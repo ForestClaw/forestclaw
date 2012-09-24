@@ -862,7 +862,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[ir]];
                     fine_neighbor_cp[ir] = get_clawpatch(neighbor_patch);
                 }
-                bool block_boundary = this_block_idx == neighbor_block_idx;
+                bool block_boundary = this_block_idx != neighbor_block_idx;
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
                 this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                             fine_neighbor_cp,do_time_interp,block_boundary);
@@ -921,7 +921,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
 
                 // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
                 // doing time interpolation if necessary
-                bool block_boundary = this_block_idx == neighbor_block_idx;
+                bool block_boundary = this_block_idx != neighbor_block_idx;
                 this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                 refratio,fine_neighbor_cp,step_info->do_time_interp,
                                                 block_boundary);
@@ -1581,6 +1581,7 @@ void amrinit(fclaw2d_domain_t **domain,
 
 void amrregrid(fclaw2d_domain_t **domain)
 {
+
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     global_parms *gparms = ddata->parms;
     const amr_options_t *amropts = ddata->amropts;
@@ -1599,7 +1600,9 @@ void amrregrid(fclaw2d_domain_t **domain)
 
     // Rebuild domain if necessary
     // Will return be NULL if no refining was done?
+    cout << "amrregrid : Calling domain_adapt " << endl;
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+    cout << "Done with domain adapt" << endl;
 
     if (new_domain != NULL)
     {
@@ -1676,7 +1679,7 @@ void amrrun(fclaw2d_domain_t *domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 10;  // Take 'nstep' steps
+        int nstep = 20;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }
@@ -1783,7 +1786,7 @@ void explicit_step_fixed_output(fclaw2d_domain_t *domain)
             }
             n_inner++;
 
-            int regrid_step = 10;  // Will eventually read this in as a parameter.
+            int regrid_step = 1;  // Will eventually read this in as a parameter.
             if (n_inner % regrid_step == 0)
             {
                 // After some number of time steps, we probably need to regrid...
@@ -1871,7 +1874,7 @@ void explicit_step(fclaw2d_domain_t *domain, int nstep_outer, int nstep_inner)
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
-        int regrid_step = 10;  // Will eventually read this in as a parameter.
+        int regrid_step = 1;  // Will eventually read this in as a parameter.
         if (n % regrid_step == 0)
         {
             // After some number of time steps, we probably need to regrid...
