@@ -15,8 +15,6 @@ extern "C" {
 
     void set_common_levels_(const int& maxlevel,const int& a_level,const int& refratio);
 
-#if CH_SPACEDIM==2
-
     // ----------------------------------------------------------------------------------
     // Initialization routines
     // ----------------------------------------------------------------------------------
@@ -188,46 +186,6 @@ extern "C" {
     void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,const Real& dx,
                       const Real& dy, Real q[], Real& sum);
 
-#elif CH_SPACEDIM==3
-    void qinit_(const int& maxmx, const int& maxmy, const int& maxmz,
-               const int& meqn,const int& mbc,
-               const int& mx, const int& my, const int& mz,
-               const Real& xlower, const Real& ylower, const Real& zlower,
-               const Real& dx, const Real& dy, const Real& dz,
-               Real q[], const int& maux, Real aux[]);
-
-    void setaux_(const int& maxmx, const int& maxmy, const int& maxmz, const int& mbc,
-                 const int& mx, const int& my,  const int& mz,
-                 const Real& xlower, const Real& ylower, const Real& zlower,
-                 const Real& dx, const Real& dy, const Real& dz,
-                 const int& maux, Real aux[]);
-
-    void setprob_();
-
-    void bc3_(const int& maxmx, const int& maxmy, const int& maxmz,const int& meqn, const int& mbc,
-              const int& mx,const int& my,const int& mz,const Real& xlower,const Real& ylower,
-              const Real& zlower,const Real& dx,const Real& dy,const Real& dz,const Real q[],
-              const int& maux,const Real aux[],const Real& t,const Real& dt,const int mthbc[]);
-
-    void clawpatch3_(const int& maxm,const int& meqn,const int& maux,const int& mbc, int method[],
-                     int mthlim[],const int& mcapa,const int& mwaves,const int& mx,const int& my,
-                     const int& mz,Real qold[],Real aux[],const Real& dx,const Real& dy,const Real& dz,
-                     const Real& dt,const Real& cfl,Real work[],const int& mwork,Real qold_coarse[],
-                     Real auxold_coarse[],Real qadd_x[],Real qadd_y[],Real qadd_z[],const int auxtype_int[],
-                     const Real& xlower,const Real& ylower,const Real& zlower,int* intersectsBoundaries,
-                     const int& level,const int mthbc[],const Real& t,const int& mxc,const int& myc,
-                     const int& mzc,Real fp[],Real fm[],Real gp[],Real gm[],Real hm[],Real hp[],
-                     Real fp_chombo[],Real fm_chombo[],Real gp_chombo[],Real gm_chombo[],Real hp_chombo[],
-                     Real hm_chombo[],Real fpc_chombo[],Real fmc_chombo[],Real gpc_chombo[],Real gmc_chombo[],
-                     Real hpc_chombo[],Real hmc_chombo[]);
-
-
-    void estimate_error3_(const int& mx,const int& my,const int& mz,const int& mbc,const int& meqn,
-                          const Real& xlower,const Real& ylower,const Real& zlower,const Real& dx,
-                          const Real& dy,const Real& dz,const Real& t,const int& level,const int isBoundary[],
-                          const Real& a_refineThresh,const Real* q,Real em[]);
-
-#endif
 
 }
 

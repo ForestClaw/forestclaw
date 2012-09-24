@@ -14,7 +14,6 @@ ClawPatch::~ClawPatch()
 }
 
 
-#if CH_SPACEDIM == 2
 void ClawPatch::define(const Real&  a_xlower,
                        const Real&  a_ylower,
                        const Real&  a_xupper,
@@ -53,7 +52,6 @@ void ClawPatch::define(const Real&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_last.define(box, m_meqn);
     m_griddata_save.define(box, m_meqn);
-
     m_griddata_time_interp.define(box, m_meqn);
     if (m_maux > 0)
     {
@@ -66,60 +64,6 @@ void ClawPatch::define(const Real&  a_xlower,
 
     m_isDefined = true;
 }
-#else
-void ClawPatch::define(const Real& a_xlower,
-                       const Real& a_ylower,
-                       const Real& a_zlower,
-                       const Real& a_xupper,
-                       const Real& a_yupper,
-                       const Real& a_zupper,
-                       const global_parms* a_gparms)
-{
-    m_mx = a_gparms->m_mx_leaf;
-    m_my = a_gparms->m_my_leaf;
-    m_mz = a_gparms->m_mz_leaf;
-    m_mbc = a_gparms->m_mbc;
-
-    m_xlower = a_xlower;
-    m_ylower = a_ylower;
-    m_xupper = a_xupper;
-    m_yupper = a_yupper;
-    m_zlower = a_zlower;
-    m_zupper = a_zupper;
-
-    m_dx = (a_xupper - a_xlower)/m_mx;
-    m_dy = (a_yupper - a_ylower)/m_my;
-    m_dz = (a_zupper - a_zlower)/m_mz;
-
-
-    // Set box for grid data.  Use local indexing for now.
-    // Note that box doesn't know anything about the number of boundary conditions
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = 1-m_mbc;
-    }
-    ur[0] = m_mx + m_mbc;
-    ur[1] = m_my + m_mbc;
-    ur[2] = m_mz + m_mbc;
-    Box box(ll,ur);
-
-    m_meqn = a_gparms->m_meqn;
-    m_maux = a_gparms->m_maux;
-    m_mapped = a_gparms->m_mapped;
-    m_manifold = a_gparms->m_manifold;
-
-    m_griddata.define(box, m_meqn);
-    m_griddata_last.define(box,m_meqn);
-    if (m_maux > 0)
-    {
-        m_auxarray.define(box,m_maux);
-    }
-
-    m_isDefined = true;
-}
-#endif
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
@@ -735,7 +679,7 @@ void ClawPatch::setup_manifold(const int& a_level,
 {
 
     // This is a generic routine that sets all things related to the mapping.
-    //    set_maptype_();
+    set_maptype_();
 
     // Set fortran common block
     set_block_(m_blockno);
