@@ -109,6 +109,19 @@ extern "C" {
                                     Real qthis[],Real qcoarse[], const int& idir, const int& iside,
                                     const int& num_neighbors,const int& refratio, const int& igrid);
 
+    void mb_average_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                  const int& refratio, Real qcoarse[],  Real qfine[],
+                                  Real auxcoarse[], Real auxfine[], const int& maux,
+                                  const int& icorner, int intersects_block[]);
+
+    // Averaging at block boundaries between coarse and fine grids.
+    void  mb_average_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                         const int& meqn,const int& refratio, Real qcoarse[],
+                                         Real qfine[],Real auxcoarse[], Real auxfine[],
+                                         const int& maux, const int& a_coarse_corner,
+                                         const int& blockno);
+
+
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------
@@ -283,8 +296,17 @@ public :
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
-    void average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine, bool a_time_interp);
-    void interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine, bool a_time_interp);
+    void average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+                              bool a_time_interp);
+
+    void mb_average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+                                 bool a_time_interp, bool is_corner_block, bool intersects_block[]);
+
+    void interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+                                  bool a_time_interp);
+
+    void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+                                     bool a_time_interp, bool is_block_corner, bool intersects_block[]);
 
 
     // ----------------------------------------------------------------------------------

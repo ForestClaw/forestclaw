@@ -562,11 +562,80 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
     Real *qfine = cp_corner->m_griddata.dataPtr();
 
     average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
+}
 
+
+// internal corners only a block boundaries.
+void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
+                                        ClawPatch *cp_corner, bool a_time_interp,bool is_block_corner,
+                                        bool intersects_block[])
+{
+    // 'this' is the finer grid; 'cp_corner' is the coarser grid.
+    Real *qcoarse;
+    if (a_time_interp)
+    {
+        qcoarse = m_griddata_time_interp.dataPtr();
+    }
+    else
+    {
+        qcoarse = m_griddata.dataPtr();
+    }
+
+    Real *auxcoarse = this->m_auxarray.dataPtr();
+    Real *auxfine = cp_corner->m_auxarray.dataPtr();
+    Real *qfine = cp_corner->m_griddata.dataPtr();
+
+    if (is_block_corner)
+    {
+        mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,a_refratio,qcoarse,qfine,
+                                       auxcoarse,auxfine,m_maux,a_coarse_corner,m_blockno);
+    }
+    else
+    {
+        int block_bdry[4];
+        for (int m = 0; m < 4; m++)
+        {
+            block_bdry[m] = intersects_block[m] ? 1 : 0;
+        }
+        mb_average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine,
+                                 auxcoarse, auxfine, m_maux, a_coarse_corner, block_bdry);
+    }
+}
+
+
+void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
+                                         ClawPatch *cp_corner, bool a_time_interp, bool is_block_corner,
+                                         bool intersects_block[])
+
+{
+    Real *qcoarse;
+    if (a_time_interp)
+    {
+        qcoarse = m_griddata_time_interp.dataPtr();
+    }
+    else
+    {
+        qcoarse = m_griddata.dataPtr();
+    }
+
+    // qcorner is the finer level.
+    Real *qfine = cp_corner->m_griddata.dataPtr();
+
+    /*
+    if (a_block_boundary)
+    {
+        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
+    }
+    else
+    {
+        interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
+    }
+    */
 }
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
                                          ClawPatch *cp_corner, bool a_time_interp)
+
 {
     Real *qcoarse;
     if (a_time_interp)
@@ -677,13 +746,8 @@ bool ClawPatch::tag_for_coarsening(const int& a_refratio)
 void ClawPatch::setup_manifold(const int& a_level,
                                const int& a_maxlevel, const int& a_refratio)
 {
-
-    // This is a generic routine that sets all things related to the mapping.
-    set_maptype_();
-
     // Set fortran common block
     set_block_(m_blockno);
-
 
     // Do we really ever use the "box"?
     int ll[SpaceDim];

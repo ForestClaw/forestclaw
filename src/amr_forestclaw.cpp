@@ -537,11 +537,10 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
     const int numfaces = get_faces_per_patch(domain);
     bool intersects_bc[numfaces];
-    bool intersects_block[numfaces];
-
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
+    bool intersects_block[numfaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -579,7 +578,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
         else if (interior_corner)
         {
-            // Both faces are at a physical boundary
+            // Both faces are at a block boundary
             bool is_block_corner =
                 intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
 
@@ -643,6 +642,10 @@ void cb_corner_average(fclaw2d_domain_t *domain,
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
+    bool intersects_block[numfaces];
+    get_block_boundary(domain,this_block_idx,this_patch_idx,
+                       intersects_block);
+
     // Number of patch corners, not the number of corners in the domain!
     const int numcorners = get_corners_per_patch(domain);
 
@@ -677,6 +680,10 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         }
         else if (interior_corner)
         {
+            // Both faces are at a block boundary
+            bool is_block_corner =
+                intersects_block[faces[0]] && intersects_block[faces[1]];
+
             int corner_block_idx;
             int corner_patch_idx;
             int ref_flag;
@@ -702,9 +709,15 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 
                 fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
                 bool time_interp = step_info->do_time_interp;
-
-                // 'this' is the coarser level; 'corner_cp' is the finer level
-                this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                if (this_block_idx == corner_block_idx)
+                {
+                    this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                }
+                else
+                {
+                    this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
+                                                     is_block_corner,intersects_block);
+                }
             }
         }
     }
@@ -724,6 +737,10 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
+
+    bool intersects_block[numfaces];
+    get_block_boundary(domain,this_block_idx,this_patch_idx,
+                       intersects_block);
 
     // Number of patch corners, not the number of corners in the domain!
     const int numcorners = get_corners_per_patch(domain);
@@ -759,6 +776,11 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         }
         else if (interior_corner)
         {
+
+            // Both faces are at a block boundary
+            bool is_block_corner =
+                intersects_block[faces[0]] && intersects_block[faces[1]];
+
             int corner_block_idx;
             int corner_patch_idx;
             int ref_flag;
@@ -785,9 +807,15 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
                 fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
                 bool time_interp = step_info->do_time_interp;
-
-                // 'this' is the coarser level; 'corner_cp' is the finer level
-                this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                if (this_block_idx == corner_block_idx)
+                {
+                    this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                }
+                else
+                {
+                    this_cp->mb_interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp,
+                                                      is_block_corner, intersects_block);
+                }
             }
         }
     }
@@ -1813,7 +1841,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             }
             n_inner++;
 
-            int regrid_step = 1;  // Will eventually read this in as a parameter.
+            int regrid_step = 5;  // Will eventually read this in as a parameter.
             if (n_inner % regrid_step == 0)
             {
                 // After some number of time steps, we probably need to regrid...
@@ -1903,7 +1931,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
-        int regrid_step = 1;  // Will eventually read this in as a parameter.
+        int regrid_step = 5;  // Will eventually read this in as a parameter.
         if (n % regrid_step == 0)
         {
             // After some number of time steps, we probably need to regrid...
@@ -1931,7 +1959,7 @@ void amrrun(fclaw2d_domain_t **domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 20;  // Take 'nstep' steps
+        int nstep = 50;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }

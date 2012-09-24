@@ -158,12 +158,6 @@ c     # Exchange ghost cells at block corner
 
       integer mq, ibc, jbc
 
-      if (iblock == 1) then
-c        # Only initiate exchange from block 0.  I am not sure if the
-c        # saves any work, but seems silly to exchange twice.
-         return
-      endif
-
       do mq = 1,meqn
          if (icorner .eq. 0) then
             do ibc = 1,mbc
@@ -241,12 +235,11 @@ c                 # ibc = 2 corresponds to the second layer
                         if (iface_coarse .eq. 0) then
                            qf = qfine(ifine,jfine,mq)
                            kf = auxfine(ifine,jfine,1)
-                           sum = sum + qf*kf
                         else
                            qf = qfine(mx+1-ifine,jfine,mq)
                            kf = auxfine(mx+1-ifine,jfine,1)
-                           sum = sum + qf*kf
                         endif
+                        sum = sum + qf*kf
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
@@ -270,12 +263,11 @@ c                 # ibc = 2 corresponds to the second layer
                         if (iface_coarse .eq. 2) then
                            qf = qfine(ifine,jfine,mq)
                            kf = auxfine(ifine,jfine,1)
-                           sum = sum + kf*qf
                         else
                            qf = qfine(ifine,my+1-jfine,mq)
                            kf = auxfine(ifine,my+1-jfine,1)
-                           sum = sum + kf*qf
                         endif
+                        sum = sum + kf*qf
                      enddo
                   enddo
                   if (iface_coarse .eq. 2) then
@@ -408,52 +400,186 @@ c                       # qfine is at top edge of coarse grid
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine mb_average_corner_ghost(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,icorner_coarse)
+     &      refratio,qcoarse,qfine,auxcoarse, auxfine, maux,
+     &      icorner, is_block_bdry)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,icorner_coarse
+      integer mx,my,mbc,meqn,refratio,icorner, maux
+      integer is_block_bdry(0:3)
+      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
       integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
       integer ifine, jfine
+      double precision kf, qf, kc
 
       r2 = refratio*refratio
       do mq = 1,meqn
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-c              # Average fine grid corners onto coarse grid ghost corners
-               sum = 0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (ibc-1)*refratio + ii
-                     jfine = (jbc-1)*refratio + jj
-                     if (icorner_coarse .eq. 0) then
-                        sum = sum + qfine(mx+1-ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 1) then
-                        sum = sum + qfine(ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 2) then
-                        sum = sum + qfine(mx+1-ifine,jfine,mq)
-                     elseif (icorner_coarse .eq. 3) then
-                        sum = sum + qfine(ifine,jfine,mq)
-                     endif
+         if (icorner == 0) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+c                 # Average fine grid corners onto coarse grid ghost corners
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (ibc-1)*refratio + ii
+                        jfine = (jbc-1)*refratio + jj
+                        if (is_block_bdry(0) .eq. 1) then
+                           kf = auxfine(ifine,my+1-jfine,1)
+                           qf =   qfine(ifine,my+1-jfine,mq)
+                        elseif (is_block_bdry(2) .eq. 1) then
+                           kf = auxfine(mx+1-ifine,jfine,1)
+                           qf =   qfine(mx+1-ifine,jfine,mq)
+                        endif
+                        sum = sum + kf*qf
+                     enddo
                   enddo
+                  kc = r2*auxcoarse(1-ibc,1-jbc,1)
+                  if (is_block_bdry(0) .eq. 1) then
+                     qcoarse(1-ibc,1-jbc,mq) = sum/kc
+                  else if (is_block_bdry(2) .eq. 1) then
+                     qcoarse(1-ibc,1-jbc,mq) = sum/kc
+                  endif
                enddo
-               if (icorner_coarse .eq. 0) then
-                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
-               elseif (icorner_coarse .eq. 1) then
-                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
-               elseif (icorner_coarse .eq. 2) then
-                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
-               elseif (icorner_coarse .eq. 3) then
-                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
-               endif
             enddo
-         enddo
+         elseif (icorner .eq. 1) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+c                 # Average fine grid corners onto coarse grid ghost corners
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (ibc-1)*refratio + ii
+                        jfine = (jbc-1)*refratio + jj
+                        if (is_block_bdry(1) .eq. 1) then
+                           kf = auxfine(mx+1-ifine,my+1-jfine,1)
+                           qf =   qfine(mx+1-ifine,my+1-jfine,mq)
+                        elseif (is_block_bdry(2) .eq. 1) then
+                           kf = auxfine(ifine,jfine,1)
+                           qf = qfine(ifine,jfine,mq)
+                        endif
+                        sum = sum + kf*qf
+                     enddo
+                  enddo
+                  kc = r2*auxcoarse(mx+ibc,1-jbc,1)
+                  if (is_block_bdry(1) .eq. 1) then
+                     qcoarse(mx+ibc,1-jbc,mq) = sum/kc
+                  elseif (is_block_bdry(2) .eq. 1) then
+                     qcoarse(mx+ibc,1-jbc,mq) = sum/kc
+                  endif
+               enddo
+            enddo
+         elseif (icorner .eq. 2) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+c                 # Average fine grid corners onto coarse grid ghost corners
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (ibc-1)*refratio + ii
+                        jfine = (jbc-1)*refratio + jj
+                        if (is_block_bdry(0) .eq. 1) then
+                           kf = auxfine(ifine,jfine,1)
+                           qf =   qfine(ifine,jfine,mq)
+                        elseif (is_block_bdry(3) .eq. 1) then
+                           kf = auxfine(mx+1-ifine,my+1-jfine,1)
+                           qf =   qfine(mx+1-ifine,my+1-jfine,mq)
+                        endif
+                        sum = sum + kf*qf
+                     enddo
+                  enddo
+                  kc = r2*qcoarse(1-ibc,my+jbc,1)
+                  if (is_block_bdry(0) .eq. 1) then
+                     qcoarse(1-ibc,my+jbc,mq) = sum/kc
+                  elseif (is_block_bdry(3) .eq. 1) then
+                     qcoarse(1-ibc,my+jbc,mq) = sum/kc
+                  endif
+               enddo
+            enddo
+         elseif (icorner .eq. 3) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+c                 # Average fine grid corners onto coarse grid ghost corners
+                  sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (ibc-1)*refratio + ii
+                        jfine = (jbc-1)*refratio + jj
+                        if (is_block_bdry(1) .eq. 1) then
+                           kf = auxfine(mx+1-ifine,jfine,1)
+                           qf =   qfine(mx+1-ifine,jfine,mq)
+                        elseif (is_block_bdry(3) .eq. 1) then
+                           kf = auxfine(ifine,my+1-jfine,1)
+                           qf =   qfine(ifine,my+1-jfine,mq)
+                        endif
+                        sum = sum + kf*qf
+                     enddo
+                  enddo
+                  kc = r2*qcoarse(mx+ibc,my+jbc,1)
+                  if (is_block_bdry(1) .eq. 1) then
+                     qcoarse(mx+ibc,my+jbc,mq) = sum/kc
+                  elseif (is_block_bdry(3) .eq. 1) then
+                     qcoarse(mx+ibc,my+jbc,mq) = sum/kc
+                  endif
+               enddo
+            enddo
+         endif
       enddo
 
       end
+
+c     # Exchange ghost cells at block corner
+      subroutine mb_average_block_corner_ghost(mx,my,mbc,meqn,
+     &      refratio, qthis, qneighbor, auxcoarse, auxfine, maux,
+     &      icorner,iblock)
+      implicit none
+
+      integer mx, my, mbc, meqn, icorner, iblock, refratio,maux
+      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer mq, ibc, jbc
+
+      do mq = 1,meqn
+         if (icorner .eq. 0) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+                  qthis(1-ibc,1-jbc,mq) = qneighbor(ibc,jbc,my)
+                  qneighbor(1-ibc,1-jbc,mq) = qthis(ibc,jbc,my)
+               enddo
+            enddo
+         elseif (icorner .eq. 1) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+                  qthis(mx+ibc,1-jbc,mq) = qneighbor(mx+1-ibc,jbc,my)
+                  qneighbor(mx+ibc,1-jbc,mq) = qthis(mx+1-ibc,jbc,my)
+               enddo
+            enddo
+         elseif (icorner .eq. 2) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+                  qthis(1-ibc,my+jbc,mq) = qneighbor(ibc,my+1-jbc,mq)
+                  qneighbor(1-ibc,my+jbc,mq) = qthis(ibc,my+1-jbc,mq)
+               enddo
+            enddo
+         elseif (icorner .eq. 3) then
+            do ibc = 1,mbc
+               do jbc = 1,mbc
+                  qthis(mx+ibc,my+jbc,mq) =
+     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
+                  qneighbor(mx+ibc,my+jbc,mq) =
+     &                  qthis(mx+1-ibc,my+1-jbc,mq)
+               enddo
+            enddo
+         endif
+      enddo
+      end
+
 
       subroutine mb_interpolate_corner_ghost(mx,my,mbc,meqn,refratio,
      &      qcoarse,qfine,icorner_coarse)

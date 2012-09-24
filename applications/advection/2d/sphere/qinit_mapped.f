@@ -34,7 +34,7 @@
             y = yp(i,j)
             z = zp(i,j)
 
-            if (x .le. 0) then
+            if (x+y .le. 0) then
                q_claw(i,j,1) = 1.d0
             else
                q_claw(i,j,1) = 0.d0
