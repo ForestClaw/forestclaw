@@ -137,6 +137,12 @@ int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
  */
 int fclaw2d_patch_get_childid (const fclaw2d_patch_t * patch);
 
+/** Check if a patch is the first in a family of four siblings.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              True if patch is the first sibling.
+ */
+int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
+
 void *fclaw2d_alloc (size_t size);
 void *fclaw2d_calloc (size_t nmemb, size_t size);
 void *fclaw2d_realloc (void *ptr, size_t size);

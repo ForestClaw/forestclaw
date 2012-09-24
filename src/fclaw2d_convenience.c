@@ -128,6 +128,11 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->level = level = (int) quad->level;
             patch->flags = p4est_quadrant_child_id (quad);
+            if (j + P4EST_CHILDREN <= block->num_patches &&
+                p4est_quadrant_is_familyv (quad))
+            {
+                patch->flags |= FCLAW2D_PATCH_FIRST_SIBLING;
+            }
             P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
             qh = P4EST_QUADRANT_LEN (level);
             patch->xlower = quad->x * fclaw2d_smallest_h;
@@ -141,7 +146,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
             }
             else
             {
-                /* assign next pointer of previous patch by level in this block */
+                /* next pointer of previous patch by level in this block */
                 P4EST_ASSERT (currentbylevel[level] != NULL);
                 currentbylevel[level]->next = patch;
                 currentbylevel[level] = patch;
