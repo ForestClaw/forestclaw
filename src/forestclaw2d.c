@@ -174,10 +174,12 @@ fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
         for (j = 0; j < block->num_patches; j++)
         {
             patch = block->patches + j;
-            if (fclaw2d_patch_is_first_sibling (patch)) {
+            if (fclaw2d_patch_is_first_sibling (patch))
+            {
 #ifdef P4EST_DEBUG
                 int k;
-                for (k = 0; k < P4EST_CHILDREN; ++k) {
+                for (k = 0; k < P4EST_CHILDREN; ++k)
+                {
                     P4EST_ASSERT (j + k < block->num_patches);
                     P4EST_ASSERT (fclaw2d_patch_childid (patch + k) == k);
                 }

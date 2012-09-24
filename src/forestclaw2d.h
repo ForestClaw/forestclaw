@@ -43,7 +43,8 @@ typedef struct fclaw2d_patch fclaw2d_patch_t;
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
                                   fclaw2d_domain_t * domain, void *user);
 
-typedef enum {
+typedef enum
+{
     FCLAW2D_PATCH_CHILDID = 0x7,
     FCLAW2D_PATCH_FIRST_SIBLING = 0x8
 }
