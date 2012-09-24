@@ -67,10 +67,8 @@ main (int argc, char **argv)
   printf("\n\n");
 
   amrinit(&domain, gparms, amr_options);
-  amrrun(domain);
-  amrreset(domain);
-
-  fclaw2d_domain_destroy (domain);
+  amrrun(&domain);
+  amrreset(&domain);
 
   delete gparms;
   sc_options_destroy (options);

@@ -30,10 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ClawPatch;
 class global_parms;
 
-/*
-void explicit_step_fixed_output(fclaw2d_domain_t *domain);
-void explicit_step(fclaw2d_domain_t *domain, int nstep, int nplot);
-*/
+#if 0
+/* What domain points to will be changed on the inside hence the ** */
+void explicit_step_fixed_output(fclaw2d_domain_t **domain);
+
+/* What domain points to will be changed on the inside hence the ** */
+void explicit_step(fclaw2d_domain_t **domain, int nstep, int nplot);
+#endif
 
 // -----------------------------------------------------------------
 // Setting data in domain and patches
@@ -1590,10 +1593,8 @@ void amrinit(fclaw2d_domain_t **domain,
             // that the initial conditions have set all internal ghost cells.
             bc_set_phys(new_domain,new_level,t);
 
-
-            amrreset(*domain);
-            fclaw2d_domain_destroy(*domain);
-
+            // free all memory associated with old domain
+            amrreset(domain);
             *domain = new_domain;
 
             fclaw2d_domain_t *domain_partitioned =
@@ -1605,8 +1606,7 @@ void amrinit(fclaw2d_domain_t **domain,
                 // TODO: write a function to transfer values in parallel */
 
                 /* then the old domain is no longer necessary */
-                amrreset(*domain);
-                fclaw2d_domain_destroy(*domain);
+                amrreset(domain);
                 *domain = domain_partitioned;
 
                 /* internal clean up */
@@ -1684,8 +1684,8 @@ void amrregrid(fclaw2d_domain_t **domain)
             bc_set_phys(new_domain,level,t);
         }
 
-        amrreset(*domain);
-        fclaw2d_domain_destroy(*domain);
+        // free all memory associated with old domain
+        amrreset(domain);
         *domain = new_domain;
 
         fclaw2d_domain_t *domain_partitioned =
@@ -1698,8 +1698,7 @@ void amrregrid(fclaw2d_domain_t **domain)
             // TODO: write a function to transfer values in parallel */
 
             /* then the old domain is no longer necessary */
-            amrreset(*domain);
-            fclaw2d_domain_destroy(*domain);
+            amrreset(domain);
             *domain = domain_partitioned;
 
             /* internal clean up */
@@ -1713,14 +1712,14 @@ void amrregrid(fclaw2d_domain_t **domain)
 // Run - with or without subcycling
 // -----------------------------------------------------------------
 
-static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
+static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
 {
     // Write out an initial time file
     int iframe = 0;
-    amrout(domain,iframe);
+    amrout(*domain,iframe);
 
-    global_parms *gparms = get_domain_parms(domain);
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     Real final_time = gparms->m_tfinal;
     int nout = gparms->m_nout;
     Real initial_dt = gparms->m_initial_dt;
@@ -1738,12 +1737,12 @@ static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
         while (t_curr < tend)
         {
             subcycle_manager time_stepper;
-            time_stepper.define(domain,gparms,ddata->amropts,t_curr);
-            set_domain_time(domain,t_curr);
+            time_stepper.define(*domain,gparms,ddata->amropts,t_curr);
+            set_domain_time(*domain,t_curr);
 
             // In case we have to reject this step
-            save_time_step(domain);
-            // check_conservation(domain);
+            save_time_step(*domain);
+            // check_conservation(*domain);
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.
@@ -1776,7 +1775,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
             // This also sets the time step on all finer levels.
             time_stepper.set_dt_minlevel(dt_minlevel);
 
-            Real maxcfl_step = advance_all_levels(domain, &time_stepper);
+            Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
@@ -1784,7 +1783,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
             if (maxcfl_step > gparms->m_max_cfl)
             {
                 printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                restore_time_step(domain);
+                restore_time_step(*domain);
 
                 // Modify dt_level0 from step used.
                 dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
@@ -1818,27 +1817,28 @@ static void explicit_step_fixed_output(fclaw2d_domain_t *domain)
             if (n_inner % regrid_step == 0)
             {
                 // After some number of time steps, we probably need to regrid...
-                amrregrid(&domain);
+                amrregrid(domain);
+                ddata = get_domain_data(*domain);
             }
         }
 
         // Output file at every outer loop iteration
-        set_domain_time(domain,t_curr);
+        set_domain_time(*domain,t_curr);
         iframe++;
-        amrout(domain,iframe);
+        amrout(*domain,iframe);
     }
 }
 
-static void explicit_step(fclaw2d_domain_t *domain,
+static void explicit_step(fclaw2d_domain_t **domain,
                           int nstep_outer, int nstep_inner)
 {
     // Write out an initial time file
     int iframe = 0;
 
-    amrout(domain,iframe);
+    amrout(*domain,iframe);
 
-    global_parms *gparms = get_domain_parms(domain);
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    global_parms *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     Real initial_dt = gparms->m_initial_dt;
 
     Real t0 = 0;
@@ -1848,16 +1848,16 @@ static void explicit_step(fclaw2d_domain_t *domain,
 
     Real dt_level0 = initial_dt;
     Real t_curr = t0;
-    set_domain_time(domain,t_curr);
+    set_domain_time(*domain,t_curr);
     int n = 0;
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
-        time_stepper.define(domain,gparms,ddata->amropts,t_curr);
+        time_stepper.define(*domain,gparms,ddata->amropts,t_curr);
 
         // In case we have to reject this step
-        save_time_step(domain);
-        // check_conservation(domain);
+        save_time_step(*domain);
+        // check_conservation(*domain);
 
         // Take a stable level 0 time step (use this as the base level time step even if
         // we have no grids on level 0) and reduce it.
@@ -1877,7 +1877,7 @@ static void explicit_step(fclaw2d_domain_t *domain,
         // This also sets the time step on all finer levels.
         time_stepper.set_dt_minlevel(dt_minlevel);
 
-        Real maxcfl_step = advance_all_levels(domain, &time_stepper);
+        Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
         printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr);
@@ -1885,7 +1885,7 @@ static void explicit_step(fclaw2d_domain_t *domain,
         if (maxcfl_step > gparms->m_max_cfl)
         {
             printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-            restore_time_step(domain);
+            restore_time_step(*domain);
 
             // Modify dt_level0 from step used.
             dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
@@ -1898,7 +1898,7 @@ static void explicit_step(fclaw2d_domain_t *domain,
         t_curr += dt_minlevel;
         n++;
 
-        set_domain_time(domain,t_curr);
+        set_domain_time(*domain,t_curr);
 
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
@@ -1908,18 +1908,19 @@ static void explicit_step(fclaw2d_domain_t *domain,
         {
             // After some number of time steps, we probably need to regrid...
             cout << "regridding at step " << n << endl;
-            amrregrid(&domain);
+            amrregrid(domain);
+            ddata = get_domain_data(*domain);
         }
 
         if (n % nstep_inner == 0)
         {
             iframe++;
-            amrout(domain,iframe);
+            amrout(*domain,iframe);
         }
     }
 }
 
-void amrrun(fclaw2d_domain_t *domain)
+void amrrun(fclaw2d_domain_t **domain)
 {
 
     int outstyle = 3;
@@ -1979,14 +1980,14 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
 }
 
-void amrreset(fclaw2d_domain_t *domain)
+void amrreset(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t *dd;
-    dd = (fclaw2d_domain_data_t *) domain->user;
+    dd = (fclaw2d_domain_data_t *) (*domain)->user;
 
-    for(int i = 0; i < domain->num_blocks; i++)
+    for(int i = 0; i < (*domain)->num_blocks; i++)
     {
-        fclaw2d_block_t *block = domain->blocks + i;
+        fclaw2d_block_t *block = (*domain)->blocks + i;
         fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
 
         for(int j = 0; j < block->num_patches; j++)
@@ -2004,5 +2005,8 @@ void amrreset(fclaw2d_domain_t *domain)
         block->user = NULL;
     }
     FCLAW2D_FREE (dd);
-    domain->user = NULL;
+    (*domain)->user = NULL;
+    
+    fclaw2d_domain_destroy(*domain);
+    *domain = NULL;
 }

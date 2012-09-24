@@ -113,10 +113,17 @@ void set_domain_time(fclaw2d_domain_t *domain,double t);
 // void initial_grid(fclaw2d_domain_t *domain);
 
 void amrsetup(fclaw2d_domain_t *domain);
+
+/* What domain points to will be changed on the inside hence the ** */
 void amrinit(fclaw2d_domain_t **domain,
              global_parms *parms, const amr_options_t * amropts);
-void amrrun(fclaw2d_domain_t *domain);
+
+/* What domain points to will be changed on the inside hence the ** */
+void amrrun(fclaw2d_domain_t **domain);
+
 void amrout(fclaw2d_domain_t *domain, int iframe);
-void amrreset(fclaw2d_domain_t *domain);
+
+/* The domain will be NULL afterwards hence the ** */
+void amrreset(fclaw2d_domain_t **domain);
 
 #endif
