@@ -1374,8 +1374,10 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        gparms);
 
         int level = old_patch[0].level;
-        cp_new->copyFrom(cp_old);  // Copy grid data and aux data
         cp_new->setup_patch(level,maxlevel, refratio);
+        // This just copies the data
+        cp_new->copyFrom(cp_old);  // Copy grid data and aux data
+
         set_patch_data(&new_patch[0],cp_new);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)

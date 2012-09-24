@@ -51,11 +51,15 @@ void ClawPatch::define(const Real&  a_xlower,
 
     // This will destroy any existing memory n m_griddata.
     m_griddata.define(box, m_meqn);
+    m_griddata_last.define(box, m_meqn);
+    m_griddata_save.define(box, m_meqn);
+
     m_griddata_time_interp.define(box, m_meqn);
     if (m_maux > 0)
     {
         m_auxarray.define(box,m_maux);
     }
+
 
     m_mapped = a_gparms->m_mapped;
     m_manifold = a_gparms->m_manifold;
@@ -119,40 +123,7 @@ void ClawPatch::define(const Real& a_xlower,
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
-//     m_mx = a_cp->m_mx;
-//     m_my = a_cp->m_my;
-//     m_mbc = a_cp->m_mbc;
-//     m_meqn = a_cp->m_meqn;
-//     m_maux = a_cp->m_maux;
-//
-//     m_blockno = a_cp->m_blockno;
-//     m_mapped = a_cp->m_mapped;
-//     m_manifold = a_cp->m_manifold;
-//
-//     m_xlower = a_cp->m_xlower;
-//     m_ylower = a_cp->m_ylower;
-//     m_xupper = a_cp->m_xupper;
-//     m_yupper = a_cp->m_yupper;
-//
-//     m_dx = a_cp->m_dx;
-//     m_dy = a_cp->m_dy;
-
     m_griddata = a_cp->m_griddata;
-    // m_auxarray = a_cp->m_auxarray;
-
-    // Box box = m_griddata.box();
-    // m_griddata_time_interp.define(box,m_meqn);
-
-    // m_xp = a_cp->m_xp;
-    // m_yp = a_cp->m_yp;
-    // m_zp = a_cp->m_zp;
-    // m_xd = a_cp->m_xd;
-    // m_yd = a_cp->m_yd;
-    // m_zd = a_cp->m_zd;
-    // m_area = a_cp->m_area;
-
-    // m_griddata_save and m_griddata_last will get allocated when we set them equal to
-    // current time steps.
 }
 
 
