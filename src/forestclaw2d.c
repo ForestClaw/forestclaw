@@ -160,6 +160,35 @@ fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
     }
 }
 
+void
+fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
+                                 fclaw2d_patch_callback_t pcb, void *user)
+{
+    int i, j;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+
+    for (i = 0; i < domain->num_blocks; i++)
+    {
+        block = domain->blocks + i;
+        for (j = 0; j < block->num_patches; j++)
+        {
+            patch = block->patches + j;
+            if (fclaw2d_patch_is_first_sibling (patch)) {
+#ifdef P4EST_DEBUG
+                int k;
+                for (k = 0; k < P4EST_CHILDREN; ++k) {
+                    P4EST_ASSERT (j + k < block->num_patches);
+                    P4EST_ASSERT (fclaw2d_patch_get_childid (patch + k) == k);
+                }
+#endif
+                pcb (domain, patch, i, j, user);
+                j += P4EST_CHILDREN - 1;
+            }
+        }
+    }
+}
+
 int
 fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
                              int blockno, int patchno,

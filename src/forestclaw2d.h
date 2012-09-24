@@ -181,6 +181,18 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
                                      fclaw2d_patch_callback_t pcb,
                                      void *user);
 
+/** Iterate over all families of sibling patches.
+ * \param [in] domain	General domain structure.
+ * \param [in] pcb	Function called for each family in the domain.
+ *                      Its patch argument points to an array of four
+ *                      valid patches that constitute a family of siblings.
+ *                      Their patchnos are consecutive, blockno is the same.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
+void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
+                                      fclaw2d_patch_callback_t pcb,
+                                      void *user);
+
 /** Determine physical boundary status as 1, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
  * \param [in] blockno	Number of the block within the domain.
