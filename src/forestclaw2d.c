@@ -81,9 +81,11 @@ fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 int
 fclaw2d_patch_get_childid (const fclaw2d_patch_t * patch)
 {
-    P4EST_ASSERT (0 <= patch->childid && patch->childid < P4EST_CHILDREN);
+    const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
 
-    return patch->childid;
+    P4EST_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
+
+    return childid;
 }
 
 void *

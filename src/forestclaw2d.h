@@ -43,6 +43,12 @@ typedef struct fclaw2d_patch fclaw2d_patch_t;
 typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
                                   fclaw2d_domain_t * domain, void *user);
 
+typedef enum {
+    FCLAW2D_PATCH_CHILDID = 0x7,
+    FCLAW2D_PATCH_FIRST_SIBLING = 0x8
+}
+fclaw2d_patch_flags_t;
+
 /*
  * The domain structure gives a processor local view of the grid hierarchy.
  * Unless explicitly noted otherwise, all variables are processor local,
@@ -54,7 +60,7 @@ typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
 struct fclaw2d_patch
 {
     int level;                  /* 0 is root, increases if refined */
-    int childid;                /* child number within its parent */
+    int flags;                  /* flags that encode tree information */
     double xlower, xupper;
     double ylower, yupper;
     fclaw2d_patch_t *next;      /* next patch same level same block */
