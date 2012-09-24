@@ -119,29 +119,37 @@ void ClawPatch::define(const Real& a_xlower,
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
-    m_mx = a_cp->m_mx;
-    m_my = a_cp->m_my;
-    m_mbc = a_cp->m_mbc;
-    m_meqn = a_cp->m_meqn;
-    m_maux = a_cp->m_maux;
-
-    m_blockno = a_cp->m_blockno;
-    m_mapped = a_cp->m_mapped;
-    m_manifold = a_cp->m_manifold;
-
-    m_xlower = a_cp->m_xlower;
-    m_ylower = a_cp->m_ylower;
-    m_xupper = a_cp->m_xupper;
-    m_yupper = a_cp->m_yupper;
-
-    m_dx = a_cp->m_dx;
-    m_dy = a_cp->m_dy;
+//     m_mx = a_cp->m_mx;
+//     m_my = a_cp->m_my;
+//     m_mbc = a_cp->m_mbc;
+//     m_meqn = a_cp->m_meqn;
+//     m_maux = a_cp->m_maux;
+//
+//     m_blockno = a_cp->m_blockno;
+//     m_mapped = a_cp->m_mapped;
+//     m_manifold = a_cp->m_manifold;
+//
+//     m_xlower = a_cp->m_xlower;
+//     m_ylower = a_cp->m_ylower;
+//     m_xupper = a_cp->m_xupper;
+//     m_yupper = a_cp->m_yupper;
+//
+//     m_dx = a_cp->m_dx;
+//     m_dy = a_cp->m_dy;
 
     m_griddata = a_cp->m_griddata;
-    m_auxarray = a_cp->m_auxarray;
+    // m_auxarray = a_cp->m_auxarray;
 
-    Box box = m_griddata.box();
-    m_griddata_time_interp.define(box,m_meqn);
+    // Box box = m_griddata.box();
+    // m_griddata_time_interp.define(box,m_meqn);
+
+    // m_xp = a_cp->m_xp;
+    // m_yp = a_cp->m_yp;
+    // m_zp = a_cp->m_zp;
+    // m_xd = a_cp->m_xd;
+    // m_yd = a_cp->m_yd;
+    // m_zd = a_cp->m_zd;
+    // m_area = a_cp->m_area;
 
     // m_griddata_save and m_griddata_last will get allocated when we set them equal to
     // current time steps.
@@ -421,6 +429,7 @@ void ClawPatch::restore_step()
 void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_step,
                                  const int& a_refratio)
 {
+    set_block_(m_blockno);
     Real alpha = Real(a_fine_step)/Real(a_refratio);
 
     Real *qlast = m_griddata_last.dataPtr();

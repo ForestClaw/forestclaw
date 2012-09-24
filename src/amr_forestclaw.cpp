@@ -1366,6 +1366,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined.
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
         ClawPatch *cp_new = new ClawPatch();
+        cp_new->define(old_patch[0].xlower,
+                       old_patch[0].ylower,
+                       old_patch[0].xupper,
+                       old_patch[0].yupper,
+                       blockno,
+                       gparms);
+
         int level = old_patch[0].level;
         cp_new->copyFrom(cp_old);  // Copy grid data and aux data
         cp_new->setup_patch(level,maxlevel, refratio);
