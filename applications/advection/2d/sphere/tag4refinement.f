@@ -14,13 +14,14 @@
       qmax = -100.d0
       tag_patch = 0
       do mq = 1,meqn
-         do i = 0,mx+1
-            do j = 0,my+1
+         do i = 1,mx
+            do j = 1,my
 
-               if (init_flag == 1 .and. .false.) then
+               if (init_flag == 1) then
+c                 # Be careful : comp. coord. are [0,1]x[0,1]
                   xc = xlower + (i-0.5)*dx
                   yc = ylower + (j-0.5)*dy
-                  if (abs(xc) < dx) then
+                  if (abs(xc-0.5d0) < dx) then
                      tag_patch = 1
                      return
                   endif

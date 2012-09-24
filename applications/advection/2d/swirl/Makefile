@@ -61,20 +61,8 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
 
-ifeq ($(GEO),sphere)
-   GeoFiles := \
-      $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_sphere.o
-endif
-
-ifeq ($(GEO),disk)
-   GeoFiles := \
-      $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_disk.o
-endif
-
-ifeq ($(GEO),cart)
-   GeoFiles := \
+GeoFiles := \
       $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_cart.o
-endif
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs) $(GeoFiles)
 
