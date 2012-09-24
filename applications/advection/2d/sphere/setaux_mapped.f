@@ -84,7 +84,7 @@ c           # Hemisphere
       blockno = get_block()
 
 
-      do i = 1-mbc,mx+mbc+1
+      do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # x-faces
             xd1(1) = xd(i,j+1)
@@ -103,7 +103,7 @@ c           # x-faces
          enddo
       enddo
 
-      do j = 1-mbc,my+mbc+1
+      do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
 c           # y-faces
             xd1(1) = xd(i+1,j)

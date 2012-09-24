@@ -1681,7 +1681,7 @@ void amrregrid(fclaw2d_domain_t **domain)
 void amrrun(fclaw2d_domain_t *domain)
 {
 
-    int outstyle = 1;
+    int outstyle = 3;
 
     if (outstyle == 1)
     {
