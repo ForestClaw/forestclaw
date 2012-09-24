@@ -196,6 +196,8 @@ void ClawPatch::initialize()
 
 void ClawPatch::setAuxArray()
 {
+
+    set_block_(m_blockno);
     Real* aux = m_auxarray.dataPtr();
 
 #if CH_SPACEDIM == 2

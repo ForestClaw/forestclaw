@@ -76,7 +76,7 @@ c                 # ibc = 2 corresponds to the second layer
                         jfine = (j-1)*refratio + jj
                         if (iface_coarse .eq. 0) then
                            sum = sum + qfine(mx-ifine+1,jfine,mq)
-                        else
+                        elseif (iface_coarse .eq. 1) then
                            sum = sum + qfine(ifine,jfine,mq)
                         endif
                      enddo

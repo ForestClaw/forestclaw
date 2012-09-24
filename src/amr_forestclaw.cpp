@@ -484,6 +484,12 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
             {
                 if (iface % 2 == 1)
                 {
+                    if (this_patch_idx == 3 && this_patch->level == 3)
+                    {
+                        // cout << "this_neighbor_patch = " << this_neighbor_idx << endl;
+                        // dump_patch(domain,3);
+                    }
+
                     // Do high side exchange only
                     int idir = iface/2;   // this rounds down, right?  1/2 = 0; 3/2 = 1, etc.
                     // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
@@ -788,8 +794,6 @@ void bc_set_phys(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
                                  (void *) &a_level_time);
 }
 
-
-
 void bc_level_exchange(fclaw2d_domain_t *domain, int a_level)
 {
     fclaw2d_subcycle_info step_info;
@@ -825,7 +829,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
-    for (int idir = 0; idir < SpaceDim; idir++)
+    for (int idir = 0; idir < 2; idir++)
     {
         // Loop over low side and high side
         for (int iface = 2*idir; iface <= 2*idir + 1; iface++)
@@ -1092,7 +1096,7 @@ Real advance_level(fclaw2d_domain_t *domain,
                    const int& a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
-    bool verbose = true;
+    bool verbose = false;
     Real t_level = a_time_stepper->current_time(a_level);
 
     Real maxcfl = 0;
@@ -1481,6 +1485,13 @@ void amrinit(fclaw2d_domain_t **domain,
 
     cout << "Done with domain adaptation " << endl;
 
+    int num = (*domain)->num_blocks;
+    for (int i = 0; i < num; i++)
+    {
+        fclaw2d_block_t *block = &(*domain)->blocks[i];
+        set_block_data(block,gparms->m_mthbc);
+    }
+
     bc_set_phys(*domain,minlevel,t);
 
     // Refine as needed.
@@ -1665,7 +1676,7 @@ void amrrun(fclaw2d_domain_t *domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 20;  // Take 'nstep' steps
+        int nstep = 10;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }
