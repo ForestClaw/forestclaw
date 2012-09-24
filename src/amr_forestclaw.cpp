@@ -1329,8 +1329,6 @@ void cb_init_base(fclaw2d_domain_t *domain,
 
     cp->setup_patch(level, maxlevel, refratio);
     set_patch_data(this_patch,cp);
-
-    printf ("We're at %d %d exiting\n", this_block_idx, this_patch_idx);
 }
 
 
