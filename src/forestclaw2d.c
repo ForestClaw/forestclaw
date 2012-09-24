@@ -69,7 +69,7 @@ fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 int
 fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 {
-    const int childid = fclaw2d_patch_get_childid (patch);
+    const int childid = fclaw2d_patch_childid (patch);
 
     P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
 
@@ -79,7 +79,7 @@ fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 }
 
 int
-fclaw2d_patch_get_childid (const fclaw2d_patch_t * patch)
+fclaw2d_patch_childid (const fclaw2d_patch_t * patch)
 {
     const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
 
@@ -179,7 +179,7 @@ fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
                 int k;
                 for (k = 0; k < P4EST_CHILDREN; ++k) {
                     P4EST_ASSERT (j + k < block->num_patches);
-                    P4EST_ASSERT (fclaw2d_patch_get_childid (patch + k) == k);
+                    P4EST_ASSERT (fclaw2d_patch_childid (patch + k) == k);
                 }
 #endif
                 pcb (domain, patch, i, j, user);
