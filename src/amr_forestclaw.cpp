@@ -231,8 +231,7 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
 void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (current) %d\n",dump_patch);
-    fclaw2d_domain_iterate_patches(domain,(fclaw2d_patch_callback_t) cb_dump_patch,
-                                   &dump_patch);
+    fclaw2d_domain_iterate_patches(domain, cb_dump_patch, &dump_patch);
 }
 
 // Dump last patch
@@ -251,7 +250,7 @@ void cb_dump_last_patch(fclaw2d_domain_t *domain,
 void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (last) %d\n",dump_patch);
-    fclaw2d_domain_iterate_patches(domain,(fclaw2d_patch_callback_t) cb_dump_last_patch,
+    fclaw2d_domain_iterate_patches(domain, cb_dump_last_patch,
                                    &dump_patch);
 }
 void cb_dump_time_interp_patch(fclaw2d_domain_t *domain,
@@ -270,7 +269,7 @@ void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (time_interp) %d\n",dump_patch);
     fclaw2d_domain_iterate_patches(domain,
-                                   (fclaw2d_patch_callback_t) cb_dump_time_interp_patch,
+                                   cb_dump_time_interp_patch,
                                    &dump_patch);
 }
 
@@ -790,7 +789,7 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
 void bc_set_phys(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
 {
     fclaw2d_domain_iterate_level(domain, a_level,
-                                 (fclaw2d_patch_callback_t) cb_set_phys_bc,
+                                 cb_set_phys_bc,
                                  (void *) &a_level_time);
 }
 
@@ -964,18 +963,18 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
 
     int coarser_level = a_level - 1;
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_setup_time_interp,
+                                 cb_setup_time_interp,
                                  (void *) &step_info);
 
     // Average onto time interpolated 'virtual' data so that we can use these averaged ghost
     // values in the interpolation step below.
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_bc_average,
+                                 cb_bc_average,
                                  (void *) &step_info);
 
 
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_corner_average,
+                                 cb_corner_average,
                                  (void *) &step_info);
 
     // This is needed so that interpolation below works near boundary.
@@ -983,12 +982,12 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_bc_interpolate,
+                                 cb_bc_interpolate,
                                  (void *) &step_info);
 
 
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_corner_interpolate,
+                                 cb_corner_interpolate,
                                  (void *) &step_info);
 
 }
@@ -1004,24 +1003,24 @@ void bc_exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
     // Iterate over coarser level and average from finer neighbors to coarse.
     int coarser_level = a_level - 1;
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_bc_average,
+                                 cb_bc_average,
                                  (void *) &step_info);
 
     // Average fine grid corners to the coarse grid ghost cells
     fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_corner_average,
+                                 cb_corner_average,
                                  (void *) &step_info);
 
     bc_set_phys(domain,coarser_level,level_time);
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_bc_interpolate,
+                                 cb_bc_interpolate,
                                  (void *) &step_info);
 
     // Interpolate coarse grid to fine grid ghost cells.
     fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 (fclaw2d_patch_callback_t) cb_corner_interpolate,
+                                 cb_corner_interpolate,
                                  (void *) &step_info);
 }
 
@@ -1219,7 +1218,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step +
     // a_time_stepper.step_inc(a_level)'
     fclaw2d_domain_iterate_level(domain, a_level,
-                                 (fclaw2d_patch_callback_t) cb_advance_patch,
+                                 cb_advance_patch,
                                  (void *) &time_data);
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
@@ -1330,6 +1329,8 @@ void cb_init_base(fclaw2d_domain_t *domain,
 
     cp->setup_patch(level, maxlevel, refratio);
     set_patch_data(this_patch,cp);
+
+    printf ("We're at %d %d exiting\n", this_block_idx, this_patch_idx);
 }
 
 
@@ -1338,7 +1339,7 @@ void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
     global_parms *gparms = get_domain_parms(domain);
 
     fclaw2d_domain_iterate_level(domain, level,
-                                 (fclaw2d_patch_callback_t) cb_init_base,
+                                 cb_init_base,
                                  (void *) gparms);
 }
 
@@ -1489,7 +1490,7 @@ void amrinit(fclaw2d_domain_t **domain,
 
     // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel,
-                                 (fclaw2d_patch_callback_t) cb_amrinit,
+                                 cb_amrinit,
                                  (void *) NULL);
 
     cout << "Done with domain adaptation " << endl;
@@ -1514,7 +1515,7 @@ void amrinit(fclaw2d_domain_t **domain,
         // the fclaw2d_domain_adapt and _partition calls work fine in parallel
 
         fclaw2d_domain_iterate_level(*domain, level,
-                                     (fclaw2d_patch_callback_t) cb_tag_patch,
+                                     cb_tag_patch,
                                      (void *) &init_flag);
 
         // Rebuild domain if necessary
@@ -1531,7 +1532,9 @@ void amrinit(fclaw2d_domain_t **domain,
             allocate_user_data(new_domain);
 
             // Initialize new grids.  Assume that all ghost cells are filled in by qinit.
-            fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
+            fclaw2d_domain_iterate_adapted(*domain, new_domain,
+                                           cb_domain_adapt,
+                                           (void *) &init_flag);
 
             // Set some of the user data types.  Some of this is done in 'amr_set_base_level',
             // I should probably come up with a more general way to do this.
@@ -1604,7 +1607,7 @@ void amrregrid(fclaw2d_domain_t **domain)
     // Unlike the initial case, where we refine level by level, here, we only visit each tag
     // once and decide whether to refine or coarsen that patch.
     fclaw2d_domain_iterate_patches(*domain,
-                                   (fclaw2d_patch_callback_t) cb_tag_patch,
+                                   cb_tag_patch,
                                    (void *) &init_flag);
 
     // Rebuild domain if necessary

@@ -577,7 +577,7 @@ int num_patches(fclaw2d_domain_t *domain, int level)
 {
   int count = 0;
   fclaw2d_domain_iterate_level(domain, level,
-                               (fclaw2d_patch_callback_t) cb_num_patches,
+                               cb_num_patches,
                                &count);
   return count;
 }
