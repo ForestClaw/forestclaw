@@ -10,20 +10,18 @@ cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
 caxis([0 1]);
 
-showgridlines(3:5)
-setpatchborderprops(4:6,'linewidth',2);
-hidepatchborders(7);
+showgridlines(1:3)
+setpatchborderprops(1:6,'linewidth',2);
+hidepatchborders(6);
 
 % hidepatchborders;
-hidegridlines;
+% hidegridlines;
 
 setviews;
 view(3);
 % view(vleft);
 % view([-157.5 30]);
-axis on;
-set(gca,'box','on');
-grid on;
+% view(vtop);
 
 NoQuery = 0;
 MaxFrames = 192;

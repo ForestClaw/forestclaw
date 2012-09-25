@@ -202,7 +202,6 @@ void set_problem_parameters()
 // -----------------------------------------------------------------
 // Diagnostics
 // -----------------------------------------------------------------
-#if 0 /* reenable as needed */
 static
 void cb_check_conservation(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -226,7 +225,6 @@ void check_conservation(fclaw2d_domain_t *domain)
 }
 
 // Dump current patch
-static
 void cb_dump_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
@@ -239,7 +237,7 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
     }
 }
 
-static
+
 void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 {
     printf("Dumping patch (current) %d\n",dump_patch);
@@ -247,7 +245,6 @@ void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 }
 
 // Dump last patch
-static
 void cb_dump_last_patch(fclaw2d_domain_t *domain,
 	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
@@ -289,7 +286,28 @@ void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
                                    cb_dump_time_interp_patch,
                                    &dump_patch);
 }
-#endif /* 0 */
+
+static
+void cb_dump_auxarray(fclaw2d_domain_t *domain,
+	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+{
+    int dump_patchno = *((int *) user);
+    int numb4 = domain->blocks[block_no].num_patches_before;
+    if (patch_no == dump_patchno + numb4)
+    {
+        ClawPatch *cp = get_clawpatch(patch);
+        cp->dump_auxarray();
+    }
+}
+
+static
+void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
+{
+    printf("Dumping patch (time_interp) %d\n",dump_patchno);
+    fclaw2d_domain_iterate_patches(domain,
+                                   cb_dump_auxarray,
+                                   &dump_patchno);
+}
 
 
 // -----------------------------------------------------------------
@@ -1018,6 +1036,10 @@ void bc_exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_
 
     Real level_time = get_domain_time(domain);
 
+    // dump_auxarray(domain,11);
+    // exit(1);
+
+
 
     // Set up patch data for time interpolation.
 
@@ -1196,6 +1218,7 @@ Real advance_level(fclaw2d_domain_t *domain,
                         " without time interpolation" << endl;
                 }
                 bc_exchange_with_coarse(domain,a_level);
+
                 bc_set_phys(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
@@ -1841,7 +1864,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             }
             n_inner++;
 
-            int regrid_step = 5;  // Will eventually read this in as a parameter.
+            int regrid_step = 1;  // Will eventually read this in as a parameter.
             if (n_inner % regrid_step == 0)
             {
                 // After some number of time steps, we probably need to regrid...
@@ -1931,7 +1954,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
 
-        int regrid_step = 5;  // Will eventually read this in as a parameter.
+        int regrid_step = 1;  // Will eventually read this in as a parameter.
         if (n % regrid_step == 0)
         {
             // After some number of time steps, we probably need to regrid...
@@ -1951,7 +1974,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
 void amrrun(fclaw2d_domain_t **domain)
 {
 
-    int outstyle = 3;
+    int outstyle = 1;
 
     if (outstyle == 1)
     {
@@ -1959,7 +1982,7 @@ void amrrun(fclaw2d_domain_t **domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 50;  // Take 'nstep' steps
+        int nstep = 100;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }
@@ -2034,7 +2057,7 @@ void amrreset(fclaw2d_domain_t **domain)
     }
     FCLAW2D_FREE (dd);
     (*domain)->user = NULL;
-    
+
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }

@@ -29,6 +29,10 @@
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
+            if (aux(i,j,1) .lt. 0) then
+               write(6,*) 'area(i,j) = ', area(i,j)
+               stop
+            endif
 
             if ((i .ge. 1 .and. i .le. mx) .and.
      &            (j .ge. 1 .and. j .le. my)) then

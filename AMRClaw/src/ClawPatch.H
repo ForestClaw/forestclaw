@@ -122,6 +122,19 @@ extern "C" {
                                          const int& blockno);
 
 
+    void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                  const int& refratio, Real qcoarse[],  Real qfine[],
+                                  const int& icorner, int intersects_block[]);
+
+    // Averaging at block boundaries between coarse and fine grids.
+    void  mb_interpolate_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                         const int& meqn,const int& refratio, Real qcoarse[],
+                                         Real qfine[],const int& a_coarse_corner,
+                                         const int& blockno);
+
+
+
+
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------
@@ -308,7 +321,6 @@ public :
     void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
                                      bool a_time_interp, bool is_block_corner, bool intersects_block[]);
 
-
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------
@@ -357,6 +369,7 @@ public :
     void dump();
     void dump_last();
     void dump_time_interp();
+    void dump_auxarray();
 
 
 

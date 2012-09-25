@@ -101,7 +101,6 @@ void ClawPatch::initialize()
 
     set_block_(m_blockno);
 
-#if CH_SPACEDIM == 2
     if (m_manifold)
     {
         qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,m_xlower, m_ylower, m_dx, m_dy,
@@ -112,9 +111,6 @@ void ClawPatch::initialize()
     {
         qinit_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux);
     }
-#elif CH_SPACEDIM == 3
-    qinit_(mx,my,mz,m_meqn,m_mbc,mx,my,mz,xlower,ylower,zlower,dx,dy,dz,q,m_maux,aux);
-#endif
 }
 
 void ClawPatch::setAuxArray()
@@ -123,7 +119,6 @@ void ClawPatch::setAuxArray()
     set_block_(m_blockno);
     Real* aux = m_auxarray.dataPtr();
 
-#if CH_SPACEDIM == 2
     if (m_manifold)
     {
         setaux_mapped_(m_mx,m_my,m_mbc,m_dx,m_dy,
@@ -135,9 +130,6 @@ void ClawPatch::setAuxArray()
     {
         setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
     }
-#elif CH_SPACEDIM == 3
-    setaux_(m_mx,m_my,m_mz,m_mbc,m_mx,m_my,m_mz,m_xlower,m_ylower,m_zlower,m_dx,m_dy,m_dz,m_maux,aux);
-#endif
 }
 
 Real ClawPatch::step(const Real& a_time,
@@ -621,16 +613,21 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner, const in
     // qcorner is the finer level.
     Real *qfine = cp_corner->m_griddata.dataPtr();
 
-    /*
-    if (a_block_boundary)
+    if (is_block_corner)
     {
-        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
+        // This doesn't do anything right now.
+        mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner, m_blockno);
     }
     else
     {
-        interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
+        int bdry[4];
+        for(int m = 0; m < 4; m++)
+        {
+            bdry[m] = intersects_block[m] ? 1 : 0;
+        }
+        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner, bdry);
     }
-    */
+
 }
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
@@ -856,6 +853,27 @@ void ClawPatch::dump_time_interp()
             printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
             k++;
         }
+        printf("\n");
+    }
+}
+
+void ClawPatch::dump_auxarray()
+{
+    Real *q;
+    q = m_auxarray.dataPtr();
+    int k = 0;
+    for (int m = 0; m < m_maux; m++)
+    {
+        for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
+        {
+            for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
+            {
+                printf("q[%2d,%2d,%2d] = %24.16e\n",i,j,m,q[k]);
+                k++;
+            }
+            printf("\n");
+        }
+        printf("\n");
         printf("\n");
     }
 }

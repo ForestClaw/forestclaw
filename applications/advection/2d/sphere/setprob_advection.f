@@ -32,7 +32,7 @@ c     # -------------------------------------------------
 c     # Set mapping scaling
       scale = 1
       rot_angle(1) = pi/3.0
-      rot_angle(2) = -pi/2.d0
+      rot_angle(2) = pi/2.d0
 
       call setup_mappedgrid(rot_angle,scale)
 

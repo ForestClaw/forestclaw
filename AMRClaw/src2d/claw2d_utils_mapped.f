@@ -83,12 +83,11 @@ c                 # ibc = 2 corresponds to the second layer
                         if (iface_coarse .eq. 0) then
                            qf = qfine(mx-ifine+1,jfine,mq)
                            kf = auxfine(mx-ifine+1,jfine,1)
-                           sum = sum + qf*kf
                         else
                            qf = qfine(ifine,jfine,mq)
                            kf = auxfine(ifine,jfine,1)
-                           sum = sum + qf*kf
                         endif
+                        sum = sum + qf*kf
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
@@ -112,12 +111,11 @@ c                 # ibc = 2 corresponds to the second layer
                         if (iface_coarse .eq. 2) then
                            qf = qfine(ifine,my-jfine+1,mq)
                            kf = auxfine(ifine,my-jfine+1,1)
-                           sum = sum + kf*qf
                         else
                            qf = qfine(ifine,jfine,mq)
                            kf = auxfine(ifine,jfine,1)
-                           sum = sum + kf*qf
                         endif
+                        sum = sum + kf*qf
                      enddo
                   enddo
                   if (iface_coarse .eq. 2) then
@@ -192,3 +190,43 @@ c     # Get rectangle in coarse grid for fine grid.
 
 c      write(6,'(A,E24.16)') 'fixcapaq : maxdiff = ',maxdiff
       end
+
+
+c      subroutine coarsen(mx,my,mbc,meqn,refratio, q, qcoarse)
+c      implicit none
+c
+c      integer mx,my,mbc,meqn, refratio
+c      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+c      double precision qcoarse(1-mbc:mx/refratio+mbc,
+c     &      1-mbc:my/refratio+mbc,meqn)
+c      double precision aux(1-mbc:mx/refratio+mbc,
+c     &      1-mbc:my/refratio+mbc,meqn)
+c      double precision auxcoarse(1-mbc:mx/refratio+mbc,
+c     &      1-mbc:my/refratio+mbc,meqn)
+c
+c      integer i,j,ii,jj, ifine,jfine, r2, mq
+c      double precision sum
+c
+c      r2 = refratio**2
+c
+c      do mq = 1,meqn
+c         do i = 1,mx/refratio
+c            do j = 1,my/refratio
+c               sum = 0
+c               do ii = 1,refratio
+c                  do jj = 1,refratio
+c                     ifine = (i - 1)*refratio + ii
+c                     jfine = (j - 1)*refratio + jj
+c                     sum = sum + q(ifine,jfine,mq)
+c                  enddo
+c               enddo
+c               qcoarse(i,j,mq) = sum/r2
+c            enddo
+c         enddo
+cc     # Coarsen ghost cells
+c
+c      enddo
+c
+c
+c
+c      end
