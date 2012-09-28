@@ -1,4 +1,7 @@
+
 #include <iostream>
+#include <stdlib.h>
+
 using namespace std;
 
 typedef void (*set_value_t)(int& a);
