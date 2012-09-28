@@ -21,7 +21,7 @@ extern "C" {
     void setprob_();
 
     void set_maptype_();
-    void set_block_(const int& a_blockno);
+    void set_block_(const int * a_blockno);
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                 const int& mx, const int& my, const Real& xlower, const Real& ylower,

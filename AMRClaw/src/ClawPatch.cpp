@@ -99,7 +99,7 @@ void ClawPatch::initialize()
     Real* q = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
 
-    set_block_(m_blockno);
+    set_block_(&m_blockno);
 
     if (m_manifold)
     {
@@ -116,7 +116,7 @@ void ClawPatch::initialize()
 void ClawPatch::setAuxArray()
 {
 
-    set_block_(m_blockno);
+    set_block_(&m_blockno);
     Real* aux = m_auxarray.dataPtr();
 
     if (m_manifold)
@@ -149,7 +149,7 @@ Real ClawPatch::step_noqad(const Real& a_time,
                            const int& a_level,
                            const global_parms& gparms)
 {
-    set_block_(m_blockno);
+    set_block_(&m_blockno);
 
     Real* qold = m_griddata.dataPtr();
     Real* aux = m_auxarray.dataPtr();
@@ -336,7 +336,7 @@ void ClawPatch::restore_step()
 void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_step,
                                  const int& a_refratio)
 {
-    set_block_(m_blockno);
+    set_block_(&m_blockno);
     Real alpha = Real(a_fine_step)/Real(a_refratio);
 
     Real *qlast = m_griddata_last.dataPtr();
@@ -744,7 +744,7 @@ void ClawPatch::setup_manifold(const int& a_level,
                                const int& a_maxlevel, const int& a_refratio)
 {
     // Set fortran common block
-    set_block_(m_blockno);
+    set_block_(&m_blockno);
 
     // Do we really ever use the "box"?
     int ll[SpaceDim];
