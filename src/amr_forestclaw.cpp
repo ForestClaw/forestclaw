@@ -524,12 +524,6 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
             {
                 if (iface % 2 == 1)
                 {
-                    if (this_patch_idx == 3 && this_patch->level == 3)
-                    {
-                        // cout << "this_neighbor_patch = " << this_neighbor_idx << endl;
-                        // dump_patch(domain,3);
-                    }
-
                     // Do high side exchange only
                     int idir = iface/2;   // this rounds down, right?  1/2 = 0; 3/2 = 1, etc.
                     // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
@@ -1449,22 +1443,12 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        // Grid was not coarsened or refined.
+        // Grid was not coarsened or refined, so we can just copy
+        // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        ClawPatch *cp_new = new ClawPatch();
-        cp_new->define(old_patch[0].xlower,
-                       old_patch[0].ylower,
-                       old_patch[0].xupper,
-                       old_patch[0].yupper,
-                       blockno,
-                       gparms);
+        set_patch_data(&new_patch[0],cp_old);
+        set_patch_data(&old_patch[0],NULL);
 
-        int level = old_patch[0].level;
-        cp_new->setup_patch(level,maxlevel, refratio);
-        // This just copies the data
-        cp_new->copyFrom(cp_old);  // Copy grid data and aux data
-
-        set_patch_data(&new_patch[0],cp_new);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -2047,7 +2031,10 @@ void amrreset(fclaw2d_domain_t **domain)
             fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t *) patch->user;
             ClawPatch *cp = pd->cp;
 
-            delete cp;
+            if (cp != NULL)
+            {
+                delete cp;
+            }
             FCLAW2D_FREE (pd);
             patch->user = NULL;
         }

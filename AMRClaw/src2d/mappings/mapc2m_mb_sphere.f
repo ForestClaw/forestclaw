@@ -7,13 +7,37 @@ c     # either the upper hemisphere (blockno == 0) or the lower hemisphere
 c     # (blockno == 1).
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_sphere(xc,yc,xp,yp,zp)
+      subroutine mapc2m_sphere(xc1,yc1,xp,yp,zp)
       implicit none
 
-      double precision xc,yc, xp, yp, zp
+      double precision xc1,yc1, xp, yp, zp
 
-      double precision x1, y1, d, rp2
+      double precision x1, y1, d, rp2, xc, yc
+      logical multiblock
       integer blockno, get_block
+
+c     # If 'multiblock == .true.', then this map is applied in a multiblock
+c     # setting where each mesh is assumed to be n [-1,1]x[-1,1], and an
+c     # independent function is used to return the current block number
+c     # If used in the non-multiblock case, it is assumed that all data comes
+c     # from the domain [-3,1]x[-1,1].
+      data multiblock /.true./
+
+      xc = xc1
+      yc = yc1
+
+c     # Translate and flip [-3,-1]x[-1,1] into [1,-1]x[-1,1]
+      if (.not. multiblock) then
+         if (xc .lt. -1) then
+            blockno = 1
+            xc = -(xc+2)
+         else
+            blockno = 0
+         endif
+      else
+         blockno = get_block()
+      endif
+
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1,0.d0) + max(-1 - xc,0.d0)
@@ -35,7 +59,8 @@ c     # Set z value
          zp = sqrt(2.d0 - rp2)
       endif
 
-c     # Flip any ghost cell values back to lower hemisphere
+c     # Values that are outside of [-1,1]x[-1,1] (in ghost cell regions)
+c     # to the lower hemisphere
       if (abs(yc) .gt. 1 .or. abs(xc) .gt. 1) then
          zp = -zp
       endif
@@ -47,7 +72,6 @@ c     # This maps everything to the unit sphere
       zp = zp/sqrt(2.d0)
 
 c     # Set lower hemisphere
-      blockno = get_block()
       if (blockno .eq. 1) then
          zp = -zp
       endif
@@ -57,6 +81,8 @@ c     # Set lower hemisphere
 c --------------------------------- MAPC2M -------------------------------
 
 
+c     # Map single grid to the disk.  Since this disk will be used for the
+c     #
       subroutine mapc2p_circle_sp(x1,y1,xp,yp)
       implicit none
 
