@@ -498,7 +498,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
     {
         // Output arguments
         int neighbor_block_idx;
-        int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch indices.
+        int neighbor_patch_idx[p4est_refineFactor];
         int ref_flag;   // = -1, 0, 1
         int *ref_flag_ptr = &ref_flag;
 
