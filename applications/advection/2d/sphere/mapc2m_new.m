@@ -14,19 +14,19 @@ xp = xc;
 yp = yc;
 blockno = getblocknumber();
 
-% if (blockno == 0)
-%   zp = 0*xp + 1;
-% else
-%   zp = 0*xp - 1;
-% end
-% return;
+if (blockno == 0)
+  zp = 0*xp + 1;
+else
+  zp = 0*xp - 1;
+end
+return;
 
 % This is probably not necessary since we don't expect to have any ghost cells.
-% d = max(xc-1,0) + max(-1-xc,0);
-% xc = (1-d)./(1+d).*xc;
-%
-% d = max(yc-1,0) + max(-1-yc,0);
-% yc = (1-d)./(1+d).*yc;
+d = max(xc-1,0) + max(-1-xc,0);
+xc = (1-d)./(1+d).*xc;
+
+d = max(yc-1,0) + max(-1-yc,0);
+yc = (1-d)./(1+d).*yc;
 
 [xp,yp] = mapc2m_disk_sp(xc,yc);
 

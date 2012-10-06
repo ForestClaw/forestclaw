@@ -9,7 +9,7 @@ cv = 0.1:0.1:0.9;
 showgridlines(3);
 hidepatchborders(7);
 setpatchborderprops(1:6,'linewidth',2);
-caxis([0 1]);
+caxis([0 1]);d
 
 view([-40 20])
 set(gca,'zdir','reverse');

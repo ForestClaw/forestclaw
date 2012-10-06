@@ -97,19 +97,25 @@ extern "C" {
                                  Real qthis[], Real qneighbor[], const int& iface,
                                  const int& iblock);
 
-    void mb_exchange_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+    void mb_exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                   const int& meqn,
                                    Real qthis[], Real qneighbor[], const int& icorner,
                                    int bdry[], const int& iblock);
 
-    void mb_exchange_block_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+    void mb_exchange_block_corner_ghost_(const int& mx, const int& my,
+                                         const int& mbc, const int& meqn,
                                          Real qthis[], Real qneighbor[], const int& icorner,
                                          const int& iblock);
 
-    void mb_interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                                    Real qthis[],Real qcoarse[], const int& idir, const int& iside,
-                                    const int& num_neighbors,const int& refratio, const int& igrid);
+    void mb_interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
+                                    const int& meqn,
+                                    Real qthis[],Real qcoarse[], const int& idir,
+                                    const int& iside,
+                                    const int& num_neighbors,const int& refratio,
+                                    const int& igrid);
 
-    void mb_average_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+    void mb_average_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                  const int& meqn,
                                   const int& refratio, Real qcoarse[],  Real qfine[],
                                   Real auxcoarse[], Real auxfine[], const int& maux,
                                   const int& icorner, int intersects_block[]);
@@ -122,7 +128,8 @@ extern "C" {
                                          const int& blockno);
 
 
-    void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+    void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                      const int& meqn,
                                   const int& refratio, Real qcoarse[],  Real qfine[],
                                   const int& icorner, int intersects_block[]);
 
@@ -209,10 +216,12 @@ extern "C" {
     // ----------------------------------------------------------------------------------
     void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
                       const int& mx, const int& my, const Real& xlower, const Real& ylower,
-                      const Real& dx, const Real& dy, Real q[], const int& iframe, const int& patch_idx,
+                      const Real& dx, const Real& dy, Real q[], const int& iframe,
+                      const int& patch_idx,
                       const int& level,const int& blockno);
 
-    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,const Real& dx,
+    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                      const Real& dx,
                       const Real& dy, Real q[], Real& sum);
 
 
@@ -225,23 +234,13 @@ public :
     ClawPatch();
     ~ClawPatch();
 
-#if CH_SPACEDIM == 2
     void define(const Real&  a_xlower,
                 const Real&  a_ylower,
                 const Real&  a_xupper,
                 const Real&  a_yupper,
                 const int& a_blockno,
                 const global_parms *a_gparms);
-#else
-    void define(const Real& xlower,
-                const Real& ylower,
-                const Real& zlower,
-                const Real& xupper,
-                const Real& yupper,
-                const Real& zupper,
-                const global_parms *a_gparms);
 
-#endif
     void copyFrom(ClawPatch *a_cp);
 
     bool isDefined();
@@ -312,17 +311,23 @@ public :
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
-    void average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+    void average_corner_ghost(const int& a_corner, const int& a_refratio,
+                              ClawPatch *cp_fine,
                               bool a_time_interp);
 
-    void mb_average_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
-                                 bool a_time_interp, bool is_corner_block, bool intersects_block[]);
+    void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
+                                 ClawPatch *cp_fine,
+                                 bool a_time_interp, bool is_corner_block,
+                                 bool intersects_block[]);
 
-    void interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
+    void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
+                                  ClawPatch *cp_fine,
                                   bool a_time_interp);
 
-    void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio, ClawPatch *cp_fine,
-                                     bool a_time_interp, bool is_block_corner, bool intersects_block[]);
+    void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
+                                     ClawPatch *cp_fine,
+                                     bool a_time_interp, bool is_block_corner,
+                                     bool intersects_block[]);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
@@ -335,10 +340,12 @@ public :
                              const Real& dt);
 
     // Corners that lie on a physical face - data has to be exchanged in a particular way
-    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[], const Real& t, const Real& dt);
+    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
+                               const Real& t, const Real& dt);
 
     // Exchange corner ghost with boundary neighbor
-    void exchange_phys_face_corner_ghost(const int& a_corner, const int& a_iface, ClawPatch* cp);
+    void exchange_phys_face_corner_ghost(const int& a_corner,
+                                         const int& a_iface, ClawPatch* cp);
 
     // ----------------------------------------------------------------
     // Tagging, refining and coarsening

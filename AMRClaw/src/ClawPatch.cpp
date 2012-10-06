@@ -225,8 +225,8 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
 
 
   /*
-#if CH_SPACEDIM==2
-  int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn + (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
+  int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn +
+  (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
   Real* work = new Real[mwork];
 
   Real* fp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
@@ -258,57 +258,10 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
               fp_chombo,fm_chombo,gp_chombo,gm_chombo,
               fpc_chombo,fmc_chombo,gpc_chombo,gmc_chombo);
 
-#elif CH_SPACEDIM==3
-  int mwork = (maxm+2*m_mbc)*(46*m_meqn + (m_meqn+1)*m_mwaves + 9*m_maux + 3);
-  Real* work = new Real[mwork];
-
-  Real* fp_chombo = a_fluxp[0].dataPtr();
-  Real* fm_chombo = a_fluxm[0].dataPtr();
-  Real* fpc_chombo = a_fluxpc[0].dataPtr();
-  Real* fmc_chombo = a_fluxmc[0].dataPtr();
-
-  Real* gp_chombo = a_fluxp[1].dataPtr();
-  Real* gm_chombo = a_fluxm[1].dataPtr();
-  Real* gpc_chombo = a_fluxpc[1].dataPtr();
-  Real* gmc_chombo = a_fluxmc[1].dataPtr();
-
-  Real* hp_chombo = a_fluxp[2].dataPtr();
-  Real* hm_chombo = a_fluxm[2].dataPtr();
-  Real* hpc_chombo = a_fluxpc[2].dataPtr();
-  Real* hmc_chombo = a_fluxmc[2].dataPtr();
-
-  Real* fp = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-  Real* fm = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-
-  Real* gp = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-  Real* gm = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-
-  Real* hp = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-  Real* hm = new Real[m_meqn*(mx+2*m_mbc)*(my+2*m_mbc)*(mz+2*m_mbc)];
-
-  Real* qadd_x = a_qadd[0].dataPtr();
-  Real* qadd_y = a_qadd[1].dataPtr();
-  Real* qadd_z = a_qadd[2].dataPtr();
-
-  clawpatch3_(maxm, m_meqn, m_maux, m_mbc, m_method, m_mthlim,
-              m_mcapa, m_mwaves, mx, my, mz, qold, aux,
-              dx, dy, dz, dt, cflgrid, work, mwork, qold_coarse, auxold_coarse,
-              qadd_x, qadd_y, qadd_z, m_auxtype_int, xlower, ylower, zlower,
-              intersectsBoundary,a_level,
-              m_mthbc, a_time, mxc, myc, mzc, fp, fm, gp, gm, hp, hm,
-              fp_chombo,fm_chombo,gp_chombo,gm_chombo,hp_chombo,hm_chombo,
-              fpc_chombo, fmc_chombo, gpc_chombo, gmc_chombo,hpc_chombo,hmc_chombo);
-
-#endif
-
   delete [] fp;
   delete [] fm;
   delete [] gp;
   delete [] gm;
-#if CH_SPACEDIM == 3
-  delete [] hp;
-  delete [] hm;
-#endif
 
   delete [] intersectsBoundary;
   delete [] work;
@@ -595,9 +548,11 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner, const int& a
 }
 
 
-void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                         ClawPatch *cp_corner, bool a_time_interp, bool is_block_corner,
-                                         bool intersects_block[])
+void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
+                                            const int& a_refratio,
+                                            ClawPatch *cp_corner,
+                                            bool a_time_interp, bool is_block_corner,
+                                            bool intersects_block[])
 
 {
     Real *qcoarse;
@@ -616,7 +571,9 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner, const in
     if (is_block_corner)
     {
         // This doesn't do anything right now.
-        mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner, m_blockno);
+        mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
+                                           a_refratio, qcoarse, qfine,
+                                           a_coarse_corner, m_blockno);
     }
     else
     {
@@ -625,7 +582,9 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner, const in
         {
             bdry[m] = intersects_block[m] ? 1 : 0;
         }
-        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner, bdry);
+        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
+                                     a_refratio, qcoarse, qfine,
+                                     a_coarse_corner, bdry);
     }
 
 }
@@ -691,7 +650,8 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
             Real *auxcoarse = m_auxarray.dataPtr();
             Real *auxfine = a_cp_siblings[igrid]->m_auxarray.dataPtr();
             average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
-                                      auxcoarse, auxfine, m_maux, a_p4est_refineFactor,
+                                      auxcoarse, auxfine, m_maux,
+                                      a_p4est_refineFactor,
                                       a_refratio, igrid);
         }
         else
@@ -706,18 +666,9 @@ bool ClawPatch::tag_for_refinement(bool a_init_flag)
 {
     Real *q = m_griddata.dataPtr();
     int tag_patch;  // == 0 or 1
-    int iflag;
-
-    // I am sure there is a way to pass a boolean to Fortran ...
-    if (a_init_flag)
-    {
-        iflag = 1;
-    }
-    else
-    {
-        iflag = 0;
-    }
-    tag_for_refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx, m_dy,q,iflag,tag_patch);
+    int iflag = a_init_flag ? 1 : 0;
+    tag_for_refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,
+                        m_dx, m_dy,q,iflag,tag_patch);
     return tag_patch == 1;
 }
 

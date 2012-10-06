@@ -16,21 +16,11 @@
       do mq = 1,meqn
          do i = 1-mbc,mx+mbc
             do j = 1-mbc,my+mbc
-
-               if (init_flag == 1) then
-                  xc = xlower + (i-0.5)*dx
-                  yc = ylower + (j-0.5)*dy
-                  if (abs(xc - 0.5d0) < dx) then
-                     tag_patch = 1
-                     return
-                  endif
-               else
-                  qmin = min(q(i,j,mq),qmin)
-                  qmax = max(q(i,j,mq),qmax)
-                  if (qmax - qmin .gt. 0.25d0) then
-                     tag_patch = 1
-                     return
-                  endif
+               qmin = min(q(i,j,mq),qmin)
+               qmax = max(q(i,j,mq),qmax)
+               if (qmax - qmin .gt. 0.5d0) then
+                  tag_patch = 1
+                  return
                endif
             enddo
          enddo
@@ -64,7 +54,9 @@ c     # we would coarsen an initial grid.
             do j = 1,my
                qmin = min(qcoarsened(i,j,mq),qmin)
                qmax = max(qcoarsened(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.5d0) then
+               if (qmax - qmin .gt. 0.25d0) then
+c                 # Since this patch could be refined, we don't tag it
+c                 for coarsening.
                   tag_patch = 1
                   return
                endif

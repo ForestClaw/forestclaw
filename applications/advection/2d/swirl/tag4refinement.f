@@ -17,7 +17,7 @@
          do i = 1-mbc,mx+mbc
             do j = 1-mbc,my+mbc
 
-               if (init_flag == 1) then
+               if (init_flag .eq. 1) then
                   xc = xlower + (i-0.5)*dx
                   yc = ylower + (j-0.5)*dy
                   if (abs(xc - 0.5d0) < dx) then

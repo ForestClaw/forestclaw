@@ -1419,7 +1419,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 
         cp_new_coarse->setup_patch(level, maxlevel, refratio);
 
-        ClawPatch *cp_siblings[num_siblings]; // An array of pointers?
+        ClawPatch *cp_siblings[num_siblings];
         for (int i = 0; i < num_siblings; i++)
         {
             cp_siblings[i] = get_clawpatch(&sibling_patch[i]);
@@ -1437,6 +1437,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                 fclaw2d_patch_mark_coarsen(domain, this_block_idx, sibling_patch_idx);
             }
         }
+        delete cp_new_coarse;
     }
 }
 
@@ -1499,9 +1500,31 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined, so we can just copy
         // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        set_patch_data(&new_patch[0],cp_old);
-        set_patch_data(&old_patch[0],NULL);
+        bool old_code = false;
+        // To see differences in output, do a 'diff' on fort.q0005
+        // for each run.
+        if (old_code)
+        {
+            // This produces what appear to be correct results
+            ClawPatch *cp_new = new ClawPatch();
+            cp_new->define(old_patch->xlower,
+                           old_patch->ylower,
+                           old_patch->xupper,
+                           old_patch->yupper,
+                           blockno,
+                           gparms);
 
+            int level = new_patch->level;
+            cp_new->setup_patch(level, maxlevel, refratio);
+            cp_new->copyFrom(cp_old);
+            set_patch_data(&new_patch[0],cp_new);
+        }
+        else
+        {
+            // whereas this version has memory problems.
+            set_patch_data(&new_patch[0],cp_old);
+            set_patch_data(&old_patch[0],NULL);
+        }
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -1588,8 +1611,6 @@ void amrinit(fclaw2d_domain_t **domain,
 {
     Real t = 0;
 
-    // gparms->print_inputParams();
-
     allocate_user_data(*domain);
 
     set_domain_data(*domain, gparms, amropts);
@@ -1614,8 +1635,7 @@ void amrinit(fclaw2d_domain_t **domain,
 
 
     // Initialize base level grid - combine with 'amr_set_base_level' above?
-    fclaw2d_domain_iterate_level(*domain, minlevel,
-                                 cb_amrinit,
+    fclaw2d_domain_iterate_level(*domain, minlevel, cb_amrinit,
                                  (void *) NULL);
 
     cout << "Done with domain adaptation " << endl;
@@ -1656,12 +1676,14 @@ void amrinit(fclaw2d_domain_t **domain,
             // Allocate memory for user data types (but they don't get set)
             allocate_user_data(new_domain);
 
-            // Initialize new grids.  Assume that all ghost cells are filled in by qinit.
+            // Initialize new grids.  Assume that all ghost cells are filled
+            //in by qinit.
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt,
                                            (void *) &init_flag);
 
-            // Set some of the user data types.  Some of this is done in 'amr_set_base_level',
+            // Set some of the user data types.  Some of this is done
+            // in 'amr_set_base_level',
             // I should probably come up with a more general way to do this.
             set_domain_data(new_domain, gparms, amropts);
             set_domain_time(new_domain,t);
@@ -1726,12 +1748,11 @@ void amrregrid(fclaw2d_domain_t **domain)
     int minlevel = gparms->m_minlevel;
     int maxlevel = gparms->m_maxlevel;
 
-    // Unlike the initial case, where we refine level by level, here, we only visit each tag
-    // once and decide whether to refine or coarsen that patch.
-    fclaw2d_domain_iterate_families(*domain,cb_tag4coarsening,(void*)NULL);
+    // First determine which families should be coarsened.
+    fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening, (void*) NULL);
 
-    fclaw2d_domain_iterate_patches(*domain,
-                                   cb_tag4refinement,
+    // Then refine.
+    fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
                                    (void *) &init_flag);
 
     // Rebuild domain if necessary
@@ -1749,9 +1770,11 @@ void amrregrid(fclaw2d_domain_t **domain)
         allocate_user_data(new_domain);
 
         // Average or interpolate to new grids.
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,(void *) &init_flag);
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
+                                       (void *) &init_flag);
 
-        // Set some of the user data types.  Some of this is done in 'amr_set_base_level',
+        // Set some of the user data types.  Some of this is done in
+        // 'amr_set_base_level',
         // I should probably come up with a more general way to do this.
         set_domain_data(new_domain, gparms, amropts);
         set_domain_time(new_domain,t);
@@ -2015,7 +2038,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
 void amrrun(fclaw2d_domain_t **domain)
 {
 
-    int outstyle = 1;
+    int outstyle = 3;
 
     if (outstyle == 1)
     {
@@ -2023,7 +2046,7 @@ void amrrun(fclaw2d_domain_t **domain)
     }
     else if (outstyle == 3)
     {
-        int nstep = 100;  // Take 'nstep' steps
+        int nstep = 5;  // Take 'nstep' steps
         int nplot = 1;   // Plot every 'nplot' steps
         explicit_step(domain,nstep,nplot);
     }
