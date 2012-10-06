@@ -1412,8 +1412,8 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         // sibling "family" of patches.
         cp_new_coarse->define(sibling_patch[0].xlower,
                               sibling_patch[0].ylower,
-                              sibling_patch[num_siblings].xupper,
-                              sibling_patch[num_siblings].yupper,
+                              sibling_patch[num_siblings-1].xupper,
+                              sibling_patch[num_siblings-1].yupper,
                               this_block_idx,
                               gparms);
 
