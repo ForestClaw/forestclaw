@@ -677,23 +677,28 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
     }
 }
 
-void ClawPatch::coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
-                                   const int& a_p4est_refineFactor, const int& a_refratio)
+void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
+                                         const int& a_refratio,
+                                         const int& a_num_siblings,
+                                         const int& a_p4est_refineFactor)
 {
-    Real *qfine = a_fine->m_griddata.dataPtr();
-    Real *qcoarse = this->m_griddata.dataPtr();
-
-    if (m_manifold)
+    Real *qcoarse = m_griddata.dataPtr();
+    for(int igrid = 0; igrid < a_num_siblings; igrid++)
     {
-        Real *auxcoarse = m_auxarray.dataPtr();
-        Real *auxfine = a_fine->m_auxarray.dataPtr();
-        average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
-                                  auxcoarse, auxfine, m_maux, p4est_refineFactor,
-                                  a_refratio, a_igrid);
-    }
-    else
-    {
-        average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,p4est_refineFactor,a_refratio,a_igrid);
+        Real *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
+        if (m_manifold)
+        {
+            Real *auxcoarse = m_auxarray.dataPtr();
+            Real *auxfine = a_cp_siblings[igrid]->m_auxarray.dataPtr();
+            average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
+                                      auxcoarse, auxfine, m_maux, a_p4est_refineFactor,
+                                      a_refratio, igrid);
+        }
+        else
+        {
+            average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+                                     a_p4est_refineFactor,a_refratio,igrid);
+        }
     }
 }
 
@@ -716,22 +721,17 @@ bool ClawPatch::tag_for_refinement(bool a_init_flag)
     return tag_patch == 1;
 }
 
-bool ClawPatch::tag_for_coarsening(const int& a_refratio)
+bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
+                                   const int& a_refratio,
+                                   const int& a_num_siblings,
+                                   const int& a_p4est_refineFactor)
 {
-    Real *q = m_griddata.dataPtr();
+    this->coarsen_from_fine_family(a_cp_siblings,a_refratio,a_num_siblings,
+                                   a_p4est_refineFactor);
     int tag_patch;
-    int mx2 = m_mx/a_refratio;
-    int my2 = m_my/a_refratio;
-    Real *qcoarse = new Real[(mx2 + 2*m_mbc)*(my2 + 2*m_mbc)*m_meqn];
-    coarsen_(m_mx,m_my,m_mbc,m_meqn,a_refratio, q, qcoarse);
-
-    // it would be nice to know where the fine grid is in relation to the underlying coarse
-    // quadrant.
-    Real dx2 = a_refratio*m_dx;
-    Real dy2 = a_refratio*m_dy;
-    int iflag = 0;
-    tag_for_refinement_(mx2,my2,m_mbc,m_meqn,m_xlower,m_ylower,dx2,dy2,qcoarse,iflag,tag_patch);
-    delete [] qcoarse;
+    Real *qcoarse = m_griddata.dataPtr();
+    tag_for_coarsening_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx,m_dy,
+                              qcoarse,tag_patch);
     return tag_patch == 0;
 }
 

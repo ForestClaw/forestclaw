@@ -30,7 +30,8 @@
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
             if (aux(i,j,1) .lt. 0) then
-               write(6,*) 'area(i,j) = ', area(i,j)
+               write(6,*) 'setaux_mapped.f : area(i,j) = ', area(i,j),
+     &               dxdy
                stop
             endif
 

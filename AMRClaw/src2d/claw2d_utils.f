@@ -620,41 +620,6 @@ c     # Get rectangle in coarse grid for fine grid.
       enddo
       end
 
-      subroutine coarsen(mx,my,mbc,meqn,refratio, q, qcoarse)
-      implicit none
-
-      integer mx,my,mbc,meqn, refratio
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qcoarse(1-mbc:mx/refratio+mbc,
-     &      1-mbc:my/refratio+mbc,meqn)
-
-      integer i,j,ii,jj, ifine,jfine, r2, mq
-      double precision sum
-
-      r2 = refratio**2
-
-      do mq = 1,meqn
-         do i = 1,mx/refratio
-            do j = 1,my/refratio
-               sum = 0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (i - 1)*refratio + ii
-                     jfine = (j - 1)*refratio + jj
-                     sum = sum + q(ifine,jfine,mq)
-                  enddo
-               enddo
-               qcoarse(i,j,mq) = sum/r2
-            enddo
-         enddo
-c     # Coarsen ghost cells
-
-      enddo
-
-
-
-      end
-
 c    # ----------------------------------------------------------------------------------
 c    # Output and diagnostics
 c    # ----------------------------------------------------------------------------------

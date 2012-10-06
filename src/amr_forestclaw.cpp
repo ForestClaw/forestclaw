@@ -192,6 +192,21 @@ const int get_faces_per_patch(fclaw2d_domain_t *domain)
 }
 
 static
+const int get_siblings_per_patch(fclaw2d_domain_t *domain)
+{
+    // Number of patch corners, not the number of corners in the domain!
+    return fclaw2d_domain_num_corners(domain);
+}
+
+static
+const int get_p4est_refineFactor(fclaw2d_domain_t *domain)
+{
+    return fclaw2d_domain_num_face_corners(domain);
+}
+
+
+
+static
 void set_problem_parameters()
 {
     setprob_();
@@ -1343,20 +1358,17 @@ Real advance_all_levels(fclaw2d_domain_t *domain,
 // -----------------------------------------------------------------
 
 static
-void cb_tag_patch(fclaw2d_domain_t *domain,
-                  fclaw2d_patch_t *this_patch,
-                  int this_block_idx,
-                  int this_patch_idx,
-                  void *user)
+    void cb_tag4refinement(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
 {
 
     bool init_flag = *((bool *) user);
     global_parms *gparms = get_domain_parms(domain);
     int maxlevel = gparms->m_maxlevel;
-    int minlevel = gparms->m_minlevel;
-    int refratio = gparms->m_refratio;
     bool patch_refined = false;
-    bool patch_coarsened = false;
 
     ClawPatch *cp = get_clawpatch(this_patch);
 
@@ -1370,20 +1382,61 @@ void cb_tag_patch(fclaw2d_domain_t *domain,
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
         }
     }
+}
 
-    // If a patch has been tagged for refinement, then we shouldn't coarsen it.
-    if (level > minlevel && !init_flag && !patch_refined)
+static
+void cb_tag4coarsening(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *sibling_patch,
+                       int this_block_idx,
+                       int sibling0_patch_idx,
+                       void *user)
+{
+    global_parms *gparms = get_domain_parms(domain);
+    int minlevel = gparms->m_minlevel;
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+
+    int level = sibling_patch[0].level;
+    if (level > minlevel)
     {
-        patch_coarsened = cp->tag_for_coarsening(refratio);
+        int maxlevel = gparms->m_maxlevel;
+        int refratio = gparms->m_refratio;
+        bool patch_coarsened = false;
+
+        const int num_siblings = get_siblings_per_patch(domain);
+
+        ClawPatch *cp_new_coarse = new ClawPatch();
+
+        // Create a new coarse grid patch that contains the siblings;
+        // Average siblings to this patch and test whether coarse
+        // patch should be refined.  If not, then we coarsen the
+        // sibling "family" of patches.
+        cp_new_coarse->define(sibling_patch[0].xlower,
+                              sibling_patch[0].ylower,
+                              sibling_patch[num_siblings].xupper,
+                              sibling_patch[num_siblings].yupper,
+                              this_block_idx,
+                              gparms);
+
+        cp_new_coarse->setup_patch(level, maxlevel, refratio);
+
+        ClawPatch *cp_siblings[num_siblings]; // An array of pointers?
+        for (int i = 0; i < num_siblings; i++)
+        {
+            cp_siblings[i] = get_clawpatch(&sibling_patch[i]);
+        }
+        // Pass all four sibling patches into a single routine to see if
+        // they can be coarsened.
+        patch_coarsened = cp_new_coarse->tag_for_coarsening(cp_siblings,refratio,
+                                                            num_siblings,
+                                                            p4est_refineFactor);
         if (patch_coarsened)
         {
-            fclaw2d_patch_mark_coarsen(domain, this_block_idx, this_patch_idx);
+            for (int i = 0; i < num_siblings; i++)
+            {
+                int sibling_patch_idx = sibling0_patch_idx + i;
+                fclaw2d_patch_mark_coarsen(domain, this_block_idx, sibling_patch_idx);
+            }
         }
-    }
-    if (patch_refined && patch_coarsened)
-    {
-        printf("Patch tagged for both refinement and coarsening\n");
-        exit(1);
     }
 }
 
@@ -1435,7 +1488,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 {
     global_parms *gparms = get_domain_parms(old_domain);
 
-    const int num_siblings = fclaw2d_domain_num_corners (old_domain);
+    const int num_siblings = get_siblings_per_patch(old_domain);
     bool init_grid = *(bool *) user;
 
     int refratio = gparms->m_refratio;
@@ -1493,13 +1546,15 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
         int level = new_patch[0].level;
         cp_new->setup_patch(level, maxlevel, refratio);
-        for(int igrid = 0; igrid < num_siblings; igrid++)
+
+        ClawPatch *cp_siblings[num_siblings]; // An array of pointers?
+        for (int i = 0; i < num_siblings; i++)
         {
-            // Get one of the older finer grids and average to new coarse grid.
-            // Assume that we will never coarsen when we are initializing the grids.
-            ClawPatch *cp_old = get_clawpatch(&old_patch[igrid]);
-            cp_new->coarsen_from_fine_patch(cp_old, igrid, p4est_refineFactor,refratio);
+            cp_siblings[i] = get_clawpatch(&old_patch[i]);
         }
+        // This duplicates the work we did to determine if we even need to coarsen. Oh well.
+        cp_new->coarsen_from_fine_family(cp_siblings, refratio, num_siblings,
+                                         p4est_refineFactor);
         set_patch_data(&new_patch[0],cp_new);
     }
     else
@@ -1585,7 +1640,7 @@ void amrinit(fclaw2d_domain_t **domain,
         // the fclaw2d_domain_adapt and _partition calls work fine in parallel
 
         fclaw2d_domain_iterate_level(*domain, level,
-                                     cb_tag_patch,
+                                     cb_tag4refinement,
                                      (void *) &init_flag);
 
         // Rebuild domain if necessary
@@ -1673,8 +1728,10 @@ void amrregrid(fclaw2d_domain_t **domain)
 
     // Unlike the initial case, where we refine level by level, here, we only visit each tag
     // once and decide whether to refine or coarsen that patch.
+    fclaw2d_domain_iterate_families(*domain,cb_tag4coarsening,(void*)NULL);
+
     fclaw2d_domain_iterate_patches(*domain,
-                                   cb_tag_patch,
+                                   cb_tag4refinement,
                                    (void *) &init_flag);
 
     // Rebuild domain if necessary

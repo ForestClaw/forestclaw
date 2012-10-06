@@ -6,10 +6,14 @@ yrbcolormap;
 
 cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
-showgridlines(4);
+showgridlines(3);
 hidepatchborders(7);
 setpatchborderprops(1:6,'linewidth',2);
 caxis([0 1]);
+
+view([-40 20])
+set(gca,'zdir','reverse');
+daspect([1 1 2]);
 
 NoQuery = 0;
 MaxFrames = 192;

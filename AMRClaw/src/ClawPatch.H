@@ -170,16 +170,19 @@ extern "C" {
                              const Real& ylower, const Real& dx, const Real& dy,
                              Real q[], const int& init_flag, int& tag_patch);
 
-    void coarsen_(const int& mx,const int& my, const int& mbc, const int& meqn,
-                  const int& refratio, Real q[], Real qcoarse[]);
+    void tag_for_coarsening_(const int& mx,const int& my,const int& mbc,
+                             const int& meqn,const Real& xlower,
+                             const Real& ylower, const Real& dx, const Real& dy,
+                             Real qcoarsened[], int& tag_patch);
 
-
-    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
-                                    Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
+    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
+                                    const int& meqn, Real qcoarse[], Real qfine[],
+                                    const int& p4est_refineFactor,
                                     const int& refratio, const int& igrid);
 
-    void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,const int& meqn,
-                                  Real qcoarse[],Real qfine[],const int& p4est_refineFactor,
+    void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,
+                                  const int& meqn, Real qcoarse[],Real qfine[],
+                                  const int& p4est_refineFactor,
                                   const int& refratio, const int& igrid);
 
     void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
@@ -217,8 +220,8 @@ extern "C" {
 
 class ClawPatch
 {
-
 public :
+
     ClawPatch();
     ~ClawPatch();
 
@@ -341,15 +344,20 @@ public :
     // Tagging, refining and coarsening
     // ----------------------------------------------------------------
     bool tag_for_refinement(bool init_flag);
-    bool tag_for_coarsening(const int& a_refratio);
+    bool tag_for_coarsening(ClawPatch *cp_siblings[],
+                            const int& refratio,
+                            const int& num_siblings,
+                            const int& p4est_refineFactor);
 
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
                                    const int& a_p4est_refineFactor,
                                    const int& a_refratio);
 
-    void coarsen_from_fine_patch(ClawPatch * a_fine, const int& a_igrid,
-                                 const int& a_p4est_refineFactor, const int& a_refratio);
+    void coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
+                                  const int& a_refratio,
+                                  const int& a_num_siblings,
+                                  const int& a_p4est_refineFactor);
 
 
     // ----------------------------------------------------------------
