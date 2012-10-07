@@ -44,13 +44,7 @@ int pow_int(int a, int n);
 #define CH_SPACEDIM 2
 typedef double Real;
 
-// There might be a p4est way to get this.
-const int p4est_refineFactor = 2;
-
 const int SpaceDim = CH_SPACEDIM;
-const int NumFaces = 2*SpaceDim;
-// const int NumCorners = pow_int(SpaceDim,2);
-const int NumSiblings = pow_int(p4est_refineFactor,SpaceDim);
 
 class global_parms;
 

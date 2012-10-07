@@ -1,6 +1,8 @@
 #include "ClawPatch.H"
 #include "amr_utils.H"
 
+#include "parser.H"
+
 // This constructors includes all of parameters that are patch independent.
 // All of this could also be in some sort of "set_params" function...
 ClawPatch::ClawPatch()
