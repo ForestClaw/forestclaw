@@ -14,8 +14,10 @@ using namespace std;
 class Parser
 {
 public:
-    Parser(const char *ini_name);
+    Parser();
+    Parser(const char *section);
     ~Parser();
+    void define(int a_argc, char **a_argv);
     void dump();
 
     int get_int(const char *key, int notfound);
@@ -27,4 +29,9 @@ public:
 
 protected:
     dictionary	*m_ini;
+    static int    s_argc;
+    static char** s_argv;
+    string m_section;
+private:
+    const char* append_key(const char* key);
 };
