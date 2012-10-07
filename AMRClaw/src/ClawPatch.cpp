@@ -68,6 +68,13 @@ void ClawPatch::define(const Real&  a_xlower,
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
     m_griddata = a_cp->m_griddata;
+    /*
+    // This should not be needed, as these various states will all be
+    // recreated in the next time step.
+    m_griddata_last = a_cp->m_griddata_last;
+    m_griddata_save = a_cp->m_griddata_save;
+    m_griddata_time_interp = a_cp->m_griddata_time_interp;
+    */
 }
 
 
@@ -80,7 +87,8 @@ bool ClawPatch::isDefined()
 // Time stepping routines
 // ----------------------------------------------------------------
 
-void ClawPatch::setup_patch(const int& a_level, const int& a_maxlevel, const int& a_refratio)
+void ClawPatch::setup_patch(const int& a_level, const int& a_maxlevel,
+                            const int& a_refratio)
 {
     if (m_maux > 0)
     {
@@ -90,7 +98,6 @@ void ClawPatch::setup_patch(const int& a_level, const int& a_maxlevel, const int
         }
         setAuxArray();
     }
-    // Anything else to do?
 }
 
 
@@ -104,12 +111,13 @@ void ClawPatch::initialize()
     if (m_manifold)
     {
         qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,m_xlower, m_ylower, m_dx, m_dy,
-                      m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(), q, m_maux, aux,
-                      m_blockno);
+                      m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(),
+                      q, m_maux, aux, m_blockno);
     }
     else
     {
-        qinit_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux);
+        qinit_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,
+               m_dx,m_dy,q,m_maux,aux);
     }
 }
 
@@ -128,7 +136,8 @@ void ClawPatch::setAuxArray()
     }
     else
     {
-        setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,m_maux,aux);
+        setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,
+                m_dx,m_dy,m_maux,aux);
     }
 }
 

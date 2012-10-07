@@ -10,10 +10,10 @@ using namespace std;
 
 // Think about making ClawPatch members all static
 
-
 extern "C" {
 
-    void set_common_levels_(const int& maxlevel,const int& a_level,const int& refratio);
+    void set_common_levels_(const int& maxlevel,const int& a_level,
+                            const int& refratio);
 
     // ----------------------------------------------------------------------------------
     // Initialization routines
@@ -23,24 +23,26 @@ extern "C" {
     void set_maptype_();
     void set_block_(const int * a_blockno);
 
-    void qinit_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-                const int& mx, const int& my, const Real& xlower, const Real& ylower,
-                const Real& dx, const Real& dy, Real q[], const int& maux, Real aux[]);
+    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
+                const int& mbc, const int& mx, const int& my,
+                const Real& xlower, const Real& ylower, const Real& dx,
+                const Real& dy, Real q[], const int& maux, Real aux[]);
 
-    void qinit_mapped_(const int& mx, const int& my, const int& meqn, const int& mbc,
-                       const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
-                       Real xp[], Real yp[], Real zp[], Real q[], const int& maux,
-                       Real aux[], const int& blockno);
+    void qinit_mapped_(const int& mx, const int& my, const int& meqn,
+                       const int& mbc, const Real& xlower, const Real& ylower,
+                       const Real& dx, const Real& dy, Real xp[], Real yp[], Real zp[],
+                       Real q[], const int& maux, Real aux[], const int& blockno);
 
-    void setaux_(const int& maxmx, const int& maxmy, const int& mbc, const int& mx, const int& my,
-                 const Real& xlower, const Real& ylower, const Real& dx, const Real& dy,
+    void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
+                 const int& mx, const int& my, const Real& xlower,
+                 const Real& ylower, const Real& dx, const Real& dy,
                  const int& maux, Real aux[]);
 
     void setaux_mapped_(const int& mx, const int& my, const int& mbc,
                         const Real& dx, const Real& dy,
                         Real xp[], Real yp[], Real zp[],
-                        Real xd[], Real yd[], Real zd[], Real area[],
-                        const int& maux, Real aux[]);
+                        Real xd[], Real yd[], Real zd[],
+                        Real area[], const int& maux, Real aux[]);
 
     void b4step2_mapped_(const int& mx, const int& my, const int& mbc,
                          const int& meqn, Real q[], const Real& dx, const Real& dy,
@@ -50,9 +52,10 @@ extern "C" {
 
     void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
                                     const int& meqn, Real qfine[],Real qcoarse[],
-                                    const Real auxcoarse[], const Real auxfine[], const int& maux,
-                                    const int& idir, const int& iside, const int& num_neighbors,
-                                    const int& refratio, const int& igrid);
+                                    const Real auxcoarse[], const Real auxfine[],
+                                    const int& maux, const int& idir, const int& iside,
+                                    const int& num_neighbors, const int& refratio,
+                                    const int& igrid);
 
     void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                                 const int& meqn, Real qfine[],Real qcoarse[],
@@ -62,8 +65,8 @@ extern "C" {
 
     void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                     Real qcoarse[], Real qfine[], Real auxcoarse[], Real auxfine[],
-                    const int& maux,
-                    const int& p4est_refineFactor, const int& refratio, const int& igrid);
+                    const int& maux, const int& p4est_refineFactor,
+                    const int& refratio, const int& igrid);
 
     // ----------------------------------------------------------------------------------
     // Internal boundary conditions
@@ -129,17 +132,16 @@ extern "C" {
 
 
     void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                      const int& meqn,
-                                  const int& refratio, Real qcoarse[],  Real qfine[],
-                                  const int& icorner, int intersects_block[]);
+                                      const int& meqn, const int& refratio,
+                                      Real qcoarse[],  Real qfine[], const int& icorner,
+                                      int intersects_block[]);
 
     // Averaging at block boundaries between coarse and fine grids.
     void  mb_interpolate_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                         const int& meqn,const int& refratio, Real qcoarse[],
-                                         Real qfine[],const int& a_coarse_corner,
-                                         const int& blockno);
-
-
+                                             const int& meqn,const int& refratio,
+                                             Real qcoarse[],
+                                             Real qfine[],const int& a_coarse_corner,
+                                             const int& blockno);
 
 
     // ----------------------------------------------------------------------------------
@@ -250,7 +252,8 @@ public :
     // ----------------------------------------------------------------------------------
     void initialize();
 
-    void setup_patch(const int& a_level, const int& a_maxlevel, const int& a_refratio);
+    void setup_patch(const int& a_level, const int& a_maxlevel,
+                     const int& a_refratio);
 
     void setAuxArray();
 
@@ -258,7 +261,8 @@ public :
     // Time stepping routines
     // ----------------------------------------------------------------
 
-    // Dummy step routine useful for trying out subcycling without anything too terrible happening
+    // Dummy step routine useful for trying out subcycling without
+    // anything too terrible happening
     Real step(const Real& a_time,
               const Real& a_dt,
               const int& a_level,
@@ -280,7 +284,8 @@ public :
     void save_step();
     void restore_step();
 
-    void time_interpolate(const int& a_fine_step, const int& a_coarse_step, const int& a_step_inc);
+    void time_interpolate(const int& a_fine_step, const int& a_coarse_step,
+                          const int& a_step_inc);
 
     // ----------------------------------------------------------------
     // Internal boundary conditions
@@ -290,7 +295,8 @@ public :
     void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 
     void mb_exchange_corner_ghost(const int& a_icorner, bool a_intersects_block[],
-                                  ClawPatch *a_neighbor_cp, const bool& a_is_block_corner);
+                                  ClawPatch *a_neighbor_cp,
+                                  const bool& a_is_block_corner);
 
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
@@ -339,7 +345,8 @@ public :
                              const Real& t,
                              const Real& dt);
 
-    // Corners that lie on a physical face - data has to be exchanged in a particular way
+    // Corners that lie on a physical face - data has to be exchanged
+    // in a particular way
     void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
                                const Real& t, const Real& dt);
 
@@ -371,7 +378,8 @@ public :
     // Mapped grids
     // ----------------------------------------------------------------
 
-    void setup_manifold(const int& a_level, const int& a_maxlevel, const int& a_refratio);
+    void setup_manifold(const int& a_level, const int& a_maxlevel,
+                        const int& a_refratio);
 
     // ----------------------------------------------------------------
     // Output and diagnostics
@@ -385,8 +393,6 @@ public :
     void dump_last();
     void dump_time_interp();
     void dump_auxarray();
-
-
 
 protected :
 

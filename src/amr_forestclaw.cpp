@@ -1501,7 +1501,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
         bool old_code = false;
-        // To see differences in output, do a 'diff' on fort.q0005
+        // To see differences in output, do a 'diff' on fort.t0005
         // for each run.
         if (old_code)
         {
@@ -1749,7 +1749,8 @@ void amrregrid(fclaw2d_domain_t **domain)
     int maxlevel = gparms->m_maxlevel;
 
     // First determine which families should be coarsened.
-    fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening, (void*) NULL);
+    fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
+                                    (void*) NULL);
 
     // Then refine.
     fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
