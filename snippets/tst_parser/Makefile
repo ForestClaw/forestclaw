@@ -1,14 +1,17 @@
 TARGET = parser_example
 
-LDFLAGS = -L/Users/calhoun/projects/ForestClaw/code/p4est-build/local/lib -lsc
-CFLAGS = -I.
-CXXFLAGS = -I.
-CC = c++
+LDFLAGS = -L$(P4EST_DIR)/lib -lsc
 
-OBJS = example_parser.o dictionary.o parser.o
+CXXFLAGS = -I.
+CXX = c++
+
+CFLAGS = $(CXXFLAGS)
+CC = gcc
+
+OBJS = example_parser.o parser.o
 
 all: $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $(TARGET)
+	$(CXX) $(OBJS) $(LDFLAGS) -o $(TARGET)
 
 clean:
 	rm -f *.o $(TARGET)

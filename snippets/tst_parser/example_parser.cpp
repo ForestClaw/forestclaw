@@ -29,24 +29,25 @@ int parse_ini_file(const char * ini_name)
 
     int mx;
     mx = P.get_int("fclaw:mx",0);
-    printf("%-15s [%d]\n", "mx:", mx);
+    printf("%15s    [%d]\n", "mx", mx);
 
     int my;
     my = P.get_int("fclaw:my", 0);
-    printf("%-15s [%d]\n", "my:", my);
+    printf("%15s    [%d]\n", "my", my);
 
     double tfinal;
     tfinal = P.get_double("fclaw:tfinal", 0.0);
-    printf("%-15s [%g]\n", "Tfinal:", tfinal);
+    printf("%15s    [%g]\n", "Tfinal", tfinal);
 
     int sub;
     sub = P.get_boolean("fclaw:subcycling",-1);
-    printf("%-15s [%d]\n","Subcycling:", sub);
+    printf("%15s    [%d]\n","Subcycling", sub);
 
     int mwaves;
     mwaves = P.get_int("fclaw:mwaves",0);
-    printf("%-15s [%d]\n","mwaves",mwaves);
+    printf("%15s    [%d]\n","mwaves",mwaves);
 
+    printf("\n");
     vector<int> mthlim;
     mthlim = P.get_int_array("fclaw:mthlim");
     if (mthlim.size() != mwaves)
@@ -56,8 +57,22 @@ int parse_ini_file(const char * ini_name)
     }
     for (int j = 0; j < mthlim.size(); j++)
     {
-        printf("mthlim[%d]:      [%d]\n",j,mthlim[j]);
+        printf("mthlim[%d]   [%d]\n",j,mthlim[j]);
     }
+
+    printf("\n");
+    vector<int> mthbc;
+    mthbc = P.get_int_array("fclaw:mthbc");
+    if (mthbc.size() != 4)
+    {
+        printf("Wrong number of boundary conditions\n");
+        exit(1);
+    }
+    for (int j = 0; j < mthbc.size(); j++)
+    {
+        printf("mthbc[%d]    [%d]\n",j,mthbc[j]);
+    }
+
     printf("etc....\n");
 
     printf("\n");
@@ -66,7 +81,7 @@ int parse_ini_file(const char * ini_name)
     darray = P.get_double_array("User:darray");
     for (int j = 0; j < darray.size(); j++)
     {
-        printf("darray[%d]: [%g]\n",j,darray[j]);
+        printf("darray[%d]    [%g]\n",j,darray[j]);
     }
 
     printf("\n");
