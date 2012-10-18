@@ -337,7 +337,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int neighbor_patch_idx[],
                         int **ref_flag_ptr)
 {
-    const int p4est_refineFactor = fclaw2d_domain_num_face_corners (domain);
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -440,7 +440,7 @@ void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_patch_idx,
                         bool *intersects_block)
 {
-    const int p4est_refineFactor = fclaw2d_domain_num_face_corners (domain);
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -504,8 +504,7 @@ void cb_bc_level_face_exchange(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user)
 {
-    const int p4est_refineFactor = fclaw2d_domain_num_face_corners(domain);
-    // const int numfaces = get_faces_per_patch(domain);
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
     int numfaces = get_faces_per_patch(domain);
@@ -902,7 +901,7 @@ void cb_bc_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    const int p4est_refineFactor = fclaw2d_domain_num_face_corners(domain);
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     // We may need to average onto a time interpolated grid, not the actual solution.
     fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
@@ -964,7 +963,7 @@ void cb_bc_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    const int p4est_refineFactor = fclaw2d_domain_num_face_corners(domain);
+    const int p4est_refineFactor = get_p4est_refineFactor(domain);
     const int refratio = get_refratio(domain);
 
     fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
@@ -1492,6 +1491,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
     const int num_siblings = get_siblings_per_patch(old_domain);
     bool init_grid = *(bool *) user;
 
+    const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
     int refratio = gparms->m_refratio;
     int maxlevel = gparms->m_maxlevel;
 

@@ -22,6 +22,11 @@ void Parser::define(int a_argc, char **a_argv)
 
 Parser::Parser(const char *a_section)
 {
+    if (s_argv == NULL)
+    {
+        printf("parser.cpp : parser is not defined\n");
+        exit(1);
+    }
     m_ini = iniparser_load(s_argv[1], stderr);
     if (m_ini == NULL)
     {

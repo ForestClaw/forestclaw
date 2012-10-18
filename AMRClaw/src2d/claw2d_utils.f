@@ -520,7 +520,7 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-c              # Fill in refined values on coarse grid cell (i,j)
+c              # Fill in refined values on coarse grid cell (ic,jc)
                do ii = 1,refratio
                   do jj = 1,refratio
                      shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio

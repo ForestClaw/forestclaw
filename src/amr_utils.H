@@ -39,12 +39,14 @@ using namespace std;
 
 int pow_int(int a, int n);
 
-#define CH_assert(a)
+// #define CH_assert(a)
 
 #define CH_SPACEDIM 2
 typedef double Real;
 
 const int SpaceDim = CH_SPACEDIM;
+
+const int NumFaces = 4;
 
 class global_parms;
 
