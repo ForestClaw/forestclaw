@@ -570,7 +570,7 @@ c     # ------------------------------------------------
 
       if (mth .le. 4) then
 c        # Use minmod, superbee, etc.
-         slim = limiter(sl,sr,mth)
+         slim = philim(sl,sr,mth)
          compute_slopes = slim*sl
       else
 c        # Use AMRClaw slopes
