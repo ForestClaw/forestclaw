@@ -538,7 +538,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       double precision function compute_slopes(sl,sr,mth)
       implicit none
 
-      double precision sl,sr, s, sc, limiter, slim
+      double precision sl,sr, s, sc, philim, slim
       integer mth
 
 c     # ------------------------------------------------
