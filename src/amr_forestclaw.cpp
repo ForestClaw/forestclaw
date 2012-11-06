@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "fclaw2d_convenience.h"
+#include "fclaw_defs.H"
 
 class ClawPatch;
 class global_parms;

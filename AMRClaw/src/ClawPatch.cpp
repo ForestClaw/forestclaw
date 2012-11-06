@@ -151,7 +151,7 @@ Real ClawPatch::step(const Real& a_time,
     return cfl_grid;
 }
 
-#if CH_SPACEDIM == 2
+#if FCLAW_SPACEDIM == 2
 
 Real ClawPatch::step_noqad(const Real& a_time,
                            const Real& a_dt,
@@ -167,7 +167,7 @@ Real ClawPatch::step_noqad(const Real& a_time,
     // m_griddata_last.dataPtr() == NULL, for some reason.
     m_griddata_last = m_griddata; // Copy for time interpolation
 
-    // We also call a 'b4step2' in clawpath2, below.  But it won't
+    // We also call a 'b4step2' in clawpatch2, below.  But it won't
     // do anything in the mapped case.
     if (m_manifold)
     {
@@ -222,7 +222,7 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
   // Real* aux = m_auxarray.dataPtr();
 
   // int maxm = max(m_mx,m_my);
-#if CH_SPACEDIM == 3
+#if FCLAW_SPACEDIM == 3
   maxm = max(maxm,mz);
 #endif
 

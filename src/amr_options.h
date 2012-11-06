@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_options.h>
 
+#include "fclaw_defs.H"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -38,9 +40,51 @@ extern "C"
 
 typedef struct amr_options
 {
+    /* Fixed grid size for each grid */
     int mx, my;
+
+    /* Time stepping */
+    double initial_dt;
     double tfinal;
-    const char *subcycling;
+    double max_cfl;
+    double desired_cfl;
+    int nout;
+
+    /* Accuracy, source terms, auxiliary arrays */
+#if FCLAW_SPACEDIM == 2
+    int order[2];
+#elif FCLAW_SPACEDIM == 3
+    int order[3];
+#endif
+
+    int verbosity;
+    int src_term;
+    int mcapa;
+    int maux;
+
+    /* Information about the system of PDEs */
+    int meqn;
+    int mwaves;
+    int *mthlim;
+
+    /* Boundary condition information */
+    int mbc;
+
+#if FCLAW_SPACEDIM == 2
+    int mthbc[4];  /* Could I use 2*SpaceDim here instead? */
+#elif FCLAW_SPACEDIM == 3
+    int mthbc[6];
+#endif
+
+    /* Refinement paramters */
+    int refratio;
+    int minlevel;
+    int maxlevel;
+
+    /* Boolean values */
+    int manifold;
+    int mapped;
+    int subcycle;
 }
 amr_options_t;
 

@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "amr_forestclaw.H"
 
+#include "parser.H"
+
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
@@ -54,6 +56,33 @@ main (int argc, char **argv)
   options = sc_options_new (argv[0]);
   amr_options_register (options, amr_options);
   amr_options_parse (options, argc, argv, lp);  /* exits on option error */
+
+  /* -----------------------------------------------------------------*/
+  // This is set here just until we can read arrays in the SC library */
+  Parser P;
+  P.define(argc, argv);
+
+  // This reads vector values into amr_options
+  parse_ini_file(amr_options);
+
+  for (int j = 0; j < 4; j++)
+  {
+      printf("mthbc[%d]= %d\n",j, amr_options->mthbc[j]);
+  }
+  for (int j = 0; j < 2; j++)
+  {
+      printf("order[%d]= %d\n",j, amr_options->order[j]);
+  }
+  for (int j = 0; j < amr_options->mwaves; j++)
+  {
+      printf("mthlim[%d]= %d\n",j, amr_options->mthlim[j]);
+  }
+  /* -----------------------------------------------------------------*/
+
+  /* -----------------------------------------------------------------*/
+  /* Sample user defined options */
+  /* -----------------------------------------------------------------*/
+
 
   // Put this here so that we can read in the minimum level.
   global_parms *gparms = new global_parms();

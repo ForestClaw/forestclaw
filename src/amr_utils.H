@@ -34,20 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
+#include "fclaw_defs.H"
 
 using namespace std;
 
 int pow_int(int a, int n);
-
-// #define CH_assert(a)
-
-#define CH_SPACEDIM 2
-typedef double Real;
-
-const int SpaceDim = CH_SPACEDIM;
-
-const int NumFaces = 4;
-
 class global_parms;
 
 int num_patches(fclaw2d_domain_t *domain, int level);
@@ -189,11 +180,7 @@ public:
     int m_nout;
 
     // 'method' parameters
-#if CH_SPACEDIM == 2
-    int m_order[2];
-#else
-    int m_order[3];
-#endif
+    int m_order[SpaceDim];
     int m_verbose;
     int m_src_term;
     int m_mcapa;
@@ -209,7 +196,7 @@ public:
 
 
     int m_mbc;
-    int *m_mthbc;
+    int m_mthbc[2*SpaceDim];
 
     bool m_manifold;
     bool m_mapped;

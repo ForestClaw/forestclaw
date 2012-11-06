@@ -7,6 +7,7 @@
 using namespace std;
 
 #include "amr_utils.H"
+#include "fclaw_defs.H"
 
 // Think about making ClawPatch members all static
 
@@ -398,13 +399,13 @@ protected :
 
     int  m_mx;
     int  m_my;
-#if CH_SPACEDIM == 3
+#if FCLAW_SPACEDIM == 3
     int m_mz;
 #endif
 
     Real  m_dx;
     Real  m_dy;
-#if CH_SPACEDIM == 3
+#if FCLAW_SPACEDIM == 3
     Real m_dz;
 #endif
 
