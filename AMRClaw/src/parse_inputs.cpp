@@ -49,8 +49,8 @@ int parse_ini_file(amr_options_t *amropt)
     }
 
     vector<int> mthbc;
-    order = P.get_int_array("mthbc");
-    if (order.size() != 4)
+    mthbc = P.get_int_array("mthbc");
+    if (mthbc.size() != 2*SpaceDim)
     {
         printf("Wrong number of values for vector ""mthbc""\n");
         exit(1);
@@ -72,6 +72,23 @@ int parse_ini_file(amr_options_t *amropt)
     {
         amropt->mthlim[j] = mthlim[j];
     }
+
+    // Set up 'method' vector used by Clawpack.
+    amropt->method[0] = 0; // not used (yet) in forestclaw
+
+    amropt->method[1] = amropt->order[0];
+    if (SpaceDim == 2)
+    {
+        amropt->method[2] = amropt->order[1];
+    }
+    else
+    {
+        amropt->method[2] = 10*amropt->order[1] + amropt->order[2];
+    }
+    amropt->method[3] = amropt->verbosity;
+    amropt->method[4] = amropt->src_term;
+    amropt->method[5] = amropt->mcapa;
+    amropt->method[6] = amropt->maux;
 
     return 0;
 }

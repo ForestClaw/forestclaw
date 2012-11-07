@@ -62,6 +62,8 @@ typedef struct amr_options
     int mcapa;
     int maux;
 
+    int method[7];
+
     /* Information about the system of PDEs */
     int meqn;
     int mwaves;
@@ -94,6 +96,8 @@ void amr_options_register (sc_options_t * opt, amr_options_t * amropt);
 /* parse options and populate values in registered amr_options structure */
 void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
+
+void amr_options_delete(amr_options_t *amropt);
 
 #ifdef __cplusplus
 #if 0

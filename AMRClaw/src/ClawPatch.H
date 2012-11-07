@@ -242,7 +242,7 @@ public :
                 const Real&  a_xupper,
                 const Real&  a_yupper,
                 const int& a_blockno,
-                const global_parms *a_gparms);
+                const amr_options_t *a_gparms);
 
     void copyFrom(ClawPatch *a_cp);
 
@@ -267,20 +267,20 @@ public :
     Real step(const Real& a_time,
               const Real& a_dt,
               const int& a_level,
-              const global_parms &gparms);
+              const amr_options_t &gparms);
 
     // Actual step routine with no conservative fix-up
     Real step_noqad(const Real& a_time,
                     const Real& a_dt,
                     const int& a_level,
-                    const global_parms &gparms);
+                    const amr_options_t &gparms);
 
 
     // Full time step routine with conservative fix-up (not yet implemented)
     Real ClawPatchIntegrator(const Real& a_time,
                              const Real& a_dt,
                              const int& refRatio,const int& a_level,
-                             const global_parms &gparms);
+                             const amr_options_t &gparms);
 
     void save_step();
     void restore_step();

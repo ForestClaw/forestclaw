@@ -37,7 +37,7 @@ int pow_int(int a, int n)
     return b;
 }
 
-
+/*
 global_parms::global_parms()
 {
     m_maxmwaves = 20;
@@ -98,12 +98,13 @@ void global_parms::get_inputParams()
     m_method[6] = m_maux;
 
     // I should just figure out how bool and Fortran 'logical' vars can be passed around.
-    m_subcycle = icycle == 1;
+     m_subcycle = icycle == 1;
     m_manifold = imanifold == 1;
     m_mapped = false;
 }
+*/
 
-
+/*
 void global_parms::print_inputParams()
 {
   cout << endl;
@@ -137,14 +138,14 @@ void global_parms::print_inputParams()
   cout << "subcycling " << (m_subcycle ? "Yes" : "No") << endl;
   cout << "Manifold " << (m_manifold ? "Yes" : "No") << endl;
 
-  /*
-  cout << "Auxiliary array type : " << endl;
-  for (int i = 0; i < m_maux; i++)
-    {
-      cout << "  " << m_auxtype[i] << endl;
-    }
-  cout << endl;
-  */
+
+  // cout << "Auxiliary array type : " << endl;
+  // for (int i = 0; i < m_maux; i++)
+  //   {
+  //     cout << "  " << m_auxtype[i] << endl;
+  //   }
+  // cout << endl;
+
 
   cout << "mthbc(2*dim) (boundary conditions) = ";
   for(int i = 0; i < 2*SpaceDim; i++)
@@ -156,7 +157,7 @@ void global_parms::print_inputParams()
   cout << "Min configured level = " << m_minlevel << endl;
   cout << "Max configured level = " << m_maxlevel << endl;
 }
-
+*/
 
 FArrayBox::FArrayBox()
 {
@@ -279,19 +280,18 @@ subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 
 void subcycle_manager::define(fclaw2d_domain_t *domain,
-                              global_parms *gparms,
-                              const amr_options_t *amropts,
+                              const amr_options_t *gparms,
                               const Real& a_t_curr)
 {
     m_t_minlevel = a_t_curr;
-    m_refratio = gparms->m_refratio;
+    m_refratio = gparms->refratio;
 
     /* query the levels that exist on this processor */
     m_minlevel = domain->minlevel_all;
     m_maxlevel = domain->maxlevel_all;
     m_levels.resize(m_maxlevel + 1);
 
-    bool subcycle = gparms->m_subcycle;
+    bool subcycle = gparms->subcycle;
     m_nosubcycle = !subcycle;
     for (int level = m_minlevel; level <= m_maxlevel; level++)
     {

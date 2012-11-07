@@ -19,11 +19,11 @@ void ClawPatch::define(const Real&  a_xlower,
                        const Real&  a_xupper,
                        const Real&  a_yupper,
                        const int& a_blockno,
-                       const global_parms* a_gparms)
+                       const amr_options_t* a_gparms)
 {
-    m_mx = a_gparms->m_mx_leaf;
-    m_my = a_gparms->m_my_leaf;
-    m_mbc = a_gparms->m_mbc;
+    m_mx = a_gparms->mx;
+    m_my = a_gparms->my;
+    m_mbc = a_gparms->mbc;
     m_blockno = a_blockno;
 
     m_xlower = a_xlower;
@@ -34,8 +34,8 @@ void ClawPatch::define(const Real&  a_xlower,
     m_dx = (a_xupper - a_xlower)/m_mx;
     m_dy = (a_yupper - a_ylower)/m_my;
 
-    m_meqn = a_gparms->m_meqn;
-    m_maux = a_gparms->m_maux;
+    m_meqn = a_gparms->meqn;
+    m_maux = a_gparms->maux;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -59,8 +59,8 @@ void ClawPatch::define(const Real&  a_xlower,
     }
 
 
-    m_mapped = a_gparms->m_mapped;
-    m_manifold = a_gparms->m_manifold;
+    m_mapped = a_gparms->mapped;
+    m_manifold = a_gparms->manifold;
 
     m_isDefined = true;
 }
@@ -144,7 +144,7 @@ void ClawPatch::setAuxArray()
 Real ClawPatch::step(const Real& a_time,
                      const Real& a_dt,
                      const int& a_level,
-                     const global_parms& gparms)
+                     const amr_options_t& gparms)
 {
     Real maxwavespeed = 1; // Making this up...
     Real cfl_grid = a_dt/m_dx*maxwavespeed; //
@@ -156,7 +156,7 @@ Real ClawPatch::step(const Real& a_time,
 Real ClawPatch::step_noqad(const Real& a_time,
                            const Real& a_dt,
                            const int& a_level,
-                           const global_parms& gparms)
+                           const amr_options_t& gparms)
 {
     set_block_(&m_blockno);
 
@@ -183,7 +183,7 @@ Real ClawPatch::step_noqad(const Real& a_time,
 
     Real cflgrid;
 
-    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms.m_mwaves + 3*m_maux + 2);
+    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms.mwaves + 3*m_maux + 2);
     Real* work = new Real[mwork];
 
     Real* fp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
@@ -191,8 +191,8 @@ Real ClawPatch::step_noqad(const Real& a_time,
     Real* gp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
     Real* gm = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
 
-    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms.m_method,
-                gparms.m_mthlim, gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold,
+    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms.method,
+                gparms.mthlim, gparms.mcapa, gparms.mwaves, m_mx, m_my, qold,
                 aux, m_dx, m_dy, a_dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
                 a_time, fp, fm, gp, gm);
 
@@ -212,7 +212,7 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
                                     const Real& a_dt,
                                     const int& a_refRatio,
                                     const int& a_level,
-                                    const global_parms& gparms)
+                                    const amr_options_t& gparms)
 {
 
     // Real dt = a_dt;
@@ -227,7 +227,7 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
 #endif
 
   // set common block for level
-  set_common_levels_(gparms.m_maxlevel,a_level,gparms.m_refratio);
+  set_common_levels_(gparms.maxlevel,a_level,gparms.refratio);
 
 
   Real cflgrid = 1;

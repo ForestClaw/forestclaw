@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_defs.H"
 
 class ClawPatch;
-class global_parms;
+
 
 #if 0
 /* What domain points to will be changed on the inside hence the ** */
@@ -98,14 +98,13 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
 // -----------------------------------------------------------------
 // Set user data with user defined variables, etc.
 // -----------------------------------------------------------------
-void set_domain_data(fclaw2d_domain_t *domain, global_parms *gparms, const amr_options_t *amropts)
+void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ddata->parms = gparms;
-    ddata->amropts = amropts;
+    ddata->amropts = gparms;
 }
 
-void set_block_data(fclaw2d_block_t *block, int *mthbc)
+void set_block_data(fclaw2d_block_t *block, const int mthbc[])
 {
     fclaw2d_block_data_t *bdata = get_block_data(block);
     for(int i = 0; i < 4; i++)
@@ -143,11 +142,11 @@ static void allocate_user_data(fclaw2d_domain_t *domain)
     }
 }
 
-static
-global_parms* get_domain_parms(fclaw2d_domain_t *domain)
+
+const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    return ddata->parms;
+    return ddata->amropts;
 }
 
 void set_domain_time(fclaw2d_domain_t *domain, Real time)
@@ -174,10 +173,11 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
 static
 const int get_refratio(fclaw2d_domain_t *domain)
 {
-    global_parms *gparms = get_domain_parms(domain);
-    return gparms->m_refratio;
+    const amr_options_t* gparms = get_domain_parms(domain);
+    return gparms->refratio;
 }
 
+// int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
 static
 const int get_corners_per_patch(fclaw2d_domain_t *domain)
 {
@@ -204,8 +204,6 @@ const int get_p4est_refineFactor(fclaw2d_domain_t *domain)
 {
     return fclaw2d_domain_num_face_corners(domain);
 }
-
-
 
 static
 void set_problem_parameters()
@@ -1168,8 +1166,8 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
                       int this_patch_idx,
                       void *user)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    global_parms *gparms = ddata->parms;
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    const amr_options_t* gparms = ddata->amropts;
 
     ClawPatch *cp = get_clawpatch(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
@@ -1366,8 +1364,8 @@ static
 {
 
     bool init_flag = *((bool *) user);
-    global_parms *gparms = get_domain_parms(domain);
-    int maxlevel = gparms->m_maxlevel;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int maxlevel = gparms->maxlevel;
     bool patch_refined = false;
 
     ClawPatch *cp = get_clawpatch(this_patch);
@@ -1391,15 +1389,15 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                        int sibling0_patch_idx,
                        void *user)
 {
-    global_parms *gparms = get_domain_parms(domain);
-    int minlevel = gparms->m_minlevel;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int minlevel = gparms->minlevel;
     const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     int level = sibling_patch[0].level;
     if (level > minlevel)
     {
-        int maxlevel = gparms->m_maxlevel;
-        int refratio = gparms->m_refratio;
+        int maxlevel = gparms->maxlevel;
+        int refratio = gparms->refratio;
         bool patch_coarsened = false;
 
         const int num_siblings = get_siblings_per_patch(domain);
@@ -1448,7 +1446,7 @@ void cb_init_base(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
-    global_parms *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = new ClawPatch();
 
     cp->define(this_patch->xlower,
@@ -1459,8 +1457,8 @@ void cb_init_base(fclaw2d_domain_t *domain,
                gparms);
 
     int level  = this_patch->level;
-    int refratio = gparms->m_refratio;
-    int maxlevel = gparms->m_maxlevel;
+    int refratio = gparms->refratio;
+    int maxlevel = gparms->maxlevel;
 
     cp->setup_patch(level, maxlevel, refratio);
     set_patch_data(this_patch,cp);
@@ -1469,7 +1467,7 @@ void cb_init_base(fclaw2d_domain_t *domain,
 static
 void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
 {
-    global_parms *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
 
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_init_base,
@@ -1487,14 +1485,14 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      int old_patchno, int new_patchno,
                      void *user)
 {
-    global_parms *gparms = get_domain_parms(old_domain);
+    const amr_options_t *gparms = get_domain_parms(old_domain);
 
     const int num_siblings = get_siblings_per_patch(old_domain);
     bool init_grid = *(bool *) user;
 
     const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
-    int refratio = gparms->m_refratio;
-    int maxlevel = gparms->m_maxlevel;
+    int refratio = gparms->refratio;
+    int maxlevel = gparms->maxlevel;
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
@@ -1607,18 +1605,17 @@ void cb_amrinit(fclaw2d_domain_t *domain,
 
 // Initialize a base level of grids
 void amrinit(fclaw2d_domain_t **domain,
-             global_parms *gparms,
-             const amr_options_t * amropts)
+             const amr_options_t* gparms)
 {
     Real t = 0;
 
     allocate_user_data(*domain);
 
-    set_domain_data(*domain, gparms, amropts);
+    set_domain_data(*domain, gparms);
     set_domain_time(*domain,t);
 
-    int minlevel = gparms->m_minlevel;
-    int maxlevel = gparms->m_maxlevel;
+    int minlevel = gparms->minlevel;
+    int maxlevel = gparms->maxlevel;
 
     // Set problem dependent parameters for Riemann solvers, etc.
     // Values are typically stored in Fortran common blocks, and are not
@@ -1645,7 +1642,7 @@ void amrinit(fclaw2d_domain_t **domain,
     for (int i = 0; i < num; i++)
     {
         fclaw2d_block_t *block = &(*domain)->blocks[i];
-        set_block_data(block,gparms->m_mthbc);
+        set_block_data(block,gparms->mthbc);
     }
 
     bc_set_phys(*domain,minlevel,t);
@@ -1686,7 +1683,7 @@ void amrinit(fclaw2d_domain_t **domain,
             // Set some of the user data types.  Some of this is done
             // in 'amr_set_base_level',
             // I should probably come up with a more general way to do this.
-            set_domain_data(new_domain, gparms, amropts);
+            set_domain_data(new_domain, gparms);
             set_domain_time(new_domain,t);
 
             // Physical BCs are needed in boundary level exchange
@@ -1698,7 +1695,7 @@ void amrinit(fclaw2d_domain_t **domain,
                 fclaw2d_block_t *block = &new_domain->blocks[i];
                 // This is kind of dumb for now, since block won't in general
                 // have the same physical boundary conditions types.
-                set_block_data(block,gparms->m_mthbc);
+                set_block_data(block,gparms->mthbc);
             }
 
             int new_level = level+1;
@@ -1739,15 +1736,13 @@ void amrinit(fclaw2d_domain_t **domain,
 void amrregrid(fclaw2d_domain_t **domain)
 {
 
-    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-    global_parms *gparms = ddata->parms;
-    const amr_options_t *amropts = ddata->amropts;
+    const amr_options_t *gparms = get_domain_parms(*domain);
     Real t = get_domain_time(*domain);
 
     bool init_flag = false;
 
-    int minlevel = gparms->m_minlevel;
-    int maxlevel = gparms->m_maxlevel;
+    int minlevel = gparms->minlevel;
+    int maxlevel = gparms->maxlevel;
 
     // First determine which families should be coarsened.
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
@@ -1778,7 +1773,7 @@ void amrregrid(fclaw2d_domain_t **domain)
         // Set some of the user data types.  Some of this is done in
         // 'amr_set_base_level',
         // I should probably come up with a more general way to do this.
-        set_domain_data(new_domain, gparms, amropts);
+        set_domain_data(new_domain, gparms);
         set_domain_time(new_domain,t);
 
         // Physical BCs are needed in boundary level exchange
@@ -1789,7 +1784,7 @@ void amrregrid(fclaw2d_domain_t **domain)
             fclaw2d_block_t *block = &new_domain->blocks[i];
             // This is kind of dumb for now, since block won't in general
             // have the same physical boundary conditions types.
-            set_block_data(block,gparms->m_mthbc);
+            set_block_data(block,gparms->mthbc);
         }
 
         // Level stuff to make sure all
@@ -1835,11 +1830,11 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
     int iframe = 0;
     amrout(*domain,iframe);
 
-    global_parms *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-    Real final_time = gparms->m_tfinal;
-    int nout = gparms->m_nout;
-    Real initial_dt = gparms->m_initial_dt;
+    Real final_time = gparms->tfinal;
+    int nout = gparms->nout;
+    Real initial_dt = gparms->initial_dt;
 
     Real t0 = 0;
 
@@ -1854,7 +1849,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
         while (t_curr < tend)
         {
             subcycle_manager time_stepper;
-            time_stepper.define(*domain,gparms,ddata->amropts,t_curr);
+            time_stepper.define(*domain,gparms,t_curr);
             set_domain_time(*domain,t_curr);
 
             // In case we have to reject this step
@@ -1897,13 +1892,13 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
 
-            if (maxcfl_step > gparms->m_max_cfl)
+            if (maxcfl_step > gparms->max_cfl)
             {
                 printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
                 restore_time_step(*domain);
 
                 // Modify dt_level0 from step used.
-                dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+                dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
                 // Got back to start of loop, without incrementing step counter or time level
                 continue;
@@ -1919,7 +1914,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             }
 
             // New time step, which should give a cfl close to the desired cfl.
-            Real dt_new = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+            Real dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
             if (!took_small_step)
             {
                 dt_level0 = dt_new;
@@ -1954,9 +1949,9 @@ static void explicit_step(fclaw2d_domain_t **domain,
 
     amrout(*domain,iframe);
 
-    global_parms *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-    Real initial_dt = gparms->m_initial_dt;
+    Real initial_dt = gparms->initial_dt;
 
     Real t0 = 0;
 
@@ -1970,7 +1965,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
-        time_stepper.define(*domain,gparms,ddata->amropts,t_curr);
+        time_stepper.define(*domain,gparms,t_curr);
 
         // In case we have to reject this step
         save_time_step(*domain);
@@ -1999,13 +1994,13 @@ static void explicit_step(fclaw2d_domain_t **domain,
         printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr);
 
-        if (maxcfl_step > gparms->m_max_cfl)
+        if (maxcfl_step > gparms->max_cfl)
         {
             printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
             restore_time_step(*domain);
 
             // Modify dt_level0 from step used.
-            dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+            dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
             // Got back to start of loop, without incrementing step counter or time level
             continue;
@@ -2018,7 +2013,7 @@ static void explicit_step(fclaw2d_domain_t **domain,
         set_domain_time(*domain,t_curr);
 
         // New time step, which should give a cfl close to the desired cfl.
-        dt_level0 = dt_level0*gparms->m_desired_cfl/maxcfl_step;
+        dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
         int regrid_step = 1;  // Will eventually read this in as a parameter.
         if (n % regrid_step == 0)
@@ -2074,7 +2069,7 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
-    global_parms *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
     Real time = get_domain_time(domain);
 
     // Get total number of patches
@@ -2088,7 +2083,9 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     printf("Matlab output Frame %d  at time %12.4f\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
-    write_tfile_(&iframe,&time,&gparms->m_meqn,&ngrids,&gparms->m_maux);
+    int meqn = gparms->meqn;
+    int maux = gparms->maux;
+    write_tfile_(&iframe,&time,&meqn,&ngrids,&maux);
 
     // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
     // 0010, 0114), and closes the file.

@@ -120,8 +120,7 @@ public:
     subcycle_manager();
     ~subcycle_manager();
     void define(fclaw2d_domain_t *domain,
-                global_parms *gparms,
-                const amr_options_t *amropts,
+                const amr_options_t *gparms,
                 const Real& a_time);
 
     bool can_advance(const int& a_level, const int& a_from_step);
@@ -165,54 +164,6 @@ public:
     bool m_nosubcycle;
 };
 
-
-class global_parms
-{
-public:
-    int m_mx_leaf;
-    int m_my_leaf;
-
-    // Time stepping parameters
-    Real m_initial_dt;
-    Real m_tfinal;
-    Real m_max_cfl;
-    Real m_desired_cfl;
-    int m_nout;
-
-    // 'method' parameters
-    int m_order[SpaceDim];
-    int m_verbose;
-    int m_src_term;
-    int m_mcapa;
-    int m_maux;
-
-    int m_method[7];
-
-    // Number of equations, waves and limiters
-    int m_meqn;
-    int m_mwaves;
-    int m_maxmwaves;
-    int *m_mthlim;
-
-
-    int m_mbc;
-    int m_mthbc[2*SpaceDim];
-
-    bool m_manifold;
-    bool m_mapped;
-
-    // AMR parameters
-    int m_refratio;
-    int m_minlevel;
-    int m_maxlevel;
-    bool m_subcycle;
-
-    global_parms();
-    ~global_parms();
-    void get_inputParams(); // Read from input file
-    void print_inputParams();  // Print out for beginning info
-
-};
 
 class Box
 {

@@ -121,8 +121,8 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
                            "T", "Use subcycling in time [T]");
     amropt->subcycle = bool[0] == 'T' ? 1 : 0;
 
-    /* Is there another file that gets read if this file is not specified at the
-       command line ? */
+    /* It would be nice to have a default file that gets read, in case one is not
+       specified at the command line */
     sc_options_add_inifile (opt, 'F', "fclaw_defaults.ini",
                             "Read options from this file");
 }
@@ -146,4 +146,10 @@ amr_options_parse (sc_options_t * opt, int argc, char **argv,
                                   "claw2ez.data.used");
         SC_CHECK_ABORT (!retval, "Option save failed");
     }
+}
+
+void amr_options_delete (amr_options_t *amropts)
+{
+    // Need to delete this memory, but how?
+    // delete [] amropts->mthlim;
 }

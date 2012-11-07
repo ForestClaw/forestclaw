@@ -41,7 +41,7 @@ main (int argc, char **argv)
   MPI_Comm		mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *amr_options = &samr_options;
+  amr_options_t         samr_options, *gparms = &samr_options;
 
   mpiret = MPI_Init (&argc, &argv);
   SC_CHECK_MPI (mpiret);
@@ -54,7 +54,7 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
-  amr_options_register (options, amr_options);
+  amr_options_register (options, gparms);
   amr_options_parse (options, argc, argv, lp);  /* exits on option error */
 
   /* -----------------------------------------------------------------*/
@@ -63,19 +63,19 @@ main (int argc, char **argv)
   P.define(argc, argv);
 
   // This reads vector values into amr_options
-  parse_ini_file(amr_options);
+  parse_ini_file(gparms);
 
-  for (int j = 0; j < 4; j++)
+  for (int j = 0; j < 2*SpaceDim; j++)
   {
-      printf("mthbc[%d]= %d\n",j, amr_options->mthbc[j]);
+      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
   }
-  for (int j = 0; j < 2; j++)
+  for (int j = 0; j < SpaceDim; j++)
   {
-      printf("order[%d]= %d\n",j, amr_options->order[j]);
+      printf("order[%d]= %d\n",j, gparms->order[j]);
   }
-  for (int j = 0; j < amr_options->mwaves; j++)
+  for (int j = 0; j < gparms->mwaves; j++)
   {
-      printf("mthlim[%d]= %d\n",j, amr_options->mthlim[j]);
+      printf("mthlim[%d]= %d\n",j, gparms->mthlim[j]);
   }
   /* -----------------------------------------------------------------*/
 
@@ -85,21 +85,22 @@ main (int argc, char **argv)
 
 
   // Put this here so that we can read in the minimum level.
-  global_parms *gparms = new global_parms();
-  gparms->get_inputParams();
+  // global_parms *gparms = new global_parms();
+  // gparms->get_inputParams();
 
-  int minlevel = gparms->m_minlevel;
+  int minlevel = gparms->minlevel;
   domain = fclaw2d_domain_new_unitsquare (mpicomm,minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
   printf("\n\n");
 
-  amrinit(&domain, gparms, amr_options);
+  amrinit(&domain, gparms);
   amrrun(&domain);
   amrreset(&domain);
 
-  delete gparms;
+  // delete gparms;
+  amr_options_delete (gparms);  // This doesn't do anything now...
   sc_options_destroy (options);
   sc_finalize ();
 
