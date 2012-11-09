@@ -55,7 +55,7 @@ main (int argc, char **argv)
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
   amr_options_register (options, gparms);
-  amr_options_parse (options, argc, argv, lp);  /* exits on option error */
+  amr_options_parse (options, gparms, argc, argv, lp);
 
   /* -----------------------------------------------------------------*/
   // This is set here just until we can read arrays in the SC library */

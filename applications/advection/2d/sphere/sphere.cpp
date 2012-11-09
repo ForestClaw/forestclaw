@@ -53,7 +53,7 @@ main (int argc, char **argv)
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
   amr_options_register (options, amr_options);
-  amr_options_parse (options, argc, argv, lp);  /* exits on option error */
+  amr_options_parse (options, amr_options, argc, argv, lp);
 
   // Put this here so that we can read in the minimum level.
   global_parms *gparms = new global_parms();

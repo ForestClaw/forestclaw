@@ -51,6 +51,7 @@ typedef struct amr_options
     int nout;
 
     /* Accuracy, source terms, auxiliary arrays */
+    const char *order_string;   /* helper variable for array of values */
     int order[FCLAW_SPACEDIM];
 
     int verbosity;
@@ -86,8 +87,8 @@ amr_options_t;
 void amr_options_register (sc_options_t * opt, amr_options_t * amropt);
 
 /* parse options and populate values in registered amr_options structure */
-void amr_options_parse (sc_options_t * opt, int argc, char **argv,
-                        int log_priority);
+void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
+                        int argc, char **argv, int log_priority);
 
 void amr_options_delete (amr_options_t * amropt);
 

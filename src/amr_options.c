@@ -35,6 +35,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
+static void
+amr_options_convert_arrays (amr_options_t * amropt)
+{
+    int i;
+    int retval;
+    int *o = amropt->order;
+
+    if (amropt->order_string == NULL)
+    {
+        for (i = 0; i < SpaceDim; ++i)
+        {
+            o[i] = 0;           /* what would be a good value here? */
+        }
+    }
+    else
+    {
+        retval = 0;
+        switch (SpaceDim)
+        {
+        case 2:
+            retval = sscanf (amropt->order_string, "%d %d", &o[0], &o[1]);
+            break;
+        case 3:
+            retval = sscanf (amropt->order_string, "%d %d %d",
+                             &o[0], &o[1], &o[2]);
+            break;
+        }
+        if (retval != SpaceDim)
+        {
+            sc_abort_collective ("Option \"order\" needs DIM many values");
+        }
+    }
+}
+
 void
 amr_options_register (sc_options_t * opt, amr_options_t * amropt)
 {
@@ -62,12 +96,9 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 0,
                         "Number of time steps [0]");
 
-    /*
-       // Specify order of accuracy in each space dimension.
-       vector_length = SpaceDim;
-       sc_options_add_int_array(opt,0,"order",&amropt->order,vector_length,
-       "Normal and transverse order");
-     */
+    /* Array of SpaceDim many values */
+    sc_options_add_string (opt, 0, "order", &amropt->order_string, NULL,
+                           "Normal and transverse orders");
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
@@ -127,11 +158,13 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     
     /* It would be nice to have a default file that gets read,
        in case none is specified at the command line. */
+
+    amr_options_convert_arrays (amropt);
 }
 
 void
-amr_options_parse (sc_options_t * opt, int argc, char **argv,
-                   int log_priority)
+amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
+                   int argc, char **argv, int log_priority)
 {
     int retval;
 
@@ -148,10 +181,12 @@ amr_options_parse (sc_options_t * opt, int argc, char **argv,
                                   "claw2ez.data.used");
         SC_CHECK_ABORT (!retval, "Option save failed");
     }
+
+    amr_options_convert_arrays (amropt);
 }
 
 void
-amr_options_delete (amr_options_t * amropts)
+amr_options_delete (amr_options_t * amropt)
 {
     // Need to delete this memory, but how?
     // delete [] amropts->mthlim;
