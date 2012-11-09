@@ -1187,7 +1187,7 @@ Real advance_level(fclaw2d_domain_t *domain,
                    const int& a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
-    bool verbose = false;
+    bool verbose = (bool) a_time_stepper->m_verbosity;
     Real t_level = a_time_stepper->current_time(a_level);
 
     Real maxcfl = 0;
@@ -1823,7 +1823,6 @@ void amrregrid(fclaw2d_domain_t **domain)
 // -----------------------------------------------------------------
 // Run - with or without subcycling
 // -----------------------------------------------------------------
-
 static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
 {
     // Write out an initial time file
@@ -1835,6 +1834,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
     Real final_time = gparms->tfinal;
     int nout = gparms->nout;
     Real initial_dt = gparms->initial_dt;
+    int regrid_interval = gparms->regrid_interval;
 
     Real t0 = 0;
 
@@ -1925,8 +1925,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             }
             n_inner++;
 
-            int regrid_step = 1;  // Will eventually read this in as a parameter.
-            if (n_inner % regrid_step == 0)
+            if (n_inner % regrid_interval == 0)
             {
                 // After some number of time steps, we probably need to regrid...
                 amrregrid(domain);
@@ -1952,6 +1951,8 @@ static void explicit_step(fclaw2d_domain_t **domain,
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     Real initial_dt = gparms->initial_dt;
+    int regrid_interval = gparms->regrid_interval;
+    int verbosity = gparms->verbosity;
 
     Real t0 = 0;
 
@@ -2015,11 +2016,12 @@ static void explicit_step(fclaw2d_domain_t **domain,
         // New time step, which should give a cfl close to the desired cfl.
         dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
-        int regrid_step = 1;  // Will eventually read this in as a parameter.
-        if (n % regrid_step == 0)
+        if (n % regrid_interval == 0)
         {
-            // After some number of time steps, we probably need to regrid...
-            cout << "regridding at step " << n << endl;
+            if (verbosity == 1)
+            {
+                cout << "regridding at step " << n << endl;
+            }
             amrregrid(domain);
             ddata = get_domain_data(*domain);
         }
@@ -2035,19 +2037,23 @@ static void explicit_step(fclaw2d_domain_t **domain,
 void amrrun(fclaw2d_domain_t **domain)
 {
 
-    int outstyle = 3;
+    const amr_options_t *gparms = get_domain_parms(*domain);
 
-    if (outstyle == 1)
+    if (gparms->outstyle == 1)
     {
         explicit_step_fixed_output(domain);
     }
-    else if (outstyle == 3)
+    else if (gparms->outstyle == 2)
     {
-        int nstep = 5;  // Take 'nstep' steps
-        int nplot = 1;   // Plot every 'nplot' steps
-        explicit_step(domain,nstep,nplot);
+        printf("Outstyle 2 not implemented yet\n");
+    }
+    else if (gparms->outstyle == 3)
+    {
+        explicit_step(domain,gparms->nout,gparms->nstep);
     }
 }
+
+
 
 static
 void cb_amrout(fclaw2d_domain_t *domain,

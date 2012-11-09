@@ -172,6 +172,7 @@ public:
     Real m_dt_minlevel;
     Real m_t_minlevel;
     bool m_nosubcycle;
+    int m_verbosity;
 };
 
 

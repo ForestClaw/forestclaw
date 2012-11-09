@@ -63,7 +63,7 @@ main (int argc, char **argv)
   P.define(argc, argv);
 
   // This reads vector values into amr_options
-  parse_ini_file(gparms);
+  parse_ini_options(gparms);
 
   for (int j = 0; j < 2*SpaceDim; j++)
   {
@@ -77,6 +77,14 @@ main (int argc, char **argv)
   {
       printf("mthlim[%d]= %d\n",j, gparms->mthlim[j]);
   }
+
+  parse_ini_output(gparms,gparms->outstyle);
+
+  /*
+  sc_options_print_usage(sc_package_id,lp,options,"");
+  exit(1);
+  */
+
   /* -----------------------------------------------------------------*/
 
   /* -----------------------------------------------------------------*/

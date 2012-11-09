@@ -76,16 +76,24 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     int vector_length;
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 0,
-                        "Subdivision of each patch in x [0]");
+                        "Subdivision of each patch in x");
 
     sc_options_add_int (opt, 0, "my", &amropt->my, 0,
-                        "Subdivision of each patch in y [0]");
+                        "Subdivision of each patch in y");
 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.0,
-                           "Initial time step size [0.0]");
+                           "Initial time step size");
 
+    sc_options_add_string (opt, 0, "use_fixed_dt", &bool, "F",
+                           "Use fixed coarse grid time step [F]");
+    amropt->use_fixed_dt = bool[0] == 'T' ? 1 : 0;
+
+    /*
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
-                           "Final time [0.0]");
+    "Final time");
+    */
+
+    sc_options_add_int(opt,0,"outstyle",&amropt->outstyle,0.0,"Output style (1,2,3)");
 
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1.0,
                            "Maximum CFL number [1.0]");
@@ -93,8 +101,11 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
                            "Desired CFL number [0.9]");
 
+
+    /*
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 0,
-                        "Number of time steps [0]");
+    "Number of time steps");
+    */
 
     /* Array of SpaceDim many values */
     sc_options_add_string (opt, 0, "order", &amropt->order_string, NULL,
@@ -109,10 +120,11 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
                         "Number of auxiliary variables [0]");
 
-    sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "Number of equations [1]");
+    sc_options_add_int (opt, 0, "meqn", &amropt->meqn,1,
+                        "Number of equations");
+
     sc_options_add_int (opt, 0, "mwaves", &amropt->mwaves, 1,
-                        "Number of waves [1]");
+                        "Number of waves");
 
     /*Length should be mwaves */
     vector_length = amropt->mwaves;
@@ -136,8 +148,11 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
                         "Minimum refinement level [0]");
 
-    sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
-                        "Maximum refinement level [0]");
+    sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel,0,
+                        "Maximum refinement level");
+
+    sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,0,
+                        "Regrid every ''regrid_interval'' steps");
 
 #if 0 /* bool is not allocated, disable for now */
     /* Does bool get allocated somewhere? */
@@ -153,9 +168,10 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     amropt->subcycle = bool[0] == 'T' ? 1 : 0;
 #endif
 
+
     sc_options_add_inifile (opt, 'F', "fclaw_defaults.ini",
                             "Read options from this file");
-    
+
     /* It would be nice to have a default file that gets read,
        in case none is specified at the command line. */
 

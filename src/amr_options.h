@@ -45,10 +45,15 @@ typedef struct amr_options
 
     /* Time stepping */
     double initial_dt;
+    int use_fixed_dt;   // Boolean value
     double tfinal;
+    int outstyle;
+    int nout;
+    double *tout;
+    int nstep;
+
     double max_cfl;
     double desired_cfl;
-    int nout;
 
     /* Accuracy, source terms, auxiliary arrays */
     const char *order_string;   /* helper variable for array of values */
@@ -75,6 +80,7 @@ typedef struct amr_options
     int refratio;
     int minlevel;
     int maxlevel;
+    int regrid_interval;
 
     /* Boolean values */
     int manifold;

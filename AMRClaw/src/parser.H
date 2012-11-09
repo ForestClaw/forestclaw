@@ -22,7 +22,8 @@ extern "C"
 #endif
 #endif
 
-int parse_ini_file(amr_options_t *amropt);
+int parse_ini_options(amr_options_t *amropt);
+int parse_ini_output(amr_options_t *amropt,int outstyle);
 
 #ifdef __cplusplus
 #if 0

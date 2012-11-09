@@ -24,7 +24,7 @@ int main(int argc, char * argv[])
 */
 
 /* Read in vector valued inputs */
-int parse_ini_file(amr_options_t *amropt)
+int parse_ini_options(amr_options_t *amropt)
 {
     // Open parser for file stored in s_argc.
     Parser P("Options");
@@ -85,3 +85,40 @@ int parse_ini_file(amr_options_t *amropt)
 
     return 0;
 }
+
+int parse_ini_output(amr_options_t *amropt, int outstyle)
+{
+    if (outstyle == 1)
+    {
+        Parser P("OutputStyle_1");
+        amropt->nout = P.get_int("nout",-1);
+        amropt->tfinal = P.get_double("tfinal",0.0);
+    }
+    else if (outstyle == 2)
+    {
+        Parser P("OutputStyle_2");
+        amropt->nout = P.get_int("nout",-1);
+        vector<double> tout;
+        tout = P.get_double_array("tout");
+        amropt->tout = new double[amropt->nout+1];
+        for (int j = 0; j < amropt->nout; j++)
+        {
+            amropt->tout[j] = tout[j];
+        }
+    }
+    else if (outstyle == 3)
+    {
+        Parser P("OutputStyle_3");
+        amropt->nstep = P.get_int("nstep",0);
+        amropt->nout = P.get_int("nout",0);
+    }
+    return 0;
+}
+
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
