@@ -43,10 +43,8 @@ amr_options_add_int_array (sc_options_t * opt,
                            int **int_array, int initial_length,
                            const char *help_string)
 {
-    /* Array of mwaves many values */
     sc_options_add_string (opt, opt_char, opt_name,
                            array_string, default_string, help_string);
-    *int_array = NULL;
     amr_options_convert_int_array (*array_string, int_array, initial_length);
 }
 
