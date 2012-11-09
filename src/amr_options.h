@@ -56,8 +56,8 @@ typedef struct amr_options
     double desired_cfl;
 
     /* Accuracy, source terms, auxiliary arrays */
-    const char *order_string;   /* helper variable for array of values */
-    int order[FCLAW_SPACEDIM];
+    const char *order_string;
+    int *order;
 
     int verbosity;
     int src_term;
@@ -69,6 +69,7 @@ typedef struct amr_options
     /* Information about the system of PDEs */
     int meqn;
     int mwaves;
+    const char *mthlim_string;
     int *mthlim;
 
     /* Boundary condition information */
@@ -89,14 +90,48 @@ typedef struct amr_options
 }
 amr_options_t;
 
-/* add options specific to forestclaw to an existing sc_options structure */
-void amr_options_register (sc_options_t * opt, amr_options_t * amropt);
+/** Convert a string with multiple integers into an integer array.
+ * \param [in] array_string     A string of space-separated integers.
+ * \param [in,out] int_array    Pointer to an int array that gets resized
+ *                              and populated with values from the string.
+ *                              If string too short or NULL, set to 0.
+ * \param [in] new_length       Length of int_array.
+ */
+void amr_options_convert_int_array (const char * array_string,
+                                    int ** int_array, int new_length);
 
-/* parse options and populate values in registered amr_options structure */
+/** Add a string option and prepare using it for an integer array.
+ * \param [in,out] opt          Option container (see sc/sc_options.h).
+ * \param [in] opt_char         Option character for command line (or 0).
+ * \param [in] opt_name         Long option name for command line (or NULL).
+ * \param [in,out] array_string Address that will point to the option string.
+ * \param [in] default_string   Default string to be used or NULL.
+ * \param [in,out] int_array    Pointer to an int array that gets resized
+ *                              and populated with values from the string.
+ * \param [in] initial_length   Initial length of int_array.
+ */
+void amr_options_add_int_array (sc_options_t * opt,
+                                int opt_char, const char * opt_name,
+                                const char ** array_string,
+                                const char * default_string,
+                                int ** int_array, int initial_length,
+                                const char *help_string);
+
+/** Create storage for option values specific to forestclaw.
+ * \param [in,out] opt          Used for command line parsing.
+ * \return                      Options with preset default values.
+ */
+amr_options_t * amr_options_new (sc_options_t * opt);
+
+/* Parse options and populate values in registered amr_options structure.
+ */
 void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                         int argc, char **argv, int log_priority);
 
-void amr_options_delete (amr_options_t * amropt);
+/** Clean up option storage.
+ * \param [in,out]              Option storage will be deallocated.
+ */
+void amr_options_destroy (amr_options_t * amropt);
 
 #ifdef __cplusplus
 #if 0

@@ -41,7 +41,7 @@ main (int argc, char **argv)
   MPI_Comm		mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
+  amr_options_t         *gparms;
 
   mpiret = MPI_Init (&argc, &argv);
   SC_CHECK_MPI (mpiret);
@@ -54,24 +54,28 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
-  amr_options_register (options, gparms);
+  gparms = amr_options_new (options);
   amr_options_parse (options, gparms, argc, argv, lp);
 
   /* -----------------------------------------------------------------*/
+#if 0
   // This is set here just until we can read arrays in the SC library */
   Parser P;
   P.define(argc, argv);
 
   // This reads vector values into amr_options
   parse_ini_options(gparms);
+#endif
 
-  for (int j = 0; j < 2*SpaceDim; j++)
-  {
-      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
-  }
   for (int j = 0; j < SpaceDim; j++)
   {
       printf("order[%d]= %d\n",j, gparms->order[j]);
+  }
+
+  exit (1);
+  for (int j = 0; j < 2*SpaceDim; j++)
+  {
+      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
   }
   for (int j = 0; j < gparms->mwaves; j++)
   {
@@ -91,13 +95,7 @@ main (int argc, char **argv)
   /* Sample user defined options */
   /* -----------------------------------------------------------------*/
 
-
-  // Put this here so that we can read in the minimum level.
-  // global_parms *gparms = new global_parms();
-  // gparms->get_inputParams();
-
-  int minlevel = gparms->minlevel;
-  domain = fclaw2d_domain_new_unitsquare (mpicomm,minlevel);
+  domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
@@ -107,8 +105,7 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
-  // delete gparms;
-  amr_options_delete (gparms);  // This doesn't do anything now...
+  amr_options_destroy (gparms);
   sc_options_destroy (options);
   sc_finalize ();
 

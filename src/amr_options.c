@@ -35,45 +35,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
-static void
-amr_options_convert_arrays (amr_options_t * amropt)
+void
+amr_options_add_int_array (sc_options_t * opt,
+                           int opt_char, const char * opt_name,
+                           const char ** array_string,
+                           const char * default_string,
+                           int ** int_array, int initial_length,
+                           const char *help_string)
+{
+    /* Array of mwaves many values */
+    sc_options_add_string (opt, opt_char, opt_name,
+                           array_string, default_string, help_string);
+    *int_array = NULL;
+    amr_options_convert_int_array (*array_string, int_array, initial_length);
+}
+
+void
+amr_options_convert_int_array (const char * array_string,
+                               int ** int_array, int new_length)
 {
     int i;
-    int retval;
-    int *o = amropt->order;
+    const char *beginptr;
+    char *endptr;
 
-    if (amropt->order_string == NULL)
+    new_length = SC_MAX (new_length, 0);
+    *int_array = SC_REALLOC (*int_array, int, new_length);
+        
+    beginptr = array_string;
+    for (i = 0; i < new_length; ++i)
     {
-        for (i = 0; i < SpaceDim; ++i)
-        {
-            o[i] = 0;           /* what would be a good value here? */
+        if (beginptr == NULL) {
+            (*int_array)[i] = 0;
         }
-    }
-    else
-    {
-        retval = 0;
-        switch (SpaceDim)
-        {
-        case 2:
-            retval = sscanf (amropt->order_string, "%d %d", &o[0], &o[1]);
-            break;
-        case 3:
-            retval = sscanf (amropt->order_string, "%d %d %d",
-                             &o[0], &o[1], &o[2]);
-            break;
-        }
-        if (retval != SpaceDim)
-        {
-            sc_abort_collective ("Option \"order\" needs DIM many values");
+        else {
+            (*int_array)[i] = strtod (beginptr, &endptr);
+            beginptr = endptr;
         }
     }
 }
 
-void
-amr_options_register (sc_options_t * opt, amr_options_t * amropt)
+static void
+amr_options_convert_arrays (amr_options_t * amropt)
 {
-    const char *bool;
-    int vector_length;
+    amr_options_convert_int_array (amropt->order_string, &amropt->order,
+                                   SpaceDim);
+}
+
+amr_options_t *
+amr_options_new (sc_options_t * opt)
+{
+    amr_options_t * amropt;
+
+    amropt = SC_ALLOC_ZERO (amr_options_t, 1);
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 0,
                         "Subdivision of each patch in x");
@@ -107,9 +120,11 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     "Number of time steps");
     */
 
-    /* Array of SpaceDim many values */
-    sc_options_add_string (opt, 0, "order", &amropt->order_string, NULL,
-                           "Normal and transverse orders");
+    /* Array of SpaceDim many values, with no defaults is set to all 0's */
+    amr_options_add_int_array (opt, 0, "order", &amropt->order_string, NULL,
+                               &amropt->order, SpaceDim,
+                               "Normal and transverse orders");
+    /* At this point amropt->order is allocated. Set values if desired. */
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
@@ -126,12 +141,10 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_int (opt, 0, "mwaves", &amropt->mwaves, 1,
                         "Number of waves");
 
-    /*Length should be mwaves */
-    vector_length = amropt->mwaves;
-    /*
-       sc_options_add_int_array (opt, 0, "mthlim", &amropt->mthlim,vector_length,
-       "Waves limiters (one for each wave)");
-     */
+    /* Array of mwaves many values */
+    sc_options_add_string (opt, 0, "mthlim", &amropt->mthlim_string, NULL,
+                           "Waves limiters (one for each wave)");
+    amropt->mthlim = NULL;
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
@@ -176,6 +189,8 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
        in case none is specified at the command line. */
 
     amr_options_convert_arrays (amropt);
+
+    return amropt;
 }
 
 void
@@ -202,8 +217,8 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
 }
 
 void
-amr_options_delete (amr_options_t * amropt)
+amr_options_destroy (amr_options_t * amropt)
 {
-    // Need to delete this memory, but how?
-    // delete [] amropts->mthlim;
+    SC_FREE (amropt->order);
+    SC_FREE (amropt);
 }
