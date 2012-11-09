@@ -33,7 +33,7 @@ int parse_ini_file(amr_options_t *amropt)
     order = P.get_int_array("order");
     if (order.size() != 2)
     {
-        printf("Wrong number of values for vector ""order""\n");
+        printf("Wrong number of values for vector \"order\"\n");
         exit(1);
     }
     for (int j = 0; j < 2; j++)
@@ -43,9 +43,9 @@ int parse_ini_file(amr_options_t *amropt)
 
     vector<int> mthbc;
     mthbc = P.get_int_array("mthbc");
-    if (mthbc.size() != 2*SpaceDim)
+    if ((int) mthbc.size() != CubeFaces)
     {
-        printf("Wrong number of values for vector ""mthbc""\n");
+        printf("Wrong number of values for vector \"mthbc\"\n");
         exit(1);
     }
     for (int j = 0; j < (int) mthbc.size(); j++)

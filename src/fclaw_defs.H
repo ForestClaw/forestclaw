@@ -26,13 +26,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_DEFS_H
 #define FCLAW_DEFS_H
 
-// Some convenient preprocessor directives
-
-#define FCLAW_SPACEDIM 2    // Define using compiler switch?
-
-const int SpaceDim = FCLAW_SPACEDIM;
+/*
+ * TODO
+ *
+ * If we allow this file to be included from other *.H files, then eventually
+ * we'll have to prefix Real, SpaceDim, etc. with fclaw_ to avoid collisions.
+ */
 
 typedef double Real;
 
+// Some convenient preprocessor directives
+
+// Define using compiler switch?
+#define FCLAW_SPACEDIM 2
+static const int SpaceDim = FCLAW_SPACEDIM;
+
+// Number of faces to a cube
+#define FCLAW_CUBEFACES (2 * FCLAW_SPACEDIM)
+static const int CubeFaces = FCLAW_SPACEDIM;
 
 #endif

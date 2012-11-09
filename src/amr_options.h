@@ -51,11 +51,7 @@ typedef struct amr_options
     int nout;
 
     /* Accuracy, source terms, auxiliary arrays */
-#if FCLAW_SPACEDIM == 2
-    int order[2];
-#elif FCLAW_SPACEDIM == 3
-    int order[3];
-#endif
+    int order[FCLAW_SPACEDIM];
 
     int verbosity;
     int src_term;
@@ -72,11 +68,7 @@ typedef struct amr_options
     /* Boundary condition information */
     int mbc;
 
-#if FCLAW_SPACEDIM == 2
-    int mthbc[4];  /* Could I use 2*SpaceDim here instead? */
-#elif FCLAW_SPACEDIM == 3
-    int mthbc[6];
-#endif
+    int mthbc[FCLAW_CUBEFACES];
 
     /* Refinement paramters */
     int refratio;
