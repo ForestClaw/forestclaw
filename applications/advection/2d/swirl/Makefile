@@ -42,7 +42,6 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/b4step2_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setaux_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qinit_mapped.o \
-	$(FORESTCLAW)/AMRClaw/src2d/input_parms.o \
 	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
