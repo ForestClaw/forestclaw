@@ -43,6 +43,6 @@ static const int SpaceDim = FCLAW_SPACEDIM;
 
 // Number of faces to a cube
 #define FCLAW_CUBEFACES (2 * FCLAW_SPACEDIM)
-static const int CubeFaces = FCLAW_SPACEDIM;
+static const int CubeFaces = FCLAW_CUBEFACES;
 
 #endif
