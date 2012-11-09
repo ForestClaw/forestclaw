@@ -81,6 +81,10 @@ amr_options_convert_arrays (amr_options_t * amropt)
 {
     amr_options_convert_int_array (amropt->order_string, &amropt->order,
                                    SpaceDim);
+    amr_options_convert_int_array (amropt->mthlim_string, &amropt->mthlim,
+                                   amropt->mwaves);
+    amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                   CubeFaces);
 }
 
 amr_options_t *
@@ -126,7 +130,7 @@ amr_options_new (sc_options_t * opt)
     amr_options_add_int_array (opt, 0, "order", &amropt->order_string, NULL,
                                &amropt->order, SpaceDim,
                                "Normal and transverse orders");
-    /* At this point amropt->order is allocated. Set values if desired. */
+    /* At this point amropt->order is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
@@ -144,18 +148,19 @@ amr_options_new (sc_options_t * opt)
                         "Number of waves");
 
     /* Array of mwaves many values */
-    sc_options_add_string (opt, 0, "mthlim", &amropt->mthlim_string, NULL,
-                           "Waves limiters (one for each wave)");
-    amropt->mthlim = NULL;
+    amr_options_add_int_array (opt, 0, "mthlim", &amropt->mthlim_string, NULL,
+                               &amropt->mthlim, amropt->mwaves,
+                               "Waves limiters (one for each wave)");
+    /* At this point amropt->mthlim is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
 
-    /*
-       vector_length = 2*SpaceDim;
-       sc_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc,vector_length,
-       "Physical boundary condition type");
-     */
+    /* Array of CubeFaces many values */
+    amr_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
+                               &amropt->mthbc, CubeFaces,
+                               "Physical boundary condition type");
+    /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
                         "Refinement ratio (fixed) [2]");

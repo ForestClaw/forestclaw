@@ -114,11 +114,3 @@ int parse_ini_output(amr_options_t *amropt, int outstyle)
     }
     return 0;
 }
-
-
-// #ifdef __cplusplus
-// #if 0
-// {                               /* need this because indent is dumb */
-// #endif
-// }
-// #endif

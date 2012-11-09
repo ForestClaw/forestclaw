@@ -27,11 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "amr_forestclaw.H"
 
-#include "parser.H"
-
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
-
 
 int
 main (int argc, char **argv)
@@ -71,23 +68,23 @@ main (int argc, char **argv)
   {
       printf("order[%d]= %d\n",j, gparms->order[j]);
   }
-
-  exit (1);
-  for (int j = 0; j < 2*SpaceDim; j++)
-  {
-      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
-  }
   for (int j = 0; j < gparms->mwaves; j++)
   {
       printf("mthlim[%d]= %d\n",j, gparms->mthlim[j]);
   }
+  for (int j = 0; j < CubeFaces; j++)
+  {
+      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
+  }
 
-  parse_ini_output(gparms,gparms->outstyle);
+  /* Move this routine to amr_options */
+  /* Check if sc_options_print_usage can be used/extended instead */
+  // parse_ini_output(gparms,gparms->outstyle);
 
   /*
   sc_options_print_usage(sc_package_id,lp,options,"");
-  exit(1);
   */
+  exit(1);
 
   /* -----------------------------------------------------------------*/
 

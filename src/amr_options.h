@@ -75,7 +75,8 @@ typedef struct amr_options
     /* Boundary condition information */
     int mbc;
 
-    int mthbc[FCLAW_CUBEFACES];
+    const char *mthbc_string;
+    int *mthbc;
 
     /* Refinement paramters */
     int refratio;
