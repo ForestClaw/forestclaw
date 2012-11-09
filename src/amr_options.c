@@ -97,11 +97,8 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.0,
                            "Initial time step size");
 
-#if 0
-    sc_options_add_string (opt, 0, "use_fixed_dt", &bool, "F",
+    sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
                            "Use fixed coarse grid time step [F]");
-    amropt->use_fixed_dt = bool[0] == 'T' ? 1 : 0;
-#endif
 
     /*
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
@@ -177,14 +174,16 @@ amr_options_new (sc_options_t * opt)
 
     sc_options_add_string (opt, 0, "mapped", &bool, "F", "Mapped grid [F]");
     amropt->mapped = bool[0] == 'T' ? 1 : 0;
-
-    sc_options_add_string (opt, 0, "subcycle", &bool,
-                           "T", "Use subcycling in time [T]");
-    amropt->subcycle = bool[0] == 'T' ? 1 : 0;
 #endif
 
+#if 0
+    /* Right now all switch options default to false, need to change that */
+    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
+                           "T", "Use subcycling in time [T]");
+#endif
 
-    sc_options_add_inifile (opt, 'F', "fclaw_defaults.ini",
+    /* There is no default for this option.  A default will be read later. */
+    sc_options_add_inifile (opt, 'F', "inifile",
                             "Read options from this file");
 
     /* It would be nice to have a default file that gets read,
