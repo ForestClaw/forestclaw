@@ -196,6 +196,8 @@ amr_options_new (sc_options_t * opt)
 
     /* It would be nice to have a default file that gets read,
        in case none is specified at the command line. */
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+    /* Can check return value for -1 to see if file was not found */
 
     amr_options_convert_arrays (amropt);
 
