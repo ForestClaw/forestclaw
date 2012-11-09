@@ -108,6 +108,7 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
                         "Maximum refinement level [0]");
 
+#if 0 /* bool is not allocated, disable for now */
     /* Does bool get allocated somewhere? */
     sc_options_add_string (opt, 0, "manifold", &bool, "F", "Manifold [F]");
 
@@ -119,11 +120,13 @@ amr_options_register (sc_options_t * opt, amr_options_t * amropt)
     sc_options_add_string (opt, 0, "subcycle", &bool,
                            "T", "Use subcycling in time [T]");
     amropt->subcycle = bool[0] == 'T' ? 1 : 0;
+#endif
 
-    /* It would be nice to have a default file that gets read, in case one is not
-       specified at the command line */
     sc_options_add_inifile (opt, 'F', "fclaw_defaults.ini",
                             "Read options from this file");
+    
+    /* It would be nice to have a default file that gets read,
+       in case none is specified at the command line. */
 }
 
 void

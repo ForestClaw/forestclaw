@@ -8,6 +8,10 @@ FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
+include $(P4EST_DIR)/etc/Makefile.p4est.mk
+
+# make sure that the first make target is the executable
+default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
@@ -17,9 +21,7 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
 
-include $(P4EST_DIR)/etc/Makefile.p4est.mk
-
-.PHONY: clean $(TARGET)
+.PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
 	qinit.o \
@@ -73,5 +75,5 @@ $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 clean:
 	rm -f *.o $(TARGET) $(OBJECTS)
 
-realclean:
-	rm -f *.o $(amrclawobjs) fort.* $(TARGET)
+realclean: clean
+	rm -f $(amrclawobjs) fort.*
