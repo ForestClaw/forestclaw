@@ -8,6 +8,8 @@
 #include "amr_options.h"
 #include "parser.H"
 
+using namespace std;
+
 /* Move this to swirl.cpp, etc */
 /*
 int main(int argc, char * argv[])
@@ -20,15 +22,6 @@ int main(int argc, char * argv[])
     return status;
 }
 */
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
 
 /* Read in vector valued inputs */
 int parse_ini_file(amr_options_t *amropt)
@@ -55,14 +48,14 @@ int parse_ini_file(amr_options_t *amropt)
         printf("Wrong number of values for vector ""mthbc""\n");
         exit(1);
     }
-    for (int j = 0; j < mthbc.size(); j++)
+    for (int j = 0; j < (int) mthbc.size(); j++)
     {
         amropt->mthbc[j] = mthbc[j];
     }
 
     vector<int> mthlim;
     mthlim = P.get_int_array("mthlim");
-    if (mthlim.size() != amropt->mwaves)
+    if ((int) mthlim.size() != amropt->mwaves)
     {
         printf("Wrong number of limiters read in; mwaves = %d\n",amropt->mwaves);
         exit(1);
@@ -92,10 +85,3 @@ int parse_ini_file(amr_options_t *amropt)
 
     return 0;
 }
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif

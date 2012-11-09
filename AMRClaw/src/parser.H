@@ -14,10 +14,22 @@
 
 #include "amr_options.h"
 
-using namespace std;
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
 int parse_ini_file(amr_options_t *amropt);
 
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 class Parser
 {
@@ -32,14 +44,14 @@ public:
     double get_double(const char *key, double notfound);
     int get_boolean(const char *key, int notfound);
 
-    vector<int> get_int_array(const char *key);
-    vector<double> get_double_array(const char *key);
+    std::vector<int> get_int_array(const char *key);
+    std::vector<double> get_double_array(const char *key);
 
 protected:
     dictionary	*m_ini;
     static int    s_argc;
     static char** s_argv;
-    string m_section;
+    std::string m_section;
 private:
     const char* append_key(const char* key);
 };

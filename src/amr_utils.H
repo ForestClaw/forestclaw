@@ -36,42 +36,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw_defs.H"
 
-using namespace std;
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
 int pow_int(int a, int n);
-class global_parms;
 
 int num_patches(fclaw2d_domain_t *domain, int level);
 
 int pow_int(int a, int n);
 
-extern "C"
-{
-    void inputparms_(int& mx_leaf,
-                     int& my_leaf,
-                     Real& initial_dt,
-                     Real& tfinal,
-                     Real& max_cfl,
-                     Real& desired_cfl,
-                     int& nout,
-                     int& src_term,
-                     int& verbose,
-                     int& mcapa,
-                     int& maux,
-                     int& meqn,
-                     int& mwaves,
-                     int& maxmwaves,
-                     int  mthlim[],
-                     int& mbc,
-                     int  mthbc[],
-                     int  order[],
-                     int& minlevel,
-                     int& maxlevel,
-                     int& icycle,
-                     int& manifold);
+void inputparms_(int& mx_leaf,
+                 int& my_leaf,
+                 Real& initial_dt,
+                 Real& tfinal,
+                 Real& max_cfl,
+                 Real& desired_cfl,
+                 int& nout,
+                 int& src_term,
+                 int& verbose,
+                 int& mcapa,
+                 int& maux,
+                 int& meqn,
+                 int& mwaves,
+                 int& maxmwaves,
+                 int  mthlim[],
+                 int& mbc,
+                 int  mthbc[],
+                 int  order[],
+                 int& minlevel,
+                 int& maxlevel,
+                 int& icycle,
+                 int& manifold);
 
-    void setprob_();
+void setprob_();
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
 }
+#endif
+
 
 class level_data
 {
@@ -155,7 +165,7 @@ public:
     void increment_coarse_exchange_counter(const int& a_level);
     void increment_fine_exchange_counter(const int& a_level);
 
-    vector<level_data> m_levels;
+    std::vector<level_data> m_levels;
     int m_maxlevel;
     int m_minlevel;
     int m_refratio;

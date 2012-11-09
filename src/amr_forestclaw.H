@@ -31,11 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "ClawPatch.H"
 
-using namespace std;
-
 class ClawPatch;
-
-// using std::vector;
 
 typedef struct fclaw2d_domain_data
 {
@@ -70,17 +66,22 @@ typedef struct fclaw2d_subcycle_info
 } fclaw2d_subcycle_info_t;
 
 
+#ifdef __cplusplus
 extern "C"
 {
-    void write_tfile_(int *iframe,
-                      double *time,
-                      int *meqn,
-                      int *ngrids,
-                      int *maux);
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
-    void new_qfile_(int* iframe);
 
-}
+void write_tfile_(int *iframe,
+                  double *time,
+                  int *meqn,
+                  int *ngrids,
+                  int *maux);
+
+void new_qfile_(int* iframe);
 
 
 // ------------------------------------------------------------
@@ -125,5 +126,12 @@ void amrout(fclaw2d_domain_t *domain, int iframe);
 
 /* The domain will be NULL afterwards hence the ** */
 void amrreset(fclaw2d_domain_t **domain);
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 #endif
