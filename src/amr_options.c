@@ -97,9 +97,11 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.0,
                            "Initial time step size");
 
+#if 0
     sc_options_add_string (opt, 0, "use_fixed_dt", &bool, "F",
                            "Use fixed coarse grid time step [F]");
     amropt->use_fixed_dt = bool[0] == 'T' ? 1 : 0;
+#endif
 
     /*
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
