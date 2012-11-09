@@ -89,7 +89,7 @@ void amr_options_register (sc_options_t * opt, amr_options_t * amropt);
 void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
 
-void amr_options_delete(amr_options_t *amropt);
+void amr_options_delete (amr_options_t * amropt);
 
 #ifdef __cplusplus
 #if 0
