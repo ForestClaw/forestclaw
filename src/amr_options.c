@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
 amr_options_add_int_array (sc_options_t * opt,
-                           int opt_char, const char * opt_name,
-                           const char ** array_string,
-                           const char * default_string,
-                           int ** int_array, int initial_length,
+                           int opt_char, const char *opt_name,
+                           const char **array_string,
+                           const char *default_string,
+                           int **int_array, int initial_length,
                            const char *help_string)
 {
     /* Array of mwaves many values */
@@ -51,8 +51,8 @@ amr_options_add_int_array (sc_options_t * opt,
 }
 
 void
-amr_options_convert_int_array (const char * array_string,
-                               int ** int_array, int new_length)
+amr_options_convert_int_array (const char *array_string,
+                               int **int_array, int new_length)
 {
     int i;
     const char *beginptr;
@@ -60,14 +60,16 @@ amr_options_convert_int_array (const char * array_string,
 
     new_length = SC_MAX (new_length, 0);
     *int_array = SC_REALLOC (*int_array, int, new_length);
-        
+
     beginptr = array_string;
     for (i = 0; i < new_length; ++i)
     {
-        if (beginptr == NULL) {
+        if (beginptr == NULL)
+        {
             (*int_array)[i] = 0;
         }
-        else {
+        else
+        {
             (*int_array)[i] = strtod (beginptr, &endptr);
             beginptr = endptr;
         }
@@ -84,7 +86,7 @@ amr_options_convert_arrays (amr_options_t * amropt)
 amr_options_t *
 amr_options_new (sc_options_t * opt)
 {
-    amr_options_t * amropt;
+    amr_options_t *amropt;
 
     amropt = SC_ALLOC_ZERO (amr_options_t, 1);
 
@@ -101,11 +103,12 @@ amr_options_new (sc_options_t * opt)
                            "Use fixed coarse grid time step [F]");
 
     /*
-    sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
-    "Final time");
-    */
+       sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
+       "Final time");
+     */
 
-    sc_options_add_int(opt,0,"outstyle",&amropt->outstyle,0.0,"Output style (1,2,3)");
+    sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 0.0,
+                        "Output style (1,2,3)");
 
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1.0,
                            "Maximum CFL number [1.0]");
@@ -115,9 +118,9 @@ amr_options_new (sc_options_t * opt)
 
 
     /*
-    sc_options_add_int (opt, 0, "nout", &amropt->nout, 0,
-    "Number of time steps");
-    */
+       sc_options_add_int (opt, 0, "nout", &amropt->nout, 0,
+       "Number of time steps");
+     */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &amropt->order_string, NULL,
@@ -134,7 +137,7 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
                         "Number of auxiliary variables [0]");
 
-    sc_options_add_int (opt, 0, "meqn", &amropt->meqn,1,
+    sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations");
 
     sc_options_add_int (opt, 0, "mwaves", &amropt->mwaves, 1,
@@ -160,13 +163,13 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
                         "Minimum refinement level [0]");
 
-    sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel,0,
+    sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
                         "Maximum refinement level");
 
-    sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,0,
-                        "Regrid every ''regrid_interval'' steps");
+    sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
+                        0, "Regrid every ''regrid_interval'' steps");
 
-#if 0 /* bool is not allocated, disable for now */
+#if 0                           /* bool is not allocated, disable for now */
     /* Does bool get allocated somewhere? */
     sc_options_add_string (opt, 0, "manifold", &bool, "F", "Manifold [F]");
 

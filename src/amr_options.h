@@ -45,7 +45,7 @@ typedef struct amr_options
 
     /* Time stepping */
     double initial_dt;
-    int use_fixed_dt;   // Boolean value
+    int use_fixed_dt;           // Boolean value
     double tfinal;
     int outstyle;
     int nout;
@@ -97,8 +97,8 @@ amr_options_t;
  *                              If string too short or NULL, set to 0.
  * \param [in] new_length       Length of int_array.
  */
-void amr_options_convert_int_array (const char * array_string,
-                                    int ** int_array, int new_length);
+void amr_options_convert_int_array (const char *array_string,
+                                    int **int_array, int new_length);
 
 /** Add a string option and prepare using it for an integer array.
  * \param [in,out] opt          Option container (see sc/sc_options.h).
@@ -111,17 +111,17 @@ void amr_options_convert_int_array (const char * array_string,
  * \param [in] initial_length   Initial length of int_array.
  */
 void amr_options_add_int_array (sc_options_t * opt,
-                                int opt_char, const char * opt_name,
-                                const char ** array_string,
-                                const char * default_string,
-                                int ** int_array, int initial_length,
+                                int opt_char, const char *opt_name,
+                                const char **array_string,
+                                const char *default_string,
+                                int **int_array, int initial_length,
                                 const char *help_string);
 
 /** Create storage for option values specific to forestclaw.
  * \param [in,out] opt          Used for command line parsing.
  * \return                      Options with preset default values.
  */
-amr_options_t * amr_options_new (sc_options_t * opt);
+amr_options_t *amr_options_new (sc_options_t * opt);
 
 /* Parse options and populate values in registered amr_options structure.
  */
