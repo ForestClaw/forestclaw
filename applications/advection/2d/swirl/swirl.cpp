@@ -102,8 +102,8 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
+  sc_options_destroy (options);         /* this could be moved up */
   amr_options_destroy (gparms);
-  sc_options_destroy (options);
   sc_finalize ();
 
   mpiret = MPI_Finalize ();

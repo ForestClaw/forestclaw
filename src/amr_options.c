@@ -229,5 +229,7 @@ void
 amr_options_destroy (amr_options_t * amropt)
 {
     SC_FREE (amropt->order);
+    SC_FREE (amropt->mthlim);
+    SC_FREE (amropt->mthbc);
     SC_FREE (amropt);
 }
