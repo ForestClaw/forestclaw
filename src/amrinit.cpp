@@ -101,7 +101,7 @@ void cb_amrinit(fclaw2d_domain_t *domain,
 // Initialize a base level of grids
 void amrinit(fclaw2d_domain_t **domain, const amr_options_t* gparms)
 {
-    Real t = 0;
+    double t = 0;
 
     allocate_user_data(*domain);
 

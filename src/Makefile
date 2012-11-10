@@ -8,14 +8,14 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/parser.o \
 	$(FORESTCLAW)/AMRClaw/src/parse_inputs.o
 
-libforestclaw.a: \
+fclawobjs = \
 	amrinit.o \
 	amrrun.o \
 	amrreset.o \
+	subcycle_manager.o \
 	amr_advance.o \
 	amr_regrid.o \
 	amr_output.o \
-	subcycle_manager.o \
 	amr_diagnostics.o \
 	amr_exchangecoarse.o \
 	amr_levelexchange.o \
@@ -24,8 +24,9 @@ libforestclaw.a: \
 	amr_utils.o \
 	amr_options.o \
 	fclaw2d_convenience.o \
-	forestclaw2d.o \
-	$(amrclawobjs)
+	forestclaw2d.o
+
+libforestclaw.a: $(amrclawobjs) $(fclawobjs)
 	ar cru $@ $^
 
 .c.o:
@@ -36,4 +37,4 @@ libforestclaw.a: \
 	-I$(FORESTCLAW)/AMRClaw/src -I. -c $< -o $@
 
 clean:
-	rm -f *.o *.a $(amrclawobjs)
+	rm -f *.o *.a $(amrclawobjs) $(fclawobjs)

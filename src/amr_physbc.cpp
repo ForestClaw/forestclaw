@@ -43,8 +43,8 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
 {
     int numfaces = get_faces_per_patch(domain);
     bool intersects_bc[numfaces];
-    Real curr_time = *((Real*) user);
-    Real dt = 1e20;   // When do we need dt in setting a boundary condition?
+    double curr_time = *((double*) user);
+    double dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
@@ -55,7 +55,7 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
 }
 
 
-void set_phys_bc(fclaw2d_domain_t *domain, int a_level, Real a_level_time)
+void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time)
 {
     fclaw2d_domain_iterate_level(domain, a_level,cb_set_phys_bc,(void *) &a_level_time);
 }

@@ -134,13 +134,13 @@ const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
     return ddata->amropts;
 }
 
-void set_domain_time(fclaw2d_domain_t *domain, Real time)
+void set_domain_time(fclaw2d_domain_t *domain, double time)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->curr_time = time;
 }
 
-Real get_domain_time(fclaw2d_domain_t *domain)
+double get_domain_time(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     return ddata->curr_time;

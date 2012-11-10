@@ -34,7 +34,7 @@ subcycle_manager::~subcycle_manager() {}
 
 void subcycle_manager::define(fclaw2d_domain_t *domain,
                               const amr_options_t *gparms,
-                              const Real& a_t_curr)
+                              const double& a_t_curr)
 {
     m_t_minlevel = a_t_curr;
     m_refratio = gparms->refratio;
@@ -59,12 +59,12 @@ bool subcycle_manager::nosubcycle()
     return m_nosubcycle;
 }
 
-void subcycle_manager::set_dt_minlevel(const Real& a_dt_minlevel)
+void subcycle_manager::set_dt_minlevel(const double& a_dt_minlevel)
 {
     // Time step for minimum level (i.e. coarsest non-empty level).
     m_dt_minlevel = a_dt_minlevel;
 
-    Real dt_level = a_dt_minlevel;
+    double dt_level = a_dt_minlevel;
     m_levels[m_minlevel].set_dt(dt_level);
     for (int level = m_minlevel+1; level <= m_maxlevel; level++)
     {
@@ -133,7 +133,7 @@ bool subcycle_manager::is_finest(const int& a_level)
     return a_level == m_maxlevel;
 }
 
-Real subcycle_manager::dt(const int& a_level)
+double subcycle_manager::dt(const int& a_level)
 {
     return m_levels[a_level].dt();
 }
@@ -172,7 +172,7 @@ bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
     return b1 && b2 && b3 && b4;
 }
 
-Real subcycle_manager::current_time(const int& a_level)
+double subcycle_manager::current_time(const int& a_level)
 {
     return m_levels[a_level].current_time();
 }
@@ -234,7 +234,7 @@ void level_data::define(const int& a_level,
                         const int& a_refratio,
                         const int& a_patches_at_level,
                         const int& a_maxlevel,
-                        const Real& a_time,
+                        const double& a_time,
                         const bool& a_subcycle)
 {
     m_level = a_level;
@@ -263,12 +263,12 @@ void level_data::define(const int& a_level,
 
 }
 
-void level_data::set_dt(const Real& a_dt_level)
+void level_data::set_dt(const double& a_dt_level)
 {
     m_dt = a_dt_level;
 }
 
-Real level_data::dt()
+double level_data::dt()
 {
     return m_dt;
 }
@@ -283,7 +283,7 @@ void level_data::increment_time()
     m_time += m_dt;
 }
 
-Real level_data::current_time()
+double level_data::current_time()
 {
     return m_time;
 }

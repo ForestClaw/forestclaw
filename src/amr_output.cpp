@@ -53,7 +53,7 @@ void cb_amrout(fclaw2d_domain_t *domain,
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    Real time = get_domain_time(domain);
+    double time = get_domain_time(domain);
 
     // Get total number of patches
     int ngrids = 0;

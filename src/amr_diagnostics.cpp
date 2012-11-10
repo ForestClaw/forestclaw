@@ -41,14 +41,14 @@ void cb_check_conservation(fclaw2d_domain_t *domain,
                            void *user)
 {
     ClawPatch *this_cp = get_clawpatch(this_patch);
-    Real *sum = (Real*) user;
+    double *sum = (double*) user;
 
     *sum += this_cp->compute_sum();
 }
 
 void check_conservation(fclaw2d_domain_t *domain)
 {
-    Real sum = 0;
+    double sum = 0;
     fclaw2d_domain_iterate_patches(domain,cb_check_conservation,(void *) &sum);
 
     printf("Total sum = %24.16f\n",sum);

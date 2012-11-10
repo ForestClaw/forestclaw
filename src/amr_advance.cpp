@@ -43,25 +43,25 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
 
-    Real dt = time_data->dt;
-    Real t = time_data->t;
+    double dt = time_data->dt;
+    double t = time_data->t;
 
     int level = this_patch->level;
 
-    Real maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
+    double maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 
 static
-Real advance_level(fclaw2d_domain_t *domain,
+double advance_level(fclaw2d_domain_t *domain,
                    const int& a_level,
                    const int& a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
     bool verbose = (bool) a_time_stepper->m_verbosity;
-    Real t_level = a_time_stepper->current_time(a_level);
+    double t_level = a_time_stepper->current_time(a_level);
 
-    Real maxcfl = 0;
+    double maxcfl = 0;
     if (verbose)
     {
         cout << endl;
@@ -206,7 +206,7 @@ Real advance_level(fclaw2d_domain_t *domain,
     return time_data.maxcfl;  // Maximum from level iteration
 }
 
-Real advance_all_levels(fclaw2d_domain_t *domain,
+double advance_all_levels(fclaw2d_domain_t *domain,
                         subcycle_manager *a_time_stepper)
 {
     // 'n_fine_steps' is the number of steps we must take on the finest level to equal one
@@ -214,10 +214,10 @@ Real advance_all_levels(fclaw2d_domain_t *domain,
     int minlevel = a_time_stepper->minlevel();
     int n_fine_steps = a_time_stepper->step_inc(minlevel); // equal 1 in the non-subcycled case.
     int maxlevel = a_time_stepper->maxlevel();
-    Real maxcfl = 0;
+    double maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
-        Real cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
+        double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
         maxcfl = max(cfl_step,maxcfl);
     }
     return maxcfl;

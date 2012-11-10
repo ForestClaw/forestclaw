@@ -71,8 +71,8 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 // -----------------------------------------------------------------
 void allocate_user_data(fclaw2d_domain_t *domain);
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
-void set_domain_time(fclaw2d_domain_t *domain, Real time);
-Real get_domain_time(fclaw2d_domain_t *domain);
+void set_domain_time(fclaw2d_domain_t *domain, double time);
+double get_domain_time(fclaw2d_domain_t *domain);
 
 // Will change the name of this to 'get_clawpatch' eventually
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);

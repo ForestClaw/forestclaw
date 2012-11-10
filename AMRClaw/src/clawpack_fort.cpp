@@ -63,7 +63,7 @@ void FArrayBox::define(int a_size,const Box& a_box)
     {
         delete [] m_data;
     }
-    m_data = new Real[a_size];
+    m_data = new double[a_size];
     m_size = a_size;
     m_box = a_box;
 }
@@ -85,7 +85,7 @@ void FArrayBox::operator=(const FArrayBox& fbox)
             delete [] m_data;
             m_data = NULL;
         }
-        m_data = new Real[fbox.m_size];
+        m_data = new double[fbox.m_size];
         m_size = fbox.m_size;
     }
     if (m_data == NULL)
@@ -96,7 +96,7 @@ void FArrayBox::operator=(const FArrayBox& fbox)
             exit(1);
         }
     }
-    Real *copy = fbox.m_data;
+    double *copy = fbox.m_data;
     m_box = fbox.m_box;
     for (int i = 0; i < fbox.m_size; i++)
     {
@@ -105,7 +105,7 @@ void FArrayBox::operator=(const FArrayBox& fbox)
 }
 
 
-Real* FArrayBox::dataPtr()
+double* FArrayBox::dataPtr()
 {
     return m_data;
 }

@@ -238,7 +238,7 @@ void regrid(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    Real t = get_domain_time(*domain);
+    double t = get_domain_time(*domain);
 
     bool init_flag = false;
 

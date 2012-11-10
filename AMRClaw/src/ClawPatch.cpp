@@ -14,10 +14,10 @@ ClawPatch::~ClawPatch()
 }
 
 
-void ClawPatch::define(const Real&  a_xlower,
-                       const Real&  a_ylower,
-                       const Real&  a_xupper,
-                       const Real&  a_yupper,
+void ClawPatch::define(const double&  a_xlower,
+                       const double&  a_ylower,
+                       const double&  a_xupper,
+                       const double&  a_yupper,
                        const int& a_blockno,
                        const amr_options_t* a_gparms)
 {
@@ -103,8 +103,8 @@ void ClawPatch::setup_patch(const int& a_level, const int& a_maxlevel,
 
 void ClawPatch::initialize()
 {
-    Real* q = m_griddata.dataPtr();
-    Real* aux = m_auxarray.dataPtr();
+    double* q = m_griddata.dataPtr();
+    double* aux = m_auxarray.dataPtr();
 
     set_block_(&m_blockno);
 
@@ -125,7 +125,7 @@ void ClawPatch::setAuxArray()
 {
 
     set_block_(&m_blockno);
-    Real* aux = m_auxarray.dataPtr();
+    double* aux = m_auxarray.dataPtr();
 
     if (m_manifold)
     {
@@ -141,27 +141,27 @@ void ClawPatch::setAuxArray()
     }
 }
 
-Real ClawPatch::step(const Real& a_time,
-                     const Real& a_dt,
+double ClawPatch::step(const double& a_time,
+                     const double& a_dt,
                      const int& a_level,
                      const amr_options_t& gparms)
 {
-    Real maxwavespeed = 1; // Making this up...
-    Real cfl_grid = a_dt/m_dx*maxwavespeed; //
+    double maxwavespeed = 1; // Making this up...
+    double cfl_grid = a_dt/m_dx*maxwavespeed; //
     return cfl_grid;
 }
 
 #if FCLAW_SPACEDIM == 2
 
-Real ClawPatch::step_noqad(const Real& a_time,
-                           const Real& a_dt,
+double ClawPatch::step_noqad(const double& a_time,
+                           const double& a_dt,
                            const int& a_level,
                            const amr_options_t& gparms)
 {
     set_block_(&m_blockno);
 
-    Real* qold = m_griddata.dataPtr();
-    Real* aux = m_auxarray.dataPtr();
+    double* qold = m_griddata.dataPtr();
+    double* aux = m_auxarray.dataPtr();
 
     // Mysterious bug in this call when mx=my=4 and levels are (2,3).
     // m_griddata_last.dataPtr() == NULL, for some reason.
@@ -181,15 +181,15 @@ Real ClawPatch::step_noqad(const Real& a_time,
 
     int maxm = max(m_mx,m_my);
 
-    Real cflgrid;
+    double cflgrid;
 
     int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms.mwaves + 3*m_maux + 2);
-    Real* work = new Real[mwork];
+    double* work = new double[mwork];
 
-    Real* fp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    Real* fm = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    Real* gp = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    Real* gm = new Real[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    double* fp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    double* fm = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    double* gp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
+    double* gm = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
 
     clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms.method,
                 gparms.mthlim, gparms.mcapa, gparms.mwaves, m_mx, m_my, qold,
@@ -208,18 +208,18 @@ Real ClawPatch::step_noqad(const Real& a_time,
 #endif
 
 
-Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
-                                    const Real& a_dt,
+double ClawPatch::ClawPatchIntegrator(const double& a_time,
+                                    const double& a_dt,
                                     const int& a_refRatio,
                                     const int& a_level,
                                     const amr_options_t& gparms)
 {
 
-    // Real dt = a_dt;
+    // double dt = a_dt;
 
   // Data for step2 or step3.  This is overwritten by updated values.
-  // Real* qold = m_griddata.dataPtr();
-  // Real* aux = m_auxarray.dataPtr();
+  // double* qold = m_griddata.dataPtr();
+  // double* aux = m_auxarray.dataPtr();
 
   // int maxm = max(m_mx,m_my);
 #if FCLAW_SPACEDIM == 3
@@ -230,31 +230,31 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
   set_common_levels_(gparms.maxlevel,a_level,gparms.refratio);
 
 
-  Real cflgrid = 1;
+  double cflgrid = 1;
 
 
   /*
   int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn +
   (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
-  Real* work = new Real[mwork];
+  double* work = new double[mwork];
 
-  Real* fp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  Real* fm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  Real* gp = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  Real* gm = new Real[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  double* fp = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  double* fm = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  double* gp = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
+  double* gm = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
 
-  Real* fp_chombo = a_fluxp[0].dataPtr();
-  Real* fm_chombo = a_fluxm[0].dataPtr();
-  Real* fpc_chombo = a_fluxpc[0].dataPtr();
-  Real* fmc_chombo = a_fluxmc[0].dataPtr();
+  double* fp_chombo = a_fluxp[0].dataPtr();
+  double* fm_chombo = a_fluxm[0].dataPtr();
+  double* fpc_chombo = a_fluxpc[0].dataPtr();
+  double* fmc_chombo = a_fluxmc[0].dataPtr();
 
-  Real* gp_chombo = a_fluxp[1].dataPtr();
-  Real* gm_chombo = a_fluxm[1].dataPtr();
-  Real* gpc_chombo = a_fluxpc[1].dataPtr();
-  Real* gmc_chombo = a_fluxmc[1].dataPtr();
+  double* gp_chombo = a_fluxp[1].dataPtr();
+  double* gm_chombo = a_fluxm[1].dataPtr();
+  double* gpc_chombo = a_fluxpc[1].dataPtr();
+  double* gmc_chombo = a_fluxmc[1].dataPtr();
 
-  Real* qadd_x = a_qadd[0].dataPtr();
-  Real* qadd_y = a_qadd[1].dataPtr();
+  double* qadd_x = a_qadd[0].dataPtr();
+  double* qadd_y = a_qadd[1].dataPtr();
 
   int m_auxtype_int[10];  // dummy for now;  fix!
   clawpatch2_(maxm, gparms.m_meqn, gparms.m_maux, gparms.m_mbc, gparms.m_method,
@@ -275,7 +275,7 @@ Real ClawPatch::ClawPatchIntegrator(const Real& a_time,
   delete [] intersectsBoundary;
   delete [] work;
 
-  // Real maxWaveSpeed = (dx/dt)*cflgrid;
+  // double maxWaveSpeed = (dx/dt)*cflgrid;
   // return maxWaveSpeed;
   */
 
@@ -299,11 +299,11 @@ void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_ste
                                  const int& a_refratio)
 {
     set_block_(&m_blockno);
-    Real alpha = Real(a_fine_step)/Real(a_refratio);
+    double alpha = double(a_fine_step)/double(a_refratio);
 
-    Real *qlast = m_griddata_last.dataPtr();
-    Real *qcurr = m_griddata.dataPtr();
-    Real *qtimeinterp = m_griddata_time_interp.dataPtr();
+    double *qlast = m_griddata_last.dataPtr();
+    double *qcurr = m_griddata.dataPtr();
+    double *qtimeinterp = m_griddata_time_interp.dataPtr();
     int size = m_griddata.size();
 
     // This works, even when we have a system (meqn > 1).  Note that all ghost values
@@ -322,22 +322,22 @@ void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_ste
 
 void ClawPatch::exchange_face_ghost(const int& a_idir, ClawPatch *neighbor_cp)
 {
-    Real *qthis = m_griddata.dataPtr();
-    Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
+    double *qthis = m_griddata.dataPtr();
+    double *qneighbor = neighbor_cp->m_griddata.dataPtr();
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
 }
 
 void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
 {
-    Real *qthis = m_griddata.dataPtr();
-    Real *qneighbor = neighbor_cp->m_griddata.dataPtr();
+    double *qthis = m_griddata.dataPtr();
+    double *qneighbor = neighbor_cp->m_griddata.dataPtr();
     mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 {
-    Real *qthis = m_griddata.dataPtr();
-    Real *qcorner = cp_corner->m_griddata.dataPtr();
+    double *qthis = m_griddata.dataPtr();
+    double *qcorner = cp_corner->m_griddata.dataPtr();
 
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
 
@@ -346,8 +346,8 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, bool a_intersects_block[],
                                          ClawPatch *cp_corner, const bool& a_is_block_corner)
 {
-    Real *qthis = m_griddata.dataPtr();
-    Real *qcorner = cp_corner->m_griddata.dataPtr();
+    double *qthis = m_griddata.dataPtr();
+    double *qcorner = cp_corner->m_griddata.dataPtr();
 
     if (a_is_block_corner)
     {
@@ -371,10 +371,10 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, bool a_intersects_
 }
 
 void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mthbc[],
-                                    const Real& t, const Real& dt)
+                                    const double& t, const double& dt)
 {
-    Real *q = m_griddata.dataPtr();
-    Real *aux = m_auxarray.dataPtr();
+    double *q = m_griddata.dataPtr();
+    double *aux = m_auxarray.dataPtr();
 
     // Set a local copy of mthbc that can be used for a patch.
     int mthbc[2*SpaceDim];
@@ -394,9 +394,9 @@ void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mt
 
 
 void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                                      const Real& t, const Real& dt)
+                                      const double& t, const double& dt)
 {
-    Real *q = m_griddata.dataPtr();
+    double *q = m_griddata.dataPtr();
 
     // No code yet
     set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
@@ -405,8 +405,8 @@ void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
 void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side,
                                                 ClawPatch* cp)
 {
-    Real *this_q = m_griddata.dataPtr();
-    Real *neighbor_q = cp->m_griddata.dataPtr();
+    double *this_q = m_griddata.dataPtr();
+    double *neighbor_q = cp->m_griddata.dataPtr();
 
     exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q,
                                 a_corner, a_side);
@@ -424,7 +424,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    bool a_time_interp,
                                    bool a_block_boundary)
 {
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -435,11 +435,11 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     }
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
     {
-        Real *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
+        double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
         if (m_manifold)
         {
-            Real *auxcoarse = m_auxarray.dataPtr();
-            Real *auxfine = neighbor_cp[igrid]->m_auxarray.dataPtr();
+            double *auxcoarse = m_auxarray.dataPtr();
+            double *auxfine = neighbor_cp[igrid]->m_auxarray.dataPtr();
             if (a_block_boundary)
             {
                 mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
@@ -471,7 +471,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        bool a_time_interp,
                                        bool a_block_boundary)
 {
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -483,7 +483,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
 
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
-        Real *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
+        double *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
         int igrid = ir; // indicates which grid we are averaging from.
         if (a_block_boundary)
         {
@@ -503,7 +503,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
                                      ClawPatch *cp_corner, bool a_time_interp)
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -513,7 +513,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
         qcoarse = m_griddata.dataPtr();
     }
 
-    Real *qfine = cp_corner->m_griddata.dataPtr();
+    double *qfine = cp_corner->m_griddata.dataPtr();
 
     average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
 }
@@ -525,7 +525,7 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner, const int& a
                                         bool intersects_block[])
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -535,9 +535,9 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner, const int& a
         qcoarse = m_griddata.dataPtr();
     }
 
-    Real *auxcoarse = this->m_auxarray.dataPtr();
-    Real *auxfine = cp_corner->m_auxarray.dataPtr();
-    Real *qfine = cp_corner->m_griddata.dataPtr();
+    double *auxcoarse = this->m_auxarray.dataPtr();
+    double *auxfine = cp_corner->m_auxarray.dataPtr();
+    double *qfine = cp_corner->m_griddata.dataPtr();
 
     if (is_block_corner)
     {
@@ -564,7 +564,7 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                             bool intersects_block[])
 
 {
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -575,7 +575,7 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
     }
 
     // qcorner is the finer level.
-    Real *qfine = cp_corner->m_griddata.dataPtr();
+    double *qfine = cp_corner->m_griddata.dataPtr();
 
     if (is_block_corner)
     {
@@ -602,7 +602,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
                                          ClawPatch *cp_corner, bool a_time_interp)
 
 {
-    Real *qcoarse;
+    double *qcoarse;
     if (a_time_interp)
     {
         qcoarse = m_griddata_time_interp.dataPtr();
@@ -613,7 +613,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
     }
 
     // qcorner is the finer level.
-    Real *qfine = cp_corner->m_griddata.dataPtr();
+    double *qfine = cp_corner->m_griddata.dataPtr();
 
     interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio, qcoarse, qfine, a_coarse_corner);
 }
@@ -628,8 +628,8 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                           const int& a_p4est_refineFactor,
                                           const int& a_refratio)
 {
-    Real *qcoarse = this->m_griddata.dataPtr();
-    Real *qfine = a_fine->m_griddata.dataPtr();
+    double *qcoarse = this->m_griddata.dataPtr();
+    double *qfine = a_fine->m_griddata.dataPtr();
 
     // Use linear interpolation with limiters.
     interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_p4est_refineFactor,
@@ -637,8 +637,8 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
     if (m_manifold)
     {
         /* Doesn't quite work
-        Real *auxcoarse = m_griddata.dataPtr();
-        Real *auxfine = a_fine->m_griddata.dataPtr();
+        double *auxcoarse = m_griddata.dataPtr();
+        double *auxfine = a_fine->m_griddata.dataPtr();
         fixcapaq2_(m_mx, m_my, m_mbc, m_meqn,qcoarse, qfine, auxcoarse, auxfine,
                    m_maux, a_p4est_refineFactor, a_refratio, a_igrid);
         */
@@ -650,14 +650,14 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
                                          const int& a_num_siblings,
                                          const int& a_p4est_refineFactor)
 {
-    Real *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = m_griddata.dataPtr();
     for(int igrid = 0; igrid < a_num_siblings; igrid++)
     {
-        Real *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
+        double *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
         if (m_manifold)
         {
-            Real *auxcoarse = m_auxarray.dataPtr();
-            Real *auxfine = a_cp_siblings[igrid]->m_auxarray.dataPtr();
+            double *auxcoarse = m_auxarray.dataPtr();
+            double *auxfine = a_cp_siblings[igrid]->m_auxarray.dataPtr();
             average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
                                       auxcoarse, auxfine, m_maux,
                                       a_p4est_refineFactor,
@@ -673,7 +673,7 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
 
 bool ClawPatch::tag_for_refinement(bool a_init_flag)
 {
-    Real *q = m_griddata.dataPtr();
+    double *q = m_griddata.dataPtr();
     int tag_patch;  // == 0 or 1
     int iflag = a_init_flag ? 1 : 0;
     tag_for_refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,
@@ -689,7 +689,7 @@ bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
     this->coarsen_from_fine_family(a_cp_siblings,a_refratio,a_num_siblings,
                                    a_p4est_refineFactor);
     int tag_patch;
-    Real *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = m_griddata.dataPtr();
     tag_for_coarsening_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx,m_dy,
                               qcoarse,tag_patch);
     return tag_patch == 0;
@@ -756,22 +756,22 @@ void ClawPatch::setup_manifold(const int& a_level,
 
 void ClawPatch::write_patch_data(const int& a_iframe, const int& a_patch_num, const int& a_level)
 {
-    Real *q = m_griddata.dataPtr();
+    double *q = m_griddata.dataPtr();
     write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,
                  a_iframe,a_patch_num,a_level,m_blockno);
 }
 
-Real ClawPatch::compute_sum()
+double ClawPatch::compute_sum()
 {
-    Real *q = m_griddata.dataPtr();
-    Real sum;
+    double *q = m_griddata.dataPtr();
+    double sum;
     compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
     return sum;
 }
 
 void ClawPatch::dump()
 {
-    Real *q;
+    double *q;
     q = m_griddata.dataPtr();
     int k = 0;
     for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
@@ -787,7 +787,7 @@ void ClawPatch::dump()
 
 void ClawPatch::dump_last()
 {
-    Real *q;
+    double *q;
     q = m_griddata_last.dataPtr();
     int k = 0;
     for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
@@ -803,7 +803,7 @@ void ClawPatch::dump_last()
 
 void ClawPatch::dump_time_interp()
 {
-    Real *q;
+    double *q;
     q = m_griddata_time_interp.dataPtr();
     int k = 0;
     for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
@@ -819,7 +819,7 @@ void ClawPatch::dump_time_interp()
 
 void ClawPatch::dump_auxarray()
 {
-    Real *q;
+    double *q;
     q = m_auxarray.dataPtr();
     int k = 0;
     for (int m = 0; m < m_maux; m++)

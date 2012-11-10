@@ -17,10 +17,10 @@ public :
     ClawPatch();
     ~ClawPatch();
 
-    void define(const Real&  a_xlower,
-                const Real&  a_ylower,
-                const Real&  a_xupper,
-                const Real&  a_yupper,
+    void define(const double&  a_xlower,
+                const double&  a_ylower,
+                const double&  a_xupper,
+                const double&  a_yupper,
                 const int& a_blockno,
                 const amr_options_t *a_gparms);
 
@@ -44,21 +44,21 @@ public :
 
     // Dummy step routine useful for trying out subcycling without
     // anything too terrible happening
-    Real step(const Real& a_time,
-              const Real& a_dt,
+    double step(const double& a_time,
+              const double& a_dt,
               const int& a_level,
               const amr_options_t &gparms);
 
     // Actual step routine with no conservative fix-up
-    Real step_noqad(const Real& a_time,
-                    const Real& a_dt,
+    double step_noqad(const double& a_time,
+                    const double& a_dt,
                     const int& a_level,
                     const amr_options_t &gparms);
 
 
     // Full time step routine with conservative fix-up (not yet implemented)
-    Real ClawPatchIntegrator(const Real& a_time,
-                             const Real& a_dt,
+    double ClawPatchIntegrator(const double& a_time,
+                             const double& a_dt,
                              const int& refRatio,const int& a_level,
                              const amr_options_t &gparms);
 
@@ -123,13 +123,13 @@ public :
     // Boundary condition routines that don't require neighbors
     void set_phys_face_ghost(const bool a_intersects_bc[],
                              const int a_mthbc[],
-                             const Real& t,
-                             const Real& dt);
+                             const double& t,
+                             const double& dt);
 
     // Corners that lie on a physical face - data has to be exchanged
     // in a particular way
     void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                               const Real& t, const Real& dt);
+                               const double& t, const double& dt);
 
     // Exchange corner ghost with boundary neighbor
     void exchange_phys_face_corner_ghost(const int& a_corner,
@@ -168,7 +168,7 @@ public :
     void write_patch_data(const int& a_iframe,
                           const int& a_patch_num,
                           const int& a_level);
-    Real compute_sum();
+    double compute_sum();
 
     void dump();
     void dump_last();
@@ -183,22 +183,22 @@ protected :
     int m_mz;
 #endif
 
-    Real  m_dx;
-    Real  m_dy;
+    double  m_dx;
+    double  m_dy;
 #if FCLAW_SPACEDIM == 3
-    Real m_dz;
+    double m_dz;
 #endif
 
-    Real m_xlower;
-    Real m_ylower;
-#if CH_SPACEDIM == 3
-    Real m_zlower;
+    double m_xlower;
+    double m_ylower;
+#if FCLAW_SPACEDIM == 3
+    double m_zlower;
 #endif
 
-    Real m_xupper;
-    Real m_yupper;
-#if CH_SPACEDIM == 3
-    Real m_zupper;
+    double m_xupper;
+    double m_yupper;
+#if FCLAW_SPACEDIM == 3
+    double m_zupper;
 #endif
 
     // These are global variables, but are needed to dimensions the patch

@@ -27,9 +27,9 @@ typedef struct fclaw2d_patch_data
 
 typedef struct fclaw2d_level_time_data
 {
-    Real dt;
-    Real maxcfl;
-    Real t;
+    double dt;
+    double maxcfl;
+    double t;
 } fclaw2d_level_time_data_t;
 
 #endif

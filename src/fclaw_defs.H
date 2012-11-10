@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * we'll have to prefix Real, SpaceDim, etc. with fclaw_ to avoid collisions.
  */
 
-typedef double Real;
+/* typedef double Real; */
 
 // Some convenient preprocessor directives
 

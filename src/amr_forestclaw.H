@@ -56,7 +56,7 @@ void amrreset(fclaw2d_domain_t **domain);
 // ----------------------------
 // Routines needed to time step
 // ----------------------------
-Real advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
+double advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
 void regrid(fclaw2d_domain_t **domain);
 void amrout(fclaw2d_domain_t *domain, int iframe);
 
@@ -65,7 +65,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe);
 // Routines needed to advance a single patch
 // ----------------------------
 void level_exchange(fclaw2d_domain_t *domain, int a_level);
-void set_phys_bc(fclaw2d_domain_t *domain, int a_level, Real a_level_time);
+void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time);
 void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
                                       const int& a_coarse_step, const int& a_fine_step,
                                       const int& a_refratio);

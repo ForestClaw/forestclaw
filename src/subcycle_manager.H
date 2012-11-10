@@ -55,15 +55,15 @@ public:
                 const int& a_refratio,
                 const int& a_num_patches,
                 const int& a_maxlevel,
-                const Real& a_time,
+                const double& a_time,
                 const bool& a_subcycle);
 
-    void set_dt(const Real& a_dt);
+    void set_dt(const double& a_dt);
 
     void increment_step_counter();
     void increment_time();
-    Real current_time();
-    Real dt();
+    double current_time();
+    double dt();
 
     bool level_exchange_done();
     bool exchanged_with_coarser();
@@ -81,8 +81,8 @@ public:
     int m_step_inc;
     int m_num_patches;
 
-    Real m_time;
-    Real m_dt;
+    double m_time;
+    double m_dt;
 };
 
 
@@ -92,7 +92,7 @@ typedef struct fclaw2d_subcycle_info
     int fine_step;
     int refratio;
     bool do_time_interp;  // We may not always need to do time interpolation.
-    Real level_time;
+    double level_time;
 } fclaw2d_subcycle_info_t;
 
 
@@ -103,7 +103,7 @@ public:
     ~subcycle_manager();
     void define(fclaw2d_domain_t *domain,
                 const amr_options_t *gparms,
-                const Real& a_time);
+                const double& a_time);
 
     bool can_advance(const int& a_level, const int& a_from_step);
 
@@ -120,10 +120,10 @@ public:
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
     // i.e. powers of ref_ratio.
-    Real current_time(const int& a_level);
-    Real dt(const int& level);
+    double current_time(const int& a_level);
+    double dt(const int& level);
     void increment_time(const int& a_level);
-    void set_dt_minlevel(const Real& a_dt);
+    void set_dt_minlevel(const double& a_dt);
 
     int minlevel_factor();
     int maxlevel_factor();
@@ -141,8 +141,8 @@ public:
     int m_maxlevel;
     int m_minlevel;
     int m_refratio;
-    Real m_dt_minlevel;
-    Real m_t_minlevel;
+    double m_dt_minlevel;
+    double m_t_minlevel;
     bool m_nosubcycle;
     int m_verbosity;
 };

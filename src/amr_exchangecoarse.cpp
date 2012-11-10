@@ -406,7 +406,7 @@ void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_lev
     step_info.refratio = a_refratio;
     step_info.do_time_interp = true;
 
-    Real level_time = get_domain_time(domain);
+    double level_time = get_domain_time(domain);
 
     // Set up patch data for time interpolation.
 
@@ -445,7 +445,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
 {
     // Simple exchange - no time interpolation needed
     fclaw2d_subcycle_info_t step_info;
-    Real level_time = get_domain_time(domain);
+    double level_time = get_domain_time(domain);
     step_info.level_time = level_time;
     step_info.do_time_interp = false;
 

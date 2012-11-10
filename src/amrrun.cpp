@@ -89,20 +89,20 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-    Real final_time = gparms->tfinal;
+    double final_time = gparms->tfinal;
     int nout = gparms->nout;
-    Real initial_dt = gparms->initial_dt;
+    double initial_dt = gparms->initial_dt;
     int regrid_interval = gparms->regrid_interval;
 
-    Real t0 = 0;
+    double t0 = 0;
 
-    Real dt_outer = (final_time-t0)/Real(nout);
-    Real dt_level0 = initial_dt;
-    Real t_curr = t0;
+    double dt_outer = (final_time-t0)/double(nout);
+    double dt_level0 = initial_dt;
+    double t_curr = t0;
     for(int n = 0; n < nout; n++)
     {
-        Real tstart = t_curr;
-        Real tend = tstart + dt_outer;
+        double tstart = t_curr;
+        double tend = tstart + dt_outer;
         int n_inner = 0;
         while (t_curr < tend)
         {
@@ -127,14 +127,14 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
                 // Take one step of a stable time step for the coarsest non-empty level.
                 reduce_factor = time_stepper.minlevel_factor();
             }
-            Real dt_minlevel = dt_level0/reduce_factor;
+            double dt_minlevel = dt_level0/reduce_factor;
 
             // Use the tolerance to make sure we don't take a tiny time step just to
             // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
             // rather than taking a time step of 'dt_minlevel' now, followed a time step of only
             // 'tol' in the next step.
             // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
-            Real tol = 1e-2*dt_minlevel;
+            double tol = 1e-2*dt_minlevel;
             bool took_small_step = false;
             if (tend - t_curr - dt_minlevel < tol)
             {
@@ -145,7 +145,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             // This also sets the time step on all finer levels.
             time_stepper.set_dt_minlevel(dt_minlevel);
 
-            Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
+            double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
@@ -166,13 +166,13 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
 
             if (took_small_step)
             {
-                Real dt0 =  dt_minlevel*reduce_factor;
+                double dt0 =  dt_minlevel*reduce_factor;
                 printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
                        100.0*dt0/dt_level0);
             }
 
             // New time step, which should give a cfl close to the desired cfl.
-            Real dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
+            double dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
             if (!took_small_step)
             {
                 dt_level0 = dt_new;
@@ -207,16 +207,16 @@ static void explicit_step(fclaw2d_domain_t **domain)
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-    Real initial_dt = gparms->initial_dt;
+    double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
 
     int regrid_interval = gparms->regrid_interval;
     int verbosity = gparms->verbosity;
 
-    Real t0 = 0;
-    Real dt_level0 = initial_dt;
-    Real t_curr = t0;
+    double t0 = 0;
+    double dt_level0 = initial_dt;
+    double t_curr = t0;
     set_domain_time(*domain,t_curr);
     int n = 0;
     while (n < nstep_outer)
@@ -241,12 +241,12 @@ static void explicit_step(fclaw2d_domain_t **domain)
             // Take one step of a stable time step for the coarsest non-empty level.
             reduce_factor = time_stepper.minlevel_factor();
         }
-        Real dt_minlevel = dt_level0/reduce_factor;
+        double dt_minlevel = dt_level0/reduce_factor;
 
         // This also sets the time step on all finer levels.
         time_stepper.set_dt_minlevel(dt_minlevel);
 
-        Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
+        double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
         printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr);
