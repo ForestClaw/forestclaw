@@ -1,0 +1,311 @@
+/*
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include "amr_forestclaw.H"
+#include "amr_utils.H"
+#include "fclaw2d_convenience.h"
+#include "fclaw_defs.H"
+
+class ClawPatch;
+
+// -----------------------------------------------------------------
+// Time stepping
+//   -- saving time steps
+//   -- restoring time steps
+//   -- advancing levels
+// -----------------------------------------------------------------
+
+static
+void cb_restore_time_step(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{
+    ClawPatch *this_cp = get_clawpatch(this_patch);
+
+    // Copy most current time step data to grid data. (m_griddata <== m_griddata_last)
+    this_cp->restore_step();
+}
+
+static
+void restore_time_step(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) NULL);
+}
+
+static
+void cb_save_time_step(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
+{
+    ClawPatch *this_cp = get_clawpatch(this_patch);
+
+    // Copy grid data (m_griddata) on each patch to temporary storage
+    // (m_griddata_tmp <== m_griddata);
+    this_cp->save_step();
+}
+
+static
+void save_time_step(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) NULL);
+}
+
+
+// -------------------------------------------------------------------------------
+// Output style 1
+// Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
+// --------------------------------------------------------------------------------
+static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
+{
+    // Write out an initial time file
+    int iframe = 0;
+    amrout(*domain,iframe);
+
+    const amr_options_t *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    Real final_time = gparms->tfinal;
+    int nout = gparms->nout;
+    Real initial_dt = gparms->initial_dt;
+    int regrid_interval = gparms->regrid_interval;
+
+    Real t0 = 0;
+
+    Real dt_outer = (final_time-t0)/Real(nout);
+    Real dt_level0 = initial_dt;
+    Real t_curr = t0;
+    for(int n = 0; n < nout; n++)
+    {
+        Real tstart = t_curr;
+        Real tend = tstart + dt_outer;
+        int n_inner = 0;
+        while (t_curr < tend)
+        {
+            subcycle_manager time_stepper;
+            time_stepper.define(*domain,gparms,t_curr);
+            set_domain_time(*domain,t_curr);
+
+            // In case we have to reject this step
+            save_time_step(*domain);
+            // check_conservation(*domain);
+
+            // Take a stable level 0 time step (use this as the base level time step even if
+            // we have no grids on level 0) and reduce it.
+            int reduce_factor;
+            if (time_stepper.nosubcycle())
+            {
+                // Take one step of a stable time step for the finest non-emtpy level.
+                reduce_factor = time_stepper.maxlevel_factor();
+            }
+            else
+            {
+                // Take one step of a stable time step for the coarsest non-empty level.
+                reduce_factor = time_stepper.minlevel_factor();
+            }
+            Real dt_minlevel = dt_level0/reduce_factor;
+
+            // Use the tolerance to make sure we don't take a tiny time step just to
+            // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
+            // rather than taking a time step of 'dt_minlevel' now, followed a time step of only
+            // 'tol' in the next step.
+            // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
+            Real tol = 1e-2*dt_minlevel;
+            bool took_small_step = false;
+            if (tend - t_curr - dt_minlevel < tol)
+            {
+                dt_minlevel = tend - t_curr;  // <= 'dt_minlevel + tol'
+                took_small_step = true;
+            }
+
+            // This also sets the time step on all finer levels.
+            time_stepper.set_dt_minlevel(dt_minlevel);
+
+            Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
+
+            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
+                   time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
+
+            if (maxcfl_step > gparms->max_cfl)
+            {
+                printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                restore_time_step(*domain);
+
+                // Modify dt_level0 from step used.
+                dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+
+                // Got back to start of loop, without incrementing step counter or time level
+                continue;
+            }
+
+            t_curr += dt_minlevel;
+
+            if (took_small_step)
+            {
+                Real dt0 =  dt_minlevel*reduce_factor;
+                printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
+                       100.0*dt0/dt_level0);
+            }
+
+            // New time step, which should give a cfl close to the desired cfl.
+            Real dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
+            if (!took_small_step)
+            {
+                dt_level0 = dt_new;
+            }
+            else
+            {
+                // use time step that would have been used had we not taken a small step
+            }
+            n_inner++;
+
+            if (n_inner % regrid_interval == 0)
+            {
+                // After some number of time steps, we probably need to regrid...
+                regrid(domain);
+                ddata = get_domain_data(*domain);
+            }
+        }
+
+        // Output file at every outer loop iteration
+        set_domain_time(*domain,t_curr);
+        iframe++;
+        amrout(*domain,iframe);
+    }
+}
+
+static void explicit_step(fclaw2d_domain_t **domain)
+{
+    // Write out an initial time file
+    int iframe = 0;
+
+    amrout(*domain,iframe);
+
+    const amr_options_t *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    Real initial_dt = gparms->initial_dt;
+    int nstep_outer = gparms->nout;
+    int nstep_inner = gparms->nstep;
+
+    int regrid_interval = gparms->regrid_interval;
+    int verbosity = gparms->verbosity;
+
+    Real t0 = 0;
+    Real dt_level0 = initial_dt;
+    Real t_curr = t0;
+    set_domain_time(*domain,t_curr);
+    int n = 0;
+    while (n < nstep_outer)
+    {
+        subcycle_manager time_stepper;
+        time_stepper.define(*domain,gparms,t_curr);
+
+        // In case we have to reject this step
+        save_time_step(*domain);
+        // check_conservation(*domain);
+
+        // Take a stable level 0 time step (use this as the base level time step even if
+        // we have no grids on level 0) and reduce it.
+        int reduce_factor;
+        if (time_stepper.nosubcycle())
+        {
+            // Take one step of a stable time step for the finest non-emtpy level.
+            reduce_factor = time_stepper.maxlevel_factor();
+        }
+        else
+        {
+            // Take one step of a stable time step for the coarsest non-empty level.
+            reduce_factor = time_stepper.minlevel_factor();
+        }
+        Real dt_minlevel = dt_level0/reduce_factor;
+
+        // This also sets the time step on all finer levels.
+        time_stepper.set_dt_minlevel(dt_minlevel);
+
+        Real maxcfl_step = advance_all_levels(*domain, &time_stepper);
+
+        printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
+               time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr);
+
+        if (maxcfl_step > gparms->max_cfl)
+        {
+            printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+            restore_time_step(*domain);
+
+            // Modify dt_level0 from step used.
+            dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+
+            // Got back to start of loop, without incrementing step counter or time level
+            continue;
+        }
+
+
+        t_curr += dt_minlevel;
+        n++;
+
+        set_domain_time(*domain,t_curr);
+
+        // New time step, which should give a cfl close to the desired cfl.
+        dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+
+        if (n % regrid_interval == 0)
+        {
+            if (verbosity == 1)
+            {
+                cout << "regridding at step " << n << endl;
+            }
+            regrid(domain);
+            ddata = get_domain_data(*domain);
+        }
+
+        if (n % nstep_inner == 0)
+        {
+            iframe++;
+            amrout(*domain,iframe);
+        }
+    }
+}
+
+
+void amrrun(fclaw2d_domain_t **domain)
+{
+
+    const amr_options_t *gparms = get_domain_parms(*domain);
+
+    if (gparms->outstyle == 1)
+    {
+        explicit_step_fixed_output(domain);
+    }
+    else if (gparms->outstyle == 2)
+    {
+        printf("Outstyle 2 not implemented yet\n");
+    }
+    else if (gparms->outstyle == 3)
+    {
+        explicit_step(domain);
+    }
+}

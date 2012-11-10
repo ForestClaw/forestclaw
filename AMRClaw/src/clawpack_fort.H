@@ -1,0 +1,321 @@
+/*
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef CLAWPACK_FORT_H
+#define CLAWPACK_FORT_H
+
+#include <iostream>
+#include <cstdlib>
+#include <vector>
+
+#include "fclaw2d_convenience.h"
+#include "forestclaw2d.h"
+#include "amr_options.h"
+
+#include "fclaw_defs.H"
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+
+/*
+ * Header files for fortran functions.
+ */
+extern "C" {
+
+    void set_common_levels_(const int& maxlevel,const int& a_level,
+                            const int& refratio);
+
+    // ----------------------------------------------------------------------------------
+    // Initialization routines
+    // ----------------------------------------------------------------------------------
+    void setprob_();
+
+    void set_maptype_();
+
+    void set_block_(const int * a_blockno);
+
+    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
+                const int& mbc, const int& mx, const int& my,
+                const Real& xlower, const Real& ylower, const Real& dx,
+                const Real& dy, Real q[], const int& maux, Real aux[]);
+
+    void qinit_mapped_(const int& mx, const int& my, const int& meqn,
+                       const int& mbc, const Real& xlower, const Real& ylower,
+                       const Real& dx, const Real& dy, Real xp[], Real yp[], Real zp[],
+                       Real q[], const int& maux, Real aux[], const int& blockno);
+
+    void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
+                 const int& mx, const int& my, const Real& xlower,
+                 const Real& ylower, const Real& dx, const Real& dy,
+                 const int& maux, Real aux[]);
+
+    void setaux_mapped_(const int& mx, const int& my, const int& mbc,
+                        const Real& dx, const Real& dy,
+                        Real xp[], Real yp[], Real zp[],
+                        Real xd[], Real yd[], Real zd[],
+                        Real area[], const int& maux, Real aux[]);
+
+    void b4step2_mapped_(const int& mx, const int& my, const int& mbc,
+                         const int& meqn, Real q[], const Real& dx, const Real& dy,
+                         Real xp[], Real yp[], Real zp[],
+                         Real xd[], Real yd[], Real zd[], const Real& t,
+                         const Real& dt, const int& maux, Real aux[]);
+
+    void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
+                                    const int& meqn, Real qfine[],Real qcoarse[],
+                                    const Real auxcoarse[], const Real auxfine[],
+                                    const int& maux, const int& idir, const int& iside,
+                                    const int& num_neighbors, const int& refratio,
+                                    const int& igrid);
+
+    void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real qfine[],Real qcoarse[],
+                                const Real auxcoarse[], const Real auxfine[], const int& maux,
+                                const int& idir, const int& iside, const int& num_neighbors,
+                                const int& refratio, const int& igrid);
+
+    void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                    Real qcoarse[], Real qfine[], Real auxcoarse[], Real auxfine[],
+                    const int& maux, const int& p4est_refineFactor,
+                    const int& refratio, const int& igrid);
+
+    // ----------------------------------------------------------------------------------
+    // Internal boundary conditions
+    // ----------------------------------------------------------------------------------
+    void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                              Real qthis[],Real qneighbor[], const int& a_idir);
+
+    void average_face_ghost_(const int& mx, const int& my, const int& mbc,
+                             const int& meqn, Real qfine[],Real qcoarse[],
+                             const int& idir, const int& iside, const int& num_neighbors,
+                             const int& refratio, const int& igrid);
+
+    void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                 Real qthis[],Real qcoarse[], const int& idir, const int& iside,
+                                 const int& num_neighbors,const int& refratio, const int& igrid);
+
+
+    void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real this_q[],Real neighbor_q[],
+                                const int& a_corner);
+
+    void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                               const int& meqn, const int& a_refratio, Real this_q[],
+                               Real neighbor_q[],const int& a_corner);
+
+    void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                   const int& meqn, const int& a_refratio, Real this_q[],
+                                   Real neighbor_q[], const int& a_corner);
+
+    void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                 Real qthis[], Real qneighbor[], const int& iface,
+                                 const int& iblock);
+
+    void mb_exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                   const int& meqn,
+                                   Real qthis[], Real qneighbor[], const int& icorner,
+                                   int bdry[], const int& iblock);
+
+    void mb_exchange_block_corner_ghost_(const int& mx, const int& my,
+                                         const int& mbc, const int& meqn,
+                                         Real qthis[], Real qneighbor[], const int& icorner,
+                                         const int& iblock);
+
+    void mb_interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
+                                    const int& meqn,
+                                    Real qthis[],Real qcoarse[], const int& idir,
+                                    const int& iside,
+                                    const int& num_neighbors,const int& refratio,
+                                    const int& igrid);
+
+    void mb_average_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                  const int& meqn,
+                                  const int& refratio, Real qcoarse[],  Real qfine[],
+                                  Real auxcoarse[], Real auxfine[], const int& maux,
+                                  const int& icorner, int intersects_block[]);
+
+    // Averaging at block boundaries between coarse and fine grids.
+    void  mb_average_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                         const int& meqn,const int& refratio, Real qcoarse[],
+                                         Real qfine[],Real auxcoarse[], Real auxfine[],
+                                         const int& maux, const int& a_coarse_corner,
+                                         const int& blockno);
+
+
+    void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                      const int& meqn, const int& refratio,
+                                      Real qcoarse[],  Real qfine[], const int& icorner,
+                                      int intersects_block[]);
+
+    // Averaging at block boundaries between coarse and fine grids.
+    void  mb_interpolate_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                             const int& meqn,const int& refratio,
+                                             Real qcoarse[],
+                                             Real qfine[],const int& a_coarse_corner,
+                                             const int& blockno);
+
+
+    // ----------------------------------------------------------------------------------
+    // Physical boundary conditions
+    // ----------------------------------------------------------------------------------
+    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+              const int& mx, const int& my, const Real& xlower, const Real& ylower,
+              const Real& dx, const Real& dy, const Real q[], const int& maux,
+              const Real aux[], const Real& t, const Real& dt, const int mthbc[]);
+
+    void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn, Real q[],const int& icorner,
+                                const Real &t, const Real& dt, const int mthbc[]);
+
+    void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
+                                     const int& meqn, Real qthis[],Real qneighbor[],
+                                     const int& icorner, const int& iside);
+
+    // ----------------------------------------------------------------------------------
+    // Time stepping
+    // ----------------------------------------------------------------------------------
+    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc,
+                     const int method[], const int mthlim[], const int& mcapa,
+                     const int& mwaves, const int& mx, const int& my, Real qold[],
+                     Real auxold[], const Real& dx, const Real& dy, const Real& dt,
+                     const Real& cfl, Real work[], const int& mwork, const Real& xlower,
+                     const Real& ylower, const int& level, const Real& t, Real fp[],
+                     Real fm[], Real gp[], Real gm[]);
+
+    // ----------------------------------------------------------------------------------
+    // Tagging for refinement/coarsening
+    // ----------------------------------------------------------------------------------
+    void tag_for_refinement_(const int& mx,const int& my,const int& mbc,
+                             const int& meqn, const Real& xlower,
+                             const Real& ylower, const Real& dx, const Real& dy,
+                             Real q[], const int& init_flag, int& tag_patch);
+
+    void tag_for_coarsening_(const int& mx,const int& my,const int& mbc,
+                             const int& meqn,const Real& xlower,
+                             const Real& ylower, const Real& dx, const Real& dy,
+                             Real qcoarsened[], int& tag_patch);
+
+    void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
+                                    const int& meqn, Real qcoarse[], Real qfine[],
+                                    const int& p4est_refineFactor,
+                                    const int& refratio, const int& igrid);
+
+    void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,
+                                  const int& meqn, Real qcoarse[],Real qfine[],
+                                  const int& p4est_refineFactor,
+                                  const int& refratio, const int& igrid);
+
+    void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
+                                   const int& meqn, Real qcoarse[], Real qfine[],
+                                   const Real auxcoarse[], const Real auxfine[],
+                                   const int& maux, const int& p4est_refineFactor,
+                                   const int& refratio, const int& igrid);
+
+// ----------------------------------------------------------------------------------
+// Mapped grids
+// ----------------------------------------------------------------------------------
+    void setup_mesh_(const int& mx, const int& my, const int& mbc,
+                     const Real& xlower, const Real& ylower,
+                     const Real& dx, const Real& dy,
+                     Real xp[], Real yp[], Real zp[], Real xd[], Real yd[], Real zd[]);
+
+    void compute_area_(const int& mx, const int& my, const int& mbc,
+                       const Real& m_dx, const Real& m_dy,const Real& m_xlower,
+                       const Real& m_ylower, Real area[],
+                       const int& level, const int& maxlevel, const int& refratio);
+
+    // ----------------------------------------------------------------------------------
+    // Output and diagnostics
+    // ----------------------------------------------------------------------------------
+
+    void write_tfile_(const int &iframe,const Real &time,const int &meqn,
+                      const int &ngrids,const int &maux);
+
+    void new_qfile_(const int &iframe);
+
+    void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+                      const int& mx, const int& my, const Real& xlower, const Real& ylower,
+                      const Real& dx, const Real& dy, Real q[], const int& iframe,
+                      const int& patch_idx,
+                      const int& level,const int& blockno);
+
+    void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
+                      const Real& dx,
+                      const Real& dy, Real q[], Real& sum);
+
+
+}
+
+void set_problem_parameters();
+
+
+class Box
+{
+public:
+    Box();
+    Box(const int ll[], const int ur[]);
+    Box(const Box& a_box);
+    int smallEnd(int idir) const;
+    int bigEnd(int idir) const;
+
+private:
+    int m_ll[2];
+    int m_ur[2];
+};
+
+class FArrayBox
+{
+public:
+
+    FArrayBox();
+    ~FArrayBox();
+    // FArrayBox(const FArrayBox& fbox);
+    void define(int a_size, const Box& a_box);
+    void define(const Box& a_box, int a_fields);
+
+    Real* dataPtr();
+    Box box();
+    int size();
+    void operator=(const FArrayBox& fbox);
+private:
+    Real *m_data;
+    int m_size;
+    Box m_box;
+};
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
+
+#endif

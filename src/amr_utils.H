@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
+#include "fclaw_typedefs.h"
 #include "fclaw_defs.H"
 
 #ifdef __cplusplus
@@ -44,36 +45,49 @@ extern "C"
 #endif
 #endif
 
-int pow_int(int a, int n);
+// -----------------------------------------------------------------
+// Initialize data
+// -----------------------------------------------------------------
+void init_domain_data(fclaw2d_domain_t *domain);
+void init_block_data(fclaw2d_block_t *block);
+void init_patch_data(fclaw2d_patch_t *patch);
 
+// -----------------------------------------------------------------
+// Return pointer to user data
+// -----------------------------------------------------------------
+fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
+fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
+
+// -----------------------------------------------------------------
+// Set user data with user defined variables, etc.
+// -----------------------------------------------------------------
+void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms);
+void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
+void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+
+// -----------------------------------------------------------------
+// Some lazy helper functions that really do make things easier..
+// -----------------------------------------------------------------
+void allocate_user_data(fclaw2d_domain_t *domain);
+const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
+void set_domain_time(fclaw2d_domain_t *domain, Real time);
+Real get_domain_time(fclaw2d_domain_t *domain);
+
+// Will change the name of this to 'get_clawpatch' eventually
+ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
+const int get_refratio(fclaw2d_domain_t *domain);
+
+// int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
+const int get_corners_per_patch(fclaw2d_domain_t *domain);
+const int get_faces_per_patch(fclaw2d_domain_t *domain);
+const int get_siblings_per_patch(fclaw2d_domain_t *domain);
+const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
+
+// Misc. routines
 int num_patches(fclaw2d_domain_t *domain, int level);
-
 int pow_int(int a, int n);
 
-void inputparms_(int& mx_leaf,
-                 int& my_leaf,
-                 Real& initial_dt,
-                 Real& tfinal,
-                 Real& max_cfl,
-                 Real& desired_cfl,
-                 int& nout,
-                 int& src_term,
-                 int& verbose,
-                 int& mcapa,
-                 int& maux,
-                 int& meqn,
-                 int& mwaves,
-                 int& maxmwaves,
-                 int  mthlim[],
-                 int& mbc,
-                 int  mthbc[],
-                 int  order[],
-                 int& minlevel,
-                 int& maxlevel,
-                 int& icycle,
-                 int& manifold);
-
-void setprob_();
 
 #ifdef __cplusplus
 #if 0
@@ -81,142 +95,5 @@ void setprob_();
 #endif
 }
 #endif
-
-
-class level_data
-{
-public:
-
-    level_data();
-    ~level_data();
-
-    void define(const int& a_level,
-                const int& a_refratio,
-                const int& a_num_patches,
-                const int& a_maxlevel,
-                const Real& a_time,
-                const bool& a_subcycle);
-
-    void set_dt(const Real& a_dt);
-
-    void increment_step_counter();
-    void increment_time();
-    Real current_time();
-    Real dt();
-
-    bool level_exchange_done();
-    bool exchanged_with_coarser();
-    bool exchanged_with_finer();
-
-    void increment_level_exchange_counter();
-    void increment_coarse_exchange_counter();
-    void increment_fine_exchange_counter();
-
-    int m_level;
-    int m_last_step;
-    int m_last_level_exchange;
-    int m_last_coarse_exchange;
-    int m_last_fine_exchange;
-    int m_step_inc;
-    int m_num_patches;
-
-    Real m_time;
-    Real m_dt;
-};
-
-class subcycle_manager
-{
-public:
-    subcycle_manager();
-    ~subcycle_manager();
-    void define(fclaw2d_domain_t *domain,
-                const amr_options_t *gparms,
-                const Real& a_time);
-
-    bool can_advance(const int& a_level, const int& a_from_step);
-
-    bool solution_updated(const int& a_level, const int& a_step);
-    bool level_exchange_done(const int& a_level);
-    bool exchanged_with_coarser(const int& a_level);
-    bool exchanged_with_finer(const int& a_level);
-
-    int last_step(const int& a_level);
-    int step_inc(const int& a_level);
-    void increment_step_counter(const int& a_level);
-
-    bool nosubcycle();
-
-    // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
-    // i.e. powers of ref_ratio.
-    Real current_time(const int& a_level);
-    Real dt(const int& level);
-    void increment_time(const int& a_level);
-    void set_dt_minlevel(const Real& a_dt);
-
-    int minlevel_factor();
-    int maxlevel_factor();
-
-    bool is_coarsest(const int& a_level);
-    bool is_finest(const int& a_level);
-    int minlevel();
-    int maxlevel();
-
-    void increment_level_exchange_counter(const int& a_level);
-    void increment_coarse_exchange_counter(const int& a_level);
-    void increment_fine_exchange_counter(const int& a_level);
-
-    std::vector<level_data> m_levels;
-    int m_maxlevel;
-    int m_minlevel;
-    int m_refratio;
-    Real m_dt_minlevel;
-    Real m_t_minlevel;
-    bool m_nosubcycle;
-    int m_verbosity;
-};
-
-
-class Box
-{
-public:
-    Box();
-    Box(const int ll[], const int ur[]);
-    Box(const Box& a_box);
-    int smallEnd(int idir) const;
-    int bigEnd(int idir) const;
-
-private:
-    int m_ll[2];
-    int m_ur[2];
-};
-
-class FArrayBox
-{
-public:
-
-    FArrayBox();
-    ~FArrayBox();
-    // FArrayBox(const FArrayBox& fbox);
-    void define(int a_size, const Box& a_box);
-    void define(const Box& a_box, int a_fields);
-
-    Real* dataPtr();
-    Box box();
-    int size();
-    void operator=(const FArrayBox& fbox);
-private:
-    Real *m_data;
-    int m_size;
-    Box m_box;
-};
-
-class ProblemDomain
-{
-public:
-    bool isPeriodic(int idir) const
-        {
-            return false;
-        }
-};
 
 #endif

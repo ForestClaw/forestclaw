@@ -4,11 +4,28 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/ClawPatch.o \
+	$(FORESTCLAW)/AMRClaw/src/clawpack_fort.o \
 	$(FORESTCLAW)/AMRClaw/src/parser.o \
 	$(FORESTCLAW)/AMRClaw/src/parse_inputs.o
 
-libforestclaw.a: fclaw2d_convenience.o forestclaw2d.o \
-        amr_forestclaw.o amr_utils.o amr_options.o $(amrclawobjs)
+libforestclaw.a: \
+	amrinit.o \
+	amrrun.o \
+	amrreset.o \
+	amr_advance.o \
+	amr_regrid.o \
+	amr_output.o \
+	subcycle_manager.o \
+	amr_diagnostics.o \
+	amr_exchangecoarse.o \
+	amr_levelexchange.o \
+	amr_neighbors.o \
+	amr_physbc.o \
+	amr_utils.o \
+	amr_options.o \
+	fclaw2d_convenience.o \
+	forestclaw2d.o \
+	$(amrclawobjs)
 	ar cru $@ $^
 
 .c.o:

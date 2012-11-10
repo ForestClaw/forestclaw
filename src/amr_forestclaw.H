@@ -26,45 +26,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
+#include "fclaw_typedefs.h"
+
 #include "forestclaw2d.h"
+#include "fclaw2d_convenience.h"
 #include "amr_options.h"
 #include "amr_utils.H"
 #include "ClawPatch.H"
 
+#include "subcycle_manager.H"
+
 class ClawPatch;
-
-typedef struct fclaw2d_domain_data
-{
-    const amr_options_t *amropts;
-    double curr_time;
-} fclaw2d_domain_data_t;
-
-typedef struct fclaw2d_block_data
-{
-    int mthbc[4];               /* >=0 for physical bc types */
-} fclaw2d_block_data_t;
-
-typedef struct fclaw2d_patch_data
-{
-    ClawPatch	*cp;
-} fclaw2d_patch_data_t;
-
-typedef struct fclaw2d_level_time_data
-{
-    Real dt;
-    Real maxcfl;
-    Real t;
-} fclaw2d_level_time_data_t;
-
-typedef struct fclaw2d_subcycle_info
-{
-    int coarse_step;
-    int fine_step;
-    int refratio;
-    bool do_time_interp;  // We may not always need to do time interpolation.
-    Real level_time;
-} fclaw2d_subcycle_info_t;
-
 
 #ifdef __cplusplus
 extern "C"
@@ -74,58 +46,68 @@ extern "C"
 #endif
 #endif
 
-
-void write_tfile_(int *iframe,
-                  double *time,
-                  int *meqn,
-                  int *ngrids,
-                  int *maux);
-
-void new_qfile_(int* iframe);
-
-
-// ------------------------------------------------------------
-// Getting and setting user data in domain, blocks and patches
-// ------------------------------------------------------------
-/*
- * Either make the functions non-static, or remove these declarations.
-static void init_domain_data(fclaw2d_domain_t *domain);
-static void init_block_data(fclaw2d_block_t *block);
-static void init_patch_data(fclaw2d_patch_t *patch);
-*/
-
-fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
-
-void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *amropts);
-void set_block_data(fclaw2d_block_t *block, int* mthbc);
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
-
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
-double get_domain_time(fclaw2d_domain_t *domain);
-void set_domain_time(fclaw2d_domain_t *domain,double t);
-
-
-// There are many more of these functions that should have prototypes
-// but only if they are used outside of amr_forestclaw.cpp
-// void bc_level_exchange(fclaw2d_domain_t *domain, int a_level);
-// void initial_grid(fclaw2d_domain_t *domain);
-
-void amrsetup(fclaw2d_domain_t *domain);
-
-/* What domain points to will be changed on the inside hence the ** */
-void amrinit(fclaw2d_domain_t **domain,
-             const amr_options_t * amropts);
-
-/* What domain points to will be changed on the inside hence the ** */
+// ----------------------------
+// Routines called from 'main'
+// ----------------------------
+void amrinit(fclaw2d_domain_t **domain,const amr_options_t * amropts);
 void amrrun(fclaw2d_domain_t **domain);
+void amrreset(fclaw2d_domain_t **domain);
 
+// ----------------------------
+// Routines needed to time step
+// ----------------------------
+Real advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
+void regrid(fclaw2d_domain_t **domain);
 void amrout(fclaw2d_domain_t *domain, int iframe);
 
-/* The domain will be NULL afterwards hence the ** */
-void amrreset(fclaw2d_domain_t **domain);
+
+// ----------------------------
+// Routines needed to advance a single patch
+// ----------------------------
+void level_exchange(fclaw2d_domain_t *domain, int a_level);
+void set_phys_bc(fclaw2d_domain_t *domain, int a_level, Real a_level_time);
+void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
+                                      const int& a_coarse_step, const int& a_fine_step,
+                                      const int& a_refratio);
+void exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level);
+
+
+// ----------------------------
+// Routines needed to communicate with p4est
+// ----------------------------
+void get_face_neighbors(fclaw2d_domain_t *domain,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        int iside,
+                        int *neighbor_block_idx,
+                        int neighbor_patch_idx[],
+                        int **ref_flag_ptr);
+void get_corner_neighbor(fclaw2d_domain_t *domain,
+                         int this_block_idx,
+                         int this_patch_idx,
+                         int icorner,
+                         int *corner_block_idx,
+                         int *corner_patch_idx,
+                         int **ref_flag_ptr);
+
+void get_block_boundary(fclaw2d_domain_t *domain,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        bool *intersects_block);
+
+void get_phys_boundary(fclaw2d_domain_t *domain,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       bool *intersects_bc);
+
+// ----------------------------
+// Routines used by diagnostics
+// ----------------------------
+void check_conservation(fclaw2d_domain_t *domain);
+void dump_patch(fclaw2d_domain_t *domain, int dump_patch);
+void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch);
+void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch);
+void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
 
 #ifdef __cplusplus
 #if 0
