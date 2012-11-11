@@ -156,7 +156,7 @@ double ClawPatch::step(const double& a_time,
 double ClawPatch::step_noqad(const double& a_time,
                            const double& a_dt,
                            const int& a_level,
-                           const amr_options_t& gparms)
+                           const amr_options_t *gparms)
 {
     set_block_(&m_blockno);
 
@@ -183,7 +183,7 @@ double ClawPatch::step_noqad(const double& a_time,
 
     double cflgrid;
 
-    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms.mwaves + 3*m_maux + 2);
+    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms->mwaves + 3*m_maux + 2);
     double* work = new double[mwork];
 
     double* fp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
@@ -191,8 +191,8 @@ double ClawPatch::step_noqad(const double& a_time,
     double* gp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
     double* gm = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
 
-    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms.method,
-                gparms.mthlim, gparms.mcapa, gparms.mwaves, m_mx, m_my, qold,
+    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms->method,
+                gparms->mthlim, gparms->mcapa, gparms->mwaves, m_mx, m_my, qold,
                 aux, m_dx, m_dy, a_dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
                 a_time, fp, fm, gp, gm);
 

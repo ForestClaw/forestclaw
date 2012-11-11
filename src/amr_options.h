@@ -45,7 +45,6 @@ typedef struct amr_options
 
     /* Time stepping */
     double initial_dt;
-    int use_fixed_dt;           // Boolean value
     double tfinal;
     int outstyle;
     int nout;
@@ -78,16 +77,18 @@ typedef struct amr_options
     const char *mthbc_string;
     int *mthbc;
 
-    /* Refinement paramters */
+    /* Refinement parameters */
     int refratio;
     int minlevel;
     int maxlevel;
     int regrid_interval;
 
-    /* Boolean values */
+    /* Boolean values (switches) */
     int manifold;
     int mapped;
     int subcycle;
+    int check_conservation;
+    int use_fixed_dt;
 }
 amr_options_t;
 

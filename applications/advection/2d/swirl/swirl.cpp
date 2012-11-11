@@ -72,7 +72,7 @@ main (int argc, char **argv)
   {
       printf("mthlim[%d]= %d\n",j, gparms->mthlim[j]);
   }
-  for (int j = 0; j < CubeFaces; j++)
+  for (int j = 0; j < NumFaces; j++)
   {
       printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
   }
@@ -84,7 +84,7 @@ main (int argc, char **argv)
   /*
   sc_options_print_usage(sc_package_id,lp,options,"");
   */
-  exit(1);
+  // exit(1);
 
   /* -----------------------------------------------------------------*/
 

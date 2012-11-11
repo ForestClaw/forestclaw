@@ -48,7 +48,7 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
 
     int level = this_patch->level;
 
-    double maxcfl_grid = cp->step_noqad(t,dt,level,*gparms);
+    double maxcfl_grid = cp->step_noqad(t,dt,level,gparms);
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 

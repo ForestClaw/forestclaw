@@ -43,7 +43,7 @@ int parse_ini_options(amr_options_t *amropt)
 
     vector<int> mthbc;
     mthbc = P.get_int_array("mthbc");
-    if ((int) mthbc.size() != CubeFaces)
+    if ((int) mthbc.size() != NumFaces)
     {
         printf("Wrong number of values for vector \"mthbc\"\n");
         exit(1);

@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_SPACEDIM 2
 static const int SpaceDim = FCLAW_SPACEDIM;
 
-// Number of faces to a cube
-#define FCLAW_CUBEFACES (2 * FCLAW_SPACEDIM)
-static const int CubeFaces = FCLAW_CUBEFACES;
+// Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
+// avoid any confusion in the 2d case.
+#define FCLAW_NUMFACES (2 * FCLAW_SPACEDIM)
+static const int NumFaces = FCLAW_NUMFACES;
 
 #endif

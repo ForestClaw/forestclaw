@@ -82,7 +82,7 @@ amr_options_convert_arrays (amr_options_t * amropt)
     amr_options_convert_int_array (amropt->mthlim_string, &amropt->mthlim,
                                    amropt->mwaves);
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   CubeFaces);
+                                   NumFaces);
 }
 
 amr_options_t *
@@ -92,37 +92,34 @@ amr_options_new (sc_options_t * opt)
 
     amropt = SC_ALLOC_ZERO (amr_options_t, 1);
 
-    sc_options_add_int (opt, 0, "mx", &amropt->mx, 0,
-                        "Subdivision of each patch in x");
+    sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
+                        "Number of grid cells per patch in x");
 
-    sc_options_add_int (opt, 0, "my", &amropt->my, 0,
-                        "Subdivision of each patch in y");
+    sc_options_add_int (opt, 0, "my", &amropt->my, 8,
+                        "Number of grid cells per patch in y");
 
-    sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.0,
+    sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
                            "Initial time step size");
 
-    sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
-                           "Use fixed coarse grid time step [F]");
-
-    /*
-       sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 0.0,
-       "Final time");
-     */
-
-    sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 0.0,
+    sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 1,
                         "Output style (1,2,3)");
+
+    /* If outstyle == 1 */
+    sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 1.0,
+                           "Final time");
+
+    sc_options_add_int (opt, 0, "nout", &amropt->nout, 10,
+                        "Number of time steps");
+
+    /* Only needed if outstyle == 3 */
+    sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
+                        "Number of steps to take between printing output files.");
 
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1.0,
                            "Maximum CFL number [1.0]");
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
                            "Desired CFL number [0.9]");
-
-
-    /*
-       sc_options_add_int (opt, 0, "nout", &amropt->nout, 0,
-       "Number of time steps");
-     */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &amropt->order_string, NULL,
@@ -132,18 +129,21 @@ amr_options_new (sc_options_t * opt)
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
+
     sc_options_add_int (opt, 0, "src_term", &amropt->src_term, 0,
                         "Source term option [0]");
+
     sc_options_add_int (opt, 0, "mcapa", &amropt->mcapa, -1,
                         "Location of capacity function in aux array [-1]");
+
     sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
                         "Number of auxiliary variables [0]");
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "Number of equations");
+                        "Number of equations [1]");
 
     sc_options_add_int (opt, 0, "mwaves", &amropt->mwaves, 1,
-                        "Number of waves");
+                        "Number of waves [1]");
 
     /* Array of mwaves many values */
     amr_options_add_int_array (opt, 0, "mthlim", &amropt->mthlim_string, NULL,
@@ -154,9 +154,9 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
 
-    /* Array of CubeFaces many values */
+    /* Array of NumFaces many values */
     amr_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
-                               &amropt->mthbc, CubeFaces,
+                               &amropt->mthbc, NumFaces,
                                "Physical boundary condition type");
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
@@ -172,7 +172,8 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
                         0, "Regrid every ''regrid_interval'' steps");
 
-#if 0                           /* bool is not allocated, disable for now */
+#if 0
+    /* bool is not allocated, disable for now */
     /* Does bool get allocated somewhere? */
     sc_options_add_string (opt, 0, "manifold", &bool, "F", "Manifold [F]");
 
@@ -182,22 +183,30 @@ amr_options_new (sc_options_t * opt)
     amropt->mapped = bool[0] == 'T' ? 1 : 0;
 #endif
 
-#if 0
+    /* -------------------------------------------------------------------*/
     /* Right now all switch options default to false, need to change that */
-    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
-                           "T", "Use subcycling in time [T]");
-#endif
+    /* I am okay with them being set to false by default, since I expect that
+       user will set everything in the input file
+    */
+    sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,"Solution is on manifold [F]");
+    sc_options_add_switch (opt, 0, "mapped",   &amropt->mapped,  "Use mapped grid [F]");
+    sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
+                           "Use fixed coarse grid time step [F]");
+    sc_options_add_switch (opt, 0, "check_conservation", &amropt->check_conservation,
+                           "Check conservation [F]");
+    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,"Use subcycling in time [F]");
+    /* -------------------------------------------------------------------*/
 
     /* There is no default for this option.  A default will be read later. */
-    sc_options_add_inifile (opt, 'F', "inifile",
-                            "Read options from this file");
+    sc_options_add_inifile (opt, 'F', "inifile","Read options from this file");
 
-    /* It would be nice to have a default file that gets read,
-       in case none is specified at the command line. */
+    /* This works for me.  */
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
     /* Can check return value for -1 to see if file was not found */
 
     amr_options_convert_arrays (amropt);
+
+    check_amr_parms(amropt);
 
     return amropt;
 }

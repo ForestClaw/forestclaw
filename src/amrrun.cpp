@@ -24,9 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
+// #include "amr_utils.H"
+// #include "fclaw2d_convenience.h"
+// #include "fclaw_defs.H"
 
 class ClawPatch;
 
@@ -88,16 +88,20 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
     amrout(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     double final_time = gparms->tfinal;
     int nout = gparms->nout;
     double initial_dt = gparms->initial_dt;
     int regrid_interval = gparms->regrid_interval;
 
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+
+    bool cons_check = gparms->check_conservation;
+
     double t0 = 0;
 
     double dt_outer = (final_time-t0)/double(nout);
-    double dt_level0 = initial_dt;
+    int level_factor = pow_int(2,gparms->minlevel);
+    double dt_level0 = initial_dt*level_factor;  // Get a level 0 time step
     double t_curr = t0;
     for(int n = 0; n < nout; n++)
     {
@@ -111,8 +115,16 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             set_domain_time(*domain,t_curr);
 
             // In case we have to reject this step
-            save_time_step(*domain);
-            // check_conservation(*domain);
+            if (!gparms->use_fixed_dt)
+            {
+                save_time_step(*domain);
+            }
+
+            // Check to see if solution is still conservative
+            if (cons_check)
+            {
+                check_conservation(*domain);
+            }
 
             // Take a stable level 0 time step (use this as the base level time step even if
             // we have no grids on level 0) and reduce it.
@@ -136,12 +148,14 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
             double tol = 1e-2*dt_minlevel;
             bool took_small_step = false;
-            if (tend - t_curr - dt_minlevel < tol)
+            if (!gparms->use_fixed_dt)
             {
-                dt_minlevel = tend - t_curr;  // <= 'dt_minlevel + tol'
-                took_small_step = true;
+                if (tend - t_curr - dt_minlevel < tol)
+                {
+                    dt_minlevel = tend - t_curr;  // <= 'dt_minlevel + tol'
+                    took_small_step = true;
+                }
             }
-
             // This also sets the time step on all finer levels.
             time_stepper.set_dt_minlevel(dt_minlevel);
 
@@ -153,33 +167,37 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             if (maxcfl_step > gparms->max_cfl)
             {
                 printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                restore_time_step(*domain);
+                if (!gparms->use_fixed_dt)
+                {
+                    restore_time_step(*domain);
 
-                // Modify dt_level0 from step used.
-                dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+                    // Modify dt_level0 from step used.
+                    dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
-                // Got back to start of loop, without incrementing step counter or time level
-                continue;
+                    // Got back to start of loop, without incrementing step counter or time level
+                    continue;
+                }
             }
 
-            t_curr += dt_minlevel;
+            if (!gparms->use_fixed_dt)
+            {
+                if (took_small_step)
+                {
+                    double dt0 =  dt_minlevel*reduce_factor;
+                    printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
+                           100.0*dt0/dt_level0);
+                }
 
-            if (took_small_step)
-            {
-                double dt0 =  dt_minlevel*reduce_factor;
-                printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
-                       100.0*dt0/dt_level0);
-            }
-
-            // New time step, which should give a cfl close to the desired cfl.
-            double dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
-            if (!took_small_step)
-            {
-                dt_level0 = dt_new;
-            }
-            else
-            {
-                // use time step that would have been used had we not taken a small step
+                // New time step, which should give a cfl close to the desired cfl.
+                double dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
+                if (!took_small_step)
+                {
+                    dt_level0 = dt_new;
+                }
+                else
+                {
+                    // use time step that would have been used had we not taken a small step
+                }
             }
             n_inner++;
 
@@ -195,6 +213,10 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
         set_domain_time(*domain,t_curr);
         iframe++;
         amrout(*domain,iframe);
+
+        t_curr += dt_minlevel;
+
+
     }
 }
 
@@ -214,8 +236,11 @@ static void explicit_step(fclaw2d_domain_t **domain)
     int regrid_interval = gparms->regrid_interval;
     int verbosity = gparms->verbosity;
 
+    bool cons_check = (bool) gparms->check_conservation;
+
     double t0 = 0;
-    double dt_level0 = initial_dt;
+    int level_factor = pow_int(2,gparms->minlevel);
+    double dt_level0 = initial_dt*level_factor;
     double t_curr = t0;
     set_domain_time(*domain,t_curr);
     int n = 0;
@@ -225,10 +250,18 @@ static void explicit_step(fclaw2d_domain_t **domain)
         time_stepper.define(*domain,gparms,t_curr);
 
         // In case we have to reject this step
-        save_time_step(*domain);
-        // check_conservation(*domain);
+        if (!gparms->use_fixed_dt)
+        {
+            save_time_step(*domain);
+        }
 
-        // Take a stable level 0 time step (use this as the base level time step even if
+        // Check to see if solution is still conservative
+        if (cons_check)
+        {
+            check_conservation(*domain);
+        }
+
+        // Take a stable level 0 time step (use level 0 as the base level time step even if
         // we have no grids on level 0) and reduce it.
         int reduce_factor;
         if (time_stepper.nosubcycle())
@@ -254,15 +287,18 @@ static void explicit_step(fclaw2d_domain_t **domain)
         if (maxcfl_step > gparms->max_cfl)
         {
             printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-            restore_time_step(*domain);
+            if (!gparms->use_fixed_dt)
+            {
+                restore_time_step(*domain);
 
-            // Modify dt_level0 from step used.
-            dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+                // Modify dt_level0 from step used.
+                dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
-            // Got back to start of loop, without incrementing step counter or time level
-            continue;
+                // Got back to start of loop without incrementing step counter or
+                // current time.
+                continue;
+            }
         }
-
 
         t_curr += dt_minlevel;
         n++;
@@ -270,7 +306,10 @@ static void explicit_step(fclaw2d_domain_t **domain)
         set_domain_time(*domain,t_curr);
 
         // New time step, which should give a cfl close to the desired cfl.
-        dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+        if (!gparms->use_fixed_dt)
+        {
+            dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+        }
 
         if (n % regrid_interval == 0)
         {
@@ -289,6 +328,7 @@ static void explicit_step(fclaw2d_domain_t **domain)
         }
     }
 }
+
 
 
 void amrrun(fclaw2d_domain_t **domain)

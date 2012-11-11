@@ -53,7 +53,7 @@ public :
     double step_noqad(const double& a_time,
                     const double& a_dt,
                     const int& a_level,
-                    const amr_options_t &gparms);
+                    const amr_options_t *gparms);
 
 
     // Full time step routine with conservative fix-up (not yet implemented)
