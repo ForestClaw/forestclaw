@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int pow_int(int a, int n)
 {
-    int b = a;
-    for(int i = 0; i < n-1; i++)
+    int b = 1;
+    for(int i = 0; i < n; i++)
     {
         b *= a;
     }
