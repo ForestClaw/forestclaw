@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#include "amr_utils.H"
+#include "amr_options.h"
 #include "clawpack_fort.H"
 #include "fclaw_defs.H"
 
@@ -26,7 +26,8 @@ public :
 
     void copyFrom(ClawPatch *a_cp);
 
-    bool isDefined();
+    double* current_data_ptr();
+    bool isDefined();  // Do I even use this?
 
     // ----------------------------------------------------------------------------------
     // Initialization routines
@@ -44,16 +45,21 @@ public :
 
     // Dummy step routine useful for trying out subcycling without
     // anything too terrible happening
-    double step(const double& a_time,
-              const double& a_dt,
-              const int& a_level,
-              const amr_options_t &gparms);
+    double step_dummy(const double& a_time,
+                      const double& a_dt,
+                      const int& a_level,
+                      const amr_options_t &gparms);
 
     // Actual step routine with no conservative fix-up
-    double step_noqad(const double& a_time,
-                    const double& a_dt,
-                    const int& a_level,
-                    const amr_options_t *gparms);
+    double step_waveprop(const double& a_time,
+                         const double& a_dt,
+                         const int& a_level,
+                         const amr_options_t *gparms);
+
+    void step_diffusion(const double& a_time,
+                        const double& a_dt,
+                        const int& a_level,
+                        const amr_options_t *gparms);
 
 
     // Full time step routine with conservative fix-up (not yet implemented)
@@ -65,8 +71,12 @@ public :
     void save_step();
     void restore_step();
 
+    /*
     void time_interpolate(const int& a_fine_step, const int& a_coarse_step,
                           const int& a_step_inc);
+    */
+
+    void time_interpolate(const double& alpha);
 
     // ----------------------------------------------------------------
     // Internal boundary conditions
@@ -174,6 +184,14 @@ public :
     void dump_last();
     void dump_time_interp();
     void dump_auxarray();
+
+    double dx();
+    double dy();
+
+#if FCLAW_SPACEDIM == 3
+    double dz();
+#endif
+
 
 protected :
 

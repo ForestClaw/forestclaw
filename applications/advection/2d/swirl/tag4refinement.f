@@ -13,26 +13,27 @@
       qmin = 100.d0
       qmax = -100.d0
       tag_patch = 0
-      do mq = 1,meqn
-         do i = 1-mbc,mx+mbc
-            do j = 1-mbc,my+mbc
 
-               if (init_flag .eq. 1) then
-                  xc = xlower + (i-0.5)*dx
-                  yc = ylower + (j-0.5)*dy
-                  if (abs(xc - 0.5d0) < dx) then
-                     tag_patch = 1
-                     return
-                  endif
-               else
-                  qmin = min(q(i,j,mq),qmin)
-                  qmax = max(q(i,j,mq),qmax)
-                  if (qmax - qmin .gt. 0.25d0) then
-                     tag_patch = 1
-                     return
-                  endif
+c     # Refine based only on first variable in system.
+      mq = 1
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
+
+            if (init_flag .eq. 1) then
+               xc = xlower + (i-0.5)*dx
+               yc = ylower + (j-0.5)*dy
+               if (abs(xc - 0.5d0) < dx) then
+                  tag_patch = 1
+                  return
                endif
-            enddo
+            else
+               qmin = min(q(i,j,mq),qmin)
+               qmax = max(q(i,j,mq),qmax)
+               if (qmax - qmin .gt. 0.5d0) then
+                  tag_patch = 1
+                  return
+               endif
+            endif
          enddo
       enddo
 
@@ -59,16 +60,15 @@ c     # we would coarsen an initial grid.
       qmin = 100.d0
       qmax = -100.d0
       tag_patch = 0
-      do mq = 1,meqn
-         do i = 1,mx
-            do j = 1,my
-               qmin = min(qcoarsened(i,j,mq),qmin)
-               qmax = max(qcoarsened(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.5d0) then
-                  tag_patch = 1
-                  return
-               endif
-            enddo
+      mq = 1
+      do i = 1,mx
+         do j = 1,my
+            qmin = min(qcoarsened(i,j,mq),qmin)
+            qmax = max(qcoarsened(i,j,mq),qmax)
+            if (qmax - qmin .gt. 0.5d0) then
+               tag_patch = 1
+               return
+            endif
          enddo
       enddo
 

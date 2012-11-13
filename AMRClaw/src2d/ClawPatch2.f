@@ -123,8 +123,6 @@ c        # This shouldn't happen due to checks in claw2
       call b4step2(mx,my,mbc,mx,my,meqn,qold, xlower,ylower,dx,dy,t,
      &      dt,maux,aux)
 
-
-c
 c
 c     # take one step on the conservation law:
 c

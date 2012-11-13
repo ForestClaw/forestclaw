@@ -23,12 +23,14 @@ c     #     0.1  otherwise
           do j = 1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
 
-             s = 79.d0/128.d0
              s = 0.5d0
              if (xi .lt. s) then
-                q(i,j,1) = 1.d0
-             else
                 q(i,j,1) = 0.d0
+             else
+                q(i,j,1) = 1.d0
+             endif
+             if (meqn > 1) then
+                q(i,j,2) = 1-q(i,j,1)
              endif
           enddo
        enddo

@@ -24,12 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
-
-class ClawPatch;
-
 
 // -----------------------------------------------------------------
 // Exchange corner and face information at same level
@@ -195,11 +189,9 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 // -------------------------------------------------------------------
 void level_exchange(fclaw2d_domain_t *domain, int a_level)
 {
-    // fclaw2d_subcycle_info step_info;
-    // step_info.level_time = get_domain_time(domain);
-
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_level_face_exchange, (void *) NULL);
+
     // Do corner exchange only after physical boundary conditions have been set on all patches,
     // since corners may overlap phyical ghost cell region of neighboring patch.
     fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) NULL);

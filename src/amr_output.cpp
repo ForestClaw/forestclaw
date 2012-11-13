@@ -24,13 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
-
 #include "clawpack_fort.H"
-
-class ClawPatch;
 
 static
 void cb_amrout(fclaw2d_domain_t *domain,

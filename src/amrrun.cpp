@@ -24,17 +24,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-// #include "amr_utils.H"
-// #include "fclaw2d_convenience.h"
-// #include "fclaw_defs.H"
-
-class ClawPatch;
 
 // -----------------------------------------------------------------
 // Time stepping
 //   -- saving time steps
 //   -- restoring time steps
-//   -- advancing levels
+//   -- Time stepping, based on when output files should be created.
 // -----------------------------------------------------------------
 
 static
@@ -81,26 +76,28 @@ void save_time_step(fclaw2d_domain_t *domain)
 // Output style 1
 // Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
 // --------------------------------------------------------------------------------
-static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
+static void explicit_step_1(fclaw2d_domain_t **domain)
 {
-    // Write out an initial time file
     int iframe = 0;
     amrout(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
+
     double final_time = gparms->tfinal;
     int nout = gparms->nout;
     double initial_dt = gparms->initial_dt;
     int regrid_interval = gparms->regrid_interval;
+    bool cons_check = gparms->check_conservation;
+    int minlevel = gparms->minlevel;
+    int verbosity = gparms->verbosity;
 
     fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
 
-    bool cons_check = gparms->check_conservation;
 
     double t0 = 0;
 
     double dt_outer = (final_time-t0)/double(nout);
-    int level_factor = pow_int(2,gparms->minlevel);
+    int level_factor = pow_int(2,minlevel);
     double dt_level0 = initial_dt*level_factor;  // Get a level 0 time step
     double t_curr = t0;
     for(int n = 0; n < nout; n++)
@@ -112,6 +109,8 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
         {
             subcycle_manager time_stepper;
             time_stepper.define(*domain,gparms,t_curr);
+            time_stepper.set_multistage_false();
+
             set_domain_time(*domain,t_curr);
 
             // In case we have to reject this step
@@ -162,7 +161,7 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
             double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-                   time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr);
+                   time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
 
             if (maxcfl_step > gparms->max_cfl)
             {
@@ -200,12 +199,23 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
                 }
             }
             n_inner++;
+            t_curr += dt_minlevel;
 
-            if (n_inner % regrid_interval == 0)
+            if (regrid_interval > 0)
             {
-                // After some number of time steps, we probably need to regrid...
-                regrid(domain);
-                ddata = get_domain_data(*domain);
+                if (n_inner % regrid_interval == 0)
+                {
+                    if (verbosity == 1)
+                    {
+                        cout << "regridding at step " << n << endl;
+                    }
+                    regrid(domain);
+                    ddata = get_domain_data(*domain);
+                }
+            }
+            else
+            {
+                // Use a static grid
             }
         }
 
@@ -213,14 +223,15 @@ static void explicit_step_fixed_output(fclaw2d_domain_t **domain)
         set_domain_time(*domain,t_curr);
         iframe++;
         amrout(*domain,iframe);
-
-        t_curr += dt_minlevel;
-
-
     }
 }
 
-static void explicit_step(fclaw2d_domain_t **domain)
+static void explicit_step_2(fclaw2d_domain_t **domain)
+{
+    // Output time at specific time steps.
+}
+
+static void explicit_step_3(fclaw2d_domain_t **domain)
 {
     // Write out an initial time file
     int iframe = 0;
@@ -247,6 +258,7 @@ static void explicit_step(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
+        time_stepper.set_multistage_false();
         time_stepper.define(*domain,gparms,t_curr);
 
         // In case we have to reject this step
@@ -282,7 +294,7 @@ static void explicit_step(fclaw2d_domain_t **domain)
         double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
         printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-               time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr);
+               time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
 
         if (maxcfl_step > gparms->max_cfl)
         {
@@ -311,14 +323,21 @@ static void explicit_step(fclaw2d_domain_t **domain)
             dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
         }
 
-        if (n % regrid_interval == 0)
+        if (regrid_interval > 0)
         {
-            if (verbosity == 1)
+            if (n % regrid_interval == 0)
             {
-                cout << "regridding at step " << n << endl;
+                if (verbosity == 1)
+                {
+                    cout << "regridding at step " << n << endl;
+                }
+                regrid(domain);
+                ddata = get_domain_data(*domain);
             }
-            regrid(domain);
-            ddata = get_domain_data(*domain);
+        }
+        else
+        {
+            // use only a static grid
         }
 
         if (n % nstep_inner == 0)
@@ -338,14 +357,15 @@ void amrrun(fclaw2d_domain_t **domain)
 
     if (gparms->outstyle == 1)
     {
-        explicit_step_fixed_output(domain);
+        explicit_step_1(domain);
     }
     else if (gparms->outstyle == 2)
     {
+        explicit_step_2(domain);
         printf("Outstyle 2 not implemented yet\n");
     }
     else if (gparms->outstyle == 3)
     {
-        explicit_step(domain);
+        explicit_step_3(domain);
     }
 }

@@ -23,10 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_utils.H"
-#include "forestclaw2d.h"
 #include "amr_forestclaw.H"
-
 #include "subcycle_manager.H"
 
 subcycle_manager::subcycle_manager() {}
@@ -57,6 +54,21 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
 bool subcycle_manager::nosubcycle()
 {
     return m_nosubcycle;
+}
+
+void subcycle_manager::set_multistage_false()
+{
+    m_multistage = false;
+}
+
+void subcycle_manager::set_multistage_true()
+{
+    m_multistage = true;
+}
+
+bool subcycle_manager::multistage()
+{
+    return m_multistage;
 }
 
 void subcycle_manager::set_dt_minlevel(const double& a_dt_minlevel)

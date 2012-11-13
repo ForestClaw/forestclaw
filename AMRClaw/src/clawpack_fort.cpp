@@ -51,7 +51,7 @@ FArrayBox::~FArrayBox()
     m_size = 0;
 }
 
-void FArrayBox::define(int a_size,const Box& a_box)
+void FArrayBox::define(int a_size, const Box& a_box)
 {
     if (a_size == 0)
     {
@@ -78,29 +78,18 @@ void FArrayBox::define(const Box& a_box, int a_fields)
 // copy constructor
 void FArrayBox::operator=(const FArrayBox& fbox)
 {
-    if (fbox.m_size != m_size)
+    // Just do a straight copy;  Don't bother with checking
+    // to see if fbox.m_size == m_size.
+    if (m_data != NULL)
     {
-        if (m_data != NULL)
-        {
-            delete [] m_data;
-            m_data = NULL;
-        }
-        m_data = new double[fbox.m_size];
-        m_size = fbox.m_size;
+        delete [] m_data;
     }
-    if (m_data == NULL)
-    {
-        if (m_size == fbox.m_size)
-        {
-            printf("FArrayBox::operator=() : sizes are equal, but m_data == NULL\n");
-            exit(1);
-        }
-    }
-    double *copy = fbox.m_data;
+    m_data = new double[fbox.m_size];
     m_box = fbox.m_box;
+    m_size = fbox.m_size;
     for (int i = 0; i < fbox.m_size; i++)
     {
-        m_data[i] = copy[i];
+        m_data[i] = fbox.m_data[i];
     }
 }
 

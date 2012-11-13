@@ -24,11 +24,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
+#include "amr_parabolic.H"
 
-class ClawPatch;
+/* ----------------------------------------------------- */
+static
+void cb_advance_patch(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      void *user);
+/* ----------------------------------------------------- */
+
+
+static void level_step(fclaw2d_domain_t *domain,
+                          int a_level,
+                          fclaw2d_level_time_data_t *time_data)
+{
+
+    // Do this is all we want to do is advance each patch with a single step
+    // and are not worried about intermediate boundary conditions.
+
+    fclaw2d_domain_iterate_level(domain, a_level,
+                                 cb_advance_patch,
+                                 (void *) time_data);
+
+
+    // parabolic_step_feuler(domain,a_level,time_data);
+
+}
+
 
 static
 void cb_advance_patch(fclaw2d_domain_t *domain,
@@ -48,7 +72,7 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
 
     int level = this_patch->level;
 
-    double maxcfl_grid = cp->step_noqad(t,dt,level,gparms);
+    double maxcfl_grid = cp->step_waveprop(t,dt,level,gparms);
     time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
 }
 
@@ -90,13 +114,15 @@ double advance_level(fclaw2d_domain_t *domain,
             if (a_curr_fine_step == last_coarse_step)
             {
                 // Levels are time synchronized and we can do a simple coarse/fine
-                // exchange without time interpolation or advancing the coarser level
+                // exchange without time interpolation or first advancing the
+                // coarser level
                 if (verbose)
                 {
                     cout << " ----> Coarse and fine level are time synchronized; doing exchange"
                         " without time interpolation" << endl;
                 }
-                exchange_with_coarse(domain,a_level);
+                double alpha = 0;  // No time interpolation
+                exchange_with_coarse(domain,a_level,t_level,alpha);
 
                 set_phys_bc(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
@@ -104,9 +130,9 @@ double advance_level(fclaw2d_domain_t *domain,
 
                 if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
                 {
-                    // non-subcycled case : this advance is a bit gratuitous, because we
-                    // don't need it to advance the fine grid;  rather, we put this advance
-                    // here as a way to get advances on the coarser levels.
+                    // non-subcycled case : this advance is only needed because we
+                    // want to advance the coarser grids, not because we need time
+                    // interpolated boundary conditions.
                     if (verbose)
                     {
                         cout << " ----> Non-subcycled case " << endl;
@@ -123,6 +149,7 @@ double advance_level(fclaw2d_domain_t *domain,
             }
             else
             {
+                // We may need time interpolated boundary conditions.
                 if (verbose)
                 {
                     cout << " --> Coarse and fine level are not time synchronized; doing exchange "
@@ -146,6 +173,12 @@ double advance_level(fclaw2d_domain_t *domain,
                              << a_level << endl;
                     }
                 }
+                else
+                {
+                    // This will only happen if refratio > 2.  In that case, we have more than
+                    // one fine grid step which can use the same two coarse grid time levels
+                    // to get time interpolated boundary conditions.
+                }
                 if (!a_time_stepper->nosubcycle())
                 {
                     if (verbose)
@@ -162,8 +195,13 @@ double advance_level(fclaw2d_domain_t *domain,
                     // grid in a previous step but we still have to do time interpolation (this
                     // can only happen if refratio > 2)
 
+                    /*
                     exchange_with_coarse_time_interp(domain,a_level,last_coarse_step,
                                                      a_curr_fine_step,refratio);
+                    */
+                    double  alpha = double(a_curr_fine_step)/refratio;
+                    // exchange_with_coarse_time_interp(domain, a_level, t_level,alpha);
+                    exchange_with_coarse(domain,a_level,t_level,alpha);
                     // set_phys_bc(domain,a_level,t_level);
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
 
@@ -183,19 +221,24 @@ double advance_level(fclaw2d_domain_t *domain,
 
     time_data.maxcfl = maxcfl;
     time_data.dt = a_time_stepper->dt(a_level);
+    if (!a_time_stepper->is_coarsest(a_level))
+    {
+        time_data.dt_coarse = a_time_stepper->dt(a_level-1);
+    }
     time_data.t = t_level;
 
-    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step +
-    // a_time_stepper.step_inc(a_level)'
-    fclaw2d_domain_iterate_level(domain, a_level,
-                                 cb_advance_patch,
-                                 (void *) &time_data);
+    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
+    level_step(domain,a_level,&time_data);
+
+
+
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
 
     level_exchange(domain,a_level);
-
     set_phys_bc(domain,a_level,t_level);
+
+    // set_phys_bc(domain,a_level,t_level);
     a_time_stepper->increment_level_exchange_counter(a_level);
 
     if (verbose)

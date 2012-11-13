@@ -44,6 +44,7 @@ extern "C"
 #endif
 #endif
 
+
 class level_data
 {
 public:
@@ -85,15 +86,6 @@ public:
     double m_dt;
 };
 
-
-typedef struct fclaw2d_subcycle_info
-{
-    int coarse_step;
-    int fine_step;
-    int refratio;
-    bool do_time_interp;  // We may not always need to do time interpolation.
-    double level_time;
-} fclaw2d_subcycle_info_t;
 
 
 class subcycle_manager
@@ -137,6 +129,11 @@ public:
     void increment_coarse_exchange_counter(const int& a_level);
     void increment_fine_exchange_counter(const int& a_level);
 
+    void set_multistage_false();
+    void set_multistage_true();
+    bool multistage();
+
+
     std::vector<level_data> m_levels;
     int m_maxlevel;
     int m_minlevel;
@@ -145,6 +142,7 @@ public:
     double m_t_minlevel;
     bool m_nosubcycle;
     int m_verbosity;
+    bool m_multistage;
 };
 
 #ifdef __cplusplus

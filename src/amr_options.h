@@ -38,6 +38,8 @@ extern "C"
 #endif
 #endif
 
+
+
 typedef struct amr_options
 {
     /* Fixed grid size for each grid */
@@ -134,6 +136,8 @@ void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
  * \param [in,out]              Option storage will be deallocated.
  */
 void amr_options_destroy (amr_options_t * amropt);
+
+void check_amr_parms(amr_options_t *gparms);
 
 #ifdef __cplusplus
 #if 0

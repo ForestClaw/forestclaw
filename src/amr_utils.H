@@ -30,12 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <vector>
 
-#include "fclaw2d_convenience.h"
-#include "forestclaw2d.h"
-#include "amr_options.h"
-
-#include "fclaw_typedefs.h"
-#include "fclaw_defs.H"
+#include "amr_forestclaw.H"
 
 #ifdef __cplusplus
 extern "C"

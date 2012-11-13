@@ -23,9 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_convenience.h"
-#include "amr_options.h"
 #include "amr_forestclaw.H"
+
+// #include "fclaw2d_convenience.h"
+// #include "amr_options.h"
 
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
@@ -54,16 +55,6 @@ main (int argc, char **argv)
   gparms = amr_options_new (options);
   amr_options_parse (options, gparms, argc, argv, lp);
 
-  /* -----------------------------------------------------------------*/
-#if 0
-  // This is set here just until we can read arrays in the SC library */
-  Parser P;
-  P.define(argc, argv);
-
-  // This reads vector values into amr_options
-  parse_ini_options(gparms);
-#endif
-
   for (int j = 0; j < SpaceDim; j++)
   {
       printf("order[%d]= %d\n",j, gparms->order[j]);
@@ -76,17 +67,6 @@ main (int argc, char **argv)
   {
       printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
   }
-
-  /* Move this routine to amr_options */
-  /* Check if sc_options_print_usage can be used/extended instead */
-  // parse_ini_output(gparms,gparms->outstyle);
-
-  /*
-  sc_options_print_usage(sc_package_id,lp,options,"");
-  */
-  // exit(1);
-
-  /* -----------------------------------------------------------------*/
 
   /* -----------------------------------------------------------------*/
   /* Sample user defined options */

@@ -24,11 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
-
-class ClawPatch;
 
 /* ******************************************************************************
    This file contains all the routines (averaging and interpolation between faces
@@ -136,8 +131,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
-                fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
-                bool time_interp = step_info->do_time_interp;
+                bool &time_interp = *((bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -233,8 +227,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
-                fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
-                bool time_interp = step_info->do_time_interp;
+                bool &time_interp = *((bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -265,8 +258,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
     const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     // We may need to average onto a time interpolated grid, not the actual solution.
-    fclaw2d_subcycle_info *step_info = (fclaw2d_subcycle_info*) user;
-    bool do_time_interp = step_info->do_time_interp;
+    bool &time_interp = *((bool*) user);
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     const int refratio = get_refratio(domain);
@@ -310,7 +302,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                 bool block_boundary = this_block_idx != neighbor_block_idx;
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
                 this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
-                                            fine_neighbor_cp,do_time_interp,block_boundary);
+                                            fine_neighbor_cp,time_interp,block_boundary);
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
@@ -327,8 +319,6 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
 {
     const int p4est_refineFactor = get_p4est_refineFactor(domain);
     const int refratio = get_refratio(domain);
-
-    fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
@@ -368,9 +358,10 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
 
                 // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
                 // doing time interpolation if necessary
+                bool &time_interp = *((bool*) user);
                 bool block_boundary = this_block_idx != neighbor_block_idx;
                 this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
-                                                refratio,fine_neighbor_cp,step_info->do_time_interp,
+                                                refratio,fine_neighbor_cp,time_interp,
                                                 block_boundary);
             }
         } // loop sides (iside = 0,1,2,3)
@@ -385,90 +376,59 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    // construct all coarse level time interpolated intermediate grids.  Interpolate ghost
-    // values as well, even though neighboring fine grids may overwrite some ghost values
-    fclaw2d_subcycle_info_t *step_info = (fclaw2d_subcycle_info_t*) user;
-
+    // This is called for all patches at a level coarser than the one we have.
     ClawPatch *cp = get_clawpatch(this_patch);
-    cp->time_interpolate(step_info->fine_step, step_info->coarse_step, step_info->refratio);
+
+    double &alpha = *((double*) user);
+    cp->time_interpolate(alpha);
 }
 
 // ----------------------------------------------------------------------
-// Main routines in this file
+// Main routine in this file
 // ----------------------------------------------------------------------
-void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
-                                      const int& a_coarse_step, const int& a_fine_step,
-                                      const int& a_refratio)
-{
-    fclaw2d_subcycle_info_t step_info;
-    step_info.coarse_step = a_coarse_step;
-    step_info.fine_step = a_fine_step;
-    step_info.refratio = a_refratio;
-    step_info.do_time_interp = true;
 
-    double level_time = get_domain_time(domain);
-
-    // Set up patch data for time interpolation.
-
-    int coarser_level = a_level - 1;
-    fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 cb_setup_time_interp,
-                                 (void *) &step_info);
-
-    // Average onto time interpolated 'virtual' data so that we can use these averaged ghost
-    // values in the interpolation step below.
-    fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 cb_face_average,
-                                 (void *) &step_info);
-
-
-    fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 cb_corner_average,
-                                 (void *) &step_info);
-
-    // This is needed so that interpolation below works near boundary.
-    set_phys_bc(domain,coarser_level,level_time);
-
-    // Interpolate coarse grid to fine.
-    fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 cb_face_interpolate,
-                                 (void *) &step_info);
-
-
-    fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 cb_corner_interpolate,
-                                 (void *) &step_info);
-
-}
-
-void exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level)
+void exchange_with_coarse(fclaw2d_domain_t *domain,
+                          int a_level, double t_level,
+                          double alpha)
 {
     // Simple exchange - no time interpolation needed
-    fclaw2d_subcycle_info_t step_info;
-    double level_time = get_domain_time(domain);
-    step_info.level_time = level_time;
-    step_info.do_time_interp = false;
+    bool time_interp = alpha > 0;
+    int coarser_level = a_level - 1;
+
+    if (time_interp)
+    {
+        fclaw2d_domain_iterate_level(domain, coarser_level,
+                                     cb_setup_time_interp,
+                                     (void *) &alpha);
+    }
+
+
+    /* -------------------------------------------------------------------
+       Fill coarse grid ghost cells at edges and corners that are shared with
+       the finer grid
+       -----------------------------------------------------------------------*/
 
     // Iterate over coarser level and average from finer neighbors to coarse.
-    int coarser_level = a_level - 1;
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average,
-                                 (void *) &step_info);
+                                 (void *) &time_interp);
 
     // Average fine grid corners to the coarse grid ghost cells
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_corner_average,
-                                 (void *) &step_info);
+                                 (void *) &time_interp);
 
-    set_phys_bc(domain,coarser_level,level_time);
+    // Set coarse grid physical boundary conditions - this will help with
+    // interpolation to finer grids.
+    set_phys_bc(domain,coarser_level,t_level);
 
     // Interpolate coarse grid to fine.
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_face_interpolate,
-                                 (void *) &step_info);
+                                 (void *) &time_interp);
 
     // Interpolate coarse grid to fine grid ghost cells.
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_corner_interpolate,
-                                 (void *) &step_info);
+                                 (void *) &time_interp);
 }

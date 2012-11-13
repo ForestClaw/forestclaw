@@ -24,12 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
-
-class ClawPatch;
-
 
 // -----------------------------------------------------------------
 // Regridding
@@ -232,8 +226,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 }
 
 
-
-
 void regrid(fclaw2d_domain_t **domain)
 {
 
@@ -244,6 +236,12 @@ void regrid(fclaw2d_domain_t **domain)
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
+
+    for(int level = maxlevel; level >= minlevel; level--)
+    {
+        double alpha = 0;
+        exchange_with_coarse(*domain,level,t,alpha);
+    }
 
     // First determine which families should be coarsened.
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,

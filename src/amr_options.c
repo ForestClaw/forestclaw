@@ -242,3 +242,41 @@ amr_options_destroy (amr_options_t * amropt)
     SC_FREE (amropt->mthbc);
     SC_FREE (amropt);
 }
+
+
+// -----------------------------------------------------------------
+// Check input parms
+// -----------------------------------------------------------------
+void check_amr_parms(amr_options_t *gparms)
+{
+    /* Set up 'method' vector used by Clawpack. */
+    gparms->method[0] = gparms->use_fixed_dt;
+
+    gparms->method[1] = gparms->order[0];
+    if (SpaceDim == 2)
+    {
+        gparms->method[2] = gparms->order[1];
+    }
+    else
+    {
+        gparms->method[2] = 10*gparms->order[1] + gparms->order[2];
+    }
+    gparms->method[3] = gparms->verbosity;
+    gparms->method[4] = gparms->src_term;
+    gparms->method[5] = gparms->mcapa;
+    gparms->method[6] = gparms->maux;
+
+    /* Check outstyle. */
+    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
+    {
+        double dT_outer = gparms->tfinal/gparms->nout;
+        double dT_inner = gparms->initial_dt;
+        int nsteps = dT_outer/dT_inner;
+        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
+        {
+            printf("For fixed dt, initial time step size must divide tfinal/nout "
+                   "exactly.\n");
+            exit(1);
+        }
+    }
+}

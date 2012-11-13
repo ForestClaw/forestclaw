@@ -31,12 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "fclaw2d_convenience.h"
 #include "amr_options.h"
+
 #include "amr_utils.H"
+
 #include "ClawPatch.H"
-
 #include "subcycle_manager.H"
-
-class ClawPatch;
 
 #ifdef __cplusplus
 extern "C"
@@ -46,35 +45,45 @@ extern "C"
 #endif
 #endif
 
-// ----------------------------
-// Routines called from 'main'
-// ----------------------------
-void amrinit(fclaw2d_domain_t **domain,const amr_options_t * amropts);
-void amrrun(fclaw2d_domain_t **domain);
-void amrreset(fclaw2d_domain_t **domain);
+// ----------------------------------------
+// Routines needed to time step and produce
+// output
+// ----------------------------------------
 
-// ----------------------------
-// Routines needed to time step
-// ----------------------------
+// amrinit.cpp (called from main)
+void amrinit(fclaw2d_domain_t **domain, const amr_options_t * amropts);
+
+// amrrun.cpp  (called from main)
+void amrrun(fclaw2d_domain_t **domain);
+
+// amr_advance.cpp
 double advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
+
+// amr_regrid.cpp
 void regrid(fclaw2d_domain_t **domain);
+
+// amr_output.cpp
 void amrout(fclaw2d_domain_t *domain, int iframe);
 
 
-// ----------------------------
-// Routines needed to advance a single patch
-// ----------------------------
+// -------------------------------------------
+// Routines needed to fill in ghost cells
+// -------------------------------------------
+// amr_levelexchange.cpp
 void level_exchange(fclaw2d_domain_t *domain, int a_level);
+
+// amr_exchangecoarse.cpp
+void exchange_with_coarse(fclaw2d_domain_t *domain, int a_level,
+                          double t_level,double alpha);
+
+// amr_physbc.cpp
 void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time);
-void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
-                                      const int& a_coarse_step, const int& a_fine_step,
-                                      const int& a_refratio);
-void exchange_with_coarse(fclaw2d_domain_t *domain, const int& a_level);
 
 
-// ----------------------------
+// -------------------------------------------
 // Routines needed to communicate with p4est
-// ----------------------------
+// -------------------------------------------
+// amr_neighbors.cpp
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -82,6 +91,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int *neighbor_block_idx,
                         int neighbor_patch_idx[],
                         int **ref_flag_ptr);
+
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
@@ -103,11 +113,21 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
 // ----------------------------
 // Routines used by diagnostics
 // ----------------------------
+
+// amr_diagnostics.cpp
 void check_conservation(fclaw2d_domain_t *domain);
 void dump_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
+
+// ------------------------------------
+// Clean-up routine
+// ------------------------------------
+// amrreset.cpp
+void amrreset(fclaw2d_domain_t **domain);
+
+
 
 #ifdef __cplusplus
 #if 0
