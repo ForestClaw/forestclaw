@@ -25,6 +25,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
 /* ******************************************************************************
    This file contains all the routines (averaging and interpolation between faces
    and corners) needed for a level to do an exchange (averaging and interpolation)
@@ -388,12 +396,12 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 // ----------------------------------------------------------------------
 
 void exchange_with_coarse(fclaw2d_domain_t *domain,
-                          int a_level, double t_level,
+                          int level, double t_level,
                           double alpha)
 {
     // Simple exchange - no time interpolation needed
-    bool time_interp = alpha > 0;
-    int coarser_level = a_level - 1;
+    bool time_interp = alpha > 0; //
+    int coarser_level = level - 1;
 
     if (time_interp)
     {
@@ -403,10 +411,10 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     }
 
 
-    /* -------------------------------------------------------------------
-       Fill coarse grid ghost cells at edges and corners that are shared with
-       the finer grid
-       -----------------------------------------------------------------------*/
+/* -------------------------------------------------------------------
+   Fill coarse grid ghost cells at edges and corners that are shared with
+   the finer grid
+   -----------------------------------------------------------------------*/
 
     // Iterate over coarser level and average from finer neighbors to coarse.
     fclaw2d_domain_iterate_level(domain, coarser_level,
@@ -432,3 +440,10 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  cb_corner_interpolate,
                                  (void *) &time_interp);
 }
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif

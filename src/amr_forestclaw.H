@@ -51,7 +51,7 @@ extern "C"
 // ----------------------------------------
 
 // amrinit.cpp (called from main)
-void amrinit(fclaw2d_domain_t **domain, const amr_options_t * amropts);
+void amrinit(fclaw2d_domain_t **domain);
 
 // amrrun.cpp  (called from main)
 void amrrun(fclaw2d_domain_t **domain);

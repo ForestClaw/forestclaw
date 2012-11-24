@@ -64,6 +64,7 @@ public:
     void increment_step_counter();
     void increment_time();
     double current_time();
+    void set_time(double t);
     double dt();
 
     bool level_exchange_done();
@@ -112,7 +113,8 @@ public:
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
     // i.e. powers of ref_ratio.
-    double current_time(const int& a_level);
+    double level_time(const int& a_level);   /// time() ?
+    double initial_time();
     double dt(const int& level);
     void increment_time(const int& a_level);
     void set_dt_minlevel(const double& a_dt);
@@ -129,20 +131,15 @@ public:
     void increment_coarse_exchange_counter(const int& a_level);
     void increment_fine_exchange_counter(const int& a_level);
 
-    void set_multistage_false();
-    void set_multistage_true();
-    bool multistage();
-
-
     std::vector<level_data> m_levels;
+
     int m_maxlevel;
     int m_minlevel;
     int m_refratio;
     double m_dt_minlevel;
-    double m_t_minlevel;
+    double m_initial_time;
     bool m_nosubcycle;
     int m_verbosity;
-    bool m_multistage;
 };
 
 #ifdef __cplusplus

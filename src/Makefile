@@ -19,7 +19,7 @@ fclawobjs = \
 	amr_diagnostics.o \
 	amr_exchangecoarse.o \
 	amr_levelexchange.o \
-	amr_parabolic.o \
+	amr_mol.o \
 	amr_neighbors.o \
 	amr_physbc.o \
 	amr_utils.o \

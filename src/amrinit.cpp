@@ -24,10 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_convenience.h"
-#include "fclaw_defs.H"
-
 #include "clawpack_fort.H"
 
 class ClawPatch;
@@ -99,13 +95,11 @@ void cb_amrinit(fclaw2d_domain_t *domain,
 }
 
 // Initialize a base level of grids
-void amrinit(fclaw2d_domain_t **domain, const amr_options_t* gparms)
+void amrinit(fclaw2d_domain_t **domain)
 {
+    const amr_options_t *gparms = get_domain_parms(*domain);
     double t = 0;
 
-    allocate_user_data(*domain);
-
-    set_domain_data(*domain, gparms);
     set_domain_time(*domain,t);
 
     int minlevel = gparms->minlevel;

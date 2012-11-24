@@ -31,9 +31,9 @@ subcycle_manager::~subcycle_manager() {}
 
 void subcycle_manager::define(fclaw2d_domain_t *domain,
                               const amr_options_t *gparms,
-                              const double& a_t_curr)
+                              const double& a_initial_t)
 {
-    m_t_minlevel = a_t_curr;
+    m_initial_time = a_initial_t; // Time at start of subcycling.
     m_refratio = gparms->refratio;
 
     /* query the levels that exist on this processor */
@@ -46,7 +46,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     for (int level = m_minlevel; level <= m_maxlevel; level++)
     {
         int np = num_patches(domain,level);
-        m_levels[level].define(level,m_refratio,np,m_maxlevel,a_t_curr,subcycle);
+        m_levels[level].define(level,m_refratio,np,m_maxlevel,a_initial_t,subcycle);
     }
     m_verbosity = gparms->verbosity;
 }
@@ -54,21 +54,6 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
 bool subcycle_manager::nosubcycle()
 {
     return m_nosubcycle;
-}
-
-void subcycle_manager::set_multistage_false()
-{
-    m_multistage = false;
-}
-
-void subcycle_manager::set_multistage_true()
-{
-    m_multistage = true;
-}
-
-bool subcycle_manager::multistage()
-{
-    return m_multistage;
 }
 
 void subcycle_manager::set_dt_minlevel(const double& a_dt_minlevel)
@@ -145,6 +130,7 @@ bool subcycle_manager::is_finest(const int& a_level)
     return a_level == m_maxlevel;
 }
 
+
 double subcycle_manager::dt(const int& a_level)
 {
     return m_levels[a_level].dt();
@@ -184,9 +170,14 @@ bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
     return b1 && b2 && b3 && b4;
 }
 
-double subcycle_manager::current_time(const int& a_level)
+double subcycle_manager::level_time(const int& a_level)
 {
     return m_levels[a_level].current_time();
+}
+
+double subcycle_manager::initial_time()
+{
+    return m_initial_time;
 }
 
 bool subcycle_manager::solution_updated(const int& a_level, const int& a_step)
@@ -285,6 +276,7 @@ double level_data::dt()
     return m_dt;
 }
 
+
 void level_data::increment_step_counter()
 {
     m_last_step += m_step_inc;
@@ -298,6 +290,11 @@ void level_data::increment_time()
 double level_data::current_time()
 {
     return m_time;
+}
+
+void level_data::set_time(double a_t_level)
+{
+    m_time = a_t_level;
 }
 
 void level_data::increment_level_exchange_counter()

@@ -4,6 +4,7 @@
 #include "fclaw_defs.H"
 #include "amr_options.h"
 #include "forestclaw2d.h"
+#include "amr_mol.H"
 
 class ClawPatch;
 
@@ -11,6 +12,8 @@ typedef struct fclaw2d_domain_data
 {
     const amr_options_t *amropts;
     double curr_time;
+    fclaw_mol_solver_t f_mol_solver;
+    fclaw_mol_rhs_patch_t f_mol_rhs_patch;
 } fclaw2d_domain_data_t;
 
 typedef struct fclaw2d_block_data
@@ -23,53 +26,36 @@ typedef struct fclaw2d_patch_data
     ClawPatch	*cp;
 } fclaw2d_patch_data_t;
 
-
-
-
 /* -----------------------------------------------------------
    Data needed for time stepping
    ----------------------------------------------------------- */
+typedef
+struct fclaw2d_level_time_data
+{
+    // Single step data. This always has to be set.
+    double dt;
+    double t_initial;
+    double t_level;
+    double t_coarse;
+
+    // Needed for explicit CFL limited schemes
+    double maxcfl;
+
+    // Extra data that might be needed for more complicated time stepping
+    // Not always set.
+    double alpha;         // Fraction of coarser dt completed.
+    double dt_coarse;
+    bool is_coarsest;
+} fclaw2d_level_time_data_t;
 
 
 /*
-typedef struct fclaw2d_time_interp_data
+typedef struct fclaw2d_methods
 {
-    int level;
-    double t_level;
-    double alpha;         // Fraction of coarser dt completed.
-    double dt_fine;       // May require stages to get complete time step
-    double dt_coarse;
-    bool do_time_interp;
-    bool is_coarsest;
-} fclaw2d_time_interp_data_t;
+    // static void* f_single_step_update = NULL;
+    fclaw_mol_solver_t *f_mol_solver;
+    fclaw_mol_rhs_patch_t *f_mol_rhs_patch;
+} fclaw2d_methods_t;
 */
-
-typedef struct fclaw2d_level_time_data
-{
-    double dt;
-    double t;
-    double dt_coarse;
-    double maxcfl;
-} fclaw2d_level_time_data_t;
-
-typedef struct fclaw2d_patch_mol_data
-{
-    int count;
-    int patch_size;
-    fclaw2d_patch_t **patches; // ptrs to patches at a given level
-    double *patch_data;      // Vectorized data
-    double dx;
-    double dy;
-} fclaw2d_patch_mol_data_t;
-
-typedef struct fclaw2d_f_exp_data_fort
-{
-    fclaw2d_domain_t* domain;
-    int level;
-    double t;
-    double dt_coarse;
-    fclaw2d_patch_mol_data_t *mol_data;
-} fclaw2d_f_exp_data_fort_t;
-
 
 #endif

@@ -237,7 +237,7 @@ void regrid(fclaw2d_domain_t **domain)
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
-    for(int level = maxlevel; level >= minlevel; level--)
+    for(int level = maxlevel; level > minlevel; level--)
     {
         double alpha = 0;
         exchange_with_coarse(*domain,level,t,alpha);

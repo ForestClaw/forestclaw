@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_parabolic.H"
+#include "amr_mol.H"
 
 /* ----------------------------------------------------- */
 static
@@ -33,24 +33,22 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
                       int this_block_idx,
                       int this_patch_idx,
                       void *user);
+
 /* ----------------------------------------------------- */
 
 
-static void level_step(fclaw2d_domain_t *domain,
+static void level_advance(fclaw2d_domain_t *domain,
                           int a_level,
-                          fclaw2d_level_time_data_t *time_data)
+                          fclaw2d_level_time_data *time_data)
 {
 
-    // Do this is all we want to do is advance each patch with a single step
-    // and are not worried about intermediate boundary conditions.
-
+    /*
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_advance_patch,
                                  (void *) time_data);
+    */
 
-
-    // parabolic_step_feuler(domain,a_level,time_data);
-
+    fclaw_mol_step(domain,a_level,time_data);
 }
 
 
@@ -61,14 +59,13 @@ void cb_advance_patch(fclaw2d_domain_t *domain,
                       int this_patch_idx,
                       void *user)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    const amr_options_t* gparms = ddata->amropts;
+    const amr_options_t* gparms = get_domain_parms(domain);
 
     ClawPatch *cp = get_clawpatch(this_patch);
     fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
 
     double dt = time_data->dt;
-    double t = time_data->t;
+    double t = time_data->t_level;
 
     int level = this_patch->level;
 
@@ -83,14 +80,14 @@ double advance_level(fclaw2d_domain_t *domain,
                    subcycle_manager* a_time_stepper)
 {
     bool verbose = (bool) a_time_stepper->m_verbosity;
-    double t_level = a_time_stepper->current_time(a_level);
+    double t_level = a_time_stepper->level_time(a_level);
 
     double maxcfl = 0;
     if (verbose)
     {
         cout << endl;
         cout << "Advancing level " << a_level << " from step " <<
-            a_curr_fine_step << endl;
+            a_curr_fine_step << " at time " << t_level << endl;
     }
 
     if (!a_time_stepper->can_advance(a_level,a_curr_fine_step))
@@ -195,42 +192,45 @@ double advance_level(fclaw2d_domain_t *domain,
                     // grid in a previous step but we still have to do time interpolation (this
                     // can only happen if refratio > 2)
 
-                    /*
-                    exchange_with_coarse_time_interp(domain,a_level,last_coarse_step,
-                                                     a_curr_fine_step,refratio);
-                    */
                     double  alpha = double(a_curr_fine_step)/refratio;
-                    // exchange_with_coarse_time_interp(domain, a_level, t_level,alpha);
+                    if (verbose)
+                    {
+                        cout << " --> Doing time interpolatation from coarse grid at level "
+                             << a_level-1 << " using alpha = " << alpha << endl;
+                    }
                     exchange_with_coarse(domain,a_level,t_level,alpha);
-                    // set_phys_bc(domain,a_level,t_level);
+                    set_phys_bc(domain,a_level,t_level);
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
-
-                    // Don't increment the fine_exchange_counter, since in the time
-                    // interpolated case, there is no coarse time data at time step
-                    // a_curr_fine_step a_time_stepper->increment_fine_exchange_counter(a_level-1);
                 }
             }
         }
     }
-    if (verbose)
-    {
-        cout << "Taking step on level " << a_level << endl;
-    }
-
     fclaw2d_level_time_data_t time_data;
 
-    time_data.maxcfl = maxcfl;
+    time_data.t_level = t_level;
+    time_data.t_initial = a_time_stepper->initial_time();
     time_data.dt = a_time_stepper->dt(a_level);
+
+    if (verbose)
+    {
+        cout << "Taking step on level " << a_level << " at time " << t_level << endl;
+    }
+
+    bool adv_step = false;
+    if (adv_step)
+    {
+        time_data.maxcfl = maxcfl;
+    }
+
+    // Set some extra things needed by a multi-stage or implicit scheme.
+    time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
     if (!a_time_stepper->is_coarsest(a_level))
     {
         time_data.dt_coarse = a_time_stepper->dt(a_level-1);
     }
-    time_data.t = t_level;
 
     // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
-    level_step(domain,a_level,&time_data);
-
-
+    level_advance(domain,a_level,&time_data);
 
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
@@ -243,7 +243,8 @@ double advance_level(fclaw2d_domain_t *domain,
 
     if (verbose)
     {
-        cout << "Advance on level " << a_level << " done" << endl << endl;
+        cout << "Advance on level " << a_level << " done at time " <<
+            a_time_stepper->level_time(a_level) << endl << endl;
     }
 
     return time_data.maxcfl;  // Maximum from level iteration

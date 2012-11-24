@@ -57,7 +57,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         ngrids += block->num_patches;
     }
 
-    printf("Matlab output Frame %d  at time %12.4f\n\n",iframe,time);
+    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
     int meqn = gparms->meqn;

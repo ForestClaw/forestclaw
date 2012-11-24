@@ -76,7 +76,7 @@ void save_time_step(fclaw2d_domain_t *domain)
 // Output style 1
 // Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
 // --------------------------------------------------------------------------------
-static void explicit_step_1(fclaw2d_domain_t **domain)
+static void outstyle_1(fclaw2d_domain_t **domain)
 {
     int iframe = 0;
     amrout(*domain,iframe);
@@ -109,7 +109,6 @@ static void explicit_step_1(fclaw2d_domain_t **domain)
         {
             subcycle_manager time_stepper;
             time_stepper.define(*domain,gparms,t_curr);
-            time_stepper.set_multistage_false();
 
             set_domain_time(*domain,t_curr);
 
@@ -226,12 +225,12 @@ static void explicit_step_1(fclaw2d_domain_t **domain)
     }
 }
 
-static void explicit_step_2(fclaw2d_domain_t **domain)
+static void outstyle_2(fclaw2d_domain_t **domain)
 {
     // Output time at specific time steps.
 }
 
-static void explicit_step_3(fclaw2d_domain_t **domain)
+static void outstyle_3(fclaw2d_domain_t **domain)
 {
     // Write out an initial time file
     int iframe = 0;
@@ -258,7 +257,6 @@ static void explicit_step_3(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
-        time_stepper.set_multistage_false();
         time_stepper.define(*domain,gparms,t_curr);
 
         // In case we have to reject this step
@@ -348,6 +346,86 @@ static void explicit_step_3(fclaw2d_domain_t **domain)
     }
 }
 
+static void outstyle_4(fclaw2d_domain_t **domain)
+{
+    // Write out an initial time file
+    int iframe = 0;
+
+    amrout(*domain,iframe);
+
+    const amr_options_t *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    double initial_dt = gparms->initial_dt;
+    int nstep_outer = gparms->nout;
+    int nstep_inner = gparms->nstep;
+
+    int regrid_interval = gparms->regrid_interval;
+    int verbosity = gparms->verbosity;
+
+    bool cons_check = (bool) gparms->check_conservation;
+
+    // assume fixed dt that is stable for all grids.
+
+    double t0 = 0;
+    double t_curr = t0;
+    set_domain_time(*domain,t_curr);
+    int n = 0;
+    while (n < nstep_outer)
+    {
+        subcycle_manager time_stepper;
+        time_stepper.define(*domain,gparms,t_curr);
+
+        // Check to see if solution is still conservative
+        if (cons_check)
+        {
+            check_conservation(*domain);
+        }
+
+        double dt_minlevel = initial_dt;
+
+        // This also sets the time step on all finer levels.
+        time_stepper.set_dt_minlevel(dt_minlevel);
+
+        // We don't care about a cfl number
+
+        advance_all_levels(*domain, &time_stepper);
+
+        if (verbosity > 0)
+        {
+            printf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
+                   time_stepper.minlevel(),n+1,dt_minlevel, t_curr+dt_minlevel);
+        }
+
+        t_curr += dt_minlevel;
+        n++;
+
+        set_domain_time(*domain,t_curr);
+
+        if (regrid_interval > 0)
+        {
+            if (n % regrid_interval == 0)
+            {
+                if (verbosity == 1)
+                {
+                    cout << "regridding at step " << n << endl;
+                }
+                regrid(domain);
+                ddata = get_domain_data(*domain);
+            }
+        }
+        else
+        {
+            // use only a static grid
+        }
+
+        if (n % nstep_inner == 0)
+        {
+            iframe++;
+            amrout(*domain,iframe);
+        }
+    }
+}
+
 
 
 void amrrun(fclaw2d_domain_t **domain)
@@ -357,15 +435,19 @@ void amrrun(fclaw2d_domain_t **domain)
 
     if (gparms->outstyle == 1)
     {
-        explicit_step_1(domain);
+        outstyle_1(domain);
     }
     else if (gparms->outstyle == 2)
     {
-        explicit_step_2(domain);
+        outstyle_2(domain);
         printf("Outstyle 2 not implemented yet\n");
     }
     else if (gparms->outstyle == 3)
     {
-        explicit_step_3(domain);
+        outstyle_3(domain);
+    }
+    else if (gparms->outstyle == 4)
+    {
+        outstyle_4(domain);
     }
 }

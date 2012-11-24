@@ -1,14 +1,21 @@
+Target := tst_funcptr
 
-TARGETS = tst_funcptr
-
-default: $(TARGETS)
+# default: $(TARGETS)
 
 F77 = gfortran
 CXX = g++
 CFLAGS = -Wall -O0 -g
 
-tst_funcptr: tst_funcptr.o set_value.o
-	$(CXX) $(CFLAGS) $^ -o $@
+include Makefile.inc
+
+OBJS =  $(Target).o \
+	math_value.o \
+	$(set_file) \
+	$(not_defined) \
+	$(math_file)
+
+all: $(OBJS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $(Target)
 
 .f.o:
 	$(F77) $(CFLAGS) $^ -c -o $@
@@ -16,7 +23,10 @@ tst_funcptr: tst_funcptr.o set_value.o
 .cpp.o:
 	$(CXX) $(CFLAGS) $^ -c -o $@
 
+.c.o:
+	$(CXX) $(CFLAGS) $^ -c -o $@
+
 clean:
-	rm -f *.a *.o $(TARGETS)
+	rm -f *.o $(Target)
 
 .PHONY: clean default
