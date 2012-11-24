@@ -6,9 +6,10 @@ yrbcolormap;
 
 cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
-showgridlines([3:4]);
-hidepatchborders(6:7);
-setpatchborderprops(1:6,'linewidth',2);
+% showgridlines([3:4]);
+% hidepatchborders(6:7);
+showpatchborders;
+setpatchborderprops(1:7,'linewidth',2);
 caxis([0 1]);
 
 % view([-40 20])

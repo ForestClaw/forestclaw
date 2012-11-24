@@ -25,9 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
-// #include "fclaw2d_convenience.h"
-// #include "amr_options.h"
-
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
@@ -52,21 +49,8 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
-  gparms = amr_options_new (options);
-  amr_options_parse (options, gparms, argc, argv, lp);
-
-  for (int j = 0; j < SpaceDim; j++)
-  {
-      printf("order[%d]= %d\n",j, gparms->order[j]);
-  }
-  for (int j = 0; j < gparms->mwaves; j++)
-  {
-      printf("mthlim[%d]= %d\n",j, gparms->mthlim[j]);
-  }
-  for (int j = 0; j < NumFaces; j++)
-  {
-      printf("mthbc[%d]= %d\n",j, gparms->mthbc[j]);
-  }
+  gparms = amr_options_new (options); // Sets default values
+  amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
   /* -----------------------------------------------------------------*/
   /* Sample user defined options */
@@ -76,7 +60,6 @@ main (int argc, char **argv)
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
-  printf("\n\n");
 
   amrinit(&domain, gparms);
   amrrun(&domain);
