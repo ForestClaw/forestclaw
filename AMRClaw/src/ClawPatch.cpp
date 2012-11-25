@@ -57,7 +57,6 @@ void ClawPatch::define(const double&  a_xlower,
         m_auxarray.define(box,m_maux);
     }
 
-
     m_mapped = a_gparms->mapped;
     m_manifold = a_gparms->manifold;
 
