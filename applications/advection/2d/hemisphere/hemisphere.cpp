@@ -23,13 +23,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_convenience.h"
-#include "amr_options.h"
 #include "amr_forestclaw.H"
+#include "amr_single_step.H"
 
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
+double waveprop_update(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
 
 int
 main (int argc, char **argv)
@@ -39,7 +44,7 @@ main (int argc, char **argv)
   MPI_Comm		mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *amr_options = &samr_options;
+  amr_options_t         samr_options, *gparms = &samr_options;
 
   mpiret = MPI_Init (&argc, &argv);
   SC_CHECK_MPI (mpiret);
@@ -52,25 +57,43 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
-  amr_options_register (options, amr_options);
-  amr_options_parse (options, amr_options, argc, argv, lp);
+  gparms = amr_options_new (options); // Sets default values
+  amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
-  // Put this here so that we can read in the minimum level.
-  global_parms *gparms = new global_parms();
-  gparms->get_inputParams();
-
-  int minlevel = gparms->m_minlevel;
-  domain = fclaw2d_domain_new_unitsquare(mpicomm,minlevel);
+  // ---------------------------------------------------------------
+  // Domain geometry
+  // ---------------------------------------------------------------
+  domain = fclaw2d_domain_new_unitsquare(mpicomm,gparms->minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
   printf("\n\n");
 
-  amrinit(&domain, gparms, amr_options);
+  /* ---------------------------------------------------------------
+     Set domain data.
+     --------------------------------------------------------------- */
+  allocate_user_data(domain);       // allocate all data for the domain.
+
+  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+  ddata->amropts = gparms;
+
+/* ---------------------------------------------
+   Define the solver
+   --------------------------------------------- */
+  // This simplified view of the world will have to change
+  // when it comes time to think about solving, say,
+  // advection-diffusion.
+  ddata->f_level_advance = &fclaw_single_step;
+  ddata->f_single_step_patch = &waveprop_update;
+
+  /* --------------------------------------------------
+     Initialize and run the simulation
+     -------------------------------------------------- */
+  amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
 
-  delete gparms;
+  amr_options_destroy(gparms);
   sc_options_destroy (options);
   sc_finalize ();
 

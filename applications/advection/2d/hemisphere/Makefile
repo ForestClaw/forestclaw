@@ -8,6 +8,13 @@ FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
+include $(P4EST_DIR)/etc/Makefile.p4est.mk
+
+include Makefile.inc
+
+# make sure that the first make target is the executable
+default: $(TARGET)
+
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
@@ -16,45 +23,33 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 .f.o:
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
+.PHONY: clean realclean default $(TARGET)
 
-include $(P4EST_DIR)/etc/Makefile.p4est.mk
-
-.PHONY: clean $(TARGET)
 
 exampleobjs = \
 	qinit_mapped.o \
-	setaux_mapped.o \
-	b4step2_mapped.o \
-	setprob_advection.o \
 	ghost_twopatch.o \
-	rpn2noncons.o \
-	rpt2noncons.o \
 	init_routines.o \
 	velocity_wind.o \
 	tag4refinement.o \
 	gaussian.o \
 	cosine_bell.o \
 	slotted_disk.o \
-	mapc2m.o
+	mapc2m.o \
+	$(solver_routines)
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
-	$(FORESTCLAW)/AMRClaw/src/limiter.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setaux.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qinit.o \
-	$(FORESTCLAW)/AMRClaw/src2d/input_parms.o \
 	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
 	$(FORESTCLAW)/AMRClaw/src2d/b4step2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
-	$(FORESTCLAW)/AMRClaw/src2d/ClawPatch2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/flux2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qad2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/step2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \

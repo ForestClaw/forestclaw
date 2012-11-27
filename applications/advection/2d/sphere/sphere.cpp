@@ -86,12 +86,15 @@ main (int argc, char **argv)
   ddata->f_level_advance = &fclaw_single_step;
   ddata->f_single_step_patch = &waveprop_update;
 
+  /* --------------------------------------------------
+     Initialize and run the simulation
+     -------------------------------------------------- */
   amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
 
-  sc_options_destroy (options);
   amr_options_destroy(gparms);
+  sc_options_destroy (options);
   sc_finalize ();
 
   mpiret = MPI_Finalize ();
