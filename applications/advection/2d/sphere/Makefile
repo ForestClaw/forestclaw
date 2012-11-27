@@ -8,6 +8,12 @@ FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
+include $(P4EST_DIR)/etc/Makefile.p4est.mk
+
+include Makefile.inc
+
+# make sure that the first make target is the executable
+default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
@@ -17,25 +23,19 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
 
-include $(P4EST_DIR)/etc/Makefile.p4est.mk
-
-.PHONY: clean $(TARGET)
+.PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
 	qinit_mapped.o \
-	setaux_mapped.o \
-	b4step2_mapped.o \
-	setprob_advection.o \
 	ghost_twopatch.o \
-	rpn2noncons.o \
-	rpt2noncons.o \
 	init_routines.o \
 	velocity_wind.o \
 	tag4refinement.o \
 	gaussian.o \
 	cosine_bell.o \
 	slotted_disk.o \
-	mapc2m.o
+	mapc2m.o \
+	$(solver_routines)
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
@@ -43,7 +43,6 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setaux.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qinit.o \
-	$(FORESTCLAW)/AMRClaw/src2d/input_parms.o \
 	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \

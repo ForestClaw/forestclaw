@@ -12,7 +12,7 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 [xp,yp,zp] = mapc2m_new(xc1,yc1);
 
-return;
+% return;
 
 blockno = getblocknumber();
 
