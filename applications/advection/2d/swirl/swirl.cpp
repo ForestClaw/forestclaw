@@ -61,7 +61,7 @@ main (int argc, char **argv)
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
 
-  amrinit(&domain, gparms);
+  amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
 
