@@ -26,7 +26,6 @@ public :
 
     void copyFrom(ClawPatch *a_cp);
 
-    double* current_data_ptr();
     bool isDefined();  // Do I even use this?
 
     // ----------------------------------------------------------------------------------
@@ -43,38 +42,8 @@ public :
     // Time stepping routines
     // ----------------------------------------------------------------
 
-    // Dummy step routine useful for trying out subcycling without
-    // anything too terrible happening
-    double step_dummy(const double& a_time,
-                      const double& a_dt,
-                      const int& a_level,
-                      const amr_options_t &gparms);
-
-    // Actual step routine with no conservative fix-up
-    double step_waveprop(const double& a_time,
-                         const double& a_dt,
-                         const int& a_level,
-                         const amr_options_t *gparms);
-
-    void step_diffusion(const double& a_time,
-                        const double& a_dt,
-                        const int& a_level,
-                        const amr_options_t *gparms);
-
-
-    // Full time step routine with conservative fix-up (not yet implemented)
-    double ClawPatchIntegrator(const double& a_time,
-                             const double& a_dt,
-                             const int& refRatio,const int& a_level,
-                             const amr_options_t &gparms);
-
     void save_step();
     void restore_step();
-
-    /*
-    void time_interpolate(const int& a_fine_step, const int& a_coarse_step,
-                          const int& a_step_inc);
-    */
 
     void time_interpolate(const double& alpha);
 
@@ -188,6 +157,19 @@ public :
     double dx();
     double dy();
 
+    double *xp();
+    double *yp();
+    double *zp();
+    double *xd();
+    double *yd();
+    double *zd();
+
+    double xlower();
+    double ylower();
+
+    double* current_data_ptr();
+    double* aux_data_ptr();
+    void save_current_step();
 
 
 #if FCLAW_SPACEDIM == 3

@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "amr_forestclaw.H"
+#include "fclaw_typedefs.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -64,6 +65,7 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
 // Set user data with user defined variables, etc.
 // -----------------------------------------------------------------
 void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms);
+void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
 void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 

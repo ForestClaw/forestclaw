@@ -27,10 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_mol.H"
 
 
-/* ---------------------------------------------
+/* -----------------------------------------------------
    Store data for use by the function that evaluates
    the right hand side needed by MOL solver.
-   ---------------------------------------------*/
+   -----------------------------------------------------*/
 static fclaw2d_f_rhs_data_fort_t *s_f_rhs_data = NULL;
 
 
@@ -120,6 +120,11 @@ static
 void fclaw_mol_rhs(const double& t_inner,
                    double *q, double *rhs)
 {
+    // ------------------------------------------------------------
+    // Get data that was stored in static variables so we can put
+    // everything back on the grid
+    // ------------------------------------------------------------
+
     // Copy mol data back to domain level.  Use statically defined variables.
     fclaw2d_domain_t *domain = s_f_rhs_data->domain;
     fclaw2d_level_time_data_t *time_data = s_f_rhs_data->time_data;
@@ -129,6 +134,7 @@ void fclaw_mol_rhs(const double& t_inner,
     // The q pointer may not be the same one that is currently in
     // mol_data->patch_data, so we restore the q that is passed in.
     mol_data->patch_data_restore = q;
+
 
     // Things that are needed from the above
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -142,6 +148,9 @@ void fclaw_mol_rhs(const double& t_inner,
     int count = mol_data->count; // Total number of patches at this level.
     int size = mol_data->patch_size;
 
+    // ------------------------------------------------------------
+    // Restore data, do a boundary exchange and call RHS function
+    // ------------------------------------------------------------
     restore_patch_data(domain,level,mol_data);
 
     level_exchange(domain,level);
@@ -175,9 +184,31 @@ void fclaw_mol_rhs(const double& t_inner,
     }
 }
 
-/* ---------------------------------------------------------------
-   Take a parabolic step of 'dt'.
---------------------------------------------------------------- */
+/* ----------------------------------------------------------------------
+   Take an MOL step of 'dt'.
+
+   This needs two function pointers :
+
+         void (*fclaw_mol_rhs_patch_t)(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       int this_block_idx,
+                                       int this_patch_idx,
+                                       double t,
+                                       double *rhs);
+
+   This function evaluates the right hand side on patch 'this_patch'.
+   Both the patch data and the right hand side can be passed to a
+   Fortran routine which evaluates the right hand grid.
+
+         void (*fclaw_mol_solver_t)(int neqn,double q[],
+                                    double t, double dt);
+
+   This function is an interface to a routine 'amr_<solver>', which calls
+   an existing ODE solver.  See 'amr_rkc.cpp', and 'amr_feuler.cpp' for
+   examples.
+
+   These function pointers are stored in domain->ddata.
+----------------------------------------------------------------------- */
 void fclaw_mol_step(fclaw2d_domain_t *domain,
                     int level,
                     fclaw2d_level_time_data_t *time_data)
@@ -187,7 +218,7 @@ void fclaw_mol_step(fclaw2d_domain_t *domain,
 
     fclaw_level_mol_data_t *mol_data = vectorize_patch_data(domain,level);
 
-    int count = mol_data->count;
+    int count = mol_data->count;   // Number of patches at 'level'
     int size = mol_data->patch_size;
     int neqn = size*count;
 
@@ -197,17 +228,18 @@ void fclaw_mol_step(fclaw2d_domain_t *domain,
     s_f_rhs_data->mol_data = mol_data;
     s_f_rhs_data->time_data = time_data;
 
-    // Call time step method and solve to time t.
-    // The function below is an interface to the
-    // actual solver.
+    // -------------------------------------------------------------
+    // Call time step method and solve to time t. The function below
+    // is an interface to the actual solver.
+    // -------------------------------------------------------------
     double *q = mol_data->patch_data;
-
-
     fclaw2d_domain_data *ddata = get_domain_data(domain);
     fclaw_mol_solver_t f_mol_solver_ptr = ddata->f_mol_solver;
     f_mol_solver_ptr(neqn,q,t_level,dt);
 
-    // Return patch data to tree
+    // -------------------------------------------------------------
+    // Return patch data to the tree
+    // -------------------------------------------------------------
     restore_patch_data(domain,level,mol_data);
 
     delete [] mol_data->patches;

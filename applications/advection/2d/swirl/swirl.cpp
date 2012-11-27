@@ -24,9 +24,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
+#include "amr_single_step.H"
 
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
+
+double waveprop_update(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
+
+
+
 
 int
 main (int argc, char **argv)
@@ -52,14 +63,28 @@ main (int argc, char **argv)
   gparms = amr_options_new (options); // Sets default values
   amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
-  /* -----------------------------------------------------------------*/
-  /* Sample user defined options */
-  /* -----------------------------------------------------------------*/
 
+  // ---------------------------------------------------------------
+  // Domain geometry
+  // ---------------------------------------------------------------
   domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
+
+  /* ---------------------------------------------------------------
+     Set domain data.
+     --------------------------------------------------------------- */
+  allocate_user_data(domain);       // allocate all data for the domain.
+
+  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+  ddata->amropts = gparms;
+
+/* ---------------------------------------------
+   Define the solver
+   ---------------------------------------------*/
+  ddata->f_level_advance = &fclaw_single_step;
+  ddata->f_single_step_patch = &waveprop_update;
 
   amrinit(&domain);
   amrrun(&domain);

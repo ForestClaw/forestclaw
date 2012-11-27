@@ -42,7 +42,14 @@ void init_domain_data(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
+    ddata->amropts = NULL;
+    ddata->curr_time = 0;
+    ddata->f_level_advance = NULL;
+    ddata->f_single_step_patch = NULL;
+    ddata->f_mol_rhs_patch = NULL;
+    ddata->f_mol_solver = NULL;
 }
+
 
 void init_block_data(fclaw2d_block_t *block)
 {
@@ -86,6 +93,24 @@ void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms)
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ddata->amropts = gparms;
 }
+
+void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
+{
+    fclaw2d_domain_data_t *ddata_old = get_domain_data(old_domain);
+    fclaw2d_domain_data_t *ddata_new = get_domain_data(new_domain);
+
+    // Copy pointers
+    ddata_new->amropts = ddata_old->amropts;
+    ddata_new->curr_time = ddata_old->curr_time;
+    ddata_new->f_level_advance = ddata_old->f_level_advance;
+    ddata_new->f_single_step_patch = ddata_old->f_single_step_patch;
+    ddata_new->f_mol_rhs_patch = ddata_old->f_mol_rhs_patch;
+    ddata_new->f_mol_solver = ddata_old->f_mol_solver;
+}
+
+
+
+
 
 void set_block_data(fclaw2d_block_t *block, const int mthbc[])
 {

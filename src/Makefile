@@ -20,6 +20,7 @@ fclawobjs = \
 	amr_exchangecoarse.o \
 	amr_levelexchange.o \
 	amr_mol.o \
+	amr_single_step.o \
 	amr_neighbors.o \
 	amr_physbc.o \
 	amr_utils.o \

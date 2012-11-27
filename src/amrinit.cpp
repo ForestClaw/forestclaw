@@ -161,6 +161,7 @@ void amrinit(fclaw2d_domain_t **domain)
 
             // Allocate memory for user data types (but they don't get set)
             allocate_user_data(new_domain);
+            copy_domain_data(*domain,new_domain);
 
             // Initialize new grids.  Assume that all ghost cells are filled
             //in by qinit.
@@ -171,8 +172,10 @@ void amrinit(fclaw2d_domain_t **domain)
             // Set some of the user data types.  Some of this is done
             // in 'amr_set_base_level',
             // I should probably come up with a more general way to do this.
-            set_domain_data(new_domain, gparms);
-            set_domain_time(new_domain,t);
+
+            // Not needed, because of copy above.
+            // set_domain_data(new_domain, gparms);
+            // set_domain_time(new_domain,t);
 
             // Physical BCs are needed in boundary level exchange
             // Assume only one block, since we are assuming mthbc

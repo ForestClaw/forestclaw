@@ -81,6 +81,16 @@ double* ClawPatch::current_data_ptr()
     return m_griddata.dataPtr();
 }
 
+double* ClawPatch::aux_data_ptr()
+{
+    return m_auxarray.dataPtr();
+}
+
+void ClawPatch::save_current_step()
+{
+    m_griddata_last = m_griddata; // Copy for time interpolation
+}
+
 double ClawPatch::dx()
 {
     return m_dx;
@@ -89,6 +99,43 @@ double ClawPatch::dx()
 double ClawPatch::dy()
 {
     return m_dy;
+}
+
+double ClawPatch::xlower()
+{
+    return m_xlower;
+}
+
+double ClawPatch::ylower()
+{
+    return m_ylower;
+}
+
+double* ClawPatch::xp()
+{
+    return m_xp.dataPtr();
+}
+
+double* ClawPatch::yp()
+{
+    return m_yp.dataPtr();
+}
+double* ClawPatch::zp()
+{
+    return m_zp.dataPtr();
+}
+
+double* ClawPatch::xd()
+{
+    return m_xd.dataPtr();
+}
+double* ClawPatch::yd()
+{
+    return m_yd.dataPtr();
+}
+double* ClawPatch::zd()
+{
+    return m_zd.dataPtr();
 }
 
 
@@ -156,157 +203,6 @@ void ClawPatch::setAuxArray()
     }
 }
 
-double ClawPatch::step_dummy(const double& a_time,
-                     const double& a_dt,
-                     const int& a_level,
-                     const amr_options_t& gparms)
-{
-    double maxwavespeed = 1; // Making this up...
-    double cfl_grid = a_dt/m_dx*maxwavespeed; //
-    return cfl_grid;
-}
-
-double ClawPatch::step_waveprop(const double& a_time,
-                                const double& a_dt,
-                                const int& a_level,
-                                const amr_options_t *gparms)
-{
-    set_block_(&m_blockno);
-
-    double* qold = m_griddata.dataPtr();
-    double* aux = m_auxarray.dataPtr();
-
-    m_griddata_last = m_griddata; // Copy for time interpolation
-
-    // We also call a 'b4step2' in clawpatch2, below.  But it won't
-    // do anything in the mapped case.
-    if (m_manifold)
-    {
-
-        b4step2_mapped_(m_mx,m_my, m_mbc,m_meqn,qold, m_dx,m_dy,
-                        m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(),
-                        m_xd.dataPtr(), m_yd.dataPtr(), m_zd.dataPtr(),
-                        a_time, a_dt, m_maux, aux);
-
-    }
-
-    int maxm = max(m_mx,m_my);
-
-    double cflgrid;
-
-    int mwork = (maxm+2*m_mbc)*(12*m_meqn + (m_meqn+1)*gparms->mwaves + 3*m_maux + 2);
-    double* work = new double[mwork];
-
-    double* fp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    double* fm = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    double* gp = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-    double* gm = new double[m_meqn*(m_mx+2*m_mbc)*(m_my+2*m_mbc)];
-
-    clawpatch2_(maxm, m_meqn, m_maux, m_mbc, gparms->method,
-                gparms->mthlim, gparms->mcapa, gparms->mwaves, m_mx, m_my, qold,
-                aux, m_dx, m_dy, a_dt, cflgrid, work, mwork, m_xlower, m_ylower,a_level,
-                a_time, fp, fm, gp, gm);
-
-    delete [] fp;
-    delete [] fm;
-    delete [] gp;
-    delete [] gm;
-
-    delete [] work;
-
-    return cflgrid;
-}
-
-
-void ClawPatch::step_diffusion(const double& a_time,
-                                 const double& a_dt,
-                                 const int& a_level,
-                                 const amr_options_t *gparms)
-{
-
-    // We are going to have to take several steps to get a single a_dt step
-    // This means that boundary conditions will have to be exchanged much more often
-    // than with the advective step.
-
-}
-
-
-
-double ClawPatch::ClawPatchIntegrator(const double& a_time,
-                                    const double& a_dt,
-                                    const int& a_refRatio,
-                                    const int& a_level,
-                                    const amr_options_t& gparms)
-{
-
-    // double dt = a_dt;
-
-  // Data for step2 or step3.  This is overwritten by updated values.
-  // double* qold = m_griddata.dataPtr();
-  // double* aux = m_auxarray.dataPtr();
-
-  // int maxm = max(m_mx,m_my);
-#if FCLAW_SPACEDIM == 3
-  maxm = max(maxm,mz);
-#endif
-
-  // set common block for level
-  set_common_levels_(gparms.maxlevel,a_level,gparms.refratio);
-
-
-  double cflgrid = 1;
-
-
-  /*
-  int mwork = (maxm+2*gparms.m_mbc)*(12*gparms.m_meqn +
-  (gparms.m_meqn+1)*gparms.m_mwaves + 3*gparms.m_maux + 2);
-  double* work = new double[mwork];
-
-  double* fp = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  double* fm = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  double* gp = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-  double* gm = new double[gparms.m_meqn*(m_mx+2*gparms.m_mbc)*(m_my+2*gparms.m_mbc)];
-
-  double* fp_chombo = a_fluxp[0].dataPtr();
-  double* fm_chombo = a_fluxm[0].dataPtr();
-  double* fpc_chombo = a_fluxpc[0].dataPtr();
-  double* fmc_chombo = a_fluxmc[0].dataPtr();
-
-  double* gp_chombo = a_fluxp[1].dataPtr();
-  double* gm_chombo = a_fluxm[1].dataPtr();
-  double* gpc_chombo = a_fluxpc[1].dataPtr();
-  double* gmc_chombo = a_fluxmc[1].dataPtr();
-
-  double* qadd_x = a_qadd[0].dataPtr();
-  double* qadd_y = a_qadd[1].dataPtr();
-
-  int m_auxtype_int[10];  // dummy for now;  fix!
-  clawpatch2_(maxm, gparms.m_meqn, gparms.m_maux, gparms.m_mbc, gparms.m_method,
-              gparms.m_mthlim,
-              gparms.m_mcapa, gparms.m_mwaves, m_mx, m_my, qold, aux,
-              m_dx, m_dy, dt, cflgrid, work, mwork, qold_coarse, auxold_coarse,
-              qadd_x, qadd_y, m_auxtype_int, m_xlower, m_ylower,
-              intersectsBoundary,a_level,
-              gparms.m_mthbc, a_time, mxc, myc, fp, fm, gp, gm,
-              fp_chombo,fm_chombo,gp_chombo,gm_chombo,
-              fpc_chombo,fmc_chombo,gpc_chombo,gmc_chombo);
-
-  delete [] fp;
-  delete [] fm;
-  delete [] gp;
-  delete [] gm;
-
-  delete [] intersectsBoundary;
-  delete [] work;
-
-  // double maxWaveSpeed = (dx/dt)*cflgrid;
-  // return maxWaveSpeed;
-  */
-
-  return cflgrid;
-}
-
-
 void ClawPatch::save_step()
 {
     // Store a backup in case the CFL number is too large doesn't work out.
@@ -318,11 +214,6 @@ void ClawPatch::restore_step()
     m_griddata = m_griddata_save;
 }
 
-
-/*
-void ClawPatch::time_interpolate(const int& a_fine_step, const int& a_coarse_step,
-                                 const int& a_refratio)
-*/
 
 void ClawPatch::time_interpolate(const double& alpha)
 {

@@ -21,56 +21,23 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 */
 
 #include "amr_forestclaw.H"
-#include "amr_mol.H"
-
-/* ----------------------------------------------------- */
-static
-void cb_advance_patch(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user);
-
-/* ----------------------------------------------------- */
 
 
-static void level_advance(fclaw2d_domain_t *domain,
-                          int a_level,
-                          fclaw2d_level_time_data *time_data)
+// -----------------------------------------------------------
+// Here is where the solver that does the actual updating gets
+// called.
+// -----------------------------------------------------------
+static void update_level_solution(fclaw2d_domain_t *domain,
+                                  int a_level,
+                                  fclaw2d_level_time_data *time_data)
 {
-
-    /*
-    fclaw2d_domain_iterate_level(domain, a_level,
-                                 cb_advance_patch,
-                                 (void *) time_data);
-    */
-
-    fclaw_mol_step(domain,a_level,time_data);
-}
-
-
-static
-void cb_advance_patch(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
-{
-    const amr_options_t* gparms = get_domain_parms(domain);
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
-
-    double dt = time_data->dt;
-    double t = time_data->t_level;
-
-    int level = this_patch->level;
-
-    double maxcfl_grid = cp->step_waveprop(t,dt,level,gparms);
-    time_data->maxcfl = max(maxcfl_grid,time_data->maxcfl);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    fclaw_level_advance_t f_level_advance_ptr = ddata->f_level_advance;
+    f_level_advance_ptr(domain,a_level,time_data);
 }
 
 static
@@ -229,8 +196,11 @@ double advance_level(fclaw2d_domain_t *domain,
         time_data.dt_coarse = a_time_stepper->dt(a_level-1);
     }
 
-    // Advance this level from 'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
-    level_advance(domain,a_level,&time_data);
+    // ------------------------------------------------------------
+    // Advance this level from
+    //        'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
+    // ------------------------------------------------------------
+    update_level_solution(domain,a_level,&time_data);
 
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
@@ -238,7 +208,7 @@ double advance_level(fclaw2d_domain_t *domain,
     level_exchange(domain,a_level);
     set_phys_bc(domain,a_level,t_level);
 
-    // set_phys_bc(domain,a_level,t_level);
+    set_phys_bc(domain,a_level,t_level);
     a_time_stepper->increment_level_exchange_counter(a_level);
 
     if (verbose)
@@ -249,6 +219,10 @@ double advance_level(fclaw2d_domain_t *domain,
 
     return time_data.maxcfl;  // Maximum from level iteration
 }
+
+/* -------------------------------------------------------------
+   Main routine : Called from amrrun.cpp
+   ------------------------------------------------------------- */
 
 double advance_all_levels(fclaw2d_domain_t *domain,
                         subcycle_manager *a_time_stepper)

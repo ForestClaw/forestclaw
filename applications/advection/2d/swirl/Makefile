@@ -10,6 +10,8 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
+include Makefile.inc
+
 # make sure that the first make target is the executable
 default: $(TARGET)
 
@@ -25,39 +27,30 @@ default: $(TARGET)
 
 exampleobjs = \
 	qinit.o \
-	b4step2.o \
-	setaux.o \
-	setprob.o \
-        psi.o \
 	ghost_twopatch.o \
-	rpn2ad1.o \
-	rpt2ad1.o \
-	init_routines.o \
-	tag4refinement.o
+	tag4refinement.o \
+	$(solver_routines)
 
+
+# Lots of these routines are also only used for Clawpack, but I haven't
+# and should all really be listed under 'solver_routines'.  But for now
+# I've left them here.
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
-	$(FORESTCLAW)/AMRClaw/src/limiter.o \
+	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
+	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
+	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
 	$(FORESTCLAW)/AMRClaw/src2d/b4step2_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setaux_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qinit_mapped.o \
-	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
-	$(FORESTCLAW)/AMRClaw/src2d/ClawPatch2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/flux2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qad2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/step2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
