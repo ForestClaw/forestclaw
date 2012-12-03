@@ -219,13 +219,20 @@ static void cb_num_patches(fclaw2d_domain_t *domain,
   (*(int *) user)++;
 }
 
-int num_patches(fclaw2d_domain_t *domain, int level)
+int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
 {
-  int count = 0;
-  fclaw2d_domain_iterate_level(domain, level,
-                               cb_num_patches,
-                               &count);
-  return count;
+    int count = 0;
+    if (include_shadow == 0)
+    {
+        fclaw2d_domain_iterate_level(domain, level,
+                                     cb_num_patches,
+                                     &count);
+    }
+    else
+    {
+        // Include shadow patches
+    }
+    return count;
 }
 
 /* Functions with C prototypes to use forestclaw from C code */

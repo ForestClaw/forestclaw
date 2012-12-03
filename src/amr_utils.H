@@ -96,7 +96,7 @@ const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
 */
 
 // Misc. routines
-int num_patches(fclaw2d_domain_t *domain, int level);
+int num_patches(fclaw2d_domain_t *domain, int level,int include_shadow);
 int pow_int(int a, int n);
 
 #endif
