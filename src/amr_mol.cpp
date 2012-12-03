@@ -67,7 +67,8 @@ static
 fclaw_level_mol_data_t* vectorize_patch_data(fclaw2d_domain_t *domain,
                                                int a_level)
 {
-    int num_patches_at_level = num_patches(domain,a_level);
+    int include_shadow = 0;
+    int num_patches_at_level = num_patches(domain,a_level,include_shadow);
 
 
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -85,7 +86,10 @@ fclaw_level_mol_data_t* vectorize_patch_data(fclaw2d_domain_t *domain,
     mol_data->block_indices = new int[num_patches_at_level];
     mol_data->level = a_level;
 
-    // Store patches in newly created vector mol_data->patch_data
+    // This should be a 'domain_iterate_level_complete' - that is, we want
+    // to iterate over 'shadow' patches here.
+    // Store all patches at this level in newly created vector
+    // mol_data->patch_data
     mol_data->count = 0;
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_vectorize_patch_data,
@@ -116,10 +120,11 @@ static
     }
 }
 
-// Evaluate the right hand side, after first restoring
-// q to the tree, and getting boundary conditions.
-void fclaw_mol_rhs(const double& t_inner,
-                   double *q, double *rhs)
+/* -------------------------------------------------------------
+   Evaluate the right hand side, after first restoring
+   q to the tree, and getting boundary conditions
+   -------------------------------------------------------------- */
+void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 {
     // ------------------------------------------------------------
     // Get data that was stored in static variables so we can put
