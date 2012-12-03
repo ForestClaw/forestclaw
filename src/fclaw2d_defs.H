@@ -23,27 +23,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW_DEFS_H
-#define FCLAW_DEFS_H
+#ifndef FCLAW2D_DEFS_H
+#define FCLAW2D_DEFS_H
 
-/*
- * TODO
- *
- * If we allow this file to be included from other *.H files, then eventually
- * we'll have to prefix Real, SpaceDim, etc. with fclaw_ to avoid collisions.
- */
+/* Some convenient preprocessor directives */
 
-/* typedef double Real; */
-
-// Some convenient preprocessor directives
-
-// Define using compiler switch?
 #define FCLAW_SPACEDIM 2
 static const int SpaceDim = FCLAW_SPACEDIM;
 
-// Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-// avoid any confusion in the 2d case.
+/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
+   avoid any confusion in the 2d case. */
 #define FCLAW_NUMFACES (2 * FCLAW_SPACEDIM)
 static const int NumFaces = FCLAW_NUMFACES;
+
+#define FCLAW_P4EST_REFINE_FACTOR 2
+static const int p4est_refineFactor = FCLAW_P4EST_REFINE_FACTOR;
+
+#define FCLAW_NUM_CORNERS 4
+static const int NumCorners = FCLAW_NUM_CORNERS;
+
+#define FCLAW_NUM_SIBLINGS 4
+static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 
 #endif

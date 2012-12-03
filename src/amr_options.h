@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_options.h>
 
-#include "fclaw_defs.H"
+#include "fclaw2d_defs.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -91,6 +91,11 @@ typedef struct amr_options
     int subcycle;
     int check_conservation;
     int use_fixed_dt;
+
+    double ax;
+    double bx;
+    double ay;
+    double by;
 }
 amr_options_t;
 

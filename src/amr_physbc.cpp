@@ -37,8 +37,8 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    int numfaces = get_faces_per_patch(domain);
-    bool intersects_bc[numfaces];
+    // int numfaces = get_faces_per_patch(domain);
+    bool intersects_bc[NumFaces];
     double curr_time = *((double*) user);
     double dt = 1e20;   // When do we need dt in setting a boundary condition?
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);

@@ -18,23 +18,27 @@ void ClawPatch::define(const double&  a_xlower,
                        const double&  a_xupper,
                        const double&  a_yupper,
                        const int& a_blockno,
-                       const amr_options_t* a_gparms)
+                       const amr_options_t* gparms)
 {
-    m_mx = a_gparms->mx;
-    m_my = a_gparms->my;
-    m_mbc = a_gparms->mbc;
+    m_mx = gparms->mx;
+    m_my = gparms->my;
+    m_mbc = gparms->mbc;
     m_blockno = a_blockno;
 
-    m_xlower = a_xlower;
-    m_ylower = a_ylower;
-    m_xupper = a_xupper;
-    m_yupper = a_yupper;
+    double ax = gparms->ax;
+    double bx = gparms->bx;
+    double ay = gparms->ay;
+    double by = gparms->by;
+    m_xlower = ax + (bx - ax)*a_xlower;
+    m_xupper = ax + (bx - ax)*a_xupper;
+    m_ylower = ay + (by - ay)*a_ylower;
+    m_yupper = ay + (by - ay)*a_yupper;
 
-    m_dx = (a_xupper - a_xlower)/m_mx;
-    m_dy = (a_yupper - a_ylower)/m_my;
+    m_dx = (m_xupper - m_xlower)/m_mx;
+    m_dy = (m_yupper - m_ylower)/m_my;
 
-    m_meqn = a_gparms->meqn;
-    m_maux = a_gparms->maux;
+    m_meqn = gparms->meqn;
+    m_maux = gparms->maux;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -57,8 +61,8 @@ void ClawPatch::define(const double&  a_xlower,
         m_auxarray.define(box,m_maux);
     }
 
-    m_mapped = a_gparms->mapped;
-    m_manifold = a_gparms->manifold;
+    m_mapped = gparms->mapped;
+    m_manifold = gparms->manifold;
 
     m_isDefined = true;
 }

@@ -24,7 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                   /* need this because indent is dumb */
+#endif
+#endif
 
 /* ******************************************************************************
    This file contains all the routines (averaging and interpolation between faces
@@ -36,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    and the analogous routine, in the case that ghost cells are to be obtained from a
    temporary time interpolated grid :
 
-       void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& a_level,
-                                             const int& a_coarse_step, const int& a_fine_step,
-                                             const int& a_refratio)
+       void exchange_with_coarse_time_interp(fclaw2d_domain_t *domain, const int& level,
+                                             const int& coarse_step, const int& fine_step,
+                                             const int& refratio)
 
-   where "a_level" is the finer grid which should exchange with "a_level-1" (either
+   where "level" is the finer grid which should exchange with "level-1" (either
    at the same time at 'a_level', or at a time interpolated value.
 
    Routines in this file are :
@@ -70,21 +77,22 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    const int numfaces = get_faces_per_patch(domain);
+    // const int numfaces = get_faces_per_patch(domain);
+
     const int refratio = get_refratio(domain);
-    bool intersects_bc[numfaces];
+    bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[numfaces];
+    bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
     // Number of patch corners, not the number of corners in the domain!
-    const int numcorners = get_corners_per_patch(domain);
+    // const int numcorners = get_corners_per_patch(domain);
 
-    for (int icorner = 0; icorner < numcorners; icorner++)
+    for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
@@ -164,21 +172,21 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            int this_patch_idx,
                            void *user)
 {
-    const int numfaces = get_faces_per_patch(domain);
+    // const int numfaces = get_faces_per_patch(domain);
     const int refratio = get_refratio(domain);
-    bool intersects_bc[numfaces];
+    bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[numfaces];
+    bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
     // Number of patch corners, not the number of corners in the domain!
-    const int numcorners = get_corners_per_patch(domain);
+    // const int numcorners = get_corners_per_patch(domain);
 
-    for (int icorner = 0; icorner < numcorners; icorner++)
+    for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
@@ -266,7 +274,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     // We may need to average onto a time interpolated grid, not the actual solution.
     bool &time_interp = *((bool*) user);
@@ -328,7 +336,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     const int refratio = get_refratio(domain);
 
     ClawPatch *this_cp = get_clawpatch(this_patch);

@@ -68,7 +68,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     int minlevel = gparms->minlevel;
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     int level = sibling_patch[0].level;
     if (level > minlevel)
@@ -77,7 +77,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         int refratio = gparms->refratio;
         bool patch_coarsened = false;
 
-        const int num_siblings = get_siblings_per_patch(domain);
+        // const int num_siblings = get_siblings_per_patch(domain);
 
         ClawPatch *cp_new_coarse = new ClawPatch();
 
@@ -87,26 +87,26 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         // sibling "family" of patches.
         cp_new_coarse->define(sibling_patch[0].xlower,
                               sibling_patch[0].ylower,
-                              sibling_patch[num_siblings-1].xupper,
-                              sibling_patch[num_siblings-1].yupper,
+                              sibling_patch[NumSiblings-1].xupper,
+                              sibling_patch[NumSiblings-1].yupper,
                               this_block_idx,
                               gparms);
 
         cp_new_coarse->setup_patch(level, maxlevel, refratio);
 
-        ClawPatch *cp_siblings[num_siblings];
-        for (int i = 0; i < num_siblings; i++)
+        ClawPatch *cp_siblings[NumSiblings];
+        for (int i = 0; i < NumSiblings; i++)
         {
             cp_siblings[i] = get_clawpatch(&sibling_patch[i]);
         }
         // Pass all four sibling patches into a single routine to see if
         // they can be coarsened.
         patch_coarsened = cp_new_coarse->tag_for_coarsening(cp_siblings,refratio,
-                                                            num_siblings,
+                                                            NumSiblings,
                                                             p4est_refineFactor);
         if (patch_coarsened)
         {
-            for (int i = 0; i < num_siblings; i++)
+            for (int i = 0; i < NumSiblings; i++)
             {
                 int sibling_patch_idx = sibling0_patch_idx + i;
                 fclaw2d_patch_mark_coarsen(domain, this_block_idx, sibling_patch_idx);
@@ -127,10 +127,10 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 {
     const amr_options_t *gparms = get_domain_parms(old_domain);
 
-    const int num_siblings = get_siblings_per_patch(old_domain);
+    // const int num_siblings = get_siblings_per_patch(old_domain);
     bool init_grid = *(bool *) user;
 
-    const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
     int refratio = gparms->refratio;
     int maxlevel = gparms->maxlevel;
 
@@ -170,7 +170,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // New grids are FINER grids
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
 
-        for (int igrid = 0; igrid < num_siblings; igrid++)
+        for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
             ClawPatch *cp_new = new ClawPatch();
 
@@ -209,13 +209,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         int level = new_patch[0].level;
         cp_new->setup_patch(level, maxlevel, refratio);
 
-        ClawPatch *cp_siblings[num_siblings]; // An array of pointers?
-        for (int i = 0; i < num_siblings; i++)
+        ClawPatch *cp_siblings[NumSiblings]; // An array of pointers?
+        for (int i = 0; i < NumSiblings; i++)
         {
             cp_siblings[i] = get_clawpatch(&old_patch[i]);
         }
         // This duplicates the work we did to determine if we even need to coarsen. Oh well.
-        cp_new->coarsen_from_fine_family(cp_siblings, refratio, num_siblings,
+        cp_new->coarsen_from_fine_family(cp_siblings, refratio, NumSiblings,
                                          p4est_refineFactor);
         set_patch_data(&new_patch[0],cp_new);
     }

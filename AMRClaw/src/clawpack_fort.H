@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
-#include "fclaw_defs.H"
+#include "fclaw2d_defs.H"
 
 #ifdef __cplusplus
 extern "C"

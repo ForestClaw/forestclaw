@@ -38,7 +38,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int neighbor_patch_idx[],
                         int **ref_flag_ptr)
 {
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -139,14 +139,14 @@ void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_patch_idx,
                         bool *intersects_block)
 {
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
     int rfaceno;
-    const int numfaces = get_faces_per_patch(domain);
+    // const int numfaces = get_faces_per_patch(domain);
 
-    for (int iside = 0; iside < numfaces; iside++)
+    for (int iside = 0; iside < NumFaces; iside++)
     {
         fclaw2d_patch_relation_t neighbor_type =
             fclaw2d_patch_face_neighbors(domain,
@@ -181,10 +181,10 @@ void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        bool *intersects_bc)
 {
-    const int numfaces = get_faces_per_patch(domain);
-    int bdry[numfaces];
+    // const int numfaces = get_faces_per_patch(domain);
+    int bdry[NumFaces];
     fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
-    for(int i = 0; i < numfaces; i++)
+    for(int i = 0; i < NumFaces; i++)
     {
         // Physical boundary conditions
         intersects_bc[i] = bdry[i] == 1;

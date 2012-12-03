@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_options.h"
 
-#include "fclaw_defs.H"
-
 /* Proposed naming convention:
  * Parameter names in config file (= long option names) identical to the
  * C variable members of amr_options_t, except "-" in parameter name
@@ -171,6 +169,12 @@ amr_options_new (sc_options_t * opt)
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
                         0, "Regrid every ''regrid_interval'' steps");
+
+
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0,"xlower (ax)");
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1,"xupper (bx)");
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0,"ylower (ay)");
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1,"yupper (by)");
 
 #if 0
     /* bool is not allocated, disable for now */

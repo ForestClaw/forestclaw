@@ -47,11 +47,12 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user)
 {
-    const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
-    int numfaces = get_faces_per_patch(domain);
-    for (int iface = 0; iface < numfaces; iface++)
+    // int numfaces = get_faces_per_patch(domain);
+
+    for (int iface = 0; iface < NumFaces; iface++)
     {
         // Output arguments
         int neighbor_block_idx;
@@ -104,19 +105,20 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               void *user)
 {
 
-    const int numfaces = get_faces_per_patch(domain);
-    bool intersects_bc[numfaces];
+    // const int numfaces = get_faces_per_patch(domain);
+    bool intersects_bc[NumFaces];
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[numfaces];
+    bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
     // Number of patch corners, not the number of corners in the domain!
-    const int numcorners = get_corners_per_patch(domain);
+    // const int numcorners = get_corners_per_patch(domain);
 
-    for (int icorner = 0; icorner < numcorners; icorner++)
+
+    for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // p4est has tons of lookup table like this, can be exposed similarly
         int corner_faces[SpaceDim];

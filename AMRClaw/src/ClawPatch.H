@@ -8,7 +8,7 @@ using namespace std;
 
 #include "amr_options.h"
 #include "clawpack_fort.H"
-#include "fclaw_defs.H"
+#include "fclaw2d_defs.H"
 
 class ClawPatch
 {
@@ -228,6 +228,8 @@ protected :
     FArrayBox m_xd;
     FArrayBox m_yd;
     FArrayBox m_zd;
+
+    FArrayBox m_capacity;   // Store this instead of the aux array.
     FArrayBox m_area;
 
     bool m_isDefined;

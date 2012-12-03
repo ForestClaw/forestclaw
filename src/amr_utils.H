@@ -29,7 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "forestclaw2d.h"
 
-#include "fclaw_typedefs.H"
+#include "amr_forestclaw.H"
+#include "fclaw2d_typedefs.H"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
 
@@ -83,11 +84,16 @@ const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 
-// int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
+// Will change the name of this to 'get_clawpatch' eventually
+ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
+const int get_refratio(fclaw2d_domain_t *domain);
+
+/*
 const int get_corners_per_patch(fclaw2d_domain_t *domain);
 const int get_faces_per_patch(fclaw2d_domain_t *domain);
 const int get_siblings_per_patch(fclaw2d_domain_t *domain);
 const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
+*/
 
 // Misc. routines
 int num_patches(fclaw2d_domain_t *domain, int level);
