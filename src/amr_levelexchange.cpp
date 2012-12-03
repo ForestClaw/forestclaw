@@ -36,9 +36,9 @@ extern "C"
 #endif
 #endif
 
-// -----------------------------------------------------------------
-// Exchange corner and face information at same level
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Exchange corner and face information at same level
+   ----------------------------------------------------------------- */
 
 static
 void cb_level_face_exchange(fclaw2d_domain_t *domain,
@@ -92,8 +92,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                 // Initiate exchange from block 0
                 this_cp->mb_exchange_face_ghost(iface,neighbor_cp);
             }
-        }
-    } // loop over faces
+        } /* Check return from neighbor */
+    } /* loop over all faces */
 }
 
 static
@@ -202,15 +202,15 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 }
 #endif
 
-// -------------------------------------------------------------------
-// Main routine in this file
-// -------------------------------------------------------------------
-void level_exchange(fclaw2d_domain_t *domain, int a_level)
+/* -------------------------------------------------------------------
+   Main routine in this file
+   ------------------------------------------------------------------- */
+void level_exchange(fclaw2d_domain_t *domain, int level)
 {
-    fclaw2d_domain_iterate_level(domain, a_level,
+    fclaw2d_domain_iterate_level(domain, level,
                                  cb_level_face_exchange, (void *) NULL);
 
     // Do corner exchange only after physical boundary conditions have been set on all patches,
     // since corners may overlap phyical ghost cell region of neighboring patch.
-    fclaw2d_domain_iterate_level(domain, a_level, cb_level_corner_exchange, (void *) NULL);
+    fclaw2d_domain_iterate_level(domain, level, cb_level_corner_exchange, (void *) NULL);
 }
