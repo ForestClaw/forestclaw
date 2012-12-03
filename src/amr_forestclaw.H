@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
-#include "fclaw_typedefs.h"
+#include "fclaw_typedefs.H"
 
 #include "forestclaw2d.h"
 #include "fclaw2d_convenience.h"
