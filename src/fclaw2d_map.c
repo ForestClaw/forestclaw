@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_map.h"
 #include <p4est_base.h>
 
+/* This prototype is declared in src/clawpack_fort.H.  Clean up later. */
+void set_block_ (const int *a_blockno);
+
 /* This function can be called from Fortran inside of ClawPatch. */
 void
 fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
@@ -97,6 +100,51 @@ fclaw2d_map_new_torus (double R1, double R2)
 
 void
 fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont)
+{
+    P4EST_FREE (cont);
+}
+
+/* Use an existing Fortran mapc2m routine.
+ * The answers to the queries are expected in user_int[0] through [4].
+ * The pointer to the Fortran mapping function is stored in user_data.
+ */
+
+static int
+fclaw2d_map_query_fortran (fclaw2d_map_context_t * cont, int query_identifier)
+{
+    return 0 <= query_identifier
+        && query_identifier <
+        FCLAW2D_MAP_QUERY_LAST ? cont->user_int[query_identifier] : 0;
+}
+
+static void
+fclaw2d_map_c2m_fortran (fclaw2d_map_context_t * cont, int blockno,
+                         double cx, double cy,
+                         double *mx, double *my, double *mz)
+{
+    /* call Fortran functions */
+    set_block_ (&blockno);
+    (*(fclaw2d_map_c2m_fortran_t) cont->user_data) (&cx, &cy, mx, my, mz);
+}
+
+fclaw2d_map_context_t *
+fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
+                         const int query_results[FCLAW2D_MAP_QUERY_LAST])
+{
+    fclaw2d_map_context_t *cont;
+
+    cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont->query = fclaw2d_map_query_fortran;
+    cont->mapc2m = fclaw2d_map_c2m_fortran;
+    memcpy (cont->user_int, query_results,
+            FCLAW2D_MAP_QUERY_LAST * sizeof (int));
+    cont->user_data = (void *) mapc2m;
+
+    return cont;
+}
+
+void
+fclaw2d_map_destroy_fortran (fclaw2d_map_context_t * cont)
 {
     P4EST_FREE (cont);
 }

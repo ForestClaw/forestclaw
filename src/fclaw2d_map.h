@@ -34,6 +34,12 @@ extern "C"
 #endif
 #endif
 
+/** This prototype matches the Fortran mapc2m functions used in ForestClaw.
+ */
+typedef void (*fclaw2d_map_c2m_fortran_t) (const double *cx, const double *cy,
+                                           double *mx, double *my,
+                                           double *mz);
+
 /* These integers are meant to be passed in query_identifier of map_query_t.
  * One of these four types is generally chosen.
  * 1 maps into R^2, 2 and 3 map into R^3.
@@ -113,6 +119,20 @@ void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
  */
 fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
 void fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont);
+
+/** Create a mapping context for any number of blocks using a Fortran mapc2m.
+ * \param [in] mapc2m   Address of the Fortran mapping function.
+ *                      It expects the block number in a Clawpatch COMMON.
+ * \param [in] query_results    Results for the queries defined above.
+ * \return              Mapping context.
+ *                      Must be destroyed by fclaw2d_map_destroy_fortran.
+ */
+fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
+                                                mapc2m,
+                                                const int
+                                                query_results
+                                                [FCLAW2D_MAP_QUERY_LAST]);
+void fclaw2d_map_destroy_fortran (fclaw2d_map_context_t * cont);
 
 #ifdef __cplusplus
 #if 0
