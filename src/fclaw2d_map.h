@@ -47,6 +47,7 @@ extern "C"
  * These properties can be used to implement shortcuts in the numerical code.
  */
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
+#define FCLAW2D_MAP_QUERY_LAST            5     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
@@ -76,7 +77,6 @@ typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
  */
 struct fclaw2d_map_context
 {
-    int num_blocks;
     fclaw2d_map_query_t query;
     fclaw2d_map_c2m_t mapc2m;
     int user_int[16];
@@ -89,8 +89,8 @@ struct fclaw2d_map_context
  * \param [in] query_identifier Is passed to the map_query_t function.
  * \param [out] iresult         On return contains result of query.
  */
-void fclaw2d_map_query (fclaw2d_map_context_t * cont,
-                        const int *query_identifier, int *iresult);
+void fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
+                         const int *query_identifier, int *iresult);
 
 /** Mapping function that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
@@ -101,13 +101,15 @@ void fclaw2d_map_query (fclaw2d_map_context_t * cont,
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
  */
-void fclaw2d_map_c2m (fclaw2d_map_context_t * cont, int blockno,
-                      const double *cx, const double *cy,
-                      double *mx, double *my, double *mz);
+void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
+                       const double *cx, const double *cy,
+                       double *mx, double *my, double *mz);
 
-/** Create a mapping context for one block with [0, 1]^2 (for now).
- * Maps into a torus with large radius R1 and small radius R2.
- * Must be destroyed by fclaw2d_map_destroy_torus.
+/** Create a torus mapping for one block with [0, 1]^2 (for now).
+ * \param [in] R1       Large radius of the torus.
+ * \param [in] R2       Small radius of the torus.
+ * \return              Mapping context.
+ *                      Must be destroyed by fclaw2d_map_destroy_torus.
  */
 fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
 void fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont);

@@ -26,21 +26,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_map.h"
 #include <p4est_base.h>
 
+/* This function can be called from Fortran inside of ClawPatch. */
 void
-fclaw2d_map_query (fclaw2d_map_context_t * cont,
-                   const int *query_identifier, int *iresult)
+fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
+                    const int *query_identifier, int *iresult)
 {
     *iresult = cont->query (cont, *query_identifier);
 }
 
+/* This function can be called from Fortran inside of ClawPatch. */
 void
-fclaw2d_map_c2m (fclaw2d_map_context_t * cont, int blockno,
-                 const double *cx, const double *cy,
-                 double *mx, double *my, double *mz)
+fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
+                  const double *cx, const double *cy,
+                  double *mx, double *my, double *mz)
 {
-    P4EST_ASSERT (0 <= blockno && blockno < cont->num_blocks);
-
-    cont->mapc2m (cont, blockno, *cx, *cy, mx, my, mz);
+    cont->mapc2m (cont, *blockno, *cx, *cy, mx, my, mz);
 }
 
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
@@ -87,7 +87,6 @@ fclaw2d_map_new_torus (double R1, double R2)
     P4EST_ASSERT (0. <= R2 && R2 <= R1);
 
     cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->num_blocks = 1;
     cont->query = fclaw2d_map_query_torus;
     cont->mapc2m = fclaw2d_map_c2m_torus;
     cont->user_double[0] = R1;
