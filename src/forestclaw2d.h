@@ -40,9 +40,6 @@ typedef struct fclaw2d_domain fclaw2d_domain_t;
 typedef struct fclaw2d_block fclaw2d_block_t;
 typedef struct fclaw2d_patch fclaw2d_patch_t;
 
-typedef void (*fclaw2d_mapc2m_t) (const double xyc[2], double xyzp[3],
-                                  fclaw2d_domain_t * domain, void *user);
-
 typedef enum
 {
     FCLAW2D_PATCH_CHILDID = 0x7,
@@ -72,8 +69,6 @@ struct fclaw2d_block
 {
     double xlower, xupper;
     double ylower, yupper;
-    fclaw2d_mapc2m_t mapc2m;
-    void *mapc2m_user;
     int is_boundary[4];         /* physical boundary flag */
     int num_patches;            /* local patches in this block */
     int num_patches_before;     /* in all previous blocks */

@@ -100,12 +100,6 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         block->xupper = 1.;
         block->ylower = 0.;
         block->yupper = 1.;
-        if (conn->num_vertices > 0)
-        {
-            P4EST_ASSERT (conn->vertices != NULL);
-            block->mapc2m = fclaw2d_domain_mcp;
-            block->mapc2m_user = (void *) (long) i;
-        }
         for (face = 0; face < P4EST_FACES; ++face)
         {
             if (conn->tree_to_tree[P4EST_FACES * i + face] ==
