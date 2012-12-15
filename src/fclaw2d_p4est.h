@@ -46,11 +46,12 @@ extern "C"
 /** Create a mapping for bilinear interpolation from conn->vertices.
  * \param [in] conn     A p4est_connectivity_t pointer which is borrowed.
  * \return              Mapping context.
- *                      Must be destroyed by fclaw2d_map_destroy_conn.
+ *                      Must be destroyed by fclaw2d_p4est_map_destroy.
+ *                      The connectivity must stay alive the whole time.
  */
-fclaw2d_map_context_t *fclaw2d_map_new_conn (const p4est_connectivity_t *
-                                             conn);
-void fclaw2d_map_destroy_conn (fclaw2d_map_context_t * cont);
+fclaw2d_map_context_t *fclaw2d_p4est_map_new (const p4est_connectivity_t *
+                                              conn);
+void fclaw2d_p4est_map_destroy (fclaw2d_map_context_t * cont);
 
 #ifdef __cplusplus
 #if 0
