@@ -27,25 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-const double fclaw2d_root_len = (double) P4EST_ROOT_LEN;
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
-
-static void
-fclaw2d_domain_mcp (const double xyc[2], double xyzp[P4EST_DIM],
-                    fclaw2d_domain_t * domain, void *user)
-{
-    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    p4est_connectivity_t *conn = wrap->conn;
-    p4est_topidx_t treeid;
-
-    treeid = (p4est_topidx_t) (long) user;
-    P4EST_ASSERT (0 <= treeid && treeid < conn->num_trees);
-
-    p4est_qcoord_to_vertex (conn, treeid,
-                            (p4est_qcoord_t) (xyc[0] * fclaw2d_root_len),
-                            (p4est_qcoord_t) (xyc[1] * fclaw2d_root_len),
-                            xyzp);
-}
 
 /** Domain constructor takes ownership of wrap.
  */
