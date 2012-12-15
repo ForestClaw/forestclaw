@@ -26,6 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_map.h"
 #include <p4est_base.h>
 
+static unsigned fclaw2d_map_magic_torus;
+static unsigned fclaw2d_map_magic_fortran;
+#define FCLAW2D_MAP_MAGIC(s) \
+  (fclaw2d_map_magic_ ## s ?: (fclaw2d_map_magic_ ## s = \
+   sc_hash_function_string ("fclaw2d_map_magic_" #s, NULL)))
+
 /* This prototype is declared in src/clawpack_fort.H.  Clean up later. */
 void set_block_ (const int *a_blockno);
 
@@ -51,6 +57,8 @@ fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
 static int
 fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
+
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
@@ -73,6 +81,8 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double cx, double cy,
                        double *mx, double *my, double *mz)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
+
     const double R2 = cont->user_double[1];
     const double L = cont->user_double[0] + R2 * cos (2. * M_PI * cy);
 
@@ -90,6 +100,7 @@ fclaw2d_map_new_torus (double R1, double R2)
     P4EST_ASSERT (0. <= R2 && R2 <= R1);
 
     cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont->magic = FCLAW2D_MAP_MAGIC (torus);
     cont->query = fclaw2d_map_query_torus;
     cont->mapc2m = fclaw2d_map_c2m_torus;
     cont->user_double[0] = R1;
@@ -101,6 +112,7 @@ fclaw2d_map_new_torus (double R1, double R2)
 void
 fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
     P4EST_FREE (cont);
 }
 
@@ -112,6 +124,8 @@ fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont)
 static int
 fclaw2d_map_query_fortran (fclaw2d_map_context_t * cont, int query_identifier)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
+
     return 0 <= query_identifier
         && query_identifier <
         FCLAW2D_MAP_QUERY_LAST ? cont->user_int[query_identifier] : 0;
@@ -122,6 +136,8 @@ fclaw2d_map_c2m_fortran (fclaw2d_map_context_t * cont, int blockno,
                          double cx, double cy,
                          double *mx, double *my, double *mz)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
+
     /* call Fortran functions */
     set_block_ (&blockno);
     (*(fclaw2d_map_c2m_fortran_t) cont->user_data) (&cx, &cy, mx, my, mz);
@@ -134,6 +150,7 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
     fclaw2d_map_context_t *cont;
 
     cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont->magic = FCLAW2D_MAP_MAGIC (fortran);
     cont->query = fclaw2d_map_query_fortran;
     cont->mapc2m = fclaw2d_map_c2m_fortran;
     memcpy (cont->user_int, query_results,
@@ -146,5 +163,6 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 void
 fclaw2d_map_destroy_fortran (fclaw2d_map_context_t * cont)
 {
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
     P4EST_FREE (cont);
 }

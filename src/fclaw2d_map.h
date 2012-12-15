@@ -83,11 +83,12 @@ typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
  */
 struct fclaw2d_map_context
 {
+    unsigned magic;
     fclaw2d_map_query_t query;
     fclaw2d_map_c2m_t mapc2m;
+    void *user_data;
     int user_int[16];
     double user_double[16];
-    void *user_data;
 };
 
 /** Query function for the mapping that can be called from Fortran.
