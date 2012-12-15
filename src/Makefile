@@ -27,6 +27,7 @@ fclawobjs = \
 	amr_options.o \
 	fclaw2d_convenience.o \
 	fclaw2d_map.o \
+        fclaw2d_p4est.o \
 	forestclaw2d.o
 
 libforestclaw.a: $(amrclawobjs) $(fclawobjs)
