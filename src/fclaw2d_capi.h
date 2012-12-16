@@ -23,16 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef AMR_UTILS_H
-#define AMR_UTILS_H
+#ifndef FCLAW2D_CAPI_H
+#define FCLAW2D_CAPI_H
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-
-#include "amr_forestclaw.H"
-#include "fclaw2d_capi.h"
-#include "fclaw_typedefs.H"
+#include "amr_options.h"
+#include "forestclaw2d.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -42,59 +37,58 @@ extern "C"
 #endif
 #endif
 
-// -----------------------------------------------------------------
-// Check parms
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------
+   Data needed for time stepping
+   ----------------------------------------------------------- */
+typedef struct fclaw2d_level_time_data
+{
+    /* Single step data. This always has to be set. */
+    double dt;
+    double t_initial;
+    double t_level;
+    double t_coarse;
 
-void check_amr_parms(amr_options_t *gparms);
+    /* Needed for explicit CFL limited schemes */
+    double maxcfl;
 
-// -----------------------------------------------------------------
-// Initialize data
-// -----------------------------------------------------------------
-void init_domain_data(fclaw2d_domain_t *domain);
-void init_block_data(fclaw2d_block_t *block);
-void init_patch_data(fclaw2d_patch_t *patch);
+    /* Extra data that might be needed for more complicated time stepping
+     * Not always set. */
+    double alpha;         /* Fraction of coarser dt completed. */
+    double dt_coarse;
+    int is_coarsest;
+}
+fclaw2d_level_time_data_t;
 
-// -----------------------------------------------------------------
-// Return pointer to user data
-// -----------------------------------------------------------------
-fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
+typedef void (*fclaw2d_level_advance_t)(fclaw2d_domain_t *domain,
+                                        int level,
+                                        fclaw2d_level_time_data_t *time_data);
 
-// -----------------------------------------------------------------
-// Set user data with user defined variables, etc.
-// -----------------------------------------------------------------
-void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms);
-void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+typedef double (*fclaw2d_single_step_patch_t)(fclaw2d_domain_t *domain,
+                                              fclaw2d_patch_t *this_patch,
+                                              int this_block_idx,
+                                              int this_patch_idx,
+                                              double t,
+                                              double dt);
 
-// Will change the name of this to 'get_clawpatch' eventually
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-const int get_refratio(fclaw2d_domain_t *domain);
-
-#if 0 /* moved into fclaw2d_capi.h */
-
-// -----------------------------------------------------------------
-// Some lazy helper functions that really do make things easier..
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+ * Some lazy helper functions that really do make things easier...
+ * Defined in amr_utils.cpp
+ * Need to be prefixed to clean up namespace
+ * ---------------------------------------------------------------*/
 void allocate_user_data(fclaw2d_domain_t *domain);
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 
-// int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
+/* int corners_per_patch = FCLAW_CORNERS_PER_PATCH; */
 const int get_corners_per_patch(fclaw2d_domain_t *domain);
 const int get_faces_per_patch(fclaw2d_domain_t *domain);
 const int get_siblings_per_patch(fclaw2d_domain_t *domain);
 const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
 
-// Misc. routines
+/* Misc. routines */
 int num_patches(fclaw2d_domain_t *domain, int level);
 int pow_int(int a, int n);
-
-#endif
 
 #ifdef __cplusplus
 #if 0

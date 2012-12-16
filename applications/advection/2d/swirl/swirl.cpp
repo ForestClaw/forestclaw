@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_single_step.h"
 #include "amr_forestclaw.H"
-#include "amr_single_step.H"
 
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
@@ -83,7 +83,7 @@ main (int argc, char **argv)
 /* ---------------------------------------------
    Define the solver
    ---------------------------------------------*/
-  ddata->f_level_advance = &fclaw_single_step;
+  ddata->f_level_advance = &fclaw2d_single_step;
   ddata->f_single_step_patch = &waveprop_update;
 
   amrinit(&domain);

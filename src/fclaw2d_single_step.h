@@ -26,25 +26,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_SINGLE_STEP_H
 #define AMR_SINGLE_STEP_H
 
-#include "forestclaw2d.h"
-#include "amr_options.h"
-#include "clawpack_fort.H"
+#include "fclaw2d_capi.h"
 
-// Needed to avoid circular typedef refs.  This struct is defined in
-// 'fclaw_typedefs.h', which includes this file.
-struct fclaw2d_level_time_data;
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
-typedef double (*fclaw_single_step_patch_t)(fclaw2d_domain_t *domain,
-                                            fclaw2d_patch_t *this_patch,
-                                            int this_block_idx,
-                                            int this_patch_idx,
-                                            double t,
-                                            double dt);
+/* Defined in amr_single_step.cpp */
+void fclaw2d_single_step(fclaw2d_domain_t *domain,
+                         int level,
+                         struct fclaw2d_level_time_data *time_data);
 
-void fclaw_single_step(fclaw2d_domain_t *domain,
-                       int level,
-                       struct fclaw2d_level_time_data *time_data);
-
-
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 #endif

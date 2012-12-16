@@ -36,7 +36,7 @@ static void update_level_solution(fclaw2d_domain_t *domain,
                                   fclaw2d_level_time_data *time_data)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    fclaw_level_advance_t f_level_advance_ptr = ddata->f_level_advance;
+    fclaw2d_level_advance_t f_level_advance_ptr = ddata->f_level_advance;
     f_level_advance_ptr(domain,a_level,time_data);
 }
 

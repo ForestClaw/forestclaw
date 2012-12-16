@@ -23,7 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
+#include "fclaw2d_single_step.h"
+
+#include "amr_utils.H"
+#include "fclaw_typedefs.H"
 
 static
     void cb_single_step(fclaw2d_domain_t *domain,
@@ -38,7 +41,8 @@ static
     double t = time_data->t_level;
 
     fclaw2d_domain_data *ddata = get_domain_data(domain);
-    fclaw_single_step_patch_t f_single_step_patch_ptr = ddata->f_single_step_patch;
+    fclaw2d_single_step_patch_t
+        f_single_step_patch_ptr = ddata->f_single_step_patch;
     double maxcfl = f_single_step_patch_ptr(domain,this_patch,this_block_idx,
                                             this_patch_idx,t,dt);
 
@@ -54,9 +58,9 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-void fclaw_single_step(fclaw2d_domain_t *domain,
-                       int level,
-                       fclaw2d_level_time_data_t *time_data)
+void fclaw2d_single_step(fclaw2d_domain_t *domain,
+                         int level,
+                         fclaw2d_level_time_data_t *time_data)
 {
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_single_step,
