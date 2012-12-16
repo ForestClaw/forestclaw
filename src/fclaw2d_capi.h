@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CAPI_H
 #define FCLAW2D_CAPI_H
 
+/* amr_options.h pulls in sc_{options,obstack,containers}.h and sc.h. */
 #include "amr_options.h"
 #include "forestclaw2d.h"
 
@@ -104,6 +105,11 @@ int num_patches(fclaw2d_domain_t *domain, int level);
 int pow_int(int a, int n);
 
 /* Functions with C prototypes to use forestclaw from C code */
+
+/* These two are defined in amr_utils.cpp */
+void fclaw_mpi_init (int * argc, char *** argv,
+                     MPI_Comm mpicomm, int log_priority);
+void fclaw_mpi_finalize (void);
 
 void amrinit(fclaw2d_domain_t **domain);
 

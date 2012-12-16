@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_utils.H"
+#include <p4est_base.h>
 
 int pow_int(int a, int n)
 {
@@ -228,6 +229,29 @@ int num_patches(fclaw2d_domain_t *domain, int level)
 }
 
 /* Functions with C prototypes to use forestclaw from C code */
+
+void
+fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
+{
+    int mpiret;
+
+    mpiret = MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
+
+    sc_init (mpicomm, 0, 0, NULL, lp);
+    p4est_init (NULL, lp);
+}
+
+void
+fclaw_mpi_finalize (void)
+{
+    int mpiret;
+
+    sc_finalize ();
+
+    mpiret = MPI_Finalize ();
+    SC_CHECK_MPI (mpiret);
+}
 
 void
 fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,

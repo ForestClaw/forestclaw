@@ -23,9 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This needs to go away.  The p4est namespace should not be used directly.
-#include <p4est.h>
-
 #include "fclaw2d_single_step.h"
 #include "fclaw2d_waveprop.h"
 
@@ -35,20 +32,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int
 main (int argc, char **argv)
 {
-  int			mpiret;
-  int			lp;
-  MPI_Comm		mpicomm;
+  int		        lp;
+  MPI_Comm              mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   amr_options_t         *gparms;
 
-  mpiret = MPI_Init (&argc, &argv);
-  SC_CHECK_MPI (mpiret);
-  mpicomm = MPI_COMM_WORLD;
   lp = SC_LP_PRODUCTION;
-
-  sc_init (mpicomm, 0, 0, NULL, lp);
-  p4est_init (NULL, lp);
+  mpicomm = MPI_COMM_WORLD;
+  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
@@ -85,10 +77,8 @@ main (int argc, char **argv)
 
   sc_options_destroy (options);         /* this could be moved up */
   amr_options_destroy (gparms);
-  sc_finalize ();
 
-  mpiret = MPI_Finalize ();
-  SC_CHECK_MPI (mpiret);
+  fclaw_mpi_finalize ();
 
   return 0;
 }
