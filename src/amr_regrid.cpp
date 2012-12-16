@@ -40,10 +40,10 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
                        void *user)
 {
 
-    bool init_flag = *((bool *) user);
+    fclaw_bool init_flag = *((fclaw_bool *) user);
     const amr_options_t *gparms = get_domain_parms(domain);
     int maxlevel = gparms->maxlevel;
-    bool patch_refined = false;
+    fclaw_bool patch_refined = false;
 
     ClawPatch *cp = get_clawpatch(this_patch);
 
@@ -59,12 +59,13 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
     }
 }
 
+/* Tag family for coarsening */
 static
 void cb_tag4coarsening(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *sibling_patch,
-                       int this_block_idx,
-                       int sibling0_patch_idx,
-                       void *user)
+                               fclaw2d_patch_t *sibling_patch,
+                               int this_block_idx,
+                               int sibling0_patch_idx,
+                               void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     int minlevel = gparms->minlevel;
@@ -73,11 +74,8 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
     int level = sibling_patch[0].level;
     if (level > minlevel)
     {
-        int maxlevel = gparms->maxlevel;
         int refratio = gparms->refratio;
-        bool patch_coarsened = false;
-
-        // const int num_siblings = get_siblings_per_patch(domain);
+        fclaw_bool patch_coarsened = false;
 
         ClawPatch *cp_new_coarse = new ClawPatch();
 
@@ -92,7 +90,9 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                               this_block_idx,
                               gparms);
 
-        cp_new_coarse->setup_patch(level, maxlevel, refratio);
+        // cp_new_coarse->setup_patch(level, maxlevel, refratio);
+        // Create a fake patch? Don't set up the patch?
+        // set_user_patch_setup(new_domain,&new_patch[igrid],blockno,new_patchno);
 
         ClawPatch *cp_siblings[NumSiblings];
         for (int i = 0; i < NumSiblings; i++)
@@ -127,19 +127,18 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 {
     const amr_options_t *gparms = get_domain_parms(old_domain);
 
-    // const int num_siblings = get_siblings_per_patch(old_domain);
-    bool init_grid = *(bool *) user;
+    /* const int num_siblings = get_siblings_per_patch(old_domain); */
+    fclaw_bool init_grid = *(fclaw_bool *) user;
 
     // const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
     int refratio = gparms->refratio;
-    int maxlevel = gparms->maxlevel;
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
         // Grid was not coarsened or refined, so we can just copy
         // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        bool old_code = true;
+        fclaw_bool old_code = true;
         // To see differences in output, do a 'diff' on fort.t0005
         // for each run.
         if (old_code)
@@ -153,10 +152,17 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            blockno,
                            gparms);
 
+            set_patch_data(&new_patch[0],cp_new);
+
+            fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
+            (ddata->f_patch_setup_ptr)(new_domain,&new_patch[0],blockno,new_patchno);
+
+            /*
             int level = new_patch->level;
             cp_new->setup_patch(level, maxlevel, refratio);
+            */
             cp_new->copyFrom(cp_old);
-            set_patch_data(&new_patch[0],cp_new);
+            // set_patch_data(&new_patch[0],cp_new);
         }
         else
         {
@@ -180,18 +186,21 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            new_patch[igrid].yupper,
                            blockno,
                            gparms);
+            set_patch_data(&new_patch[igrid],cp_new);
+            fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
 
-            int level = new_patch[igrid].level;
-            cp_new->setup_patch(level, maxlevel, refratio);
+            (ddata->f_patch_setup_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
+
+            // int level = new_patch[igrid].level;
+            // cp_new->setup_patch(level, maxlevel, refratio);
             if (init_grid)
             {
-                cp_new->initialize();
+                (ddata->f_patch_initialize_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
             }
             else
             {
                 cp_old->interpolate_to_fine_patch(cp_new,igrid,p4est_refineFactor,refratio);
             }
-            set_patch_data(&new_patch[igrid],cp_new);
         }
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
@@ -205,9 +214,15 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        new_patch[0].yupper,
                        blockno,
                        gparms);
+        set_patch_data(&new_patch[0],cp_new);
 
+        fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
+        (ddata->f_patch_setup_ptr)(new_domain,&new_patch[0],blockno,new_patchno);
+
+        /*
         int level = new_patch[0].level;
         cp_new->setup_patch(level, maxlevel, refratio);
+        */
 
         ClawPatch *cp_siblings[NumSiblings]; // An array of pointers?
         for (int i = 0; i < NumSiblings; i++)
@@ -217,7 +232,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // This duplicates the work we did to determine if we even need to coarsen. Oh well.
         cp_new->coarsen_from_fine_family(cp_siblings, refratio, NumSiblings,
                                          p4est_refineFactor);
-        set_patch_data(&new_patch[0],cp_new);
     }
     else
     {
@@ -233,7 +247,7 @@ void regrid(fclaw2d_domain_t **domain)
     const amr_options_t *gparms = get_domain_parms(*domain);
     double t = get_domain_time(*domain);
 
-    bool init_flag = false;
+    fclaw_bool init_flag = false;
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;

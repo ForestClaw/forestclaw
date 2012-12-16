@@ -45,8 +45,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     m_nosubcycle = !subcycle;
     for (int level = m_minlevel; level <= m_maxlevel; level++)
     {
-        int np = num_patches(domain,level);
-        m_levels[level].define(level,m_refratio,np,m_maxlevel,a_initial_t,subcycle);
+        m_levels[level].define(level,m_refratio,m_maxlevel,a_initial_t,subcycle);
     }
     m_verbosity = gparms->verbosity;
 }
@@ -103,6 +102,11 @@ int subcycle_manager::minlevel()
 int subcycle_manager::maxlevel()
 {
     return m_maxlevel;
+}
+
+int subcycle_manager::verbosity()
+{
+    return m_verbosity;
 }
 
 int subcycle_manager::last_step(const int& a_level)
@@ -235,7 +239,6 @@ level_data::~level_data() {}
 
 void level_data::define(const int& a_level,
                         const int& a_refratio,
-                        const int& a_patches_at_level,
                         const int& a_maxlevel,
                         const double& a_time,
                         const bool& a_subcycle)
@@ -244,7 +247,6 @@ void level_data::define(const int& a_level,
     m_last_step = 0;
     m_last_level_exchange = 0;   // Assume that the level exchange has been done at subcycled time
                                  // step 0.
-    m_num_patches = a_patches_at_level;
     m_time = a_time;
 
 

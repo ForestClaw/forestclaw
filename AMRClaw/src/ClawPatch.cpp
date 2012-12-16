@@ -5,7 +5,6 @@
 // All of this could also be in some sort of "set_params" function...
 ClawPatch::ClawPatch()
 {
-    m_isDefined = false;
 }
 
 ClawPatch::~ClawPatch()
@@ -24,6 +23,7 @@ void ClawPatch::define(const double&  a_xlower,
     m_my = gparms->my;
     m_mbc = gparms->mbc;
     m_blockno = a_blockno;
+    m_meqn = gparms->meqn;
 
     double ax = gparms->ax;
     double bx = gparms->bx;
@@ -36,9 +36,6 @@ void ClawPatch::define(const double&  a_xlower,
 
     m_dx = (m_xupper - m_xlower)/m_mx;
     m_dy = (m_yupper - m_ylower)/m_my;
-
-    m_meqn = gparms->meqn;
-    m_maux = gparms->maux;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -56,15 +53,8 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata_last.define(box, m_meqn);
     m_griddata_save.define(box, m_meqn);
     m_griddata_time_interp.define(box, m_meqn);
-    if (m_maux > 0)
-    {
-        m_auxarray.define(box,m_maux);
-    }
 
-    m_mapped = gparms->mapped;
     m_manifold = gparms->manifold;
-
-    m_isDefined = true;
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -80,14 +70,9 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
 }
 
 // This is used by level_step.
-double* ClawPatch::current_data_ptr()
+double* ClawPatch::q()
 {
     return m_griddata.dataPtr();
-}
-
-double* ClawPatch::aux_data_ptr()
-{
-    return m_auxarray.dataPtr();
 }
 
 void ClawPatch::save_current_step()
@@ -142,70 +127,64 @@ double* ClawPatch::zd()
     return m_zd.dataPtr();
 }
 
-
-bool ClawPatch::isDefined()
+double* ClawPatch::area()
 {
-    return m_isDefined;
+    return m_area.dataPtr();
 }
 
-// ----------------------------------------------------------------
-// Time stepping routines
-// ----------------------------------------------------------------
-
-void ClawPatch::setup_patch(const int& a_level,
-                            const int& a_maxlevel,
-                            const int& a_refratio)
+double* ClawPatch::xface_normals()
 {
-    if (m_maux > 0)
-    {
-        if (m_manifold)
-        {
-            setup_manifold(a_level, a_maxlevel, a_refratio);
-        }
-        setAuxArray();
-    }
+    return m_xface_normals.dataPtr();
+}
+
+double* ClawPatch::yface_normals()
+{
+    return m_yface_normals.dataPtr();
 }
 
 
-void ClawPatch::initialize()
+double* ClawPatch::edge_lengths()
 {
-    double* q = m_griddata.dataPtr();
-    double* aux = m_auxarray.dataPtr();
-
-    set_block_(&m_blockno);
-
-    if (m_manifold)
-    {
-        qinit_mapped_(m_mx, m_my, m_meqn, m_mbc,m_xlower, m_ylower, m_dx, m_dy,
-                      m_xp.dataPtr(), m_yp.dataPtr(), m_zp.dataPtr(),
-                      q, m_maux, aux, m_blockno);
-    }
-    else
-    {
-        qinit_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,
-               m_dx,m_dy,q,m_maux,aux);
-    }
+    return m_edge_lengths.dataPtr();
 }
 
-void ClawPatch::setAuxArray()
+
+void* ClawPatch::user_solver_data()
 {
+    return m_user_solver_data;
+}
 
-    set_block_(&m_blockno);
-    double* aux = m_auxarray.dataPtr();
+void ClawPatch::set_user_solver_data(void* user)
+{
+    m_user_solver_data = user;
+}
 
-    if (m_manifold)
+void* ClawPatch::waveprop_data()
+{
+    return m_waveprop_data;
+}
+
+void ClawPatch::set_waveprop_data(void* solverdata)
+{
+    m_waveprop_data = solverdata;
+}
+
+
+/* ----------------------------------------------------------------
+   Time stepping routines
+   ---------------------------------------------------------------- */
+
+/*
+void ClawPatch::setup_patch(const int& level,
+                            const amr_options_t *gparms)
+{
+    if (gparms->manifold)
     {
-        setaux_mapped_(m_mx,m_my,m_mbc,m_dx,m_dy,
-                       m_xp.dataPtr(),m_yp.dataPtr(),m_zp.dataPtr(),
-                       m_xd.dataPtr(),m_yd.dataPtr(),m_zd.dataPtr(),
-                       m_area.dataPtr(), m_maux,aux);
-    }
-    else
-    {
-        setaux_(m_mx,m_my,m_mbc,m_mx,m_my,m_xlower,m_ylower,
-                m_dx,m_dy,m_maux,aux);
+        setup_manifold(level, gparms);
     }
 }
+*/
+
 
 void ClawPatch::save_step()
 {
@@ -239,9 +218,9 @@ void ClawPatch::time_interpolate(const double& alpha)
 }
 
 
-// ----------------------------------------------------------------
-// Single level exchanges
-// ----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   Single level exchanges
+   ---------------------------------------------------------------- */
 
 void ClawPatch::exchange_face_ghost(const int& a_idir, ClawPatch *neighbor_cp)
 {
@@ -266,8 +245,8 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
 
 }
 
-void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, bool a_intersects_block[],
-                                         ClawPatch *cp_corner, const bool& a_is_block_corner)
+void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_intersects_block[],
+                                         ClawPatch *cp_corner, const fclaw_bool& a_is_block_corner)
 {
     double *qthis = m_griddata.dataPtr();
     double *qcorner = cp_corner->m_griddata.dataPtr();
@@ -293,7 +272,9 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, bool a_intersects_
     }
 }
 
-void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mthbc[],
+
+/*
+void ClawPatch::set_phys_face_ghost(const fclaw_bool a_intersects_bc[], const int a_mthbc[],
                                     const double& t, const double& dt)
 {
     double *q = m_griddata.dataPtr();
@@ -314,6 +295,7 @@ void ClawPatch::set_phys_face_ghost(const bool a_intersects_bc[], const int a_mt
     }
     bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
 }
+*/
 
 
 void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
@@ -336,16 +318,16 @@ void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& 
 }
 
 
-// ----------------------------------------------------------------
-// Multi-level operations
-// ----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   Multi-level operations
+   ---------------------------------------------------------------- */
 void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_iface_coarse,
                                    const int& a_p4est_refineFactor,
                                    const int& a_refratio,
                                    ClawPatch **neighbor_cp,
-                                   bool a_time_interp,
-                                   bool a_block_boundary)
+                                   fclaw_bool a_time_interp,
+                                   fclaw_bool a_block_boundary)
 {
     double *qcoarse;
     if (a_time_interp)
@@ -361,19 +343,20 @@ void ClawPatch::average_face_ghost(const int& a_idir,
         double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
         if (m_manifold)
         {
-            double *auxcoarse = m_auxarray.dataPtr();
-            double *auxfine = neighbor_cp[igrid]->m_auxarray.dataPtr();
+            /* This should be the area vector, not an aux array */
+            double *areacoarse = m_area.dataPtr();
+            double *areafine = neighbor_cp[igrid]->m_area.dataPtr();
             if (a_block_boundary)
             {
                 mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                       auxcoarse, auxfine, m_maux,
+                                       areacoarse, areafine,
                                        a_idir,a_iface_coarse,
                                        a_p4est_refineFactor,a_refratio,igrid);
             }
             else
             {
                 average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                           auxcoarse, auxfine, m_maux,
+                                           areacoarse, areafine,
                                            a_idir,a_iface_coarse,
                                            a_p4est_refineFactor,a_refratio,igrid);
             }
@@ -391,8 +374,8 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_p4est_refineFactor,
                                        const int& a_refratio,
                                        ClawPatch **neighbor_cp,
-                                       bool a_time_interp,
-                                       bool a_block_boundary)
+                                       fclaw_bool a_time_interp,
+                                       fclaw_bool a_block_boundary)
 {
     double *qcoarse;
     if (a_time_interp)
@@ -423,7 +406,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
 
 //
 void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                     ClawPatch *cp_corner, bool a_time_interp)
+                                     ClawPatch *cp_corner, fclaw_bool a_time_interp)
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
     double *qcoarse;
@@ -446,9 +429,9 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
 // internal corners only a block boundaries.
 void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
                                         const int& a_refratio,
-                                        ClawPatch *cp_corner, bool a_time_interp,
-                                        bool is_block_corner,
-                                        bool intersects_block[])
+                                        ClawPatch *cp_corner, fclaw_bool a_time_interp,
+                                        fclaw_bool is_block_corner,
+                                        fclaw_bool intersects_block[])
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
     double *qcoarse;
@@ -461,15 +444,15 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
         qcoarse = m_griddata.dataPtr();
     }
 
-    double *auxcoarse = this->m_auxarray.dataPtr();
-    double *auxfine = cp_corner->m_auxarray.dataPtr();
+    double *areacoarse = this->m_area.dataPtr();
+    double *areafine = cp_corner->m_area.dataPtr();
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     if (is_block_corner)
     {
         mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
                                        a_refratio,qcoarse,qfine,
-                                       auxcoarse,auxfine,m_maux,
+                                       areacoarse,areafine,
                                        a_coarse_corner,m_blockno);
     }
     else
@@ -481,7 +464,7 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
         }
         mb_average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
                                  a_refratio, qcoarse, qfine,
-                                 auxcoarse, auxfine, m_maux,
+                                 areacoarse, areafine,
                                  a_coarse_corner, block_bdry);
     }
 }
@@ -490,8 +473,8 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
 void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                             const int& a_refratio,
                                             ClawPatch *cp_corner,
-                                            bool a_time_interp, bool is_block_corner,
-                                            bool intersects_block[])
+                                            fclaw_bool a_time_interp, fclaw_bool is_block_corner,
+                                            fclaw_bool intersects_block[])
 
 {
     double *qcoarse;
@@ -529,7 +512,7 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
 }
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                         ClawPatch *cp_corner, bool a_time_interp)
+                                         ClawPatch *cp_corner, fclaw_bool a_time_interp)
 
 {
     double *qcoarse;
@@ -559,8 +542,8 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                           const int& a_p4est_refineFactor,
                                           const int& a_refratio)
 {
-    double *qcoarse = this->m_griddata.dataPtr();
-    double *qfine = a_fine->m_griddata.dataPtr();
+    double *qcoarse = q();
+    double *qfine = a_fine->q();
 
     // Use linear interpolation with limiters.
     interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
@@ -568,12 +551,10 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                a_refratio,a_igrid);
     if (m_manifold)
     {
-        /* Doesn't quite work
-        double *auxcoarse = m_griddata.dataPtr();
-        double *auxfine = a_fine->m_griddata.dataPtr();
-        fixcapaq2_(m_mx, m_my, m_mbc, m_meqn,qcoarse, qfine, auxcoarse, auxfine,
-                   m_maux, a_p4est_refineFactor, a_refratio, a_igrid);
-        */
+        double *areacoarse = m_area.dataPtr();
+        double *areafine = a_fine->m_area.dataPtr();
+        fixcapaq2_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine, areacoarse, areafine,
+                   a_p4est_refineFactor, a_refratio, a_igrid);
     }
 }
 
@@ -588,10 +569,10 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
         double *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
         if (m_manifold)
         {
-            double *auxcoarse = m_auxarray.dataPtr();
-            double *auxfine = a_cp_siblings[igrid]->m_auxarray.dataPtr();
+            double *areacoarse = m_area.dataPtr();
+            double *areafine = a_cp_siblings[igrid]->m_area.dataPtr();
             average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
-                                      auxcoarse, auxfine, m_maux,
+                                      areacoarse, areafine,
                                       a_p4est_refineFactor,
                                       a_refratio, igrid);
         }
@@ -603,7 +584,7 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
     }
 }
 
-bool ClawPatch::tag_for_refinement(bool a_init_flag)
+fclaw_bool ClawPatch::tag_for_refinement(fclaw_bool a_init_flag)
 {
     double *q = m_griddata.dataPtr();
     int tag_patch;  // == 0 or 1
@@ -613,7 +594,7 @@ bool ClawPatch::tag_for_refinement(bool a_init_flag)
     return tag_patch == 1;
 }
 
-bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
+fclaw_bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
                                    const int& a_refratio,
                                    const int& a_num_siblings,
                                    const int& a_p4est_refineFactor)
@@ -628,29 +609,33 @@ bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
 }
 
 
-// ----------------------------------------------------------------
-// Mapped grids
-// ----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   Mapped grids
+   ---------------------------------------------------------------- */
 
-void ClawPatch::setup_manifold(const int& a_level,
-                               const int& a_maxlevel, const int& a_refratio)
+void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
 {
     // Set fortran common block
     set_block_(&m_blockno);
 
-    // Do we really ever use the "box"?
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int maxlevel = gparms->maxlevel;
+    int refratio = gparms->refratio;
+
     int ll[SpaceDim];
     int ur[SpaceDim];
     for (int idir = 0; idir < SpaceDim; idir++)
     {
-        ll[idir] = -m_mbc;
+        ll[idir] = -mbc;
     }
-    ur[0] = m_mx + m_mbc + 1;
-    ur[1] = m_my + m_mbc + 1;
+    ur[0] = mx + mbc + 1;
+    ur[1] = my + mbc + 1;
 
-    Box box_p(ll,ur);
+    Box box_p(ll,ur);   /* Store cell centered values here */
 
-    // Mesh cell centers of physical mesh
+    /* Mesh cell centers of physical mesh */
     m_xp.define(box_p,1);
     m_yp.define(box_p,1);
     m_zp.define(box_p,1);
@@ -658,32 +643,57 @@ void ClawPatch::setup_manifold(const int& a_level,
     // Compute area of the mesh cell.
     m_area.define(box_p,1);
 
-    // Mesh cell corners of physical mesh
+    /* Node centered values */
     for (int idir = 0; idir < SpaceDim; idir++)
     {
-        ll[idir] = -m_mbc;
+        ll[idir] = -mbc;
     }
-    ur[0] = m_mx + m_mbc + 2;
-    ur[1] = m_my + m_mbc + 2;
+    ur[0] = mx + mbc + 2;
+    ur[1] = my + mbc + 2;
     Box box_d(ll,ur);
 
     m_xd.define(box_d,1);
     m_yd.define(box_d,1);
     m_zd.define(box_d,1);
 
-    // Compute centers and corners of mesh cell
-    setup_mesh_(m_mx,m_my,m_mbc,m_xlower,m_ylower,m_dx,m_dy,
-                m_xp.dataPtr(),m_yp.dataPtr(),m_zp.dataPtr(),
-                m_xd.dataPtr(),m_yd.dataPtr(),m_zd.dataPtr());
+    /* Face centered values */
+    m_xface_normals.define(box_d,3);
+    m_yface_normals.define(box_d,3);
+    m_edge_lengths.define(box_d,2);
 
-    compute_area_(m_mx, m_my, m_mbc, m_dx, m_dy,m_xlower, m_ylower,
-                  m_area.dataPtr(), a_level, a_maxlevel, a_refratio);
+
+    /* Get pointers to pass to mesh routine */
+    double *xp = m_xp.dataPtr();
+    double *yp = m_yp.dataPtr();
+    double *zp = m_zp.dataPtr();
+    double *xd = m_xd.dataPtr();
+    double *yd = m_yd.dataPtr();
+    double *zd = m_zd.dataPtr();
+    double *area = m_area.dataPtr();
+
+    double *xnormals = m_xface_normals.dataPtr();
+    double *ynormals = m_yface_normals.dataPtr();
+    double *edge_lengths = m_edge_lengths.dataPtr();
+
+    /* Compute centers and corners of mesh cell */
+    setup_mesh_(mx,my,mbc,m_xlower,m_ylower,m_dx,m_dy,
+                xp,yp,zp,xd,yd,zd);
+
+    /* The level and the refratio is needed here to compute
+       areas on coarser meshes based on areas of the finest
+       level meshes. */
+    compute_area_(mx, my, mbc, m_dx, m_dy,m_xlower, m_ylower,
+                  area, level, maxlevel, refratio);
+
+    compute_normals_(mx,my,mbc,xp,yp,zp,xd,yd,zd,
+                     xnormals,ynormals,edge_lengths);
+
 }
 
 
-// ----------------------------------------------------------------
-// Output and diagnostics
-// ----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   Output and diagnostics
+   ---------------------------------------------------------------- */
 
 
 void ClawPatch::write_patch_data(const int& a_iframe,
@@ -750,6 +760,7 @@ void ClawPatch::dump_time_interp()
     }
 }
 
+/*
 void ClawPatch::dump_auxarray()
 {
     double *q;
@@ -770,3 +781,4 @@ void ClawPatch::dump_auxarray()
         printf("\n");
     }
 }
+*/

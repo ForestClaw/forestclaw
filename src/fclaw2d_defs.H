@@ -45,4 +45,7 @@ static const int NumCorners = FCLAW_NUM_CORNERS;
 #define FCLAW_NUM_SIBLINGS 4
 static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 
+/* change to P4EST_BOOL ? */
+#define fclaw_bool bool
+
 #endif

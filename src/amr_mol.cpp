@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static fclaw2d_f_rhs_data_fort_t *s_f_rhs_data = NULL;
 
 
-// ----------------------------------------------------------
-// Vectorize all patch data at a given level
-// ----------------------------------------------------------
+/* ----------------------------------------------------------
+   Vectorize all patch data at a given level
+   ---------------------------------------------------------- */
 static
 void cb_vectorize_patch_data(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
@@ -46,7 +46,7 @@ void cb_vectorize_patch_data(fclaw2d_domain_t *domain,
                              void *user)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    double *curr_data = cp->current_data_ptr();
+    double *q = cp->q();
 
     fclaw_level_mol_data_t *mol_data = (fclaw_level_mol_data_t*) user;
     int size = mol_data->patch_size;
@@ -55,10 +55,10 @@ void cb_vectorize_patch_data(fclaw2d_domain_t *domain,
     mol_data->block_indices[count] = this_block_idx;
     mol_data->patch_indices[count] = this_patch_idx;
 
-    // Copy patch data to  vector.
+    /* Copy patch data to  vector. */
     for (int i = 0; i < size; i++)
     {
-        mol_data->patch_data[count*size + i] = curr_data[i];
+        mol_data->patch_data[count*size + i] = q[i];
     }
     mol_data->count++;
 }
@@ -86,10 +86,10 @@ fclaw_level_mol_data_t* vectorize_patch_data(fclaw2d_domain_t *domain,
     mol_data->block_indices = new int[num_patches_at_level];
     mol_data->level = a_level;
 
-    // This should be a 'domain_iterate_level_complete' - that is, we want
-    // to iterate over 'shadow' patches here.
-    // Store all patches at this level in newly created vector
-    // mol_data->patch_data
+    /* This should be a 'domain_iterate_level_complete' - that is, we want
+       to iterate over 'shadow' patches here.
+       Store all patches at this level in newly created vector
+       mol_data->patch_data */
     mol_data->count = 0;
     fclaw2d_domain_iterate_level(domain, a_level,
                                  cb_vectorize_patch_data,
@@ -97,9 +97,9 @@ fclaw_level_mol_data_t* vectorize_patch_data(fclaw2d_domain_t *domain,
     return mol_data;
 }
 
-// ----------------------------------------------------------
-// Restore vectorized data to patches in tree.
-// ----------------------------------------------------------
+/* ----------------------------------------------------------
+   Restore vectorized data to patches in tree.
+   ---------------------------------------------------------- */
 static
     void restore_patch_data(fclaw2d_domain_t *domain,
                             int a_level,
@@ -111,11 +111,11 @@ static
     {
         fclaw2d_patch_t *this_patch = mol_data->patches[i];
         ClawPatch *cp = get_clawpatch(this_patch);
-        double *cp_data = cp->current_data_ptr();
+        double *q = cp->q();
         double *patch_data = &mol_data->patch_data_restore[i*patch_size];
         for (int j = 0; j < patch_size; j++)
         {
-            cp_data[j] = patch_data[j];
+            q[j] = patch_data[j];
         }
     }
 }
@@ -126,46 +126,47 @@ static
    -------------------------------------------------------------- */
 void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 {
-    // ------------------------------------------------------------
-    // Get data that was stored in static variables so we can put
-    // everything back on the grid
-    // ------------------------------------------------------------
+    /* ------------------------------------------------------------
+       Get data that was stored in static variables so we can put
+       everything back on the grid
+       ------------------------------------------------------------ */
 
-    // Copy mol data back to domain level.  Use statically defined variables.
+    /* Copy mol data back to domain level.  Use statically defined variables. */
     fclaw2d_domain_t *domain = s_f_rhs_data->domain;
     fclaw2d_level_time_data_t *time_data = s_f_rhs_data->time_data;
     fclaw_level_mol_data_t *mol_data = s_f_rhs_data->mol_data;
 
 
-    // The q pointer may not be the same one that is currently in
-    // mol_data->patch_data, so we restore the q that is passed in.
+    /* The q pointer may not be the same one that is currently in
+       mol_data->patch_data, so we restore the q that is passed in. */
     mol_data->patch_data_restore = q;
 
 
-    // Things that are needed from the above
+    /* Things that are needed from the above */
     const amr_options_t *gparms = get_domain_parms(domain);
 
-    // From time_data
+    /* From time_data */
     double t_level = time_data->t_level;
     double t_initial = time_data->t_initial;
     double dt_coarse = time_data->dt_coarse;
+
     int level = mol_data->level;
 
-    int count = mol_data->count; // Total number of patches at this level.
+    int count = mol_data->count; /* Total number of patches at this level. */
     int size = mol_data->patch_size;
 
-    // ------------------------------------------------------------
-    // Restore data, do a boundary exchange and call RHS function
-    // ------------------------------------------------------------
+    /* ------------------------------------------------------------
+       Restore data, do a boundary exchange and call RHS function
+       ------------------------------------------------------------ */
     restore_patch_data(domain,level,mol_data);
 
     level_exchange(domain,level);
     set_phys_bc(domain,level, t_inner);
 
-    // Set ghost cell values at newly updated data on level 'level'.
+    /* Set ghost cell values at newly updated data on level 'level'. */
     if (t_inner > t_level)
     {
-        // level_exchange(domain,level);
+        /* level_exchange(domain,level); */
 
         if (!time_data->is_coarsest && gparms->subcycle)
         {
@@ -175,19 +176,20 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
         }
     }
 
+    double cfl;
     for(int i = 0; i < count; i++)
     {
         fclaw2d_patch_t *this_patch = mol_data->patches[i];
         int this_patch_idx = mol_data->patch_indices[i];
         int this_block_idx = mol_data->block_indices[i];
 
-        // This is the user defined routine.  The value of
-        // this function pointer is set in main.
+        /* This is the user defined routine.  The value of
+           this function pointer is set in main. */
         fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-        fclaw2d_mol_rhs_patch_t f_mol_rhs_patch_ptr = ddata->f_mol_rhs_patch;
-        f_mol_rhs_patch_ptr(domain,this_patch,this_block_idx,
-                            this_patch_idx,t_inner,&rhs[i*size]);
+        cfl = (ddata->f_ode_solver_rhs_patch_ptr)(domain,this_patch,this_block_idx,
+                                                  this_patch_idx,t_inner,&rhs[i*size]);
     }
+    time_data->maxcfl = max(time_data->maxcfl,cfl);
 }
 
 /* ----------------------------------------------------------------------
@@ -215,41 +217,43 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 
    These function pointers are stored in domain->ddata.
 ----------------------------------------------------------------------- */
-void fclaw_mol_step(fclaw2d_domain_t *domain,
-                    int level,
-                    fclaw2d_level_time_data_t *time_data)
+double fclaw2d_mol_step_level(fclaw2d_domain_t *domain,
+                            int level,
+                            fclaw2d_level_time_data_t *time_data,
+                            fclaw2d_ode_solver_level_t f_ode_solver_level_ptr)
 {
     double t_level = time_data->t_level;
     double dt = time_data->dt;
 
     fclaw_level_mol_data_t *mol_data = vectorize_patch_data(domain,level);
 
-    int count = mol_data->count;   // Number of patches at 'level'
+    int count = mol_data->count;   /* Number of patches at 'level' */
     int size = mol_data->patch_size;
     int neqn = size*count;
 
-    // Set static data that is needed by 'f_exp' below.
+    /* Set static data that is needed by 'f_exp' below. */
     s_f_rhs_data = new fclaw2d_f_rhs_data_fort_t;
     s_f_rhs_data->domain = domain;
     s_f_rhs_data->mol_data = mol_data;
     s_f_rhs_data->time_data = time_data;
 
-    // -------------------------------------------------------------
-    // Call time step method and solve to time t. The function below
-    // is an interface to the actual solver.
-    // -------------------------------------------------------------
+    /* -------------------------------------------------------------
+       Call time step method and solve to time t. The function below
+       is an interface to the actual solver.
+       ------------------------------------------------------------- */
     double *q = mol_data->patch_data;
-    fclaw2d_domain_data *ddata = get_domain_data(domain);
-    fclaw_mol_solver_t f_mol_solver_ptr = ddata->f_mol_solver;
-    f_mol_solver_ptr(neqn,q,t_level,dt);
+    f_ode_solver_level_ptr(neqn,q,t_level,dt);
 
-    // -------------------------------------------------------------
-    // Return patch data to the tree
-    // -------------------------------------------------------------
+    /* -------------------------------------------------------------
+       Return patch data to the tree
+       ------------------------------------------------------------- */
     restore_patch_data(domain,level,mol_data);
 
     delete [] mol_data->patches;
     delete [] mol_data->patch_data;
 
     delete s_f_rhs_data;
+
+    /* There may not always be a CFL number ... */
+    return time_data->maxcfl;
 }

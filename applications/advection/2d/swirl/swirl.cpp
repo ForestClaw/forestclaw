@@ -23,8 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_single_step.h"
-#include "fclaw2d_waveprop.h"
+// This needs to go away.  The p4est namespace should not be used directly.
+#include <p4est.h>
+
+#include "swirl_user.H"
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
@@ -45,7 +47,9 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
-  gparms = amr_options_new (options); // Sets default values
+  gparms = amr_options_new (options,
+                            amr_waveprop_readparms,
+                            amr_waveprop_checkparms); // Sets default values
   amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
 
@@ -68,8 +72,10 @@ main (int argc, char **argv)
 /* ---------------------------------------------
    Define the solver
    ---------------------------------------------*/
-  ddata->f_level_advance = &fclaw2d_single_step;
-  ddata->f_single_step_patch = &fclaw2d_waveprop_update;
+  ddata->f_single_step_update_patch_ptr = &amr_single_step_update_patch;
+  ddata->f_patch_setup_ptr = &amr_patch_setup;
+  ddata->f_patch_initialize_ptr = &amr_patch_initialize;
+  ddata->f_patch_physbc_ptr = &amr_patch_physbc;
 
   amrinit(&domain);
   amrrun(&domain);

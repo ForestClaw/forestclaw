@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
-
-class ClawPatch;
+#include "amr_solver_typedefs.H"
 
 void cb_tag4refinement(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -61,28 +60,24 @@ void cb_init_base(fclaw2d_domain_t *domain,
                this_patch->yupper,
                this_block_idx,
                gparms);
-
-    int level  = this_patch->level;
-    int refratio = gparms->refratio;
-    int maxlevel = gparms->maxlevel;
-
-    cp->setup_patch(level, maxlevel, refratio);
     set_patch_data(this_patch,cp);
+
+    /* The user can now retrieve the ClawPatch from 'this_patch' and set
+       up whatever they need to set up. */
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    fclaw2d_patch_setup_t f_ptr = ddata->f_patch_setup_ptr;
+    f_ptr(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 static
-void amr_set_base_level(fclaw2d_domain_t *domain, const int& level)
+void set_base_level(fclaw2d_domain_t *domain, const int& level)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    fclaw2d_domain_iterate_level(domain, level,
-                                 cb_init_base,
-                                 (void *) gparms);
+    fclaw2d_domain_iterate_level(domain, level, cb_init_base,(void *) NULL);
 }
 
-// -----------------------------------------------------------------
-// Initial grid
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Initial grid
+   ----------------------------------------------------------------- */
 static
 void cb_amrinit(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *this_patch,
@@ -90,9 +85,9 @@ void cb_amrinit(fclaw2d_domain_t *domain,
                 int this_patch_idx,
                 void *user)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-    cp->initialize();
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    fclaw2d_patch_initialize_t f_ptr = ddata->f_patch_initialize_ptr;
+    f_ptr(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 // Initialize a base level of grids
@@ -116,7 +111,7 @@ void amrinit(fclaw2d_domain_t **domain)
 
     // This function is redundant, and should be made more general.
     cout << "Setting base level " << endl;
-    amr_set_base_level(*domain,minlevel);
+    set_base_level(*domain,minlevel);
 
     cout << "Done with amr_set_base_level " << endl;
 

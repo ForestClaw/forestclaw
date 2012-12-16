@@ -24,9 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_single_step.h"
-
-#include "amr_utils.H"
-#include "fclaw_typedefs.H"
+#include "amr_forestclaw.H"
 
 static
     void cb_single_step(fclaw2d_domain_t *domain,
@@ -35,19 +33,18 @@ static
                         int this_patch_idx,
                         void *user)
 {
-    fclaw2d_level_time_data_t *time_data = (fclaw2d_level_time_data_t *) user;
+    single_step_data_t *ss_data = (single_step_data_t *) user;
 
-    double dt = time_data->dt;
-    double t = time_data->t_level;
+    double dt = ss_data->dt;
+    double t = ss_data->t;
 
-    fclaw2d_domain_data *ddata = get_domain_data(domain);
-    fclaw2d_single_step_patch_t
-        f_single_step_patch_ptr = ddata->f_single_step_patch;
-    double maxcfl = f_single_step_patch_ptr(domain,this_patch,this_block_idx,
-                                            this_patch_idx,t,dt);
-
-    time_data->maxcfl = max(maxcfl,time_data->maxcfl);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    double maxcfl = (ddata->f_single_step_update_patch_ptr)(domain,this_patch,
+                                                            this_block_idx,
+                                                            this_patch_idx,t,dt);
+    ss_data->maxcfl = max(maxcfl,ss_data->maxcfl);
 }
+
 
 /* ---------------------------------------------------
    Advance the level using a single explicit time step
@@ -58,11 +55,17 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-void fclaw2d_single_step(fclaw2d_domain_t *domain,
-                         int level,
-                         fclaw2d_level_time_data_t *time_data)
+double fclaw2d_single_step_level(fclaw2d_domain_t *domain,
+                               int level,
+                               double t, double dt)
 {
-    fclaw2d_domain_iterate_level(domain, level,
-                                 cb_single_step,
-                                 (void *) time_data);
+
+    /* Iterate over every patch at this level */
+    single_step_data_t ss_data;
+    ss_data.t = t;
+    ss_data.dt = dt;
+    ss_data.maxcfl = 0;
+    fclaw2d_domain_iterate_level(domain, level, cb_single_step,(void *) &ss_data);
+
+    return ss_data.maxcfl;
 }

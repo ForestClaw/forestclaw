@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
+void amr_checkparms(amr_options_t *gparms);
+
 void
 amr_options_add_int_array (sc_options_t * opt,
                            int opt_char, const char *opt_name,
@@ -84,7 +86,9 @@ amr_options_convert_arrays (amr_options_t * amropt)
 }
 
 amr_options_t *
-amr_options_new (sc_options_t * opt)
+    amr_options_new (sc_options_t * opt,
+                     fclaw2d_readparms_t f_user_readparms_ptr,
+                     fclaw2d_checkparms_t f_user_checkparms_ptr)
 {
     amr_options_t *amropt;
 
@@ -113,41 +117,14 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
                         "Number of steps to take between printing output files.");
 
-    sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1.0,
-                           "Maximum CFL number [1.0]");
 
-    sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                           "Desired CFL number [0.9]");
-
-    /* Array of SpaceDim many values, with no defaults is set to all 0's */
-    amr_options_add_int_array (opt, 0, "order", &amropt->order_string, NULL,
-                               &amropt->order, SpaceDim,
-                               "Normal and transverse orders");
     /* At this point amropt->order is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
 
-    sc_options_add_int (opt, 0, "src_term", &amropt->src_term, 0,
-                        "Source term option [0]");
-
-    sc_options_add_int (opt, 0, "mcapa", &amropt->mcapa, -1,
-                        "Location of capacity function in aux array [-1]");
-
-    sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
-                        "Number of auxiliary variables [0]");
-
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations [1]");
-
-    sc_options_add_int (opt, 0, "mwaves", &amropt->mwaves, 1,
-                        "Number of waves [1]");
-
-    /* Array of mwaves many values */
-    amr_options_add_int_array (opt, 0, "mthlim", &amropt->mthlim_string, NULL,
-                               &amropt->mthlim, amropt->mwaves,
-                               "Waves limiters (one for each wave)");
-    /* At this point amropt->mthlim is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
@@ -204,13 +181,26 @@ amr_options_new (sc_options_t * opt)
     /* There is no default for this option.  A default will be read later. */
     sc_options_add_inifile (opt, 'F', "inifile","Read options from this file");
 
+    /* Read in any other parms the user might want, including user parms */
+    if (f_user_readparms_ptr != NULL)
+    {
+        f_user_readparms_ptr(opt,amropt);
+    }
+
     /* This works for me.  */
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
     /* Can check return value for -1 to see if file was not found */
 
-    amr_options_convert_arrays (amropt);
+    amr_options_convert_arrays(amropt);
 
-    check_amr_parms(amropt);
+    /* Check parms read in above */
+    amr_checkparms(amropt);
+
+    /* Check parms that involve the solver (or anything the user might want) */
+    if (f_user_checkparms_ptr != NULL)
+    {
+        f_user_checkparms_ptr(amropt);
+    }
 
     return amropt;
 }
@@ -241,8 +231,9 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
 void
 amr_options_destroy (amr_options_t * amropt)
 {
-    SC_FREE (amropt->order);
-    SC_FREE (amropt->mthlim);
+    /* These are now stored under amropt->waveprop_parms */
+    /* SC_FREE (amropt->->order); */
+    /* SC_FREE (amropt->mthlim); */
     SC_FREE (amropt->mthbc);
     SC_FREE (amropt);
 }
@@ -251,25 +242,8 @@ amr_options_destroy (amr_options_t * amropt)
 // -----------------------------------------------------------------
 // Check input parms
 // -----------------------------------------------------------------
-void check_amr_parms(amr_options_t *gparms)
+void amr_checkparms(amr_options_t *gparms)
 {
-    /* Set up 'method' vector used by Clawpack. */
-    gparms->method[0] = gparms->use_fixed_dt;
-
-    gparms->method[1] = gparms->order[0];
-    if (SpaceDim == 2)
-    {
-        gparms->method[2] = gparms->order[1];
-    }
-    else
-    {
-        gparms->method[2] = 10*gparms->order[1] + gparms->order[2];
-    }
-    gparms->method[3] = gparms->verbosity;
-    gparms->method[4] = gparms->src_term;
-    gparms->method[5] = gparms->mcapa;
-    gparms->method[6] = gparms->maux;
-
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
     {
@@ -283,4 +257,5 @@ void check_amr_parms(amr_options_t *gparms)
             exit(1);
         }
     }
+
 }

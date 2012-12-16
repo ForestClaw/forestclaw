@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_utils.H"
 #include <p4est_base.h>
+#include "amr_single_step.H"
+#include "amr_mol.H"
 
 int pow_int(int a, int n)
 {
@@ -36,19 +38,41 @@ int pow_int(int a, int n)
     return b;
 }
 
-// -----------------------------------------------------------------
-// Initialize data
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Initialize data
+   ----------------------------------------------------------------- */
+
+// Should this maybe be 'allocate_domain_data' instead?  Reserve 'init'
+// assigning default values to items?
 void init_domain_data(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
+
     ddata->amropts = NULL;
     ddata->curr_time = 0;
-    ddata->f_level_advance = NULL;
-    ddata->f_single_step_patch = NULL;
-    ddata->f_mol_rhs_patch = NULL;
-    ddata->f_mol_solver = NULL;
+
+    /* Single step solver that is called. */
+    ddata->f_single_step_level_ptr = &fclaw2d_single_step_level;
+
+    /* Callback for single step solver */
+    ddata->f_single_step_update_patch_ptr = NULL;
+
+    /* Interface to (Fortran) ODE solver that is called */
+    ddata->f_ode_solver_level_ptr = NULL;
+
+    /* Right hand side for an MOL solver */
+    ddata->f_ode_solver_rhs_patch_ptr = NULL;
+
+    /* Setup patch */
+    ddata->f_patch_setup_ptr = NULL;
+
+    /* Initialize patch */
+    ddata->f_patch_initialize_ptr = NULL;
+
+    /* Boundary conditions */
+    ddata->f_patch_physbc_ptr = NULL;
+
 }
 
 
@@ -98,15 +122,23 @@ void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms)
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
 {
     fclaw2d_domain_data_t *ddata_old = get_domain_data(old_domain);
+
+    /* Has the data already been allocated? */
     fclaw2d_domain_data_t *ddata_new = get_domain_data(new_domain);
 
-    // Copy pointers
+    /* Copy data members */
     ddata_new->amropts = ddata_old->amropts;
     ddata_new->curr_time = ddata_old->curr_time;
-    ddata_new->f_level_advance = ddata_old->f_level_advance;
-    ddata_new->f_single_step_patch = ddata_old->f_single_step_patch;
-    ddata_new->f_mol_rhs_patch = ddata_old->f_mol_rhs_patch;
-    ddata_new->f_mol_solver = ddata_old->f_mol_solver;
+
+    ddata_new->f_single_step_level_ptr = ddata_old->f_single_step_level_ptr;
+    ddata_new->f_single_step_update_patch_ptr = ddata_old->f_single_step_update_patch_ptr;
+
+    ddata_new->f_ode_solver_level_ptr = ddata_old->f_ode_solver_level_ptr;
+    ddata_new->f_ode_solver_rhs_patch_ptr = ddata_old->f_ode_solver_rhs_patch_ptr;
+
+    ddata_new->f_patch_setup_ptr = ddata_old->f_patch_setup_ptr;
+    ddata_new->f_patch_initialize_ptr = ddata_old->f_patch_initialize_ptr;
+    ddata_new->f_patch_physbc_ptr = ddata_old->f_patch_physbc_ptr;
 }
 
 
@@ -179,36 +211,46 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
 }
 /* end of helper functions */
 
+/*
 const int get_refratio(fclaw2d_domain_t *domain)
 {
     const amr_options_t* gparms = get_domain_parms(domain);
     return gparms->refratio;
 }
+*/
 
 // int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
 
+/*
 const int get_corners_per_patch(fclaw2d_domain_t *domain)
 {
     // Number of patch corners, not the number of corners in the domain!
     return fclaw2d_domain_num_corners(domain);
 }
+*/
 
+/*
 const int get_faces_per_patch(fclaw2d_domain_t *domain)
 {
     // Number of faces per patch, not the total number of faces in the domain!
     return fclaw2d_domain_num_faces(domain);
 }
+*/
 
+/*
 const int get_siblings_per_patch(fclaw2d_domain_t *domain)
 {
     // Number of patch corners, not the number of corners in the domain!
     return fclaw2d_domain_num_corners(domain);
 }
+*/
 
+/*
 const int get_p4est_refineFactor(fclaw2d_domain_t *domain)
 {
     return fclaw2d_domain_num_face_corners(domain);
 }
+*/
 
 
 
@@ -271,7 +313,7 @@ fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
 
   fclaw2d_domain_data_t *ddata = get_domain_data(domain);
   ddata->amropts = gparms;
-  
+
   ddata->f_level_advance = level_advance_cb;
   ddata->f_single_step_patch = single_step_patch_cb;
 }

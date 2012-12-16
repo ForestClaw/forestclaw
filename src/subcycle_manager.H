@@ -46,7 +46,6 @@ public:
 
     void define(const int& a_level,
                 const int& a_refratio,
-                const int& a_num_patches,
                 const int& a_maxlevel,
                 const double& a_time,
                 const bool& a_subcycle);
@@ -73,7 +72,6 @@ public:
     int m_last_coarse_exchange;
     int m_last_fine_exchange;
     int m_step_inc;
-    int m_num_patches;
 
     double m_time;
     double m_dt;
@@ -102,6 +100,8 @@ public:
     void increment_step_counter(const int& a_level);
 
     bool nosubcycle();
+    int verbosity();
+
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
     // i.e. powers of ref_ratio.
@@ -123,8 +123,8 @@ public:
     void increment_coarse_exchange_counter(const int& a_level);
     void increment_fine_exchange_counter(const int& a_level);
 
+private :
     std::vector<level_data> m_levels;
-
     int m_maxlevel;
     int m_minlevel;
     int m_refratio;

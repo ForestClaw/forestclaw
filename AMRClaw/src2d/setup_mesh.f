@@ -179,3 +179,210 @@ c     # computed at the center of the mesh cell.
       norm_cross = sqrt(w(1)*w(1) + w(2)*w(2) + w(3)*w(3))
 
       end
+
+
+
+      SUBROUTINE compute_normals(mx,my,mbc,xp,yp,zp,xd,yd,zd,
+     &      xnormals,ynormals,edge_lengths)
+      IMPLICIT NONE
+
+      INTEGER mx,my,mbc
+
+      double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+
+      double precision xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+
+      INTEGER i,j,m
+      DOUBLE PRECISION taud(3),taup(3), sp,sd,st,ct
+      DOUBLE PRECISION nv(3), a1, a2, w(3)
+
+      DOUBLE PRECISION a11, a12, a22, nlen,s,nv1(3)
+      DOUBLE PRECISION h
+
+      INTEGER version
+
+      DATA version /1/
+
+c     # Compute normals at all interior edges.
+
+c     # Get x-face normals
+      DO j = 1-mbc,my+mbc+1
+         DO i = 1-mbc,mx+mbc+1
+
+            taud(1) = xp(i,j) - xp(i-1,j)
+            taud(2) = yp(i,j) - yp(i-1,j)
+            taud(3) = zp(i,j) - zp(i-1,j)
+
+            taup(1) = xd(i,j+1) - xd(i,j)
+            taup(2) = yd(i,j+1) - yd(i,j)
+            taup(3) = zd(i,j+1) - zd(i,j)
+
+            CALL get_normal(taup,taud,nv,sp)
+
+            DO m = 1,3
+               xnormals(i,j,m) = nv(m)
+            ENDDO
+            edge_lengths(i,j,1) = sp
+         ENDDO
+      ENDDO
+
+      DO j = 1-mbc,my+mbc+1
+         DO i = 1-mbc,mx+mbc+1
+c           # Now do y-faces
+            taud(1) = xp(i,j) - xp(i,j-1)
+            taud(2) = yp(i,j) - yp(i,j-1)
+            taud(3) = zp(i,j) - zp(i,j-1)
+
+            taup(1) = xd(i+1,j) - xd(i,j)
+            taup(2) = yd(i+1,j) - yd(i,j)
+            taup(3) = zd(i+1,j) - zd(i,j)
+
+            CALL get_normal(taup,taud,nv,sp)
+
+c           # nv has unit length
+            DO m = 1,3
+               ynormals(i,j,m) = nv(m)
+            ENDDO
+            edge_lengths(i,j,2) = sp
+         ENDDO
+      ENDDO
+
+      END SUBROUTINE compute_normals
+
+
+c     # Compute an approximate unit normal to cell edge
+c     #
+c     # Inputs :
+c     # taud     Vector between adjoining cell centers ("dual" cell edge)
+c     # taup     Vector between edge nodes ("primal" cell edge)
+c     #
+c     # Ouputs :
+c     # nv       Unit vector vector normal to taup, and tangent to the surface
+c     # sp       Length of taup
+c     #
+c     # Idea is to construct normal to edge vector using
+c     #
+c     #     t^i = a^{i1} t_1 + a^{i2} t_2
+c     #
+c     # where t_1, t_2 are coordinate basis vectors T_xi, T_eta
+c     # and t^i dot t_j = 1 (i == j), 0 (i /= j)
+c     #
+c     # At left edge, we have
+c     #       taud ~ T_xi = t_1  and   taup ~ T_eta = t_2
+c     #
+c     # At bottom edge, we have
+c     #       taup ~ T_xi = t_1  and   taud ~ T_eta = t_2
+c     #
+c     # Metric a_{ij} = t_i dot t_j
+c     # Metric a^{ij} is the inverse of a_{ij}
+c     #
+c     # Both versions use this idea.  That is, both compute
+c     # coefficients c1, c2 so that the unit normal at the edge
+c     # is expressed as
+c     #
+c     #        n = c1*taup + c2*taud
+c     #
+c     # In version 1, trig. identities are used to express these coefficients
+c     # in terms of the angle between taup and taud.  In version 2, entries of
+c     # the conjugate tensor are used directly.   Both compute the same vector, but
+c     # version 2 is about 20%-30% faster.
+c     #
+c     # Formulas work for both left and bottom edges.
+c     #
+c     # Neither version depends on any knowledge of the surface normals.
+
+      subroutine get_normal(taup,taud,nv,sp)
+      implicit none
+
+      double precision taup(3),taud(3),nv(3), sp
+      integer version
+
+      data version /2/
+
+      if (version .eq .1) then
+         call get_normal_ver1(taup,taud,nv,sp)
+      elseif (version .eq. 2) then
+         call get_normal_ver2(taup,taud,nv,sp)
+      endif
+
+      end
+
+      subroutine get_normal_ver1(taup,taud,nv,sp)
+      implicit none
+
+      double precision taup(3),taud(3),nv(3)
+      double precision sp,sd,dt,ct,st,c1,c2
+      double precision tp(3), td(3)
+
+      integer m
+
+      sp = 0
+      sd = 0
+      do m = 1,3
+         sp = sp + taup(m)*taup(m)
+         sd = sd + taud(m)*taud(m)
+      enddo
+      sp = sqrt(sp)
+      sd = sqrt(sd)
+
+c     # st = sin(theta)
+c     # ct = cos(theta)
+c     # theta = angle between taup and taud
+      ct = 0
+      do m = 1,3
+         tp(m) = taup(m)/sp
+         td(m) = taud(m)/sd
+         ct = ct + tp(m)*td(m)
+      enddo
+      st = sqrt(1.d0-ct*ct)
+
+      c1 = 1.d0/st
+      c2 = -ct/st
+      do m = 1,3
+         nv(m) = c1*td(m) + c2*tp(m)
+      enddo
+      end
+
+      subroutine get_normal_ver2(taup,taud,nv,sp)
+      implicit none
+
+      double precision taup(3),taud(3),nv(3), sp
+
+      integer m
+      double precision nlen,aii,ai2,c1,c2
+
+c     # we leave out any scaling by the determinant of the metric,
+c     # since we just normalize the vector anyway.
+      aii = 0
+      ai2 = 0
+      do m = 1,3
+         aii = aii + taup(m)*taup(m)
+         ai2 = ai2 - taud(m)*taup(m)
+      enddo
+
+      nlen = 0
+      do m = 1,3
+         nv(m) = aii*taud(m) + ai2*taup(m)
+         nlen = nlen + nv(m)*nv(m)
+      enddo
+      nlen = sqrt(nlen)
+
+c      c1 = aii/nlen
+c      c2 = ai2/nlen
+
+      do m = 1,3
+c         nv(m) = c1*taud(m) + c2*taup(m)
+         nv(m) = nv(m)/nlen
+      enddo
+      sp = sqrt(aii)
+
+
+      end

@@ -111,24 +111,3 @@ void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
                                    cb_dump_time_interp_patch,
                                    &dump_patch);
 }
-
-static
-void cb_dump_auxarray(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
-{
-    int dump_patchno = *((int *) user);
-    int numb4 = domain->blocks[block_no].num_patches_before;
-    if (patch_no == dump_patchno + numb4)
-    {
-        ClawPatch *cp = get_clawpatch(patch);
-        cp->dump_auxarray();
-    }
-}
-
-void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
-{
-    printf("Dumping patch (time_interp) %d\n",dump_patchno);
-    fclaw2d_domain_iterate_patches(domain,
-                                   cb_dump_auxarray,
-                                   &dump_patchno);
-}

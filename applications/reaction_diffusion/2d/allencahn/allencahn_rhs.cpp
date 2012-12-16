@@ -48,7 +48,6 @@ extern "C"
 }
 
 
-// This name is fixed.
 void allencahn_rhs(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
                    int this_block_idx,
@@ -58,8 +57,6 @@ void allencahn_rhs(fclaw2d_domain_t *domain,
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     const amr_options_t *gparms = get_domain_parms(domain);
-
-    // printf("t = %16.8e\n",t);
 
     double dx = cp->dx();
     double dy = cp->dy();

@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_SINGLE_STEP_H
 
 #include "fclaw2d_capi.h"
+#include "forestclaw2d.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,10 +37,24 @@ extern "C"
 #endif
 #endif
 
-/* Defined in amr_single_step.cpp */
-void fclaw2d_single_step(fclaw2d_domain_t *domain,
-                         int level,
-                         struct fclaw2d_level_time_data *time_data);
+
+/* Needed to avoid circular typedef refs.  This struct is defined in
+   'fclaw_typedefs.h', which includes this file. */
+
+typedef struct single_step_data single_step_data_t;
+
+struct single_step_data
+{
+    double t;
+    double dt;
+    double maxcfl;
+};
+
+struct fclaw2d_level_time_data;
+
+double fclaw2d_single_step_level(fclaw2d_domain_t *domain,
+                               int level,
+                               double t, double dt);
 
 #ifdef __cplusplus
 #if 0

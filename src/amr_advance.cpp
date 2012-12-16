@@ -25,20 +25,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
+#include "amr_mol.H"
+#include "amr_solver_typedefs.H"
 
+/* ----------------------------------------------------------
+   Manage subcyling process
+   ---------------------------------------------------------- */
 
-// -----------------------------------------------------------
-// Here is where the solver that does the actual updating gets
-// called.
-// -----------------------------------------------------------
 static void update_level_solution(fclaw2d_domain_t *domain,
                                   int a_level,
                                   fclaw2d_level_time_data *time_data)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    fclaw2d_level_advance_t f_level_advance_ptr = ddata->f_level_advance;
-    f_level_advance_ptr(domain,a_level,time_data);
+    double t = time_data->t_level;
+    double dt = time_data->dt;
+    double cfl;
+    if (ddata->f_single_step_level_ptr != NULL)
+    {
+        cfl = (ddata->f_single_step_level_ptr)(domain,a_level,t,dt);
+    }
+
+    /* We may actually do both.  Just need to be sure that coarser level has taken a
+       time step though */
+    if (ddata->f_ode_solver_level_ptr != NULL)
+    {
+        cfl = fclaw2d_mol_step_level(domain,a_level,time_data,
+                                     ddata->f_ode_solver_level_ptr);
+    }
+    time_data->maxcfl = max(time_data->maxcfl,cfl);
 }
 
 static
@@ -47,7 +61,8 @@ double advance_level(fclaw2d_domain_t *domain,
                    const int& a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
-    bool verbose = (bool) a_time_stepper->m_verbosity;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    bool verbose = (bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
 
     double maxcfl = 0;
@@ -62,7 +77,7 @@ double advance_level(fclaw2d_domain_t *domain,
     {
         if (!a_time_stepper->level_exchange_done(a_level))
         {
-            // Level exchange should have been done right after solution update.
+            /* Level exchange should have been done right after solution update. */
             printf("Error (advance_level) : Level exchange at level %d not done at time step %d\n",
                    a_level,a_curr_fine_step);
             exit(1);
@@ -78,9 +93,9 @@ double advance_level(fclaw2d_domain_t *domain,
             }
             if (a_curr_fine_step == last_coarse_step)
             {
-                // Levels are time synchronized and we can do a simple coarse/fine
-                // exchange without time interpolation or first advancing the
-                // coarser level
+                /* Levels are time synchronized and we can do a simple coarse/fine
+                   exchange without time interpolation or first advancing the
+                   coarser level */
                 if (verbose)
                 {
                     cout << " ----> Coarse and fine level are time synchronized; doing exchange"
@@ -95,9 +110,9 @@ double advance_level(fclaw2d_domain_t *domain,
 
                 if (a_time_stepper->nosubcycle() && !a_time_stepper->is_coarsest(a_level))
                 {
-                    // non-subcycled case : this advance is only needed because we
-                    // want to advance the coarser grids, not because we need time
-                    // interpolated boundary conditions.
+                    /* non-subcycled case : this advance is only needed because we
+                       want to advance the coarser grids, not because we need time
+                       interpolated boundary conditions. */
                     if (verbose)
                     {
                         cout << " ----> Non-subcycled case " << endl;
@@ -114,7 +129,7 @@ double advance_level(fclaw2d_domain_t *domain,
             }
             else
             {
-                // We may need time interpolated boundary conditions.
+                /* We may need time interpolated boundary conditions. */
                 if (verbose)
                 {
                     cout << " --> Coarse and fine level are not time synchronized; doing exchange "
@@ -122,9 +137,9 @@ double advance_level(fclaw2d_domain_t *domain,
                 }
                 if ((a_curr_fine_step > last_coarse_step))
                 {
-                    // subcycled case : a_curr_fine_step will only be greater than
-                    // last_coarse_step if we haven't yet advanced the coarse grid to a time level
-                    // beyond the current fine grid level.
+                    /* subcycled case : a_curr_fine_step will only be greater than
+                       last_coarse_step if we haven't yet advanced the coarse grid to a time level
+                       beyond the current fine grid level. */
                     if (verbose)
                     {
                         cout << " ----> Subcycled case " << endl;
@@ -140,9 +155,9 @@ double advance_level(fclaw2d_domain_t *domain,
                 }
                 else
                 {
-                    // This will only happen if refratio > 2.  In that case, we have more than
-                    // one fine grid step which can use the same two coarse grid time levels
-                    // to get time interpolated boundary conditions.
+                    /* This will only happen if refratio > 2.  In that case, we have more than
+                       one fine grid step which can use the same two coarse grid time levels
+                       to get time interpolated boundary conditions. */
                 }
                 if (!a_time_stepper->nosubcycle())
                 {
@@ -151,14 +166,14 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " --> Doing time interpolatation from coarse grid at level "
                              << a_level-1 << endl;
                     }
-                    int refratio = get_refratio(domain);
+                    int refratio = gparms->refratio;
 
-                    // (1) a_curr_fine_step > last_coarse_step : we just advanced the coarse grid
-                    // and can now apply time interpolated boundary conditions, or
-                    //
-                    // (2) a_curr_fine_step < last_coarse_step : we advanced the coarse
-                    // grid in a previous step but we still have to do time interpolation (this
-                    // can only happen if refratio > 2)
+                    /* (1) a_curr_fine_step > last_coarse_step : we just advanced the coarse grid
+                       and can now apply time interpolated boundary conditions, or
+
+                       (2) a_curr_fine_step < last_coarse_step : we advanced the coarse
+                       grid in a previous step but we still have to do time interpolation (this
+                       can only happen if refratio > 2) */
 
                     double  alpha = double(a_curr_fine_step)/refratio;
                     if (verbose)
@@ -178,6 +193,7 @@ double advance_level(fclaw2d_domain_t *domain,
     time_data.t_level = t_level;
     time_data.t_initial = a_time_stepper->initial_time();
     time_data.dt = a_time_stepper->dt(a_level);
+    time_data.fixed_dt = a_time_stepper->nosubcycle();
 
     if (verbose)
     {
@@ -190,17 +206,17 @@ double advance_level(fclaw2d_domain_t *domain,
         time_data.maxcfl = maxcfl;
     }
 
-    // Set some extra things needed by a multi-stage or implicit scheme.
+    /* Set some extra things needed by a multi-stage or implicit scheme. */
     time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
     if (!a_time_stepper->is_coarsest(a_level))
     {
         time_data.dt_coarse = a_time_stepper->dt(a_level-1);
     }
 
-    // ------------------------------------------------------------
-    // Advance this level from
-    //        'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
-    // ------------------------------------------------------------
+    /* ------------------------------------------------------------
+       Advance this level from
+       'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
+       ------------------------------------------------------------ */
     update_level_solution(domain,a_level,&time_data);
 
     a_time_stepper->increment_step_counter(a_level);

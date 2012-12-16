@@ -62,7 +62,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
 
     // Write out header file containing global information for 'iframe'
     int meqn = gparms->meqn;
-    int maux = gparms->maux;
+    int maux = 0;
     write_tfile_(iframe,time,meqn,ngrids,maux);
 
     // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,

@@ -26,17 +26,10 @@ public :
 
     void copyFrom(ClawPatch *a_cp);
 
-    bool isDefined();  // Do I even use this?
-
     // ----------------------------------------------------------------------------------
     // Initialization routines
     // ----------------------------------------------------------------------------------
-    void initialize();
-
-    void setup_patch(const int& a_level, const int& a_maxlevel,
-                     const int& a_refratio);
-
-    void setAuxArray();
+    void setup_patch(const int& level, const amr_options_t *gparms);
 
     // ----------------------------------------------------------------
     // Time stepping routines
@@ -54,9 +47,9 @@ public :
 
     void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 
-    void mb_exchange_corner_ghost(const int& a_icorner, bool a_intersects_block[],
+    void mb_exchange_corner_ghost(const int& a_icorner, fclaw_bool a_intersects_block[],
                                   ClawPatch *a_neighbor_cp,
-                                  const bool& a_is_block_corner);
+                                  const fclaw_bool& a_is_block_corner);
 
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
@@ -64,7 +57,7 @@ public :
                             const int& a_num_neighbors,
                             const int& a_refratio,
                             ClawPatch **neighbor_cp,
-                            bool a_time_interp, bool a_block_boundary);
+                            fclaw_bool a_time_interp, fclaw_bool a_block_boundary);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
@@ -72,35 +65,35 @@ public :
                                 const int& a_num_neighbors,
                                 const int& a_refratio,
                                 ClawPatch **a_neighbor_cp,
-                                bool a_time_interp,
-                                bool a_block_boundary);
+                                fclaw_bool a_time_interp,
+                                fclaw_bool a_block_boundary);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
     void average_corner_ghost(const int& a_corner, const int& a_refratio,
                               ClawPatch *cp_fine,
-                              bool a_time_interp);
+                              fclaw_bool a_time_interp);
 
     void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
                                  ClawPatch *cp_fine,
-                                 bool a_time_interp, bool is_corner_block,
-                                 bool intersects_block[]);
+                                 fclaw_bool a_time_interp, fclaw_bool is_corner_block,
+                                 fclaw_bool intersects_block[]);
 
     void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                   ClawPatch *cp_fine,
-                                  bool a_time_interp);
+                                  fclaw_bool a_time_interp);
 
     void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                      ClawPatch *cp_fine,
-                                     bool a_time_interp, bool is_block_corner,
-                                     bool intersects_block[]);
+                                     fclaw_bool a_time_interp, fclaw_bool is_block_corner,
+                                     fclaw_bool intersects_block[]);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------
 
     // Boundary condition routines that don't require neighbors
-    void set_phys_face_ghost(const bool a_intersects_bc[],
+    void set_phys_face_ghost(const fclaw_bool a_intersects_bc[],
                              const int a_mthbc[],
                              const double& t,
                              const double& dt);
@@ -117,8 +110,8 @@ public :
     // ----------------------------------------------------------------
     // Tagging, refining and coarsening
     // ----------------------------------------------------------------
-    bool tag_for_refinement(bool init_flag);
-    bool tag_for_coarsening(ClawPatch *cp_siblings[],
+    fclaw_bool tag_for_refinement(fclaw_bool init_flag);
+    fclaw_bool tag_for_coarsening(ClawPatch *cp_siblings[],
                             const int& refratio,
                             const int& num_siblings,
                             const int& p4est_refineFactor);
@@ -138,8 +131,7 @@ public :
     // Mapped grids
     // ----------------------------------------------------------------
 
-    void setup_manifold(const int& a_level, const int& a_maxlevel,
-                        const int& a_refratio);
+    void setup_manifold(const int& a_level, const amr_options_t *gparms);
 
     // ----------------------------------------------------------------
     // Output and diagnostics
@@ -152,7 +144,6 @@ public :
     void dump();
     void dump_last();
     void dump_time_interp();
-    void dump_auxarray();
 
     double dx();
     double dy();
@@ -164,12 +155,29 @@ public :
     double *yd();
     double *zd();
 
+    double *area();
+
+    double *xface_normals();
+    double *yface_normals();
+    double *edge_lengths();
+
     double xlower();
     double ylower();
 
-    double* current_data_ptr();
-    double* aux_data_ptr();
+    double* q();
     void save_current_step();
+
+    /* Other solvers will be added here */
+    /* These routines are defined, but note that we don't use any of the
+       specifics form the wave prop routines, so that amr_waveprop.cpp does
+       not need to be compiled in */
+    void* waveprop_data();
+    void set_waveprop_data(void* solver_data);
+
+
+    /* In case the user wants to add their own solver data */
+    void set_user_solver_data(void* userdata);
+    void* user_solver_data();
 
 
 #if FCLAW_SPACEDIM == 3
@@ -203,23 +211,26 @@ protected :
     double m_zupper;
 #endif
 
-    // These are global variables, but are needed to dimensions the patch
-    // and auxilliary data correctly, and so are useful to have locally.
+    /* These are global variables, but are needed to dimensions the patch, so we keep
+       them here.*/
     int m_meqn;
-    int m_maux;
     int m_mbc;
 
-    bool m_manifold;
-    bool m_mapped;
-    int m_blockno; // This determines which mapping to use for this patch
+    fclaw_bool m_manifold;
+    // fclaw_bool m_mapped;
+    int m_blockno; /* This determines which mapping to use for this patch */
 
-    // Here is where the data is stored.
+    /* Current time step */
     FArrayBox m_griddata;
-    FArrayBox m_griddata_time_interp;
-    FArrayBox m_griddata_last;  // stores previous time step for interpolation in time
-    FArrayBox m_griddata_save;
 
-    FArrayBox m_auxarray;
+    /* Time interpolated grid data */
+    FArrayBox m_griddata_time_interp;
+
+    /* Last time step, needed to get time interpolated data */
+    FArrayBox m_griddata_last;
+
+    /* Save last time step in case we need to retake a time step */
+    FArrayBox m_griddata_save;
 
     FArrayBox m_xp;
     FArrayBox m_yp;
@@ -229,10 +240,15 @@ protected :
     FArrayBox m_yd;
     FArrayBox m_zd;
 
-    FArrayBox m_capacity;   // Store this instead of the aux array.
     FArrayBox m_area;
+    FArrayBox m_xface_normals;
+    FArrayBox m_yface_normals;
+    FArrayBox m_edge_lengths;
 
-    bool m_isDefined;
+    void *m_waveprop_data;
+
+    /* Allow the user to add their own data  here */
+    void *m_user_solver_data;
 
 }; // End class ClawPatch
 

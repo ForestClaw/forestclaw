@@ -27,10 +27,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_MOL_H
 
 #include "fclaw2d_capi.h"
+#include "forestclaw2d.h"
+#include "amr_options.h"
+
+/* Needed to avoid circular typedef refs.  This struct is defined in
+   'fclaw_typedefs.h', which includes this file. */
+
+struct fclaw2d_level_time_data;
 
 typedef struct fclaw_level_mol_data fclaw_level_mol_data_t;
 typedef struct fclaw2d_f_rhs_data_fort fclaw2d_f_rhs_data_fort_t;
-
 
 struct fclaw_level_mol_data
 {
@@ -42,6 +48,8 @@ struct fclaw_level_mol_data
     int *block_indices;
     double *patch_data;
     double *patch_data_restore;
+    int composite;  // Set to nonzero if we have a composite grid that we are time stepping with a
+                    // fixed time step (no subcycling).
 };
 
 
@@ -54,7 +62,6 @@ struct fclaw2d_f_rhs_data_fort
 
 extern "C"
 {
-
     /* Fortran routine that does actual time stepping */
     void feuler_(void* f, const int& neqn, double q[],
                  const double& t, const double& dt,
@@ -65,12 +72,13 @@ extern "C"
               int info[], double rhs_work[], int& idid);
 }
 
-// This is called from Fortran, so needs to be in this 'extern C' scope.
-/* NOTE: but it's not currently.  Also it uses C++ references. */
-void fclaw_mol_rhs(const double& t_inner, double *q, double *rhs_work);
+/* This is called from Fortran, so needs to be in this 'extern C' scope. */
+void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs_work);
 
-void fclaw_mol_step(fclaw2d_domain_t *domain,
-                    int level, struct fclaw2d_level_time_data *time_data);
+double fclaw2d_mol_step_level(fclaw2d_domain_t *domain,
+                              int level,
+                              struct fclaw2d_level_time_data *time_data,
+                              fclaw2d_ode_solver_level_t f_mol_solver_level_ptr);
 
 void parabolic_step_feuler(int neqn, double q[], double t, double dt);
 void parabolic_step_rkc(int neqn, double q[], double t, double dt);

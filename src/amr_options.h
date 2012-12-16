@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_OPTIONS_H
 
 #include <sc_options.h>
-
 #include "fclaw2d_defs.H"
 
 #ifdef __cplusplus
@@ -38,9 +37,15 @@ extern "C"
 #endif
 #endif
 
+typedef struct amr_options amr_options_t;
 
 
-typedef struct amr_options
+typedef void (*fclaw2d_readparms_t)(sc_options_t *opt,
+                                    amr_options_t *gparms);
+
+typedef void (*fclaw2d_checkparms_t)(amr_options_t *gparms);
+
+struct amr_options
 {
     /* Fixed grid size for each grid */
     int mx, my;
@@ -53,25 +58,25 @@ typedef struct amr_options
     double *tout;
     int nstep;
 
+    int verbosity;
+
+    /* wave prop parameters */
     double max_cfl;
     double desired_cfl;
 
-    /* Accuracy, source terms, auxiliary arrays */
     const char *order_string;
     int *order;
 
-    int verbosity;
     int src_term;
     int mcapa;
     int maux;
-
     int method[7];
-
-    /* Information about the system of PDEs */
-    int meqn;
     int mwaves;
     const char *mthlim_string;
     int *mthlim;
+
+    /* Information about the system of PDEs */
+    int meqn;
 
     /* Boundary condition information */
     int mbc;
@@ -96,8 +101,14 @@ typedef struct amr_options
     double bx;
     double ay;
     double by;
-}
-amr_options_t;
+
+    /* Add waveprop solver props here */
+    void *waveprop_parms;
+
+    /* User parms */
+    void *user_parms;
+
+};
 
 /** Convert a string with multiple integers into an integer array.
  * \param [in] array_string     A string of space-separated integers.
@@ -130,7 +141,9 @@ void amr_options_add_int_array (sc_options_t * opt,
  * \param [in,out] opt          Used for command line parsing.
  * \return                      Options with preset default values.
  */
-amr_options_t *amr_options_new (sc_options_t * opt);
+amr_options_t *amr_options_new (sc_options_t * opt,
+                                fclaw2d_readparms_t f_readparms,
+                                fclaw2d_checkparms_t f_checkparms);
 
 /* Parse options and populate values in registered amr_options structure.
  */
@@ -141,8 +154,6 @@ void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
  * \param [in,out]              Option storage will be deallocated.
  */
 void amr_options_destroy (amr_options_t * amropt);
-
-void check_amr_parms(amr_options_t *gparms);
 
 #ifdef __cplusplus
 #if 0

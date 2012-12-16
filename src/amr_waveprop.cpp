@@ -29,60 +29,183 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "clawpack_fort.H"
 
-// This is called if you want to only compute the right hand side for the
-// single step routine.
-double fclaw2d_waveprop_rhs(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double *rhs)
+#include "amr_waveprop.H"
+
+static
+amr_waveprop_parms_t* get_waveprop_parms(const amr_options_t* gparms)
 {
-    // This should evaluate the right hand side, but not actually do the update.
-    // This will be useful in cases where we want to use something other than
-    // a single step method.  For example, in a RK scheme, one might want to
-    // call the right hand side to evaluate stages.
-    return 0;
+    amr_waveprop_parms_t *waveprop_parms = (amr_waveprop_parms_t*) gparms->waveprop_parms;
+    return waveprop_parms;
 }
 
-// This is called from the single_step callback.
-// and is of type 'flaw_single_step_t'
-double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx,
-                               int this_patch_idx,
-                               double t,
-                               double dt)
+static
+amr_waveprop_patch_data_t* get_waveprop_data(ClawPatch *cp)
 {
-    const amr_options_t* gparms = get_domain_parms(domain);
-    int level = this_patch->level;
+    /* We need the this cast here, because ClawPatch::waveprop_data() only returns a
+       void* object */
+    amr_waveprop_patch_data_t *solver_data = (amr_waveprop_patch_data_t*) cp->waveprop_data();
+    return solver_data;
+}
 
-    ClawPatch *cp = get_clawpatch(this_patch);
+void amr_waveprop_readparms(sc_options_t *opt,  amr_options_t *gparms)
+{
+    /* This is a good example of a place where a [Section] would be nice.
+       Something like [waveprop] */
+
+    amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t;
+    gparms->waveprop_parms = (void*) waveprop_parms;
+
+    sc_options_add_double (opt, 0, "max_cfl", &waveprop_parms->max_cfl, 1.0,
+                           "Maximum CFL number [1.0]");
+
+    sc_options_add_double (opt, 0, "desired_cfl", &waveprop_parms->desired_cfl, 0.9,
+                           "Desired CFL number [0.9]");
+
+    /* Array of SpaceDim many values, with no defaults is set to all 0's */
+    amr_options_add_int_array (opt, 0, "order", &waveprop_parms->order_string, NULL,
+                               &waveprop_parms->order, SpaceDim,
+                               "Normal and transverse orders");
+
+    sc_options_add_int (opt, 0, "mcapa", &waveprop_parms->mcapa, -1,
+                        "Location of capacity function in aux array [-1]");
+
+    sc_options_add_int (opt, 0, "maux", &waveprop_parms->maux, 0,
+                        "Number of auxiliary variables [0]");
+
+    sc_options_add_int (opt, 0, "mwaves", &waveprop_parms->mwaves, 1,
+                        "Number of waves [1]");
+
+    sc_options_add_int (opt, 0, "src_term", &waveprop_parms->src_term, 0,
+                        "Source term option [0]");
+
+    sc_options_add_int (opt, 0, "maux", &waveprop_parms->maux, 0,
+                        "Numer of auxilliary variables [0]");
+
+    /* Array of mwaves many values */
+    amr_options_add_int_array (opt, 0, "mthlim", &waveprop_parms->mthlim_string, NULL,
+                               &waveprop_parms->mthlim, waveprop_parms->mwaves,
+                               "Waves limiters (one for each wave)");
+    /* At this point amropt->mthlim is allocated. Set defaults if desired. */
+}
+
+void amr_waveprop_checkparms(amr_options_t *gparms)
+{
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(gparms);
+
+    /* Set up 'method' vector used by Clawpack. */
+    waveprop_parms->method[0] = gparms->use_fixed_dt;
+
+    waveprop_parms->method[1] = waveprop_parms->order[0];
+    if (SpaceDim == 2)
+    {
+        waveprop_parms->method[2] = waveprop_parms->order[1];
+    }
+    else
+    {
+        waveprop_parms->method[2] = 10*waveprop_parms->order[1] + waveprop_parms->order[2];
+    }
+    waveprop_parms->method[3] = gparms->verbosity;
+    waveprop_parms->method[4] = waveprop_parms->src_term;
+    waveprop_parms->method[5] = waveprop_parms->mcapa;
+    waveprop_parms->method[6] = waveprop_parms->maux;
+
+    /* Should also check mthbc, mthlim, etc. */
+}
+
+
+/* This should only be called when a new ClawPatch is created. */
+void amr_waveprop_setaux(fclaw2d_domain_t *domain,
+                         fclaw2d_patch_t *this_patch,
+                         int this_block_idx,
+                         int this_patch_idx)
+{
+    const amr_options_t *gparms                 = get_domain_parms(domain);
+    ClawPatch *cp                         = get_clawpatch(this_patch);
+    // amr_waveprop_parms_t *waveprop_parms  = get_waveprop_parms(gparms);
+    amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
 
     set_block_(&this_block_idx);
 
-    double* qold = cp->current_data_ptr();
-    double* aux = cp->aux_data_ptr();
-
-    cp->save_current_step();  // Save for time interpolation
-
-    // Global to all patches
     int mx = gparms->mx;
     int my = gparms->my;
+    int maxmx = mx;
+    int maxmy = my;
     int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-    int maux = gparms->maux;
-    int mwaves = gparms->mwaves;
 
-    // Specific to the patch
+    /* Construct an index box to hold the aux array */
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = 1-mbc;
+    }
+    ur[0] = mx + mbc;
+    ur[1] = my + mbc;
+    Box box(ll,ur);
+
+    FArrayBox &auxarray = waveprop_data->auxarray;
+    int maux = gparms->maux;
+
+    auxarray.define(box,maux);
+    waveprop_data->maux = gparms->maux;
+
+    double *aux = auxarray.dataPtr();
+
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
+    if (gparms->manifold)
+    {
+        /* Modified clawpack aux routine */
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+        double *area = cp->area();
 
-    // We also call a 'b4step2' in clawpatch2, below.  But it won't
-    // do anything in the mapped case.
+        setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
+                         maux,aux,xp,yp,zp,xd,yd,zd,area);
+    }
+    else
+    {
+        /* Standard clawpack aux routine */
+        setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux, aux);
+    }
+}
+
+void amr_waveprop_qinit(fclaw2d_domain_t *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx)
+{
+    const amr_options_t *gparms              = get_domain_parms(domain);
+    ClawPatch *cp                            = get_clawpatch(this_patch);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+    amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
+
+    set_block_(&this_block_idx);
+
+    double* q = cp->q();
+
+    double* aux = waveprop_data->auxarray.dataPtr();
+    int maux = waveprop_parms->maux;
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int maxmx = mx;
+    int maxmy = my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
     if (gparms->manifold)
     {
         double *xp = cp->xp();
@@ -92,9 +215,195 @@ double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
         double *yd = cp->yd();
         double *zd = cp->zd();
 
-        b4step2_mapped_(mx,my, mbc,meqn,qold,dx,dy,xp,yp,zp,xd,yd,zd,
-                        t, dt, maux, aux);
+        qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+                        dx,dy,q,maux,aux,xp,yp,zp,xd,yd,zd,this_block_idx);
     }
+    else
+    {
+        qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+               dx,dy,q,maux,aux);
+    }
+}
+
+void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt)
+{
+    const amr_options_t *gparms                    = get_domain_parms(domain);
+    ClawPatch *cp                            = get_clawpatch(this_patch);
+    amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+
+    set_block_(&this_block_idx);
+
+    double* q = cp->q();
+
+    double* aux = waveprop_data->auxarray.dataPtr();
+    int maux = waveprop_parms->maux;
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int maxmx = mx;
+    int maxmy = my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    if (gparms->manifold)
+    {
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+
+        b4step2_manifold_(maxmx, maxmy, mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
+                          t,dt,maux,aux,xp,yp,zp,xd,yd,zd);
+    }
+    else
+    {
+        b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
+    }
+}
+
+
+/* Use this to return only the right hand side of the waveprop algorithm */
+double amr_waveprop_step2_rhs(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double *rhs)
+{
+    /* This should evaluate the right hand side, but not actually do the update.
+       This will be useful in cases where we want to use something other than
+       a single step method.  For example, in a RK scheme, one might want to
+       call the right hand side to evaluate stages. */
+    return 0;
+}
+
+
+void amr_waveprop_bc2(fclaw2d_domain *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      double t,
+                      double dt,
+                      fclaw_bool intersects_phys_bdry[])
+{
+
+    const amr_options_t* gparms              = get_domain_parms(domain);
+    ClawPatch *cp                            = get_clawpatch(this_patch);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+    amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
+
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    fclaw2d_block_data_t *bdata = get_block_data(this_block);
+    int *block_mthbc = bdata->mthbc;
+
+    /* Set a local copy of mthbc that can be used for a patch. */
+    int mthbc[NumFaces];
+    for(int i = 0; i < NumFaces; i++)
+    {
+        if (intersects_phys_bdry[i])
+        {
+            mthbc[i] = block_mthbc[i];
+        }
+        else
+        {
+            mthbc[i] = -1;
+        }
+    }
+
+    set_block_(&this_block_idx);
+
+    double* q = cp->q();
+
+    int maux = waveprop_parms->maux;
+    double *aux = waveprop_data->auxarray.dataPtr();
+
+    /* Global to all patches */
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int maxmx = mx;
+    int maxmy = my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* Specific to the patch */
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* Should I also have a 'mapped' version of this? */
+    if (gparms->manifold)
+    {
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+        double *xface_normals = cp->xface_normals();
+        double *yface_normals = cp->yface_normals();
+
+        bc2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc,
+                      xp,yp,zp,xd,yd,zd,xface_normals,yface_normals);
+    }
+    else
+    {
+        bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
+    }
+}
+
+
+/* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
+double amr_waveprop_step2(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt)
+{
+    const amr_options_t* gparms              = get_domain_parms(domain);
+    ClawPatch *cp                            = get_clawpatch(this_patch);
+    amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
+    amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(gparms);
+
+    set_block_(&this_block_idx);
+
+    int level = this_patch->level;
+
+    double* qold = cp->q();
+
+    double* aux = waveprop_data->auxarray.dataPtr();
+    int maux = waveprop_data->maux;
+
+    cp->save_current_step();  // Save for time interpolation
+
+    // Global to all patches
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    // Specific to the patch
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    // Specific to solver
+    int mwaves = waveprop_parms->mwaves;
 
     int maxm = max(mx,my);
 
@@ -109,10 +418,12 @@ double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    clawpatch2_(maxm, meqn, maux, mbc, gparms->method,
-                gparms->mthlim, gparms->mcapa, mwaves, mx, my, qold,
-                aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,level,
-                t, fp, fm, gp, gm);
+    // Replace this with a call to "step2" at some point...
+    clawpatch2_(maxm, meqn, maux, mbc, waveprop_parms->method,
+                waveprop_parms->mthlim, waveprop_parms->mcapa, mwaves,
+                mx, my, qold,
+                aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,
+                level,t, fp, fm, gp, gm);
 
     delete [] fp;
     delete [] fm;
@@ -122,4 +433,57 @@ double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
     delete [] work;
 
     return cflgrid;
+}
+
+
+static
+void cb_dump_auxarray(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      void *user)
+{
+    int dump_patchno = *((int *) user);
+    int numb4 = domain->blocks[this_block_idx].num_patches_before;
+
+    if (this_patch_idx == dump_patchno + numb4)
+    {
+        const amr_options_t* gparms              = get_domain_parms(domain);
+        ClawPatch *cp                            = get_clawpatch(this_patch);
+        amr_waveprop_patch_data_t *waveprop_data = get_waveprop_data(cp);
+        // amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(gparms);
+
+        double* aux = waveprop_data->auxarray.dataPtr();
+        int maux = waveprop_data->maux;
+
+        int mx = gparms->mx;
+        int my = gparms->my;
+        int mbc = gparms->mbc;
+
+        int k = 0;
+        for (int m = 0; m < maux; m++)
+        {
+            for(int j = 1-mbc; j <= my+mbc; j++)
+            {
+                for(int i = 1-mbc; i <= mx+mbc; i++)
+                {
+                    printf("q[%2d,%2d,%2d] = %24.16e\n",i,j,m,aux[k]);
+                    k++;
+                }
+                printf("\n");
+            }
+            printf("\n");
+            printf("\n");
+        }
+    }
+}
+
+
+void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
+{
+    printf("Dumping patch (time_interp) %d\n",dump_patchno);
+    fclaw2d_domain_iterate_patches(domain,
+                                   cb_dump_auxarray,
+                                   &dump_patchno);
+
 }

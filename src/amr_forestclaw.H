@@ -99,7 +99,7 @@ void get_block_boundary(fclaw2d_domain_t *domain,
 void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx,
-                       bool *intersects_bc);
+                       fclaw_bool *intersects_bc);
 
 // ----------------------------
 // Routines used by diagnostics

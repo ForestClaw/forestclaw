@@ -77,9 +77,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    // const int numfaces = get_faces_per_patch(domain);
-
-    const int refratio = get_refratio(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int refratio = gparms->refratio;
     bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
@@ -172,8 +171,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            int this_patch_idx,
                            void *user)
 {
-    // const int numfaces = get_faces_per_patch(domain);
-    const int refratio = get_refratio(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int refratio = gparms->refratio;
     bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
@@ -280,7 +279,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
     bool &time_interp = *((bool*) user);
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
-    const int refratio = get_refratio(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int refratio = gparms->refratio;
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
@@ -336,8 +336,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
-    const int refratio = get_refratio(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int refratio = gparms->refratio;
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
 

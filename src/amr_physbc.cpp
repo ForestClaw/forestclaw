@@ -24,11 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_utils.H"
+#include "amr_solver_typedefs.H"
 
-// -----------------------------------------------------------------------------
-// Physical boundary conditions
-// -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+   Physical boundary conditions
+   ----------------------------------------------------------------------------- */
 
 static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,
@@ -38,16 +38,18 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    void *user)
 {
     // int numfaces = get_faces_per_patch(domain);
-    bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bc[NumFaces];
     double curr_time = *((double*) user);
-    double dt = 1e20;   // When do we need dt in setting a boundary condition?
+    double dt = 1e20;
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    fclaw2d_block_data_t *bdata = get_block_data (this_block);
-
-    ClawPatch *this_cp = get_clawpatch(this_patch);
-    this_cp->set_phys_face_ghost(intersects_bc,bdata->mthbc,curr_time,dt);
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    (ddata->f_patch_physbc_ptr)(domain,
+                                this_patch,
+                                this_block_idx,
+                                this_patch_idx,
+                                curr_time,dt,
+                                intersects_bc);
 }
 
 

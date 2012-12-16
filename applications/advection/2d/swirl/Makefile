@@ -19,6 +19,10 @@ default: $(TARGET)
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
 
+.c.o:
+	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
+
 .f.o:
 	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
 
@@ -27,6 +31,7 @@ default: $(TARGET)
 
 exampleobjs = \
 	qinit.o \
+	swirl_user.o \
 	ghost_twopatch.o \
 	tag4refinement.o \
 	$(solver_routines)
@@ -41,9 +46,10 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
-	$(FORESTCLAW)/AMRClaw/src2d/b4step2_mapped.o \
-	$(FORESTCLAW)/AMRClaw/src2d/setaux_mapped.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qinit_mapped.o \
+	$(FORESTCLAW)/AMRClaw/src2d/bc2_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/b4step2_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/setaux_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/qinit_manifold.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
 	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
