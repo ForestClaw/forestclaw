@@ -23,17 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_waveprop.h"
+
 #include "amr_forestclaw.H"
 #include "clawpack_fort.H"
 
 // This is called if you want to only compute the right hand side for the
 // single step routine.
-double waveprop_rhs(fclaw2d_domain_t *domain,
-                    fclaw2d_patch_t *this_patch,
-                    int this_block_idx,
-                    int this_patch_idx,
-                    double t,
-                    double *rhs)
+double fclaw2d_waveprop_rhs(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double *rhs)
 {
     // This should evaluate the right hand side, but not actually do the update.
     // This will be useful in cases where we want to use something other than
@@ -44,12 +46,12 @@ double waveprop_rhs(fclaw2d_domain_t *domain,
 
 // This is called from the single_step callback.
 // and is of type 'flaw_single_step_t'
-double waveprop_update(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt)
+double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               double t,
+                               double dt)
 {
     const amr_options_t* gparms = get_domain_parms(domain);
     int level = this_patch->level;

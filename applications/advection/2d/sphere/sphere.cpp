@@ -23,18 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_single_step.h"
-#include "amr_forestclaw.H"
-
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
-double waveprop_update(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt);
+#include <fclaw2d_single_step.h>
+#include <fclaw2d_waveprop.h>
+
+#include <amr_forestclaw.H>
 
 int
 main (int argc, char **argv)
@@ -84,7 +79,7 @@ main (int argc, char **argv)
   // when it comes time to think about solving, say,
   // advection-diffusion.
   ddata->f_level_advance = &fclaw2d_single_step;
-  ddata->f_single_step_patch = &waveprop_update;
+  ddata->f_single_step_patch = &fclaw2d_waveprop_update;
 
   /* --------------------------------------------------
      Initialize and run the simulation
