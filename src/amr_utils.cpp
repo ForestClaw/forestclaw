@@ -226,3 +226,21 @@ int num_patches(fclaw2d_domain_t *domain, int level)
                                &count);
   return count;
 }
+
+/* Functions with C prototypes to use forestclaw from C code */
+
+void
+fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
+                              amr_options_t * gparms,
+                              fclaw2d_level_advance_t level_advance_cb,
+                              fclaw2d_single_step_patch_t
+                              single_step_patch_cb)
+{
+  allocate_user_data(domain);
+
+  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+  ddata->amropts = gparms;
+  
+  ddata->f_level_advance = level_advance_cb;
+  ddata->f_single_step_patch = single_step_patch_cb;
+}
