@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_waveprop.h"
 
 #include "amr_forestclaw.H"
+#include "amr_utils.H"
 #include "clawpack_fort.H"
 
 // This is called if you want to only compute the right hand side for the

@@ -23,39 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#ifndef AMR_INCLUDES_H
+#define AMR_INCLUDES_H
 
+/* NOTE: This file is meant to be included from .cpp files only. */
 
-void amrreset(fclaw2d_domain_t **domain)
-{
-    fclaw2d_domain_data_t *dd;
-    dd = (fclaw2d_domain_data_t *) (*domain)->user;
+#include <iostream>
+#include <cstdlib>
+#include <vector>
 
-    for(int i = 0; i < (*domain)->num_blocks; i++)
-    {
-        fclaw2d_block_t *block = (*domain)->blocks + i;
-        fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
+#include "amr_forestclaw.H"
+#include "amr_utils.H"
 
-        for(int j = 0; j < block->num_patches; j++)
-        {
-            fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t *) patch->user;
-            ClawPatch *cp = pd->cp;
-
-            if (cp != NULL)
-            {
-                delete cp;
-            }
-            FCLAW2D_FREE (pd);
-            patch->user = NULL;
-        }
-
-        FCLAW2D_FREE (bd);
-        block->user = NULL;
-    }
-    FCLAW2D_FREE (dd);
-    (*domain)->user = NULL;
-
-    fclaw2d_domain_destroy(*domain);
-    *domain = NULL;
-}
+#endif

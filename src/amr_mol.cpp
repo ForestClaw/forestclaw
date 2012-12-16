@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
+#include "amr_utils.H"
 #include "amr_mol.H"
 
 
@@ -178,7 +179,7 @@ void fclaw_mol_rhs(const double& t_inner,
         // This is the user defined routine.  The value of
         // this function pointer is set in main.
         fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-        fclaw_mol_rhs_patch_t f_mol_rhs_patch_ptr = ddata->f_mol_rhs_patch;
+        fclaw2d_mol_rhs_patch_t f_mol_rhs_patch_ptr = ddata->f_mol_rhs_patch;
         f_mol_rhs_patch_ptr(domain,this_patch,this_block_idx,
                             this_patch_idx,t_inner,&rhs[i*size]);
     }

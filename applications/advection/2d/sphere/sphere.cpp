@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_waveprop.h>
 
 #include <amr_forestclaw.H>
+#include <amr_utils.H>
 
 int
 main (int argc, char **argv)

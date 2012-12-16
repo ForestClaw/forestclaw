@@ -70,6 +70,19 @@ typedef double (*fclaw2d_single_step_patch_t)(fclaw2d_domain_t *domain,
                                               double t,
                                               double dt);
 
+/* Interface to MOL solver */
+ 
+typedef void (*fclaw2d_mol_rhs_patch_t)(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx,
+                                        int this_patch_idx,
+                                        double t,
+                                        double *rhs);
+
+typedef void (*fclaw_mol_solver_t)(int neqn,double q[],
+                                   double t, double dt);
+
+
 /* -----------------------------------------------------------------
  * Some lazy helper functions that really do make things easier...
  * Defined in amr_utils.cpp
@@ -91,6 +104,12 @@ int num_patches(fclaw2d_domain_t *domain, int level);
 int pow_int(int a, int n);
 
 /* Functions with C prototypes to use forestclaw from C code */
+
+void amrinit(fclaw2d_domain_t **domain);
+
+void amrrun(fclaw2d_domain_t **domain);
+
+void amrreset(fclaw2d_domain_t **domain);
 
 void fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
                                    amr_options_t * gparms,

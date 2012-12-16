@@ -26,16 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
-#include "fclaw_typedefs.H"
-
 #include "forestclaw2d.h"
-#include "fclaw2d_convenience.h"
-#include "amr_options.h"
 
-#include "amr_utils.H"
-
-#include "ClawPatch.H"
 #include "subcycle_manager.H"
+
+/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #ifdef __cplusplus
 extern "C"
@@ -49,12 +44,6 @@ extern "C"
 // Routines needed to time step and produce
 // output
 // ----------------------------------------
-
-// amrinit.cpp (called from main)
-void amrinit(fclaw2d_domain_t **domain);
-
-// amrrun.cpp  (called from main)
-void amrrun(fclaw2d_domain_t **domain);
 
 // amr_advance.cpp
 double advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
@@ -120,12 +109,6 @@ void dump_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch);
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
-
-// ------------------------------------
-// Clean-up routine
-// ------------------------------------
-// amrreset.cpp
-void amrreset(fclaw2d_domain_t **domain);
 
 
 

@@ -26,13 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_UTILS_H
 #define AMR_UTILS_H
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
+#include "amr_options.h"
+#include "forestclaw2d.h"
 
-#include "amr_forestclaw.H"
-#include "fclaw2d_capi.h"
 #include "fclaw_typedefs.H"
+
+/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #ifdef __cplusplus
 extern "C"

@@ -24,14 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+#include "amr_utils.H"
 
 /* ******************************************************************************
    This file contains all the routines (averaging and interpolation between faces
@@ -59,6 +52,16 @@ extern "C"
    the finest grid.
    ******************************************************************************
 */
+
+/* NOTE: Do we need the extern "C" here?  We're passing callbacks
+   to C iterators but maybe C++ handles it just fine. */
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
 static
 void cb_corner_average(fclaw2d_domain_t *domain,
@@ -391,6 +394,13 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     cp->time_interpolate(alpha);
 }
 
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
+
 // ----------------------------------------------------------------------
 // Main routine in this file
 // ----------------------------------------------------------------------
@@ -440,10 +450,3 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  cb_corner_interpolate,
                                  (void *) &time_interp);
 }
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif

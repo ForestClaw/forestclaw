@@ -2,12 +2,9 @@
 #define FCLAW_TYPEDEFS_H
 
 #include "fclaw2d_capi.h"
-#include "fclaw2d_single_step.h"
 
 #include "fclaw_defs.H"
-#include "amr_mol.H"
-
-class ClawPatch;
+#include "ClawPatch.H"
 
 typedef struct fclaw2d_domain_data
 {
@@ -22,7 +19,7 @@ typedef struct fclaw2d_domain_data
 
     // MOL solver requires both a patch_rhs function and
     // an ODE solver (a mol_solver).
-    fclaw_mol_rhs_patch_t f_mol_rhs_patch;
+    fclaw2d_mol_rhs_patch_t f_mol_rhs_patch;
     fclaw_mol_solver_t f_mol_solver;
 }
 fclaw2d_domain_data_t;

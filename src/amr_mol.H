@@ -26,27 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_MOL_H
 #define AMR_MOL_H
 
-#include "forestclaw2d.h"
-#include "amr_options.h"
-
-// Needed to avoid circular typedef refs.  This struct is defined in
-// 'fclaw_typedefs.h', which includes this file.
-struct fclaw2d_level_time_data;
+#include "fclaw2d_capi.h"
 
 typedef struct fclaw_level_mol_data fclaw_level_mol_data_t;
 typedef struct fclaw2d_f_rhs_data_fort fclaw2d_f_rhs_data_fort_t;
-
-// These are used to define domain data in 'fclaw_typedefs.h'
-typedef void (*fclaw_mol_rhs_patch_t)(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double *rhs);
-
-// Interface to MOL solver
-typedef void (*fclaw_mol_solver_t)(int neqn,double q[],
-                                   double t, double dt);
 
 
 struct fclaw_level_mol_data
@@ -83,6 +66,7 @@ extern "C"
 }
 
 // This is called from Fortran, so needs to be in this 'extern C' scope.
+/* NOTE: but it's not currently.  Also it uses C++ references. */
 void fclaw_mol_rhs(const double& t_inner, double *q, double *rhs_work);
 
 void fclaw_mol_step(fclaw2d_domain_t *domain,

@@ -24,6 +24,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
+#include "amr_utils.H"
+
+/* NOTE: Do we need the extern "C" here?  We're passing callbacks
+   to C iterators but maybe C++ handles it just fine. */
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
 // -----------------------------------------------------------------
 // Exchange corner and face information at same level
@@ -183,6 +194,13 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
     }
 }
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 // -------------------------------------------------------------------
 // Main routine in this file
