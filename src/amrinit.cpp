@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "amr_solver_typedefs.H"
 
+#include "ClawPatch.H"
+
 void cb_tag4refinement(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
@@ -65,8 +67,7 @@ void cb_init_base(fclaw2d_domain_t *domain,
     /* The user can now retrieve the ClawPatch from 'this_patch' and set
        up whatever they need to set up. */
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    fclaw2d_patch_setup_t f_ptr = ddata->f_patch_setup_ptr;
-    f_ptr(domain,this_patch,this_block_idx,this_patch_idx);
+    (ddata->f_patch_setup_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 static
@@ -86,8 +87,7 @@ void cb_amrinit(fclaw2d_domain_t *domain,
                 void *user)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    fclaw2d_patch_initialize_t f_ptr = ddata->f_patch_initialize_ptr;
-    f_ptr(domain,this_patch,this_block_idx,this_patch_idx);
+    (ddata->f_patch_initialize_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 // Initialize a base level of grids

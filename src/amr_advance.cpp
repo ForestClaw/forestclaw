@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "amr_includes.H"
+
 #include "amr_forestclaw.H"
 #include "amr_mol.H"
 #include "amr_solver_typedefs.H"

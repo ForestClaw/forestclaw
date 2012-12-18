@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "subcycle_manager.H"
 
+#include "amr_includes.H"
+
 subcycle_manager::subcycle_manager() {}
 subcycle_manager::~subcycle_manager() {}
 

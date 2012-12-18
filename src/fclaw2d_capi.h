@@ -41,6 +41,8 @@ extern "C"
 /* -----------------------------------------------------------
    Data needed for time stepping
    ----------------------------------------------------------- */
+
+#if 0
 typedef struct fclaw2d_level_time_data
 {
     /* Single step data. This always has to be set. */
@@ -72,7 +74,7 @@ typedef double (*fclaw2d_single_step_patch_t)(fclaw2d_domain_t *domain,
                                               double dt);
 
 /* Interface to MOL solver */
- 
+
 typedef void (*fclaw2d_mol_rhs_patch_t)(fclaw2d_domain_t *domain,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
@@ -84,6 +86,7 @@ typedef void (*fclaw_mol_solver_t)(int neqn,double q[],
                                    double t, double dt);
 
 
+#endif
 /* -----------------------------------------------------------------
  * Some lazy helper functions that really do make things easier...
  * Defined in amr_utils.cpp
@@ -95,13 +98,15 @@ void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 
 /* int corners_per_patch = FCLAW_CORNERS_PER_PATCH; */
+/*
 const int get_corners_per_patch(fclaw2d_domain_t *domain);
 const int get_faces_per_patch(fclaw2d_domain_t *domain);
 const int get_siblings_per_patch(fclaw2d_domain_t *domain);
 const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
+*/
 
 /* Misc. routines */
-int num_patches(fclaw2d_domain_t *domain, int level);
+int num_patches(fclaw2d_domain_t *domain, int level,int include_shadow);
 int pow_int(int a, int n);
 
 /* Functions with C prototypes to use forestclaw from C code */
@@ -117,11 +122,13 @@ void amrrun(fclaw2d_domain_t **domain);
 
 void amrreset(fclaw2d_domain_t **domain);
 
+/*
 void fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
                                    amr_options_t * gparms,
                                    fclaw2d_level_advance_t level_advance_cb,
                                    fclaw2d_single_step_patch_t
                                    single_step_patch_cb);
+*/
 
 #ifdef __cplusplus
 #if 0

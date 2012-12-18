@@ -53,7 +53,7 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->curr_time = 0;
 
     /* Single step solver that is called. */
-    ddata->f_single_step_level_ptr = &fclaw2d_single_step_level;
+    ddata->f_single_step_level_ptr = &amr_single_step_level;
 
     /* Callback for single step solver */
     ddata->f_single_step_update_patch_ptr = NULL;
@@ -302,6 +302,7 @@ fclaw_mpi_finalize (void)
     SC_CHECK_MPI (mpiret);
 }
 
+/*
 void
 fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
                               amr_options_t * gparms,
@@ -317,3 +318,4 @@ fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
   ddata->f_level_advance = level_advance_cb;
   ddata->f_single_step_patch = single_step_patch_cb;
 }
+*/

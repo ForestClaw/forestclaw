@@ -25,14 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                   /* need this because indent is dumb */
-#endif
-#endif
-
 /* ******************************************************************************
    This file contains all the routines (averaging and interpolation between faces
    and corners) needed for a level to do an exchange (averaging and interpolation)
