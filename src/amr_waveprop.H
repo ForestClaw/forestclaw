@@ -143,8 +143,7 @@ typedef struct amr_waveprop_patch_data
     int maux;
 } amr_waveprop_patch_data_t;
 
-void amr_waveprop_readparms(sc_options_t *opt,  amr_options_t *gparms);
-void amr_waveprop_checkparms(amr_options_t *gparms);
+void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms);
 
 void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,

@@ -40,10 +40,8 @@ extern "C"
 typedef struct amr_options amr_options_t;
 
 
-typedef void (*fclaw2d_readparms_t)(sc_options_t *opt,
-                                    amr_options_t *gparms);
-
-typedef void (*fclaw2d_checkparms_t)(amr_options_t *gparms);
+typedef void (*fclaw2d_user_parms_new_t)(sc_options_t *opt,
+                                         amr_options_t *gparms);
 
 struct amr_options
 {
@@ -142,8 +140,7 @@ void amr_options_add_int_array (sc_options_t * opt,
  * \return                      Options with preset default values.
  */
 amr_options_t *amr_options_new (sc_options_t * opt,
-                                fclaw2d_readparms_t f_readparms,
-                                fclaw2d_checkparms_t f_checkparms);
+                                fclaw2d_user_parms_new_t f_user_parms_ptr);
 
 /* Parse options and populate values in registered amr_options structure.
  */

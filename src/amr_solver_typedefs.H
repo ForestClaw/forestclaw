@@ -39,11 +39,8 @@ extern "C"
 struct fclaw2d_level_time_data;
 struct amr_options;
 
-typedef void (*fclaw2d_readparms_t)(sc_options_t *opt,
+typedef void (*fclaw2d_user_parms_new_t)(sc_options_t *opt,
                                     struct amr_options *gparms);
-
-typedef void (*fclaw2d_checkparms_t)(struct amr_options *gparms);
-
 
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,

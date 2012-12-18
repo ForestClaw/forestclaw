@@ -77,18 +77,42 @@ amr_options_convert_int_array (const char *array_string,
 static void
 amr_options_convert_arrays (amr_options_t * amropt)
 {
+    /*
     amr_options_convert_int_array (amropt->order_string, &amropt->order,
                                    SpaceDim);
     amr_options_convert_int_array (amropt->mthlim_string, &amropt->mthlim,
-                                   amropt->mwaves);
+    amropt->mwaves);
+    */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
                                    NumFaces);
 }
 
+
+/* -----------------------------------------------------------------
+   Check input parms
+   ----------------------------------------------------------------- */
+static
+void amr_checkparms(amr_options_t *gparms)
+{
+    /* Check outstyle. */
+    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
+    {
+        double dT_outer = gparms->tfinal/gparms->nout;
+        double dT_inner = gparms->initial_dt;
+        int nsteps = dT_outer/dT_inner;
+        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
+        {
+            printf("For fixed dt, initial time step size must divide tfinal/nout "
+                   "exactly.\n");
+            exit(1);
+        }
+    }
+
+}
+
 amr_options_t *
     amr_options_new (sc_options_t * opt,
-                     fclaw2d_readparms_t f_user_readparms_ptr,
-                     fclaw2d_checkparms_t f_user_checkparms_ptr)
+                     fclaw2d_user_parms_new_t f_user_parms_new_ptr)
 {
     amr_options_t *amropt;
 
@@ -181,26 +205,34 @@ amr_options_t *
     /* There is no default for this option.  A default will be read later. */
     sc_options_add_inifile (opt, 'F', "inifile","Read options from this file");
 
-    /* Read in any other parms the user might want, including user parms */
-    if (f_user_readparms_ptr != NULL)
-    {
-        f_user_readparms_ptr(opt,amropt);
-    }
-
     /* This works for me.  */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+
+    /* -----------------------------------------------------------------------*/
+    /* Read in options from file */
     /* Can check return value for -1 to see if file was not found */
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+    /* -----------------------------------------------------------------------*/
 
-    amr_options_convert_arrays(amropt);
+    /* -----------------------------------------------------------------------*/
+    /* some post processing */
+    /* amr_options_convert_arrays(amropt); */
+    amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                   NumFaces);
+    /* -----------------------------------------------------------------------*/
 
+    /* -----------------------------------------------------------------------*/
     /* Check parms read in above */
     amr_checkparms(amropt);
+    /* -----------------------------------------------------------------------*/
 
-    /* Check parms that involve the solver (or anything the user might want) */
-    if (f_user_checkparms_ptr != NULL)
+
+    /* -----------------------------------------------------------------------*/
+    /* Read in any other parms the user might want, including solver parms. */
+    if (f_user_parms_new_ptr != NULL)
     {
-        f_user_checkparms_ptr(amropt);
+        f_user_parms_new_ptr(opt,amropt);
     }
+    /* -----------------------------------------------------------------------*/
 
     return amropt;
 }
@@ -229,33 +261,13 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
 }
 
 void
-amr_options_destroy (amr_options_t * amropt)
+    amr_options_destroy (amr_options_t * amropt,
+                         fclaw2d_user_parms_destroy_t f_user_parms_destroy_ptr)
 {
     /* These are now stored under amropt->waveprop_parms */
     /* SC_FREE (amropt->->order); */
     /* SC_FREE (amropt->mthlim); */
     SC_FREE (amropt->mthbc);
     SC_FREE (amropt);
-}
-
-
-// -----------------------------------------------------------------
-// Check input parms
-// -----------------------------------------------------------------
-void amr_checkparms(amr_options_t *gparms)
-{
-    /* Check outstyle. */
-    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
-    {
-        double dT_outer = gparms->tfinal/gparms->nout;
-        double dT_inner = gparms->initial_dt;
-        int nsteps = dT_outer/dT_inner;
-        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
-        {
-            printf("For fixed dt, initial time step size must divide tfinal/nout "
-                   "exactly.\n");
-            exit(1);
-        }
-    }
 
 }

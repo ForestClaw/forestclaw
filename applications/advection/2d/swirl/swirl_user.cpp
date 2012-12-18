@@ -73,16 +73,10 @@ void amr_patch_physbc(fclaw2d_domain *domain,
 }
 
 
-void amr_user_readparms(sc_options_t *opt,  amr_options_t *gparms)
+void amr_parms_new(sc_options_t *opt,  amr_options_t *gparms)
 {
     /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_readparms(opt,gparms);
-}
-
-void amr_user_checkparms(amr_options_t *gparms)
-{
-    /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_checkparms(gparms);
+    amr_waveprop_parms_new(opt,gparms);
 }
 
 double amr_single_step_update_patch(fclaw2d_domain_t *domain,

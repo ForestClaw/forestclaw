@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_INCLUDES_H
 #define AMR_INCLUDES_H
 
-/* NOTE: This file is meant to be included from .cpp files only. */
+/* NOTE: This file is meant to be included by .cpp files only. */
 
 #include <iostream>
 #include <cstdlib>

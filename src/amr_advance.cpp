@@ -42,6 +42,9 @@ static void update_level_solution(fclaw2d_domain_t *domain,
     double t = time_data->t_level;
     double dt = time_data->dt;
     double cfl;
+
+    /* Idea here is that the user may want to apply a single step routine,
+       an MOL routine, or both. */
     if (ddata->f_single_step_level_ptr != NULL)
     {
         cfl = (ddata->f_single_step_level_ptr)(domain,a_level,t,dt);

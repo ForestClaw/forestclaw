@@ -1,4 +1,4 @@
-      subroutine ClawPatch2(maxm, meqn, maux, mbc, method, mthlim,
+      subroutine clawpatch2(maxm, meqn, maux, mbc, method, mthlim,
      &      mcapa, mwaves, mx, my, qold, aux, dx, dy, dt, cfl,
      &      work, mwork,xlower,ylower,level,t, fp,fm, gp, gm)
 
@@ -120,8 +120,9 @@ c        # This shouldn't happen due to checks in claw2
          stop
       endif
 
-      call b4step2(mx,my,mbc,mx,my,meqn,qold, xlower,ylower,dx,dy,t,
-     &      dt,maux,aux)
+c     # This is now called from C code
+c      call b4step2(mx,my,mbc,mx,my,meqn,qold, xlower,ylower,dx,dy,t,
+c     &      dt,maux,aux)
 
 c
 c     # take one step on the conservation law:
@@ -165,6 +166,8 @@ c                 # with capa array.
 c        # with source term:   use Godunov splitting
 c        # In AMRClaw, a function called 'src1d' is called from
 c        # from qad.  But we don't do that here.
+c
+c        # Not clear where this should fit in now.
          call src2(maxmx,maxmy,meqn,mbc,mx,my,
      &         xlower,ylower,dx,dy,
      &         qold,maux,aux,t,dt)

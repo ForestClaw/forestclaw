@@ -47,12 +47,16 @@ amr_waveprop_patch_data_t* get_waveprop_data(ClawPatch *cp)
     return solver_data;
 }
 
-void amr_waveprop_readparms(sc_options_t *opt,  amr_options_t *gparms)
+void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
 {
     /* This is a good example of a place where a [Section] would be nice.
-       Something like [waveprop] */
+       Something like [waveprop].  See fclaw_defaults.ini */
 
-    amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t;
+    amr_waveprop_parms_t *waveprop_parms;
+
+    waveprop_parms = SC_ALLOC_ZERO (amr_waveprop_parms_t, 1);
+
+    /* amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t; */
     gparms->waveprop_parms = (void*) waveprop_parms;
 
     sc_options_add_double (opt, 0, "max_cfl", &waveprop_parms->max_cfl, 1.0,
@@ -72,26 +76,37 @@ void amr_waveprop_readparms(sc_options_t *opt,  amr_options_t *gparms)
     sc_options_add_int (opt, 0, "maux", &waveprop_parms->maux, 0,
                         "Number of auxiliary variables [0]");
 
-    sc_options_add_int (opt, 0, "mwaves", &waveprop_parms->mwaves, 1,
-                        "Number of waves [1]");
-
     sc_options_add_int (opt, 0, "src_term", &waveprop_parms->src_term, 0,
                         "Source term option [0]");
 
-    sc_options_add_int (opt, 0, "maux", &waveprop_parms->maux, 0,
-                        "Numer of auxilliary variables [0]");
+    sc_options_add_int (opt, 0, "mwaves", &waveprop_parms->mwaves, 1,
+                        "Number of waves [1]");
 
     /* Array of mwaves many values */
     amr_options_add_int_array (opt, 0, "mthlim", &waveprop_parms->mthlim_string, NULL,
                                &waveprop_parms->mthlim, waveprop_parms->mwaves,
                                "Waves limiters (one for each wave)");
     /* At this point amropt->mthlim is allocated. Set defaults if desired. */
-}
 
-void amr_waveprop_checkparms(amr_options_t *gparms)
-{
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(gparms);
 
+    /* -----------------------------------------------------------------------*/
+    /* Read in options from file */
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+    /* -----------------------------------------------------------------------*/
+
+
+    /* -----------------------------------------------------------------------*/
+    /* Some post-processing */
+    amr_options_convert_int_array (waveprop_parms->mthlim_string, &waveprop_parms->mthlim,
+                                   waveprop_parms->mwaves);
+
+
+    amr_options_convert_int_array (waveprop_parms->order_string, &waveprop_parms->order,
+                                   SpaceDim);
+    /* -----------------------------------------------------------------------*/
+
+
+    /* -----------------------------------------------------------------------*/
     /* Set up 'method' vector used by Clawpack. */
     waveprop_parms->method[0] = gparms->use_fixed_dt;
 
