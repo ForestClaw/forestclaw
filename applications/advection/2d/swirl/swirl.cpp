@@ -26,10 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
-#include "swirl_user.H"
-
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
+
+#include "swirl_user.H"
+
 
 int
 main (int argc, char **argv)
@@ -44,16 +45,16 @@ main (int argc, char **argv)
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-  /* propose option handling as present in p4est/libsc */
-  /* the option values live in amr_options, see amr_options.h */
+  /* ---------------------------------------------------------------
+     Read parameters from .ini file.
+     -------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
-  gparms = amr_options_new (options, amr_parms_new);
+  gparms = amr_options_new (options, swirl_parms_new);
   amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
-
-  // ---------------------------------------------------------------
-  // Domain geometry
-  // ---------------------------------------------------------------
+  /* ---------------------------------------------------------------
+     Domain geometry
+     -------------------------------------------------------------- */
   domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
@@ -62,27 +63,22 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  allocate_user_data(domain);       // allocate all data for the domain.
-
+  init_domain_data(domain);       // allocate all data for the domain.
   fclaw2d_domain_data_t *ddata = get_domain_data(domain);
   ddata->amropts = gparms;
 
-/* ---------------------------------------------
-   Define the solver
-   ---------------------------------------------*/
-  /* Question : How come I need to use '&' in assigning a function pointer, but
-     not when passing in the function as an argument ? */
-  ddata->f_single_step_update_patch_ptr = &amr_single_step_update_patch;
-  ddata->f_patch_setup_ptr = &amr_patch_setup;
-  ddata->f_patch_initialize_ptr = &amr_patch_initialize;
-  ddata->f_patch_physbc_ptr = &amr_patch_physbc;
+  swirl_solver_setup(domain);
 
+  /* ---------------------------------------------------------------
+     Run
+     --------------------------------------------------------------- */
+  init_block_and_patch_data(domain);  /* Allocate block and patch data */
   amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
 
   sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms);
+  amr_options_destroy (gparms,swirl_parms_destroy);
 
   fclaw_mpi_finalize ();
 

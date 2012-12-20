@@ -43,6 +43,9 @@ typedef struct amr_options amr_options_t;
 typedef void (*fclaw2d_user_parms_new_t)(sc_options_t *opt,
                                          amr_options_t *gparms);
 
+typedef void (*fclaw2d_user_parms_destroy_t)(amr_options_t *gparms);
+
+
 struct amr_options
 {
     /* Fixed grid size for each grid */
@@ -150,7 +153,8 @@ void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
 /** Clean up option storage.
  * \param [in,out]              Option storage will be deallocated.
  */
-void amr_options_destroy (amr_options_t * amropt);
+void amr_options_destroy (amr_options_t * amropt,
+                          fclaw2d_user_parms_destroy_t f_user_parms_destroy_ptr);
 
 #ifdef __cplusplus
 #if 0

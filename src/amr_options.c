@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
-void amr_checkparms(amr_options_t *gparms);
-
 void
 amr_options_add_int_array (sc_options_t * opt,
                            int opt_char, const char *opt_name,
@@ -146,6 +144,13 @@ amr_options_t *
 
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
+
+    sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
+                        "Maximum CFL allowed [1]");
+
+    sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
+                        "Maximum CFL allowed [0.9]");
+
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations [1]");
@@ -268,6 +273,7 @@ void
     /* SC_FREE (amropt->->order); */
     /* SC_FREE (amropt->mthlim); */
     SC_FREE (amropt->mthbc);
+    f_user_parms_destroy_ptr(amropt);
     SC_FREE (amropt);
 
 }

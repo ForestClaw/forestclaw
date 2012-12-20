@@ -103,9 +103,10 @@ void FArrayBox::define(const Box& a_box, int a_fields)
     }
 
     // define(box_size*a_fields,a_box);
+
     set_dataPtr(box_size*a_fields);
 
-    m_size = box_size;
+    m_size = box_size*a_fields;
     m_fields = a_fields;
     m_box = a_box;
 }

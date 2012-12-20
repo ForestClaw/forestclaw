@@ -45,17 +45,17 @@ static void update_level_solution(fclaw2d_domain_t *domain,
 
     /* Idea here is that the user may want to apply a single step routine,
        an MOL routine, or both. */
-    if (ddata->f_single_step_level_ptr != NULL)
+    if (ddata->f_level_single_step_ptr != NULL)
     {
-        cfl = (ddata->f_single_step_level_ptr)(domain,a_level,t,dt);
+        cfl = (ddata->f_level_single_step_ptr)(domain,a_level,t,dt);
     }
 
     /* We may actually do both.  Just need to be sure that coarser level has taken a
        time step though */
-    if (ddata->f_ode_solver_level_ptr != NULL)
+    if (ddata->f_level_ode_solver_ptr != NULL)
     {
-        cfl = fclaw2d_mol_step_level(domain,a_level,time_data,
-                                     ddata->f_ode_solver_level_ptr);
+        cfl = fclaw2d_level_mol_step(domain,a_level,time_data,
+                                     ddata->f_level_ode_solver_ptr);
     }
     time_data->maxcfl = max(time_data->maxcfl,cfl);
 }

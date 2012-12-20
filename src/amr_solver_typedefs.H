@@ -39,18 +39,15 @@ extern "C"
 struct fclaw2d_level_time_data;
 struct amr_options;
 
-typedef void (*fclaw2d_user_parms_new_t)(sc_options_t *opt,
-                                    struct amr_options *gparms);
-
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx);
 
-typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx);
+typedef void (*fclaw2d_patch_init_t)(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx);
 
 typedef void (*fclaw2d_patch_physbc_t)(fclaw2d_domain *domain,
                                        fclaw2d_patch_t *this_patch,
@@ -62,11 +59,11 @@ typedef void (*fclaw2d_patch_physbc_t)(fclaw2d_domain *domain,
 
 
 /* Interface to MOL solver */
-typedef void (*fclaw2d_ode_solver_level_t)(int neqn, double q[], double t, double dt);
+typedef void (*fclaw2d_level_ode_solver_t)(int neqn, double q[], double t, double dt);
 
 
 /* These return a max cfl number, if needed */
-typedef double (*fclaw2d_ode_solver_rhs_patch_t)(fclaw2d_domain_t *domain,
+typedef double (*fclaw2d_patch_ode_solver_rhs_t)(fclaw2d_domain_t *domain,
                                                  fclaw2d_patch_t *this_patch,
                                                  int this_block_idx,
                                                  int this_patch_idx,
@@ -75,13 +72,13 @@ typedef double (*fclaw2d_ode_solver_rhs_patch_t)(fclaw2d_domain_t *domain,
 
 
 
-typedef double (*fclaw2d_single_step_level_t)(fclaw2d_domain_t *domain,
+typedef double (*fclaw2d_level_single_step_t)(fclaw2d_domain_t *domain,
                                             int level,
                                             double t, double dt);
 
 
 
-typedef double (*fclaw2d_single_step_update_patch_t)(fclaw2d_domain_t *domain,
+typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      fclaw2d_patch_t *this_patch,
                                                      int this_block_idx,
                                                      int this_patch_idx,

@@ -53,22 +53,22 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->curr_time = 0;
 
     /* Single step solver that is called. */
-    ddata->f_single_step_level_ptr = &amr_single_step_level;
+    ddata->f_level_single_step_ptr = &amr_level_single_step_update;
 
     /* Callback for single step solver */
-    ddata->f_single_step_update_patch_ptr = NULL;
+    ddata->f_patch_single_step_update_ptr = NULL;
 
     /* Interface to (Fortran) ODE solver that is called */
-    ddata->f_ode_solver_level_ptr = NULL;
+    ddata->f_level_ode_solver_ptr = NULL;
 
     /* Right hand side for an MOL solver */
-    ddata->f_ode_solver_rhs_patch_ptr = NULL;
+    ddata->f_patch_ode_solver_rhs_ptr = NULL;
 
     /* Setup patch */
     ddata->f_patch_setup_ptr = NULL;
 
     /* Initialize patch */
-    ddata->f_patch_initialize_ptr = NULL;
+    ddata->f_patch_init_ptr = NULL;
 
     /* Boundary conditions */
     ddata->f_patch_physbc_ptr = NULL;
@@ -130,19 +130,16 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     ddata_new->amropts = ddata_old->amropts;
     ddata_new->curr_time = ddata_old->curr_time;
 
-    ddata_new->f_single_step_level_ptr = ddata_old->f_single_step_level_ptr;
-    ddata_new->f_single_step_update_patch_ptr = ddata_old->f_single_step_update_patch_ptr;
+    ddata_new->f_level_single_step_ptr = ddata_old->f_level_single_step_ptr;
+    ddata_new->f_patch_single_step_update_ptr = ddata_old->f_patch_single_step_update_ptr;
 
-    ddata_new->f_ode_solver_level_ptr = ddata_old->f_ode_solver_level_ptr;
-    ddata_new->f_ode_solver_rhs_patch_ptr = ddata_old->f_ode_solver_rhs_patch_ptr;
+    ddata_new->f_level_ode_solver_ptr = ddata_old->f_level_ode_solver_ptr;
+    ddata_new->f_patch_ode_solver_rhs_ptr = ddata_old->f_patch_ode_solver_rhs_ptr;
 
     ddata_new->f_patch_setup_ptr = ddata_old->f_patch_setup_ptr;
-    ddata_new->f_patch_initialize_ptr = ddata_old->f_patch_initialize_ptr;
+    ddata_new->f_patch_init_ptr = ddata_old->f_patch_init_ptr;
     ddata_new->f_patch_physbc_ptr = ddata_old->f_patch_physbc_ptr;
 }
-
-
-
 
 
 void set_block_data(fclaw2d_block_t *block, const int mthbc[])
@@ -164,12 +161,12 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 // -----------------------------------------------------------------
 // Some lazy helper functions that really do make things easier..
 // -----------------------------------------------------------------
-void allocate_user_data(fclaw2d_domain_t *domain)
+void init_block_and_patch_data(fclaw2d_domain_t *domain)
 {
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
 
-    init_domain_data(domain);
+    // init_domain_data(domain);
 
     for (int i = 0; i < domain->num_blocks; i++)
     {
@@ -210,49 +207,6 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
     return pdata->cp;
 }
 /* end of helper functions */
-
-/*
-const int get_refratio(fclaw2d_domain_t *domain)
-{
-    const amr_options_t* gparms = get_domain_parms(domain);
-    return gparms->refratio;
-}
-*/
-
-// int corners_per_patch = FCLAW_CORNERS_PER_PATCH;
-
-/*
-const int get_corners_per_patch(fclaw2d_domain_t *domain)
-{
-    // Number of patch corners, not the number of corners in the domain!
-    return fclaw2d_domain_num_corners(domain);
-}
-*/
-
-/*
-const int get_faces_per_patch(fclaw2d_domain_t *domain)
-{
-    // Number of faces per patch, not the total number of faces in the domain!
-    return fclaw2d_domain_num_faces(domain);
-}
-*/
-
-/*
-const int get_siblings_per_patch(fclaw2d_domain_t *domain)
-{
-    // Number of patch corners, not the number of corners in the domain!
-    return fclaw2d_domain_num_corners(domain);
-}
-*/
-
-/*
-const int get_p4est_refineFactor(fclaw2d_domain_t *domain)
-{
-    return fclaw2d_domain_num_face_corners(domain);
-}
-*/
-
-
 
 
 static void cb_num_patches(fclaw2d_domain_t *domain,

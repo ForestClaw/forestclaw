@@ -102,6 +102,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     int level_factor = pow_int(2,minlevel);
     double dt_level0 = initial_dt*level_factor;  // Get a level 0 time step
     double t_curr = t0;
+
     for(int n = 0; n < nout; n++)
     {
         double tstart = t_curr;
@@ -256,6 +257,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     double t_curr = t0;
     set_domain_time(*domain,t_curr);
     int n = 0;
+
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;

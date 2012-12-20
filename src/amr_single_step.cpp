@@ -39,7 +39,7 @@ static
     double t = ss_data->t;
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    double maxcfl = (ddata->f_single_step_update_patch_ptr)(domain,this_patch,
+    double maxcfl = (ddata->f_patch_single_step_update_ptr)(domain,this_patch,
                                                             this_block_idx,
                                                             this_patch_idx,t,dt);
     ss_data->maxcfl = max(maxcfl,ss_data->maxcfl);
@@ -55,9 +55,9 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-double amr_single_step_level(fclaw2d_domain_t *domain,
-                             int level,
-                             double t, double dt)
+double amr_level_single_step_update(fclaw2d_domain_t *domain,
+                                    int level,
+                                    double t, double dt)
 {
 
     /* Iterate over every patch at this level */

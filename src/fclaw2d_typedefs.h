@@ -10,9 +10,6 @@ class ClawPatch;
 
 typedef fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
-typedef void (*fclaw2d_level_advance_t)(fclaw2d_domain_t *domain,
-                                        int level,
-                                        fclaw2d_level_time_data_t *time_data);
 
 typedef struct fclaw2d_domain_data
 {
@@ -22,12 +19,13 @@ typedef struct fclaw2d_domain_data
     double curr_time;
 
     fclaw2d_patch_setup_t f_patch_setup_ptr;
-    fclaw2d_patch_initialize_t f_patch_initialize_ptr;
+    fclaw2d_patch_init_t f_patch_init_ptr;
+    fclaw2d_patch_physbc_t f_patch_physbc_ptr;
 
     /* A single step solver.  Note that the user may want to
        change this one out */
-    fclaw2d_single_step_level_t f_single_step_level_ptr;
-    fclaw2d_single_step_update_patch_t f_single_step_update_patch_ptr;
+    fclaw2d_level_single_step_t f_level_single_step_ptr;
+    fclaw2d_patch_single_step_update_t f_patch_single_step_update_ptr;
 
     /* MOL solver requires both a patch_rhs function and
        an ODE solver (a mol_solver).  Note that the
@@ -35,9 +33,8 @@ typedef struct fclaw2d_domain_data
        expect users to change this (unlike with
        'fclaw2d_single_step_level_t */
 
-    fclaw2d_ode_solver_level_t f_ode_solver_level_ptr;
-    fclaw2d_ode_solver_rhs_patch_t f_ode_solver_rhs_patch_ptr;
-    fclaw2d_patch_physbc_t f_patch_physbc_ptr;
+    fclaw2d_level_ode_solver_t f_level_ode_solver_ptr;
+    fclaw2d_patch_ode_solver_rhs_t f_patch_ode_solver_rhs_ptr;
 
 } fclaw2d_domain_data_t;
 

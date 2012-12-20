@@ -75,10 +75,10 @@ extern "C"
 /* This is called from Fortran, so needs to be in this 'extern C' scope. */
 void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs_work);
 
-double fclaw2d_mol_step_level(fclaw2d_domain_t *domain,
+double fclaw2d_level_mol_step(fclaw2d_domain_t *domain,
                               int level,
                               struct fclaw2d_level_time_data *time_data,
-                              fclaw2d_ode_solver_level_t f_mol_solver_level_ptr);
+                              fclaw2d_level_ode_solver_t f_mol_solver_level_ptr);
 
 void parabolic_step_feuler(int neqn, double q[], double t, double dt);
 void parabolic_step_rkc(int neqn, double q[], double t, double dt);

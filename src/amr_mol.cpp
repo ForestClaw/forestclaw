@@ -186,7 +186,7 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
         /* This is the user defined routine.  The value of
            this function pointer is set in main. */
         fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-        cfl = (ddata->f_ode_solver_rhs_patch_ptr)(domain,this_patch,this_block_idx,
+        cfl = (ddata->f_patch_ode_solver_rhs_ptr)(domain,this_patch,this_block_idx,
                                                   this_patch_idx,t_inner,&rhs[i*size]);
     }
     time_data->maxcfl = max(time_data->maxcfl,cfl);
@@ -217,10 +217,10 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 
    These function pointers are stored in domain->ddata.
 ----------------------------------------------------------------------- */
-double fclaw2d_mol_step_level(fclaw2d_domain_t *domain,
-                            int level,
-                            fclaw2d_level_time_data_t *time_data,
-                            fclaw2d_ode_solver_level_t f_ode_solver_level_ptr)
+double fclaw2d_level_mol_step(fclaw2d_domain_t *domain,
+                              int level,
+                              fclaw2d_level_time_data_t *time_data,
+                              fclaw2d_level_ode_solver_t f_ode_solver_level_ptr)
 {
     double t_level = time_data->t_level;
     double dt = time_data->dt;

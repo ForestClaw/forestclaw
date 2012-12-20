@@ -195,7 +195,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             // cp_new->setup_patch(level, maxlevel, refratio);
             if (init_grid)
             {
-                (ddata->f_patch_initialize_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
+                (ddata->f_patch_init_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
             }
             else
             {
@@ -278,11 +278,12 @@ void regrid(fclaw2d_domain_t **domain)
         // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
 
         // Allocate memory for user data types (but they don't get set)
-        allocate_user_data(new_domain);
+        init_domain_data(new_domain);
         copy_domain_data(*domain,new_domain);
         set_domain_time(new_domain,t);
 
         // Average or interpolate to new grids.
+        init_block_and_patch_data(new_domain);
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
                                        (void *) &init_flag);
 

@@ -50,45 +50,43 @@ extern "C"
 
 void check_amr_parms(amr_options_t *gparms);
 
-// -----------------------------------------------------------------
-// Initialize data
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Initialize data
+   ----------------------------------------------------------------- */
 void init_domain_data(fclaw2d_domain_t *domain);
 void init_block_data(fclaw2d_block_t *block);
 void init_patch_data(fclaw2d_patch_t *patch);
+void init_block_and_patch_data(fclaw2d_domain_t *domain);
 
-// -----------------------------------------------------------------
-// Return pointer to user data
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Return pointer to user data
+   ---------------------------------------------------------------- */
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
+fclaw2d_block_data_t  *get_block_data(fclaw2d_block_t *block);
+fclaw2d_patch_data_t  *get_patch_data(fclaw2d_patch_t *patch);
 
-// -----------------------------------------------------------------
-// Set user data with user defined variables, etc.
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Set user data with user defined variables, etc.
+   ----------------------------------------------------------------- */
 void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms);
-void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
 void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
-// Will change the name of this to 'get_clawpatch' eventually
+void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
+
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-const int get_refratio(fclaw2d_domain_t *domain);
 
 #if 0 /* moved into fclaw2d_capi.h */
 
-// -----------------------------------------------------------------
-// Some lazy helper functions that really do make things easier..
-// -----------------------------------------------------------------
-void allocate_user_data(fclaw2d_domain_t *domain);
+/* -----------------------------------------------------------------
+   Some helper functions that really do make things easier..
+   ----------------------------------------------------------------- */
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 
-// Will change the name of this to 'get_clawpatch' eventually
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-const int get_refratio(fclaw2d_domain_t *domain);
+/* const int get_refratio(fclaw2d_domain_t *domain); */
 
 /*
 const int get_corners_per_patch(fclaw2d_domain_t *domain);

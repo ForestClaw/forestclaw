@@ -130,8 +130,6 @@ struct amr_waveprop_parms
 
     int method[7];  /* method[7] */
     int mcapa;
-    double max_cfl;
-    double desired_cfl;
     int src_term;
     void *user;
 
@@ -143,7 +141,10 @@ typedef struct amr_waveprop_patch_data
     int maux;
 } amr_waveprop_patch_data_t;
 
+void amr_waveprop_setup(fclaw2d_domain_t *domain);
+
 void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms);
+void amr_waveprop_parms_destroy(amr_options_t *gparms);
 
 void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,

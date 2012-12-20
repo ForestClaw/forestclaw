@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_waveprop.H"
+#include "swirl_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -34,11 +35,24 @@ extern "C"
 #endif
 #endif
 
+void swirl_solver_setup(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
 
-void amr_patch_setup(fclaw2d_domain_t *domain,
-                     fclaw2d_patch_t *this_patch,
-                     int this_block_idx,
-                     int this_patch_idx)
+    ddata->f_patch_setup_ptr              = &swirl_patch_setup;
+    ddata->f_patch_init_ptr               = &swirl_patch_init;
+    ddata->f_patch_physbc_ptr             = &swirl_patch_physbc;
+    ddata->f_patch_single_step_update_ptr = &swirl_patch_single_step_update;
+
+    /* Setup solvers */
+    amr_waveprop_setup(domain);
+}
+
+
+void swirl_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx)
 {
     /* This will call a fortran 'setaux' routine (either
        manifold or non-manifold version) */
@@ -49,10 +63,10 @@ void amr_patch_setup(fclaw2d_domain_t *domain,
 
 
 
-void amr_patch_initialize(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
+void swirl_patch_init(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx)
 {
     /* This will call a fortran 'qinit' routine (either the manifold
        or non-manifold version */
@@ -60,31 +74,37 @@ void amr_patch_initialize(fclaw2d_domain_t *domain,
 }
 
 
-void amr_patch_physbc(fclaw2d_domain *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt,
-                      fclaw_bool intersects_bc[])
+void swirl_patch_physbc(fclaw2d_domain *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt,
+                        fclaw_bool intersects_bc[])
 {
     amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc);
 }
 
 
-void amr_parms_new(sc_options_t *opt,  amr_options_t *gparms)
+void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms)
 {
     /* We can also just use a pointer to amr_waveprop_readparms directly */
     amr_waveprop_parms_new(opt,gparms);
 }
 
-double amr_single_step_update_patch(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double t,
-                                    double dt)
+void swirl_parms_destroy(amr_options_t *gparms)
+{
+    /* We can also just use a pointer to amr_waveprop_readparms directly */
+    amr_waveprop_parms_destroy(gparms);
+}
+
+double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx,
+                                      double t,
+                                      double dt)
 {
     /* Should I call b4step2 in here? */
     amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
@@ -94,12 +114,13 @@ double amr_single_step_update_patch(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
-double amr_single_step_rhs_patch(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double *rhs)
+
+double swirl_patch_single_step_rhs(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx,
+                                   double t,
+                                   double *rhs)
 {
     /* This hasn't been implemented yet, and in any case will
        only be called if the user

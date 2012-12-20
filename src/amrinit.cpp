@@ -87,7 +87,7 @@ void cb_amrinit(fclaw2d_domain_t *domain,
                 void *user)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    (ddata->f_patch_initialize_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
+    (ddata->f_patch_init_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 // Initialize a base level of grids
@@ -105,9 +105,6 @@ void amrinit(fclaw2d_domain_t **domain)
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
     set_problem_parameters();
-
-    // Set up storage for base level grids so we can initialize them
-    // Allocates per-block and per-patch user data
 
     // This function is redundant, and should be made more general.
     cout << "Setting base level " << endl;
@@ -156,11 +153,12 @@ void amrinit(fclaw2d_domain_t **domain)
             // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
 
             // Allocate memory for user data types (but they don't get set)
-            allocate_user_data(new_domain);
+            init_domain_data(new_domain);
             copy_domain_data(*domain,new_domain);
 
             // Initialize new grids.  Assume that all ghost cells are filled
             //in by qinit.
+            init_block_and_patch_data(new_domain);
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt,
                                            (void *) &init_flag);

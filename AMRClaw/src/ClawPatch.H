@@ -10,6 +10,12 @@ using namespace std;
 #include "clawpack_fort.H"
 #include "fclaw2d_defs.H"
 
+class ClawPatch;
+
+typedef void (*fclaw2d_solver_patch_data_constructor_t)(void **solverdata);
+typedef void (*fclaw2d_solver_patch_data_destructor_t)(void **solverdata);
+
+
 class ClawPatch
 {
 public :
@@ -171,13 +177,11 @@ public :
     /* These routines are defined, but note that we don't use any of the
        specifics form the wave prop routines, so that amr_waveprop.cpp does
        not need to be compiled in */
-    void* waveprop_data();
-    void set_waveprop_data(void* solver_data);
 
-
-    /* In case the user wants to add their own solver data */
-    void set_user_solver_data(void* userdata);
-    void* user_solver_data();
+    void* waveprop_patch_data();
+    void set_waveprop_patch_data(void* solver_data);
+    static fclaw2d_solver_patch_data_constructor_t f_waveprop_patch_data_constructor_ptr;
+    static fclaw2d_solver_patch_data_destructor_t f_waveprop_patch_data_destructor_ptr;
 
 
 #if FCLAW_SPACEDIM == 3
@@ -245,11 +249,8 @@ protected :
     FArrayBox m_yface_normals;
     FArrayBox m_edge_lengths;
 
-    void *m_waveprop_data;
-
-    /* Allow the user to add their own data  here */
-    void *m_user_solver_data;
-
+    /* Data associated with the wave propagation algorithm (ClawPack) */
+    void *m_waveprop_patch_data;
 }; // End class ClawPatch
 
 #endif

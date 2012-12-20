@@ -37,41 +37,44 @@ extern "C"
 #endif
 #endif
 
+void swirl_solver_setup(fclaw2d_domain_t *domain);
 
-void amr_patch_setup(fclaw2d_domain_t *domain,
-                     fclaw2d_patch_t *this_patch,
-                     int this_block_idx,
-                     int this_patch_idx);
+void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms);
 
-void amr_patch_initialize(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx);
+void swirl_parms_destroy(amr_options_t *gparms);
 
-void amr_patch_physbc(fclaw2d_domain *domain,
+
+void swirl_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
+
+void swirl_patch_init(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt,
-                      fclaw_bool intersects_bc[]);
+                      int this_patch_idx);
 
-void amr_parms_new(sc_options_t *opt,  amr_options_t *gparms);
+void swirl_patch_physbc(fclaw2d_domain *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt,
+                        fclaw_bool intersects_bc[]);
 
+double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx,
+                                      double t,
+                                      double dt);
 
-double amr_single_step_update_patch(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double t,
-                                    double dt);
-
-double amr_ode_solver_rhs_patch(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double *rhs);
+double swirl_patch_single_step_rhs(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx,
+                                   double t,
+                                   double *rhs);
 
 #ifdef __cplusplus
 #if 0

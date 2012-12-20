@@ -1,6 +1,20 @@
 #include "ClawPatch.H"
 #include "amr_includes.H"
 
+
+void solver_dummy(void** solverdata)
+{
+    printf("Calling dummy constructor\n");
+    *solverdata = (void*) NULL;
+}
+
+// Solver constructors and destructors
+fclaw2d_solver_patch_data_constructor_t
+    ClawPatch::f_waveprop_patch_data_constructor_ptr = &solver_dummy;
+fclaw2d_solver_patch_data_destructor_t
+    ClawPatch::f_waveprop_patch_data_destructor_ptr = &solver_dummy;
+
+
 // This constructors includes all of parameters that are patch independent.
 // All of this could also be in some sort of "set_params" function...
 ClawPatch::ClawPatch()
@@ -9,6 +23,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
+    ClawPatch::f_waveprop_patch_data_destructor_ptr(&m_waveprop_patch_data);
 }
 
 
@@ -55,6 +70,8 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata_time_interp.define(box, m_meqn);
 
     m_manifold = gparms->manifold;
+
+    ClawPatch::f_waveprop_patch_data_constructor_ptr(&m_waveprop_patch_data);
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -149,24 +166,18 @@ double* ClawPatch::edge_lengths()
 }
 
 
-void* ClawPatch::user_solver_data()
+/* ----------------------------------------------------
+   Solver data and functions
+   ---------------------------------------------------*/
+// Wave propagation algorithms
+void* ClawPatch::waveprop_patch_data()
 {
-    return m_user_solver_data;
+    return m_waveprop_patch_data;
 }
 
-void ClawPatch::set_user_solver_data(void* user)
+void ClawPatch::set_waveprop_patch_data(void* solverdata)
 {
-    m_user_solver_data = user;
-}
-
-void* ClawPatch::waveprop_data()
-{
-    return m_waveprop_data;
-}
-
-void ClawPatch::set_waveprop_data(void* solverdata)
-{
-    m_waveprop_data = solverdata;
+    m_waveprop_patch_data = solverdata;
 }
 
 
