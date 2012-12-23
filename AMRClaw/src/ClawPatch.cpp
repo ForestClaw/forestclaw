@@ -185,17 +185,6 @@ void ClawPatch::set_waveprop_patch_data(void* solverdata)
    Time stepping routines
    ---------------------------------------------------------------- */
 
-/*
-void ClawPatch::setup_patch(const int& level,
-                            const amr_options_t *gparms)
-{
-    if (gparms->manifold)
-    {
-        setup_manifold(level, gparms);
-    }
-}
-*/
-
 
 void ClawPatch::save_step()
 {
@@ -283,30 +272,6 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_inter
     }
 }
 
-
-/*
-void ClawPatch::set_phys_face_ghost(const fclaw_bool a_intersects_bc[], const int a_mthbc[],
-                                    const double& t, const double& dt)
-{
-    double *q = m_griddata.dataPtr();
-    double *aux = m_auxarray.dataPtr();
-
-    // Set a local copy of mthbc that can be used for a patch.
-    int mthbc[2*SpaceDim];
-    for(int i = 0; i < 2*SpaceDim; i++)
-    {
-        if (a_intersects_bc[i])
-        {
-            mthbc[i] = a_mthbc[i];
-        }
-        else
-        {
-            mthbc[i] = -1;
-        }
-    }
-    bc2_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,m_maux,aux,t,dt,mthbc);
-}
-*/
 
 
 void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],

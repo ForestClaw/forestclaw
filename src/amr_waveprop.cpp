@@ -438,13 +438,6 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
     /* amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t; */
     gparms->waveprop_parms = (void*) waveprop_parms;
 
-    /*
-    sc_options_add_double (opt, 0, "max_cfl", &waveprop_parms->max_cfl, 1.0,
-                           "Maximum CFL number [1.0]");
-
-    sc_options_add_double (opt, 0, "desired_cfl", &waveprop_parms->desired_cfl, 0.9,
-                           "Desired CFL number [0.9]");
-    */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &waveprop_parms->order_string, NULL,
@@ -519,9 +512,11 @@ void amr_waveprop_parms_destroy(amr_options_t *gparms)
 static
 void amr_waveprop_patch_data_constructor(void** wp)
 {
-    amr_waveprop_patch_data_t *waveprop_patch_data;
-    waveprop_patch_data = FCLAW2D_ALLOC_ZERO (amr_waveprop_patch_data_t, 1);
+    *wp = FCLAW2D_ALLOC_ZERO (amr_waveprop_patch_data_t, 1);
     *wp = waveprop_patch_data;
+
+    // Or for short...
+    // *wp = (void*) FCLAW2D_ALLOC_ZERO (amr_waveprop_patch_data_t, 1);
 }
 
 static
@@ -529,6 +524,7 @@ void amr_waveprop_patch_data_destructor(void **wp)
 {
     amr_waveprop_patch_data_t *waveprop_patch_data = (amr_waveprop_patch_data_t*) *wp;
     FCLAW2D_FREE(waveprop_patch_data);
+    FCLAW2D_FREE(*wp);
     *wp = (void*) NULL;
 }
 

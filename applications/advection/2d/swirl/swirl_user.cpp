@@ -45,7 +45,7 @@ void swirl_solver_setup(fclaw2d_domain_t *domain)
     ddata->f_patch_single_step_update_ptr = &swirl_patch_single_step_update;
 
     /* Setup solvers */
-    amr_waveprop_setup(domain);
+    amr_waveprop_create(domain);
 }
 
 
