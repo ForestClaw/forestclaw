@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_capi.h>
 #include <fclaw2d_convenience.h>
-#include <fclaw2d_single_step.h>
-#include <fclaw2d_waveprop.h>
+#include <amr_single_step.H>
+#include <amr_waveprop.H>
 
 int
 main (int argc, char **argv)

@@ -46,10 +46,10 @@ fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
 /* This function can be called from Fortran inside of ClawPatch. */
 void
 fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
-                  const double *cx, const double *cy,
-                  double *mx, double *my, double *mz)
+                  const double *xc, const double *yc,
+                  double *xp, double *yp, double *zp)
 {
-    cont->mapc2m (cont, *blockno, *cx, *cy, mx, my, mz);
+    cont->mapc2m(cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
@@ -78,17 +78,19 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 
 static void
 fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
-                       double cx, double cy,
-                       double *mx, double *my, double *mz)
+                       double xc, double yc,
+                       double *xp, double *yp, double *zp)
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
 
+    const double R1 = cont->user_double[0]
     const double R2 = cont->user_double[1];
-    const double L = cont->user_double[0] + R2 * cos (2. * M_PI * cy);
+    /* const double L = cont->user_double[0] + R2 * cos (2. * M_PI * yc); */
+    const double L = R1 + R2 * cos (2. * M_PI * yc);
 
-    *mx = L * cos (2. * M_PI * cx);
-    *my = L * sin (2. * M_PI * cx);
-    *mz = R2 * sin (2. * M_PI * cy);
+    *xp = L * cos (2. * M_PI * xc);
+    *yp = L * sin (2. * M_PI * xc);
+    *zp = R2 * sin (2. * M_PI * yc);
 }
 
 fclaw2d_map_context_t *
@@ -133,14 +135,14 @@ fclaw2d_map_query_fortran (fclaw2d_map_context_t * cont, int query_identifier)
 
 static void
 fclaw2d_map_c2m_fortran (fclaw2d_map_context_t * cont, int blockno,
-                         double cx, double cy,
-                         double *mx, double *my, double *mz)
+                         double xc, double yc,
+                         double *xp, double *yp, double *zp)
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
 
     /* call Fortran functions */
     set_block_ (&blockno);
-    (*(fclaw2d_map_c2m_fortran_t) cont->user_data) (&cx, &cy, mx, my, mz);
+    (*(fclaw2d_map_c2m_fortran_t) cont->user_data) (&xc, &yc, xp, yp, zp);
 }
 
 fclaw2d_map_context_t *

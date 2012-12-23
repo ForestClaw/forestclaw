@@ -36,9 +36,9 @@ extern "C"
 
 /** This prototype matches the Fortran mapc2m functions used in ForestClaw.
  */
-typedef void (*fclaw2d_map_c2m_fortran_t) (const double *cx, const double *cy,
-                                           double *mx, double *my,
-                                           double *mz);
+typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
+                                           double *xp, double *yp,
+                                           double *zp);
 
 /* These integers are meant to be passed in query_identifier of map_query_t.
  * One of these four types is generally chosen.
@@ -53,7 +53,9 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *cx, const double *cy,
  * These properties can be used to implement shortcuts in the numerical code.
  */
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
-#define FCLAW2D_MAP_QUERY_LAST            5     /* #"official" queries. */
+#define FCLAW2D_MAP_QUERY_IS_FLAT         5     /* Curvature is zero */
+#define FCLAW2D_MAP_QUERY_IS_PHYS         6     /* Has phyical boundaries (not a sphere) */
+#define FCLAW2D_MAP_QUERY_LAST            7     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
@@ -75,8 +77,8 @@ typedef int (*fclaw2d_map_query_t) (fclaw2d_map_context_t * cont,
  * \param [out] mz      Transformed z-coordinate.
  */
 typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
-                                   double cx, double cy,
-                                   double *mx, double *my, double *mz);
+                                   double xc, double yc,
+                                   double *xp, double *yp, double *zp);
 
 /** Mapping context that is interpreted by its query and c2m members.
  * The callbacks are free to define the meaning of the user_* fields.
@@ -109,8 +111,8 @@ void fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
  * \param [out] mz      Transformed z-coordinate.
  */
 void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
-                       const double *cx, const double *cy,
-                       double *mx, double *my, double *mz);
+                       const double *xc, const double *yc,
+                       double *xp, double *yp, double *zp);
 
 /** Create a torus mapping for one block with [0, 1]^2 (for now).
  * \param [in] R1       Large radius of the torus.
