@@ -4,9 +4,7 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/ClawPatch.o \
-	$(FORESTCLAW)/AMRClaw/src/clawpack_fort.o \
-	$(FORESTCLAW)/AMRClaw/src/parser.o \
-	$(FORESTCLAW)/AMRClaw/src/parse_inputs.o
+	$(FORESTCLAW)/AMRClaw/src/clawpack_fort.o
 
 fclawobjs = \
 	amrinit.o \
