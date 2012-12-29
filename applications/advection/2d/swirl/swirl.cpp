@@ -67,18 +67,17 @@ main (int argc, char **argv)
   fclaw2d_domain_data_t *ddata = get_domain_data(domain);
   ddata->amropts = gparms;
 
-  swirl_solver_setup(domain);
+  swirl_solvers_link(domain);
 
   /* ---------------------------------------------------------------
      Run
      --------------------------------------------------------------- */
-  init_block_and_patch_data(domain);  /* Allocate block and patch data */
   amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
 
   sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms,swirl_parms_destroy);
+  amr_options_destroy (gparms,swirl_parms_delete);
 
   fclaw_mpi_finalize ();
 

@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_base.h>
 #include "amr_single_step.H"
 #include "amr_mol.H"
+#include "amr_solver_typedefs.H"
 
 int pow_int(int a, int n)
 {
@@ -52,27 +53,9 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->amropts = NULL;
     ddata->curr_time = 0;
 
-    /* Single step solver that is called. */
-    ddata->f_level_single_step_ptr = &amr_level_single_step_update;
-
-    /* Callback for single step solver */
-    ddata->f_patch_single_step_update_ptr = NULL;
-
-    /* Interface to (Fortran) ODE solver that is called */
-    ddata->f_level_ode_solver_ptr = NULL;
-
-    /* Right hand side for an MOL solver */
-    ddata->f_patch_ode_solver_rhs_ptr = NULL;
-
-    /* Setup patch */
-    ddata->f_patch_setup_ptr = NULL;
-
-    /* Initialize patch */
-    ddata->f_patch_init_ptr = NULL;
-
-    /* Boundary conditions */
-    ddata->f_patch_physbc_ptr = NULL;
-
+    fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
+    initialize_solver_functions(solver_functions);
+    ddata->solver_functions = solver_functions;
 }
 
 
@@ -113,11 +96,14 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
 // -----------------------------------------------------------------
 // Set user data with user defined variables, etc.
 // -----------------------------------------------------------------
+
+/*
 void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ddata->amropts = gparms;
 }
+*/
 
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
 {
@@ -130,16 +116,9 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     ddata_new->amropts = ddata_old->amropts;
     ddata_new->curr_time = ddata_old->curr_time;
 
-    ddata_new->f_level_single_step_ptr = ddata_old->f_level_single_step_ptr;
-    ddata_new->f_patch_single_step_update_ptr = ddata_old->f_patch_single_step_update_ptr;
-
-    ddata_new->f_level_ode_solver_ptr = ddata_old->f_level_ode_solver_ptr;
-    ddata_new->f_patch_ode_solver_rhs_ptr = ddata_old->f_patch_ode_solver_rhs_ptr;
-
-    ddata_new->f_patch_setup_ptr = ddata_old->f_patch_setup_ptr;
-    ddata_new->f_patch_init_ptr = ddata_old->f_patch_init_ptr;
-    ddata_new->f_patch_physbc_ptr = ddata_old->f_patch_physbc_ptr;
+    copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
 }
+
 
 
 void set_block_data(fclaw2d_block_t *block, const int mthbc[])
@@ -150,6 +129,7 @@ void set_block_data(fclaw2d_block_t *block, const int mthbc[])
         bdata->mthbc[i] = mthbc[i];
     }
 }
+
 
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 {
@@ -206,6 +186,13 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
 
     return pdata->cp;
 }
+
+fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    return ddata->solver_functions;
+}
+
 /* end of helper functions */
 
 

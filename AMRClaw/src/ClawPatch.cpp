@@ -2,18 +2,23 @@
 #include "amr_includes.H"
 
 
-void solver_dummy(void** solverdata)
+void solver_default(void** solverdata)
 {
-    printf("Calling dummy constructor\n");
     *solverdata = (void*) NULL;
 }
 
-// Solver constructors and destructors
-fclaw2d_solver_patch_data_constructor_t
-    ClawPatch::f_waveprop_patch_data_constructor_ptr = &solver_dummy;
-fclaw2d_solver_patch_data_destructor_t
-    ClawPatch::f_waveprop_patch_data_destructor_ptr = &solver_dummy;
+// -----------------------------------------------------
+// Wave propagation new/delete
+// -----------------------------------------------------
+fclaw2d_solver_patch_data_new_t
+    ClawPatch::f_waveprop_patch_data_new = &solver_default;
+fclaw2d_solver_patch_data_delete_t
+    ClawPatch::f_waveprop_patch_data_delete = &solver_default;
 
+
+// -----------------------------------------------------
+// User data new/delete
+// -----------------------------------------------------
 
 // This constructors includes all of parameters that are patch independent.
 // All of this could also be in some sort of "set_params" function...
@@ -23,7 +28,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
-    ClawPatch::f_waveprop_patch_data_destructor_ptr(&m_waveprop_patch_data);
+    ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
 }
 
 
@@ -71,7 +76,7 @@ void ClawPatch::define(const double&  a_xlower,
 
     m_manifold = gparms->manifold;
 
-    ClawPatch::f_waveprop_patch_data_constructor_ptr(&m_waveprop_patch_data);
+    ClawPatch::f_waveprop_patch_data_new(&m_waveprop_patch_data);
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -735,26 +740,3 @@ void ClawPatch::dump_time_interp()
         printf("\n");
     }
 }
-
-/*
-void ClawPatch::dump_auxarray()
-{
-    double *q;
-    q = m_auxarray.dataPtr();
-    int k = 0;
-    for (int m = 0; m < m_maux; m++)
-    {
-        for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-        {
-            for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-            {
-                printf("q[%2d,%2d,%2d] = %24.16e\n",i,j,m,q[k]);
-                k++;
-            }
-            printf("\n");
-        }
-        printf("\n");
-        printf("\n");
-    }
-}
-*/

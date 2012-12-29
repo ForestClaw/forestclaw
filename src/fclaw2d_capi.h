@@ -97,6 +97,7 @@ const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 
+
 /* int corners_per_patch = FCLAW_CORNERS_PER_PATCH; */
 /*
 const int get_corners_per_patch(fclaw2d_domain_t *domain);

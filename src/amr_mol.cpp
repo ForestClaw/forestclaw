@@ -185,9 +185,9 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 
         /* This is the user defined routine.  The value of
            this function pointer is set in main. */
-        fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-        cfl = (ddata->f_patch_ode_solver_rhs_ptr)(domain,this_patch,this_block_idx,
-                                                  this_patch_idx,t_inner,&rhs[i*size]);
+        fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+        cfl = (sf->f_patch_ode_solver_rhs)(domain,this_patch,this_block_idx,
+                                              this_patch_idx,t_inner,&rhs[i*size]);
     }
     time_data->maxcfl = max(time_data->maxcfl,cfl);
 }
@@ -197,19 +197,19 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 
    This needs two function pointers :
 
-         void (*fclaw_mol_rhs_patch_t)(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx,
-                                       int this_patch_idx,
-                                       double t,
-                                       double *rhs);
+         void (*fclaw_patch_ode_solver_rhs_t)(fclaw2d_domain_t *domain,
+                                              fclaw2d_patch_t *this_patch,
+                                              int this_block_idx,
+                                              int this_patch_idx,
+                                              double t,
+                                              double *rhs);
 
    This function evaluates the right hand side on patch 'this_patch'.
    Both the patch data and the right hand side can be passed to a
    Fortran routine which evaluates the right hand grid.
 
-         void (*fclaw_mol_solver_t)(int neqn,double q[],
-                                    double t, double dt);
+         void (*fclaw_level_ode_solver_t)(int neqn, double q[],
+                                          double t, double dt);
 
    This function is an interface to a routine 'amr_<solver>', which calls
    an existing ODE solver.  See 'amr_rkc.cpp', and 'amr_feuler.cpp' for
@@ -220,7 +220,7 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
 double fclaw2d_level_mol_step(fclaw2d_domain_t *domain,
                               int level,
                               fclaw2d_level_time_data_t *time_data,
-                              fclaw2d_level_ode_solver_t f_ode_solver_level_ptr)
+                              fclaw2d_level_ode_solver_t f_level_ode_solver)
 {
     double t_level = time_data->t_level;
     double dt = time_data->dt;
@@ -242,7 +242,7 @@ double fclaw2d_level_mol_step(fclaw2d_domain_t *domain,
        is an interface to the actual solver.
        ------------------------------------------------------------- */
     double *q = mol_data->patch_data;
-    f_ode_solver_level_ptr(neqn,q,t_level,dt);
+    f_level_ode_solver(neqn,q,t_level,dt);
 
     /* -------------------------------------------------------------
        Return patch data to the tree

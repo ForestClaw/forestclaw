@@ -12,9 +12,8 @@ using namespace std;
 
 class ClawPatch;
 
-typedef void (*fclaw2d_solver_patch_data_constructor_t)(void **solverdata);
-typedef void (*fclaw2d_solver_patch_data_destructor_t)(void **solverdata);
-
+typedef void (*fclaw2d_solver_patch_data_new_t)(void **solverdata);
+typedef void (*fclaw2d_solver_patch_data_delete_t)(void **solverdata);
 
 class ClawPatch
 {
@@ -32,16 +31,12 @@ public :
 
     void copyFrom(ClawPatch *a_cp);
 
-    // ----------------------------------------------------------------------------------
-    // Initialization routines
-    // ----------------------------------------------------------------------------------
-    void setup_patch(const int& level, const amr_options_t *gparms);
-
     // ----------------------------------------------------------------
     // Time stepping routines
     // ----------------------------------------------------------------
 
     void save_step();
+    void save_current_step();
     void restore_step();
 
     void time_interpolate(const double& alpha);
@@ -151,8 +146,15 @@ public :
     void dump_last();
     void dump_time_interp();
 
+    // ----------------------------------------------------------------
+    // Access functions
+    // ----------------------------------------------------------------
     double dx();
     double dy();
+
+#if FCLAW_SPACEDIM == 3
+    double dz();
+#endif
 
     double *xp();
     double *yp();
@@ -171,22 +173,16 @@ public :
     double ylower();
 
     double* q();
-    void save_current_step();
 
-    /* Other solvers will be added here */
-    /* These routines are defined, but note that we don't use any of the
-       specifics form the wave prop routines, so that amr_waveprop.cpp does
-       not need to be compiled in */
-
+    // ----------------------------------------------------------------
+    // Wave propagation routines
+    // Only defined if we are really using the wave prop algorithm.
+    // The new/delete functions are static because we want to define them
+    // ----------------------------------------------------------------
     void* waveprop_patch_data();
     void set_waveprop_patch_data(void* solver_data);
-    static fclaw2d_solver_patch_data_constructor_t f_waveprop_patch_data_constructor_ptr;
-    static fclaw2d_solver_patch_data_destructor_t f_waveprop_patch_data_destructor_ptr;
-
-
-#if FCLAW_SPACEDIM == 3
-    double dz();
-#endif
+    static fclaw2d_solver_patch_data_new_t f_waveprop_patch_data_new;
+    static fclaw2d_solver_patch_data_delete_t f_waveprop_patch_data_delete;
 
 
 protected :
@@ -251,6 +247,8 @@ protected :
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_waveprop_patch_data;
+
+    // Add user data (for coefficients, for example)
 }; // End class ClawPatch
 
 #endif

@@ -48,6 +48,7 @@ amr_waveprop_patch_data_t* get_waveprop_patch_data(ClawPatch *cp)
     return wp;
 }
 
+
 /* This should only be called when a new ClawPatch is created. */
 void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
@@ -237,7 +238,6 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
                       double dt,
                       fclaw_bool intersects_phys_bdry[])
 {
-
     const amr_options_t* gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
     amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
@@ -465,7 +465,7 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
 
     /* -----------------------------------------------------------------------*/
     /* Read in options from file */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_waveprop.ini");
     /* -----------------------------------------------------------------------*/
 
 
@@ -501,7 +501,7 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
     /* Should also check mthbc, mthlim, etc. */
 }
 
-void amr_waveprop_parms_destroy(amr_options_t *gparms)
+void amr_waveprop_parms_delete(amr_options_t *gparms)
 {
     amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(gparms);
 
@@ -510,27 +510,33 @@ void amr_waveprop_parms_destroy(amr_options_t *gparms)
 }
 
 static
-void amr_waveprop_patch_data_constructor(void** wp)
+void amr_waveprop_patch_data_new(void** wp)
 {
-    *wp = FCLAW2D_ALLOC_ZERO (amr_waveprop_patch_data_t, 1);
-    *wp = waveprop_patch_data;
+    amr_waveprop_patch_data_t* waveprop_patch_data;
+    waveprop_patch_data = new amr_waveprop_patch_data_t;
+    *wp = (void*) waveprop_patch_data;
 
-    // Or for short...
+    // or?
     // *wp = (void*) FCLAW2D_ALLOC_ZERO (amr_waveprop_patch_data_t, 1);
 }
 
 static
-void amr_waveprop_patch_data_destructor(void **wp)
+void amr_waveprop_patch_data_delete(void **wp)
 {
     amr_waveprop_patch_data_t *waveprop_patch_data = (amr_waveprop_patch_data_t*) *wp;
-    FCLAW2D_FREE(waveprop_patch_data);
-    FCLAW2D_FREE(*wp);
+    delete waveprop_patch_data;
+
+    // or?
+    // FCLAW2D_FREE(waveprop_patch_data);
+
     *wp = (void*) NULL;
 }
 
-void amr_waveprop_setup(fclaw2d_domain_t *domain)
+
+void amr_waveprop_link(fclaw2d_domain_t *domain)
 {
-    // Solver constructors and destructors
-    ClawPatch::f_waveprop_patch_data_constructor_ptr = &amr_waveprop_patch_data_constructor;
-    ClawPatch::f_waveprop_patch_data_destructor_ptr = &amr_waveprop_patch_data_destructor;
+    // These are called whenever a new ClawPatch is created.
+
+    ClawPatch::f_waveprop_patch_data_new = &amr_waveprop_patch_data_new;
+    ClawPatch::f_waveprop_patch_data_delete = &amr_waveprop_patch_data_delete;
 }

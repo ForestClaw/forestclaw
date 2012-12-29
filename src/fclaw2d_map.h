@@ -53,8 +53,12 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
  * These properties can be used to implement shortcuts in the numerical code.
  */
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
+
+#if 0
 #define FCLAW2D_MAP_QUERY_IS_FLAT         5     /* Curvature is zero */
-#define FCLAW2D_MAP_QUERY_IS_PHYS         6     /* Has phyical boundaries (not a sphere) */
+#define FCLAW2D_MAP_QUERY_IS_PHYS         6     /* Has phyical boundaries */
+#endif
+
 #define FCLAW2D_MAP_QUERY_LAST            7     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
@@ -70,11 +74,11 @@ typedef int (*fclaw2d_map_query_t) (fclaw2d_map_context_t * cont,
 /** This function performs the coordinate transformation.
  * \param [in] cont     Matching mapping context.
  * \param [in] blockno  Number of the block to be transformed.
- * \param [in] cx       X-coordinate in [block->xlower, block->xupper].
- * \param [in] cy       Y-coordinate in [block->ylower, block->yupper].
- * \param [out] mx      Transformed x-coordinate.
- * \param [out] my      Transformed y-coordinate.
- * \param [out] mz      Transformed z-coordinate.
+ * \param [in] xc       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] yc       Y-coordinate in [block->ylower, block->yupper].
+ * \param [out] xp      Transformed x-coordinate.
+ * \param [out] yp      Transformed y-coordinate.
+ * \param [out] zp      Transformed z-coordinate.
  */
 typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
                                    double xc, double yc,

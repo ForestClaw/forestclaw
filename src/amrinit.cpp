@@ -47,11 +47,11 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
 
 static
-void cb_init_base(fclaw2d_domain_t *domain,
-                  fclaw2d_patch_t *this_patch,
-                  int this_block_idx,
-                  int this_patch_idx,
-                  void *user)
+    void cb_initialize_base(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = new ClawPatch();
@@ -66,14 +66,14 @@ void cb_init_base(fclaw2d_domain_t *domain,
 
     /* The user can now retrieve the ClawPatch from 'this_patch' and set
        up whatever they need to set up. */
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    (ddata->f_patch_setup_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+    (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 static
 void set_base_level(fclaw2d_domain_t *domain, const int& level)
 {
-    fclaw2d_domain_iterate_level(domain, level, cb_init_base,(void *) NULL);
+    fclaw2d_domain_iterate_level(domain, level, cb_initialize_base,(void *) NULL);
 }
 
 /* -----------------------------------------------------------------
@@ -86,8 +86,8 @@ void cb_amrinit(fclaw2d_domain_t *domain,
                 int this_patch_idx,
                 void *user)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    (ddata->f_patch_init_ptr)(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+    (sf->f_patch_initialize)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 // Initialize a base level of grids
@@ -105,6 +105,8 @@ void amrinit(fclaw2d_domain_t **domain)
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
     set_problem_parameters();
+
+    init_block_and_patch_data(*domain);  /* Allocate block and patch data */
 
     // This function is redundant, and should be made more general.
     cout << "Setting base level " << endl;

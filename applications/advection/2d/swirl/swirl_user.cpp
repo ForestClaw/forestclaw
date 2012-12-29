@@ -35,18 +35,18 @@ extern "C"
 #endif
 #endif
 
-void swirl_solver_setup(fclaw2d_domain_t *domain)
+void swirl_solvers_link(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
-    ddata->f_patch_setup_ptr              = &swirl_patch_setup;
-    ddata->f_patch_init_ptr               = &swirl_patch_init;
-    ddata->f_patch_physbc_ptr             = &swirl_patch_physbc;
-    ddata->f_patch_single_step_update_ptr = &swirl_patch_single_step_update;
+    sf->f_patch_setup              = &swirl_patch_setup;
+    sf->f_patch_initialize         = &swirl_patch_initialize;
+    sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
+    sf->f_patch_single_step_update = &swirl_patch_single_step_update;
 
-    /* Setup solvers */
-    amr_waveprop_create(domain);
+    amr_waveprop_link(domain);
 }
+
 
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
@@ -58,15 +58,15 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
        manifold or non-manifold version) */
     amr_waveprop_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
-    /* Set up diffusion coefficients? Read in velocity data? */
+    /* Set up diffusion coefficients? Read in velocity data? Material properties? */
 }
 
 
 
-void swirl_patch_init(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx)
+void swirl_patch_initialize(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
 {
     /* This will call a fortran 'qinit' routine (either the manifold
        or non-manifold version */
@@ -74,30 +74,18 @@ void swirl_patch_init(fclaw2d_domain_t *domain,
 }
 
 
-void swirl_patch_physbc(fclaw2d_domain *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt,
-                        fclaw_bool intersects_bc[])
+void swirl_patch_physical_bc(fclaw2d_domain *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt,
+                             fclaw_bool intersects_bc[])
 {
     amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc);
 }
 
-
-void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms)
-{
-    /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_parms_new(opt,gparms);
-}
-
-void swirl_parms_destroy(amr_options_t *gparms)
-{
-    /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_parms_destroy(gparms);
-}
 
 double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -129,6 +117,20 @@ double swirl_patch_single_step_rhs(fclaw2d_domain_t *domain,
                                         this_patch_idx,t,rhs);
     return cfl;
 }
+
+void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms)
+{
+    /* We can also just use a pointer to amr_waveprop_readparms directly */
+    amr_waveprop_parms_new(opt,gparms);
+}
+
+void swirl_parms_delete(amr_options_t *gparms)
+{
+    /* We can also just use a pointer to amr_waveprop_readparms directly */
+    amr_waveprop_parms_delete(gparms);
+}
+
+
 
 #ifdef __cplusplus
 #if 0

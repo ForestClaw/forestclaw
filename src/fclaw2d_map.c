@@ -72,6 +72,13 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 1;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
         return 0;
+
+#if 0
+    case FCLAW2d_MAP_QUERY_IS_FLAT:
+        return 0;
+    case FCLAW2d_MAP_QUERY_IS_PHYS:
+        return 0;
+#endif
     }
     return 0;
 }
@@ -83,7 +90,7 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
 
-    const double R1 = cont->user_double[0]
+    const double R1 = cont->user_double[0];
     const double R2 = cont->user_double[1];
     /* const double L = cont->user_double[0] + R2 * cos (2. * M_PI * yc); */
     const double L = R1 + R2 * cos (2. * M_PI * yc);

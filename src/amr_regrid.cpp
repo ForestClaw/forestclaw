@@ -125,6 +125,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      int old_patchno, int new_patchno,
                      void *user)
 {
+
     const amr_options_t *gparms = get_domain_parms(old_domain);
 
     /* const int num_siblings = get_siblings_per_patch(old_domain); */
@@ -154,15 +155,10 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
             set_patch_data(&new_patch[0],cp_new);
 
-            fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
-            (ddata->f_patch_setup_ptr)(new_domain,&new_patch[0],blockno,new_patchno);
+            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+            (sf->f_patch_setup)(new_domain,&new_patch[0],blockno,new_patchno);
 
-            /*
-            int level = new_patch->level;
-            cp_new->setup_patch(level, maxlevel, refratio);
-            */
             cp_new->copyFrom(cp_old);
-            // set_patch_data(&new_patch[0],cp_new);
         }
         else
         {
@@ -187,15 +183,15 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                            blockno,
                            gparms);
             set_patch_data(&new_patch[igrid],cp_new);
-            fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
+            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
 
-            (ddata->f_patch_setup_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
+            (sf->f_patch_setup)(new_domain,&new_patch[igrid],blockno,new_patchno);
 
             // int level = new_patch[igrid].level;
             // cp_new->setup_patch(level, maxlevel, refratio);
             if (init_grid)
             {
-                (ddata->f_patch_init_ptr)(new_domain,&new_patch[igrid],blockno,new_patchno);
+                (sf->f_patch_initialize)(new_domain,&new_patch[igrid],blockno,new_patchno);
             }
             else
             {
@@ -216,8 +212,8 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                        gparms);
         set_patch_data(&new_patch[0],cp_new);
 
-        fclaw2d_domain_data_t *ddata = get_domain_data(old_domain);
-        (ddata->f_patch_setup_ptr)(new_domain,&new_patch[0],blockno,new_patchno);
+        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+        (sf->f_patch_setup)(new_domain,&new_patch[0],blockno,new_patchno);
 
         /*
         int level = new_patch[0].level;

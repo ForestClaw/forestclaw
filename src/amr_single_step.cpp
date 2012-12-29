@@ -38,10 +38,10 @@ static
     double dt = ss_data->dt;
     double t = ss_data->t;
 
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    double maxcfl = (ddata->f_patch_single_step_update_ptr)(domain,this_patch,
-                                                            this_block_idx,
-                                                            this_patch_idx,t,dt);
+    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+    double maxcfl = (sf->f_patch_single_step_update)(domain,this_patch,
+                                                     this_block_idx,
+                                                     this_patch_idx,t,dt);
     ss_data->maxcfl = max(maxcfl,ss_data->maxcfl);
 }
 
@@ -50,7 +50,11 @@ static
    Advance the level using a single explicit time step
    Assumption is that the call back function 'cb_single_step'
    can update each patch independently of all the other
-   patches at the level.
+   patches at the level.  A second assumption is that only
+   boundary conditions at the the current patch time are
+   needed.  These are set before entering the patch update
+   routine.
+
    This function is analogous to the MOL step solver
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.

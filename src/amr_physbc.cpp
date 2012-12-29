@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_solver_typedefs.H"
 
-/* -----------------------------------------------------------------------------
-   Physical boundary conditions
-   ----------------------------------------------------------------------------- */
-
 static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
@@ -37,21 +33,24 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    // int numfaces = get_faces_per_patch(domain);
     fclaw_bool intersects_bc[NumFaces];
     double curr_time = *((double*) user);
     double dt = 1e20;
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    (ddata->f_patch_physbc_ptr)(domain,
-                                this_patch,
-                                this_block_idx,
-                                this_patch_idx,
-                                curr_time,dt,
-                                intersects_bc);
+    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+    (sf->f_patch_physical_bc)(domain,
+                              this_patch,
+                              this_block_idx,
+                              this_patch_idx,
+                              curr_time,dt,
+                              intersects_bc);
 }
 
+
+/* -----------------------------------------------------------------------------
+   Set physical boundary conditions on a patch
+   ----------------------------------------------------------------------------- */
 
 void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time)
 {

@@ -76,6 +76,11 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 
+fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain);
+
+
+/* I am not really sure what 'capi' stands for... */
+
 #if 0 /* moved into fclaw2d_capi.h */
 
 /* -----------------------------------------------------------------
