@@ -1,21 +1,26 @@
 # -*- Makefile -*-
 
+AMR_WAVEPROP = $(FORESTCLAW)/src/solvers/amr_waveprop
+AMR_WAVEPROP_FORTRAN = $(FORESTCLAW)/src/solvers/amr_waveprop/fortran_source
+
+solver_includes = -I$(AMR_WAVEPROP)
+
 
 waveprop := \
-	$(FORESTCLAW)/src/amr_waveprop.o \
+	$(AMR_WAVEPROP)/amr_waveprop.o \
 	$(FORESTCLAW)/AMRClaw/src/limiter.o \
-	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/src2_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/b4step2_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/setaux_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qinit_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
-	$(FORESTCLAW)/AMRClaw/src2d/flux2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qad2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/step2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/ClawPatch2.o
+	$(AMR_WAVEPROP_FORTRAN)/src2.o \
+	$(AMR_WAVEPROP_FORTRAN)/src2_manifold.o \
+	$(AMR_WAVEPROP_FORTRAN)/b4step2_manifold.o \
+	$(AMR_WAVEPROP_FORTRAN)/setaux_manifold.o \
+	$(AMR_WAVEPROP_FORTRAN)/qinit_manifold.o \
+	$(AMR_WAVEPROP_FORTRAN)/bc2.o \
+	$(AMR_WAVEPROP_FORTRAN)/bc2_manifold.o \
+	$(AMR_WAVEPROP_FORTRAN)/fdisc.o \
+	$(AMR_WAVEPROP_FORTRAN)/flux2.o \
+	$(AMR_WAVEPROP_FORTRAN)/qad2.o \
+	$(AMR_WAVEPROP_FORTRAN)/step2.o \
+	$(AMR_WAVEPROP_FORTRAN)/ClawPatch2.o
 
 
 

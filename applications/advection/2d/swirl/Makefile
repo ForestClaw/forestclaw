@@ -17,7 +17,7 @@ default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
+	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ $(solver_includes) -c $< -o $@
 
 .c.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
