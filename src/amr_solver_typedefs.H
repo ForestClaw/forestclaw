@@ -95,13 +95,13 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
 
 struct fclaw2d_solver_functions
 {
-
     fclaw2d_patch_setup_t f_patch_setup;
     fclaw2d_patch_initialize_t f_patch_initialize;
     fclaw2d_patch_physical_bc_t f_patch_physical_bc;
 
     /* A single step solver.  Note that the user may want to
        change this one out */
+    fclaw_bool use_single_step_update;
     fclaw2d_level_single_step_t f_level_single_step;
     fclaw2d_patch_single_step_update_t f_patch_single_step_update;
 
@@ -111,6 +111,7 @@ struct fclaw2d_solver_functions
        expect users to change this (unlike with
        'fclaw2d_single_step_level_t */
 
+    fclaw_bool use_mol_update;
     fclaw2d_level_ode_solver_t f_level_ode_solver;
     fclaw2d_patch_ode_solver_rhs_t f_patch_ode_solver_rhs;
 };

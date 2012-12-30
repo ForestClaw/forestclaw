@@ -47,5 +47,7 @@ static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 
 /* change to P4EST_BOOL ? */
 #define fclaw_bool bool
+#define fclaw_true true
+#define fclaw_false false
 
 #endif

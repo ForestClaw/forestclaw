@@ -640,6 +640,9 @@ void  amr_waveprop_link_solvers(fclaw2d_domain_t* domain)
 
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
+    sf->use_single_step_update = fclaw_true;
+    sf->use_mol_update = fclaw_false;
+
     if (waveprop_parms->maux > 0)
     {
         sf->f_patch_setup              = &amr_waveprop_setaux;

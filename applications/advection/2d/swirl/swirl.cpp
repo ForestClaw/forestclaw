@@ -50,7 +50,8 @@ main (int argc, char **argv)
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
   /* ---------------------------------------------------------------
-     Read parameters from .ini file.
+     Read parameters from .ini file, parse command line, and
+     do parameter checking.
      -------------------------------------------------------------- */
   options = sc_options_new(argv[0]);
 
@@ -93,11 +94,13 @@ main (int argc, char **argv)
      Set domain data.
      --------------------------------------------------------------- */
 
-  /* Using user defined functions */
+  /* Using user defined functions just to demonstrate how one might setup
+     something that depends on more than one solver (although only one is used
+     here) */
   link_problem_setup(domain,swirl_problem_setup);
   swirl_link_solvers(domain);
 
-  /* Plain vanilla waveprop algorithm */
+  /* Plain vanilla waveprop algorithm.  This version doesn't require swirl_user.{H,cpp} */
   /* link_problem_setup(domain,amr_waveprop_setprob); */
   /* amr_waveprop_link_solvers(domain); */
 
@@ -108,8 +111,8 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
-  sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms);
+  sc_options_destroy(options);         /* this could be moved up */
+  amr_options_destroy(gparms);
   amr_waveprop_parms_delete(waveprop_parms);
 
   fclaw_mpi_finalize ();

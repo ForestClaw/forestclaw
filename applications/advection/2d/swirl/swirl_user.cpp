@@ -39,6 +39,9 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
+    sf->use_single_step_update = fclaw_true;
+    sf->use_mol_update = fclaw_false;
+
     sf->f_patch_setup              = &swirl_patch_setup;
     sf->f_patch_initialize         = &swirl_patch_initialize;
     sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
@@ -49,6 +52,9 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
+    /* Setup any fortran common blocks for general problem
+       and any other general problem specific things that only needs
+       to be done once. */
     amr_waveprop_setprob(domain);
 }
 
@@ -95,7 +101,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-    /* Should I call b4step2 in here, or make this another function? */
     amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,

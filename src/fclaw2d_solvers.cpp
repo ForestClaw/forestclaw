@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_mol.H"
 #include "amr_solver_typedefs.H"
 #include "fclaw2d_solvers.H"
+#include "fclaw2d_defs.h"
 
 void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -38,18 +39,79 @@ void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
     /* This is called if there is nothing to do to set up a new patch */
 }
 
+void amr_dummy_patch_initialize(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx)
+{
+    /* This is called if there is nothing to do to set up a new patch */
+}
+
+
+void amr_dummy_patch_physical_bc(fclaw2d_domain *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 double t,
+                                 double dt,
+                                 fclaw_bool *intersects_bc)
+{
+    /* Do nothing */
+}
+
+void amr_dummy_level_ode_solver(int neqn, double q[], double t, double dt)
+{
+    /* Do nothing */
+}
+
+double amr_dummy_patch_ode_solver_rhs(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx,
+                                      double t,
+                                      double *rhs)
+{
+    /* Do nothing */
+    return 0;
+}
+
+double amr_dummy_level_single_step(fclaw2d_domain_t *domain,
+                                   int level,
+                                   double t, double dt)
+{
+    /* Do nothing */
+    return 0;
+}
+
+double amr_dummy_patch_single_step_update(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx,
+                                          int this_patch_idx,
+                                          double t,
+                                          double dt)
+{
+    /* Do nothing */
+    return 0;
+}
+
 
 void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions)
 {
     fclaw2d_solver_functions_t *sf = solver_functions;
 
-    sf->f_patch_setup              = NULL;
-    sf->f_patch_initialize         = NULL;
-    sf->f_patch_physical_bc        = NULL;
+    sf->use_single_step_update = fclaw_true;
+    sf->use_mol_update = fclaw_false;
+
+    sf->f_patch_setup              = &amr_dummy_patch_setup;
+    sf->f_patch_initialize         = &amr_dummy_patch_initialize;
+    sf->f_patch_physical_bc        = &amr_dummy_patch_physical_bc;
+
     sf->f_level_single_step        = &amr_level_single_step_update;  /* default? */
-    sf->f_patch_single_step_update = NULL;
-    sf->f_level_ode_solver         = NULL;
-    sf->f_patch_ode_solver_rhs     = NULL;
+
+    sf->f_patch_single_step_update = &amr_dummy_patch_single_step_update;
+
+    sf->f_level_ode_solver         = &amr_dummy_level_ode_solver;
+    sf->f_patch_ode_solver_rhs     = &amr_dummy_patch_ode_solver_rhs;
 }
 
 
