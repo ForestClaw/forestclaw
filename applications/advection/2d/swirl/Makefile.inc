@@ -5,6 +5,12 @@ waveprop := \
 	$(FORESTCLAW)/src/amr_waveprop.o \
 	$(FORESTCLAW)/AMRClaw/src/limiter.o \
 	$(FORESTCLAW)/AMRClaw/src2d/src2.o \
+	$(FORESTCLAW)/AMRClaw/src2d/src2_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/b4step2_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/setaux_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/qinit_manifold.o \
+	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
+	$(FORESTCLAW)/AMRClaw/src2d/bc2_manifold.o \
 	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
 	$(FORESTCLAW)/AMRClaw/src2d/flux2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/qad2.o \

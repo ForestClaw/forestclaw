@@ -87,13 +87,17 @@ typedef void (*fclaw_mol_solver_t)(int neqn,double q[],
 
 
 #endif
+
 /* -----------------------------------------------------------------
  * Some lazy helper functions that really do make things easier...
  * Defined in amr_utils.cpp
  * Need to be prefixed to clean up namespace
  * ---------------------------------------------------------------*/
 void allocate_user_data(fclaw2d_domain_t *domain);
+
+void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t *gparms);
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
+
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
 

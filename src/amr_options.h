@@ -40,8 +40,7 @@ extern "C"
 typedef struct amr_options amr_options_t;
 
 
-typedef void (*fclaw2d_user_parms_new_t)(sc_options_t *opt,
-                                         amr_options_t *gparms);
+typedef void* (*fclaw2d_user_parms_new_t)(sc_options_t *opt);
 
 typedef void (*fclaw2d_user_parms_destroy_t)(amr_options_t *gparms);
 
@@ -65,18 +64,7 @@ struct amr_options
     double max_cfl;
     double desired_cfl;
 
-    const char *order_string;
-    int *order;
-
-    int src_term;
-    int mcapa;
-    int maux;
-    int method[7];
-    int mwaves;
-    const char *mthlim_string;
-    int *mthlim;
-
-    /* Information about the system of PDEs */
+    /* Number of equations in the system of PDEs */
     int meqn;
 
     /* Boundary condition information */
@@ -98,16 +86,12 @@ struct amr_options
     int check_conservation;
     int use_fixed_dt;
 
+    /* xlower,xupper,ylower,yupper for block.
+       This is probably only useful in the single block case  */
     double ax;
     double bx;
     double ay;
     double by;
-
-    /* Add waveprop solver props here */
-    void *waveprop_parms;
-
-    /* User parms */
-    void *user_parms;
 
 };
 
@@ -142,19 +126,25 @@ void amr_options_add_int_array (sc_options_t * opt,
  * \param [in,out] opt          Used for command line parsing.
  * \return                      Options with preset default values.
  */
-amr_options_t *amr_options_new (sc_options_t * opt,
-                                fclaw2d_user_parms_new_t f_user_parms_ptr);
+amr_options_t *amr_options_new (sc_options_t * opt);
 
 /* Parse options and populate values in registered amr_options structure.
  */
+#if 0
 void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                         int argc, char **argv, int log_priority);
+#endif
+void amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority);
+
 
 /** Clean up option storage.
  * \param [in,out]              Option storage will be deallocated.
  */
-void amr_options_destroy (amr_options_t * amropt,
-                          fclaw2d_user_parms_destroy_t f_user_parms_destroy_ptr);
+void amr_options_destroy (amr_options_t * amropt);
+
+
+void amr_postprocess_parms(amr_options_t* amropt);
+void amr_checkparms(amr_options_t* amropt);
 
 #ifdef __cplusplus
 #if 0

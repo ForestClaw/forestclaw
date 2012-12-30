@@ -91,6 +91,23 @@ extern "C"
                           double xp[], double yp[], double zp[],
                           double xd[], double yd[], double zd[]);
 
+    void src2_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
+                        const int& mbc, const int& mx,const int& my,
+                        const double& xlower, const double& ylower,
+                        const double& dx, const double& dy, double q[],
+                        const int& maux, double aux[], const double& t,
+                        const double& dt,
+                        double xp[], double yp[], double zp[],
+                        double xd[], double yd[], double zd[]);
+
+    void src2_(const int& maxmx, const int& maxmy, const int& meqn,
+               const int& mbc, const int& mx,const int& my,
+               const double& xlower, const double& ylower,
+               const double& dx, const double& dy, double q[],
+               const int& maux, double aux[], const double& t,
+               const double& dt);
+
+
     /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
@@ -116,6 +133,7 @@ extern "C"
 #endif
 
 typedef struct amr_waveprop_parms amr_waveprop_parms_t;
+typedef struct amr_waveprop_patch_data amr_waveprop_patch_data_t;
 
 /* Only one copy of waveprop_parms for each run */
 struct amr_waveprop_parms
@@ -136,17 +154,30 @@ struct amr_waveprop_parms
 
 };
 
+void set_waveprop_parms(fclaw2d_domain_t* domain,amr_waveprop_parms_t* waveprop_parms);
+amr_waveprop_parms_t* amr_waveprop_parms_new(sc_options_t *opt);
+void amr_waveprop_checkparms(amr_waveprop_parms_t *waveprop_parms,amr_options_t* gparms);
+void amr_waveprop_parms_delete(amr_waveprop_parms_t *waveprop_parms);
+void amr_waveprop_postprocess_parms(amr_waveprop_parms_t* waveprop_parms);
+
+void amr_waveprop_link_solvers(fclaw2d_domain_t* domain);
+
+void amr_waveprop_setprob(fclaw2d_domain_t* domain);
+
+/* ----------------------------------------------------------------------
+   Patch related parms
+   ---------------------------------------------------------------------- */
+
 /* Patch data is stored in each ClawPatch */
-typedef struct amr_waveprop_patch_data
+struct amr_waveprop_patch_data
 {
     FArrayBox auxarray;
     int maux;
-} amr_waveprop_patch_data_t;
+};
 
-void amr_waveprop_link(fclaw2d_domain_t *domain);
 
-void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms);
-void amr_waveprop_parms_delete(amr_options_t *gparms);
+void amr_waveprop_link_to_clawpatch();
+
 
 void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
@@ -165,14 +196,14 @@ void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt);
 
+void amr_waveprop_bc2(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      double t,
+                      double dt,
+                      fclaw_bool intersects_bc[]);
 
-/* Use this ro return only the right hand side of the waveprop algorithm */
-double amr_waveprop_step2_rhs(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx,
-                              double t,
-                              double *rhs);
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
@@ -183,13 +214,13 @@ double amr_waveprop_step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt);
 
-void amr_waveprop_bc2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt,
-                          fclaw_bool intersects_bc[]);
+/* Use this ro return only the right hand side of the waveprop algorithm */
+double amr_waveprop_step2_rhs(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double *rhs);
 
 
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);

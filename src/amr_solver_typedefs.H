@@ -41,8 +41,7 @@ struct amr_options;
 
 typedef struct fclaw2d_solver_functions fclaw2d_solver_functions_t;
 
-
-typedef void (*fclaw2d_link_solvers_t)(fclaw2d_domain_t *domain);
+typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
 
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -96,7 +95,6 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
 
 struct fclaw2d_solver_functions
 {
-    fclaw2d_link_solvers_t f_link_solvers;
 
     fclaw2d_patch_setup_t f_patch_setup;
     fclaw2d_patch_initialize_t f_patch_initialize;

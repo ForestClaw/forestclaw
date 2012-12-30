@@ -37,12 +37,9 @@ extern "C"
 #endif
 #endif
 
-void swirl_solvers_link(fclaw2d_domain_t *domain);
+void swirl_link_solvers(fclaw2d_domain_t *domain);
 
-void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms);
-
-void swirl_parms_delete(amr_options_t *gparms);
-
+void swirl_problem_setup(fclaw2d_domain_t* domain);
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -68,13 +65,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       int this_patch_idx,
                                       double t,
                                       double dt);
-
-double swirl_patch_single_step_rhs(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *this_patch,
-                                   int this_block_idx,
-                                   int this_patch_idx,
-                                   double t,
-                                   double *rhs);
 
 #ifdef __cplusplus
 #if 0

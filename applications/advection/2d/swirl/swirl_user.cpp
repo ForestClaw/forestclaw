@@ -35,7 +35,7 @@ extern "C"
 #endif
 #endif
 
-void swirl_solvers_link(fclaw2d_domain_t *domain)
+void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
@@ -44,9 +44,13 @@ void swirl_solvers_link(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
     sf->f_patch_single_step_update = &swirl_patch_single_step_update;
 
-    amr_waveprop_link(domain);
+    amr_waveprop_link_to_clawpatch();
 }
 
+void swirl_problem_setup(fclaw2d_domain_t* domain)
+{
+    amr_waveprop_setprob(domain);
+}
 
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
@@ -54,8 +58,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    /* This will call a fortran 'setaux' routine (either
-       manifold or non-manifold version) */
+    /* Set velocity data */
     amr_waveprop_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
     /* Set up diffusion coefficients? Read in velocity data? Material properties? */
@@ -68,8 +71,6 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    /* This will call a fortran 'qinit' routine (either the manifold
-       or non-manifold version */
     amr_waveprop_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -94,42 +95,13 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-    /* Should I call b4step2 in here? */
+    /* Should I call b4step2 in here, or make this another function? */
     amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);
     return maxcfl;
 }
-
-
-double swirl_patch_single_step_rhs(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *this_patch,
-                                   int this_block_idx,
-                                   int this_patch_idx,
-                                   double t,
-                                   double *rhs)
-{
-    /* This hasn't been implemented yet, and in any case will
-       only be called if the user
-       wants to use an MOL approach to time stepping */
-    double cfl = amr_waveprop_step2_rhs(domain,this_patch,this_block_idx,
-                                        this_patch_idx,t,rhs);
-    return cfl;
-}
-
-void swirl_parms_new(sc_options_t *opt,  amr_options_t *gparms)
-{
-    /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_parms_new(opt,gparms);
-}
-
-void swirl_parms_delete(amr_options_t *gparms)
-{
-    /* We can also just use a pointer to amr_waveprop_readparms directly */
-    amr_waveprop_parms_delete(gparms);
-}
-
 
 
 #ifdef __cplusplus

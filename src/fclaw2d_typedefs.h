@@ -10,13 +10,19 @@ class ClawPatch;
 
 typedef fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
+typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t* domain);
 
 typedef struct fclaw2d_domain_data
 {
     const amr_options_t *amropts;
 
+    /* Some solver parms */
+    void* waveprop_parms;
+
     /* Time at start of each subcycled time step */
     double curr_time;
+
+    fclaw2d_problem_setup_t f_problem_setup;
 
     fclaw2d_solver_functions_t* solver_functions;
 

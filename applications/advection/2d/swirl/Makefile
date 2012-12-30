@@ -42,14 +42,9 @@ exampleobjs = \
 # I've left them here.
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/b4step2_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/setaux_manifold.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qinit_manifold.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
 	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \

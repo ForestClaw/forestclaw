@@ -39,6 +39,11 @@ int pow_int(int a, int n)
     return b;
 }
 
+void problem_setup_default(fclaw2d_domain_t* domain)
+{
+}
+
+
 /* -----------------------------------------------------------------
    Initialize data
    ----------------------------------------------------------------- */
@@ -52,6 +57,8 @@ void init_domain_data(fclaw2d_domain_t *domain)
 
     ddata->amropts = NULL;
     ddata->curr_time = 0;
+
+    ddata->f_problem_setup = &problem_setup_default;
 
     fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
     initialize_solver_functions(solver_functions);
@@ -97,14 +104,6 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
 // Set user data with user defined variables, etc.
 // -----------------------------------------------------------------
 
-/*
-void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ddata->amropts = gparms;
-}
-*/
-
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
 {
     fclaw2d_domain_data_t *ddata_old = get_domain_data(old_domain);
@@ -114,6 +113,8 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
     /* Copy data members */
     ddata_new->amropts = ddata_old->amropts;
+    ddata_new->waveprop_parms = ddata_old->waveprop_parms;
+
     ddata_new->curr_time = ddata_old->curr_time;
 
     copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
@@ -160,11 +161,23 @@ void init_block_and_patch_data(fclaw2d_domain_t *domain)
     }
 }
 
+void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_problem_setup = f_problem_setup;
+}
+
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     return ddata->amropts;
+}
+
+void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t* gparms)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->amropts = gparms;
 }
 
 void set_domain_time(fclaw2d_domain_t *domain, double time)
@@ -242,21 +255,3 @@ fclaw_mpi_finalize (void)
     mpiret = MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
 }
-
-/*
-void
-fclaw2d_allocate_domain_data (fclaw2d_domain_t * domain,
-                              amr_options_t * gparms,
-                              fclaw2d_level_advance_t level_advance_cb,
-                              fclaw2d_single_step_patch_t
-                              single_step_patch_cb)
-{
-  allocate_user_data(domain);
-
-  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-  ddata->amropts = gparms;
-
-  ddata->f_level_advance = level_advance_cb;
-  ddata->f_single_step_patch = single_step_patch_cb;
-}
-*/

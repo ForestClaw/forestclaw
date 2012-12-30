@@ -28,14 +28,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
-
+#include "fclaw2d_solvers.H"
 #include "amr_waveprop.H"
 
 
-static
-amr_waveprop_parms_t* get_waveprop_parms(const amr_options_t* gparms)
+void set_waveprop_parms(fclaw2d_domain_t* domain,amr_waveprop_parms_t* waveprop_parms)
 {
-    amr_waveprop_parms_t *waveprop_parms = (amr_waveprop_parms_t*) gparms->waveprop_parms;
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    ddata->waveprop_parms = (void*) waveprop_parms;
+}
+
+static
+amr_waveprop_parms_t* get_waveprop_parms(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    amr_waveprop_parms_t *waveprop_parms = (amr_waveprop_parms_t*) ddata->waveprop_parms;
     return waveprop_parms;
 }
 
@@ -48,6 +55,11 @@ amr_waveprop_patch_data_t* get_waveprop_patch_data(ClawPatch *cp)
     return wp;
 }
 
+void amr_waveprop_setprob(fclaw2d_domain_t* domain)
+{
+    setprob_();
+}
+
 
 /* This should only be called when a new ClawPatch is created. */
 void amr_waveprop_setaux(fclaw2d_domain_t *domain,
@@ -56,7 +68,7 @@ void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          int this_patch_idx)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(gparms);
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
 
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
@@ -84,7 +96,7 @@ void amr_waveprop_setaux(fclaw2d_domain_t *domain,
     int maux = waveprop_parms->maux;
 
     auxarray.define(box,maux);
-    waveprop_patch_data->maux = gparms->maux;
+    waveprop_patch_data->maux = maux;
 
     double *aux = auxarray.dataPtr();
 
@@ -121,7 +133,7 @@ void amr_waveprop_qinit(fclaw2d_domain_t *domain,
 {
     const amr_options_t *gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
 
     set_block_(&this_block_idx);
@@ -174,7 +186,7 @@ void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
     const amr_options_t *gparms                    = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
 
     set_block_(&this_block_idx);
 
@@ -213,6 +225,55 @@ void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
     }
 }
 
+void amr_waveprop_src2(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt)
+{
+    const amr_options_t *gparms                    = get_domain_parms(domain);
+    ClawPatch *cp                            = get_clawpatch(this_patch);
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
+
+    set_block_(&this_block_idx);
+
+    double* q = cp->q();
+
+    double* aux = waveprop_patch_data->auxarray.dataPtr();
+    int maux = waveprop_parms->maux;
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int maxmx = mx;
+    int maxmy = my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    if (gparms->manifold)
+    {
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+
+        src2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                      maux,aux,t,dt,xp,yp,zp,xd,yd,zd);
+    }
+    else
+    {
+        src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
+    }
+}
+
 
 /* Use this to return only the right hand side of the waveprop algorithm */
 double amr_waveprop_step2_rhs(fclaw2d_domain_t *domain,
@@ -240,7 +301,7 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
 {
     const amr_options_t* gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(gparms);
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
@@ -315,7 +376,7 @@ double amr_waveprop_step2(fclaw2d_domain_t *domain,
     const amr_options_t* gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(gparms);
+    amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(domain);
 
     set_block_(&this_block_idx);
 
@@ -373,6 +434,28 @@ double amr_waveprop_step2(fclaw2d_domain_t *domain,
     return cflgrid;
 }
 
+double amr_waveprop_update(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           double t,
+                           double dt)
+{
+    const amr_options_t* gparms = get_domain_parms(domain);
+    const amr_waveprop_parms_t* waveprop_parms = get_waveprop_parms(domain);
+
+    amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+
+    double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+
+    if (waveprop_parms->src_term > 0)
+    {
+        amr_waveprop_src2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    }
+    return maxcfl;
+}
+
+
 
 static
 void cb_dump_auxarray(fclaw2d_domain_t *domain,
@@ -389,7 +472,6 @@ void cb_dump_auxarray(fclaw2d_domain_t *domain,
         const amr_options_t* gparms              = get_domain_parms(domain);
         ClawPatch *cp                            = get_clawpatch(this_patch);
         amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-        // amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(gparms);
 
         double* aux = waveprop_patch_data->auxarray.dataPtr();
         int maux = waveprop_patch_data->maux;
@@ -426,7 +508,8 @@ void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
 
 }
 
-void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
+
+amr_waveprop_parms_t*  amr_waveprop_parms_new(sc_options_t *opt)
 {
     /* This is a good example of a place where a [Section] would be nice.
        Something like [waveprop].  See fclaw_defaults.ini */
@@ -436,15 +519,14 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
     waveprop_parms = SC_ALLOC_ZERO (amr_waveprop_parms_t, 1);
 
     /* amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t; */
-    gparms->waveprop_parms = (void*) waveprop_parms;
-
+    /* gparms->waveprop_parms = (void*) waveprop_parms; */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &waveprop_parms->order_string, NULL,
                                &waveprop_parms->order, SpaceDim,
                                "Normal and transverse orders");
 
-    sc_options_add_int (opt, 0, "mcapa", &waveprop_parms->mcapa, -1,
+    sc_options_add_int (opt, 'M', "mcapa", &waveprop_parms->mcapa, -1,
                         "Location of capacity function in aux array [-1]");
 
     sc_options_add_int (opt, 0, "maux", &waveprop_parms->maux, 0,
@@ -463,25 +545,22 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
     /* At this point amropt->mthlim is allocated. Set defaults if desired. */
 
 
-    /* -----------------------------------------------------------------------*/
-    /* Read in options from file */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_waveprop.ini");
-    /* -----------------------------------------------------------------------*/
+    /* -----------------------------------------------------------------------
+       Read in options from file
+       ----------------------------------------------------------------------- */
+   sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_waveprop.ini");
 
+   amr_waveprop_postprocess_parms(waveprop_parms);
 
-    /* -----------------------------------------------------------------------*/
-    /* Some post-processing */
-    amr_options_convert_int_array (waveprop_parms->mthlim_string, &waveprop_parms->mthlim,
-                                   waveprop_parms->mwaves);
+   return waveprop_parms;
 
+}
 
-    amr_options_convert_int_array (waveprop_parms->order_string, &waveprop_parms->order,
-                                   SpaceDim);
-    /* -----------------------------------------------------------------------*/
-
-
-    /* -----------------------------------------------------------------------*/
-    /* Set up 'method' vector used by Clawpack. */
+void amr_waveprop_checkparms(amr_waveprop_parms_t* waveprop_parms, amr_options_t* gparms)
+{
+    /* -----------------------------------------------------------------------
+       Set up 'method' vector used by Clawpack.
+       ------------------------------------------------------------------------ */
     waveprop_parms->method[0] = gparms->use_fixed_dt;
 
     waveprop_parms->method[1] = waveprop_parms->order[0];
@@ -499,12 +578,26 @@ void amr_waveprop_parms_new(sc_options_t *opt,  amr_options_t *gparms)
     waveprop_parms->method[6] = waveprop_parms->maux;
 
     /* Should also check mthbc, mthlim, etc. */
+
 }
 
-void amr_waveprop_parms_delete(amr_options_t *gparms)
+void amr_waveprop_postprocess_parms(amr_waveprop_parms_t* waveprop_parms)
 {
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(gparms);
+    /* -----------------------------------------------------------------------
+       Some post-processing of arrays
+       ------------------------------------------------------------------------ */
 
+    amr_options_convert_int_array (waveprop_parms->mthlim_string, &waveprop_parms->mthlim,
+                                   waveprop_parms->mwaves);
+
+
+    amr_options_convert_int_array (waveprop_parms->order_string, &waveprop_parms->order,
+                                   SpaceDim);
+}
+
+
+void amr_waveprop_parms_delete(amr_waveprop_parms_t* waveprop_parms)
+{
     SC_FREE(waveprop_parms->order);
     SC_FREE(waveprop_parms->mthlim);
 }
@@ -533,10 +626,35 @@ void amr_waveprop_patch_data_delete(void **wp)
 }
 
 
-void amr_waveprop_link(fclaw2d_domain_t *domain)
+void amr_waveprop_link_to_clawpatch()
 {
-    // These are called whenever a new ClawPatch is created.
-
+    /* These are called whenever a new ClawPatch is created. */
     ClawPatch::f_waveprop_patch_data_new = &amr_waveprop_patch_data_new;
     ClawPatch::f_waveprop_patch_data_delete = &amr_waveprop_patch_data_delete;
+}
+
+void  amr_waveprop_link_solvers(fclaw2d_domain_t* domain)
+{
+    const amr_options_t* gparms = get_domain_parms(domain);
+    const amr_waveprop_parms_t* waveprop_parms = get_waveprop_parms(domain);
+
+    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+
+    if (waveprop_parms->maux > 0)
+    {
+        sf->f_patch_setup              = &amr_waveprop_setaux;
+    }
+    else
+    {
+        sf->f_patch_setup              = &amr_dummy_patch_setup;
+    }
+
+    sf->f_patch_initialize         = &amr_waveprop_qinit;
+    sf->f_patch_physical_bc        = &amr_waveprop_bc2;
+
+    /* Calls b4step2, step2 and src2 */
+    sf->f_patch_single_step_update = &amr_waveprop_update;
+
+    /* This is needed so that a ClawPatch knows how to create data for a waveprop solver */
+    amr_waveprop_link_to_clawpatch();
 }

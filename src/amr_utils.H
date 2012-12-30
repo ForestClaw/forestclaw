@@ -68,11 +68,13 @@ fclaw2d_patch_data_t  *get_patch_data(fclaw2d_patch_t *patch);
 /* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
-void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms);
+/* void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms); */
 void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
+
+void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
 
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 

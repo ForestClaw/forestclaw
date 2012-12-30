@@ -72,6 +72,8 @@ amr_options_convert_int_array (const char *array_string,
     }
 }
 
+#if 0
+/* This is now done in a post-processing step */
 static void
 amr_options_convert_arrays (amr_options_t * amropt)
 {
@@ -84,33 +86,11 @@ amr_options_convert_arrays (amr_options_t * amropt)
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
                                    NumFaces);
 }
+#endif
 
-
-/* -----------------------------------------------------------------
-   Check input parms
-   ----------------------------------------------------------------- */
-static
-void amr_checkparms(amr_options_t *gparms)
-{
-    /* Check outstyle. */
-    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
-    {
-        double dT_outer = gparms->tfinal/gparms->nout;
-        double dT_inner = gparms->initial_dt;
-        int nsteps = dT_outer/dT_inner;
-        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
-        {
-            printf("For fixed dt, initial time step size must divide tfinal/nout "
-                   "exactly.\n");
-            exit(1);
-        }
-    }
-
-}
 
 amr_options_t *
-    amr_options_new (sc_options_t * opt,
-                     fclaw2d_user_parms_new_t f_user_parms_new_ptr)
+    amr_options_new (sc_options_t * opt)
 {
     amr_options_t *amropt;
 
@@ -212,39 +192,62 @@ amr_options_t *
 
     /* This works for me.  */
 
-    /* -----------------------------------------------------------------------*/
-    /* Read in options from file */
-    /* Can check return value for -1 to see if file was not found */
+    /* -----------------------------------------------------------------------
+       Read in options from file
+       Can check return value for -1 to see if file was not found
+       ----------------------------------------------------------------------- */
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
-    /* -----------------------------------------------------------------------*/
 
-    /* -----------------------------------------------------------------------*/
-    /* some post processing */
-    /* amr_options_convert_arrays(amropt); */
-    amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   NumFaces);
-    /* -----------------------------------------------------------------------*/
-
-    /* -----------------------------------------------------------------------*/
-    /* Check parms read in above */
-    amr_checkparms(amropt);
-    /* -----------------------------------------------------------------------*/
-
-
-    /* -----------------------------------------------------------------------*/
-    /* Read in any other parms the user might want, including solver parms. */
-    if (f_user_parms_new_ptr != NULL)
-    {
-        f_user_parms_new_ptr(opt,amropt);
-    }
-    /* -----------------------------------------------------------------------*/
+    amr_postprocess_parms(amropt);
 
     return amropt;
 }
 
+void amr_postprocess_parms(amr_options_t *amropt)
+{
+    /* -----------------------------------------------------------------------
+       This has to happen after parameters have been parsed, but before we
+       check parameters.
+       ----------------------------------------------------------------------- */
+    amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                   NumFaces);
+
+}
+
+
+/* -----------------------------------------------------------------
+   Check input parms
+   ----------------------------------------------------------------- */
+void amr_checkparms(amr_options_t *gparms)
+{
+    /* Check outstyle. */
+    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
+    {
+        double dT_outer = gparms->tfinal/gparms->nout;
+        double dT_inner = gparms->initial_dt;
+        int nsteps = dT_outer/dT_inner;
+        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
+        {
+            printf("For fixed dt, initial time step size must divide tfinal/nout "
+                   "exactly.\n");
+            exit(1);
+        }
+    }
+
+    /* Could also do basic sanity checks on mx,my,... */
+}
+
+
+
+
+#if 0
 void
 amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                    int argc, char **argv, int log_priority)
+#endif
+
+void
+amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority)
 {
     int retval;
 
@@ -262,18 +265,21 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
         SC_CHECK_ABORT (!retval, "Option save failed");
     }
 
+#if 0
+    /* This is now done in a post-processing step */
     amr_options_convert_arrays (amropt);
+#endif
 }
 
+
+
 void
-    amr_options_destroy (amr_options_t * amropt,
-                         fclaw2d_user_parms_destroy_t f_user_parms_destroy_ptr)
+    amr_options_destroy (amr_options_t * amropt)
 {
     /* These are now stored under amropt->waveprop_parms */
     /* SC_FREE (amropt->->order); */
     /* SC_FREE (amropt->mthlim); */
     SC_FREE (amropt->mthbc);
-    f_user_parms_destroy_ptr(amropt);
     SC_FREE (amropt);
 
 }

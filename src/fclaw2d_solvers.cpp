@@ -28,13 +28,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_single_step.H"
 #include "amr_mol.H"
 #include "amr_solver_typedefs.H"
+#include "fclaw2d_solvers.H"
+
+void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx)
+{
+    /* This is called if there is nothing to do to set up a new patch */
+}
 
 
 void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions)
 {
     fclaw2d_solver_functions_t *sf = solver_functions;
 
-    sf->f_link_solvers             = NULL;
     sf->f_patch_setup              = NULL;
     sf->f_patch_initialize         = NULL;
     sf->f_patch_physical_bc        = NULL;
@@ -44,6 +52,7 @@ void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions)
     sf->f_patch_ode_solver_rhs     = NULL;
 }
 
+
 void copy_solver_functions(fclaw2d_solver_functions_t* old_solver_functions,
                            fclaw2d_solver_functions_t* new_solver_functions)
 {
@@ -51,7 +60,6 @@ void copy_solver_functions(fclaw2d_solver_functions_t* old_solver_functions,
     fclaw2d_solver_functions_t *oldsf = old_solver_functions;
     fclaw2d_solver_functions_t *newsf = new_solver_functions;
 
-    newsf->f_link_solvers             = oldsf->f_link_solvers;
     newsf->f_patch_setup              = oldsf->f_patch_setup;
     newsf->f_patch_initialize         = oldsf->f_patch_initialize;
     newsf->f_patch_physical_bc        = oldsf->f_patch_physical_bc;

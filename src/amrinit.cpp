@@ -94,6 +94,10 @@ void cb_amrinit(fclaw2d_domain_t *domain,
 void amrinit(fclaw2d_domain_t **domain)
 {
     const amr_options_t *gparms = get_domain_parms(*domain);
+    fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+
+    (ddata->f_problem_setup)(*domain);
+
     double t = 0;
 
     set_domain_time(*domain,t);
@@ -104,7 +108,6 @@ void amrinit(fclaw2d_domain_t **domain)
     // Set problem dependent parameters for Riemann solvers, etc.
     // Values are typically stored in Fortran common blocks, and are not
     // available outside of Fortran.
-    set_problem_parameters();
 
     init_block_and_patch_data(*domain);  /* Allocate block and patch data */
 

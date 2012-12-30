@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
+#include "amr_waveprop.H"
+#include "amr_options.h"
 
 #include "swirl_user.H"
 
@@ -40,6 +42,8 @@ main (int argc, char **argv)
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   amr_options_t         *gparms;
+  amr_waveprop_parms_t  *waveprop_parms;
+
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
@@ -48,9 +52,26 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Read parameters from .ini file.
      -------------------------------------------------------------- */
-  options = sc_options_new (argv[0]);
-  gparms = amr_options_new (options, swirl_parms_new);
-  amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
+  options = sc_options_new(argv[0]);
+
+  /* Register default parameters and any solver parameters */
+  gparms = amr_options_new(options);
+  waveprop_parms = amr_waveprop_parms_new(options);
+
+  /* Parse any command line arguments.  Argument gparms is no longer needed
+     as an input since the array conversion is now done in 'postprocess' */
+#if 0
+  amr_options_parse(options, gparms, argc, argv, lp);
+#endif
+  amr_options_parse(options,argc,argv,lp);
+
+  /* Any arrays are converted here */
+  amr_postprocess_parms(gparms);
+  amr_waveprop_postprocess_parms(waveprop_parms);
+
+  /* Check final state of parameters */
+  amr_checkparms(gparms);
+  amr_waveprop_checkparms(waveprop_parms,gparms);
 
   /* ---------------------------------------------------------------
      Domain geometry
@@ -63,11 +84,22 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  init_domain_data(domain);       // allocate all data for the domain.
-  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-  ddata->amropts = gparms;
+  init_domain_data(domain);
 
-  swirl_solvers_link(domain);
+  set_domain_parms(domain,gparms);
+  set_waveprop_parms(domain,waveprop_parms);
+
+  /* ---------------------------------------------------------------
+     Set domain data.
+     --------------------------------------------------------------- */
+
+  /* Using user defined functions */
+  link_problem_setup(domain,swirl_problem_setup);
+  swirl_link_solvers(domain);
+
+  /* Plain vanilla waveprop algorithm */
+  /* link_problem_setup(domain,amr_waveprop_setprob); */
+  /* amr_waveprop_link_solvers(domain); */
 
   /* ---------------------------------------------------------------
      Run
@@ -77,7 +109,8 @@ main (int argc, char **argv)
   amrreset(&domain);
 
   sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms,swirl_parms_delete);
+  amr_options_destroy (gparms);
+  amr_waveprop_parms_delete(waveprop_parms);
 
   fclaw_mpi_finalize ();
 
