@@ -23,42 +23,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_WAVEPROP_H
-#define FCLAW2D_WAVEPROP_H
+// #include "amr_forestclaw.H"
+#include "amr_mol.H"
 
-#include "fclaw2d_capi.h"
-
-#ifdef __cplusplus
-extern "C"
+// This is the function needed by the particular MOL solver.  In this case, we
+// just call the mol_rhs directly.
+static
+void f_feuler(const int& neqn, const double& t_inner, double q[], double rhs[])
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
-/* This is called if you want to only compute the right hand side for the
- * single step routine. */
-double fclaw2d_waveprop_rhs(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double *rhs);
-
-/* This is called from the single_step callback.
- * and is of type 'fclaw2d_single_step_t' */
-double fclaw2d_waveprop_update(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx,
-                               int this_patch_idx,
-                               double t,
-                               double dt);
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+    fclaw_mol_rhs(t_inner, q, rhs);
 }
-#endif
 
-#endif
+
+void parabolic_step_feuler(int neqn, double q[], double t, double dt)
+{
+    double *feuler_work = new double[neqn];
+
+    // This is the real solver routine.
+    feuler_((void*) &f_feuler,neqn,q,t,dt,feuler_work);
+
+    delete [] feuler_work;
+}
