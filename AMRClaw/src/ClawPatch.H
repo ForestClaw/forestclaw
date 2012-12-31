@@ -27,6 +27,7 @@ public :
                 const double&  a_xupper,
                 const double&  a_yupper,
                 const int& a_blockno,
+                const int& a_level,
                 const amr_options_t *a_gparms);
 
     void copyFrom(ClawPatch *a_cp);

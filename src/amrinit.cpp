@@ -55,12 +55,14 @@ static
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = new ClawPatch();
+    int level = this_patch->level;
 
     cp->define(this_patch->xlower,
                this_patch->ylower,
                this_patch->xupper,
                this_patch->yupper,
                this_block_idx,
+               level,
                gparms);
     set_patch_data(this_patch,cp);
 

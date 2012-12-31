@@ -37,6 +37,7 @@ void ClawPatch::define(const double&  a_xlower,
                        const double&  a_xupper,
                        const double&  a_yupper,
                        const int& a_blockno,
+                       const int& a_level,
                        const amr_options_t* gparms)
 {
     m_mx = gparms->mx;
@@ -67,7 +68,6 @@ void ClawPatch::define(const double&  a_xlower,
     ur[1] = m_my + m_mbc;
     Box box(ll,ur);
 
-
     // This will destroy any existing memory n m_griddata.
     m_griddata.define(box, m_meqn);
     m_griddata_last.define(box, m_meqn);
@@ -75,6 +75,10 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata_time_interp.define(box, m_meqn);
 
     m_manifold = gparms->manifold;
+    if (m_manifold)
+    {
+        setup_manifold(a_level,gparms);
+    }
 
     ClawPatch::f_waveprop_patch_data_new(&m_waveprop_patch_data);
 }
@@ -532,10 +536,13 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                a_refratio,a_igrid);
     if (m_manifold)
     {
+        /*
         double *areacoarse = m_area.dataPtr();
         double *areafine = a_fine->m_area.dataPtr();
+
         fixcapaq2_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine, areacoarse, areafine,
                    a_p4est_refineFactor, a_refratio, a_igrid);
+        */
     }
 }
 

@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-
 int
 main (int argc, char **argv)
 {
@@ -91,7 +90,7 @@ main (int argc, char **argv)
   set_waveprop_parms(domain,waveprop_parms);
 
   /* ---------------------------------------------------------------
-     Set domain data.
+     Define the solver
      --------------------------------------------------------------- */
 
   /* Using user defined functions just to demonstrate how one might setup

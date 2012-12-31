@@ -1,15 +1,21 @@
-      subroutine qinit_mapped(mx,my,meqn,mbc,xlower, ylower, dx, dy,
-     &      xp, yp, zp, q_claw,maux,aux,blockno)
+      subroutine qinit_manifold(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux,
+     &      xp,yp,zp,xd,yd,zd,this_block_idx)
+
       implicit none
 
-      integer mx,my,meqn,mbc, maux, blockno
+      integer maxmx, maxmy, meqn, mbc, mx, my, maux,this_block_idx
       double precision xlower, ylower, dx, dy
-      double precision q_claw(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision    aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
 
       double precision a,b,c, q0, q1,q2
       integer i,j, ichoice, get_init_choice
@@ -35,9 +41,9 @@
             z = zp(i,j)
 
             if (x .le. 0) then
-               q_claw(i,j,1) = 1.d0
+               q(i,j,1) = 1.d0
             else
-               q_claw(i,j,1) = 0.d0
+               q(i,j,1) = 0.d0
             endif
 
 c            if (ichoice .eq. 1) then
@@ -48,13 +54,15 @@ c            elseif (ichoice .eq. 4) then
 c               q1 = slotted_disk_sum(x,y,z)
 c            endif
 c            q_claw(i,j,1) = q1
-
-            if (ichoice .eq. 3) then
-               q2 = a*q1**2 + b
-               q_claw(i,j,2) = q2
-            endif
+c
+c            if (ichoice .eq. 3) then
+c               q2 = a*q1**2 + b
+c               q(i,j,2) = q2
+c            endif
          enddo
       enddo
 
 
+
+      return
       end

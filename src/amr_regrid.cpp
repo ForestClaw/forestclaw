@@ -88,6 +88,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                               sibling_patch[NumSiblings-1].xupper,
                               sibling_patch[NumSiblings-1].yupper,
                               this_block_idx,
+                              level,
                               gparms);
 
         // cp_new_coarse->setup_patch(level, maxlevel, refratio);
@@ -146,11 +147,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         {
             // This produces what appear to be correct results
             ClawPatch *cp_new = new ClawPatch();
+            int level = new_patch->level;
             cp_new->define(old_patch->xlower,
                            old_patch->ylower,
                            old_patch->xupper,
                            old_patch->yupper,
                            blockno,
+                           level,
                            gparms);
 
             set_patch_data(&new_patch[0],cp_new);
@@ -175,13 +178,16 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
             ClawPatch *cp_new = new ClawPatch();
+            int level = new_patch->level;
 
             cp_new->define(new_patch[igrid].xlower,
                            new_patch[igrid].ylower,
                            new_patch[igrid].xupper,
                            new_patch[igrid].yupper,
                            blockno,
+                           level,
                            gparms);
+
             set_patch_data(&new_patch[igrid],cp_new);
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
 
@@ -204,11 +210,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // newsize == DOUBLESIZE (must remember  : DOUBLESIZE means a coarser grid!)
         // new grid is a COARSE grid
         ClawPatch *cp_new = new ClawPatch();
+        int level = new_patch->level;
         cp_new->define(new_patch[0].xlower,
                        new_patch[0].ylower,
                        new_patch[0].xupper,
                        new_patch[0].yupper,
                        blockno,
+                       level,
                        gparms);
         set_patch_data(&new_patch[0],cp_new);
 

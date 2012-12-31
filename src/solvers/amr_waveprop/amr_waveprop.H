@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.h"
 #include "amr_options.h"
+#include "clawpack_fort.H"
 
 /* I know this is one 'extern C' too many, but I like the indentation here */
 extern "C"

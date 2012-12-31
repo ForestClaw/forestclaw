@@ -10,7 +10,6 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-
 include Makefile.inc
 
 # make sure that the first make target is the executable
@@ -18,14 +17,14 @@ default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ $(solver_includes) -c $< -o $@
+	-I$(FORESTCLAW)/AMRClaw/src -I$(FORESTCLAW)/src/ $(solver_includes) -c $< -o $@
 
 .c.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< -I$(solver_includes) -o $@
+	$(FC) -Wall $(FFLAGS) -c $< $(solver_includes) -o $@
 
 
 .PHONY: clean realclean default $(TARGET)
@@ -36,9 +35,6 @@ exampleobjs = \
 	$(solver_objs)
 
 
-# Lots of these routines are also only used for Clawpack, but I haven't
-# and should all really be listed under 'solver_routines'.  But for now
-# I've left them here.
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
@@ -68,4 +64,4 @@ clean:
 	rm -f *.o $(TARGET) $(OBJECTS)
 
 realclean: clean
-	rm -f $(amrclawobjs) fort.*
+	rm -f $(TARGET) $(OBJECTS) fort.*
