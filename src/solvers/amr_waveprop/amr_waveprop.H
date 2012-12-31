@@ -155,14 +155,22 @@ struct amr_waveprop_parms
 
 };
 
+
+/* ----------------------------------------------------------------------
+   Routines that get called once when setting up the problem and solvers.
+   ---------------------------------------------------------------------- */
+
+/* Reading in parameters */
 void set_waveprop_parms(fclaw2d_domain_t* domain,amr_waveprop_parms_t* waveprop_parms);
 amr_waveprop_parms_t* amr_waveprop_parms_new(sc_options_t *opt);
 void amr_waveprop_checkparms(amr_waveprop_parms_t *waveprop_parms,amr_options_t* gparms);
 void amr_waveprop_parms_delete(amr_waveprop_parms_t *waveprop_parms);
 void amr_waveprop_postprocess_parms(amr_waveprop_parms_t* waveprop_parms);
 
+/* Linking solvers */
 void amr_waveprop_link_solvers(fclaw2d_domain_t* domain);
 
+/* Problem setup - user defined */
 void amr_waveprop_setprob(fclaw2d_domain_t* domain);
 
 /* ----------------------------------------------------------------------

@@ -32,12 +32,8 @@ default: $(TARGET)
 
 exampleobjs = \
 	ghost_twopatch.o \
-	init_routines.o \
 	velocity_wind.o \
 	tag4refinement.o \
-	gaussian.o \
-	cosine_bell.o \
-	slotted_disk.o \
 	mapc2m.o \
 	$(solver_objs)
 

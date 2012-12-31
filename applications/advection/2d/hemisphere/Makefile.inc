@@ -28,7 +28,7 @@ solver_objs := \
 	qinit_manifold.o \
 	b4step2_manifold.o \
 	setaux_manifold.o \
-	setprob_advection.o \
+	setprob.o \
 	rpn2noncons.o \
 	rpt2noncons.o \
 	$(waveprop_objs)

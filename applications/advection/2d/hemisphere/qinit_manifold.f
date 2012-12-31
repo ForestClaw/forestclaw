@@ -17,23 +17,9 @@
       double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
       double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
 
-      double precision a,b,c, q0, q1,q2
-      integer i,j, ichoice, get_init_choice
-      double precision t,x,y,z
-      double precision gaussian_sum, cosine_bell_sum
-      double precision slotted_disk_sum
+      integer i,j
+      double precision x,y,z
 
-      ichoice = get_init_choice()
-
-      if (ichoice .eq. 3 .and. meqn .eq. 1) then
-         write(6,*) 'Error : Set meqn=2 for correlated cosine bells'
-         stop
-      endif
-
-      a = -0.8d0
-      b = 0.9d0
-
-      t = 0
       do j = 0,my+1
          do i = 0,mx+1
             x = xp(i,j)
@@ -45,24 +31,8 @@
             else
                q(i,j,1) = 0.d0
             endif
-
-c            if (ichoice .eq. 1) then
-c               q1 = gaussian_sum(x,y,z)
-c            elseif (ichoice .eq. 2 .or. ichoice .eq. 3) then
-c               q1 = cosine_bell_sum(x,y,z)
-c            elseif (ichoice .eq. 4) then
-c               q1 = slotted_disk_sum(x,y,z)
-c            endif
-c            q_claw(i,j,1) = q1
-c
-c            if (ichoice .eq. 3) then
-c               q2 = a*q1**2 + b
-c               q(i,j,2) = q2
-c            endif
          enddo
       enddo
-
-
 
       return
       end

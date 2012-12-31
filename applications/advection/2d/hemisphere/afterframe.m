@@ -19,8 +19,8 @@ hidepatchborders(7);
 
 % view([-121.5 30]);
 setviews;
-% view(vtop);
-view(3);
+view(vtop);
+% view(3);
 
 NoQuery = 0;
 MaxFrames = 192;
