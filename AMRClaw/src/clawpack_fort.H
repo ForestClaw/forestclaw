@@ -235,9 +235,6 @@ void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
 #endif
 
 
-void set_problem_parameters();
-
-
 class Box
 {
 public:

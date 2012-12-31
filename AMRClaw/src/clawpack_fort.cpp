@@ -29,12 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "clawpack_fort.H"
 
-void set_problem_parameters()
-{
-    setprob_();
-}
-
-
 FArrayBox::FArrayBox()
 {
     m_data = NULL;
