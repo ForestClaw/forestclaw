@@ -10,6 +10,7 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
+
 include Makefile.inc
 
 # make sure that the first make target is the executable
@@ -24,17 +25,15 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
+	$(FC) -Wall $(FFLAGS) -c $< -I$(solver_includes) -o $@
 
 
 .PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
-	qinit.o \
-	swirl_user.o \
 	ghost_twopatch.o \
 	tag4refinement.o \
-	$(solver_routines)
+	$(solver_objs)
 
 
 # Lots of these routines are also only used for Clawpack, but I haven't

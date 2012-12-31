@@ -23,8 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_waveprop.h"
-
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
@@ -441,7 +439,6 @@ double amr_waveprop_update(fclaw2d_domain_t *domain,
                            double t,
                            double dt)
 {
-    const amr_options_t* gparms = get_domain_parms(domain);
     const amr_waveprop_parms_t* waveprop_parms = get_waveprop_parms(domain);
 
     amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
@@ -635,7 +632,6 @@ void amr_waveprop_link_to_clawpatch()
 
 void  amr_waveprop_link_solvers(fclaw2d_domain_t* domain)
 {
-    const amr_options_t* gparms = get_domain_parms(domain);
     const amr_waveprop_parms_t* waveprop_parms = get_waveprop_parms(domain);
 
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);

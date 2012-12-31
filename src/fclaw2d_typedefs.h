@@ -4,11 +4,11 @@
 #include "fclaw2d_defs.H"
 #include "amr_options.h"
 #include "forestclaw2d.h"
-#include "amr_solver_typedefs.H"
+#include "fclaw2d_solvers.H"
 
 class ClawPatch;
 
-typedef fclaw2d_level_time_data fclaw2d_level_time_data_t;
+typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t* domain);
 

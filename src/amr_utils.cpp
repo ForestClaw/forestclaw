@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_base.h>
 #include "amr_single_step.H"
 #include "amr_mol.H"
-#include "amr_solver_typedefs.H"
+#include "fclaw2d_solvers.H"
 
 int pow_int(int a, int n)
 {

@@ -42,6 +42,86 @@ void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx);
 
+typedef struct fclaw2d_solver_functions fclaw2d_solver_functions_t;
+
+
+
+typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
+
+typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx);
+
+typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx);
+
+typedef void (*fclaw2d_patch_physical_bc_t)(fclaw2d_domain *domain,
+                                            fclaw2d_patch_t *this_patch,
+                                            int this_block_idx,
+                                            int this_patch_idx,
+                                            double t,
+                                            double dt,
+                                            fclaw_bool *intersects_bc);
+
+
+/* Interface to MOL solver */
+typedef void (*fclaw2d_level_ode_solver_t)(int neqn, double q[], double t, double dt);
+
+
+/* These return a max cfl number, if needed */
+typedef double (*fclaw2d_patch_ode_solver_rhs_t)(fclaw2d_domain_t *domain,
+                                                 fclaw2d_patch_t *this_patch,
+                                                 int this_block_idx,
+                                                 int this_patch_idx,
+                                                 double t,
+                                                 double *rhs);
+
+
+
+typedef double (*fclaw2d_level_single_step_t)(fclaw2d_domain_t *domain,
+                                            int level,
+                                            double t, double dt);
+
+
+
+typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *this_patch,
+                                                     int this_block_idx,
+                                                     int this_patch_idx,
+                                                     double t,
+                                                     double dt);
+
+
+struct fclaw2d_solver_functions
+{
+    fclaw2d_patch_setup_t f_patch_setup;
+    fclaw2d_patch_initialize_t f_patch_initialize;
+    fclaw2d_patch_physical_bc_t f_patch_physical_bc;
+
+    /* A single step solver.  Note that the user may want to
+       change this one out */
+    fclaw_bool use_single_step_update;
+    fclaw2d_level_single_step_t f_level_single_step;
+    fclaw2d_patch_single_step_update_t f_patch_single_step_update;
+
+    /* MOL solver requires both a patch_rhs function and
+       an ODE solver (a mol_solver).  Note that the
+       function 'fclaw2d_mol_step_level' is fixed;  I don't
+       expect users to change this (unlike with
+       'fclaw2d_single_step_level_t */
+
+    fclaw_bool use_mol_update;
+    fclaw2d_level_ode_solver_t f_level_ode_solver;
+    fclaw2d_patch_ode_solver_rhs_t f_patch_ode_solver_rhs;
+};
+
+void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions);
+
+void copy_solver_functions(fclaw2d_solver_functions_t* old_solver_functions,
+                           fclaw2d_solver_functions_t* new_solver_functions);
 
 #ifdef __cplusplus
 #if 0

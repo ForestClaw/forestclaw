@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_solver_typedefs.H"
+#include "fclaw2d_solvers.H"
 
 static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,

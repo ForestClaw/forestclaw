@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
-#include "amr_solver_typedefs.H"
+#include "fclaw2d_solvers.H"
 
 #include "ClawPatch.H"
 

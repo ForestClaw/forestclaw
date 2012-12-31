@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "amr_single_step.H"
 #include "amr_mol.H"
-#include "amr_solver_typedefs.H"
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_defs.h"
 
@@ -36,7 +35,7 @@ void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-    /* This is called if there is nothing to do to set up a new patch */
+    /* Do nothing */
 }
 
 void amr_dummy_patch_initialize(fclaw2d_domain_t *domain,
@@ -44,7 +43,7 @@ void amr_dummy_patch_initialize(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
-    /* This is called if there is nothing to do to set up a new patch */
+    /* Do nothing */
 }
 
 

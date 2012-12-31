@@ -1,14 +1,13 @@
 # -*- Makefile -*-
 
 AMR_WAVEPROP = $(FORESTCLAW)/src/solvers/amr_waveprop
-AMR_WAVEPROP_FORTRAN = $(FORESTCLAW)/src/solvers/amr_waveprop/fortran_source
+AMR_WAVEPROP_FORTRAN = $(AMR_WAVEPROP)/fortran_source
 
-solver_includes = -I$(AMR_WAVEPROP)
-
+solver_includes = -I$(AMR_WAVEPROP) -I$(AMR_WAVEPROP_FORTRAN)
 
 waveprop := \
 	$(AMR_WAVEPROP)/amr_waveprop.o \
-	$(FORESTCLAW)/AMRClaw/src/limiter.o \
+	$(AMR_WAVEPROP_FORTRAN)/limiter.o \
 	$(AMR_WAVEPROP_FORTRAN)/src2.o \
 	$(AMR_WAVEPROP_FORTRAN)/src2_manifold.o \
 	$(AMR_WAVEPROP_FORTRAN)/b4step2_manifold.o \
@@ -24,7 +23,9 @@ waveprop := \
 
 
 
-solver_routines := \
+solver_objs := \
+	qinit.o \
+	swirl_user.o \
 	b4step2.o \
 	setaux.o \
 	setprob.o \
