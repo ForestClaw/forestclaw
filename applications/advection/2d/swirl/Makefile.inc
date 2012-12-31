@@ -25,11 +25,7 @@ waveprop := \
 
 solver_objs := \
 	qinit.o \
-	swirl_user.o \
 	b4step2.o \
 	setaux.o \
 	setprob.o \
-	psi.o \
-	rpn2ad1.o \
-	rpt2ad1.o \
 	$(waveprop)

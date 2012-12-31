@@ -32,6 +32,10 @@ default: $(TARGET)
 exampleobjs = \
 	ghost_twopatch.o \
 	tag4refinement.o \
+	psi.o \
+	rpn2ad1.o \
+	rpt2ad1.o \
+	swirl_user.o \
 	$(solver_objs)
 
 

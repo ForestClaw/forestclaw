@@ -29,6 +29,4 @@ solver_objs := \
 	b4step2_manifold.o \
 	setaux_manifold.o \
 	setprob.o \
-	rpn2noncons.o \
-	rpt2noncons.o \
 	$(waveprop_objs)

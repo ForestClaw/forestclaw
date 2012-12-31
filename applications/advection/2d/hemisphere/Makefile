@@ -34,6 +34,8 @@ exampleobjs = \
 	ghost_twopatch.o \
 	velocity_wind.o \
 	tag4refinement.o \
+	rpn2noncons.o \
+	rpt2noncons.o \
 	mapc2m.o \
 	$(solver_objs)
 

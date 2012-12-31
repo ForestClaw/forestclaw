@@ -462,8 +462,8 @@ void cb_dump_auxarray(fclaw2d_domain_t *domain,
                       void *user)
 {
     int dump_patchno = *((int *) user);
-    int numb4 = domain->blocks[this_block_idx].num_patches_before;
 
+    int numb4 = domain->blocks[this_block_idx].num_patches_before;
     if (this_patch_idx == dump_patchno + numb4)
     {
         const amr_options_t* gparms              = get_domain_parms(domain);
@@ -514,9 +514,6 @@ amr_waveprop_parms_t*  amr_waveprop_parms_new(sc_options_t *opt)
     amr_waveprop_parms_t *waveprop_parms;
 
     waveprop_parms = SC_ALLOC_ZERO (amr_waveprop_parms_t, 1);
-
-    /* amr_waveprop_parms_t *waveprop_parms = new amr_waveprop_parms_t; */
-    /* gparms->waveprop_parms = (void*) waveprop_parms; */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &waveprop_parms->order_string, NULL,
@@ -587,7 +584,6 @@ void amr_waveprop_postprocess_parms(amr_waveprop_parms_t* waveprop_parms)
     amr_options_convert_int_array (waveprop_parms->mthlim_string, &waveprop_parms->mthlim,
                                    waveprop_parms->mwaves);
 
-
     amr_options_convert_int_array (waveprop_parms->order_string, &waveprop_parms->order,
                                    SpaceDim);
 }
@@ -641,11 +637,11 @@ void  amr_waveprop_link_solvers(fclaw2d_domain_t* domain)
 
     if (waveprop_parms->maux > 0)
     {
-        sf->f_patch_setup              = &amr_waveprop_setaux;
+        sf->f_patch_setup          = &amr_waveprop_setaux;
     }
     else
     {
-        sf->f_patch_setup              = &amr_dummy_patch_setup;
+        sf->f_patch_setup          = &amr_dummy_patch_setup;
     }
 
     sf->f_patch_initialize         = &amr_waveprop_qinit;

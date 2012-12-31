@@ -47,15 +47,18 @@ main (int argc, char **argv)
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
 
-  gparms = amr_options_new (options); // Sets default values
+  /* Read in values from default .ini files */
+  gparms = amr_options_new (options);
   waveprop_parms = amr_waveprop_parms_new(options);
 
-
+  /* Parse command line for any modifications */
   amr_options_parse (options, argc, argv, lp);  // Reads options from a file
 
+  /* Postprocess array inputs */
   amr_postprocess_parms(gparms);
   amr_waveprop_postprocess_parms(waveprop_parms);
 
+  /* Verify inputs */
   amr_checkparms(gparms);
   amr_waveprop_checkparms(waveprop_parms,gparms);
 
@@ -70,20 +73,19 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  init_domain_data(domain);       // allocate all data for the domain.
+  init_domain_data(domain);
 
+  /* Store domain parameters */
   set_domain_parms(domain,gparms);
   set_waveprop_parms(domain,waveprop_parms);
-
 
 /* ---------------------------------------------
    Define the solver
    --------------------------------------------- */
 
-  /* Plain vanilla waveprop algorithm.  This version doesn't require swirl_user.{H,cpp} */
+  /* Link waveprop solvers to domain */
   link_problem_setup(domain,amr_waveprop_setprob);
   amr_waveprop_link_solvers(domain);
-
 
   /* --------------------------------------------------
      Initialize and run the simulation
