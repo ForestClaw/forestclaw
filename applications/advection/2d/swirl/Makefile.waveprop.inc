@@ -3,9 +3,9 @@
 AMR_WAVEPROP = $(FORESTCLAW)/src/solvers/amr_waveprop
 AMR_WAVEPROP_FORTRAN = $(AMR_WAVEPROP)/fortran_source
 
-solver_includes = -I$(AMR_WAVEPROP) -I$(AMR_WAVEPROP_FORTRAN)
+waveprop_includes = -I$(AMR_WAVEPROP) -I$(AMR_WAVEPROP_FORTRAN)
 
-waveprop := \
+waveprop_lib := \
 	$(AMR_WAVEPROP)/amr_waveprop.o \
 	$(AMR_WAVEPROP_FORTRAN)/limiter.o \
 	$(AMR_WAVEPROP_FORTRAN)/src2.o \
@@ -15,7 +15,6 @@ waveprop := \
 	$(AMR_WAVEPROP_FORTRAN)/qinit_manifold.o \
 	$(AMR_WAVEPROP_FORTRAN)/bc2.o \
 	$(AMR_WAVEPROP_FORTRAN)/bc2_manifold.o \
-	$(AMR_WAVEPROP_FORTRAN)/fdisc.o \
 	$(AMR_WAVEPROP_FORTRAN)/flux2.o \
 	$(AMR_WAVEPROP_FORTRAN)/qad2.o \
 	$(AMR_WAVEPROP_FORTRAN)/step2.o \
@@ -23,9 +22,9 @@ waveprop := \
 
 
 
-solver_objs := \
+waveprop_objs := \
 	qinit.o \
 	b4step2.o \
 	setaux.o \
 	setprob.o \
-	$(waveprop)
+	$(waveprop_lib)
