@@ -13,10 +13,12 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 solver_objs :=
 solver_includes :=
 
+# ---------------------------------
 include Makefile.waveprop.inc
-
 solver_objs += $(waveprop_objs)
 solver_includes += $(waveprop_includes)
+
+# ---------------------------------
 
 # make sure that the first make target is the executable
 default: $(TARGET)
@@ -84,4 +86,4 @@ clean:
 	rm -f *.o $(TARGET) $(OBJECTS)
 
 realclean:
-	rm -f *.o $(amrclawobjs) fort.* $(TARGET)
+	rm -f *.o $(OBJECTS) fort.* $(TARGET)
