@@ -19,20 +19,11 @@ c     # Refine based only on first variable in system.
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 
-            if (init_flag .eq. 1) then
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-               if (abs(xc - 0.5d0) < dx) then
-                  tag_patch = 1
-                  return
-               endif
-            else
-               qmin = min(q(i,j,mq),qmin)
-               qmax = max(q(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.5d0) then
-                  tag_patch = 1
-                  return
-               endif
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
+            if (qmax - qmin .gt. 0.5d0) then
+               tag_patch = 1
+               return
             endif
          enddo
       enddo

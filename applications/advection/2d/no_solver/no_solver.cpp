@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "amr_options.h"
+#include "no_solver_user.H"
 
 int
 main (int argc, char **argv)
@@ -85,7 +86,18 @@ main (int argc, char **argv)
      compile without any solver routines.
      --------------------------------------------------------------- */
 
-  /* Do nothing */
+
+  /* Initialize data but don't do anything */
+  fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+  sf->f_patch_initialize = &no_solver_patch_initialize;
+
+
+  /* ---------------------------------------------------------------
+     Initialize and run (but with out updating anything)
+     --------------------------------------------------------------- */
+  amrinit(&domain);
+  amrrun(&domain);  /* Nothing should happen */
+  amrreset(&domain);
 
   /* ---------------------------------------------------------------
      Clean up
