@@ -106,11 +106,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 {
 
     // const int numfaces = get_faces_per_patch(domain);
-    bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bc[NumFaces];
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[NumFaces];
+    fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -125,16 +125,16 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
         // Both faces are at a physical boundary
-        bool is_phys_corner =
+        fclaw_bool is_phys_corner =
                 intersects_bc[corner_faces[0]] && intersects_bc[corner_faces[1]];
 
         // Corner lies in interior of physical boundary edge.
-        bool corner_on_phys_face = !is_phys_corner &&
+        fclaw_bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
 
         // Either a corner at a block boundary (but not a physical boundary),
         // or internal to a block
-        bool interior_corner = !corner_on_phys_face && !is_phys_corner;
+        fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
         if (is_phys_corner)
@@ -150,7 +150,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         else if (interior_corner)
         {
             // Both faces are at a block boundary
-            bool is_block_corner =
+            fclaw_bool is_block_corner =
                 intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
 
             // We know corner 'icorner' has an adjacent patch.

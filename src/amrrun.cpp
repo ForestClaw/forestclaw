@@ -89,7 +89,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     int nout = gparms->nout;
     double initial_dt = gparms->initial_dt;
     int regrid_interval = gparms->regrid_interval;
-    bool cons_check = gparms->check_conservation;
+    fclaw_bool cons_check = gparms->check_conservation;
     int minlevel = gparms->minlevel;
     int verbosity = gparms->verbosity;
 
@@ -148,7 +148,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             // 'tol' in the next step.
             // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
             double tol = 1e-2*dt_minlevel;
-            bool took_small_step = false;
+            fclaw_bool took_small_step = false;
             if (!gparms->use_fixed_dt)
             {
                 if (tend - t_curr - dt_minlevel < tol)
@@ -249,7 +249,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     int regrid_interval = gparms->regrid_interval;
     int verbosity = gparms->verbosity;
 
-    bool cons_check = (bool) gparms->check_conservation;
+    fclaw_bool cons_check = (fclaw_bool) gparms->check_conservation;
 
     double t0 = 0;
     int level_factor = pow_int(2,gparms->minlevel);
@@ -366,7 +366,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
     int regrid_interval = gparms->regrid_interval;
     int verbosity = gparms->verbosity;
 
-    bool cons_check = (bool) gparms->check_conservation;
+    fclaw_bool cons_check = (fclaw_bool) gparms->check_conservation;
 
     // assume fixed dt that is stable for all grids.
 

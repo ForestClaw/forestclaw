@@ -68,7 +68,7 @@ double advance_level(fclaw2d_domain_t *domain,
                    subcycle_manager* a_time_stepper)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    bool verbose = (bool) a_time_stepper->verbosity();
+    fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
 
     double maxcfl = 0;
@@ -206,7 +206,7 @@ double advance_level(fclaw2d_domain_t *domain,
         cout << "Taking step on level " << a_level << " at time " << t_level << endl;
     }
 
-    bool adv_step = false;
+    fclaw_bool adv_step = false;
     if (adv_step)
     {
         time_data.maxcfl = maxcfl;

@@ -137,7 +137,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
-                        bool *intersects_block)
+                        fclaw_bool *intersects_block)
 {
     // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
@@ -179,7 +179,7 @@ void get_block_boundary(fclaw2d_domain_t *domain,
 void get_phys_boundary(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx,
-                       bool *intersects_bc)
+                       fclaw_bool *intersects_bc)
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[NumFaces];

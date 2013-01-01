@@ -71,12 +71,12 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
-    bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[NumFaces];
+    fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -92,14 +92,14 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         fclaw2d_domain_corner_faces(domain, icorner, faces);
 
         // Both faces are at a physical boundary
-        bool is_phys_corner =
+        fclaw_bool is_phys_corner =
                 intersects_bc[faces[0]] && intersects_bc[faces[1]];
 
         // Corner lies in interior of physical boundary edge.
-        bool corner_on_phys_face = !is_phys_corner &&
+        fclaw_bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
 
-        bool interior_corner = !corner_on_phys_face && !is_phys_corner;
+        fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
         if (is_phys_corner)
@@ -115,7 +115,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         else if (interior_corner)
         {
             // Both faces are at a block boundary
-            bool is_block_corner =
+            fclaw_bool is_block_corner =
                 intersects_block[faces[0]] && intersects_block[faces[1]];
 
             int corner_block_idx;
@@ -141,7 +141,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
-                bool &time_interp = *((bool*) user);
+                fclaw_bool &time_interp = *((fclaw_bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -165,12 +165,12 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
-    bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bc[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bc);
 
-    bool intersects_block[NumFaces];
+    fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -186,14 +186,14 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         fclaw2d_domain_corner_faces(domain, icorner, faces);
 
         // Both faces are at a physical boundary
-        bool is_phys_corner =
+        fclaw_bool is_phys_corner =
                 intersects_bc[faces[0]] && intersects_bc[faces[1]];
 
         // Corner lies in interior of physical boundary edge.
-        bool corner_on_phys_face = !is_phys_corner &&
+        fclaw_bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
 
-        bool interior_corner = !corner_on_phys_face && !is_phys_corner;
+        fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
         if (is_phys_corner)
@@ -210,7 +210,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         {
 
             // Both faces are at a block boundary
-            bool is_block_corner =
+            fclaw_bool is_block_corner =
                 intersects_block[faces[0]] && intersects_block[faces[1]];
 
             int corner_block_idx;
@@ -237,7 +237,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
-                bool &time_interp = *((bool*) user);
+                fclaw_bool &time_interp = *((fclaw_bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -268,7 +268,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
     // const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     // We may need to average onto a time interpolated grid, not the actual solution.
-    bool &time_interp = *((bool*) user);
+    fclaw_bool &time_interp = *((fclaw_bool*) user);
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -310,7 +310,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                         &neighbor_block->patches[neighbor_patch_idx[ir]];
                     fine_neighbor_cp[ir] = get_clawpatch(neighbor_patch);
                 }
-                bool block_boundary = this_block_idx != neighbor_block_idx;
+                fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
                 this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                             fine_neighbor_cp,time_interp,block_boundary);
@@ -369,8 +369,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
 
                 // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
                 // doing time interpolation if necessary
-                bool &time_interp = *((bool*) user);
-                bool block_boundary = this_block_idx != neighbor_block_idx;
+                fclaw_bool &time_interp = *((fclaw_bool*) user);
+                fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                 this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                 refratio,fine_neighbor_cp,time_interp,
                                                 block_boundary);
@@ -410,7 +410,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           double alpha)
 {
     // Simple exchange - no time interpolation needed
-    bool time_interp = alpha > 0; //
+    fclaw_bool time_interp = alpha > 0; //
     int coarser_level = level - 1;
 
     if (time_interp)

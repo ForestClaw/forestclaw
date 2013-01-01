@@ -43,7 +43,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     m_maxlevel = domain->maxlevel_all;
     m_levels.resize(m_maxlevel + 1);
 
-    bool subcycle = gparms->subcycle;
+    fclaw_bool subcycle = gparms->subcycle;
     m_nosubcycle = !subcycle;
     for (int level = m_minlevel; level <= m_maxlevel; level++)
     {
@@ -52,7 +52,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     m_verbosity = gparms->verbosity;
 }
 
-bool subcycle_manager::nosubcycle()
+fclaw_bool subcycle_manager::nosubcycle()
 {
     return m_nosubcycle;
 }
@@ -126,12 +126,12 @@ void subcycle_manager::increment_time(const int& a_level)
     m_levels[a_level].increment_time();
 }
 
-bool subcycle_manager::is_coarsest(const int& a_level)
+fclaw_bool subcycle_manager::is_coarsest(const int& a_level)
 {
     return a_level == m_minlevel;
 }
 
-bool subcycle_manager::is_finest(const int& a_level)
+fclaw_bool subcycle_manager::is_finest(const int& a_level)
 {
     return a_level == m_maxlevel;
 }
@@ -142,14 +142,14 @@ double subcycle_manager::dt(const int& a_level)
     return m_levels[a_level].dt();
 }
 
-bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
+fclaw_bool subcycle_manager::can_advance(const int& a_level, const int& a_curr_step)
 {
-    bool verbose = false;
-    bool b1 = solution_updated(a_level,a_curr_step); // do we need this?  We shouldn't be here if
+    fclaw_bool verbose = false;
+    fclaw_bool b1 = solution_updated(a_level,a_curr_step); // do we need this?  We shouldn't be here if
                                                      // we have not taken a time step to 'a_curr_step'
-    bool b2 = level_exchange_done(a_level);
-    bool b3 = exchanged_with_coarser(a_level);
-    bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
+    fclaw_bool b2 = level_exchange_done(a_level);
+    fclaw_bool b3 = exchanged_with_coarser(a_level);
+    fclaw_bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
     if (verbose)
     {
         if (!b1)
@@ -186,17 +186,17 @@ double subcycle_manager::initial_time()
     return m_initial_time;
 }
 
-bool subcycle_manager::solution_updated(const int& a_level, const int& a_step)
+fclaw_bool subcycle_manager::solution_updated(const int& a_level, const int& a_step)
 {
     return m_levels[a_level].m_last_step >= a_step;
 }
 
-bool subcycle_manager::level_exchange_done(const int& a_level)
+fclaw_bool subcycle_manager::level_exchange_done(const int& a_level)
 {
     return m_levels[a_level].level_exchange_done();
 }
 
-bool subcycle_manager::exchanged_with_coarser(const int& a_level)
+fclaw_bool subcycle_manager::exchanged_with_coarser(const int& a_level)
 {
     if (is_coarsest(a_level))
         return true;
@@ -204,7 +204,7 @@ bool subcycle_manager::exchanged_with_coarser(const int& a_level)
         return m_levels[a_level].exchanged_with_coarser();
 }
 
-bool subcycle_manager::exchanged_with_finer(const int& a_level)
+fclaw_bool subcycle_manager::exchanged_with_finer(const int& a_level)
 {
     if (is_finest(a_level))
         return true;
@@ -243,7 +243,7 @@ void level_data::define(const int& a_level,
                         const int& a_refratio,
                         const int& a_maxlevel,
                         const double& a_time,
-                        const bool& a_subcycle)
+                        const fclaw_bool& a_subcycle)
 {
     m_level = a_level;
     m_last_step = 0;
@@ -317,17 +317,17 @@ void level_data::increment_fine_exchange_counter()
 }
 
 
-bool level_data::level_exchange_done()
+fclaw_bool level_data::level_exchange_done()
 {
     return m_last_level_exchange == m_last_step;
 }
 
-bool level_data::exchanged_with_coarser()
+fclaw_bool level_data::exchanged_with_coarser()
 {
     return m_last_coarse_exchange == m_last_step;
 }
 
-bool level_data::exchanged_with_finer()
+fclaw_bool level_data::exchanged_with_finer()
 {
     return m_last_fine_exchange == m_last_step;
 }

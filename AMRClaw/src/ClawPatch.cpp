@@ -269,9 +269,8 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_inter
     }
     else
     {
-        int numfaces = 2*SpaceDim;
-        int bdry[numfaces];
-        for(int m = 0; m < numfaces; m++)
+        int bdry[NumFaces];
+        for(int m = 0; m < NumFaces; m++)
         {
             bdry[m] = a_intersects_block[m] ? 1 : 0;
         }
