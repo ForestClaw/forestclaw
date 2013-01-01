@@ -1,9 +1,10 @@
-      subroutine setaux_mapped(mx,my,mbc,dx,dy,
-     &      xp,yp,zp,xd,yd,zd,area,maux,aux)
+      subroutine setaux_manifold(maxmx,maxmy,mbc,mx,my,
+     &      xlower,ylower,dx,dy,
+     &      maux,aux,xp,yp,zp,xd,yd,zd,area)
       implicit none
 
-      integer mx,my, mbc, meqn, maux
-      double precision dx,dy
+      integer maxmx, maxmy, mbc, mx,my, meqn, maux
+      double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -29,12 +30,6 @@
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
-            if (aux(i,j,1) .lt. 0) then
-               write(6,*) 'setaux_mapped.f : area(i,j) = ', area(i,j),
-     &               dxdy
-               stop
-            endif
-
             if ((i .ge. 1 .and. i .le. mx) .and.
      &            (j .ge. 1 .and. j .le. my)) then
                sum = sum + area(i,j)

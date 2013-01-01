@@ -90,3 +90,28 @@ c     # Get Cartesian components of the velocity vector
       endif
 
       end
+
+      subroutine set_wind_parms(kappa,tfinal)
+      implicit none
+
+      double precision kappa,tfinal
+      double precision init_kappa_com, tfinal_com
+      common /comwind/ init_kappa_com, tfinal_com
+
+      init_kappa_com = kappa
+      tfinal_com = tfinal
+
+      end
+
+
+      subroutine get_wind_parms(kappa,tfinal)
+      implicit none
+
+      double precision kappa,tfinal
+      double precision init_kappa_com, tfinal_com
+      common /comwind/ init_kappa_com, tfinal_com
+
+      kappa = init_kappa_com
+      tfinal = tfinal_com
+
+      end

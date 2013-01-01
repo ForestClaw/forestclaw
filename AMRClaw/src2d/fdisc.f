@@ -3,7 +3,6 @@
 
       double precision x,y
 
-
       fdisc = 0
 
       end

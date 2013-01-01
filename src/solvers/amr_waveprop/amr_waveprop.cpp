@@ -302,6 +302,8 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
     amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
     amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
 
+    set_block_(&this_block_idx);
+
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = get_block_data(this_block);
     int *block_mthbc = bdata->mthbc;
@@ -319,8 +321,6 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
             mthbc[i] = -1;
         }
     }
-
-    set_block_(&this_block_idx);
 
     double* q = cp->q();
 
@@ -353,7 +353,9 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
         double *xface_normals = cp->xface_normals();
         double *yface_normals = cp->yface_normals();
 
-        bc2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc,
+
+        bc2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                      maux,aux,t,dt,mthbc,
                       xp,yp,zp,xd,yd,zd,xface_normals,yface_normals);
     }
     else

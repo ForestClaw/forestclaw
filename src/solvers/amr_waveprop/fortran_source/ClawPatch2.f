@@ -16,9 +16,9 @@
       parameter(maxmaux = 100)
       double precision work(mwork)
 
-      double precision   qold(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
+      double precision qold(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
-      double precision  aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
+      double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
 c     Conservative numerical fluxes returned here.
       double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -92,7 +92,6 @@ c Some debugging information for iunit.
 
 c -----------------------------------------------------------------------
 c     # take one step on the conservation law:
-
 
 c     # partition work array into pieces needed for local storage in
 c     # step2 routine. Find starting index of each piece:
@@ -207,21 +206,20 @@ c     # and not because of some grand software design issue...
 
       end
 
-
-c     # This is called from ClawPatch.cpp, in ClawPatch::setAuxArray().
-c     # this same subroutine is also in src2d
-      subroutine set_common_levels(a_maxlevel,a_level,a_refratio)
-      implicit none
-
-c     # Inputs
-      integer a_level, a_maxlevel, a_refratio
-
-c     # set common block  that can be seen by setaux.f, for example.
-      integer com_level, com_maxlevel, com_refratio
-      common /comlevel/ com_maxlevel, com_level, com_refratio
-
-      com_maxlevel = a_maxlevel  !! maximum grid level; maxlevel = 0 --> no refinement
-      com_level = a_level  !! Current level
-      com_refratio = a_refratio
-
-      end
+cc     # This is called from ClawPatch.cpp, in ClawPatch::setAuxArray().
+cc     # this same subroutine is also in src2d
+c      subroutine set_common_levels(a_maxlevel,a_level,a_refratio)
+c      implicit none
+c
+cc     # Inputs
+c      integer a_level, a_maxlevel, a_refratio
+c
+cc     # set common block  that can be seen by setaux.f, for example.
+c      integer com_level, com_maxlevel, com_refratio
+c      common /comlevel/ com_maxlevel, com_level, com_refratio
+c
+c      com_maxlevel = a_maxlevel  !! maximum grid level; maxlevel = 0 --> no refinement
+c      com_level = a_level  !! Current level
+c      com_refratio = a_refratio
+c
+c      end

@@ -196,7 +196,7 @@ amr_options_t *
        Read in options from file
        Can check return value for -1 to see if file was not found
        ----------------------------------------------------------------------- */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw_defaults.ini");
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_defaults.ini");
 
     amr_postprocess_parms(amropt);
 
@@ -261,7 +261,7 @@ amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority)
     if (sc_is_root ())
     {
         retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
-                                  "claw2ez.data.used");
+                                  "fclaw2d_defaults.ini.used");
         SC_CHECK_ABORT (!retval, "Option save failed");
     }
 

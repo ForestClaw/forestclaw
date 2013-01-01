@@ -288,13 +288,6 @@ void regrid(fclaw2d_domain_t **domain)
 
         // Average or interpolate to new grids.
         init_block_and_patch_data(new_domain);
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
-                                       (void *) &init_flag);
-
-        // Set some of the user data types.  Some of this is done in
-        // 'amr_set_base_level',
-        // I should probably come up with a more general way to do this.
-        // set_domain_data(new_domain, gparms);
 
         // Physical BCs are needed in boundary level exchange
         // Assume only one block, since we are assuming mthbc
@@ -306,6 +299,14 @@ void regrid(fclaw2d_domain_t **domain)
             // have the same physical boundary conditions types.
             set_block_data(block,gparms->mthbc);
         }
+
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
+                                       (void *) &init_flag);
+
+        // Set some of the user data types.  Some of this is done in
+        // 'amr_set_base_level',
+        // I should probably come up with a more general way to do this.
+        // set_domain_data(new_domain, gparms);
 
         // Level stuff to make sure all
         for (int level = minlevel; level <= maxlevel; level++)

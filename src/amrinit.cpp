@@ -166,6 +166,19 @@ void amrinit(fclaw2d_domain_t **domain)
             // Initialize new grids.  Assume that all ghost cells are filled
             //in by qinit.
             init_block_and_patch_data(new_domain);
+
+            // Physical BCs are needed in boundary level exchange
+            // Assume only one block, since we are assuming mthbc
+            int num = new_domain->num_blocks;
+            for (int i = 0; i < num; i++)
+            {
+                fclaw2d_block_t *block = &new_domain->blocks[i];
+                // This is kind of dumb for now, since block won't in general
+                // have the same physical boundary conditions types.
+                set_block_data(block,gparms->mthbc);
+            }
+
+
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt,
                                            (void *) &init_flag);
@@ -177,18 +190,6 @@ void amrinit(fclaw2d_domain_t **domain)
             // Not needed, because of copy above.
             // set_domain_data(new_domain, gparms);
             // set_domain_time(new_domain,t);
-
-            // Physical BCs are needed in boundary level exchange
-            // Assume only one block, since we are assuming mthbc
-
-            int num = new_domain->num_blocks;
-            for (int i = 0; i < num; i++)
-            {
-                fclaw2d_block_t *block = &new_domain->blocks[i];
-                // This is kind of dumb for now, since block won't in general
-                // have the same physical boundary conditions types.
-                set_block_data(block,gparms->mthbc);
-            }
 
             int new_level = level+1;
             // Upon initialization, we don't do any ghost cell exchanges, because we assume

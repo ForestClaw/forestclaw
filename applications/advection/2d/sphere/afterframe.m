@@ -10,12 +10,10 @@ cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
 caxis([0 1]);
 
-showgridlines(1:4)
+showgridlines(1:3)
 setpatchborderprops(1:6,'linewidth',2);
 hidepatchborders(6);
 
-% hidepatchborders;
-% hidegridlines;
 
 setviews;
 view(3);

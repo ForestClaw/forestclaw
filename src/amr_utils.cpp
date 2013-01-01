@@ -58,6 +58,7 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->amropts = NULL;
     ddata->curr_time = 0;
 
+    /* I put this here because somehow it is not part of a 'solver' */
     ddata->f_problem_setup = &problem_setup_default;
 
     fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
@@ -161,11 +162,13 @@ void init_block_and_patch_data(fclaw2d_domain_t *domain)
     }
 }
 
+
 void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->f_problem_setup = f_problem_setup;
 }
+
 
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)

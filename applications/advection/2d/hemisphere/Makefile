@@ -10,7 +10,13 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-include Makefile.inc
+solver_objs :=
+solver_includes :=
+
+include Makefile.waveprop.inc
+
+solver_objs += $(waveprop_objs)
+solver_includes += $(waveprop_includes)
 
 # make sure that the first make target is the executable
 default: $(TARGET)
@@ -44,7 +50,6 @@ amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
-	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \

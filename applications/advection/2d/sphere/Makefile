@@ -10,44 +10,45 @@ FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-include Makefile.inc
+solver_objs :=
+solver_includes :=
+
+include Makefile.waveprop.inc
+
+solver_objs += $(waveprop_objs)
+solver_includes += $(waveprop_includes)
 
 # make sure that the first make target is the executable
 default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src/ -c $< -o $@
+	-I$(FORESTCLAW)/src -I$(FORESTCLAW)/AMRClaw/src -I. ${solver_includes} -c $< -o $@
+
+.c.o:
+	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	-I$(FORESTCLAW)/src -I$(FORESTCLAW)/AMRClaw/src -I. ${solver_includes} -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< -I$(FORESTCLAW)/AMRClaw/src2d -o $@
+	$(FC) -Wall $(FFLAGS) -c $< ${solver_includes} -o $@
 
 
 .PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
-	qinit_mapped.o \
 	ghost_twopatch.o \
-	init_routines.o \
 	velocity_wind.o \
 	tag4refinement.o \
-	gaussian.o \
-	cosine_bell.o \
-	slotted_disk.o \
 	mapc2m.o \
-	$(solver_routines)
+	rpn2noncons.o \
+	rpt2noncons.o \
+	$(solver_objs)
 
 amrclawobjs = \
 	$(FORESTCLAW)/AMRClaw/src/philim.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
-	$(FORESTCLAW)/AMRClaw/src2d/setaux.o \
-	$(FORESTCLAW)/AMRClaw/src2d/qinit.o \
-	$(FORESTCLAW)/AMRClaw/src2d/bc2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/fdisc.o \
-	$(FORESTCLAW)/AMRClaw/src2d/b4step2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
-	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \

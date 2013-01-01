@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_single_step.h>
-#include <fclaw2d_waveprop.h>
+#include <amr_single_step.h>
+#include <amr_waveprop.H>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
@@ -37,42 +37,55 @@ main (int argc, char **argv)
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
+  amr_waveprop_parms_t* waveprop_parms;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-  /* propose option handling as present in p4est/libsc */
-  /* the option values live in amr_options, see amr_options.h */
+  /* ---------------------------------------------------------------
+     Read in parameters and options
+     --------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
-  gparms = amr_options_new (options); // Sets default values
-  amr_options_parse (options, gparms, argc, argv, lp);  // Reads options from a file
 
-  // ---------------------------------------------------------------
-  // Domain geometry
-  // ---------------------------------------------------------------
+  /* Read parameters from .ini file */
+  gparms = amr_options_new (options); // Sets default values
+  waveprop_parms = amr_waveprop_parms_new(options);
+
+  /* Parse command line */
+  amr_options_parse (options, argc, argv, lp);  // Reads options from a file
+
+  /* Postprocess arrays */
+  amr_postprocess_parms(gparms);
+  amr_waveprop_postprocess_parms(waveprop_parms);
+
+  amr_checkparms(gparms);
+  amr_waveprop_checkparms(waveprop_parms,gparms);
+
+  /* ---------------------------------------------------------------
+     Domain geometry
+     --------------------------------------------------------------- */
+  /* For sphere */
   domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
+
+  /* For hemisphere */
+  /* domain = fclaw2d_domain_new_unitsquare (mpicomm,gparms->minlevel); */
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
-  printf("\n\n");
 
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  allocate_user_data(domain);       // allocate all data for the domain.
+  init_domain_data(domain);
 
-  fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-  ddata->amropts = gparms;
+  /* Store parameters */
+  set_domain_parms(domain,gparms);
+  set_waveprop_parms(domain,waveprop_parms);
 
-/* ---------------------------------------------
-   Define the solver
-   --------------------------------------------- */
-  // This simplified view of the world will have to change
-  // when it comes time to think about solving, say,
-  // advection-diffusion.
-  ddata->f_level_advance = &fclaw2d_single_step;
-  ddata->f_single_step_patch = &fclaw2d_waveprop_update;
+  /* Link solvers to the domain */
+  link_problem_setup(domain,amr_waveprop_setprob);
+  amr_waveprop_link_solvers(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation
@@ -81,8 +94,12 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
+  /* --------------------------------------------------
+     Clean up.
+     -------------------------------------------------- */
   amr_options_destroy(gparms);
-  sc_options_destroy (options);
+  sc_options_destroy(options);
+  amr_waveprop_parms_delete(waveprop_parms);
 
   fclaw_mpi_finalize ();
 
