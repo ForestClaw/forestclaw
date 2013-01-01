@@ -19,7 +19,7 @@ if (blockno == 0)
 else
   zp = 0*xp - 1;
 end
-return;
+% return;
 
 % This is probably not necessary since we don't expect to have any ghost cells.
 d = max(xc-1,0) + max(-1-xc,0);
