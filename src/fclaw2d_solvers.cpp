@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <p4est_base.h>
 #include "amr_utils.H"
-#include "amr_single_step.H"
+#include "amr_single_step.h"
 #include "amr_mol.H"
 #include "fclaw2d_solvers.H"
-#include "fclaw2d_defs.h"
+#include "fclaw2d_defs.H"
 
 void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,

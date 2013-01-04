@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_utils.H"
 #include <p4est_base.h>
-#include "amr_single_step.H"
+#include "amr_single_step.h"
 #include "amr_mol.H"
 #include "fclaw2d_solvers.H"
 
