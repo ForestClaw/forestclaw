@@ -175,6 +175,14 @@ fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm, int initial_level)
 }
 
 fclaw2d_domain_t *
+fclaw2d_domain_new_torus (MPI_Comm mpicomm, int initial_level)
+{
+    fclaw2d_check_initial_level (mpicomm, initial_level);
+    return
+        fclaw2d_domain_new (p4est_wrap_new_periodic (mpicomm, initial_level));
+}
+
+fclaw2d_domain_t *
 fclaw2d_domain_new_twosphere (MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -183,11 +191,19 @@ fclaw2d_domain_new_twosphere (MPI_Comm mpicomm, int initial_level)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_moebius (MPI_Comm mpicomm, int initial_level)
+fclaw2d_domain_new_cubedsphere (MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return
-        fclaw2d_domain_new (p4est_wrap_new_moebius (mpicomm, initial_level));
+        fclaw2d_domain_new (p4est_wrap_new_cubed (mpicomm, initial_level));
+}
+
+fclaw2d_domain_t *
+fclaw2d_domain_new_disk (MPI_Comm mpicomm, int initial_level)
+{
+    fclaw2d_check_initial_level (mpicomm, initial_level);
+    return
+        fclaw2d_domain_new (p4est_wrap_new_disk (mpicomm, initial_level));
 }
 
 void

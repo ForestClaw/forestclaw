@@ -51,7 +51,7 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
+  domain = fclaw2d_domain_new_torus (mpicomm, gparms->minlevel);
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
