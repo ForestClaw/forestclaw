@@ -42,7 +42,7 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 
 /* These integers are meant to be passed in query_identifier of map_query_t.
  * One of these four types is generally chosen.
- * 1 maps into R^2, 2 and 3 map into R^3.
+ * 1 maps into R^2, 2 and 3 map into R^2 or R^3.
  */
 #define FCLAW2D_MAP_QUERY_IS_USED         0     /* is the map used at all? */
 #define FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT  1     /* x_i -> a_i x_i + b_i */
@@ -53,19 +53,22 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
  * These properties can be used to implement shortcuts in the numerical code.
  */
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
+#define FCLAW2D_MAP_QUERY_IS_PLANAR       5     /* (x,y) -> (?,?,0) */
 
 #if 0
-#define FCLAW2D_MAP_QUERY_IS_FLAT         5     /* Zero curvature (def.?) */
+/* How would flat be defined exactly? */
+#define FCLAW2D_MAP_QUERY_IS_FLAT         5     /* Zero curvature */
 /* Has phyical boundaries: should not be relevant to mappings */
 #endif
 
-#define FCLAW2D_MAP_QUERY_LAST            5     /* #"official" queries. */
+#define FCLAW2D_MAP_QUERY_LAST            6     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
 /** This function is used to query the map for general properties.
  * \param [in] cont     Matching mapping context.
  * \param [in] query_identifier Integer that identifies the query.
+ *                      Be sure to use the symbolic constants above.
  * \return              Result of the query.
  */
 typedef int (*fclaw2d_map_query_t) (fclaw2d_map_context_t * cont,
@@ -149,6 +152,8 @@ void fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont);
  * \param [in] mapc2m   Address of the Fortran mapping function.
  *                      It expects the block number in a Clawpatch COMMON.
  * \param [in] query_results    Results for the queries defined above.
+ *                      Be sure to assign them by the symbolic constants
+ *                      defined above since these may change in the future.
  * \return              Mapping context.
  *                      Must be destroyed by fclaw2d_map_destroy_fortran.
  */

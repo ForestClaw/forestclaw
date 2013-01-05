@@ -74,11 +74,8 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 1;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
         return 0;
-
-#if 0
-    case FCLAW2d_MAP_QUERY_IS_FLAT:
+    case FCLAW2D_MAP_QUERY_IS_PLANAR:
         return 0;
-#endif
     }
     return 0;
 }
@@ -143,6 +140,8 @@ fclaw2d_map_query_csphere (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_PLANAR:
         return 0;
     }
     return 0;
@@ -242,6 +241,8 @@ fclaw2d_map_query_disk (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
+        return 1;
+    case FCLAW2D_MAP_QUERY_IS_PLANAR:
         return 1;
     }
     return 0;
