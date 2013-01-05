@@ -135,6 +135,16 @@ void fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont);
 fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
 void fclaw2d_map_destroy_csphere (fclaw2d_map_context_t * cont);
 
+/** Create a planar spherical disk mapping from five trees.
+ * It is composed of a center square and one deformed patches on either side.
+ * \param [in] R1       Outer radius of the disk.
+ * \param [in] R2       Radius at any corner of the inside square.
+ * \return              Mapping context.
+ *                      Must be destroyed by fclaw2d_map_destroy_disk.
+ */
+fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
+void fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont);
+
 /** Create a mapping context for any number of blocks using a Fortran mapc2m.
  * \param [in] mapc2m   Address of the Fortran mapping function.
  *                      It expects the block number in a Clawpatch COMMON.

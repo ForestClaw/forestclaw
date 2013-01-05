@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static unsigned fclaw2d_map_magic_torus;
 static unsigned fclaw2d_map_magic_csphere;      /* cubed sphere */
+static unsigned fclaw2d_map_magic_disk;         /* spherical xy disk */
 static unsigned fclaw2d_map_magic_fortran;
 #define FCLAW2D_MAP_MAGIC(s) \
   (fclaw2d_map_magic_ ## s ?: (fclaw2d_map_magic_ ## s = \
@@ -219,6 +220,114 @@ void
 fclaw2d_map_destroy_csphere (fclaw2d_map_context_t * cont)
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (csphere));
+    P4EST_FREE (cont);
+}
+
+/* Spherical disk in xy plane.  Matches p4est_connectivity_new_disk (). */
+
+static int
+fclaw2d_map_query_disk (fclaw2d_map_context_t * cont, int query_identifier)
+{
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (disk));
+
+    switch (query_identifier)
+    {
+    case FCLAW2D_MAP_QUERY_IS_USED:
+        return 1;
+        /* no break necessary after return statement */
+    case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_AFFINE:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
+        return 1;
+    case FCLAW2D_MAP_QUERY_IS_GRAPH:
+        return 1;
+    }
+    return 0;
+}
+
+static inline void
+fclaw2d_map_c2m_disk_help (double R2sqrbyR1, double R1byR2,
+                           double xi, double eta, double *x, double *y)
+{
+    const double R = R2sqrbyR1 * pow (R1byR2, 1. + eta);
+    const double tan_xi = tan (.5 * M_PI * (xi - .5));
+    const double xi_prime = (1. - eta) * 2. * (xi - .5) + eta * tan_xi; 
+
+    *y = R / sqrt (1. + eta * SC_SQR (tan_xi) + (1. - eta));
+    *x = *y * xi_prime;
+}
+
+static void
+fclaw2d_map_c2m_disk (fclaw2d_map_context_t * cont, int blockno,
+                      double xc, double yc,
+                      double *xp, double *yp, double *zp)
+{
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (disk));
+
+    P4EST_ASSERT (0. <= xc && xc <= 1.);
+    P4EST_ASSERT (0. <= yc && yc <= 1.);
+    
+    *zp = 0.;
+    if (blockno == 2) {
+        /* center square */
+        const double half_length = cont->user_double[2];
+
+        *xp = (2. * xc - 1.) * half_length;
+        *yp = (2. * yc - 1.) * half_length;
+    }
+    else {
+        /* outer patches */
+        const double R2sqrbyR1 = cont->user_double[0];
+        const double R1byR2 = cont->user_double[1];
+
+        switch (blockno)
+        {
+        case 0:
+            fclaw2d_map_c2m_disk_help (R2sqrbyR1, R1byR2,
+                                       xc, 1. - yc, xp, yp);
+            *yp = -*yp;
+            break;
+        case 1:
+            fclaw2d_map_c2m_disk_help (R2sqrbyR1, R1byR2,
+                                       yc, 1. - xc, yp, xp);
+            *xp = -*xp;
+            break;
+        case 3:
+            fclaw2d_map_c2m_disk_help (R2sqrbyR1, R1byR2, yc, xc, yp, xp);
+            break;
+        case 4:
+            fclaw2d_map_c2m_disk_help (R2sqrbyR1, R1byR2, xc, yc, xp, yp);
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
+    }
+}
+
+fclaw2d_map_context_t *
+fclaw2d_map_new_disk (double R1, double R2)
+{
+    fclaw2d_map_context_t *cont;
+
+    P4EST_ASSERT (0. < R2 && R2 <= R1); 
+
+    cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont->magic = FCLAW2D_MAP_MAGIC (disk);
+    cont->query = fclaw2d_map_query_disk;
+    cont->mapc2m = fclaw2d_map_c2m_disk;
+    cont->user_double[0] = R2 * R2 / R1;
+    cont->user_double[1] = R1 / R2;
+    cont->user_double[2] = R2 / M_SQRT2;        /* half length of square */
+
+    return cont;
+}
+
+void
+fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont)
+{
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (disk));
     P4EST_FREE (cont);
 }
 
