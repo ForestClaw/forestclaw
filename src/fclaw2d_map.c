@@ -49,7 +49,7 @@ fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
                   const double *xc, const double *yc,
                   double *xp, double *yp, double *zp)
 {
-    cont->mapc2m(cont, *blockno, *xc, *yc, xp, yp, zp);
+    cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
@@ -76,8 +76,6 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 #if 0
     case FCLAW2d_MAP_QUERY_IS_FLAT:
         return 0;
-    case FCLAW2d_MAP_QUERY_IS_PHYS:
-        return 0;
 #endif
     }
     return 0;
@@ -88,12 +86,12 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
-    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
-
     const double R1 = cont->user_double[0];
     const double R2 = cont->user_double[1];
     /* const double L = cont->user_double[0] + R2 * cos (2. * M_PI * yc); */
     const double L = R1 + R2 * cos (2. * M_PI * yc);
+
+    P4EST_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
 
     *xp = L * cos (2. * M_PI * xc);
     *yp = L * sin (2. * M_PI * xc);
@@ -105,7 +103,6 @@ fclaw2d_map_new_torus (double R1, double R2)
 {
     fclaw2d_map_context_t *cont;
 
-    P4EST_ASSERT (0. <= R1);
     P4EST_ASSERT (0. <= R2 && R2 <= R1);
 
     cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
