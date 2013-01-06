@@ -34,7 +34,7 @@ extern "C"
 #endif
 #endif
 
-/** This prototype matches the Fortran mapc2m functions used in ForestClaw.
+/** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
 typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
                                            double *xp, double *yp,
@@ -54,14 +54,15 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
  */
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
 #define FCLAW2D_MAP_QUERY_IS_PLANAR       5     /* (x,y) -> (?,?,0) */
+#define FCLAW2D_MAP_QUERY_IS_ALIGNED      6     /* (x,y) -> (f(x),g(y),0) */
 
 #if 0
 /* How would flat be defined exactly? */
-#define FCLAW2D_MAP_QUERY_IS_FLAT         5     /* Zero curvature */
+#define FCLAW2D_MAP_QUERY_IS_FLAT         ?     /* Zero curvature */
 /* Has phyical boundaries: should not be relevant to mappings */
 #endif
 
-#define FCLAW2D_MAP_QUERY_LAST            6     /* #"official" queries. */
+#define FCLAW2D_MAP_QUERY_LAST            7     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
