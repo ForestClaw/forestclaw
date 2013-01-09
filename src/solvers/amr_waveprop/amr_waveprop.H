@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* I know this is one 'extern C' too many, but I like the indentation here */
 extern "C"
 {
+    void setprob_();
+
     void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
               const int& mx, const int& my, const double& xlower, const double& ylower,
               const double& dx, const double& dy, const double q[], const int& maux,

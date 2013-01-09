@@ -50,8 +50,6 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 /* ----------------------------------------------------------------------------------
    Initialization routines
    ---------------------------------------------------------------------------------- */
-void setprob_();
-
 void set_maptype_();
 
 void set_block_(const int * a_blockno);
