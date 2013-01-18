@@ -43,6 +43,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     int rblockno;
     int rpatchno[p4est_refineFactor];
     int rfaceno;
+    int ftransform[9];
 
     fclaw2d_patch_relation_t neighbor_type =
         fclaw2d_patch_face_neighbors(domain,
@@ -71,6 +72,14 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
      }
     else
     {
+        // This is demonstration code to infer the patch transformation.
+        // We can do this at a later point when we really need to transform
+        // a patch into it's face neighbor's coordinate system.
+        // This is nontrivial only across a block boundary
+        if (this_block_idx != rblockno) {
+            fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+        }
+
         if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
         {
             // Neighbors are finer grids
@@ -144,6 +153,7 @@ void get_block_boundary(fclaw2d_domain_t *domain,
     int rblockno;
     int rpatchno[p4est_refineFactor];
     int rfaceno;
+    int ftransform[9];
     // const int numfaces = get_faces_per_patch(domain);
 
     for (int iside = 0; iside < NumFaces; iside++)
@@ -169,6 +179,14 @@ void get_block_boundary(fclaw2d_domain_t *domain,
         }
         else
         {
+            // This is demonstration code to infer the patch transformation.
+            // We can do this at a later point when we really need to transform
+            // a patch into it's face neighbor's coordinate system.
+            // This is nontrivial only across a block boundary
+            if (this_block_idx != rblockno) {
+                fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+            }
+
             // We have a neighbor patch on block 'rblockno'.
             intersects_block[iside] = this_block_idx != rblockno;
         }

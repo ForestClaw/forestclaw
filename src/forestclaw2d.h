@@ -229,6 +229,27 @@ fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
                                                        int rpatchno[2],
                                                        int *rfaceno);
 
+/** Fill an array with the axis combination of a face neighbor transform.
+ * \param [in]  faceno      The number of the originating face.
+ * \param [in]  rfaceno     Encoded as rfaceno = r * 4 + nf, where nf = 0..3 is
+ *                          the neigbbor's connecting face number and r = 0..1
+ *                          is the relative orientation to the neighbor's face.
+ * \param [out] ftransform  This array holds 9 integers.
+ *              [0,2]       The coordinate axis sequence of the origin face,
+ *                          the first referring to the tangential and the second
+ *                          to the normal.  A permutation of (0, 1).
+ *              [3,5]       The coordinate axis sequence of the target face.
+ *              [6,8]       Edge reversal flag for tangential axis (boolean);
+ *                          face code in [0, 3] for the normal coordinate q:
+ *                          0: q' = -q
+ *                          1: q' = q + 1
+ *                          2: q' = q - 1
+ *                          3: q' = 2 - q
+ *              [1,4,7]     0 (unused for compatibility with 3D).
+ */
+void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
+                                        int ftransform[]);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e. no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.

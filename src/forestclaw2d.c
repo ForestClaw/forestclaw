@@ -374,6 +374,12 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     }
 }
 
+void
+fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
+{
+    p4est_expand_face_transform (faceno, rfaceno, ftransform);
+}
+
 int
 fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                 int blockno, int patchno, int cornerno,
