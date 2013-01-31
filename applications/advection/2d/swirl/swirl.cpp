@@ -108,6 +108,7 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
   amrinit(&domain);
   amrrun(&domain);
+
   amrreset(&domain);
 
   sc_options_destroy(options);         /* this could be moved up */

@@ -118,6 +118,15 @@ struct fclaw2d_solver_functions
     fclaw2d_patch_ode_solver_rhs_t f_patch_ode_solver_rhs;
 };
 
+/*
+struct fclaw2d_solver_patch_data
+{
+    fclaw2d_solver_patch_data_new_t f_solver_patch_data_new;
+    fclaw2d_solver_patch_data_delete_t f_solver_patch_data_delete;
+    void* solver_data;
+}
+*/
+
 void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions);
 
 void copy_solver_functions(fclaw2d_solver_functions_t* old_solver_functions,
