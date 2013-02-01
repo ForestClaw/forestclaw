@@ -45,7 +45,8 @@ static void update_level_solution(fclaw2d_domain_t *domain,
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
     /* Idea here is that the user may want to apply a single step routine,
-       an MOL routine, or both. */
+       an MOL routine, or possibly both. */
+
     if (sf->use_single_step_update)
     {
         cfl = (sf->f_level_single_step)(domain,a_level,t,dt);
@@ -206,11 +207,9 @@ double advance_level(fclaw2d_domain_t *domain,
         cout << "Taking step on level " << a_level << " at time " << t_level << endl;
     }
 
-    fclaw_bool adv_step = false;
-    if (adv_step)
-    {
-        time_data.maxcfl = maxcfl;
-    }
+    /* Need to figure out what to do if our time step doesn't depend on
+       a cfl condition */
+    time_data.maxcfl = maxcfl;
 
     /* Set some extra things needed by a multi-stage or implicit scheme. */
     time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
