@@ -15,9 +15,9 @@ c     # meth determines what limiter is used.
 c     # a is assumed to be nonzero.
 c
       r = b/a
-      go to (10,20,30,40) meth
+      goto (10, 20, 30, 40) meth
 
-c
+
    10 continue
 c     --------
 c     # minmod
