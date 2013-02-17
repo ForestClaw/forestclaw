@@ -32,9 +32,23 @@ c
       double precision wave(1-mbc:maxm+mbc, meqn, mwaves)
       double precision s(1-mbc:maxm+mbc, mwaves)
 
-      integer mw,i, m
+      integer mw,i, m, ibc
       double precision dotr, wnorm2, dotl, wlimitr
       double precision philim
+
+c      write(6,*) 'Messed with limiter.f'
+
+c     Memory errors are all coming from boundary conditions not be
+c     set correctly in the sphere case.
+      do m = 1,meqn
+         do mw = 1,mwaves
+            do ibc = 1,mbc
+c               wave(1-ibc,m,mw) = 0
+c               wave(mx+ibc,m,mw) = 0
+            enddo
+         enddo
+      enddo
+
 
 c
       do mw = 1,mwaves
