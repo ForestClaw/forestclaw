@@ -24,6 +24,13 @@ c        # saves any work, but seems silly to exchange twice.
          return
       endif
 
+c      write(6,*) 'Warning ------------ Setting all BCs to 0 --------'
+
+c      call set_bcs_to_zero(mx,my,mbc,meqn,qthis, qneighbor)
+
+
+c      return
+
 
       do mq = 1,meqn
          if (iface .eq. 0) then
@@ -44,7 +51,7 @@ c        # saves any work, but seems silly to exchange twice.
             do i = 1,mx
                do jbc = 1,mbc
                   qthis(i,1-jbc,mq) = qneighbor(i,jbc,mq)
-                  qneighbor(i,1-jbc,mq) = qthis(i,jbc,mq)
+                   qneighbor(i,1-jbc,mq) = qthis(i,jbc,mq)
                enddo
             enddo
          elseif (iface .eq. 3) then
@@ -57,6 +64,45 @@ c        # saves any work, but seems silly to exchange twice.
          endif
       enddo
       end
+
+      subroutine set_bcs_to_zero(mx,my,mbc,meqn,
+     &      qthis, qneighbor)
+
+
+      integer mx,my,mbc,meqn
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer i,j,ibc,jbc,mq
+
+
+      write(6,*) 'Warning ------------ Setting all BCs to 0 --------'
+
+c      return
+
+      do mq = 1,meqn
+         do j = 1,my
+            do ibc = 1,mbc
+               qthis(1-ibc,j,mq) = 0
+               qthis(mx+ibc,j,mq) = 0
+               qneighbor(1-ibc,j,mq) = 0
+               qneighbor(mx+ibc,j,mq) = 0
+            enddo
+         enddo
+
+         do i = 1-mbc,mx+mbc
+            do jbc = 1,mbc
+               qthis(i,1-jbc,mq) = 0
+               qthis(i,my+ibc,mq) = 0
+               qneighbor(i,1-jbc,mq) = 0
+               qneighbor(i,my+jbc,mq) = 0
+            enddo
+         enddo
+      enddo
+
+      return
+      end
+
 
 
 c     # Exchange ghost cells at interior of a block boundary.
@@ -71,11 +117,16 @@ c     # Exchange ghost cells at interior of a block boundary.
 
       integer mq, ibc, jbc, m
 
+c      call set_bcs_to_zero(mx,my,mbc,meqn,qthis, qneighbor)
+
+c      return
+
       if (iblock .eq. 1) then
 c        # Only initiate exchange from block 0.  I am not sure if the
 c        # saves any work, but seems silly to exchange twice.
          return
       endif
+
 
       do mq = 1,meqn
          if (icorner .eq. 0) then
@@ -216,6 +267,15 @@ c     # Assume this is mapped.
       integer j, jc_add, jbc, jj, jfine
 
 c     # 'iface' is relative to the coarse grid
+
+      write(6,*)'Mess with mb_average_face_ghost'
+
+      call set_bcs_to_zero(mx,my,mbc,meqn,qcoarse, qfine)
+
+
+      return
+
+
 
       r2 = refratio*refratio
 
@@ -416,6 +476,20 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       integer ifine, jfine
       double precision kf, qf, kc
 
+      write(6,*) 'WARNING : (mb_average_corner_ghost) : setting to 0'
+
+      do mq = 1,meqn
+         do ibc = 1,mbc
+            do jbc = 1,mbc
+               qcoarse(1-ibc,1-jbc,mq) = 0
+               qcoarse(mx+ibc,my+jbc,mq) = 0
+            enddo
+         enddo
+      enddo
+
+      return
+
+
       r2 = refratio*refratio
       do mq = 1,meqn
          if (icorner == 0) then
@@ -530,6 +604,21 @@ c     # Exchange ghost cells at block corner
 
       integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
       double precision sum,qf,kf,kc
+
+      write(6,*) 'WARNING : (mb_average_block_corner_ghost) : ',
+     &      ' setting to 0'
+
+      do mq = 1,meqn
+         do ibc = 1,mbc
+            do jbc = 1,mbc
+               qcoarse(1-ibc,1-jbc,mq) = 0
+               qcoarse(mx+ibc,my+jbc,mq) = 0
+            enddo
+         enddo
+      enddo
+
+      return
+
 
       r2 = refratio**2
       do mq = 1,meqn

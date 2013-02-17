@@ -26,12 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 
-// -----------------------------------------------------------------
-// Regridding
-//   -- Initialization routines
-//   -- cell tagging
-//   -- interpolating/coarsening as needed
-// -----------------------------------------------------------------
+/* -----------------------------------------------------------------
+   Regridding
+     - Initialization routines
+     - cell tagging
+     - interpolating/coarsening as needed
+   ---------------------------------------------------------------- */
 
 void cb_tag4refinement(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -140,7 +140,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined, so we can just copy
         // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        fclaw_bool old_code = fclaw_true;
+        fclaw_bool old_code = fclaw_false;
         // To see differences in output, do a 'diff' on fort.t0005
         // for each run.
         if (old_code)

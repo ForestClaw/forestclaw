@@ -103,6 +103,7 @@ c        # Format statement 109 below will not work.
          stop
       endif
 
+c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
       do j = 1,my
          do i = 1,mx
             do mq = 1,meqn
