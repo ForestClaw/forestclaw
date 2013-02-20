@@ -1,0 +1,221 @@
+
+\documentclass{IOS-Book-Article}
+
+\usepackage{mathptmx}
+
+%\usepackage{times}
+%\normalfont
+%\usepackage[T1]{fontenc}
+%\usepackage[mtplusscr,mtbold]{mathtime}
+%
+\begin{document}
+\begin{frontmatter}              % The preamble begins here.
+
+%\pretitle{Pretitle}
+\title{Instructions for the Preparation of an\\
+Electronic Camera-Ready Manuscript in\\ \LaTeX}
+\runningtitle{IOS Press Style Sample}
+%\subtitle{Subtitle}
+
+\author[A]{\fnms{Book Production} \snm{Manager}%
+\thanks{Corresponding Author: Book Production Manager, IOS Press, Nieuwe Hemweg 6B,
+1013 BG Amsterdam, The Netherlands; E-mail:
+bookproduction@iospress.nl.}},
+\author[B]{\fnms{Second} \snm{Author}}
+and
+\author[B]{\fnms{Third} \snm{Author}}
+
+\runningauthor{B.P. Manager et al.}
+\address[A]{Book Production Department, IOS Press, The Netherlands}
+\address[B]{Short Affiliation of Second Author and Third Author}
+
+\begin{abstract}
+These instructions are designed for the Preparation of an Electronic
+Camera-Ready Manuscript in \LaTeX{} and should be read carefully. If you
+have any questions regarding the instructions, please contact the Book
+Production Department, by e-mail: \textit{bookproduction@iospress.nl}
+or fax: +31-20-6870039.
+\end{abstract}
+
+\begin{keyword}
+electronic camera-ready manuscript\sep IOS Press\sep
+\LaTeX\sep book\sep layout
+\end{keyword}
+\end{frontmatter}
+
+\thispagestyle{empty}
+\pagestyle{empty}
+
+\section*{Introduction}
+This document provides instructions for style and layout and how to submit the final
+version. Although it was written for individual authors contributing to IOS Press books,
+it can also be used by the author/editor preparing a monograph or an edited volume.
+
+Authors should realize that the manuscript submitted by the volume editor to IOS
+Press will be almost identical to the final, printed version that appears in the book,
+except for the pagination and the insertion of running headlines. Proofreading as
+regards technical content and English usage is the responsibility of the author.
+
+A template file for \LaTeX2e is available from the Author's Corner on
+www.iospress.nl. \LaTeX{} styles required for the \LaTeX{} template are also
+available.\footnote{For authors using MS Word separate Instructions as well
+as a Word template are available from the Author's Corner on
+www.iospress.nl.}
+
+\section{Typographical Style and Layout}
+
+\subsection{Type Area}
+The text output area is automatically set within an area 12.4 cm
+horizontally and 20 cm vertically. Please do not use any
+\LaTeX{} or \TeX{} commands that affect the layout or formatting of
+your document (i.e. commands like \verb|\textheight|,
+\verb|\textwidth|, etc.).
+
+
+
+\subsection{Font}
+
+The font type for running text (body text) is 10~point Times New Roman.
+There is no need to code normal type (roman text). For literal text, please use
+\texttt{type\-writer} (\verb|\texttt{}|)
+or \textsf{sans serif} (\verb|\textsf{}|). \emph{Italic} (\verb|\emph{}|)
+or \textbf{boldface} (\verb|\textbf{}|) should be used for emphasis.
+
+\subsection{General Layout}
+Use single (1.0) line spacing throughout the document. For the main
+body of the paper use the commands of the standard \LaTeX{}
+``article'' class. You can add packages or declare new \LaTeX{}
+functions if and only if there is no conflict between your packages
+and the \texttt{IOS-Book-Article}.
+
+Always give a \verb|\label| where possible and use \verb|\ref| for cross-referencing.
+
+
+\subsection{(Sub-)Section Headings}
+Use the standard \LaTeX{} commands for headings: {\small \verb|\section|, \verb|\subsection|, \verb|\subsubsection|, \verb|\paragraph|}.
+Headings will be automatically numbered.
+
+Use initial capitals in the headings, except for articles (a, an, the), coordinate
+conjunctions (and, or, nor), and prepositions, unless they appear at the beginning
+of the heading.
+
+\subsection{Footnotes and Endnotes}
+Please keep footnotes to a minimum. If they take up more space than roughly 10\% of
+the type area, list them as endnotes, before the References. Footnotes and endnotes
+should both be numbered in arabic numerals and, in the case of endnotes, preceded by
+the heading ``Endnotes''.
+
+\subsection{References}
+
+References to the literature should be mentioned in the main text by arabic numerals in
+square brackets. Use the Citation-Sequence System, which means they are ``listed and
+numbered in the sequence in which they are 1st cited. ($\ldots$) Subsequent citations of the
+same document use the same numbers as that of its initial citation'' \cite{r1}.
+
+As regards the content, form and punctuation of the References, if the volume
+editor has not expressed a preference in this matter, authors should select the format
+most appropriate to their article, and use it \textit{consistently}.
+
+\section{Illustrations}
+
+\subsection{General Remarks on Illustrations}
+The text should include references to all illustrations. Refer to illustrations in the
+text as Table~1, Table~2, Figure~1, Figure~2, etc., not with the section or chapter number
+included, e.g. Table 3.2, Figure 4.3, etc. Do not use the words ``below'' or ``above''
+referring to the tables, figures, etc.
+
+Do not collect illustrations at the back of your article, but incorporate them in the
+text. Position tables and figures at the top or bottom of a page, with at least 2 lines
+extra space between tables or figures and the running text.
+
+Illustrations should be centered on the page, except for small figures that can fit
+side by side inside the type area. Tables and figures should not have text wrapped
+alongside.
+
+Place figure captions \textit{below} the figure, table captions \textit{above} the table.
+Use bold for table/figure labels and numbers, e.g.: \textbf{Table 1.}, \textbf{Figure 2.},
+and roman for the text of the caption. Keep table and figure captions justified. Center
+short figure captions only.
+
+The minimum \textit{font size} for characters in tables is 8 points, and for lettering in other
+illustrations, 6 points.
+
+On maps and other figures where a \textit{scale} is needed, use bar scales rather than
+numerical ones of the type 1:10,000.
+
+\subsection{Quality of Illustrations}
+Use only Type I fonts for lettering in illustrations.
+
+Include graphics in Encapsulated postscript (EPS) format. Do \textit{not} use illustrations
+taken from the Internet. The resolution of images intended for viewing on a screen is
+not sufficient for the printed version of the book.
+
+If you are incorporating screen captures, keep in mind that the text may not be
+legible after reproduction (using a screen capture tool, instead of the Print Screen
+option of PC's, might help to improve the quality).
+
+\subsection{Color Illustrations}
+Please note, that illustrations will only be printed in color if the volume editor agrees to
+pay the production costs for color printing. However, you should \textit{not} use color in
+illustrations that must be printed in black and white, because this will greatly reduce the
+print quality. (Note that in software the default often is color, so you may have to
+change the settings for these illustrations.)
+
+Illustrations that must be printed in colour should be enclosed as CMYK-encoded
+EPS files.
+
+
+\section{Equations}
+Number equations consecutively, not section-wise. Place the numbers in parentheses at
+the right-hand margin, level with the last line of the equation. Refer to equations in the
+text as Eq. (1), Eqs. (3) and (5).
+
+\section{Fine Tuning}
+
+\subsection{Type Area}
+\textbf{Check once more that all the text and illustrations are inside the type area and
+that the type area is used to the maximum.} You may of course end a page with one
+or more blank lines to avoid `widow' headings, or at the end of a chapter.
+
+\subsection{Capitalization}
+Use initial capitals in the title and headings, except for articles (a, an, the), coordinate
+conjunctions (and, or, nor), and prepositions, unless they appear at the beginning of the
+title or heading.
+
+\subsection{Page Numbers and Running Headlines}
+You do not need to include page numbers or running headlines. These elements will be
+added by the publisher.
+
+\section{Submitting the Manuscript}
+Submit the following to the volume editor:
+
+\begin{enumerate}
+\item The main source file, and any other required files. Do not submit more than
+one version of any item.
+
+\item Identical high resolution PDF file with all fonts embedded. First produce a
+Postscript file from \LaTeX{} with DVIPS version 5.56 or higher. The option
+``-M'' (don't make fonts) should be indicated. Use Adobe Acrobat Distiller to
+produce the PDF and choose the job option \textit{Press-Optimized}.
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{r1}
+\textit{Scientific Style and Format: The CBE manual for authors,
+editors and publishers}. Style Manual Committee, Council of Biology Editors.
+Sixth ed. Cambridge University Press, 1994.
+
+\bibitem{r2}
+L.U. Ante, Cem surgere: Surgite postquam sederitis, qui manducatis panem doloris,
+\textit{Omnes} \textbf{13} (1916), 114--119.
+
+\bibitem{r3}
+T.X. Confortavit, \textit{Seras}, Portarum, New York, 1995.
+
+\bibitem{r4}
+P.A. Deus, Ater hoc et filius et mater praestet nobis,
+\textit{Paterhoc} \textbf{66} (1993), 856--890.
+
+\end{thebibliography}
+\end{document}
