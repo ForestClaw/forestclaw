@@ -1,0 +1,76 @@
+% PLEASE USE THIS FILE AS A TEMPLATE FOR THE PUBLICATION 
+% Check file IOS-Book-Article.tex
+%
+
+
+
+% preferred topic area: algorithms
+% 
+% at most 5 keywords
+% 
+% relevance
+% 
+% originality
+
+
+\documentclass{IOS-Book-Article}     %[seceqn,secfloat,secthm]
+
+\usepackage{mathptmx}
+%\usepackage[T1]{fontenc}
+%\usepackage{times}%
+%
+%%%%%%%%%%% Put your definitions here
+
+
+%%%%%%%%%%% End of definitions
+\begin{document}
+\begin{frontmatter}          % The preamble begins here.
+%
+%\pretitle{}
+\title{Title}
+\runningtitle{Running title}
+%\subtitle{}
+
+% For one author:
+\author[A]{\fnms{Carsten} \snm{Burstedde}%
+\thanks{Corresponding author.  E-mail: \texttt{burstedde@ins.uni-bonn.de}}},
+\author[B]{\fnms{Donna} \snm{Calhoun}},
+\author[C]{\fnms{Kyle} \snm{Mandli}} and
+\author[C]{\fnms{Andy R.} \snm{Terrel}}
+\runningauthor{C.\ Burstedde et.al.}
+\address[A]{Institut f\"ur Numerische Simulation, Universit\"at Bonn, Germany}
+\address[B]{Boise State University, Idaho, USA}
+\address[C]{Institute for Computational Engineering and Sciences,\\
+The University of Texas at Austin, USA}
+%
+% Two or more authors:
+%\author[A]{\fnms{} \snm{}},
+%\author[B]{\fnms{} \snm{}}
+%\runningauthor{}
+%\address[A]{}
+%\address[B]{}
+%
+%%\begin{abstract}
+
+%%\end{abstract}
+
+\begin{keyword}
+adaptive mesh refinement,
+clawpack,
+HPC,
+manycore
+\end{keyword}
+
+\end{frontmatter}
+
+\cite{BursteddeWilcoxGhattas11}
+
+%%%%%%%%%%% The article body starts:
+
+\section*{Introduction}
+
+
+%%%%%%%%%%% The bibliography starts:
+\bibliographystyle{siam}
+\bibliography{ccgo}
+\end{document}
