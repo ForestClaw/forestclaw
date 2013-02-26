@@ -21,7 +21,10 @@
 
 \usepackage{amsmath,amssymb}
 \usepackage{cite}
+\usepackage{color}
+\usepackage{xspace}
 
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
 \newcommand{\sR}{\mathbb{R}}
 
 %%%%%%%%%%% End of definitions
@@ -84,14 +87,15 @@ With the advent of high-throughput coprocessors, such as GPGPUs or the MIC
 chip, comes the opportunity to sustain unprecedented rates of floating point
 operations at comparably high integration density and low cost.  These
 architectures, however, require careful structuring of the data layout and
-memory access patterns to fully utilize their multithreading and vectorization
+memory access patterns to exhaust their multithreading and vectorization
 capabilities.
 
 Consequently, it is not clear a priori how to accelerate PDE solvers that use
-adaptive mesh refinement, especially when working with unstructured meshes.  It
-has been realized early though that it helps to aggregate degrees of freedom
-(DOF) at the element level, as it is done with high-order spectral element
-\cite{TufoFischer99}, finite volume, or discontinuous Galerkin
+adaptive mesh refinement, especially when working with unstructured meshes.  Of
+course, it has been realized early that it helps to aggregate degrees of
+freedom (DOF) at the element level, as it has been done with high-order
+spectral element \cite{TufoFischer99}, finite volume
+\todo{add favorite citation}, or discontinuous Galerkin
 \cite{BursteddeGhattasGurnisEtAl10} methods.
 %
 % For example, SEs optimized for computational speed have originally been
@@ -99,16 +103,26 @@ has been realized early though that it helps to aggregate degrees of freedom
 % been extended to non-conforming adaptive meshes \cite{FischerKruseLoth02,
 % BursteddeGhattasGurnisEtAl10}.
 
-To enable hardware acceleration for dynamic AMR, we like to build upon the
-forest-of-octrees paradigm because of its low overhead and parallel scalability
-\cite{BursteddeWilcoxGhattas11}.  We go beyond the traditional high-order
-element by introducing a complete compute patch with $m^d$ DOFs as our
-macro-element.  In fact, this approach resembles block-structured AMR
-\cite{ColellaGravesKeenEtAl07}
+To enable hardware acceleration for parallel dynamic AMR, we like to build upon
+the forest-of-octrees paradigm because of its low overhead and proven
+scalability \cite{BursteddeWilcoxGhattas11}.  As an important extension, we go
+beyond the traditional high-order element and define each mesh element to be a
+dense compute patch with $m^d$ DOFs.  In fact, this approach resembles
+block-structured AMR \cite{ColellaGravesKeenEtAl07}
 % todo cite John B.\ Bell
 except that the patches are not overlapping, which enables us to capitalize on
-our previous experience with AMR PDE solvers.
-% \cite{BursteddeStadlerAlisicEtAl13}.
+our previous experience with scalable FE solvers for PDEs
+\cite{BursteddeStadlerAlisicEtAl13}.  A particular implementation of such a
+patch is available with the Clawpack software \cite{LeVeque97} that has been
+designed to solve hyperbolic conservation laws on a uniform compute patch and
+successfully used in the context of block-structured AMR \todo{AMRClaw
+citation}.
+
+In this paper we describe how we design the coupling of forest-of-octree AMR
+with Clawpack at the leaf level.  We comment on challenges that arise in
+enabling efficient parallelism and multiblock geometries and close with a range
+of numerical examples that demonstrate the conceptual improvements in relation
+to other approaches.
 
 \section*{Design principles}
 
