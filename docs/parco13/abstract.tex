@@ -20,6 +20,7 @@
 %%%%%%%%%%% Put your definitions here
 
 \usepackage{amsmath,amssymb}
+\usepackage{cite}
 
 \newcommand{\sR}{\mathbb{R}}
 
@@ -28,8 +29,9 @@
 \begin{frontmatter}          % The preamble begins here.
 %
 %\pretitle{}
-\title{Title}
-\runningtitle{Running title}
+\title{ForestClaw:
+        Hybrid forest-of-octrees AMR for hyperbolic conservation laws}
+\runningtitle{ForestClaw}
 %\subtitle{}
 
 % Two or more authors:
@@ -54,13 +56,13 @@ The University of Texas at Austin, USA}
 %
 We present a new hybrid paradigm for parallel adaptive mesh refinement (AMR)
 that combines the scalability and lightweight architecture of tree-based AMR
-with the computational efficiency of grid-based solvers for hyperbolic
+with the computational efficiency of patch-based solvers for hyperbolic
 conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
-as one uniform compute patch in $\sR^d$ of dimension $m^d$, where $m$ is
-customarily between 8 and 32.  Thus, computation on each grid can be optimized
+as one uniform compute patch in $\sR^d$ of dimensions $m^d$, where $m$ is
+customarily between 8 and 32.  Thus, computation on each patch can be optimized
 for speed, while we inherit the flexibility of adaptive meshes.  In our work we
 choose the p4est AMR library as mesh backend since it allows to compose the
-mesh from multiple mapped blocks, thus enabling us to work with the cubed
+mesh from multiple mapped octrees, thus enabling us to work with the cubed
 sphere and other nontrivial multiblock geometries.
 %
 \end{abstract}
@@ -74,17 +76,64 @@ manycore
 
 \end{frontmatter}
 
-\cite{BursteddeWilcoxGhattas11}
-
 %%%%%%%%%%% The article body starts:
 
 \section*{Introduction}
 
-\section*{}
+Experience from integration with large-scale adaptive-mesh PDE solvers.
 
-\section*{}
+Design goals: Lightweight, modular, reuse.
+
+Separation of mesh on the one hand from discretization and solvers on the other.
+
+Mesh information is discrete (tree nodes have integer coordinates in
+$(0, 2^L($ where $L$ is the maximum allowed refinement level of the tree.
+
+sorted ordering of tree nodes, lookup tables, .
+
+
+p4est \cite{BursteddeWilcoxGhattas11}
+
+
+rank as is common with parallelization using the MPI framework
+\cite{Forum94, SnirOttoHuss-LedermanEtAl96}.
+
+Challenge: patch neighborhood information is known to the mesh backend
+but needs to be used to handle ghost information.
+
+
+
+\section*{Hybrid forest-of-octrees AMR}
+
+
+Iterators over all leafs, optionally restricted to a given level.
+
+
+same block, same rank: local copy.
+
+neighbor block: permutation of patch points due to non-aligned
+coordinate systems
+
+neighbor processor: data needs to be fetched over the network first.
+
+Trees have different coordinate systems.
+
+$L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
+
+
+
+\section*{Patch-based numerics at the leaf level}
+
+
+
+
+\section*{Numerical results}
+
+
+
 
 %%%%%%%%%%% The bibliography starts:
 \bibliographystyle{siam}
 \bibliography{ccgo}
+
 \end{document}
