@@ -61,18 +61,18 @@ conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
 as one uniform compute patch in $\sR^d$ of dimensions $m^d$, where $m$ is
 customarily between 8 and 32.  Thus, computation on each patch can be optimized
 for speed, while we inherit the flexibility of adaptive meshes.  In our work we
-choose the p4est AMR library as mesh backend since it allows to compose the
-mesh from multiple mapped octrees, thus enabling us to work with the cubed
-sphere and other nontrivial multiblock geometries.
+choose to work with the p4est AMR library since it allows to compose the mesh
+from multiple mapped octrees, thus enabling the cubed sphere and other
+nontrivial multiblock geometries.
 %
 \end{abstract}
 
-\begin{keyword}
-adaptive mesh refinement,
-clawpack,
-HPC,
-manycore
-\end{keyword}
+% \begin{keyword}
+% adaptive mesh refinement,
+% clawpack,
+% HPC,
+% manycore
+% \end{keyword}
 
 \end{frontmatter}
 
@@ -107,8 +107,8 @@ macro-element.  In fact, this approach resembles block-structured AMR
 \cite{ColellaGravesKeenEtAl07}
 % todo cite John B.\ Bell
 except that the patches are not overlapping, which enables us to capitalize on
-our previous experience with AMR PDE solvers
-\cite{BursteddeStadlerAlisicEtAl13}.
+our previous experience with AMR PDE solvers.
+% \cite{BursteddeStadlerAlisicEtAl13}.
 
 \section*{Design principles}
 
