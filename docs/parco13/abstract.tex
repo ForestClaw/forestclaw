@@ -126,9 +126,42 @@ to other approaches.
 
 \section*{Design principles}
 
+The starting point of our work is defined by the p4est algorithms for
+forest-of-octrees AMR on the one hand, and the Clawpack algorithms for the
+numerical solution of hyperbolic conservation laws
+% on uniformly gridded domains
+on the other.  Both are specialized codes with the following characteristics:
+\begin{center}
+\begin{tabular}{l|l|l}
+& \multicolumn{1}{c|}{\texttt{p4est}} & \multicolumn{1}{c}{Clawpack} \\
+\hline
+subject & hexahedral nonconforming mesh &  hyperbolic PDE on $[0, 1]^d$ \\
+structure & forest of octrees & patch of $m^d$ DOFs \\
+atomic unit & octree leaf & one DOF \\
+parallelization & MPI & threads \\
+memory access & distributed & shared \\
+data type & integers & floating point values \\
+language & C & Fortran 77 \\
+dependencies & none & none \\
+\hline
+\end{tabular}
+\end{center}
+The proposed 1:1 correspondence between a leaf and a patch thus combines two
+hithertwo disjoint models in a modular way that permits the reuse of existing,
+verified and performant codes if the integration is done well.  The resulting
+parallel programming model is a hybrid and often referred to as MPI+X.
+
+Multiblock handling
+
+Identification: an octree is a block, and a leaf is a patch.
+
+Each block is understood as a reference unit cube with an optional per-block
+geometric mapping.  The coordinate system of 
 
 
-Now combine.
+Information provided by the mesh:
+Sequence of blocks, list of patches for each.  Each patch
+has a list of neighbor patches including information on 
 
 
 
@@ -186,6 +219,12 @@ of freedom.  The layer of ghost copies is usually 2 points deep.
 \section*{Numerical results}
 
 
+
+\section*{Acknowledgements}
+
+The authors acknowledge valuable discussion with Randy LeVeque, Marsha Berger,
+and Hans-Petter Langtangen.  The leaf/grid paradigm was independently presented
+by B.\ as part of a talk at the SCI Institute, Utah, in July 2011.
 
 
 %%%%%%%%%%% The bibliography starts:
