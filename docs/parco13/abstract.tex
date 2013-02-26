@@ -142,7 +142,7 @@ parallelization & MPI & threads \\
 memory access & distributed & shared \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
-dependencies & none & none \\
+dependencies & none & Python \\
 \hline
 \end{tabular}
 \end{center}
@@ -152,6 +152,8 @@ verified and performant codes if the integration is done well.  The resulting
 parallel programming model is a hybrid and often referred to as MPI+X.
 
 Multiblock handling
+generic transformations
+yields periodicity as a special case
 
 Identification: an octree is a block, and a leaf is a patch.
 
@@ -164,6 +166,8 @@ Sequence of blocks, list of patches for each.  Each patch
 has a list of neighbor patches including information on 
 
 
+AMR Metadata $\ll$ numerical data
+
 
 Experience from integration with large-scale adaptive-mesh PDE solvers.
 Design goals: Lightweight, modular, reuse.
@@ -175,6 +179,7 @@ $(0, 2^L($ where $L$ is the maximum allowed refinement level of the tree.
 
 sorted ordering of tree nodes, lookup tables, .
 
+Dimension independence
 
 
 rank as is common with parallelization using the MPI framework
@@ -207,6 +212,15 @@ Trees have different coordinate systems.
 
 $L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
 
+fast (O(log N/P)) neighbor and parent/child lookups
+horizontal/vertical tree traversal
+
+
+subcycling: level-wise load balancing as done in structured AMR or
+geometric adaptive multigrid \cite{SundarBirosBursteddeEtAl12}
+
+
+\todo{What is BearClaw (tree-based / S.\ Mitran)?}
 
 
 \section*{Patch-based numerics at the leaf level}
