@@ -1,0 +1,10 @@
+
+1. Non-overlapping parallel advection in 2D, no subcycling.
+
+2. Use generic multiblock meshes and generic per-block geometry mappings.
+
+3. Enable subcycling and make it work in parallel.
+
+4. Enable solvers that require shadow patches and make it work in parallel.
+
+5. Extend everything to 3D.
