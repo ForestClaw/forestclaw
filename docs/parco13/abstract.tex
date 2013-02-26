@@ -1,7 +1,5 @@
-% PLEASE USE THIS FILE AS A TEMPLATE FOR THE PUBLICATION 
+% PLEASE USE THIS FILE AS A TEMPLATE FOR THE PUBLICATION
 % Check file IOS-Book-Article.tex
-%
-
 
 
 % preferred topic area: algorithms
@@ -21,6 +19,9 @@
 %
 %%%%%%%%%%% Put your definitions here
 
+\usepackage{amsmath,amssymb}
+
+\newcommand{\sR}{\mathbb{R}}
 
 %%%%%%%%%%% End of definitions
 \begin{document}
@@ -48,10 +49,21 @@
 \address[B]{Boise State University, Idaho, USA}
 \address[C]{Institute for Computational Engineering and Sciences,\\
 The University of Texas at Austin, USA}
-%
-%%\begin{abstract}
 
-%%\end{abstract}
+\begin{abstract}
+%
+We present a new hybrid paradigm for parallel adaptive mesh refinement (AMR)
+that combines the scalability and lightweight architecture of tree-based AMR
+with the computational efficiency of grid-based solvers for hyperbolic
+conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
+as one uniform compute patch in $\sR^d$ of dimension $m^d$, where $m$ is
+customarily between 8 and 32.  Thus, computation on each grid can be optimized
+for speed, while we inherit the flexibility of adaptive meshes.  In our work we
+choose the p4est AMR library as mesh backend since it allows to compose the
+mesh from multiple mapped blocks, thus enabling us to work with the cubed
+sphere and other nontrivial multiblock geometries.
+%
+\end{abstract}
 
 \begin{keyword}
 adaptive mesh refinement,
@@ -68,7 +80,9 @@ manycore
 
 \section*{Introduction}
 
+\section*{}
 
+\section*{}
 
 %%%%%%%%%%% The bibliography starts:
 \bibliographystyle{siam}
