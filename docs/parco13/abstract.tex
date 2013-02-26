@@ -80,8 +80,45 @@ manycore
 
 \section*{Introduction}
 
-Experience from integration with large-scale adaptive-mesh PDE solvers.
+With the advent of high-throughput coprocessors, such as GPGPUs or the MIC
+chip, comes the opportunity to sustain unprecedented rates of floating point
+operations at comparably high integration density and low cost.  These
+architectures, however, require careful structuring of the data layout and
+memory access patterns to fully utilize their multithreading and vectorization
+capabilities.
 
+Consequently, it is not clear a priori how to accelerate PDE solvers that use
+adaptive mesh refinement, especially when working with unstructured meshes.  It
+has been realized early though that it helps to aggregate degrees of freedom
+(DOF) at the element level, as it is done with high-order spectral element
+\cite{TufoFischer99}, finite volume, or discontinuous Galerkin
+\cite{BursteddeGhattasGurnisEtAl10} methods.
+%
+% For example, SEs optimized for computational speed have originally been
+% implemented on unstructured conforming meshes \cite{TufoFischer99} and later
+% been extended to non-conforming adaptive meshes \cite{FischerKruseLoth02,
+% BursteddeGhattasGurnisEtAl10}.
+
+To enable hardware acceleration for dynamic AMR, we like to build upon the
+forest-of-octrees paradigm because of its low overhead and parallel scalability
+\cite{BursteddeWilcoxGhattas11}.  We go beyond the traditional high-order
+element by introducing a complete compute patch with $m^d$ DOFs as our
+macro-element.  In fact, this approach resembles block-structured AMR
+\cite{ColellaGravesKeenEtAl07}
+% todo cite John B.\ Bell
+except that the patches are not overlapping, which enables us to capitalize on
+our previous experience with AMR PDE solvers
+\cite{BursteddeStadlerAlisicEtAl13}.
+
+\section*{Design principles}
+
+
+
+Now combine.
+
+
+
+Experience from integration with large-scale adaptive-mesh PDE solvers.
 Design goals: Lightweight, modular, reuse.
 
 Separation of mesh on the one hand from discretization and solvers on the other.
@@ -92,11 +129,9 @@ $(0, 2^L($ where $L$ is the maximum allowed refinement level of the tree.
 sorted ordering of tree nodes, lookup tables, .
 
 
-p4est \cite{BursteddeWilcoxGhattas11}
-
 
 rank as is common with parallelization using the MPI framework
-\cite{Forum94, SnirOttoHuss-LedermanEtAl96}.
+%\cite{Forum94, SnirOttoHuss-LedermanEtAl96}.
 
 Challenge: patch neighborhood information is known to the mesh backend
 but needs to be used to handle ghost information.
@@ -106,7 +141,12 @@ but needs to be used to handle ghost information.
 \section*{Hybrid forest-of-octrees AMR}
 
 
+$z$-order
+
 Iterators over all leafs, optionally restricted to a given level.
+Random access is possible.  Looping over the patches in the order prescribed
+by the forest leads to a high percentage of cache reuse, since the ghost
+patches are likely closeby with respect to the $z$-order.
 
 
 same block, same rank: local copy.
@@ -114,7 +154,7 @@ same block, same rank: local copy.
 neighbor block: permutation of patch points due to non-aligned
 coordinate systems
 
-neighbor processor: data needs to be fetched over the network first.
+neighbor rank: data needs to be fetched over the network first.
 
 Trees have different coordinate systems.
 
@@ -125,6 +165,8 @@ $L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
 \section*{Patch-based numerics at the leaf level}
 
 
+Patch: contains the local coordinates and copies of neighboring ghost degrees
+of freedom.  The layer of ghost copies is usually 2 points deep.
 
 
 \section*{Numerical results}
@@ -133,7 +175,7 @@ $L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
 
 
 %%%%%%%%%%% The bibliography starts:
-\bibliographystyle{siam}
+\bibliographystyle{unsrt}
 \bibliography{ccgo}
 
 \end{document}
