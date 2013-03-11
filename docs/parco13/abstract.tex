@@ -26,6 +26,7 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
 \newcommand{\sR}{\mathbb{R}}
+\newcommand{\dt}{\mathrm{d}t}
 \newcommand{\forestclaw}{Forestclaw\xspace}
 \newcommand{\pforest}{\texttt{p4est}\xspace}
 
@@ -124,7 +125,7 @@ citation}.
 
 In this paper we describe how we design the coupling of forest-of-octree AMR
 with Clawpack at the leaf level.  We comment on challenges that arise in
-enabling efficient parallelism and multiblock geometries and close with a range
+enabling multiblock geometries and efficient parallelism and close with a range
 of numerical examples that demonstrate the conceptual improvements in relation
 to other approaches.
 
@@ -159,8 +160,8 @@ hithertwo disjoint models in a modular way:
 discretization and solvers on the other.
 \item The AMR metadata (24 bytes per leaf) is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
-\item The resulting parallel programming model is a hybrid and often referred
-to as MPI+X.
+\item The resulting parallel programming model is a hybrid (often referred
+to as MPI+X).
 \end{enumerate}
 
 % yields periodicity as a special case
@@ -172,15 +173,16 @@ created by external hexahedral mesh generators, elimintating the need to encode
 it by hand.
 
 A main challenge is presented by the fact that the patch neighborhood is only
-known to the mesh backend, from which it needs to be propagated to the
+known to \pforest, from which it needs to be propagated to the
 numerical code in \forestclaw that implements the interaction with ghost
 patches.  To this end, we define an interface that allows distributed read-only
 access to the sequence of blocks, the list of patches for each, and a lookup of
 neighbor patches (and their relative orientation which is nontrivial between
 blocks).  The exchange of ghost data and parallel partitioning is provided
-transparently by the backend.  Mesh modification directives, such as local
-refinement and coarsening, are called from \forestclaw and relayed to the mesh
-backend.
+transparently by \pforest.  Mesh modification directives, such as local
+refinement and coarsening, are called from \forestclaw and relayed to \pforest.
+
+% Forestclaw would support swapping out p4est or Clawpack
 
 % AMR Metadata $\ll$ numerical data
 
@@ -197,36 +199,46 @@ backend.
 
 \section{Parallelization}
 
+The MPI layer is addressed from within \pforest and not exposed to the
+\forestclaw code.  The order of leaves is maintained in \pforest according to a
+space filling curve.  Each MPI rank has a local view on its own partition,
+augmented where necessary with information about one layer of ghost patches.
 
-$z$-order
+\forestclaw uses iterators over all leafs, optionally restricted to a given
+level.  Random access is possible and used when executing $O(1)$ time neighbor
+lookups.  Looping over the patches in the order prescribed by the forest and
+accessing neighbors only relative to the current patch leads to a high
+percentage of cache reuse.
+% since the ghost patches are likely closeby with respect to the $z$-order.
 
-Iterators over all leafs, optionally restricted to a given level.
-Random access is possible.  Looping over the patches in the order prescribed
-by the forest leads to a high percentage of cache reuse, since the ghost
-patches are likely closeby with respect to the $z$-order.
+When \forestclaw accesses neighbor patches, they can be on the same or a
+different block.  In the latter case, coordinate transformations are carried
+out.  The structure of \forestclaw is oblivious to the fact that it only has a
+local view of the distributed mesh and data which relieves the developer from
+programming to the MPI interface.  Parallel neighbor exchanges are hidden
+inside \pforest and called by \forestclaw at well-defined synchronization
+points.  There is one such parallel data exchange per time step for a global
+value of $\dt$, or one exchange per discretization level per time step if $\dt$
+is chosen per-patch depending on its size (this is sometimes called
+subcycling).  When using subcycling, the load balance is attained per level as
+it is done in structured AMR or recent geometric adaptive multigrid schemes
+\cite{SundarBirosBursteddeEtAl12}.
 
+The threaded parallelism over the degrees of freedom of a patch is handled by
+\forestclaw alone without the need to involve \pforest.
 
-same block, same rank: local copy.
+% Trees have different coordinate systems.
+% neighbor block: permutation of patch points due to non-aligned coordinate
+% systems
 
-neighbor block: permutation of patch points due to non-aligned
-coordinate systems
+% neighbor rank: data needs to be fetched over the network first.
 
-neighbor rank: data needs to be fetched over the network first.
+% $L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
 
-Trees have different coordinate systems.
-
-$L$ is 30 for 2D and 19 for 3D, so it allows for deep hierarchies.
-
-fast (O(log N/P)) neighbor and parent/child lookups
-horizontal/vertical tree traversal
-
-
-subcycling: level-wise load balancing as done in structured AMR or
-geometric adaptive multigrid \cite{SundarBirosBursteddeEtAl12}
-
+% fast (O(log N/P)) neighbor and parent/child lookups
+% horizontal/vertical tree traversal
 
 \todo{What is BearClaw (tree-based / S.\ Mitran)?}
-
 
 \section{Patch-based numerics at the leaf level}
 
