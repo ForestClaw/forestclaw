@@ -33,26 +33,6 @@
 
 
 
-@InProceedings{,
-  author = 	 {},
-  title = 	 {},
-  OPTcrossref =  {},
-  OPTkey = 	 {},
-  OPTbooktitle = {},
-  OPTpages = 	 {},
-  OPTyear = 	 {},
-  OPTeditor = 	 {},
-  OPTvolume = 	 {},
-  OPTnumber = 	 {},
-  OPTseries = 	 {},
-  OPTaddress = 	 {},
-  OPTmonth = 	 {},
-  OPTorganization = {},
-  OPTpublisher = {},
-  OPTnote = 	 {},
-  OPTannote = 	 {}
-}
-
 @Article{cal:sfv,
   author = {D. Calhoun},
   title = {A {C}artesian grid method for solving the two-dimensional
@@ -72,19 +52,6 @@
   volume = "211",
   pages = "347--366"
 }
-@Misc{ebchombo,
- key = "ebchombo",
-  howpublished = "{EBChombo website :
-  \url{http://seesar.lbl.gov/anag/chombo}}"
-}
-
-@misc{chombo,
-  key = "chombo",
-  howpublished = "{Chombo website : \url{http://seesar.lbl.gov/anag/chombo}}"
-}
-
-
-
 
 @Article{dc-rjl:advdiff,
   author = {D. Calhoun and R. J. LeVeque},
@@ -104,48 +71,7 @@
   pages = {259--277}
 }
 
-@Article{joh-col:cart,
-  author = "H. Johansen and P. Colella",
-  title = "A {C}artesian grid embedded boundary method for {P}oisson's equation
-  on irregular domains",
-  journal = jcp,
-  year = 1998,
-  volume = 147,
-  pages = "60--85",
-}
-
-@Article{mjb-col:amr,
-  author = {M. J. Berger and P. Colella},
-  title = {Local adaptive mesh refinement for shock hydrodynamics},
-  journal = jcp,
-  year = 1989,
-  volume = 82,
-  pages = "64--84"
-}
-
-
-@Article{mjb-hel-rjl:hbox,
-  author = {M. J. Berger and C. Helzel and R. J. LeVeque},
-  title = {{H}-box methods for the approximation of one-dimensional
-  conservation laws on irregular grids},
-  journal = {SIAM J. Numer. Anal.},
-  year = {2003},
-  volume = {41},
-  pages = {893--918},
-  URL = "{\url{http://epubs.siam.org/sam-bin/dbq/article/40539}}"
-}
-
-@Article{mjb-hel-rjl:hbox2,
-  author = {C. Helzel and M. J. Berger and R. J. LeVeque},
-  title = {A high-resolution rotated grid method for conservation laws with
-  embedded geometries},
-  journal = {SIAM J. Sci. Comput.},
-  year = {2005},
-  volume = {26},
-  pages = {785--809}
-}
-
-@Article{mjb-ol:amr,
+@Article{be-ol:1984,
   author = {M. J. Berger and J. Oliger},
   title = {Adaptive mesh refinement for hyperbolic partial differential
   equations},
@@ -155,9 +81,16 @@
   pages = "484--512"
 }
 
+@Article{be-co:1989,
+  author = {M. J. Berger and P. Colella},
+  title = {Local adaptive mesh refinement for shock hydrodynamics},
+  journal = jcp,
+  year = 1989,
+  volume = 82,
+  pages = "64--84"
+}
 
-
-@Misc{mjb-rjl:aiaa89,
+@Misc{be-le:1989,
   author = {M. J. Berger and R. J. LeVeque},
   title = {An adaptive {C}artesian mesh algorithm for the {E}uler equations in
   arbitrary geometries},
@@ -165,24 +98,6 @@
   pages = {1--7},
   howpublished = {AIAA paper AIAA-89-1930}
 }
-@Misc{mjb-rjl:aiaa91,
-  author = {M. J. Berger and R. J. LeVeque},
-  title = {A Rotated Difference Scheme for {C}artesian Grids in Complex
-  Geometries},
-  year = {1991},
-  howpublished = {AIAA Conference on Computational Fluid Dynamics, Honolulu,
-  HI, CP-91-1602}
-}
-
-
-
-
-
-@Misc{samrai,
-  key = "samrai",
-  howpublished = "{SAMRAI website : \url{http://www.llnl.gov/CASC/SAMRAI/}}",
-  year = 	 2004}
-
 
 @Article{be-ri:1991,
   author = 	 "M. J. Berger and I. Rigoutsos",
@@ -194,18 +109,38 @@
   number = 	 5,
   pages = 	 "1278--1286"}
 
-@Article{mjb-rjl:amrclaw,
+
+@Misc{be-le:1991,
   author = {M. J. Berger and R. J. LeVeque},
-  title = {Adaptive Mesh Refinement using Wave-Propagation Algorithms for
-  Hyperbolic Systems},
-  journal = {SIAM J. Numer. Anal.},
-  year = {1998},
-  volume = {35},
-  pages = {2298--2316},
-  URL = "{\url{http://epubs.siam.org/sam-bin/dbq/article/31597}}",
+  title = {A Rotated Difference Scheme for {C}artesian Grids in Complex
+  Geometries},
+  year = {1991},
+  howpublished = {AIAA Conference on Computational Fluid Dynamics, Honolulu,
+  HI, CP-91-1602}
 }
 
-@Article{mjb-rjl:1998,
+@Article{le-li:1994,
+  author = {R. J. LeVeque and Z. Li},
+  title = {The Immersed Interface Method for Elliptic Equations with
+  Discontinuous Coefficients and Singular Sources},
+  journal = {SIAM J. Num. Anal.},
+  year = {1994},
+  volume = {31},
+  pages = {1019--1044}
+}
+
+
+@Article{jo-co:1998,
+  author = "H. Johansen and P. Colella",
+  title = "A {C}artesian grid embedded boundary method for {P}oisson's equation
+  on irregular domains",
+  journal = jcp,
+  year = 1998,
+  volume = 147,
+  pages = "60--85",
+}
+
+@Article{be-le:1998,
   author =	 "M. J. Berger and R. J. LeVeque",
   title =	 "Adaptive mesh refinement using wave-propagation
                   algorithms for hyperbolic systems",
@@ -214,8 +149,8 @@
   volume =	 35,
   number =	 6,
   pages =	 "2298--2316"
+  URL = "{\url{http://epubs.siam.org/sam-bin/dbq/article/31597}}",
 }
-
 
 @Article{re-be-li-cr-be:1999,
   author = 	 "C. A. Rendleman and V. E. Beckner and M. Lijewski and
@@ -229,7 +164,57 @@
   pages =	 "147--157"
 }
 
-@TechReport{calhoun:chomboclaw,
+@Article{ma-co:2000,
+  author = 	 "D. F. Martin and P. Colella",
+  title = 	 "A Cell-Centered Adaptive Projection Method for the Incompressible Euler Equations",
+  journal = 	 jcp,
+  year = 	 2000,
+  volume = 	 167,
+  pages = 	 "271--312"
+}
+
+@Article{da-be:2000,
+  author = 	 "M. Day and J. Bell",
+  title = 	 "Numerical Simulation of Laminar Reacting Flows with
+                   Complex Chemistry",
+  journal = 	 ctm,
+  year = 	 2000,
+  volume = 	 4,
+  pages = 	 "535--556"}
+
+@Article{be-he-le:2003,
+  author = {M. J. Berger and C. Helzel and R. J. LeVeque},
+  title = {{H}-box methods for the approximation of one-dimensional
+  conservation laws on irregular grids},
+  journal = {SIAM J. Numer. Anal.},
+  year = {2003},
+  volume = {41},
+  pages = {893--918},
+  URL = "{\url{http://epubs.siam.org/sam-bin/dbq/article/40539}}"
+}
+
+@InProceedings{ca-le:2004,
+  author = 	 "D. Calhoun and R. J. LeVeque",
+  title = 	 "An accuracy study of mesh refinement on mapped grids",
+  booktitle = "Proceedings of the {\em Chicago Workshop on Adaptive Mesh Refinement}",
+  year = 	 2004,
+  volume = 	 41,
+  series = 	 "Lecture Notes in Computational Science and Engineering",
+  month = 	 "December"}
+
+
+
+@Article{be-he-le:2005,
+  author = {C. Helzel and M. J. Berger and R. J. LeVeque},
+  title = {A high-resolution rotated grid method for conservation laws with
+  embedded geometries},
+  journal = {SIAM J. Sci. Comput.},
+  year = {2005},
+  volume = {26},
+  pages = {785--809}
+}
+
+@TechReport{ca:chomboclaw,
   author = 	 "D. Calhoun",
   title = 	 "Chombo{C}law {U}ser's {G}uide, {V}ersion 1.0",
   institution =  "Lawrence Berkeley Laboratory",
@@ -249,49 +234,6 @@
   doi = "{\url{http://doi.acm.org/10.1145/1128022.1128074}}"
 }
 
-
-@Article{rjl-li:poisson,
-  author = {R. J. LeVeque and Z. Li},
-  title = {The Immersed Interface Method for Elliptic Equations with
-  Discontinuous Coefficients and Singular Sources},
-  journal = {SIAM J. Num. Anal.},
-  year = {1994},
-  volume = {31},
-  pages = {1019--1044}
-}
-
-
-
-
-@Article{ma-co-gr:2008,
-  author = 	 "D. F. Martin and P. Colella and D. T. Graves",
-  title = 	 "A cell-centered adaptive projection method for the incompressible {N}avier-{S}tokes equations in three dimensions",
-  journal = 	 jcp,
-  year = 	 2008,
-  volume = 	 227,
-  pages = 	 "1863--1886" }
-
-
-
-@Article{ma-co:2000,
-  author = 	 "D. F. Martin and P. Colella",
-  title = 	 "A Cell-Centered Adaptive Projection Method for the Incompressible Euler Equations",
-  journal = 	 jcp,
-  year = 	 2000,
-  volume = 	 167,
-  pages = 	 "271--312"}
-
-
-@Article{da-be:2000,
-  author = 	 "M. Day and J. Bell",
-  title = 	 "Numerical Simulation of Laminar Reacting Flows with
-                   Complex Chemistry",
-  journal = 	 ctm,
-  year = 	 2000,
-  volume = 	 4,
-  pages = 	 "535--556"}
-
-
 @TechReport{ca:2007,
   author = 	 "D. Calhoun",
   title = 	 "Wave propagation algorithms and adaptive mesh refinement for simulating hydrogen explosions in nuclear containment buildings",
@@ -299,37 +241,6 @@
   year = 	 2007,
   number =       "{SFME/LTMF/RT/07-14/A}"
 }
-
-
-@TechReport{ca:2009,
-  author = 	 "D. Calhoun",
-  title = 	 "Using {C}artesian grid cut-cell methods to
-              simulate detonations in nuclear containment buildings",
-  institution =  cea,
-  year = 	 2009,
-  number = "{SFME/LTMF/RT/09-010/A}"
-}
-
-@Article{co-be-ke-li-li-st:2007,
-  author = "P. Colella and J. Bell and N. Keen and T. Ligocki and M. Lijewski and B. Van Straalen",
-  title = 	 "Performance and Scaling of Locally-Structured Grid Methods for
-              Partial Differential Equations",
-  journal = 	 "J. Phys. Conf. Ser.",
-  year = 	 2007,
-  volume = 	 78,
-  number = 	 012013}
-
-
-
-@Article{be-ca-he-le:2009,
-  author = 	 "M. J. Berger and D. Calhoun, C. Helzel, R. J. LeVeque",
-  title = 	 "Logically rectangular finite volume methods with
-                  adaptive refinement on the sphere",
-  journal = 	 "Phil. Trans. R. Soc. A",
-  year = 	 2009,
-  volume = 	 367,
-  number = 	 1,
-  pages = 	 "4483--4496"}
 
 
 @InProceedings{ca-pa:2007,
@@ -344,18 +255,51 @@
   month = 	 "April"}
 
 
+@Article{co-be-ke-li-li-st:2007,
+  author = "P. Colella and J. Bell and N. Keen and T. Ligocki and M. Lijewski and B. Van Straalen",
+  title = 	 "Performance and Scaling of Locally-Structured Grid Methods for
+              Partial Differential Equations",
+  journal = 	 "J. Phys. Conf. Ser.",
+  year = 	 2007,
+  volume = 	 78,
+  number = 	 012013}
 
 
-@InProceedings{ca-le:2004,
-  author = 	 "D. Calhoun and R. J. LeVeque",
-  title = 	 "An accuracy study of mesh refinement on mapped grids",
-  booktitle = "Proceedings of the {\em Chicago Workshop on Adaptive Mesh Refinement}",
-  year = 	 2004,
-  volume = 	 41,
-  series = 	 "Lecture Notes in Computational Science and Engineering",
-  month = 	 "December"}
+@Article{ma-co-gr:2008,
+  author = 	 "D. F. Martin and P. Colella and D. T. Graves",
+  title = 	 "A cell-centered adaptive projection method for the
+incompressible {N}avier-{S}tokes equations in three dimensions",
+  journal = 	 jcp,
+  year = 	 2008,
+  volume = 	 227,
+  pages = 	 "1863--1886" }
 
 
+
+
+@TechReport{ca:2009,
+  author = 	 "D. Calhoun",
+  title = 	 "Using {C}artesian grid cut-cell methods to
+              simulate detonations in nuclear containment buildings",
+  institution =  cea,
+  year = 	 2009,
+  number = "{SFME/LTMF/RT/09-010/A}"
+}
+
+
+
+@Article{be-ca-he-le:2009,
+  author = 	 "M. J. Berger and D. Calhoun, C. Helzel, R. J. LeVeque",
+  title = 	 "Logically rectangular finite volume methods with
+                  adaptive refinement on the sphere",
+  journal = 	 "Phil. Trans. R. Soc. A",
+  year = 	 2009,
+  volume = 	 367,
+  number = 	 1,
+  pages = 	 "4483--4496"}
+
+
+%% ------------------------------ AMR Codes --------------------------------
 @Article{ma-ol-mo-de-pa:2000,
   author = 	 "Peter MacNeice and Kevin M. Olson and Clark Mobarry and
                      Rosalinda deFainchtein and Charles Packer",
@@ -365,15 +309,13 @@
   volume = 	 126,
   pages = 	 "330--354"}
 
-
-
-
 @InProceedings{ol-ma:2005,
   author = 	 "Kevin Olson and Peter MacNeice",
-  title = 	 "{An Overview of the PARAMESH AMR Software and Some of  Its
+  title = 	 "{An Overview of the {PARAMESH AMR} Software and Some of  Its
                 Applications}",
   booktitle = "{Adaptive Mesh Refinement-Theory and Applications,
-      Proceedings of the {\em Chicago Workshop on Adaptive Mesh Refinement Methods}}",
+                  Proceedings of the {\em Chicago Workshop on Adaptive
+                  Mesh Refinement Methods}}",
   year = 	 2005,
   editor = 	 "T. Plewa and T. Linde and G. Weirs",
   volume = 	 41,
@@ -382,21 +324,59 @@
 
 
 
-
-
 @InProceedings{ol:2006,
   author = 	 "Kevin Olson",
   title = 	 "{PARAMESH: A Parallel Adaptive Grid Tool}",
-  booktitle = "{Parallel Computational Fluid Dynamics 2005:
-        Theory and Applications: Proceedings of the Parallel CFD Conference}",
+  booktitle = "{Parallel Computational Fluid Dynamics 2005: Theory and
+                  Applications: Proceedings of the Parallel CFD
+                  Conference}",
   year = 	 "2006",
   editor = 	 "A. Deane and A. Ecer and G. Brenner and D. Emerson and
              J. McDonough and J. Periaux and N. Satofuka and D. Tromeur-Dervout",
   address = 	 "{College Park, Maryland, USA}"
 }
 
+@Misc{amrclaw,
+  key = "amrclaw",
+  howpublished = "{AMRClaw website : \url{http://www.clawpack.org}}"
+}
 
 @Misc{paramesh,
   key = 	 "paramesh",
   howpublished = "{PARAMESH website :
-   \url{http://www.physics.drexel.edu/~olson/paramesh-doc/Users_manual/amr.html}}"}
+   \url{http://www.physics.drexel.edu/~olson/paramesh-doc/Users_manual/amr.html}}"
+}
+
+
+@misc{chombo,
+  key = "chombo",
+  howpublished = "{Chombo website : \url{http://seesar.lbl.gov/anag/chombo}}"
+}
+
+@Misc{samrai,
+  key = "samrai",
+  howpublished = "{SAMRAI website : \url{http://www.llnl.gov/CASC/SAMRAI/}}",
+  year = 	 2004}
+
+@Misc{ebchombo,
+ key = "ebchombo",
+  howpublished = "{EBChombo website :
+  \url{http://seesar.lbl.gov/anag/chombo}}"
+}
+
+@ARTICLE{geoclaw,
+  author = {Marsha J. Berger and David L. George and Randall J. LeVeque and Kyle
+	T. Mandli},
+  title = {The {GeoClaw} software for depth-averaged flows with adaptive refinement},
+  journal = {Advances in Water Resources},
+  year = {2011},
+  volume = {34},
+  pages = {1195-1206},
+  number = {9},
+  month = {September},
+  note = {arXiv:1008.0455v2 [physics.geo-ph]},
+  doi = {10.1016/j.advwatres.2011.02.016},
+  timestamp = {2012.11.21}
+}
+
+%% ------------------------------ AMR Codes --------------------------------
