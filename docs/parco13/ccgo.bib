@@ -1939,33 +1939,33 @@
   year = {2010},
   abstract = {A goal-oriented analysis of linear, stochastic advection-diffusion
 	models is
-	
+
 	presented which provides both a method for solution verification as
 	well
-	
+
 	as a basis for improving results through adaptation of both the mesh
 	and
-	
+
 	the way random variables are approximated. A class of models problems
-	
+
 	with random coefficients and source terms is cast in a variational
 	setting.
-	
+
 	Specific quantities of interest are specified which are also random
 	variables.
-	
+
 	A stochastic adjoint problem associated with the quantities of interest
 	is
-	
+
 	formulated and a posteriori error estimates are derived. These are
 	used to
-	
+
 	guide an adaptive algorithm which adjusts the sparse probabilistic
 	grid so
-	
+
 	as to control the approximation error. Numerical examples are given
 	to
-	
+
 	demonstrate the methodology for a specific model problem.},
   file = {AlmeidaOden10.pdf:AlmeidaOden10.pdf:PDF},
   owner = {ccgo},
@@ -5891,7 +5891,7 @@
 	a rigid framework into which they have to fit. A judicious use of
 	programming techniques allows us to avoid the computational costs
 	frequently associated with abstract object-oriented class libraries.
-	
+
 	The paper presents a detailed description of the abstractions chosen
 	for defining geometric information of meshes and the handling of
 	degrees of freedom associated with finite element spaces, as well
@@ -5919,13 +5919,13 @@
 	space. In $hp$ adaptive finite element methods, one defines these
 	discrete spaces by choosing different polynomial degrees for the
 	shape functions defined on a locally refined mesh.
-	
+
 	Although this basic idea is quite simple, its implementation in algorithms
 	and data structures is challenging. It has apparently not been documented
 	in the literature in its most general form. Rather, most existing
 	implementations appear to be for special combinations of finite elements,
 	or for discontinuous Galerkin methods.
-	
+
 	In this article, we discuss generic data structures and algorithms
 	used in the implementation of $hp$ methods for arbitrary elements,
 	and the complications and pitfalls one encounters. As a consequence,
@@ -8255,38 +8255,38 @@
   year = {2009},
   publisher = {ACM/IEEE},
   abstract = {Sparse matrix-vector multiplication (SpMV) is of singular importance
-	
+
 	in sparse linear algebra. In contrast to the uniform regularity
-	
+
 	of dense linear algebra, sparse operations encounter a broad spectrum
-	
+
 	of matrices ranging from the regular to the highly irregular.
-	
+
 	Harnessing the tremendous potential of throughput-oriented processors
-	
+
 	for sparse operations requires that we expose substantial
-	
+
 	fine-grained parallelism and impose sufficient regularity on execution
-	
+
 	paths and memory access patterns. We explore SpMV methods
-	
+
 	that are well-suited to throughput-oriented architectures like
-	
+
 	the GPU and which exploit several common sparsity classes. The
-	
+
 	techniques we propose are efficient, successfully utilizing large
 	percentages
-	
+
 	of peak bandwidth. Furthermore, they deliver excellent
-	
+
 	total throughput, averaging 16 GFLOP/s and 10 GFLOP/s in double
-	
+
 	precision for structured grid and unstructured mesh matrices,
-	
+
 	respectively, on a GeForce GTX 285. This is roughly 2.8 times the
-	
+
 	throughput previously achieved on Cell BE and more than 10 times
-	
+
 	that of a quad-core Intel Clovertown system.},
   file = {BellGarland10.pdf:BellGarland10.pdf:PDF},
   owner = {ccgo},
@@ -13553,7 +13553,7 @@
 @ARTICLE{BrambleLazarovPasciak97,
   author = {James H. Bramble and Raytcho Lazarov and Joseph Pasciak},
   title = {A least-squares approach based on a discrete minus one inner product
-	
+
 	 for first order systems},
   journal = {Math. Comp.},
   year = {1997},
@@ -14535,11 +14535,11 @@
   keywords = {Convergence DIagnostic; MCMC; MPSRF},
   owner = {ccgo},
   review = {Discussion of several methods for monitoring MCMC convergence.
-	
-	
+
+
 	PSRF univariate statistics and possible extensions.
-	
-	
+
+
 	Multivariate version: MPSRF and its computation in section 4.},
   timestamp = {2009.05.26}
 }
@@ -15189,7 +15189,7 @@
 @ARTICLE{Bui-ThanhGhattas12d,
   author = {Tan Bui-Thanh and Omar Ghattas},
   title = {A Scaled Stochastic {N}ewton Algorithm for {M}arkov Chain {M}onte
-	
+
 	 {C}arlo Simulations},
   journal = {Submitted to SIAM Journal of Uncertainty Quantification},
   year = {2012},
@@ -17006,7 +17006,7 @@
 @ARTICLE{CaiLazarovManteuffelEtAl94,
   author = {R. Cai and R. Lazarov and T.A. Manteuffel and S.F. McCormick.},
   title = {First-order system least squares for second-order partial
-	
+
 	 differential equations},
   journal = {SIAM J. Numer. Anal.},
   year = {1994},
@@ -20191,72 +20191,72 @@
   number = {2},
   abstract = {Abstract. We develop a new general purpose MCMC sampler for arbitrary
 	con-
-	
+
 	tinuous distributions that requires no tuning. We call this MCMC the
 	t-walk. The
-	
+
 	t-walk maintains two independent points in the sample space, and all
 	moves are
-	
+
 	based on proposals that are then accepted with a standard Metropolis-Hastings
-	
+
 	acceptance probability on the product space. Hence the t-walk is provably
 	con-
-	
+
 	vergent under the usual mild requirements. We restrict proposal distributions,
 	or
-	
+
 	`moves', to those that produce an algorithm that is invariant to scale,
 	and ap-
-	
+
 	proximately invariant to affine transformations of the state space.
 	Hence scaling
-	
+
 	of proposals, and effectively also coordinate transformations, that
 	might be used
-	
+
 	to increase efficiency of the sampler, are not needed since the t-walk's
 	operation
-	
+
 	is identical on any scaled version of the target distribution. Four
 	moves are given
-	
+
 	that result in an effective sampling algorithm.
-	
-	
+
+
 	We use the simple device of updating only a random subset of coordinates
 	at
-	
+
 	each step to allow application of the t-walk to high-dimensional problems.
 	In a se-
-	
+
 	ries of test problems across dimensions we find that the t-walk is
 	only a small factor
-	
+
 	less efficient than optimally tuned algorithms, but significantly
 	outperforms gen-
-	
+
 	eral random-walk M-H samplers that are not tuned for specific problems.
 	Further,
-	
+
 	the t-walk remains effective for target distributions for which no
 	optimal affine
-	
+
 	transformation exists such as those where correlation structure is
 	very different in
-	
+
 	differing regions of state space.
-	
-	
+
+
 	Several examples are presented showing good mixing and convergence
 	charac-
-	
+
 	teristics, varying in dimensions from 1 to 200 and with radically
 	different scale and
-	
+
 	correlation structure, using exactly the same sampler. The t-walk
 	is available for
-	
+
 	R, Python, MatLab and C++ at http://www.cimat.mx/~jac/twalk/.},
   doi = {DOI:10.1214/10-BA603},
   file = {:ChristenFox10.pdf:PDF},
@@ -30187,7 +30187,7 @@
   author = {S. Ezzedine and Y. Rubin and J. Chen},
   title = {Bayesian method for hydrogeological site characterization using borehole
 	and geophysical survey data: {T}heory and application
-	
+
 	to the {L}awrence {L}ivermore {N}ational {L}aboratory {S}uperfund
 	site},
   journal = {Water Resources Research},
@@ -30586,40 +30586,40 @@
   year = {2010},
   abstract = {A new scheme for differentiating complex mesh-based numerical models
 	(e.g. finite element models), the
-	
+
 	Independent Set Perturbation Adjoint method (ISP-Adjoint), is presented.
 	Differentiation of the matrices
-	
+
 	and source terms making up the discrete forward model is realized
 	by a graph coloring approach
-	
+
 	(forming independent sets of variables) combined with a perturbation
 	method to obtain gradients in
-	
+
 	numerical discretizations. This information is then convolved with
 	the mathematical adjoint, which
-	
+
 	uses the transpose matrix of the discrete forward model. The adjoint
 	code is simple to implement
-	
+
 	even with complex governing equations, discretization methods and
 	non-linear parameterizations. Importantly,
-	
+
 	the adjoint code is independent of the implementation of the forward
 	code. This greatly reduces
-	
+
 	the effort required to implement the adjoint model and maintain it
 	as the forward model continues
-	
+
 	to be developed; as compared with more traditional approaches such
 	as applying automatic differentiation
-	
+
 	tools. The approach can be readily extended to reduced-order models.
 	The method is applied
-	
+
 	to a one-dimensional Burgerss equation problem, with a highly non-linear
 	high-resolution discretization
-	
+
 	method, and to a two-dimensional, non-linear, reduced-order model
 	of an idealized ocean gyre.},
   doi = {10.1002/fld.2297},
@@ -30640,28 +30640,28 @@
   number = {8-9},
   abstract = {In this paper, we describe the construction of a three-dimensional
 	adaptive mesh data assimilation
-	
+
 	method for oceanographic/coastal applications, including a free surface.
 	This is the first attempt at
-	
+
 	introducing a moving computational domain into an adjoint model with
 	mesh adaptivity. We also
-	
+
 	provide insight into the feasibility and reliability of the adaptive
 	mesh adjoint model. The use of differing
-	
+
 	adapting meshes for forward and adjoint problems is considered here,
 	where each mesh is optimized
-	
+
 	with respect to the individual properties of each solution. The free
 	surface test case considered is that
-	
+
 	of flow in a two-dimensional vertical fluid slice. In this test case
 	the sea surface elevation boundary
-	
+
 	conditions is optimized by assimilating sea surface height observations.
 	The feasibility of an assimilation
-	
+
 	approach on adapting moving domains is demonstrated by comparison
 	with a fixed mesh result.},
   file = {FangPainPiggott05.pdf:FangPainPiggott05.pdf:PDF},
@@ -31125,7 +31125,7 @@
 @ARTICLE{FattebertHornungWissink07,
   author = {J.-L. Fattebert and R.D. Hornung and A.M. Wissink},
   title = {Finite element approach for density functional
-	
+
 	theory calculations on locally-refined meshes},
   journal = {Journal of Computational Physics},
   year = {2007},
@@ -31133,13 +31133,13 @@
   pages = {759-773},
   abstract = {We present a quadratic finite element approach to discretize the Kohn-Sham
 	equations on structured non-uniform
-	
+
 	meshes. A multigrid FAC preconditioner is proposed to iteratively
 	solve the equations by an accelerated steepest descent
-	
+
 	scheme. The method was implemented using SAMRAI, a parallel software
 	infrastructure for general AMR applications.
-	
+
 	Examples of applications to small nanoclusters calculations are presented.},
   file = {FattebertHornungWissink07.pdf:FattebertHornungWissink07.pdf:PDF},
   owner = {ccgo},
@@ -34231,33 +34231,33 @@
   volume = {2},
   pages = {67-76},
   abstract = {The aim of this paper is to describe in detail
-	
+
 	how the benchmark tests ISMIP-HOM (Ice Sheet Model Intercomparison
-	
+
 	Project-Higher-Order ice-sheet Model) have
-	
+
 	been performed using the open source finite element (FE)
-	
+
 	code Elmer (http://www.csc.fi/elmer). The ISMIP-HOM
-	
+
 	setup consists of five diagnostic and one prognostic experiments,
-	
+
 	for both 2-D and 3-D geometries. For all the tests, the
-	
+
 	full-Stokes equations are solved. Some technical points concerning
-	
+
 	FE, such as mesh characteristics, stabilisation methods,
-	
+
 	numerical methods used to solve the linear system and
-	
+
 	parallel performance are discussed. For all these setups, the
-	
+
 	CPU time consumption in relation to the accuracy of the solution
-	
+
 	is analysed. Based on these findings, some general
-	
+
 	rules on optimising the computing time versus the accuracy
-	
+
 	of the results are deduced.},
   file = {GagliardiniZwinger08.pdf:GagliardiniZwinger08.pdf:PDF},
   owner = {ccgo},
@@ -35223,8 +35223,8 @@
   owner = {ccgo},
   publisher = {Taylor \& Francis},
   review = {Section 3.3 Taylored Chain reference
-	
-	
+
+
 	(Second order taylor series => Newton's method like)},
   timestamp = {2009.05.12}
 }
@@ -40366,33 +40366,33 @@
 
 @ARTICLE{HaberChungHermann12,
   author = {E. Haber and M. Chung and F. Hermann},
-  title = {An effective method for parameter estimation with {PDE} 
-	
+  title = {An effective method for parameter estimation with {PDE}
+
 	constraints with multiple right hand sides},
   journal = {SIAM Journal on Optimization},
   year = {2012},
   volume = {to appear},
   abstract = {Many parameter estimation problems involve with a parameter-dependant
 	PDEs
-	
+
 	with multiple right hand sides. The computational cost and memory
 	requirements
-	
+
 	of such problems increases linearly with the number of right hand
 	sides. For many
-	
+
 	applications this is the main bottleneck of the computation. In this
 	paper we show that
-	
+
 	problems with multiple right hand sides can be reformulated as stochastic
 	optimization
-	
+
 	problems that are much cheaper to solve. We discuss the solution methodology
 	and
-	
+
 	use the direct current resistivity as a model problem to show the
 	eectiveness of our
-	
+
 	approach.},
   file = {:HaberChungHermann10.pdf:PDF},
   owner = {ccgo},
@@ -41011,7 +41011,7 @@
 	dynamical implications},
   journal = {Philosophical Transactions of the Royal Society of London. Series
 	A, Mathematical and
-	
+
 	Physical Sciences},
   year = {1989},
   volume = {328},
@@ -48967,25 +48967,25 @@
   series = {Notes on Numerical Fluid Mechanics},
   abstract = {Three solvers for saddle point problems arising from the linearization
 	and discretization
-	
+
 	of the steady state incompressible Navier-Stokes equations are numerically
 	studied.
-	
+
 	The numerical tests are based on nonconforming finite element approximations
 	of lowest
-	
+
 	order in two-dimensional domains using isotropicmeshes. The investigated
 	solvers
-	
+
 	are coupled multigrid methods with Vanka-type smoothers, flexible
 	GMRES with a
-	
+
 	block-diagonal preconditioner proposed by Vassilevski and Lazarov
 	(1996), and flexible
-	
+
 	GMRES with a coupled preconditioner which is based on an algebraic
 	multigrid
-	
+
 	method.},
   file = {:JohnMatthiesMitkovaEtAl00.pdf:PDF},
   owner = {ccgo},
@@ -56734,7 +56734,7 @@
 @MISC{LiebermanFidkowskiWillcoxEtAl09,
   author = {C. Lieberman and K. Fidkowski and K. Willcox and O. Ghattas},
   title = {Real-time data assimilation using {H}essian-based model reduction:
-	
+
 	 {A}pplication to linear contaminant transport.},
   howpublished = {In preparation},
   year = {2009},
@@ -58338,9 +58338,9 @@
 @PHDTHESIS{Lu05,
   author = {James Ching-Chieh Lu},
   title = {An a posteriori Error Control Framework for
-	
+
 	 Adaptive Precision Optimization using
-	
+
 	Discontinuous Galerkin Finite Element Method},
   school = {Massachusetts Institute of Technology},
   year = {2005},
@@ -58450,34 +58450,34 @@
   pages = {4591-4609},
   abstract = {We apply concentration-of-measure inequalities to the quantification
 	of uncertainties in the performance
-	
+
 	of engineering systems. Specifically, we envision uncertainty quantification
 	in the context of certification,
-	
+
 	i.e., as a tool for deciding whether a system is likely to perform
 	safely and reliably within design specifications.
-	
+
 	We show that concentration-of-measure inequalities rigorously bound
 	probabilities of failure
-	
+
 	and thus supply conservative certification criteria. In addition,
 	they supply unambiguous quantitative
-	
+
 	definitions of terms such as margins, epistemic and aleatoric uncertainties,
 	verification and validation
-	
+
 	measures, confidence factors, and others, as well as providing clear
 	procedures for computing these quantities
-	
+
 	by means of concerted simulation and experimental campaigns. We also
 	investigate numerically
-	
+
 	the tightness of concentration-of-measure inequalities with the aid
 	of an imploding ring example. Our
-	
+
 	numerical tests establish the robustness and viability of concentration-of-measure
 	inequalities as a basis
-	
+
 	for certification in that particular example of application.},
   doi = {doi:10.1016/j.cma.2008.06.008},
   file = {:LucasOwhadiOrtiz08.pdf:PDF},
@@ -60234,40 +60234,40 @@
   pages = {191-204},
   abstract = {Glaciers and ice sheets play a dynamic role in Earth's climate system,
 	influencing regional- and global-scale climate and
-	
+
 	responding to climate change on time scales from years to millennia.
 	They are also an integral part of Earth's landscape in alpine
-	
+
 	and polar regions, where they are an active agent in isostatic, tectonic,
 	and Earth surface processes. This review paper summarizes
-	
+
 	recent progress in understanding and modelling ice sheet dynamics,
 	from the microphysical processes of ice deformation in glaciers
-	
+
 	to continental-scale processes that influence ice dynamics. Based
 	on recent insights and research directions, it can be expected that
-	
+
 	a new generation of ice sheet models will soon replace the current
 	standard. Improvements that can be foreseen in the near future
-	
+
 	include: (i) the addition of internally-consistent evolutionary equations
 	for ice crystal fabric (anisotropic flow laws), (ii) more
-	
+
 	generalized flow laws that include different deformation mechanisms
 	under different stress regimes, (iii) explicit incorporation of
-	
+
 	the effects of chemical impurities and grain size (dynamic recrystallization)
 	on ice deformation, (iv) higher-order stress solutions to
-	
+
 	the momentum balance (Stokes' equation) that governs ice sheet flow,
 	and (v) the continued merger of ice sheet models with
-	
+
 	increasingly complex Earth systems models, which include fully-coupled
 	subglacial hydrological and geological processes.
-	
+
 	Examples from the Greenland Ice Sheet and Vatnajokull Ice Cap, Iceland
 	are used to illustrate several of these new directions
-	
+
 	and their importance to glacier dynamics.},
   doi = {10.1016/j.epsl.2005.08.016},
   file = {:Marshall05.pdf:PDF},
@@ -63053,7 +63053,7 @@
 	by acoustic theory, but they are also treated as undesirable noise
 	when they should be used to provide extra information, such as $S$-wave
 	velocity, about the subsurface.
-	
+
 	The problems of using the conventional acoustic wave equation approach
 	can be eliminated via an elastic approach. In this paper, equations
 	have been derived to perform an inversion for $P$-wave velocity,
@@ -63076,7 +63076,7 @@
 	greater power than any migration since it solves for the $P$-wave
 	velocity, $S$-wave velocity, and density and can handle very general
 	situations including transmission problems.
-	
+
 	Three main weaknesses of this technique are that it requires fairly
 	accurate a priori knowledge of the low-wavenumber velocity model,
 	it assumes Gaussian model statistics, and it is very computer-intensive.
@@ -63669,7 +63669,7 @@
   author = {Muller, R. D. and Sdrolias, M. and Gaina, C. and Roest, W. R.},
   title = {Age, spreading rates, and spreading asymmetry of the world's ocean
 	crust
-	
+
 	},
   journal = {Geochem. Geophys. Geosyst.},
   year = {2008},
@@ -65687,8 +65687,8 @@
 
 @ARTICLE{NovakRitter96,
   author = {Erich Novak and Klaus Ritter},
-  title = {High dimensional integration of smooth functions over cubes 
-	
+  title = {High dimensional integration of smooth functions over cubes
+
 	},
   journal = {Numer. Math.},
   year = {1996},
@@ -67600,7 +67600,7 @@
   title = {Low dimensional modeling of flow reactors },
   journal = {Int. J. Heat Mass Transf. Int. J. Heat Mass Int. J. Heat Mass Int.
 	J. Heat Mass
-	
+
 	},
   year = {1996},
   volume = {39},
@@ -72093,7 +72093,7 @@
   author = {Sebastian Reiter and Andreas Vogel and Ingo Heppner and Martin Rupp
 	and Gabriel Wittum},
   title = {A Massively Parallel Geometric Multigrid Solver on
-	
+
 	Hierarchically Distributed Grids},
   journal = {Computing and Visualization in Science},
   year = {2012},
@@ -73039,36 +73039,36 @@
   number = {4},
   abstract = {In thisp aperw e considera continuous-timme ethodo f approximatinag
 	givend istribution7 ru singt he
-	
+
 	Langevin diffusion dLt =
-	
+
 	dW/
-	
+
 	+ I V log 7r(Lt)dt. We find conditions under this diffusion converges
-	
+
 	exponentiallyq uicklyt o 7ro r does not: in one dimension,t hese are
 	essentiallyt hat for distributions
-	
+
 	with exponentiatl ailso f the form7 r(x)o ce xp(--yx| ), 0 < /3 <
 	00, exponentiacl onvergenceo ccursi f
-	
+
 	and only if/3 > 1.
-	
+
 	We then considerc onditionsu nderw hich the discretea pproximationtso
 	the diffusionc onverge.
-	
+
 	We firsts how that even when the diffusioni tselfc onverges,n aived
 	iscretizationns eed not do so. We
-	
+
 	then considera 'Metropolis-adjustedve' rsiono f the algorithma, nd
 	findc onditionsu nderw hicht his
-	
+
 	also convergesa t an exponentialr ate:p erhapss urprisinglye,v en
 	the Metropolizedv ersionn eed not
-	
+
 	convergee xponentiallyf ast even if the diffusiond oes. We brieflyd
 	iscussa truncatedf orm of the
-	
+
 	algorithmw hich,i n practice,s houlda void the difficultieso f the
 	otherf orms},
   file = {:RobertsTweedie96.pdf:PDF},
@@ -75448,7 +75448,7 @@
 
 @STANDARD{Sayas11,
   title = {Retarded potentials and time domain boundary
-	
+
 	integral equations: a road-map},
   organization = {University of Delaware},
   author = {Francisco-Javier Sayas},
@@ -75523,40 +75523,40 @@
   number = {4},
   abstract = {This paper presents an inter-comparison of three different models
 	applied to various
-	
+
 	glacier geometries. The three models are built on different approximations
 	of the
-	
+
 	Stokes equations, from the well known Shallow Ice Approximation (SIA)
 	to the full-
-	
+
 	5 Stokes (FS) solution with an intermediate higher-order (HO) model
 	which incorporates
-	
+
 	longitudinal stresses. The studied glaciers are synthetic geometries,
 	but two of them
-	
+
 	are constructed so as to mimic a valley glacier and a volcano glacier.
 	For each class
-	
+
 	of glacier, the bedrock slope and/or the aspect ratio are varied.
 	First, the models are
-	
+
 	compared in a diagnostic way for a fixed and given geometry. Here
 	the SIA surface ve10
-	
+
 	locity can overestimate the FS velocity by a factor of 5 to a factor
 	of 10. Then, the free
-	
+
 	surface is allowed to evolve and the time-dependent evolution of the
 	glacier is studied.
-	
+
 	As a result, the difference between the models decreases, but can
 	still be as large as
-	
+
 	a factor of 1.5 to 2. This decrease can be explained by a negative
 	feedback for the SIA
-	
+
 	which overestimates velocities.},
   file = {SchaeferGagliardiniPattynEtAl08.pdf:SchaeferGagliardiniPattynEtAl08.pdf:PDF},
   issn = {1994-0432},
@@ -76717,40 +76717,40 @@
   pages = {631-642},
   number = {187},
   abstract = {We present an application of the newly developed CAFFE model (Continuum-mechanical,
-	
+
 	Anisotropic Flow model based on an anisotropic Flow Enhancement factor)
 	to the EPICA ice core at
-	
+
 	Kohnen Station, DronningMaud Land, Antarctica (referred to as the
 	EDML core). A one-dimensional flow
-	
+
 	model for the site is devised, which includes the anisotropic flow
 	law and the fabric evolution equation
-	
+
 	of the CAFFE model. Three different solution methods are employed:
 	(i) computing the ice flow based
-	
+
 	on the flow law of the CAFFE model and the measured fabrics; (ii)
 	solving the CAFFE fabric evolution
-	
+
 	equation under the simplifying assumption of transverse isotropy;
 	and (iii) solving the unrestricted CAFFE
-	
+
 	fabric evolution equation. Method (i) demonstrates clearly the importance
 	of the anisotropic fabric in the
-	
+
 	ice column for the flow velocity. The anisotropic enhancement factor
 	produced with method (ii) agrees
-	
+
 	reasonably well with that of method (i), even though the measured
 	fabric shows a girdle structure (which
-	
+
 	breaks the transverse isotropy) in large parts of the ice core. For
 	method (iii), we find that the measured
-	
+
 	fabric is reproduced well by the model down to ?2100m depth. Systematic
 	deviations at greater depths
-	
+
 	are attributed to the disregard of migration recrystallization in
 	the model.},
   file = {SeddikGrevePlacidiEtAl08.pdf:SeddikGrevePlacidiEtAl08.pdf:PDF}
@@ -82278,7 +82278,7 @@
 	must involve all the parameters) by first optimizing for the $P$-wave
 	velocity and impedance, then optimizing for the $S$-wave velocity
 	and impedance, and finally optimizing for density.
-	
+
 	The first part of the problem of obtaining the long wavelengths of
 	the $P$-wave velocity and the short wavelengths of the $P$-wave impedance
 	is similar to the problem solved by present industrial practice (for
@@ -82295,7 +82295,7 @@
 	contain information, an optimization for density should be performed
 	(the short wavelengths of impedances do not give independent information
 	on density and velocity independently).
-	
+
 	Because the problem is nonlinear, the whole process should be iterated
 	to convergence; however, the information from each parameter should
 	be independent enough for an interesting first solution.},
@@ -85980,7 +85980,7 @@
   author = {Andreas Vogel and Sebastian Reiter and Martin Rupp and Arne N\"agel
 	and Gabriel Wittum},
   title = {{UG 4}---A Novel Flexible Software System for Simulating {PDE}
-	
+
 	Based Models on High Performance Computers},
   journal = {Computing and Visualization in Science},
   year = {2012},
@@ -86149,7 +86149,7 @@
   title = {Proper orthogonal decomposition and singular value decomposition},
   booktitle = {Spezialforschungsbereich F003 Optimierung und Kontrolle, Projektbereich
 	Kontinuierliche Optimierung und Kontrolle, Bericht
-	
+
 	},
   year = {1999},
   date-added = {2005-11-17 15:09:29 -0500},
@@ -87288,7 +87288,7 @@
 	key logic steps and mathematical-physics framework behind the development
 	of practical algorithms for seismic exploration derived from the
 	inverse scattering series.
-	
+
 	There are both significant symmetries and critical subtle differences
 	between the forward scattering series construction and the inverse
 	scattering series processing of seismic events. These similarities
@@ -87302,7 +87302,7 @@
 	uncoupled task-specific subseries that accomplish: (1) free-surface
 	multiple removal; (2) internal multiple attenuation; (3) imaging
 	primaries at depth; and (4) inverting for earth material properties.
-	
+
 	A combination of forward series analogues and physical intuition is
 	employed to locate those subseries. We show that the sum of the four
 	task-specific subseries does not correspond to the original inverse
@@ -90909,7 +90909,7 @@
   author = {Zhang, J. and McMechan, G.~A.},
   title = {Reply to comment by {M. M. Deal and G. Nolet} on '{E}stimation of
 	resolution and covariance for large matrix
-	
+
 	inversions'},
   journal = {Geophysical Journal International},
   year = {1996},
@@ -92819,4 +92819,3 @@
   owner = {ccgo},
   timestamp = {2007.04.23}
 }
-

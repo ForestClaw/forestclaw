@@ -3,11 +3,11 @@
 
 
 % preferred topic area: algorithms
-% 
+%
 % at most 5 keywords
-% 
+%
 % relevance
-% 
+%
 % originality
 
 
@@ -24,6 +24,7 @@
 \usepackage{color}
 \usepackage{xspace}
 
+\newcommand{\comment}[1]{\textcolor{green}{[DAC: #1]}\xspace}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
 \newcommand{\sR}{\mathbb{R}}
 \newcommand{\dt}{\mathrm{d}t}
@@ -52,7 +53,7 @@
 \author[B]{\fnms{Donna} \snm{Calhoun}},
 \author[C]{\fnms{Kyle} \snm{Mandli}} and
 \author[C]{\fnms{Andy R.} \snm{Terrel}}
-\runningauthor{C.\ Burstedde et.al.}
+\runningauthor{C.\ Burstedde et al.}
 \address[A]{Institut f\"ur Numerische Simulation, Universit\"at Bonn, Germany}
 \address[B]{Boise State University, Idaho, USA}
 \address[C]{Institute for Computational Engineering and Sciences,\\
@@ -67,14 +68,15 @@ conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
 as one uniform compute patch in $\sR^d$ of dimensions $m^d$, where $m$ is
 customarily between 8 and 32.  Thus, computation on each patch can be optimized
 for speed, while we inherit the flexibility of adaptive meshes.  In our work we
-choose to work with the \pforest AMR library since it allows to compose the mesh
-from multiple mapped octrees, thus enabling the cubed sphere and other
+choose to work with the \pforest AMR library since it allows us to compose the mesh
+from multiple mapped octrees and enable the cubed sphere and other
 nontrivial multiblock geometries.
 %
 \end{abstract}
 
 % \begin{keyword}
 % adaptive mesh refinement,
+% wave propagation algorithms
 % clawpack,
 % HPC,
 % manycore
@@ -93,39 +95,42 @@ architectures, however, require careful structuring of the data layout and
 memory access patterns to exhaust their multithreading and vectorization
 capabilities.
 
-Consequently, it is not clear a priori how to accelerate PDE solvers that use
-adaptive mesh refinement, especially when working with unstructured meshes.  Of
-course, it has been realized early that it helps to aggregate degrees of
-freedom (DOF) at the element level, as it has been done with high-order
-spectral element \cite{TufoFischer99}, finite volume
-\todo{add favorite citation}, or discontinuous Galerkin
+Consequently, it is not clear a priori how to accelerate PDE solvers
+that use adaptive mesh refinement, especially when working with
+unstructured meshes \comment{This sounds we are now going to talk
+  about unstructured meshes.}.  Of course, it has been realized early
+that it helps to aggregate degrees of freedom (DOF) at the element
+level, as it has been done with high-order spectral element
+\cite{TufoFischer99}, finite volume
+\cite{paramesh, chombo, samrai}, or discontinuous Galerkin
 \cite{BursteddeGhattasGurnisEtAl10} methods.
-%
+\comment{Are you looking for references to parallel AMR codes?  Or more general AMR codes based on the FVM? }
+
 % For example, SEs optimized for computational speed have originally been
 % implemented on unstructured conforming meshes \cite{TufoFischer99} and later
 % been extended to non-conforming adaptive meshes \cite{FischerKruseLoth02,
 % BursteddeGhattasGurnisEtAl10}.
 
-To enable hardware acceleration for parallel dynamic AMR, we like to build upon
-the forest-of-octrees paradigm because of its low overhead and proven
-scalability \cite{BursteddeWilcoxGhattas11}.  This approach identifies each
-octree leaf with a mesh element.  In this work, we go
-beyond the traditional high-order element and define each element to be a
-dense compute patch with $m^d$ DOFs.  In fact, this approach resembles
-block-structured AMR \cite{ColellaGravesKeenEtAl07}
-\todo{favorite BoxLib citation}
-except that the patches are not overlapping, which enables us to capitalize on
-our previous experience with scalable FE solvers for PDEs
-\cite{BursteddeStadlerAlisicEtAl13}.  The Clawpack software \cite{LeVeque97}
-provides a popular implementation of such a patch.  It has
-been designed to solve hyperbolic conservation laws
+To enable hardware acceleration for parallel dynamic AMR, we like to
+build upon the forest-of-octrees paradigm because of its low overhead
+and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
+identifies each octree leaf with a mesh element.  In this work, we go
+beyond the traditional high-order element and define each element to
+be a dense compute patch with $m^d$ DOFs.  In fact, this approach
+resembles block-structured AMR \cite{be-ol:1984, be-co:1989, be-le:1991,
+ColellaGravesKeenEtAl07} except that the
+patches are not overlapping, which enables us to capitalize on our
+previous experience with scalable FE solvers for PDEs
+\cite{BursteddeStadlerAlisicEtAl13}.  The Clawpack software
+\cite{LeVeque97} provides a popular implementation of such a patch.
+It has been designed to solve hyperbolic conservation laws
 % on a uniform compute patch
-and successfully used in the context of block-structured AMR \todo{AMRClaw
-citation}.
+and successfully used in the context of block-structured AMR
+\cite{be-le:1991, amrclaw}.
 
-In this paper we describe how we design the coupling of forest-of-octree AMR
+In this paper we describe our design for the coupling of forest-of-octree AMR
 with Clawpack at the leaf level.  We comment on challenges that arise in
-enabling multiblock geometries and efficient parallelism and close with a range
+enabling multiblock geometries and efficient parallelism and conclude with a range
 of numerical examples that demonstrate the conceptual improvements in relation
 to other approaches.
 
@@ -136,6 +141,8 @@ forest-of-octrees AMR on the one hand, and the Clawpack algorithms for the
 numerical solution of hyperbolic conservation laws
 % on uniformly gridded domains
 on the other.  Both are specialized codes with the following characteristics:
+\comment{I am not sure about the Python dependency;  the latest version of Clawpack relies on
+Python to generate an input file, but the code itself is F77 (or maybe some F90). }
 \begin{center}
 \begin{tabular}{l|l|l}
 & \multicolumn{1}{c|}{\pforest} & \multicolumn{1}{c}{Clawpack} \\
@@ -152,13 +159,14 @@ dependencies & none & Python \\
 \end{tabular}
 \end{center}
 The proposed 1:1 correspondence between a leaf and a patch thus combines two
-hithertwo disjoint models in a modular way:
+previously disjoint models in a modular way:
 \begin{enumerate}
 \item We permit the reuse of existing, verified and performant codes.
 % if the integration is done well
 \item We preserve the separation of the mesh on one hand from the
 discretization and solvers on the other.
-\item The AMR metadata (24 bytes per leaf) is insignificant compared to
+\item The AMR metadata (approx 100 bytes per leaf
+\comment{?? : in 3d: 5 ints,  9 floats; in 2d: 4 ints, 6 floats}) is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
 \item The resulting parallel programming model is a hybrid (often referred
 to as MPI+X).
@@ -169,20 +177,24 @@ A particular feature of \forestclaw is that the generic handling of multiblock
 geometries is inherited from \pforest, identifying each octree as a block, and
 each leaf as a patch.  Each block is understood as a reference unit cube with
 its own geometric mapping.  The connectivity of the blocks is static and can be
-created by external hexahedral mesh generators, elimintating the need to encode
+created by external hexahedral mesh generators, eliminating the need to encode
 it by hand.
 
-A main challenge is presented by the fact that the patch neighborhood is only
-known to \pforest, from which it needs to be propagated to the
-numerical code in \forestclaw that implements the interaction with ghost
-patches.  To this end, we define an interface that allows distributed read-only
-access to the sequence of blocks, the list of patches for each, and a lookup of
-neighbor patches (and their relative orientation which is nontrivial between
-blocks).  The exchange of ghost data and parallel partitioning is provided
-transparently by \pforest.  Mesh modification directives, such as local
-refinement and coarsening, are called from \forestclaw and relayed to \pforest.
+A main challenge is presented by the fact that the patch neighborhood
+is only known to \pforest.  This patch connectivity information needs
+to be propagated to the numerical code in \forestclaw that implements
+the interaction with neighbor patches via the use of a layer of ghost
+cells surrounding each patch.  To this end, we define an interface
+that allows distributed read-only access to the sequence of blocks,
+the list of patches for each, and a lookup of neighbor patches (and
+their relative orientation which is nontrivial between blocks).  The
+exchange of ghost data and parallel partitioning is provided
+transparently by \pforest.  Mesh modification directives, such as
+local refinement and coarsening, are called from \forestclaw and
+relayed to \pforest.
 
 % Forestclaw would support swapping out p4est or Clawpack
+
 
 % AMR Metadata $\ll$ numerical data
 
@@ -206,7 +218,7 @@ augmented where necessary with information about one layer of ghost patches.
 
 \forestclaw uses iterators over all leafs, optionally restricted to a given
 level.  Random access is possible and used when executing $O(1)$ time neighbor
-lookups.  Looping over the patches in the order prescribed by the forest and
+lookups.  Looping over the patches in the order prescribed by the forest \comment{tree?} and
 accessing neighbors only relative to the current patch leads to a high
 percentage of cache reuse.
 % since the ghost patches are likely closeby with respect to the $z$-order.
@@ -260,6 +272,6 @@ by B.\ as part of a talk at the SCI Institute, Utah, in July 2011.
 
 %%%%%%%%%%% The bibliography starts:
 \bibliographystyle{unsrt}
-\bibliography{ccgo}
+\bibliography{ccgo,../Biblio/amr}
 
 \end{document}
