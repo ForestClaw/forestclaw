@@ -268,12 +268,9 @@ c     # Assume this is mapped.
 
 c     # 'iface' is relative to the coarse grid
 
-      write(6,*)'Mess with mb_average_face_ghost'
-
-      call set_bcs_to_zero(mx,my,mbc,meqn,qcoarse, qfine)
-
-
-      return
+c      write(6,*)'Mess with mb_average_face_ghost'
+c      call set_bcs_to_zero(mx,my,mbc,meqn,qcoarse, qfine)
+c      return
 
 
 
@@ -476,18 +473,18 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       integer ifine, jfine
       double precision kf, qf, kc
 
-      write(6,*) 'WARNING : (mb_average_corner_ghost) : setting to 0'
-
-      do mq = 1,meqn
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-               qcoarse(1-ibc,1-jbc,mq) = 0
-               qcoarse(mx+ibc,my+jbc,mq) = 0
-            enddo
-         enddo
-      enddo
-
-      return
+c       write(6,*) 'WARNING : (mb_average_corner_ghost) : setting to 0'
+c
+c       do mq = 1,meqn
+c          do ibc = 1,mbc
+c             do jbc = 1,mbc
+c                qcoarse(1-ibc,1-jbc,mq) = 0
+c                qcoarse(mx+ibc,my+jbc,mq) = 0
+c             enddo
+c          enddo
+c       enddo
+c
+c       return
 
 
       r2 = refratio*refratio
@@ -605,19 +602,19 @@ c     # Exchange ghost cells at block corner
       integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
       double precision sum,qf,kf,kc
 
-      write(6,*) 'WARNING : (mb_average_block_corner_ghost) : ',
-     &      ' setting to 0'
-
-      do mq = 1,meqn
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-               qcoarse(1-ibc,1-jbc,mq) = 0
-               qcoarse(mx+ibc,my+jbc,mq) = 0
-            enddo
-         enddo
-      enddo
-
-      return
+c       write(6,*) 'WARNING : (mb_average_block_corner_ghost) : ',
+c      &      ' setting to 0'
+c
+c       do mq = 1,meqn
+c          do ibc = 1,mbc
+c             do jbc = 1,mbc
+c                qcoarse(1-ibc,1-jbc,mq) = 0
+c                qcoarse(mx+ibc,my+jbc,mq) = 0
+c             enddo
+c          enddo
+c       enddo
+c
+c       return
 
 
       r2 = refratio**2
