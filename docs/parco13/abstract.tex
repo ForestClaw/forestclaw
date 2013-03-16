@@ -161,7 +161,7 @@ subject & hexahedral nonconforming mesh &  hyperbolic PDE on $[0, 1]^d$ \\
 structure & forest of octrees & patch of $m^d$ DOFs \\
 atomic unit & octree leaf & one DOF \\
 parallelization & MPI & threads (Manyclaw variant) \\
-memory access & distributed & shared \\
+memory access & distributed & shared on each MPI rank \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
 dependencies & none & Python (optional) \\
@@ -175,14 +175,15 @@ previously disjoint models in a modular way:
 % if the integration is done well
 \item We preserve the separation of the mesh on one hand from the
 discretization and solvers on the other.
-\item The AMR metadata (24 bytes per \pforest leaf plus 92 bytes per
-forestclaw patch)
+\item The AMR metadata (\pforest:
+under 1k bytes per octree, 8 bytes per MPI rank,
+24 bytes per leaf; \forestclaw: $84 + 28d$ bytes per patch)
 % \comment{?? : in 3d: 5 ints,  9 floats; in 2d: 4 ints, 6 floats}
 % CB: thanks, I hav added it.
 is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
 \item The resulting parallel programming model is a hybrid (often referred
-to as MPI+X).
+to as MPI+X).  Only rank-local leaves/patches are stored and computed.
 \end{enumerate}
 
 % yields periodicity as a special case
@@ -198,9 +199,11 @@ is only known to \pforest.  This patch connectivity information needs
 to be propagated to the numerical code in \forestclaw that implements
 the interaction with neighbor patches via the use of a layer of ghost
 cells surrounding each patch.  To this end, we define an interface
-that allows distributed read-only access to the sequence of blocks,
+that allows read-only access to the sequence of blocks,
 the list of patches for each, and a lookup of neighbor patches (and
-their relative orientation which is nontrivial between blocks).  The
+their relative orientation which is nontrivial between blocks).
+Just as \pforest, \forestclaw stores only the patches local to each
+MPI rank.  The
 exchange of ghost data and parallel partitioning is provided
 transparently by \pforest.  Mesh modification directives, such as
 local refinement and coarsening, are called from \forestclaw and
@@ -229,9 +232,10 @@ The MPI layer is addressed from within \pforest and not exposed to the
 space filling curve.  Each MPI rank has a local view on its own partition,
 augmented where necessary with information about one layer of ghost patches.
 
-\forestclaw uses iterators over all leafs, optionally restricted to a given
-level.  Random access is possible and used when executing $O(1)$ time neighbor
-lookups.  Looping over the patches in the order prescribed by the forest
+\forestclaw uses iterators over all rank-local leafs, optionally restricted to
+a given level.  Random access is possible and used when executing $O(1)$ time
+neighbor lookups.  Looping over the patches in the order prescribed by the
+forest
 % \comment{tree?}
 % CB: I think forest is fine here.
 and
