@@ -97,15 +97,20 @@ memory access patterns to exhaust their multithreading and vectorization
 capabilities.
 
 Consequently, it is not clear a priori how to accelerate PDE solvers
-that use adaptive mesh refinement, especially when working with
-unstructured meshes \comment{This sounds we are now going to talk
-  about unstructured meshes.}.  Of course, it has been realized early
+that use adaptive mesh refinement.
+%, especially when working with
+%unstructured meshes \comment{This sounds we are now going to talk
+%  about unstructured meshes.}.
+% CB: Good point, took it out.
+Of course, it has been realized early
 that it helps to aggregate degrees of freedom (DOF) at the element
 level, as it has been done with high-order spectral element
 \cite{TufoFischer99}, finite volume
 \cite{paramesh, chombo, samrai}, or discontinuous Galerkin
 \cite{BursteddeGhattasGurnisEtAl10} methods.
-\comment{Are you looking for references to parallel AMR codes?  Or more general AMR codes based on the FVM? }
+\comment{Are you looking for references to parallel AMR codes?  Or more general AMR codes based on the FVM?}
+\todo{No, I was looking for unstructured FV references.  Would you have any,
+and can we add the block-AMR references later?}
 
 % For example, SEs optimized for computational speed have originally been
 % implemented on unstructured conforming meshes \cite{TufoFischer99} and later
@@ -115,11 +120,11 @@ level, as it has been done with high-order spectral element
 To enable hardware acceleration for parallel dynamic AMR, we like to
 build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
-identifies each octree leaf with a mesh element.  In this work, we go
+identifies each octree leaf with a mesh element.  In our work, we go
 beyond the traditional high-order element and define each element to
 be a dense compute patch with $m^d$ DOFs.  In fact, this approach
 resembles block-structured AMR \cite{be-ol:1984, be-co:1989, be-le:1991,
-ColellaGravesKeenEtAl07} except that the
+ColellaGravesKeenEtAl07,Uintah} except that the
 patches are not overlapping, which enables us to capitalize on our
 previous experience with scalable FE solvers for PDEs
 \cite{BursteddeStadlerAlisicEtAl13}.  The Clawpack software
@@ -142,8 +147,11 @@ forest-of-octrees AMR on the one hand, and the Clawpack algorithms for the
 numerical solution of hyperbolic conservation laws
 % on uniformly gridded domains
 on the other.  Both are specialized codes with the following characteristics:
-\comment{I am not sure about the Python dependency;  the latest version of Clawpack relies on
-Python to generate an input file, but the code itself is F77 (or maybe some F90). }
+% \comment{I am not sure about the Python dependency;  the latest version of
+% Clawpack relies on
+%Python to generate an input file, but the code itself is F77 (or maybe some
+%F90). }
+% CB: I made it optional.
 \begin{center}
 \begin{tabular}{l|l|l}
 & \multicolumn{1}{c|}{\pforest} & \multicolumn{1}{c}{Clawpack} \\
@@ -155,7 +163,7 @@ parallelization & MPI & threads (Manyclaw variant) \\
 memory access & distributed & shared \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
-dependencies & none & Python \\
+dependencies & none & Python (optional) \\
 %\hline
 \end{tabular}
 \end{center}
@@ -166,8 +174,11 @@ previously disjoint models in a modular way:
 % if the integration is done well
 \item We preserve the separation of the mesh on one hand from the
 discretization and solvers on the other.
-\item The AMR metadata (approx 100 bytes per leaf
-\comment{?? : in 3d: 5 ints,  9 floats; in 2d: 4 ints, 6 floats}) is insignificant compared to
+\item The AMR metadata (24 bytes per \pforest leaf plus 92 bytes per
+forestclaw patch)
+% \comment{?? : in 3d: 5 ints,  9 floats; in 2d: 4 ints, 6 floats}
+% CB: thanks, I hav added it.
+is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
 \item The resulting parallel programming model is a hybrid (often referred
 to as MPI+X).
@@ -219,9 +230,13 @@ augmented where necessary with information about one layer of ghost patches.
 
 \forestclaw uses iterators over all leafs, optionally restricted to a given
 level.  Random access is possible and used when executing $O(1)$ time neighbor
-lookups.  Looping over the patches in the order prescribed by the forest \comment{tree?} and
+lookups.  Looping over the patches in the order prescribed by the forest
+% \comment{tree?}
+% CB: I think forest is fine here.
+and
 accessing neighbors only relative to the current patch leads to a high
-percentage of cache reuse.
+percentage of cache reuse
+\cite{BursteddeBurtscherGhattasEtAl09}.
 % since the ghost patches are likely closeby with respect to the $z$-order.
 
 When \forestclaw accesses neighbor patches, they can be on the same or a
@@ -251,7 +266,7 @@ The threaded parallelism over the degrees of freedom of a patch is handled by
 % fast (O(log N/P)) neighbor and parent/child lookups
 % horizontal/vertical tree traversal
 
-\todo{What is BearClaw (tree-based / S.\ Mitran)?}
+% \todo{What is BearClaw (tree-based / S.\ Mitran)?}
 
 \section{Patch-based numerics at the leaf level}
 
