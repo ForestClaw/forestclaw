@@ -366,13 +366,33 @@ general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
 
 \section{Numerical results}
 
-* sphere results\\
-* swirl example
+\begin{figure}
+\begin{center}
+\includegraphics[width=.4\columnwidth]{quadtree}
+\hspace{.05\columnwidth}
+\includegraphics[width=.4\columnwidth]{sphere_plot167}
+\end{center}
+\caption{Numerical results for solving the advection equation.  Left:  Unit
+square (single quadtree) with a twisting velocity field.  Right: Spherical ball
+with a rotational velocity field constructed from two mapped quadtrees.  In
+both cases the concentration is color-coded with a sharp gradient shown in red.
+The adaptive mesh refinement follows the location of the gradient (the patches
+are not shown where they become too fine for display).  Here we use $m = 8$
+cells per \clawpack patch.}
+\label{results2d}
+\end{figure}
 
-To come...
+The results in this section are preliminary and will be extended in the final
+version.  We have so far exercised \forestclaw for two 2D manifolds, namely the
+unit square and a sphere composed of two mapped squares.  On both we solve the
+advection equation with a given velocity field.  We advect a concentration
+field with a sharp gradient which we track dynamically with adaptive mesh
+refinement.  We observe that the refinement follows the front and allows for an
+accurate representation of its location over time; see Figure~\ref{results2d}.
 
-Parallelization is not completed yet but envisioned for the final version of
-the paper.
+\pforest is parallelized with MPI and well tested on large supercomputers, both
+in 2D and 3D.  Parallelization of \forestclaw is not completed yet but
+envisioned for the final version of the paper.
 
 \section*{Acknowledgements}
 
