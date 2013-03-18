@@ -188,7 +188,8 @@ parallelization & MPI & threads (\manyclaw variant) \\
 memory access & distributed & shared on each MPI rank \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
-dependencies & none & Python (optional) \\
+% CB: dropped dependencies.
+% dependencies & none & Python (optional) \\
 %\hline
 \end{tabular}
 \end{center}
@@ -307,7 +308,8 @@ by \forestclaw alone without the need to involve \pforest.
 For hyperbolic problems, we integrate the solution on a a single uniform
 patch, containing $m^d$ cells,
 using the wave propagation algorithm described by R. J. LeVeque and
-implemented in \clawpack \cite{le:2002, clawpack}.  We assume a
+implemented in \clawpack \cite{le:2002, clawpack}.  Optionally, the coordinates
+of the patch can be geometrically mapped.  We assume a
 single degree of freedom per cell and reconstruct a piecewise
 constant solution to obtain left and right states at cell
 edges.  At each edge, we solve Riemann problems to obtain left and
