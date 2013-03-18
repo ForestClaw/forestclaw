@@ -22,6 +22,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{cite}
 \usepackage{color}
+\usepackage{graphicx}
 \usepackage{url}
 \usepackage{xspace}
 
@@ -253,10 +254,21 @@ adaptive refinement and coarsening, are called from \forestclaw and relayed to
 
 \section{Parallelization}
 
+\begin{figure}
+\centering
+\includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
+\caption{The leaves in a forest of six octrees that serves as the computational
+domain for the cubed sphere.  An adhoc refinement pattern has been 2:1 balanced
+in terms of neighbor sizes and partitioned between five MPI processes (the
+three middle ones are shown from black to white).}
+\label{cubed3}
+\end{figure}
+
 The MPI layer is addressed from within \pforest and not exposed to the
 \forestclaw code.  The order of leaves is maintained in \pforest according to a
 space filling curve.  Each MPI rank has a local view on its own partition,
-augmented where necessary with information about one layer of ghost leaves.
+augmented where necessary with information about one layer of ghost leaves
+(see Figure~\ref{cubed3}).
 
 \forestclaw uses iterators over all rank-local leafs, optionally restricted to
 a given level.  Random access is possible and used when executing $O(1)$ time
