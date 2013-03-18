@@ -324,7 +324,7 @@ piecewise constant solution to obtain left and right states at cell edges.  At
 each edge, we solve Riemann problems to obtain left and right going waves
 propagating at speeds determined from the solution to the Riemann problem.  For
 scalar advection, the speed of each wave is simply the local advection speed at
-the cell interface.  For non- linear problems and systems, an approximate
+the cell interface.  For non-linear problems and systems, an approximate
 Riemann solver, such as a Roe solver \cite{roesolver}, is typically used.  Since
 much of the physics of an application can be contained in the Riemann solver,
 \forestclaw adopts \clawpack's interface to Riemann solvers effectively allowing
