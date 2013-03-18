@@ -91,8 +91,7 @@ nontrivial multiblock geometries.
 
 \section{Introduction}
 
-With the advent of high-throughput coprocessors, such as GPGPUs or the MIC
-chip, comes the opportunity to sustain unprecedented rates of floating point
+With the advent of many-core chips, such as GPUs and the MIC architecture, comes the opportunity to sustain unprecedented rates of floating point
 operations at comparably high integration density and low cost.  These
 architectures, however, require careful structuring of the data layout and
 memory access patterns to exhaust their multithreading and vectorization
@@ -106,7 +105,7 @@ that use adaptive mesh refinement.
 % CB: Good point, took it out.
 Of course, it was realized early that it helps to aggregate degrees of
 freedom (DOF) at the element level, as has been done with high-order
-spectral element \cite{TufoFischer99}
+spectral element \cite{TufoFischer99}, low order continuous Galerkin via methods that accumulate many elements simultaneously \cite{knepleyterrel:2013},
 %finite volume (element?)
 or discontinuous Galerkin \cite{HesthavenWarburton02}
 methods.  GPU implementations of the latter have been proposed recently
@@ -141,7 +140,7 @@ build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
 identifies each octree leaf with a mesh element.  In our work, we go
 beyond the traditional high-order element and define each element to
-be a dense compute patch with $m^d$ DOFs.  In fact, this approach
+be a dense computational patch with $m^d$ DOFs.  In fact, this approach
 resembles block-structured AMR \cite{be-ol:1984, be-co:1989,
 % be-le:1991 (cited below)
 ColellaGravesKeenEtAl07,
@@ -188,7 +187,7 @@ parallelization & MPI & threads (\manyclaw variant) \\
 memory access & distributed & shared on each MPI rank \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
-dependencies & none & Python (optional) \\
+% dependencies & none & Python (optional) \\
 %\hline
 \end{tabular}
 \end{center}
@@ -278,13 +277,13 @@ inside \pforest and called by \forestclaw at well-defined synchronization
 points.  There is one such parallel data exchange per time step for a global
 value of $\dt$, or one exchange per discretization level per time step if $\dt$
 is chosen per-patch depending on its size (this is sometimes called
-subcycling).  When using subcycling, the load balance is attained per level as
+sub-cycling).  When using sub-cycling, the load balance is attained per level as
 it is done for example in Chombo \cite{ColellaGravesKeenEtAl07}
 or recent geometric adaptive multigrid schemes
 \cite{SundarBirosBursteddeEtAl12}.
 
 The threaded parallelism over the degrees of freedom of a patch can be handled
-by \forestclaw alone without the need to involve \pforest.
+by \forestclaw alone without the need to involve \pforest.  Additionally many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for the hyperbolic integration on a leaf-patch.  The design of leaf-patches allows for the smart management of data local to accelerator and the host.
 
 % Trees have different coordinate systems.
 % neighbor block: permutation of patch points due to non-aligned coordinate
@@ -304,7 +303,7 @@ by \forestclaw alone without the need to involve \pforest.
 % CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
 % that would mean a whole leaf.
 
-For hyperbolic problems, we integrate the solution on a a single uniform patch,
+For hyperbolic problems, we integrate the solution on a single uniform patch,
 containing $m^d$ cells, using the wave propagation algorithm described by R. J.
 LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
 clawpack}.  We assume a single degree of freedom per cell and reconstruct a
