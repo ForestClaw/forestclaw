@@ -254,12 +254,18 @@ adaptive refinement and coarsening, are called from \forestclaw and relayed to
 \section{Parallelization}
 
 \begin{figure}
-\centering
+\begin{center}
+\includegraphics[width=.4\columnwidth]{../figs_misc/forest_stacked}
+\hspace{.05\columnwidth}
 \includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
-\caption{The leaves in a forest of six octrees that serves as the computational
-domain for the cubed sphere.  An adhoc refinement pattern has been 2:1 balanced
-in terms of neighbor sizes and partitioned between five MPI processes (the
-three middle ones are shown from black to white).}
+\end{center}
+\caption{Left: Forest of two quadtrees, partitioned among three MPI processes.
+Each quadtree has its own coordinate orientation.  The situation in 3D
+(octrees) is analogous.  Right: The leaves in a forest of six quadtrees that
+serves as the computational domain for the cubed sphere.  An adhoc refinement
+pattern has been 2:1 balanced in terms of neighbor sizes and partitioned
+between five MPI processes (the three middle ones are shown from black to
+white).}
 \label{cubed3}
 \end{figure}
 
