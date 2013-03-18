@@ -115,11 +115,11 @@ The finite volume method has typically been implemented using a single degree
 of freedom per cell on
 % either
 structured
-\cite{ppm, clawpack, weno}
+\cite{ppm, clawpack}
 or unstructured meshes
 \cite{ddfv, ausm+, openfoam},
-where higher order methods have been constructed by widening the stencil
-\cite{needonehere}.
+where higher order methods have been constructed by widening the stencil, for instance in WENO methods
+\cite{Shu:2009bi}.
 % \comment{Are you looking for
 %   references to parallel AMR codes?  Or more general AMR codes based
 %   on the FVM?}  \todo{No, I was looking for unstructured FV
@@ -156,7 +156,7 @@ previous experience with scalable FE solvers for PDEs
 It has been designed to solve hyperbolic conservation laws
 % on a uniform compute patch
 and successfully used in the context of block-structured AMR
-\cite{be-le:1991, amrclaw}.
+\cite{be-le:1991, amrclaw, Berger:2011du}.
 
 In this paper we describe our design for the coupling of forest-of-octree AMR
 with \clawpack at the leaf level.  We comment on challenges that arise in
@@ -304,19 +304,21 @@ by \forestclaw alone without the need to involve \pforest.
 % CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
 % that would mean a whole leaf.
 
-For hyperbolic problems, we integrate the solution on a a single uniform
-patch, containing $m^d$ cells,
-using the wave propagation algorithm described by R. J. LeVeque and
-implemented in \clawpack \cite{le:2002, clawpack}.  We assume a
-single degree of freedom per cell and reconstruct a piecewise
-constant solution to obtain left and right states at cell
-edges.  At each edge, we solve Riemann problems to obtain left and
-right going waves propagating at speeds determined from the solution
-to the Riemann problem.  For scalar advection, the speed of each wave
-is simply the local advection speed at the cell interface.  For non-linear
-problems and systems, an approximate Riemann solver, such as a Roe solver
-\cite{roesolver}, is typically used.  Wave limiters are used to surpress
-spurious oscillations at sharp gradients in the flow.
+For hyperbolic problems, we integrate the solution on a a single uniform patch,
+containing $m^d$ cells, using the wave propagation algorithm described by R. J.
+LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
+clawpack}.  We assume a single degree of freedom per cell and reconstruct a
+piecewise constant solution to obtain left and right states at cell edges.  At
+each edge, we solve Riemann problems to obtain left and right going waves
+propagating at speeds determined from the solution to the Riemann problem.  For
+scalar advection, the speed of each wave is simply the local advection speed at
+the cell interface.  For non- linear problems and systems, an approximate
+Riemann solver, such as a Roe solver \cite{roesolver}, is typically used.  Since
+much of the physics of an application can be contained in the Riemann solver,
+\forestclaw adopts \clawpack's interface to Riemann solvers effectively allowing
+problems solved with \clawpack to be solvable in \forestclaw.  In order to
+achieve second order accuracy wave limiters are used to suppress spurious
+oscillations at sharp gradients in the flow.
 
 Data exchanges between neighboring patches are done via layers of
 ghost cells extending the dimensions along the edges of each patch.
@@ -332,7 +334,7 @@ from their interior edge cells to their fine grid neighbor's ghost
 cell values.  To avoid loss of conservation and the creation of
 spurious extrema, we use a standard conservative, limited
 interpolation scheme to interpolate values from the coarse grid to
-fine grid coarse cells \cite{amrclaw, chombo}.  When subcycling, time accurate
+fine grid coarse cells \cite{amrclaw, chombo}.  When sub-cycling, time accurate
 data between coarse grids is used to fill in ghost cells for fine grids.
 As mentioned in the previous section, this procedure can be extended
 transparently to distributed parallelism by defining an abstract exchange
