@@ -29,9 +29,10 @@
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
 \newcommand{\sR}{\mathbb{R}}
 \newcommand{\dt}{\mathrm{d}t}
-\newcommand{\clawpack}{{\sc Clawpack\xspace}}
+\newcommand{\clawpack}{{\sc Clawpack}\xspace}
 \newcommand{\forestclaw}{Forestclaw\xspace}
 \newcommand{\pforest}{\texttt{p4est}\xspace}
+\newcommand{\manyclaw}{Manyclaw\xspace}
 
 %%%%%%%%%%% End of definitions
 \begin{document}
@@ -103,38 +104,51 @@ that use adaptive mesh refinement.
 %unstructured meshes \comment{This sounds we are now going to talk
 %  about unstructured meshes.}.
 % CB: Good point, took it out.
-Of course, was realized early that it helps to aggregate degrees of
+Of course, it was realized early that it helps to aggregate degrees of
 freedom (DOF) at the element level, as has been done with high-order
-spectral element \cite{TufoFischer99}, finite volume (element?)
-\cite{???}, or discontinuous Galerkin
-\cite{BursteddeGhattasGurnisEtAl10} methods.  The finite volume method
-has typically been implemented using a single degree of freedom per
-cell on either structured \cite{ppm, clawpack, weno} or unstructured
-meshes \cite{ddfv, ausm+, openfoam, }.  \comment{Are you looking for
-  references to parallel AMR codes?  Or more general AMR codes based
-  on the FVM?}  \todo{No, I was looking for unstructured FV
-  references.  Would you have any, and can we add the block-AMR
-  references later?} \comment{But most finite volume methods
-  (structured or unstructured) only have a single degree of freedom
-  per mesh cell (``element''?)  Only recently have people increased
-  the order by extending the stencil (without increase the DOFs per
-  mesh cell).}
+spectral element \cite{TufoFischer99}
+%finite volume (element?)
+or discontinuous Galerkin \cite{HesthavenWarburton02}
+methods.  GPU implementations of the latter have been proposed recently
+\cite{KlocknerWarburtonBridgeEtAl09, BursteddeGhattasGurnisEtAl10}.
+The finite volume method has typically been implemented using a single degree
+of freedom per cell on
+% either
+structured
+\cite{ppm, clawpack, weno}
+or unstructured meshes
+\cite{ddfv, ausm+, openfoam},
+where higher order methods have been constructed by widening the stencil
+\cite{needonehere}.
+% \comment{Are you looking for
+%   references to parallel AMR codes?  Or more general AMR codes based
+%   on the FVM?}  \todo{No, I was looking for unstructured FV
+%   references.  Would you have any, and can we add the block-AMR
+%   references later?} \comment{But most finite volume methods
+%   (structured or unstructured) only have a single degree of freedom
+%   per mesh cell (``element''?)  Only recently have people increased
+%   the order by extending the stencil (without increase the DOFs per
+%   mesh cell).}
+% CB: Can you fix some of the above citations?
 
 % For example, SEs optimized for computational speed have originally been
 % implemented on unstructured conforming meshes \cite{TufoFischer99} and later
 % been extended to non-conforming adaptive meshes \cite{FischerKruseLoth02,
 % BursteddeGhattasGurnisEtAl10}.
 
-To enable hardware acceleration for parallel dynamic AMR, we
+To facilitate hardware acceleration for parallel dynamic AMR, we
 build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
 identifies each octree leaf with a mesh element.  In our work, we go
 beyond the traditional high-order element and define each element to
 be a dense compute patch with $m^d$ DOFs.  In fact, this approach
-resembles block-structured AMR \cite{be-ol:1984, be-co:1989, be-le:1991,
+resembles block-structured AMR \cite{be-ol:1984, be-co:1989,
+% be-le:1991 (cited below)
 ColellaGravesKeenEtAl07,
 BerzinsLuitjensMengEtAl10} except that the
-patches are not overlapping (except in ghost cell regions),
+patches are not overlapping,
+% (except in ghost cell regions),
+% CB: we comment on this later in Section 4.
 which enables us to capitalize on our
 previous experience with scalable FE solvers for PDEs
 \cite{BursteddeStadlerAlisicEtAl13}.  The \clawpack software
@@ -158,19 +172,19 @@ numerical solution of hyperbolic conservation laws
 % on uniformly gridded domains
 on the other.  Both are specialized codes with the following characteristics:
 % \comment{I am not sure about the Python dependency;  the latest version of
-% Clawpack relies on
+% \clawpack relies on
 %Python to generate an input file, but the code itself is F77 (or maybe some
 %F90). }
 % CB: I made it optional.
-% DAC : Good.
+% DAC: Good.
 \begin{center}
 \begin{tabular}{l|l|l}
-& \multicolumn{1}{c|}{\pforest} & \multicolumn{1}{c}{Clawpack} \\
+& \multicolumn{1}{c|}{\pforest} & \multicolumn{1}{c}{\clawpack} \\
 \hline
 subject & hexahedral nonconforming mesh &  hyperbolic PDE on $[0, 1]^d$ \\
-structure & forest of octrees & patch of $m^d$ DOFs \\
-atomic unit & octree leaf & one DOF \\
-parallelization & MPI & threads (Manyclaw variant) \\
+toplevel unit & forest of octrees & patch of $m^d$ FV cells \\
+atomic unit & octree leaf & one DOF in each cell \\
+parallelization & MPI & threads (\manyclaw variant) \\
 memory access & distributed & shared on each MPI rank \\
 data type & integers & floating point values \\
 language & C & Fortran 77 \\
@@ -178,31 +192,33 @@ dependencies & none & Python (optional) \\
 %\hline
 \end{tabular}
 \end{center}
-The proposed 1:1 correspondence between a leaf and a patch thus combines two
+Each leaf as the atomic unit of \pforest houses a toplevel unit of \clawpack.
+The term cell is used to identify a single DOF within a \clawpack patch.  The
+proposed 1:1 correspondence between a leaf and a patch thus combines two
 previously disjoint models in a modular way:
 \begin{enumerate}
-\item We permit the reuse of existing, verified and performant codes.
+\item We permit the reuse of existing, verified, and performant codes.
 % if the integration is done well
-\item We preserve the separation of the mesh on one hand from the
+\item We preserve the separation between the mesh on one hand and the
 discretization and solvers on the other.
 \item The AMR metadata (\pforest:
 under 1k bytes per octree, 8 bytes per MPI rank,
-24 bytes per leaf; \forestclaw: $84 + 28d$ bytes per patch)
+24 bytes per leaf. \forestclaw: $84 + 28d$ bytes per patch)
 % \comment{?? : in 3d: 5 ints,  9 floats; in 2d: 4 ints, 6 floats}
-% CB: thanks, I hav added it.
+% CB: thanks, I have added it.
 is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
 \item The resulting parallel programming model is a hybrid (often referred
-to as MPI+X).  Only rank-local leaves/patches are stored and computed.
+to as MPI+X).  Only rank-local leaves/patches are stored and computed on.
 \end{enumerate}
 
 % yields periodicity as a special case
 A particular feature of \forestclaw is that the generic handling of multiblock
-geometries is inherited from \pforest, identifying each octree as a block, and
-each leaf as a patch.  Each block is understood as a reference unit cube with
-its own geometric mapping.  The connectivity of the blocks is static and can be
-created by external hexahedral mesh generators, eliminating the need to encode
-it by hand.
+geometries is inherited from \pforest, identifying each octree as a block.
+% and each leaf as a patch.
+Each block is understood as a reference unit cube with
+its own geometric mapping.  The connectivity of the blocks can be created by
+external hexahedral mesh generators, eliminating the need to encode it by hand.
 
 A main challenge is presented by the fact that the patch neighborhood
 is only known to \pforest.  This patch connectivity information needs
@@ -212,13 +228,13 @@ cells surrounding each patch.  To this end, we define an interface
 that allows read-only access to the sequence of blocks,
 the list of patches for each, and a lookup of neighbor patches (and
 their relative orientation which is nontrivial between blocks).
-Just as \pforest, \forestclaw stores only the patches local to each
-MPI rank.  The exchange of ghost data and parallel partitioning is provided
-transparently by \pforest.  Mesh modification directives, such as
-local refinement and coarsening, are called from \forestclaw and
-relayed to \pforest.
+Suitably informed by \pforest, \forestclaw stores only the patches local to
+each MPI rank.  The exchange of ghost data and parallel repartitioning is
+provided transparently by \pforest.  Mesh modification directives, such as
+adaptive refinement and coarsening, are called from \forestclaw and relayed to
+\pforest.
 
-% Forestclaw would support swapping out p4est or Clawpack
+% Forestclaw would support swapping out p4est or \clawpack
 
 
 % AMR Metadata $\ll$ numerical data
@@ -239,7 +255,7 @@ relayed to \pforest.
 The MPI layer is addressed from within \pforest and not exposed to the
 \forestclaw code.  The order of leaves is maintained in \pforest according to a
 space filling curve.  Each MPI rank has a local view on its own partition,
-augmented where necessary with information about one layer of ghost patches.
+augmented where necessary with information about one layer of ghost leaves.
 
 \forestclaw uses iterators over all rank-local leafs, optionally restricted to
 a given level.  Random access is possible and used when executing $O(1)$ time
@@ -263,11 +279,12 @@ points.  There is one such parallel data exchange per time step for a global
 value of $\dt$, or one exchange per discretization level per time step if $\dt$
 is chosen per-patch depending on its size (this is sometimes called
 subcycling).  When using subcycling, the load balance is attained per level as
-it is done in structured AMR or recent geometric adaptive multigrid schemes
+it is done for example in Chombo \cite{ColellaGravesKeenEtAl07}
+or recent geometric adaptive multigrid schemes
 \cite{SundarBirosBursteddeEtAl12}.
 
-The threaded parallelism over the degrees of freedom of a patch is handled by
-\forestclaw alone without the need to involve \pforest.
+The threaded parallelism over the degrees of freedom of a patch can be handled
+by \forestclaw alone without the need to involve \pforest.
 
 % Trees have different coordinate systems.
 % neighbor block: permutation of patch points due to non-aligned coordinate
@@ -284,24 +301,29 @@ The threaded parallelism over the degrees of freedom of a patch is handled by
 
 \section{Patch-based numerics at the leaf level}
 
-For hyperbolic problems, we integrate the solution on a a single patch
+% CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
+% that would mean a whole leaf.
+
+For hyperbolic problems, we integrate the solution on a a single uniform
+patch, containing $m^d$ cells,
 using the wave propagation algorithm described by R. J. LeVeque and
-implemented in {\sc Clawpack} \cite{le:2002, clawpack}.  We assume a
-single degree of freedom per mesh cell and reconstruct a piecewise
-constant solution to obtain left and right states at a mesh cell
+implemented in \clawpack \cite{le:2002, clawpack}.  We assume a
+single degree of freedom per cell and reconstruct a piecewise
+constant solution to obtain left and right states at cell
 edges.  At each edge, we solve Riemann problems to obtain left and
 right going waves propagating at speeds determined from the solution
 to the Riemann problem.  For scalar advection, the speed of each wave
-is simply the local advection speed at the cell interface. For
-non-linear problems and systems, an approximate Riemann solver, such
-as a Roe solver, is typically used. Wave limiters are used to surpress
+is simply the local advection speed at the cell interface.  For non-linear
+problems and systems, an approximate Riemann solver, such as a Roe solver
+\cite{roesolver}, is typically used.  Wave limiters are used to surpress
 spurious oscillations at sharp gradients in the flow.
 
 Data exchanges between neighboring patches are done via layers of
 ghost cells extending the dimensions along the edges of each patch.
 The interior edge values of a given patch overlap the ghost cell
 region of a neighboring patch.  For the second order wave propagation
-algorithm, two layers of ghost cells are sufficient.  Neighboring
+algorithm, two layers of ghost cells are sufficient.  This implies that
+one layer of ghost patches is sufficient for $m \ge 4$.  Neighboring
 patches at the same level of refinement simply copy their interior
 edge values into a neighbors' ghost cells.  Neighboring fine grid
 patches average their interior edge data to a coarser neighbor's ghost
@@ -312,10 +334,15 @@ spurious extrema, we use a standard conservative, limited
 interpolation scheme to interpolate values from the coarse grid to
 fine grid coarse cells \cite{amrclaw, chombo}.  When subcycling, time accurate
 data between coarse grids is used to fill in ghost cells for fine grids.
+As mentioned in the previous section, this procedure can be extended
+transparently to distributed parallelism by defining an abstract exchange
+routine for ghost patch data.
 
-Grid refinement and de-refinement also requires interpolation from coarse grids
-to newly created fine grids, and the averaging of fine grid data to a newly created
-underlying coarse grid.
+Grid refinement and coarsening requires interpolation from coarse grids
+to newly created fine grids, and the averaging of fine grid data to a newly
+created underlying coarse grid.  This operation is rank-local, analogous to the
+general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
+4]{BursteddeGhattasStadlerEtAl08}.
 
 \section{Numerical results}
 
@@ -328,8 +355,9 @@ To come...
 \section*{Acknowledgements}
 
 The authors acknowledge valuable discussion with Randy LeVeque, Marsha Berger,
-and Hans-Petter Langtangen.  We also acknowledge David Ketchison and the KAUST sponsored HPC$^3$
-numerics workshop at which the initial phases of this project were first discussed.
+and Hans-Petter Langtangen.  We also acknowledge David Ketcheson and the KAUST
+sponsored HPC$^3$ numerics workshop at which the initial phases of this project
+were first discussed.
 The leaf/patch paradigm was independently presented
 by B.\ as part of a talk at the SCI Institute, Utah, in July 2011.
 
