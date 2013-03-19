@@ -25,6 +25,7 @@
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{xspace}
+\usepackage{graphicx}
 
 \newcommand{\comment}[1]{\textcolor{green}{[DAC: #1]}\xspace}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
@@ -34,6 +35,12 @@
 \newcommand{\forestclaw}{Forestclaw\xspace}
 \newcommand{\pforest}{\texttt{p4est}\xspace}
 \newcommand{\manyclaw}{Manyclaw\xspace}
+
+
+% \newcommand{\plotbox}[1]{\fbox{#1}}
+\newcommand{\plotbox}[1]{#1}
+
+\newcommand{\Fig}[1]{Figure \ref{fig:#1}}
 
 %%%%%%%%%%% End of definitions
 \begin{document}
@@ -366,12 +373,68 @@ general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
 4]{BursteddeGhattasStadlerEtAl08}.
 
 \section{Numerical results}
+Below, we provide two examples that demonstrate the \forestclaw code.
+The numerical results to date have been designed to verify that
+interface layer between \pforest and \forestclaw is sufficiently
+flexible and robust.  Of particular importance was ensuring that all
+ghost cell ghost cell transfers (including averaging and
+interpolation) have been implemented correctly.
+The basic \clawpack algorithm and corresponding code have been
+thoroughly tested, and so needed no further verification here.
+
+In both sets of numerical results, we solve a scalar advection
+equation, given by
+\begin{equation*}
+q_t + ({\bf u}\cdot \nabla) q = 0
+\end{equation*}
+\noindent
+where the velocity field ${\bf u} = (u(\xi,\eta,t), v(\xi,\eta,t)$ is
+a prescribed function of computational coordinates.  The relevant
+numerical parameters that are set in each case include the size of the
+patch on each leaf ($m=8$ in each case), and the minimum and maximum
+levels, which in turn fix minimum and maximum effective grid
+resolutions.
+
+In both examples, a patch is tagged for refinement if the
+difference between its maximum and minimum values exceed a prescribed
+threshold.  A family of patches (4 sibling patches in 2d) is coarsened
+if a coarsened parent patch did not meet the criteria for refinement.
+
+\noindent
+{\bf Example 1 : } In this example, an initial concentration field $q$
+is set to 0 in the left half of a computational square and to 1 in the
+right half.  A time dependent flow field is prescribed that distorts
+the interface between the 0 and 1 concentration values.  The minimum
+and maximum levels of refinement were set to 3 and 6, respectively.
+This results in a minimum resolution of $64 \times 64$ and a maximum
+resolution of $512 \times 512$. \Fig{results2d} shows the results
+at an intermediate time step.
+
+% \begin{figure}
+% \begin{center}
+% \plotbox{\includegraphics[height=0.485\textwidth,clip=true,trim=3cm 0cm 2cm 0cm]{quadtree.png}} \hfil
+% \plotbox{\includegraphics[height=0.485\textwidth,clip=true,trim=6cm 0cm 7cm 0cm]{sphere_plot167.png}}
+% \end{center}
+% \caption{Results for scalar advection using \forestclaw.}
+% \label{fig:results}
+% \end{figure}
+
+\noindent {\bf Example 2 : } This example, we demonstrate the
+multiblock functionality of \forestclaw by considering flow on a
+sphere.  The sphere mapping we use consists of two quadtrees, each
+defined in the computational space $[-1,1] \times [-1,1]$
+\cite{ca-he-le:2008, be-ca-he-le:2009}.  Each quadtree is mapped to cover one hemisphere
+of the sphere.  The initial conditions were set to 0 in one half of
+the sphere, and 1 in the other half, where the halves are not
+necessarily aligned with the equator of the mapping.  The flow field
+${u}$ simulates rigid body rotation.  We show the results at an intermediate time in
+\Fig{results2d}.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=.4\columnwidth]{quadtree}
-\hspace{.05\columnwidth}
-\includegraphics[width=.4\columnwidth]{sphere_plot167}
+\plotbox{\includegraphics[width=.4\columnwidth]{quadtree}} \hfil
+% \hspace{.05\columnwidth}
+\plotbox{\includegraphics[width=.4\columnwidth]{sphere_plot167}}
 \end{center}
 \caption{Numerical results for solving the advection equation.  Left:  Unit
 square (single quadtree) with a twisting velocity field.  Right: Spherical ball
@@ -380,7 +443,7 @@ both cases the concentration is color-coded with a sharp gradient shown in red.
 The adaptive mesh refinement follows the location of the gradient (the patches
 are not shown where they become too fine for display).  Here we use $m = 8$
 cells per \clawpack patch.}
-\label{results2d}
+\label{fig:results2d}
 \end{figure}
 
 The results in this section are preliminary and will be extended in the final
@@ -389,7 +452,7 @@ unit square and a sphere composed of two mapped squares.  On both we solve the
 advection equation with a given velocity field.  We advect a concentration
 field with a sharp gradient which we track dynamically with adaptive mesh
 refinement.  We observe that the refinement follows the front and allows for an
-accurate representation of its location over time; see Figure~\ref{results2d}.
+accurate representation of its location over time; see \Fig{results2d}.
 
 \pforest is parallelized with MPI and well tested on large supercomputers, both
 in 2D and 3D.  Parallelization of \forestclaw is not completed yet but
@@ -397,12 +460,15 @@ envisioned for the final version of the paper.
 
 \section*{Acknowledgements}
 
-The authors acknowledge valuable discussion with Randy LeVeque, Marsha Berger,
-and Hans-Petter Langtangen.  We also acknowledge David Ketcheson and the KAUST
-sponsored HPC$^3$ numerics workshop at which the initial phases of this project
-were first discussed.
-The leaf/patch paradigm was independently presented
-by B.\ as part of a talk at the SCI Institute, Utah, in July 2011.
+The authors acknowledge valuable discussion with Randy LeVeque, Marsha
+Berger, and Hans-Petter Langtangen.  We also acknowledge David
+Ketcheson and the KAUST sponsored HPC$^3$ numerics workshop at which
+the initial phases of this project were first discussed.  The second
+author would like to also acknowledge the Isaac Newton Institute
+(Cambridge, UK), where much of the preliminary development work for
+\forestclaw was done. The leaf/patch paradigm was independently
+presented by B.\ as part of a talk at the SCI Institute, Utah, in July
+2011.
 
 
 %%%%%%%%%%% The bibliography starts:
