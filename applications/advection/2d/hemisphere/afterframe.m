@@ -8,7 +8,7 @@ yrbcolormap;
 
 cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
-% caxis([0 1]);
+caxis([0 1]);
 
 showgridlines(1:4)
 setpatchborderprops(1:6,'linewidth',2);
@@ -21,6 +21,9 @@ hidepatchborders(7);
 setviews;
 view(vtop);
 % view(3);
+
+s = sum(sum(isnan(q)));
+fprintf('Number of nans : %d\n',s);
 
 NoQuery = 0;
 MaxFrames = 192;
