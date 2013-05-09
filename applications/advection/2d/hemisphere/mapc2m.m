@@ -10,13 +10,18 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 %    http://www.amath.washington.edu/~rjl/pubs/circles
 
 
+[xp,yp,zp] = mapc2m_pillow(xc1,yc1);
+
+return;
+
+
 maptype = 'sphere';
 
 xc = 2*xc1 - 1;
 yc = 2*yc1 - 1;
 
 xp = xc;
-yp = xc + yc;
+yp = yc;
 zp = 0*xp;
 
 if (strcmp(maptype,'cart') == 1)
