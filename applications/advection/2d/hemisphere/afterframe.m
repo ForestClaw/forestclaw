@@ -10,9 +10,9 @@ cv = 0.1:0.1:0.9;
 % drawcontourlines(cv);
 caxis([0 1]);
 
-showgridlines(1:4)
-setpatchborderprops(1:6,'linewidth',2);
-hidepatchborders(7);
+showgridlines(1:3)
+setpatchborderprops(1:7,'linewidth',2);
+% hidepatchborders(7);
 
 % hidepatchborders;
 % hidegridlines;
@@ -20,6 +20,7 @@ hidepatchborders(7);
 % view([-121.5 30]);
 setviews;
 view(vtop);
+view([22.5 24]);
 % view(3);
 
 s = sum(sum(isnan(q)));
