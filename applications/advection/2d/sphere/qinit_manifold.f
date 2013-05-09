@@ -26,7 +26,7 @@
             y = yp(i,j)
             z = zp(i,j)
 
-            if (x .le. 0) then
+            if (y .le. 0) then
                q(i,j,1) = 1.d0
             else
                q(i,j,1) = 0.d0

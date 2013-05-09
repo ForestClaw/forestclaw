@@ -12,13 +12,13 @@ caxis([0 1]);
 
 showgridlines(1:3)
 setpatchborderprops(1:6,'linewidth',2);
-hidepatchborders(6);
+% hidepatchborders(6);
+showpatchborders();
 
 
 setviews;
 view(3);
-% view([47.5 6]);
-% view(vtop);
+% view(vback);
 
 NoQuery = 0;
 MaxFrames = 192;
