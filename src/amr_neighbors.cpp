@@ -38,7 +38,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int neighbor_patch_idx[],
                         int **ref_flag_ptr)
 {
-    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -115,33 +114,105 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
-                         int **ref_flag_ptr)
+                         int **ref_flag_ptr,
+                         fclaw_bool is_block_corner)
 {
 
     /* Code is now back in state it was before I added stuff */
     fclaw2d_patch_relation_t neighbor_type;
-    int rproc;
-    int has_corner_neighbor =
-      fclaw2d_patch_corner_neighbors (domain, this_block_idx, this_patch_idx,
-        icorner, &rproc, corner_block_idx, corner_patch_idx, &neighbor_type);
+    fclaw_bool has_corner_neighbor;
 
+    // hack for now!
+    fclaw_bool is_sphere_grid = fclaw_false;
+    if (is_sphere_grid)
+    {
+        if (false)
+        {
+            has_corner_neighbor = fclaw_true;  // By definition
+            int rproc[p4est_refineFactor];
+            int rpatchno[p4est_refineFactor];
+            int rfaceno;
+            // int ftransform[9];
+
+            int iface = icorner % 2;
+            neighbor_type =
+                fclaw2d_patch_face_neighbors(domain,
+                                             this_block_idx,
+                                             this_patch_idx,
+                                             iface,
+                                             rproc,
+                                             corner_block_idx,
+                                             rpatchno,
+                                             &rfaceno);
+
+            if (this_block_idx == *corner_block_idx)
+            {
+                printf("Something went wrong;  these blocks should be different\n");
+                exit(1);
+            }
+            else if (rfaceno != iface)
+            {
+                printf("Something went wrong; face not correct\n");
+                exit(1);
+            }
+            else
+            {
+                if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
+                    neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+                {
+                    // This patch shares face 'iface' with a single patch.
+                    *corner_patch_idx = rpatchno[0];
+                }
+                else
+                {
+                    // On bottom corners, we want to take the first patch in the list;
+                    // On top corners, we take the last patch in the list.
+                    int iface = (icorner/2)*(p4est_refineFactor - 1);
+                    *corner_patch_idx = rpatchno[iface];
+                }
+            }
+        }
+        else
+        {
+             // Sphere grid, but we are not at a block corner
+              int rproc;
+              has_corner_neighbor =
+                  fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
+                                                 icorner, &rproc, corner_block_idx,
+                                                 corner_patch_idx, &neighbor_type);
+         }
+    }
+    else
+    {
+        // Not a sphere grid or not a corner block (or neither)
+        // neighbor_type is one of :
+        // FCLAW2D_PATCH_BOUNDARY,
+        // FCLAW2D_PATCH_HALFSIZE,
+        // FCLAW2D_PATCH_SAMESIZE,
+        // FCLAW2D_PATCH_DOUBLESIZE
+        int rproc;
+        has_corner_neighbor =
+            fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
+                                           icorner, &rproc, corner_block_idx,
+                                           corner_patch_idx, &neighbor_type);
+
+
+    }
     if (!has_corner_neighbor)
     {
-        // printf("get_corner_neighbors : Patch %d at corner %d does not have any "
-        //        "corner neighbors\n",this_patch_idx,icorner);
         *ref_flag_ptr = NULL;
     }
     else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
     {
-      **ref_flag_ptr = 1;
+        **ref_flag_ptr = 1;
     }
     else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
     {
-      **ref_flag_ptr = 0;
+        **ref_flag_ptr = 0;
     }
     else
     {
-      **ref_flag_ptr = -1;
+        **ref_flag_ptr = -1;
     }
 }
 
