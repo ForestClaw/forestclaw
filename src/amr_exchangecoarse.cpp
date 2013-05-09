@@ -99,6 +99,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         fclaw_bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
 
+        // This corner may still be on a block boundary.
         fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
@@ -129,7 +130,14 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                &ref_flag_ptr);
+                                &ref_flag_ptr,
+                                is_block_corner);
+
+            // Possible returns from ref_flag :
+            // FCLAW2D_PATCH_BOUNDARY : ref_flag_ptr = NULL
+            // FCLAW2D_PATCH_HALFSIZE : ref_flag = 1 (one level finer)
+            // FCLAW2D_PATCH_SAMESIZE : ref_flag = 0 (same level)
+            // FCLAW2D_PATCH_DOUBLESIZE : ref_flag = -1 (one level coarser)
 
             if (ref_flag_ptr == NULL)
             {
@@ -137,6 +145,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == 1)
             {
+                // Corner neighbor at a finer level.
                 fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
@@ -224,7 +233,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                &ref_flag_ptr);
+                                &ref_flag_ptr,
+                                is_block_corner);
 
             if (ref_flag_ptr == NULL)
             {

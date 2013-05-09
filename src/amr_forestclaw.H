@@ -90,7 +90,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
-                         int **ref_flag_ptr);
+                         int **ref_flag_ptr,
+                         fclaw_bool is_block_corner);
 
 void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_block_idx,
