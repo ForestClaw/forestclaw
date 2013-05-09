@@ -4,6 +4,8 @@ function [xp,yp,zp] = mapc2m_pillow(xc1,yc1)
 % determine sign of z-coordinate.
 %
 
+comp_grid = true;
+
 % First, get into [-1 1] from [0,1]
 xc = 2*xc1 - 1;
 yc = 2*yc1 - 1;
@@ -13,13 +15,16 @@ r1 = 1;
 xp = xc;
 yp = yc;
 blockno = getblocknumber();
+   
 
 if (blockno == 0)
   zp = 0*xp + 1;
 else
   zp = 0*xp - 1;
 end
-% return;
+if (comp_grid)
+    return;
+end
 
 % This is probably not necessary since we don't expect to have any ghost cells.
 d = max(xc-1,0) + max(-1-xc,0);
@@ -37,11 +42,9 @@ mghost = (abs(xc) > 1) | (abs(yc) > 1);
 
 zp(mghost) = -zp(mghost);          % negate z in lower hemisphere
 
-blockno = getblocknumber();
-
 if (blockno == 1)
-  zp = -zp;
-end;
+    zp = -zp;
+end
 
 % [xp,yp,zp] = rotate_map(xp,yp,zp);
 
