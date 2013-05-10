@@ -117,6 +117,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_patch_idx,
                          int **ref_flag_ptr)
 {
+
+    /* Code is now back in state it was before I added stuff */
     fclaw2d_patch_relation_t neighbor_type;
     int rproc;
     int has_corner_neighbor =
