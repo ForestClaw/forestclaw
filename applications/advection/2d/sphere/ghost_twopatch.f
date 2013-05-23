@@ -249,16 +249,16 @@ c     # average ghost cells from 'igrid' neighbor 'qfine' (igrid = 0,1)
 c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
 c     # Assume this is mapped.
       subroutine mb_average_face_ghost(mx,my,mbc,meqn,qcoarse,
-     &      qfine,auxcoarse, auxfine, maux,
+     &      qfine,auxcoarse, auxfine,
      &      idir,iface_coarse,p4est_refineFactor,refratio,igrid)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
-      integer p4est_refineFactor, maux
+      integer p4est_refineFactor
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1)
+      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,1)
 
       double precision sum, kf, kc, qf
 
@@ -457,14 +457,14 @@ c                       # qfine is at top edge of coarse grid
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine mb_average_corner_ghost(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,auxcoarse, auxfine, maux,
+     &      refratio,qcoarse,qfine,auxcoarse, auxfine,
      &      icorner, is_block_bdry)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,icorner, maux
+      integer mx,my,mbc,meqn,refratio,icorner
       integer is_block_bdry(0:3)
-      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1)
+      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,1)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
@@ -473,23 +473,36 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       integer ifine, jfine
       double precision kf, qf, kc
 
-c       write(6,*) 'WARNING : (mb_average_corner_ghost) : setting to 0'
-c
-c       do mq = 1,meqn
-c          do ibc = 1,mbc
-c             do jbc = 1,mbc
-c                qcoarse(1-ibc,1-jbc,mq) = 0
-c                qcoarse(mx+ibc,my+jbc,mq) = 0
-c             enddo
-c          enddo
-c       enddo
-c
-c       return
+      integer get_block_idx, get_patch_idx
+      logical debug_is_on
 
+      include "debug.i"
+
+      block_idx = get_block_idx()
+      patch_idx = get_patch_idx()
+      if (block_idx .eq. 0 .and. patch_idx .eq. 11) then
+         call set_debug_on()
+      endif
+
+      if (debug_is_on()) then
+         write(6,'(A,I2)') 'Before corner averaging (icorner = ',
+     &         icorner,')'
+         do i = 1-mbc,2
+            do j = 1-mbc,2
+               write(6,100) i,j,qcoarse(i,j,1)
+            enddo
+            write(6,*) ' '
+         enddo
+         write(6,*) ' '
+      endif
+  100 format(2I5,F24.16)
 
       r2 = refratio*refratio
       do mq = 1,meqn
-         if (icorner == 0) then
+         if (icorner .eq. 0) then
+            if (debug_is_on()) then
+               write(6,*) 'branch : icorner == 0'
+            endif
             do ibc = 1,mbc
                do jbc = 1,mbc
 c                 # Average fine grid corners onto coarse grid ghost corners
@@ -585,17 +598,28 @@ c                  kc = r2*auxcoarse(mx+ibc,my+jbc,1)
          endif
       enddo
 
+      if (debug_is_on()) then
+         write(6,*) 'After corner averaging'
+         do i = 1-mbc,2
+            do j = 1-mbc,2
+               write(6,100) i,j,qcoarse(i,j,1)
+            enddo
+            write(6,*) ' '
+         enddo
+         write(6,*) ' '
+      endif
+
       end
 
 c     # Exchange ghost cells at block corner
       subroutine mb_average_block_corner_ghost(mx,my,mbc,meqn,
-     &      refratio, qcoarse, qfine, auxcoarse, auxfine, maux,
+     &      refratio, qcoarse, qfine, auxcoarse, auxfine,
      &      icorner,iblock)
       implicit none
 
-      integer mx, my, mbc, meqn, icorner, iblock, refratio,maux
-      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      integer mx, my, mbc, meqn, icorner, iblock, refratio
+      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1)
+      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,1)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -781,7 +805,7 @@ c     # Exchange ghost cells at block corner
       subroutine mb_interpolate_block_corner_ghost(mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, icorner_coarse, iblock)
       implicit none
-      integer mx, my, mbc, meqn, icorner_coarse, iblock, refratio,maux
+      integer mx, my, mbc, meqn, icorner_coarse, iblock, refratio
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
