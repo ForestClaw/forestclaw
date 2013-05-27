@@ -9,16 +9,19 @@ FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
+FORTRAN_INC = $(FORTRAN_SRC)
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 solver_objs :=
 solver_includes :=
+debug_files :=
 
 include Makefile.waveprop.inc
 
 solver_objs += $(waveprop_objs)
 solver_includes += $(waveprop_includes)
+debug_files += $(FORTRAN_SRC)/debug.o
 
 # make sure that the first make target is the executable
 default: $(TARGET)
@@ -32,8 +35,7 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/src -I$(FORESTCLAW)/AMRClaw/src -I. ${solver_includes} -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< ${solver_includes} -o $@
-
+	$(FC) -Wall $(FFLAGS) -I$(FORTRAN_INC) -c $< ${solver_includes} -o $@
 
 .PHONY: clean realclean default $(TARGET)
 
@@ -74,7 +76,7 @@ ifeq ($(GEO),cart)
       $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_cart.o
 endif
 
-OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs) $(GeoFiles)
+OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs) $(GeoFiles) $(debug_files)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \

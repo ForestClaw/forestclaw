@@ -457,52 +457,25 @@ c                       # qfine is at top edge of coarse grid
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine mb_average_corner_ghost(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,auxcoarse, auxfine,
+     &      refratio,qcoarse,qfine,areacoarse, areafine,
      &      icorner, is_block_bdry)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,icorner
       integer is_block_bdry(0:3)
-      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1)
-      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,1)
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision     qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
       integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
       integer ifine, jfine
       double precision kf, qf, kc
 
-      integer get_block_idx, get_patch_idx
-      logical debug_is_on
-
-      include "debug.i"
-
-      block_idx = get_block_idx()
-      patch_idx = get_patch_idx()
-      if (block_idx .eq. 0 .and. patch_idx .eq. 11) then
-         call set_debug_on()
-      endif
-
-      if (debug_is_on()) then
-         write(6,'(A,I2)') 'Before corner averaging (icorner = ',
-     &         icorner,')'
-         do i = 1-mbc,2
-            do j = 1-mbc,2
-               write(6,100) i,j,qcoarse(i,j,1)
-            enddo
-            write(6,*) ' '
-         enddo
-         write(6,*) ' '
-      endif
-  100 format(2I5,F24.16)
-
       r2 = refratio*refratio
       do mq = 1,meqn
          if (icorner .eq. 0) then
-            if (debug_is_on()) then
-               write(6,*) 'branch : icorner == 0'
-            endif
             do ibc = 1,mbc
                do jbc = 1,mbc
 c                 # Average fine grid corners onto coarse grid ghost corners
@@ -512,16 +485,16 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(0) .eq. 1) then
-                           kf = auxfine(ifine,my+1-jfine,1)
+                           kf = areafine(ifine,my+1-jfine)
                            qf =   qfine(ifine,my+1-jfine,mq)
                         elseif (is_block_bdry(2) .eq. 1) then
-                           kf = auxfine(mx+1-ifine,jfine,1)
+                           kf = areafine(mx+1-ifine,jfine)
                            qf =   qfine(mx+1-ifine,jfine,mq)
                         endif
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*auxcoarse(1-ibc,1-jbc,1)
+                  kc = r2*areacoarse(1-ibc,1-jbc)
                   qcoarse(1-ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
@@ -535,16 +508,16 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(1) .eq. 1) then
-                           kf = auxfine(mx+1-ifine,my+1-jfine,1)
+                           kf = areafine(mx+1-ifine,my+1-jfine)
                            qf =   qfine(mx+1-ifine,my+1-jfine,mq)
                         elseif (is_block_bdry(2) .eq. 1) then
-                           kf = auxfine(ifine,jfine,1)
+                           kf = areafine(ifine,jfine)
                            qf =   qfine(ifine,jfine,mq)
                         endif
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*auxcoarse(mx+ibc,1-jbc,1)
+                  kc = r2*areacoarse(mx+ibc,1-jbc)
                   qcoarse(mx+ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
@@ -558,16 +531,16 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(0) .eq. 1) then
-                           kf = auxfine(ifine,jfine,1)
+                           kf = areafine(ifine,jfine)
                            qf =   qfine(ifine,jfine,mq)
                         elseif (is_block_bdry(3) .eq. 1) then
-                           kf = auxfine(mx+1-ifine,my+1-jfine,1)
+                           kf = areafine(mx+1-ifine,my+1-jfine)
                            qf =   qfine(mx+1-ifine,my+1-jfine,mq)
                         endif
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*auxcoarse(1-ibc,my+jbc,1)
+                  kc = r2*areacoarse(1-ibc,my+jbc)
                   qcoarse(1-ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
@@ -581,33 +554,22 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(1) .eq. 1) then
-                           kf = auxfine(mx+1-ifine,jfine,1)
+                           kf = areafine(mx+1-ifine,jfine)
                            qf =   qfine(mx+1-ifine,jfine,mq)
                         elseif (is_block_bdry(3) .eq. 1) then
-                           kf = auxfine(ifine,my+1-jfine,1)
+                           kf = areafine(ifine,my+1-jfine)
                            qf =   qfine(ifine,my+1-jfine,mq)
                         endif
                         sum = sum + kf*qf
                      enddo
                   enddo
-c                  kc = r2*auxcoarse(mx+ibc,my+jbc,1)
-                  kc = 1
+                  kc = r2*areacoarse(mx+ibc,my+jbc)
                   qcoarse(mx+ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
          endif
       enddo
 
-      if (debug_is_on()) then
-         write(6,*) 'After corner averaging'
-         do i = 1-mbc,2
-            do j = 1-mbc,2
-               write(6,100) i,j,qcoarse(i,j,1)
-            enddo
-            write(6,*) ' '
-         enddo
-         write(6,*) ' '
-      endif
 
       end
 
@@ -625,21 +587,6 @@ c     # Exchange ghost cells at block corner
 
       integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
       double precision sum,qf,kf,kc
-
-c       write(6,*) 'WARNING : (mb_average_block_corner_ghost) : ',
-c      &      ' setting to 0'
-c
-c       do mq = 1,meqn
-c          do ibc = 1,mbc
-c             do jbc = 1,mbc
-c                qcoarse(1-ibc,1-jbc,mq) = 0
-c                qcoarse(mx+ibc,my+jbc,mq) = 0
-c             enddo
-c          enddo
-c       enddo
-c
-c       return
-
 
       r2 = refratio**2
       do mq = 1,meqn

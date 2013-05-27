@@ -111,9 +111,14 @@ double advance_level(fclaw2d_domain_t *domain,
                         " without time interpolation" << endl;
                 }
                 double alpha = 0;  // No time interpolation
+
+                /* Boundary conditions on finer grid should be set so that they can
+                   be used in setting corners on coarser grids, if needed. */
+                set_phys_bc(domain,a_level,t_level);
+
                 exchange_with_coarse(domain,a_level,t_level,alpha);
 
-                set_phys_bc(domain,a_level,t_level);
+                // set_phys_bc(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
 

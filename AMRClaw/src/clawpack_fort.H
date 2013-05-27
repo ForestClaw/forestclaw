@@ -224,6 +224,18 @@ void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
                   const double& dx,
                   const double& dy, double q[], double& sum);
 
+int get_debug_flag_();
+void set_debug_flag_(const int& iflag);
+void set_debug_on_();
+void set_debug_off_();
+fclaw_bool debug_is_on_();
+fclaw_bool debug_is_off_();
+
+void set_debug_info_(const int& block_idx, const int& patch_idx, const int& level);
+void reset_debug_info_();
+int get_block_idx_();
+int get_patch_idx_();
+int get_level_();
 
 #ifdef __cplusplus
 #if 0

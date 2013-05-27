@@ -124,63 +124,51 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     // hack for now!
     fclaw_bool is_sphere_grid = fclaw_false;
-    if (is_sphere_grid)
+    if (is_sphere_grid && is_block_corner)
     {
-        if (false)
+        has_corner_neighbor = fclaw_true;  // By definition
+        int rproc[p4est_refineFactor];
+        int rpatchno[p4est_refineFactor];
+        int rfaceno;
+        // int ftransform[9];
+
+        int iface = icorner % 2;
+        neighbor_type =
+            fclaw2d_patch_face_neighbors(domain,
+                                         this_block_idx,
+                                         this_patch_idx,
+                                         iface,
+                                         rproc,
+                                         corner_block_idx,
+                                         rpatchno,
+                                         &rfaceno);
+
+        if (this_block_idx == *corner_block_idx)
         {
-            has_corner_neighbor = fclaw_true;  // By definition
-            int rproc[p4est_refineFactor];
-            int rpatchno[p4est_refineFactor];
-            int rfaceno;
-            // int ftransform[9];
-
-            int iface = icorner % 2;
-            neighbor_type =
-                fclaw2d_patch_face_neighbors(domain,
-                                             this_block_idx,
-                                             this_patch_idx,
-                                             iface,
-                                             rproc,
-                                             corner_block_idx,
-                                             rpatchno,
-                                             &rfaceno);
-
-            if (this_block_idx == *corner_block_idx)
-            {
-                printf("Something went wrong;  these blocks should be different\n");
-                exit(1);
-            }
-            else if (rfaceno != iface)
-            {
-                printf("Something went wrong; face not correct\n");
-                exit(1);
-            }
-            else
-            {
-                if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
-                    neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
-                {
-                    // This patch shares face 'iface' with a single patch.
-                    *corner_patch_idx = rpatchno[0];
-                }
-                else
-                {
-                    // On bottom corners, we want to take the first patch in the list;
-                    // On top corners, we take the last patch in the list.
-                    int iface = (icorner/2)*(p4est_refineFactor - 1);
-                    *corner_patch_idx = rpatchno[iface];
-                }
-            }
+            printf("Something went wrong;  these blocks should be different\n");
+            exit(1);
+        }
+        else if (rfaceno != iface)
+        {
+            printf("Something went wrong; faces should have same number\n");
+            exit(1);
         }
         else
         {
-             // Sphere grid, but we are not at a block corner
-              int rproc;
-              has_corner_neighbor =
-                  fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
-                                                 icorner, &rproc, corner_block_idx,
-                                                 corner_patch_idx, &neighbor_type);
-         }
+            if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
+                neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+            {
+                // This patch shares face 'iface' with a single patch.
+                *corner_patch_idx = rpatchno[0];
+            }
+            else
+            {
+                // On bottom corners, we want to take the first patch in the list;
+                // On top corners, we take the last patch in the list.
+                int iface = (icorner/2)*(p4est_refineFactor - 1);
+                *corner_patch_idx = rpatchno[iface];
+            }
+        }
     }
     else
     {

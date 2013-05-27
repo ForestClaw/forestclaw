@@ -20,7 +20,7 @@ setpatchborderprops(1:7,'linewidth',2);
 % view([-121.5 30]);
 setviews;
 view(vtop);
-view([22.5 24]);
+% view([22.5 24]);
 % view(3);
 
 s = sum(sum(isnan(q)));

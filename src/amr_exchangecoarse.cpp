@@ -151,6 +151,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
                 fclaw_bool &time_interp = *((fclaw_bool*) user);
+                int level = corner_patch->level;
+                set_debug_info_(this_block_idx, this_patch_idx, level);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -160,6 +162,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                     this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
                                                      is_block_corner,intersects_block);
                 }
+                reset_debug_info_();
             }
         }
     }
@@ -441,7 +444,8 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  cb_face_average,
                                  (void *) &time_interp);
 
-    // Average fine grid corners to the coarse grid ghost cells
+    // DAC : This could be the problem!
+    // // Average fine grid corners to the coarse grid ghost cells
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_corner_average,
                                  (void *) &time_interp);

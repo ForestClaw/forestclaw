@@ -280,6 +280,10 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
       integer ifine, jfine
 
+      integer get_block_idx, get_patch_idx
+      logical debug_is_on
+
+
       r2 = refratio*refratio
       do mq = 1,meqn
          do ibc = 1,mbc
@@ -313,6 +317,7 @@ c              # Average fine grid corners onto coarse grid ghost corners
             enddo
          enddo
       enddo
+
 
       end
 

@@ -20,8 +20,8 @@
       integer i,j
       double precision x,y,z
 
-      do j = 0,my+1
-         do i = 0,mx+1
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)

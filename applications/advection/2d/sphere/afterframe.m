@@ -15,10 +15,8 @@ setpatchborderprops(1:6,'linewidth',2);
 % hidepatchborders(6);
 showpatchborders();
 
-
 setviews;
 view(3);
-% view(vback);
 
 NoQuery = 0;
 MaxFrames = 192;

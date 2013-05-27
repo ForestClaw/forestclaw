@@ -65,8 +65,6 @@ c              # Physical locations of cell centers
       double precision xef, yef, xe,ye
       integer k, m
 
-      logical debug
-
       rfactor = 1
       do ir = level,maxlevel-1
          rfactor = rfactor*refratio
@@ -108,13 +106,14 @@ c     # than in the rest of the mesh.
       enddo
 
 c      open(10,file='area.out');
-c      do i = 1,mx
-c         do j = 1,my
+c      do i = 1-mbc,mx+mbc
+c         do j = 1-mbc,my+mbc
 c            write(10,'(2I5,E16.8)') i,j,area(i,j)
 c         enddo
 c         write(10,*) ' '
 c      enddo
 c      close(10)
+c      stop
 c
 c      open(10,file='points.out');
 c      do i = 1,mx+1

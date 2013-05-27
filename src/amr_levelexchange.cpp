@@ -165,7 +165,8 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                &ref_flag_ptr);
+                                &ref_flag_ptr,
+                                is_block_corner);
 
             if (ref_flag_ptr == NULL)
             {

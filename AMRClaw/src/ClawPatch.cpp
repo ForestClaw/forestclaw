@@ -327,7 +327,6 @@ void ClawPatch::average_face_ghost(const int& a_idir,
         double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
         if (m_manifold)
         {
-            /* This should be the area vector, not an aux array */
             double *areacoarse = m_area.dataPtr();
             double *areafine = neighbor_cp[igrid]->m_area.dataPtr();
             if (a_block_boundary)
