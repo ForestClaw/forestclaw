@@ -50,7 +50,18 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 /* ----------------------------------------------------------------------------------
    Initialization routines
    ---------------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------ */
+/* This is here for now;  may be taken out once I figure out Carsten's
+   'mapping context' idea */
 void set_maptype_();
+
+int isflat_();
+int iscart_();
+int isdisk_();
+int ishemisphere_();
+int issphere_();
+/* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);
 

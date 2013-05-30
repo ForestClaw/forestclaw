@@ -123,6 +123,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     fclaw_bool has_corner_neighbor;
 
     // hack for now!
+    // fclaw_bool is_sphere_grid = issphere_();
+    // Things seem to work without my 'fix'.  But will investigate this.
     fclaw_bool is_sphere_grid = fclaw_false;
     if (is_sphere_grid && is_block_corner)
     {
