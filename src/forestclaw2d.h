@@ -256,7 +256,7 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
- * \param [in] cornerno	Number of the patch corner: bl, br, tl, tr.
+ * \param [in] cornerno	Number of the patch corner: 0=bl, 1=br, 2=tl, 3=tr.
  * \param [out] rproc   Processor number of neighbor patch.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch number.
