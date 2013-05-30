@@ -15,7 +15,7 @@ r1 = 1;
 xp = xc;
 yp = yc;
 blockno = getblocknumber();
-   
+
 
 if (blockno == 0)
   zp = 0*xp + 1;

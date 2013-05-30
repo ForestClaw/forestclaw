@@ -14,7 +14,6 @@ showgridlines(1:3)
 setpatchborderprops(1:6,'linewidth',2);
 % hidepatchborders(6);
 showpatchborders();
-
 setviews;
 view(3);
 
