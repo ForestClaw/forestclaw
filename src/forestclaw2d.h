@@ -86,6 +86,7 @@ struct fclaw2d_domain
     int minlevel_all, maxlevel_all;     /* proc local */
     int global_minlevel, global_maxlevel;       /* global */
     int possible_maxlevel;      /* theoretical maximum */
+    int num_ghosts;             /* ghost patches relevant to this processor */
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */
@@ -217,6 +218,8 @@ fclaw2d_patch_relation_t;
  * \param [out] rproc   Processor number of neighbor patches.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghosts[ instead.
  * \param [out] rfaceno Neighbor face number and orientation.
  * \return              The relative patch size of the face neighbor.
  */
@@ -260,6 +263,8 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  * \param [out] rproc   Processor number of neighbor patch.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch number.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghosts[ instead.
  * \param [out] neighbor_size   The relative patch size of the neighbor.
  * \return			True if at least one corner neighbor exists.
  */
