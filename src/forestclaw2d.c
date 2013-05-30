@@ -557,3 +557,15 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
         P4EST_ASSERT (nj == new_block->num_patches);
     }
 }
+
+void
+fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
+                               void ** patch_data, void ** ghost_data)
+{
+  /* This function does nothing in serial or without data. */
+  if (data_size == 0) {
+    return;
+  }
+
+  /* TODO: implement parallel version */
+}

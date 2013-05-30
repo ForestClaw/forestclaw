@@ -316,6 +316,22 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
+/** Exchange data for parallel ghost neighbors.
+ * This function gathers data from parallel neighbor patches.
+ * We assume that the data size for all patches is the same.
+ * \param [in] domain           Used to access forest and ghost metadata.
+ *                              #(local patches) is domain->num_patches_all.
+ *                              #(parallel ghost patches) is domain->num_ghosts.
+ * \param [in] data_size        Number of bytes per patch to transfer.
+ * \param [in] patch_data       One pointer per processor-local patch as input.
+ * \param [in,out] ghost_data   One pointer per off-processor patch as output.
+ *                              The memory must be pre-allocated.
+ */
+void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
+                                    size_t data_size,
+                                    void ** patch_data,
+                                    void ** ghost_data);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
