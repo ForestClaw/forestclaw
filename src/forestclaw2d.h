@@ -218,6 +218,7 @@ fclaw2d_patch_relation_t;
  * \param [out] rproc   Processor number of neighbor patches.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
+ *                              The patch number is relative to its block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts[ instead.
  * \param [out] rfaceno Neighbor face number and orientation.
@@ -262,7 +263,7 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  * \param [in] cornerno	Number of the patch corner: 0=bl, 1=br, 2=tl, 3=tr.
  * \param [out] rproc   Processor number of neighbor patch.
  * \param [out] rblockno        Neighbor block number.
- * \param [out] rpatchno        Neighbor patch number.
+ * \param [out] rpatchno        Neighbor patch number relative to the block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts[ instead.
  * \param [out] neighbor_size   The relative patch size of the neighbor.

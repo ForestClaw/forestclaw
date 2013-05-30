@@ -270,6 +270,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     {
         /* off-processor ghost neighbor */
         qtq -= mesh->local_num_quadrants;
+        P4EST_ASSERT (qtq >= 0 && qtq < domain->num_ghosts);
         *proc = mesh->ghost_to_proc[qtq];
         ghost = p4est_quadrant_array_index (&wrap->ghost->ghosts, qtq);
         P4EST_ASSERT (0 <= ghost->p.piggy3.which_tree);
@@ -455,6 +456,12 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         rq = p4est_quadrant_array_index (qarr, 0);
         *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
         *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;  /* ghost index */
+        P4EST_ASSERT (*rproc == domain->mpirank ||
+                      (*rpatchno >= 0 && *rpatchno < domain->num_ghosts));
+        P4EST_ASSERT (*rproc != domain->mpirank ||
+                      (*rblockno >= 0 && *rblockno < domain->num_blocks &&
+                       *rpatchno >= 0 &&
+                       *rpatchno < domain->blocks[*rblockno].num_patches));
     }
 
     sc_array_reset (earr);
