@@ -71,6 +71,7 @@ void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_manyclaw_patch_data_t *manyclaw_patch_data = get_manyclaw_patch_data(cp);
 
+    /* For multiblock problems; otherwise block_idx == 0*/
     set_block_(&this_block_idx);
 
     int mx = gparms->mx;
@@ -79,7 +80,7 @@ void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
     int maxmy = my;
     int mbc = gparms->mbc;
 
-    /* Construct an index box to hold the aux array */
+    /* Allocate aux array for each new patch */
     int ll[SpaceDim];
     int ur[SpaceDim];
     for (int idir = 0; idir < SpaceDim; idir++)
@@ -90,7 +91,7 @@ void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
     ur[1] = my + mbc;
     Box box(ll,ur);
 
-    FArrayBox &auxarray = manyclaw_patch_data->auxarray;
+    FArrayBox &auxarray = manyclaw_patch_data->auxarray; /* No space yet allocated */
     int maux = manyclaw_parms->maux;
 
     auxarray.define(box,maux);
@@ -105,7 +106,7 @@ void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
 
     if (gparms->manifold)
     {
-        /* Modified clawpack aux routine */
+        /* Modified clawpack aux routine that passes in mapping terms */
         double *xp = cp->xp();
         double *yp = cp->yp();
         double *zp = cp->zp();
@@ -169,8 +170,7 @@ void amr_manyclaw_qinit(fclaw2d_domain_t *domain,
     }
     else
     {
-        qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-               dx,dy,q,maux,aux);
+        qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
     }
 }
 
@@ -232,7 +232,11 @@ void amr_manyclaw_src2(fclaw2d_domain_t *domain,
 {
     const amr_options_t *gparms                    = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
+
+    /* Solver defined data;  see amr_manyclaw.H */
     amr_manyclaw_patch_data_t *manyclaw_patch_data = get_manyclaw_patch_data(cp);
+
+    /* Parameters specific to manyclaw and read from fclaw2d_manyclaw.ini */
     amr_manyclaw_parms_t *manyclaw_parms     = get_manyclaw_parms(domain);
 
     set_block_(&this_block_idx);
@@ -417,7 +421,9 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    // Replace this with a call to "step2" at some point...
+    /* This is more or less equivalent to the amrclaw routine 'stepgrid' and
+       takes a step on a single grid and updates the grid with the new solution
+    */
     clawpatch2_(maxm, meqn, maux, mbc, manyclaw_parms->method,
                 manyclaw_parms->mthlim, manyclaw_parms->mcapa, mwaves,
                 mx, my, qold,
@@ -434,6 +440,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     return cflgrid;
 }
 
+/* This routine combines a few of the steps that one might do to update a patch */
 double amr_manyclaw_update(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -639,6 +646,9 @@ void amr_manyclaw_link_to_clawpatch()
     ClawPatch::f_manyclaw_patch_data_delete = &amr_manyclaw_patch_data_delete;
 }
 
+
+/* This the default "linker".   This can be used if the user only wants default
+   routines listed below.  */
 void  amr_manyclaw_link_solvers(fclaw2d_domain_t* domain)
 {
     const amr_manyclaw_parms_t* manyclaw_parms = get_manyclaw_parms(domain);

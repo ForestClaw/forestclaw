@@ -50,11 +50,47 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     amr_manyclaw_link_to_clawpatch();
 }
 
+/* -----------------------------------------------------------
+   Routines below call standard Clawpack routines indirectly through
+   calls to ManyClaw interfaces, found in
+             forestclaw/src/solvers/amr_manyclaw/amr_manyclaw.cpp
+
+   Calls to Clawpack routines are as follows :
+   -------------------------------------------
+   amr_manyclaw_setprob(...)  --> setprob_()
+   amr_manyclaw_setaux(...)   --> setaux_(...)
+   amr_manyclaw_qinit(...)    --> qinit_(...)
+   amr_manyclaw_bc2(...)      --> bc2_(...)
+   amr_manyclaw_b4step2(...)  --> b4step2_(...)
+   amr_manyclaw_step2(...)    --> step2_(...) (the amrclaw version;  doesn't update)
+   amr_manyclaw_src2(...)     --> src2_(...)
+
+   The routines below are linked to ForestClaw routines with a call to
+   'swirl_link_solvers'
+
+   User defined 'swirl' routines            linked to ForestClaw as :
+   -------------------------------------------------------------------
+   swirl_patch_setup(...)               --> patch_setup(...) (call setaux, etc)
+   swirl_patch_initialize(...)          --> patch_initialize(...)  (call qinit, etc)
+   swirl_patch_physical_bc(...)         --> patch_physical_bc(...) (call bc2, etc)
+   swirl_patch_single_step_update(...)  --> patch_single_step_update(...)
+                                            (call b4step2, step2, src2, etc)
+
+
+   This routine is linked to a problem setup routine using 'link_problem_setup'.
+   It is not done above because this is not technically part of a 'solver'. But the
+   user could call a solver dependent function here.
+
+   User defined 'swirl' routine            linked to ForestClaw as :
+   -------------------------------------------------------------------
+   swirl_problem_setup(...)             --> problem_setup(...) (call setprob, etc)
+
+
+   --------------------------------------------------------------------------------- */
+
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
+    /* This is called once at the start of the run */
     amr_manyclaw_setprob(domain);
 }
 
@@ -64,10 +100,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    /* Set velocity data */
+    /* This is called once when a new patch is created. */
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-
-    /* Set up diffusion coefficients? Read in velocity data? Material properties? */
 }
 
 
@@ -77,6 +111,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
+    /* This is called once for each patch in the initial grid layout */
     amr_manyclaw_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -89,6 +124,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              double dt,
                              fclaw_bool intersects_bc[])
 {
+    /* This is called everytime a patch needs physical boundary conditions */
     amr_manyclaw_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc);
 }
@@ -101,6 +137,8 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
+    /* This does a single step update on a patch */
+
     amr_manyclaw_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = amr_manyclaw_step2(domain,this_patch,this_block_idx,

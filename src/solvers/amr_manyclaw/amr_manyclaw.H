@@ -184,6 +184,8 @@ struct amr_manyclaw_patch_data
 {
     FArrayBox auxarray;
     int maux;
+
+    /* Add any data here that the patch may also need */
 };
 
 
@@ -225,7 +227,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt);
 
-/* Use this ro return only the right hand side of the manyclaw algorithm */
+/* This routine returns only the right hand side of the manyclaw algorithm */
 double amr_manyclaw_step2_rhs(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
