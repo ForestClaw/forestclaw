@@ -544,11 +544,22 @@ amr_manyclaw_parms_t*  amr_manyclaw_parms_new(sc_options_t *opt)
     /* -----------------------------------------------------------------------
        Read in options from file
        ----------------------------------------------------------------------- */
-   sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_manyclaw.ini");
+    /* -----------------------------------------------------------------------
+       Options will be read from this file, if a '-U' flag is used at the command
+       line.  Use this file for local modifications that are not tracked by Git.
+       ----------------------------------------------------------------------- */
+    sc_options_add_inifile (opt, 'U', "inifile",
+                            "Read ManyClaw options from this file [default : fclaw2d_manyclaw.ini]");
 
-   amr_manyclaw_postprocess_parms(manyclaw_parms);
+    /* -----------------------------------------------------------------------
+       This is the default file that will be read if no command line options are
+       given.  This file is tracked by Git.
+       ----------------------------------------------------------------------- */
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_manyclaw.ini");
 
-   return manyclaw_parms;
+    amr_manyclaw_postprocess_parms(manyclaw_parms);
+
+    return manyclaw_parms;
 
 }
 

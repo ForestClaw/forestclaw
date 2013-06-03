@@ -544,6 +544,21 @@ amr_waveprop_parms_t*  amr_waveprop_parms_new(sc_options_t *opt)
     /* -----------------------------------------------------------------------
        Read in options from file
        ----------------------------------------------------------------------- */
+
+    /* -----------------------------------------------------------------------
+       Options will be read from this file, if a '-W' flag is used at the command
+       line.  Use this file for local modifications that are not tracked by Git.
+       ----------------------------------------------------------------------- */
+    sc_options_add_inifile (opt, 'W', "inifile",
+                            "Read waveprop options from this file [default : fclaw2d_waveprop.ini]");
+
+    /* -----------------------------------------------------------------------
+       This is the default file that will be read if no command line options are
+       given.  This file is tracked by Git.
+       ----------------------------------------------------------------------- */
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_waveprop.ini");
+
+
    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_waveprop.ini");
 
    amr_waveprop_postprocess_parms(waveprop_parms);

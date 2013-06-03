@@ -15,6 +15,10 @@ fclaw2d_solver_patch_data_new_t
 fclaw2d_solver_patch_data_delete_t
     ClawPatch::f_waveprop_patch_data_delete = &solver_default;
 
+fclaw2d_solver_patch_data_new_t
+    ClawPatch::f_manyclaw_patch_data_new = &solver_default;
+fclaw2d_solver_patch_data_delete_t
+    ClawPatch::f_manyclaw_patch_data_delete = &solver_default;
 
 // -----------------------------------------------------
 // User data new/delete
@@ -29,6 +33,7 @@ ClawPatch::ClawPatch()
 ClawPatch::~ClawPatch()
 {
     ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
+    ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
 }
 
 
@@ -81,6 +86,7 @@ void ClawPatch::define(const double&  a_xlower,
     }
 
     ClawPatch::f_waveprop_patch_data_new(&m_waveprop_patch_data);
+    ClawPatch::f_manyclaw_patch_data_new(&m_manyclaw_patch_data);
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -187,6 +193,17 @@ void* ClawPatch::waveprop_patch_data()
 void ClawPatch::set_waveprop_patch_data(void* solverdata)
 {
     m_waveprop_patch_data = solverdata;
+}
+
+// Wave propagation algorithms
+void* ClawPatch::manyclaw_patch_data()
+{
+    return m_manyclaw_patch_data;
+}
+
+void ClawPatch::set_manyclaw_patch_data(void* solverdata)
+{
+    m_manyclaw_patch_data = solverdata;
 }
 
 

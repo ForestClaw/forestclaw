@@ -175,6 +175,11 @@ public :
 
     double* q();
 
+
+    /* ---------------------------------------------------------------
+       This isn't very object oriented, and I will think about a better
+       way to do this without deriving classes */
+
     // ----------------------------------------------------------------
     // Wave propagation routines
     // Only defined if we are really using the wave prop algorithm.
@@ -185,6 +190,15 @@ public :
     static fclaw2d_solver_patch_data_new_t f_waveprop_patch_data_new;
     static fclaw2d_solver_patch_data_delete_t f_waveprop_patch_data_delete;
 
+    // ----------------------------------------------------------------
+    // Wave propagation used for ManyClaw
+    // Only defined if we are really using ManyClaw
+    // The new/delete functions are static because we want to define them
+    // ----------------------------------------------------------------
+    void* manyclaw_patch_data();
+    void set_manyclaw_patch_data(void* solver_data);
+    static fclaw2d_solver_patch_data_new_t f_manyclaw_patch_data_new;
+    static fclaw2d_solver_patch_data_delete_t f_manyclaw_patch_data_delete;
 
 protected :
 
@@ -248,6 +262,8 @@ protected :
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_waveprop_patch_data;
+    /* Data associated with the wave propagation algorithm (ClawPack) */
+    void *m_manyclaw_patch_data;
 
     // Add user data (for coefficients, for example)
 }; // End class ClawPatch

@@ -272,9 +272,7 @@ void regrid(fclaw2d_domain_t **domain)
 
     // Rebuild domain if necessary
     // Will return be NULL if no refining was done?
-    cout << "amrregrid : Calling domain_adapt " << endl;
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-    cout << "Done with domain adapt" << endl;
 
     if (new_domain != NULL)
     {

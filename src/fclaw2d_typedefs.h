@@ -19,6 +19,8 @@ typedef struct fclaw2d_domain_data
     /* Some solver parms */
     void* waveprop_parms;
 
+    void* manyclaw_parms;
+
     /* Time at start of each subcycled time step */
     double curr_time;
 

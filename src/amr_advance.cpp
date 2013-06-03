@@ -118,7 +118,7 @@ double advance_level(fclaw2d_domain_t *domain,
 
                 exchange_with_coarse(domain,a_level,t_level,alpha);
 
-                // set_phys_bc(domain,a_level,t_level);
+                set_phys_bc(domain,a_level,t_level);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
 

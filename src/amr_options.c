@@ -187,14 +187,15 @@ amr_options_t *
     sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,"Use subcycling in time [F]");
     /* -------------------------------------------------------------------*/
 
-    /* There is no default for this option.  A default will be read later. */
-    sc_options_add_inifile (opt, 'F', "inifile","Read options from this file");
-
-    /* This works for me.  */
+    /* -----------------------------------------------------------------------
+       Options will be read from this file, if a '-F' flag is used at the command
+       line.  Use this file for local modifications that are not tracked by Git.
+       ----------------------------------------------------------------------- */
+    sc_options_add_inifile (opt, 'F', "inifile","Read waveprop options from this file");
 
     /* -----------------------------------------------------------------------
-       Read in options from file
-       Can check return value for -1 to see if file was not found
+       This is the default file that will be read if no command line options are
+       given.  This file is tracked by Git.
        ----------------------------------------------------------------------- */
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_defaults.ini");
 
