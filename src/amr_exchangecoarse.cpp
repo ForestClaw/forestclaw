@@ -152,7 +152,6 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 
                 fclaw_bool &time_interp = *((fclaw_bool*) user);
                 int level = corner_patch->level;
-                set_debug_info_(this_block_idx, this_patch_idx, level);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -162,7 +161,6 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                     this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
                                                      is_block_corner,intersects_block);
                 }
-                reset_debug_info_();
             }
         }
     }
