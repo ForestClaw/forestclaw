@@ -62,7 +62,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpirank = wrap->p4est->mpirank;
     domain->pp = (void *) wrap;
     domain->pp_owned = 1;
-    domain->num_ghosts = (int) wrap->ghost->ghosts.elem_count;
+    domain->num_ghost_patches = (int) wrap->ghost->ghosts.elem_count;
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->patch_to_block =

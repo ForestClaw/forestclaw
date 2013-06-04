@@ -86,7 +86,7 @@ struct fclaw2d_domain
     int minlevel_all, maxlevel_all;     /* proc local */
     int global_minlevel, global_maxlevel;       /* global */
     int possible_maxlevel;      /* theoretical maximum */
-    int num_ghosts;             /* ghost patches relevant to this processor */
+    int num_ghost_patches;      /* off-proc patches relevant to this proc */
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */
@@ -220,7 +220,7 @@ fclaw2d_patch_relation_t;
  * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
  *                              The patch number is relative to its block.
  *                              If the neighbor is off-processor, this is not
- *                              a patch number but in [0, num_ghosts[ instead.
+ *                              a patch number but in [0, num_ghost_patches[.
  * \param [out] rfaceno Neighbor face number and orientation.
  * \return              The relative patch size of the face neighbor.
  */
@@ -265,7 +265,7 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch number relative to the block.
  *                              If the neighbor is off-processor, this is not
- *                              a patch number but in [0, num_ghosts[ instead.
+ *                              a patch number but in [0, num_ghosts_patches[.
  * \param [out] neighbor_size   The relative patch size of the neighbor.
  * \return			True if at least one corner neighbor exists.
  */
@@ -318,11 +318,11 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      void *user);
 
 /** Exchange data for parallel ghost neighbors.
- * This function gathers data from parallel neighbor patches.
+ * This function gathers data from parallel neighbor (ghost) patches.
  * We assume that the data size for all patches is the same.
  * \param [in] domain           Used to access forest and ghost metadata.
  *                              #(local patches) is domain->num_patches_all.
- *                              #(parallel ghost patches) is domain->num_ghosts.
+ *                              #(off-proc patches) is domain->num_ghost_patches.
  * \param [in] data_size        Number of bytes per patch to transfer.
  * \param [in] patch_data       One pointer per processor-local patch as input.
  * \param [in,out] ghost_data   One pointer per off-processor patch as output.
