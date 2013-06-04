@@ -43,7 +43,8 @@ typedef struct fclaw2d_patch fclaw2d_patch_t;
 typedef enum
 {
     FCLAW2D_PATCH_CHILDID = 0x7,
-    FCLAW2D_PATCH_FIRST_SIBLING = 0x8
+    FCLAW2D_PATCH_FIRST_SIBLING = 0x8,
+    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10
 }
 fclaw2d_patch_flags_t;
 
@@ -325,13 +326,17 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
  *                              #(off-proc patches) is domain->num_ghost_patches.
  * \param [in] data_size        Number of bytes per patch to transfer.
  * \param [in] patch_data       One pointer per processor-local patch as input.
+ *                              It is only ever dereferenced for patches that
+ *                              touch the parallel boundary from the inside, i.e.,
+ *                              if (flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY).
+ *                              The pointers to the others' data can be NULL.
  * \param [in,out] ghost_data   One pointer per off-processor patch as output.
  *                              The memory must be pre-allocated.
  */
-void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
-                                    size_t data_size,
-                                    void ** patch_data,
-                                    void ** ghost_data);
+void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
+                                       size_t data_size,
+                                       void ** patch_data,
+                                       void ** ghost_data);
 
 #ifdef __cplusplus
 #if 0
