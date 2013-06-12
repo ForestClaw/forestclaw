@@ -589,6 +589,8 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
 
 fclaw_bool ClawPatch::tag_for_refinement(fclaw_bool a_init_flag)
 {
+    set_block_(&m_blockno);
+
     double *q = m_griddata.dataPtr();
     int tag_patch;  // == 0 or 1
     int iflag = a_init_flag ? 1 : 0;
