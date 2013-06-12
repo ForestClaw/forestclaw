@@ -47,6 +47,10 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 
     ClawPatch *cp = get_clawpatch(this_patch);
 
+    // call fortran routine
+    int level = this_patch->level;
+    set_debug_info_(this_block_idx, this_patch_idx, level);
+
     int level = this_patch->level;
     if (level < maxlevel)
     {
@@ -72,6 +76,10 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
     // const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
     int level = sibling_patch[0].level;
+
+    // Make this information accessible to Fortran
+    set_debug_info_(this_block_idx, sibling0_patch_idx, level);
+
     if (level > minlevel)
     {
         int refratio = gparms->refratio;
