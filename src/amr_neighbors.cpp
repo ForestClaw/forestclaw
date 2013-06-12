@@ -122,10 +122,10 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     fclaw2d_patch_relation_t neighbor_type;
     fclaw_bool has_corner_neighbor;
 
-    // hack for now!
-    // fclaw_bool is_sphere_grid = issphere_();
+    // hack for now
+    fclaw_bool is_sphere_grid = issphere_();
     // Things seem to work without my 'fix'.  But will investigate this.
-    fclaw_bool is_sphere_grid = fclaw_false;
+    // fclaw_bool is_sphere_grid = fclaw_false;
     if (is_sphere_grid && is_block_corner)
     {
         has_corner_neighbor = fclaw_true;  // By definition
@@ -134,7 +134,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         int rfaceno;
         // int ftransform[9];
 
-        int iface = icorner % 2;
+        int iface = icorner % 2;    // Use only faces 0 or 1 to get block data.
         neighbor_type =
             fclaw2d_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -163,7 +163,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                 // This patch shares face 'iface' with a single patch.
                 *corner_patch_idx = rpatchno[0];
             }
-            else
+            else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
             {
                 // On bottom corners, we want to take the first patch in the list;
                 // On top corners, we take the last patch in the list.
