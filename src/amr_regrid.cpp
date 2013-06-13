@@ -148,7 +148,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // Grid was not coarsened or refined, so we can just copy
         // the pointer
         ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        fclaw_bool old_code = fclaw_false;
+        fclaw_bool old_code = fclaw_true;
         // To see differences in output, do a 'diff' on fort.t0005
         // for each run.
         if (old_code)
