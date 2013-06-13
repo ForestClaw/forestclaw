@@ -12,7 +12,7 @@
 
       integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
       integer mq
-      double precision sumfine, r2, qf, areaf, areac
+      double precision sum, r2, qf, kf, kc
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
@@ -27,18 +27,18 @@ c     # Do an area weighted average
       do mq = 1,meqn
          do j = 1,my/p4est_refineFactor
             do i = 1,mx/p4est_refineFactor
-               sumfine = 0
+               sum = 0
                do ii = 1,refratio
                   do jj = 1,refratio
                      ifine = (i-1)*refratio + ii
                      jfine = (j-1)*refratio + jj
                      qf = qfine(ifine,jfine,mq)
-                     areaf = areafine(ifine,jfine)
-                     sumfine = sumfine + areaf*qf
+                     kf = areafine(ifine,jfine)
+                     sum = sum + kf*qf
                   enddo
                enddo
-               areac = areacoarse(i+ic_add,j+jc_add)
-               qcoarse(i+ic_add,j + jc_add,mq) = sumfine/areac
+               kc = areacoarse(i+ic_add,j+jc_add)
+               qcoarse(i+ic_add,j + jc_add,mq) = sum/kc
             enddo
          enddo
       enddo
@@ -59,7 +59,7 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      double precision sumfine, areaf, areac, qc,qf
+      double precision sum, kf, kc, qc,qf
 
       integer mq,r2
       integer i, ic_add, ibc, ii, ifine
@@ -77,27 +77,27 @@ c     # Average fine grid onto coarse grid
                do ibc = 1,mbc
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
 c                 # ibc = 2 corresponds to the second layer
-                  sumfine = 0
+                  sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
                         ifine = (ibc-1)*refratio + ii
                         jfine = (j-1)*refratio + jj
                         if (iface_coarse .eq. 0) then
                            qf = qfine(mx-ifine+1,jfine,mq)
-                           areaf = areafine(mx-ifine+1,jfine)
+                           kf = areafine(mx-ifine+1,jfine)
                         else
                            qf = qfine(ifine,jfine,mq)
-                           areaf = areafine(ifine,jfine)
+                           kf = areafine(ifine,jfine)
                         endif
-                        sumfine = sumfine + qf*areaf
+                        sum = sum + qf*kf
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
-                     areac = areacoarse(1-ibc,j+jc_add)
-                     qcoarse(1-ibc,j+jc_add,mq) = sumfine/areac
+                     kc = areacoarse(1-ibc,j+jc_add)
+                     qcoarse(1-ibc,j+jc_add,mq) = sum/kc
                   else
-                     areac = areacoarse(mx+ibc,j+jc_add)
-                     qcoarse(mx+ibc,j+jc_add,mq) = sumfine/areac
+                     kc = areacoarse(mx+ibc,j+jc_add)
+                     qcoarse(mx+ibc,j+jc_add,mq) = sum/kc
                   endif
                enddo
             enddo
@@ -105,27 +105,27 @@ c                 # ibc = 2 corresponds to the second layer
             ic_add = igrid*mx/p4est_refineFactor
             do i = 1,mx/p4est_refineFactor
                do jbc = 1,mbc
-                  sumfine = 0
+                  sum = 0
                   do ii = 1,refratio
                      do jj = 1,refratio
                         ifine = (i-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (iface_coarse .eq. 2) then
                            qf = qfine(ifine,my-jfine+1,mq)
-                           areaf = areafine(ifine,my-jfine+1)
+                           kf = areafine(ifine,my-jfine+1)
                         else
                            qf = qfine(ifine,jfine,mq)
-                           areaf = areafine(ifine,jfine)
+                           kf = areafine(ifine,jfine)
                         endif
-                        sumfine = sumfine + areaf*qf
+                        sum = sum + kf*qf
                      enddo
                   enddo
                   if (iface_coarse .eq. 2) then
-                     areac = areacoarse(i+ic_add,1-jbc)
-                     qcoarse(i+ic_add,1-jbc,mq) = sumfine/areac
+                     kc = areacoarse(i+ic_add,1-jbc)
+                     qcoarse(i+ic_add,1-jbc,mq) = sum/kc
                   else
-                     areac = areacoarse(i+ic_add,my+jbc)
-                     qcoarse(i+ic_add,my+jbc,mq) = sumfine/areac
+                     kc = areacoarse(i+ic_add,my+jbc)
+                     qcoarse(i+ic_add,my+jbc,mq) = sum/kc
                   endif
                enddo
             enddo
@@ -135,11 +135,11 @@ c                 # ibc = 2 corresponds to the second layer
       end
 
       subroutine fixcapaq2(mx,my,mbc,meqn,qcoarse,qfine,
-     &      areacoarse,areafine,maux, p4est_refineFactor,
+     &      areacoarse,areafine, p4est_refineFactor,
      &      refratio,igrid)
       implicit none
 
-      integer mx,my,mbc,meqn, maux, refratio, igrid
+      integer mx,my,mbc,meqn, refratio, igrid
       integer p4est_refineFactor
 
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -148,7 +148,7 @@ c                 # ibc = 2 corresponds to the second layer
       double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
-      double precision areaf, areac, r2, sumfine, cons_diff, qf, qc
+      double precision kf, kc, r2, sum, cons_diff, qf, qc
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
@@ -163,73 +163,32 @@ c     # Get rectangle in coarse grid for fine grid.
       do m = 1,meqn
          do i = 1,mx/p4est_refineFactor
             do j = 1,my/p4est_refineFactor
-               sumfine = 0.d0
+               sum = 0.d0
                do ii = 1,refratio
                   do jj = 1,refratio
                      ifine = (i-1)*refratio + ii
                      jfine = (j-1)*refratio + jj
-                     areaf = areafine(ifine,jfine)
+                     kf = areafine(ifine,jfine)
                      qf = qfine(ifine,jfine,m)
-                     sumfine = sumfine + areaf*qf
+                     sum = sum + kf*qf
                   enddo
                enddo
 
-               areac = areacoarse(i+ic_add,j+jc_add)
+               kc = areacoarse(i+ic_add,j+jc_add)
                qc = qcoarse(i+ic_add, j+jc_add,m)
-               cons_diff = qc*areac - sumfine
+               cons_diff = qc*kc - sum
 
                do ii = 1,refratio
                   do jj = 1,refratio
                      ifine  = (i-1)*refratio + ii
                      jfine  = (j-1)*refratio + jj
-                     areaf = areafine(ifine,jfine)
+                     kf = areafine(ifine,jfine)
                      qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
-     &                     cons_diff/areaf
+     &                     cons_diff/kf
                   enddo
                enddo
             enddo  !! end of meqn
          enddo
       enddo
 
-c      write(6,'(A,E24.16)') 'fixcapaq : maxdiff = ',maxdiff
       end
-
-
-c      subroutine coarsen(mx,my,mbc,meqn,refratio, q, qcoarse)
-c      implicit none
-c
-c      integer mx,my,mbc,meqn, refratio
-c      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-c      double precision qcoarse(1-mbc:mx/refratio+mbc,
-c     &      1-mbc:my/refratio+mbc,meqn)
-c      double precision aux(1-mbc:mx/refratio+mbc,
-c     &      1-mbc:my/refratio+mbc,meqn)
-c      double precision auxcoarse(1-mbc:mx/refratio+mbc,
-c     &      1-mbc:my/refratio+mbc,meqn)
-c
-c      integer i,j,ii,jj, ifine,jfine, r2, mq
-c      double precision sum
-c
-c      r2 = refratio**2
-c
-c      do mq = 1,meqn
-c         do i = 1,mx/refratio
-c            do j = 1,my/refratio
-c               sum = 0
-c               do ii = 1,refratio
-c                  do jj = 1,refratio
-c                     ifine = (i - 1)*refratio + ii
-c                     jfine = (j - 1)*refratio + jj
-c                     sum = sum + q(ifine,jfine,mq)
-c                  enddo
-c               enddo
-c               qcoarse(i,j,mq) = sum/r2
-c            enddo
-c         enddo
-cc     # Coarsen ghost cells
-c
-c      enddo
-c
-c
-c
-c      end
