@@ -24,14 +24,6 @@ c        # saves any work, but seems silly to exchange twice.
          return
       endif
 
-c      write(6,*) 'Warning ------------ Setting all BCs to 0 --------'
-
-c      call set_bcs_to_zero(mx,my,mbc,meqn,qthis, qneighbor)
-
-
-c      return
-
-
       do mq = 1,meqn
          if (iface .eq. 0) then
             do j = 1,my
@@ -268,14 +260,6 @@ c     # Assume this is mapped.
 
 c     # 'iface' is relative to the coarse grid
 
-c      write(6,*)'Mess with mb_average_face_ghost'
-c      call set_bcs_to_zero(mx,my,mbc,meqn,qcoarse, qfine)
-c      return
-
-
-
-      r2 = refratio*refratio
-
 c     # Average fine grid onto coarse grid
       do mq = 1,meqn
          if (idir .eq. 0) then
@@ -300,10 +284,10 @@ c                 # ibc = 2 corresponds to the second layer
                      enddo
                   enddo
                   if (iface_coarse .eq. 0) then
-                     kc = r2*areacoarse(1-ibc,j+jc_add)
+                     kc = areacoarse(1-ibc,j+jc_add)
                      qcoarse(1-ibc,j+jc_add,mq) = sum/kc
                   else
-                     kc = r2*areacoarse(mx+ibc,j+jc_add)
+                     kc = areacoarse(mx+ibc,j+jc_add)
                      qcoarse(mx+ibc,j+jc_add,mq) = sum/kc
                   endif
                enddo
@@ -328,10 +312,10 @@ c                 # ibc = 2 corresponds to the second layer
                      enddo
                   enddo
                   if (iface_coarse .eq. 2) then
-                     kc = r2*areacoarse(i+ic_add,1-jbc)
+                     kc = areacoarse(i+ic_add,1-jbc)
                      qcoarse(i+ic_add,1-jbc,mq) = sum/kc
                   else
-                     kc = r2*areacoarse(i+ic_add,my+jbc)
+                     kc = areacoarse(i+ic_add,my+jbc)
                      qcoarse(i+ic_add,my+jbc,mq) = sum/kc
                   endif
                enddo
@@ -494,7 +478,7 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(1-ibc,1-jbc)
+                  kc = areacoarse(1-ibc,1-jbc)
                   qcoarse(1-ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
@@ -517,7 +501,7 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(mx+ibc,1-jbc)
+                  kc = areacoarse(mx+ibc,1-jbc)
                   qcoarse(mx+ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
@@ -540,7 +524,7 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(1-ibc,my+jbc)
+                  kc = areacoarse(1-ibc,my+jbc)
                   qcoarse(1-ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
@@ -563,7 +547,7 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(mx+ibc,my+jbc)
+                  kc = areacoarse(mx+ibc,my+jbc)
                   qcoarse(mx+ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
@@ -589,6 +573,7 @@ c     # Exchange ghost cells at block corner
       integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
       double precision sum,qf,kf,kc
 
+
       r2 = refratio**2
       do mq = 1,meqn
          if (icorner .eq. 0) then
@@ -604,8 +589,8 @@ c     # Exchange ghost cells at block corner
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(1-ibc,1-ibc)
-                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+                  kc = areacoarse(1-ibc,1-ibc)
+                  qcoarse(1-ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
          elseif (icorner .eq. 1) then
@@ -621,8 +606,8 @@ c     # Exchange ghost cells at block corner
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(mx+ibc,1-jbc)
-                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+                  kc = areacoarse(mx+ibc,1-jbc)
+                  qcoarse(mx+ibc,1-jbc,mq) = sum/kc
                enddo
             enddo
          elseif (icorner .eq. 2) then
@@ -638,8 +623,8 @@ c     # Exchange ghost cells at block corner
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(1-ibc,my+jbc)
-                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+                  kc = areacoarse(1-ibc,my+jbc)
+                  qcoarse(1-ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
          elseif (icorner .eq. 3) then
@@ -655,12 +640,13 @@ c     # Exchange ghost cells at block corner
                         sum = sum + kf*qf
                      enddo
                   enddo
-                  kc = r2*areacoarse(mx+ibc,my+jbc)
-                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+                  kc = areacoarse(mx+ibc,my+jbc)
+                  qcoarse(mx+ibc,my+jbc,mq) = sum/kc
                enddo
             enddo
          endif
       enddo
+
       end
 
 
