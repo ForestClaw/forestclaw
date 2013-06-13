@@ -57,45 +57,6 @@ c        # saves any work, but seems silly to exchange twice.
       enddo
       end
 
-      subroutine set_bcs_to_zero(mx,my,mbc,meqn,
-     &      qthis, qneighbor)
-
-
-      integer mx,my,mbc,meqn
-      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
-      integer i,j,ibc,jbc,mq
-
-
-      write(6,*) 'Warning ------------ Setting all BCs to 0 --------'
-
-c      return
-
-      do mq = 1,meqn
-         do j = 1,my
-            do ibc = 1,mbc
-               qthis(1-ibc,j,mq) = 0
-               qthis(mx+ibc,j,mq) = 0
-               qneighbor(1-ibc,j,mq) = 0
-               qneighbor(mx+ibc,j,mq) = 0
-            enddo
-         enddo
-
-         do i = 1-mbc,mx+mbc
-            do jbc = 1,mbc
-               qthis(i,1-jbc,mq) = 0
-               qthis(i,my+ibc,mq) = 0
-               qneighbor(i,1-jbc,mq) = 0
-               qneighbor(i,my+jbc,mq) = 0
-            enddo
-         enddo
-      enddo
-
-      return
-      end
-
-
 
 c     # Exchange ghost cells at interior of a block boundary.
       subroutine mb_exchange_corner_ghost(mx,my,mbc,meqn,
@@ -109,16 +70,11 @@ c     # Exchange ghost cells at interior of a block boundary.
 
       integer mq, ibc, jbc, m
 
-c      call set_bcs_to_zero(mx,my,mbc,meqn,qthis, qneighbor)
-
-c      return
-
       if (iblock .eq. 1) then
 c        # Only initiate exchange from block 0.  I am not sure if the
 c        # saves any work, but seems silly to exchange twice.
          return
       endif
-
 
       do mq = 1,meqn
          if (icorner .eq. 0) then
@@ -157,7 +113,7 @@ c        # saves any work, but seems silly to exchange twice.
             do ibc = 1,mbc
                do jbc = 1,mbc
                   if (is_block_bdry(0) .eq. 1) then
-                     qthis(1-ibc,my+ibc,mq) =
+                     qthis(1-ibc,my+jbc,mq) =
      &                     qneighbor(ibc,jbc,mq)
                      qneighbor(1-ibc,1-jbc,mq) =
      &                     qthis(ibc,my+1-jbc,mq)
@@ -254,7 +210,7 @@ c     # Assume this is mapped.
 
       double precision sum, kf, kc, qf
 
-      integer mq,r2
+      integer mq
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
 
@@ -333,7 +289,7 @@ c                 # ibc = 2 corresponds to the second layer
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer mq,r2
+      integer mq
       integer i, i1, i2, ibc, ii, ifine
       integer j, j1, j2, jbc, jj, jfine
       integer ic_add, jc_add, ic, jc, mth
@@ -453,11 +409,10 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       double precision     qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
-      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+      integer i,j,ibc,jbc,i1,j1,ii,jj,mq
       integer ifine, jfine
       double precision kf, qf, kc
 
-      r2 = refratio*refratio
       do mq = 1,meqn
          if (icorner .eq. 0) then
             do ibc = 1,mbc
@@ -570,11 +525,10 @@ c     # Exchange ghost cells at block corner
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
+      integer mq, ibc, jbc, ii, jj, ifine, jfine
       double precision sum,qf,kf,kc
 
 
-      r2 = refratio**2
       do mq = 1,meqn
          if (icorner .eq. 0) then
             do ibc = 1,mbc
@@ -742,7 +696,7 @@ c     # Exchange ghost cells at block corner
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer mq, ibc, jbc, ii, jj, r2, ifine, jfine
+      integer mq, ibc, jbc, ii, jj, ifine, jfine
       integer ic, jc, mth
       double precision gradx, grady, shiftx, shifty
       double precision sl, sr, qc, value, compute_slopes
