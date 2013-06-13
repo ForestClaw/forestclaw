@@ -48,14 +48,14 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
 
     // call fortran routine
+
+
     int level = this_patch->level;
     set_debug_info_(this_block_idx, this_patch_idx, level);
 
-    int level = this_patch->level;
     if (level < maxlevel)
     {
         patch_refined = cp->tag_for_refinement(init_flag);
-
         if (patch_refined)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);

@@ -176,15 +176,17 @@ c     # Get rectangle in coarse grid for fine grid.
 
                kc = areacoarse(i+ic_add,j+jc_add)
                qc = qcoarse(i+ic_add, j+jc_add,m)
-               cons_diff = qc*kc - sum
+               cons_diff = (qc*kc - sum)/r2
 
                do ii = 1,refratio
                   do jj = 1,refratio
                      ifine  = (i-1)*refratio + ii
                      jfine  = (j-1)*refratio + jj
                      kf = areafine(ifine,jfine)
-                     qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
-     &                     cons_diff/kf
+                     if (kf .ne. 0) then
+                        qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
+     &                        cons_diff/kf
+                     endif
                   enddo
                enddo
             enddo  !! end of meqn

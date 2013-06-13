@@ -551,13 +551,11 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                a_refratio,a_igrid);
     if (m_manifold)
     {
-        /*
         double *areacoarse = m_area.dataPtr();
         double *areafine = a_fine->m_area.dataPtr();
 
         fixcapaq2_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine, areacoarse, areafine,
                    a_p4est_refineFactor, a_refratio, a_igrid);
-        */
     }
 }
 
@@ -721,16 +719,7 @@ void ClawPatch::dump()
 {
     double *q;
     q = m_griddata.dataPtr();
-    int k = 0;
-    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-    {
-        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-        {
-            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
-            k++;
-        }
-        printf("\n");
-    }
+    dump_patch_(m_mx,m_my,m_mbc,m_meqn,q);
 }
 
 void ClawPatch::dump_last()

@@ -248,6 +248,8 @@ int get_block_idx_();
 int get_patch_idx_();
 int get_level_();
 
+void dump_patch_(const int& mx, const int& my, const int& m_mbc, const int& meqn, double q[]);
+
 #ifdef __cplusplus
 #if 0
 {

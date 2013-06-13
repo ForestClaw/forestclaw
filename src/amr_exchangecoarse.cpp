@@ -412,9 +412,11 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 }
 #endif
 
-// ----------------------------------------------------------------------
-// Main routine in this file
-// ----------------------------------------------------------------------
+/* ----------------------------------------------------------------------
+   Main routine in this file.  This file assumes that both coarse and
+   fine grids have valid interior data;  they only need to exchange (
+   via interpolating and averaging) ghost cell values.
+   -------------------------------------------------------------------- */
 
 void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
