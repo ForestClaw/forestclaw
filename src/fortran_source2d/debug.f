@@ -77,3 +77,19 @@ c     #
       include "debug.i"
       get_level = level_com
       end
+
+
+      subroutine dump_patch(mx,my,mbc,meqn,q)
+      implicit none
+      integer mx,my,mbc,meqn,mq
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer i,j
+
+      mq = 1
+      do j = my+mbc,1-mbc,-1
+         write(6,100) j, (q(i,j,mq),i = 1-mbc,mx+mbc)
+      enddo
+      write(6,*) ' '
+  100 format(I5,50F12.4)
+
+      end
