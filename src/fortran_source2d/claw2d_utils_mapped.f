@@ -158,6 +158,11 @@ c     # Get rectangle in coarse grid for fine grid.
       ic_add = ig*mx/p4est_refineFactor
       jc_add = jg*my/p4est_refineFactor
 
+c     # ------------------------------------------------------
+c     # This routine ensures that the interpolated solution
+c     # has the same mass as the coarse grid solution
+c     # -------------------------------------------------------
+
 
       r2 = refratio*refratio
       do m = 1,meqn
@@ -183,10 +188,12 @@ c     # Get rectangle in coarse grid for fine grid.
                      ifine  = (i-1)*refratio + ii
                      jfine  = (j-1)*refratio + jj
                      kf = areafine(ifine,jfine)
-                     if (kf .ne. 0) then
-                        qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
-     &                        cons_diff/kf
+                     if (kf .eq. 0) then
+                        write(6,*) 'fixcapaq : kf = 0'
+                        stop
                      endif
+                     qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
+     &                     cons_diff/kf
                   enddo
                enddo
             enddo  !! end of meqn

@@ -151,7 +151,6 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
 
                 fclaw_bool &time_interp = *((fclaw_bool*) user);
-                // int level = corner_patch->level;
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
