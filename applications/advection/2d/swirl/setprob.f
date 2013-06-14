@@ -10,6 +10,8 @@
       read(7,*) tperiod
       close(7)
 
+      call set_maptype()
+
       pi = 4.d0*atan(1.d0)
       pi2 = 2.d0*pi
 
