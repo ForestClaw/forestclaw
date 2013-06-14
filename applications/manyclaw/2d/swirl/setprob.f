@@ -13,5 +13,6 @@
       pi = 4.d0*atan(1.d0)
       pi2 = 2.d0*pi
 
+      call set_maptype()
 
       end
