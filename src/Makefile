@@ -2,11 +2,9 @@
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-amrclawobjs = \
-	$(FORESTCLAW)/AMRClaw/src/ClawPatch.o \
-	$(FORESTCLAW)/AMRClaw/src/clawpack_fort.o
-
 fclawobjs = \
+	ClawPatch.o \
+	clawpack_fort.o \
 	amrinit.o \
 	amrrun.o \
 	amrreset.o \
@@ -29,7 +27,7 @@ fclawobjs = \
         fclaw2d_p4est.o \
 	forestclaw2d.o
 
-libforestclaw.a: $(amrclawobjs) $(fclawobjs)
+libforestclaw.a: $(fclawobjs)
 	ar cru $@ $^
 
 .c.o:
@@ -40,4 +38,7 @@ libforestclaw.a: $(amrclawobjs) $(fclawobjs)
 	-I$(FORESTCLAW)/AMRClaw/src -I. -c $< -o $@
 
 clean:
-	rm -f *.o *.a $(amrclawobjs) $(fclawobjs)
+	rm -f *.o *.a $(fclawobjs)
+
+realclean:
+	rm -f *.o *.a $(fclawobjs)
