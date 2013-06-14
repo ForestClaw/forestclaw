@@ -3,19 +3,14 @@ s = 1e-2;
 axis image;
 daspect([1 1 1]);
 axis off;
-yrbcolormap;
-% colormap(jet);
 
-cv = 0.1:0.1:0.9;
-% drawcontourlines(cv);
+yrbcolormap;
 caxis([0 1]);
 
 showgridlines(1:4)
 setpatchborderprops(1:6,'linewidth',2);
-% hidepatchborders(6);
 showpatchborders();
 setviews;
-view(3);
 
 NoQuery = 0;
 MaxFrames = 192;
