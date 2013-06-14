@@ -4,22 +4,12 @@ daspect([1 1 1]);
 axis off;
 yrbcolormap;
 
-cv = 0.1:0.1:0.9;
 showgridlines(1:4);
 showpatchborders;
 setpatchborderprops(1:7,'linewidth',2);
 caxis([0 1]);
 
-% view([-40 20])
-% set(gca,'zdir','reverse');
-% daspect([1 1 2]);
-
-fprintf('[%e, %e],\n',qmin,qmax);
-
-view(2);
-
 NoQuery = 0;
-MaxFrames = 192;
 prt = false;
 if (prt)
   filename = 'swirl000.png';
