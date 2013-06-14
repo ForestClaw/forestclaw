@@ -20,7 +20,7 @@
                if (init_flag == 1) then
                   xc = xlower + (i-0.5)*dx
                   yc = ylower + (j-0.5)*dy
-                  if (abs(xc - 0.5d0) < dx) then
+                  if (abs(xc-0.5) < dx) then
                      tag_patch = 1
                      return
                   endif
@@ -64,7 +64,7 @@ c     # we would coarsen an initial grid.
             do j = 1,my
                qmin = min(qcoarsened(i,j,mq),qmin)
                qmax = max(qcoarsened(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.5d0) then
+               if (qmax - qmin .gt. 0.25d0) then
                   tag_patch = 1
                   return
                endif

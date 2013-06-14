@@ -20,13 +20,13 @@
       integer i,j
       double precision x,y,z
 
-      do j = 0,my+1
-         do i = 0,mx+1
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
 
-            if (y .le. 0) then
+            if (x .le. 0) then
                q(i,j,1) = 1.d0
             else
                q(i,j,1) = 0.d0

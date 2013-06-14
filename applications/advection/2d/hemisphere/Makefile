@@ -54,6 +54,7 @@ amrclawobjs = \
 	$(FORTRAN_SRC)/setup_mesh.o \
 	$(FORTRAN_SRC)/claw2d_utils.o \
 	$(FORTRAN_SRC)/claw_out2.o \
+	$(FORTRAN_SRC)/debug.o \
 	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \

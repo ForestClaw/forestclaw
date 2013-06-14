@@ -3,27 +3,14 @@ s = 1e-2;
 axis image;
 daspect([1 1 1]);
 axis off;
-yrbcolormap;
-% colormap(jet);
 
-cv = 0.1:0.1:0.9;
-% drawcontourlines(cv);
+yrbcolormap;
 caxis([0 1]);
 
-showgridlines(1:3)
-setpatchborderprops(1:7,'linewidth',2);
-% hidepatchborders(7);
-
-% hidepatchborders;
-% hidegridlines;
-
-% view([-121.5 30]);
+showgridlines(1:4)
+setpatchborderprops(1:6,'linewidth',2);
+showpatchborders();
 setviews;
-view(vtop);
-view(3);
-
-s = sum(sum(isnan(q)));
-fprintf('Number of nans : %d\n',s);
 
 NoQuery = 0;
 MaxFrames = 192;
@@ -40,3 +27,4 @@ end;
 
 clear afterframe;
 clear mapc2m;
+clear mapc2m_pillow;
