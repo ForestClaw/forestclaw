@@ -13,7 +13,6 @@ showpatchborders();
 setviews;
 
 NoQuery = 0;
-MaxFrames = 192;
 prt = false;
 if (prt)
   filename = 'swirl000.png';
