@@ -18,21 +18,34 @@
       double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
 
       integer i,j
-      double precision x,y,z
+      double precision x,y,z, xlow, ylow, w
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
+            xlow = xlower + (i-1)*dx
+            ylow = ylower + (j-1)*dy
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
 
-            if (x .le. 0) then
-               q(i,j,1) = 1.d0
-            else
-               q(i,j,1) = 0.d0
-            endif
+            call cellave2(xlow,ylow,dx,dy,w)
+            q(i,j,1) = w
          enddo
       enddo
 
       return
+      end
+
+
+      double precision function  fdisc(xc,yc)
+      implicit none
+
+      double precision xc,yc, xp, yp, zp
+
+      call mapc2m(xc,yc,xp,yp,zp)
+
+      fdisc = xp
+
+
+
       end
