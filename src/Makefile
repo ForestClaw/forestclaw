@@ -31,10 +31,7 @@ fclawobjs = \
 	fclaw2d_solvers.o \
 	fclaw2d_map.o \
         fclaw2d_p4est.o \
-	forestclaw2d.o
-
-# Fortran routines used generally by solvers (so far).
-amrclawobjs = \
+	forestclaw2d.o \
 	$(FORTRAN_SRC)/philim.o \
 	$(FORTRAN_SRC)/claw_out2.o \
 	$(FORTRAN_SRC)/mapc2p.o \
@@ -44,14 +41,14 @@ amrclawobjs = \
 	$(FORTRAN_SRC)/claw2d_utils.o \
 	$(FORTRAN_SRC)/debug.o \
 	$(FORTRAN_SRC)/cellave2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
-	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
+	$(FORESTCLAW)/src/mappings/set_maptype.o \
+	$(FORESTCLAW)/src/mappings/scale_rot_map.o \
+	$(FORESTCLAW)/src/mappings/block.o \
+	$(FORESTCLAW)/src/mappings/cart/mapc2m_cart.o \
+	$(FORESTCLAW)/src/mappings/disk/mapc2m_disk.o \
+	$(FORESTCLAW)/src/mappings/sphere/mapc2m_sphere.o
 
-libforestclaw.a: $(fclawobjs) $(amrclawobjs)
+libforestclaw.a: $(fclawobjs)
 	ar cru $@ $^
 
 .c.o:
@@ -64,7 +61,7 @@ libforestclaw.a: $(fclawobjs) $(amrclawobjs)
 	$(FC) -Wall $(FFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o *.a $(fclawobjs) $(amrclawobjs)
+	rm -f *.o *.a $(fclawobjs)
 
 realclean:
 	rm -f *.o *.a $(fclawobjs)
