@@ -13,24 +13,35 @@
       double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j, m
-      double precision x,y,z
+      integer i,j
+      double precision x,y,z, xlow, ylow, w
 
-      do m = 1,meqn
-         do j = 1-mbc,my+mbc
-            do i = 1-mbc,mx+mbc
-               x = xp(i,j)
-               y = yp(i,j)
-               z = zp(i,j)
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
+            xlow = xlower + (i-1)*dx
+            ylow = ylower + (j-1)*dy
+            x = xp(i,j)
+            y = yp(i,j)
+            z = zp(i,j)
 
-               if (x .le. 0) then
-                  q(i,j,m) = 1.d0
-               else
-                  q(i,j,m) = 0.d0
-               endif
-            enddo
+            call cellave2(xlow,ylow,dx,dy,w)
+            q(i,j,1) = w
          enddo
       enddo
 
       return
+      end
+
+
+      double precision function  fdisc(xc,yc)
+      implicit none
+
+      double precision xc,yc, xp, yp, zp
+
+      call mapc2m(xc,yc,xp,yp,zp)
+
+      fdisc = xp
+
+
+
       end
