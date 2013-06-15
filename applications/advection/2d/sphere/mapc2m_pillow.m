@@ -46,7 +46,7 @@ if (blockno == 1)
     zp = -zp;
 end
 
-% [xp,yp,zp] = rotate_map(xp,yp,zp);
+[xp,yp,zp] = rotate_map(xp,yp,zp);
 
 
 % ----------------------------------------------------------------
