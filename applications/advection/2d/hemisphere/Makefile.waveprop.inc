@@ -9,12 +9,10 @@ waveprop_objs = \
 	$(AMR_WAVEPROP)/amr_waveprop.o \
 	$(AMR_WAVEPROP_FORTRAN)/limiter.o \
 	$(AMR_WAVEPROP_FORTRAN)/src2.o \
-	$(AMR_WAVEPROP_FORTRAN)/src2_manifold.o \
 	$(AMR_WAVEPROP_FORTRAN)/b4step2.o \
 	$(AMR_WAVEPROP_FORTRAN)/setaux.o \
 	$(AMR_WAVEPROP_FORTRAN)/qinit.o \
 	$(AMR_WAVEPROP_FORTRAN)/bc2.o \
-	$(AMR_WAVEPROP_FORTRAN)/bc2_manifold.o \
 	$(AMR_WAVEPROP_FORTRAN)/flux2.o \
 	$(AMR_WAVEPROP_FORTRAN)/qad2.o \
 	$(AMR_WAVEPROP_FORTRAN)/step2.o \
