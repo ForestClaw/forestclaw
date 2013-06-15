@@ -85,6 +85,7 @@ main (int argc, char **argv)
      Don't do any solve or run.  This is just to test that we can
      compile without any solver routines.
      --------------------------------------------------------------- */
+  link_problem_setup(domain,no_solver_setprob);
 
 
   /* Initialize data but don't do anything */

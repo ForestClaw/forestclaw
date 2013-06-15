@@ -8,6 +8,9 @@ FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
+FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
+FORTRAN_INC = $(FORTRAN_SRC)
+
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 solver_objs :=
@@ -38,7 +41,6 @@ default: $(TARGET)
 .PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
-	$(FORESTCLAW)/AMRClaw/src2d/cellave2.o \
 	no_solver_user.o \
 	initialize.o \
 	ghost_twopatch.o \
@@ -49,15 +51,17 @@ exampleobjs = \
 # and should all really be listed under 'solver_routines'.  But for now
 # I've left them here.
 amrclawobjs = \
-	$(FORESTCLAW)/AMRClaw/src/philim.o \
-	$(FORESTCLAW)/AMRClaw/src2d/claw_out2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mapc2p.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mapc2m.o \
-	$(FORESTCLAW)/AMRClaw/src2d/setup_mesh.o \
-	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils.o \
+	$(FORTRAN_SRC)/philim.o \
+	$(FORTRAN_SRC)/claw_out2.o \
+	$(FORTRAN_SRC)/mapc2p.o \
+	$(FORTRAN_SRC)/mapc2m.o \
+	$(FORTRAN_SRC)/setup_mesh.o \
+	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
+	$(FORTRAN_SRC)/claw2d_utils.o \
+	$(FORTRAN_SRC)/debug.o \
+	$(FORTRAN_SRC)/cellave2.o \
 	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
 	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
-	$(FORESTCLAW)/AMRClaw/src2d/claw2d_utils_mapped.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
 	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \

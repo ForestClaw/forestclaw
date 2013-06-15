@@ -35,6 +35,11 @@ extern "C"
 #endif
 #endif
 
+void no_solver_setprob(fclaw2d_domain_t* domain)
+{
+    set_maptype_();
+}
+
 
 void no_solver_patch_initialize(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
