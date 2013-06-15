@@ -1,8 +1,9 @@
 # Makefile in src
 
 TARGET = no_solver
-
 GEO = cart
+
+
 
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -28,7 +29,7 @@ default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src $(solver_objs) -c $< -o $@
+	-I. -I$(FORESTCLAW)/src $(solver_objs) -c $< -o $@
 
 .c.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
@@ -46,26 +47,6 @@ exampleobjs = \
 	ghost_twopatch.o \
 	tag4refinement.o
 
-
-# Lots of these routines are also only used for Clawpack, but I haven't
-# and should all really be listed under 'solver_routines'.  But for now
-# I've left them here.
-amrclawobjs = \
-	$(FORTRAN_SRC)/philim.o \
-	$(FORTRAN_SRC)/claw_out2.o \
-	$(FORTRAN_SRC)/mapc2p.o \
-	$(FORTRAN_SRC)/mapc2m.o \
-	$(FORTRAN_SRC)/setup_mesh.o \
-	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
-	$(FORTRAN_SRC)/claw2d_utils.o \
-	$(FORTRAN_SRC)/debug.o \
-	$(FORTRAN_SRC)/cellave2.o \
-	$(FORESTCLAW)/AMRClaw/src2d/set_maptype.o \
-	$(FORESTCLAW)/AMRClaw/src2d/scale_rot_map.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/block.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_cart.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_disk.o \
-	$(FORESTCLAW)/AMRClaw/src2d/mappings/mapc2m_mb_sphere.o
 
 GeoFiles := \
       $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_cart.o
