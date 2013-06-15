@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <stdio.h>
 #include "amr_forestclaw.H"
 
 /* ******************************************************************************
@@ -322,6 +323,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                 }
                 fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                 // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
+
                 this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                             fine_neighbor_cp,time_interp,block_boundary);
             }
@@ -404,6 +406,27 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     cp->time_interpolate(alpha);
 }
 
+static
+void cb_dump_patch(fclaw2d_domain_t *domain,
+                   fclaw2d_patch_t *this_patch,
+                   int this_block_idx,
+                   int this_patch_idx,
+                   void *user)
+{
+    // This is called for all patches at a level coarser than the one we have.
+    ClawPatch *cp = get_clawpatch(this_patch);
+
+    FILE *fid = (FILE*) user;
+    if (this_block_idx == 0)
+    {
+        fprintf(fid,"patchno = %d\n",this_patch_idx);
+        cp->dump();
+    }
+
+}
+
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
@@ -462,4 +485,13 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_corner_interpolate,
                                  (void *) &time_interp);
+
+    /*
+    FILE *fid = fopen("patch.dat","w");
+    fclaw2d_domain_iterate_level(domain,coarser_level,
+                                 cb_dump_patch,
+                                 (void *) fid);
+    fclose(fid);
+    */
+
 }
