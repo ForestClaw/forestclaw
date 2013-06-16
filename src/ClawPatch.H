@@ -168,6 +168,10 @@ public :
 
     double *xface_normals();
     double *yface_normals();
+    double *xface_tangents();
+    double *yface_tangents();
+    double *surf_normals();
+    double *curvature();
     double *edge_lengths();
 
     double xlower();
@@ -178,13 +182,14 @@ public :
 
     /* ---------------------------------------------------------------
        This isn't very object oriented, and I will think about a better
-       way to do this without deriving classes */
+       way to do this without deriving classes
+    */
 
-    // ----------------------------------------------------------------
-    // Wave propagation routines
-    // Only defined if we are really using the wave prop algorithm.
-    // The new/delete functions are static because we want to define them
-    // ----------------------------------------------------------------
+    /* ----------------------------------------------------------------
+       Wave propagation routines
+       Only defined if we are really using the wave prop algorithm.
+       The new/delete functions are static because we want to define them
+       ---------------------------------------------------------------- */
     void* waveprop_patch_data();
     void set_waveprop_patch_data(void* solver_data);
     static fclaw2d_solver_patch_data_new_t f_waveprop_patch_data_new;
@@ -258,7 +263,12 @@ protected :
     FArrayBox m_area;
     FArrayBox m_xface_normals;
     FArrayBox m_yface_normals;
+    FArrayBox m_xface_tangents;
+    FArrayBox m_yface_tangents;
+    FArrayBox m_surf_normals;
     FArrayBox m_edge_lengths;
+
+    FArrayBox m_curvature;  // ???
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_waveprop_patch_data;

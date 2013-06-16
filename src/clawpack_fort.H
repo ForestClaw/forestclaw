@@ -201,6 +201,16 @@ void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
 
 /* ----------------------------------------------------------------------------------
    Mapped grids
+   area                : 1 float
+   xp,yp,zp, xd,yd zp  : 6 floats
+   xnormals, ynormals  : 6 floats
+   ytangents, ytangent : 6 floats
+   edgelengths         : 2 floats
+   surfnormals         : 3 floats
+   curvature           : 1 float
+   -----------------------------
+   total               : 25 floats (in 2d!!)
+
    ---------------------------------------------------------------------------------- */
 void setup_mesh_(const int& mx, const int& my, const int& mbc,
                  const double& xlower, const double& ylower,
@@ -215,7 +225,16 @@ void compute_area_(const int& mx, const int& my, const int& mbc,
 void compute_normals_(const int& mx, const int& my, const int& mbc,
                       double xp[], double yp[], double zp[],
                       double xd[], double yd[], double zd[],
-                      double xnormals[],double ynormals[],double edge_lengths[]);
+                      double xnormals[],double ynormals[]);
+
+void compute_tangents_(const int& mx, const int& my, const int& mbc,
+                      double xd[], double yd[], double zd[],
+                      double xtangents[],double ytangents[],double edge_lengths[]);
+
+void compute_surf_normals_(const int& mx, const int& my, const int& mbc,
+                           double xnormals[],double ynormals[],double edge_lengths[],
+                           double curvature[], double surfnormals[]);
+
 
 /* ----------------------------------------------------------------------------------
    Output and diagnostics

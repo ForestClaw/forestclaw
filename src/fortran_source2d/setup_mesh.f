@@ -182,7 +182,7 @@ c     # computed at the center of the mesh cell.
 
 
       SUBROUTINE compute_normals(mx,my,mbc,xp,yp,zp,xd,yd,zd,
-     &      xnormals,ynormals,edge_lengths)
+     &      xnormals,ynormals)
       IMPLICIT NONE
 
       INTEGER mx,my,mbc
@@ -197,14 +197,9 @@ c     # computed at the center of the mesh cell.
 
       double precision xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
 
       INTEGER i,j,m
-      DOUBLE PRECISION taud(3),taup(3), sp,sd,st,ct
-      DOUBLE PRECISION nv(3), a1, a2, w(3)
-
-      DOUBLE PRECISION a11, a12, a22, nlen,s,nv1(3)
-      DOUBLE PRECISION h
+      DOUBLE PRECISION taud(3),taup(3),nv(3), sp
 
       INTEGER version
 
@@ -224,12 +219,11 @@ c     # Get x-face normals
             taup(2) = yd(i,j+1) - yd(i,j)
             taup(3) = zd(i,j+1) - zd(i,j)
 
-            CALL get_normal(taup,taud,nv,sp)
+            CALL get_normal(taup,taud,nv)
 
             DO m = 1,3
                xnormals(i,j,m) = nv(m)
             ENDDO
-            edge_lengths(i,j,1) = sp
          ENDDO
       ENDDO
 
@@ -244,17 +238,70 @@ c           # Now do y-faces
             taup(2) = yd(i+1,j) - yd(i,j)
             taup(3) = zd(i+1,j) - zd(i,j)
 
-            CALL get_normal(taup,taud,nv,sp)
+            CALL get_normal(taup,taud,nv)
 
 c           # nv has unit length
             DO m = 1,3
                ynormals(i,j,m) = nv(m)
             ENDDO
-            edge_lengths(i,j,2) = sp
          ENDDO
       ENDDO
 
       END SUBROUTINE compute_normals
+
+
+      SUBROUTINE compute_tangents(mx,my,mbc,xd,yd,zd,
+     &      xtangents,ytangents,edge_lengths)
+      IMPLICIT NONE
+
+      INTEGER mx,my,mbc
+
+      double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
+
+      double precision xtangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision ytangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+
+      INTEGER i,j,m
+      DOUBLE PRECISION taup(3),tlen
+
+c     # Compute normals at all interior edges.
+
+c     # Get x-face normals
+      DO j = -mbc,my+mbc+1
+         DO i = -mbc,mx+mbc+2
+
+            taup(1) = xd(i,j+1) - xd(i,j)
+            taup(2) = yd(i,j+1) - yd(i,j)
+            taup(3) = zd(i,j+1) - zd(i,j)
+            tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
+
+            DO m = 1,3
+               xtangents(i,j,m) = taup(m)/tlen
+            ENDDO
+            edge_lengths(i,j,1) = tlen
+         ENDDO
+      ENDDO
+
+      DO j = -mbc,my+mbc+2
+         DO i = -mbc,mx+mbc+1
+c           # Now do y-faces
+            taup(1) = xd(i+1,j) - xd(i,j)
+            taup(2) = yd(i+1,j) - yd(i,j)
+            taup(3) = zd(i+1,j) - zd(i,j)
+            tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
+
+c           # nv has unit length
+            DO m = 1,3
+               ytangents(i,j,m) = taup(m)/tlen
+            ENDDO
+            edge_lengths(i,j,2) = tlen
+         ENDDO
+      ENDDO
+
+      END SUBROUTINE compute_tangents
 
 
 c     # Compute an approximate unit normal to cell edge
@@ -298,23 +345,23 @@ c     # Formulas work for both left and bottom edges.
 c     #
 c     # Neither version depends on any knowledge of the surface normals.
 
-      subroutine get_normal(taup,taud,nv,sp)
+      subroutine get_normal(taup,taud,nv)
       implicit none
 
-      double precision taup(3),taud(3),nv(3), sp
+      double precision taup(3),taud(3),nv(3)
       integer version
 
       data version /2/
 
       if (version .eq .1) then
-         call get_normal_ver1(taup,taud,nv,sp)
+         call get_normal_ver1(taup,taud,nv)
       elseif (version .eq. 2) then
-         call get_normal_ver2(taup,taud,nv,sp)
+         call get_normal_ver2(taup,taud,nv)
       endif
 
       end
 
-      subroutine get_normal_ver1(taup,taud,nv,sp)
+      subroutine get_normal_ver1(taup,taud,nv)
       implicit none
 
       double precision taup(3),taud(3),nv(3)
@@ -350,7 +397,7 @@ c     # theta = angle between taup and taud
       enddo
       end
 
-      subroutine get_normal_ver2(taup,taud,nv,sp)
+      subroutine get_normal_ver2(taup,taud,nv)
       implicit none
 
       double precision taup(3),taud(3),nv(3), sp
@@ -381,7 +428,48 @@ c      c2 = ai2/nlen
 c         nv(m) = c1*taud(m) + c2*taup(m)
          nv(m) = nv(m)/nlen
       enddo
-      sp = sqrt(aii)
+c      sp = sqrt(aii)
+
+
+      end
+
+      SUBROUTINE compute_surf_normals(mx,my,mbc,
+     &      xnormals,ynormals,edge_lengths,curvature,surfnormals)
+      IMPLICIT NONE
+
+      INTEGER mx,my,mbc
+
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+      double precision  surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+      double precision    curvature(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      INTEGER i,j,m
+      DOUBLE PRECISION nv(3), sp, nlen
+
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
+            do m = 1,3
+               nv(m) = 0
+            enddo
+            nlen = 0
+            do m = 1,3
+               nv(m) = nv(m) +
+     &               edge_lengths(i+1,j,1)*xnormals(i+1,j,m) -
+     &               edge_lengths(i,j,1)*xnormals(i,j,m) +
+     &               edge_lengths(i,j+1,2)*ynormals(i,j+1,m) -
+     &               edge_lengths(i,j,2)*ynormals(i,j,m)
+               nlen = nlen + nv(m)**2
+            enddo
+            nlen = sqrt(nlen)
+            do m = 1,3
+               surfnormals(i,j,m) = nv(m)/nlen
+            enddo
+            curvature(i,j) = nlen
+         enddo
+      enddo
+
 
 
       end

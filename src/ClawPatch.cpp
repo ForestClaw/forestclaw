@@ -174,10 +174,29 @@ double* ClawPatch::yface_normals()
     return m_yface_normals.dataPtr();
 }
 
+double* ClawPatch::xface_tangents()
+{
+    return m_xface_tangents.dataPtr();
+}
+
+double* ClawPatch::yface_tangents()
+{
+    return m_yface_tangents.dataPtr();
+}
+
+double* ClawPatch::surf_normals()
+{
+    return m_surf_normals.dataPtr();
+}
 
 double* ClawPatch::edge_lengths()
 {
     return m_edge_lengths.dataPtr();
+}
+
+double* ClawPatch::curvature()
+{
+    return m_curvature.dataPtr();
 }
 
 
@@ -642,6 +661,8 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
     m_xp.define(box_p,1);
     m_yp.define(box_p,1);
     m_zp.define(box_p,1);
+    m_surf_normals.define(box_p,3);
+    m_curvature.define(box_p,3);
 
     // Compute area of the mesh cell.
     m_area.define(box_p,1);
@@ -662,6 +683,8 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
     /* Face centered values */
     m_xface_normals.define(box_d,3);
     m_yface_normals.define(box_d,3);
+    m_xface_tangents.define(box_d,3);
+    m_yface_tangents.define(box_d,3);
     m_edge_lengths.define(box_d,2);
 
 
@@ -676,6 +699,10 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
 
     double *xnormals = m_xface_normals.dataPtr();
     double *ynormals = m_yface_normals.dataPtr();
+    double *xtangents = m_xface_tangents.dataPtr();
+    double *ytangents = m_yface_tangents.dataPtr();
+    double *surfnormals = m_surf_normals.dataPtr();
+    double *curvature = m_curvature.dataPtr();
     double *edge_lengths = m_edge_lengths.dataPtr();
 
     /* Compute centers and corners of mesh cell */
@@ -689,8 +716,12 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
                   area, level, maxlevel, refratio);
 
     compute_normals_(mx,my,mbc,xp,yp,zp,xd,yd,zd,
-                     xnormals,ynormals,edge_lengths);
+                     xnormals,ynormals);
 
+    compute_tangents_(mx,my,mbc,xd,yd,zd,xtangents,ytangents,edge_lengths);
+
+    compute_surf_normals_(mx,my,mbc,xnormals,ynormals,edge_lengths,
+                          curvature, surfnormals);
 }
 
 
