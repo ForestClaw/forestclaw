@@ -65,63 +65,54 @@ void amr_waveprop_setaux(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-
+    // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
 
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
-    int maxmx = mx;
-    int maxmy = my;
     int mbc = gparms->mbc;
 
-    /* Construct an index box to hold the aux array */
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = 1-mbc;
-    }
-    ur[0] = mx + mbc;
-    ur[1] = my + mbc;
-    Box box(ll,ur);
-
-    FArrayBox &auxarray = waveprop_patch_data->auxarray;
-    int maux = waveprop_parms->maux;
-
-    auxarray.define(box,maux);
-    waveprop_patch_data->maux = maux;
-
-    double *aux = auxarray.dataPtr();
-
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        /* Modified clawpack aux routine */
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-        double *area = cp->area();
+    /* ----------------------------------------------------------- */
+    // Set aux array.  First, get number of aux variables (stored in
+    // global solver data
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
 
-        setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-                         maux,aux,xp,yp,zp,xd,yd,zd,area);
-    }
-    else
-    {
-        /* Standard clawpack aux routine */
-        setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux, aux);
-    }
+    // Construct an index box to hold the aux array
+    int ll[2], ur[2];
+    ll[0] = 1-mbc;
+    ll[1] = 1-mbc;
+    ur[0] = mx + mbc;
+    ur[1] = my + mbc;
+    Box box(ll,ur);
+
+    // get solver specific data stored on this patch
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    waveprop_patch_data->auxarray.define(box,maux);
+    waveprop_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
+
+    /* ----------------------------------------------------------- */
+    // Pointers needed to pass to class setaux call, and other setaux
+    // specific arguments
+    double *aux = waveprop_patch_data->auxarray.dataPtr();
+
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ----------------------------------------------------------- */
+    // Classic setaux call
+    setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
 }
 
 void amr_waveprop_qinit(fclaw2d_domain_t *domain,
@@ -129,49 +120,45 @@ void amr_waveprop_qinit(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx)
 {
-    const amr_options_t *gparms              = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-
+    // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
 
-    double* q = cp->q();
-
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
-
-    /* maux is also stored in waveprop_patch_data */
-    int maux = waveprop_parms->maux;
-
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
-    int maxmx = mx;
-    int maxmy = my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
+    /* ------------------------------------------------------- */
+    // Global solver parameters
+    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
 
-        qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-                        dx,dy,q,maux,aux,xp,yp,zp,xd,yd,zd,this_block_idx);
-    }
-    else
-    {
-        qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-               dx,dy,q,maux,aux);
-    }
+    /* ------------------------------------------------------- */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Solver specific patch data
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    double* aux = waveprop_patch_data->auxarray.dataPtr();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------- */
+    // Call to classic Clawpack 'qinit' routine.
+    qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
 void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
@@ -181,46 +168,45 @@ void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-    const amr_options_t *gparms                    = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
-
+    // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
 
-    double* q = cp->q();
-
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
-    int maux = waveprop_parms->maux;
-
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
-    int maxmx = mx;
-    int maxmy = my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
+    /* ------------------------------------------------------- */
+    // Global solver parameters
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
 
-        b4step2_manifold_(maxmx, maxmy, mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
-                          t,dt,maux,aux,xp,yp,zp,xd,yd,zd);
-    }
-    else
-    {
-        b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
-    }
+    /* ------------------------------------------------------- */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Solver specific patch data
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    double* aux = waveprop_patch_data->auxarray.dataPtr();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------- */
+    // Classic call to b4step2(..)
+    b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
 }
 
 void amr_waveprop_src2(fclaw2d_domain_t *domain,
@@ -230,46 +216,45 @@ void amr_waveprop_src2(fclaw2d_domain_t *domain,
                        double t,
                        double dt)
 {
-    const amr_options_t *gparms                    = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
-
+    // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
 
-    double* q = cp->q();
-
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
-    int maux = waveprop_parms->maux;
-
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
-    int maxmx = mx;
-    int maxmy = my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
+    /* ------------------------------------------------------- */
+    // Global solver parameters
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
 
-        src2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                      maux,aux,t,dt,xp,yp,zp,xd,yd,zd);
-    }
-    else
-    {
-        src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
-    }
+    /* ------------------------------------------------------- */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Solver specific patch data
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    double* aux = waveprop_patch_data->auxarray.dataPtr();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------- */
+    // Classic call to src2(..)
+    src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
 }
 
 
@@ -297,13 +282,32 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
                       double dt,
                       fclaw_bool intersects_phys_bdry[])
 {
-    const amr_options_t* gparms              = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-
+    // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
 
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------- */
+    // Global solver parameters
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
+
+    /* ------------------------------------------------------ */
+    // Set up boundary conditions
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = get_block_data(this_block);
     int *block_mthbc = bdata->mthbc;
@@ -322,46 +326,21 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
         }
     }
 
+    /* ------------------------------------------------------- */
+    // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    int maux = waveprop_parms->maux;
-    double *aux = waveprop_patch_data->auxarray.dataPtr();
+    // Solver specific patch data
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    double* aux = waveprop_patch_data->auxarray.dataPtr();
 
-    /* Global to all patches */
-    int mx = gparms->mx;
-    int my = gparms->my;
+    // Other input arguments
     int maxmx = mx;
     int maxmy = my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
 
-    /* Specific to the patch */
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* Should I also have a 'mapped' version of this? */
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-        double *xface_normals = cp->xface_normals();
-        double *yface_normals = cp->yface_normals();
-
-
-        bc2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                      maux,aux,t,dt,mthbc,
-                      xp,yp,zp,xd,yd,zd,xface_normals,yface_normals);
-    }
-    else
-    {
-        bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
-    }
+    /* ------------------------------------------------------- */
+    // Classic call to bc2(..)
+    bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
 }
 
 
