@@ -76,7 +76,7 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
 
        amr_waveprop_setaux(domain, this_patch, this_block_idx, this_patch_idx);
 
-       The code below can be cut and paste and used for other similar calls.
+       The code below can be cut and paste and used for other similar examples.
        -------------------------------------------------------------------- */
 
     // Set the index of the current block, in case this info is needed by setaux.
@@ -105,6 +105,11 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
+    /* ------------------------------------------------------------------- */
+    // allocate space for the aux array
+    amr_waveprop_define_auxarray(domain,cp);
+
+    /* ------------------------------------------------------------------- */
     // Include additional metric terms not typically passed to 'setaux'
     double *xnormals = cp->xface_normals();
     double *ynormals = cp->yface_normals();
@@ -112,33 +117,12 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
     double *ynormals = cp->yface_normals();
     double *surfnormals = cp->surf_normals();
 
-    /* --------------------------------------------------------------------- */
-    // Global waveprop parms (not stored with every patch)
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    /* ----------------------------------------------------------- */
+    // Get newly created aux array
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
-    /* --------------------------------------------------------------------- */
-    // get the number of aux variables in the solver data area
-    int maux = waveprop_parms->maux;
-
-    // Define and allocate the aux array.  First, create an index box that
-    // will hold the array.
-    int ll[2], ur[2];
-    ll[0] = 1-mbc;
-    ll[1] = 1-mbc;
-    ur[0] = mx + mbc;
-    ur[1] = my + mbc;
-    Box box(ll,ur);
-
-    // allocate space for the aux array
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    waveprop_patch_data->auxarray.define(Box,maux);
-
-    // set the number of aux variables in the solver data (more for completeness
-    // than anything).
-    waveprop_patch_data->maux = maux;
-
-    // Get pointers to pass to fortran
-    double *aux = waveprop_patch_data->auxarray.dataPtr();
 
     /* ------------------------------------------------------------------- */
     // Make call to our own version of setaux.  Here, we have included metric
