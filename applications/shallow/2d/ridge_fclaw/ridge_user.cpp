@@ -45,7 +45,7 @@ void ridge_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &ridge_patch_setup;
     sf->f_patch_initialize         = &ridge_patch_initialize;
-    sf->f_patch_physical_bc        = &amr_waveprop_bc2;
+    sf->f_patch_physical_bc        = &ridge_patch_physical_bc;
     sf->f_patch_single_step_update = &ridge_patch_single_step_update;
 
     // This sets any static functions needed to construct data associated with
@@ -153,10 +153,7 @@ void ridge_patch_physical_bc(fclaw2d_domain *domain,
                              double dt,
                              fclaw_bool intersects_bc[])
 {
-    /*
-    amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc);
-    */
+    // The sphere doesn't have physical boundary conditions.
 }
 
 
