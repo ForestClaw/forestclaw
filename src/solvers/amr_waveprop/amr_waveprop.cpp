@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 #include "amr_waveprop.H"
 
-
 void set_waveprop_parms(fclaw2d_domain_t* domain,amr_waveprop_parms_t* waveprop_parms)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
@@ -52,6 +51,42 @@ amr_waveprop_patch_data_t* get_waveprop_patch_data(ClawPatch *cp)
     amr_waveprop_patch_data_t *wp = (amr_waveprop_patch_data_t*) cp->waveprop_patch_data();
     return wp;
 }
+
+
+void amr_waveprop_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    int maux = waveprop_parms->maux;
+
+    // Construct an index box to hold the aux array
+    int ll[2], ur[2];
+    ll[0] = 1-mbc;
+    ll[1] = 1-mbc;
+    ur[0] = mx + mbc;
+    ur[1] = my + mbc;
+    Box box(ll,ur);
+
+    // get solver specific data stored on this patch
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    waveprop_patch_data->auxarray.define(box,maux);
+    waveprop_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
+}
+
+void amr_waveprop_get_auxarray(fclaw2d_domain_t* domain,
+                               ClawPatch *cp, double **aux, int* maux)
+{
+    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
+    *maux = waveprop_parms->maux;
+
+    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    *aux = waveprop_patch_data->auxarray.dataPtr();
+}
+
 
 void amr_waveprop_setprob(fclaw2d_domain_t* domain)
 {
@@ -84,28 +119,14 @@ void amr_waveprop_setaux(fclaw2d_domain_t *domain,
     double dy = cp->dy();
 
     /* ----------------------------------------------------------- */
-    // Set aux array.  First, get number of aux variables (stored in
-    // global solver data
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
-    int maux = waveprop_parms->maux;
-
-    // Construct an index box to hold the aux array
-    int ll[2], ur[2];
-    ll[0] = 1-mbc;
-    ll[1] = 1-mbc;
-    ur[0] = mx + mbc;
-    ur[1] = my + mbc;
-    Box box(ll,ur);
-
-    // get solver specific data stored on this patch
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    waveprop_patch_data->auxarray.define(box,maux);
-    waveprop_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
+    amr_waveprop_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
-    double *aux = waveprop_patch_data->auxarray.dataPtr();
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     int maxmx = mx;
     int maxmy = my;
@@ -140,17 +161,12 @@ void amr_waveprop_qinit(fclaw2d_domain_t *domain,
     double dy = cp->dy();
 
     /* ------------------------------------------------------- */
-    // Global solver parameters
-    amr_waveprop_parms_t *waveprop_parms     = get_waveprop_parms(domain);
-    int maux = waveprop_parms->maux;
-
-    /* ------------------------------------------------------- */
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Solver specific patch data
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -188,17 +204,12 @@ void amr_waveprop_b4step2(fclaw2d_domain_t *domain,
     double dy = cp->dy();
 
     /* ------------------------------------------------------- */
-    // Global solver parameters
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
-    int maux = waveprop_parms->maux;
-
-    /* ------------------------------------------------------- */
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Solver specific patch data
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -236,17 +247,12 @@ void amr_waveprop_src2(fclaw2d_domain_t *domain,
     double dy = cp->dy();
 
     /* ------------------------------------------------------- */
-    // Global solver parameters
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
-    int maux = waveprop_parms->maux;
-
-    /* ------------------------------------------------------- */
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Solver specific patch data
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -301,11 +307,6 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ------------------------------------------------------- */
-    // Global solver parameters
-    amr_waveprop_parms_t *waveprop_parms = get_waveprop_parms(domain);
-    int maux = waveprop_parms->maux;
-
     /* ------------------------------------------------------ */
     // Set up boundary conditions
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
@@ -330,9 +331,9 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Solver specific patch data
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -354,7 +355,7 @@ double amr_waveprop_step2(fclaw2d_domain_t *domain,
 {
     const amr_options_t* gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
-    amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+    // amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
     amr_waveprop_parms_t * waveprop_parms   = get_waveprop_parms(domain);
 
     set_block_(&this_block_idx);
@@ -363,8 +364,9 @@ double amr_waveprop_step2(fclaw2d_domain_t *domain,
 
     double* qold = cp->q();
 
-    double* aux = waveprop_patch_data->auxarray.dataPtr();
-    int maux = waveprop_parms->maux;
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
     cp->save_current_step();  // Save for time interpolation
 
@@ -449,10 +451,11 @@ void cb_dump_auxarray(fclaw2d_domain_t *domain,
     {
         const amr_options_t* gparms              = get_domain_parms(domain);
         ClawPatch *cp                            = get_clawpatch(this_patch);
-        amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
+        // amr_waveprop_patch_data_t *waveprop_patch_data = get_waveprop_patch_data(cp);
 
-        double* aux = waveprop_patch_data->auxarray.dataPtr();
-        int maux = waveprop_patch_data->maux;
+        double *aux;
+        int maux;
+        amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
         int mx = gparms->mx;
         int my = gparms->my;

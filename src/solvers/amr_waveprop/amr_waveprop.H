@@ -29,8 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "amr_options.h"
 #include "clawpack_fort.H"
+#include "amr_forestclaw.H"
 
-/* I know this is one 'extern C' too many, but I like the indentation here */
+
 extern "C"
 {
     void setprob_();
@@ -40,28 +41,11 @@ extern "C"
               const double& dx, const double& dy, const double q[], const int& maux,
               const double aux[], const double& t, const double& dt, const int mthbc[]);
 
-    void bc2_manifold_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-                       const int& mx, const int& my, const double& xlower, const double& ylower,
-                       const double& dx, const double& dy, const double q[], const int& maux,
-                       const double aux[], const double& t, const double& dt, const int mthbc[],
-                       double xp[], double yp[], double zp[],
-                       double xd[],double yd[],double zd[],
-                       const double xface_normals[], const double yface_normals[]);
-
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
                 const int& mbc, const int& mx, const int& my,
                 const double& xlower, const double& ylower,
                 const double& dx, const double& dy,
                 double q[], const int& maux, double aux[]);
-
-    void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[],
-                         double xp[], double yp[], double zp[],
-                         double xd[], double yd[], double zd[],
-                         const int& blockno);
 
     void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
                  const int& mx, const int& my,
@@ -69,39 +53,12 @@ extern "C"
                  const double& dx, const double& dy,
                  const int& maux, double aux[]);
 
-    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                          const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],double area[]);
-
     void b4step2_(const int& maxmx, const int& maxmy, const int& mbc,
                   const int& mx, const int& my, const int& meqn,
                   double q[], const double& xlower, const double& ylower,
                   const double& dx, const double& dy,
                   const double& t, const double& dt,
                   const int& maux, double aux[]);
-
-
-    void b4step2_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                          const int& mx, const int& my, const int& meqn,
-                          double q[], const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const double& t, const double& dt,
-                          const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[]);
-
-    void src2_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                        const int& mbc, const int& mx,const int& my,
-                        const double& xlower, const double& ylower,
-                        const double& dx, const double& dy, double q[],
-                        const int& maux, double aux[], const double& t,
-                        const double& dt,
-                        double xp[], double yp[], double zp[],
-                        double xd[], double yd[], double zd[]);
 
     void src2_(const int& maxmx, const int& maxmy, const int& meqn,
                const int& mbc, const int& mx,const int& my,
@@ -121,10 +78,8 @@ extern "C"
                      const double& cfl, double work[], const int& mwork, const double& xlower,
                      const double& ylower, const int& level, const double& t, double fp[],
                      double fm[], double gp[], double gm[]);
+
 }
-
-
-
 
 
 #ifdef __cplusplus
@@ -161,6 +116,10 @@ struct amr_waveprop_parms
 /* ----------------------------------------------------------------------
    Routines that get called once when setting up the problem and solvers.
    ---------------------------------------------------------------------- */
+/* waveprop specific arguments */
+void amr_waveprop_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
+void amr_waveprop_get_auxarray(fclaw2d_domain_t* domain,
+                               ClawPatch *cp, double **aux, int* maux);
 
 /* Reading in parameters */
 void set_waveprop_parms(fclaw2d_domain_t* domain,amr_waveprop_parms_t* waveprop_parms);
@@ -215,6 +174,13 @@ void amr_waveprop_bc2(fclaw2d_domain_t *domain,
                       double dt,
                       fclaw_bool intersects_bc[]);
 
+void amr_waveprop_src2(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
+
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
@@ -233,6 +199,12 @@ double amr_waveprop_step2_rhs(fclaw2d_domain_t *domain,
                               double t,
                               double *rhs);
 
+double amr_waveprop_update(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           double t,
+                           double dt);
 
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
 
