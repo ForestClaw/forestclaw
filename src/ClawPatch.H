@@ -205,6 +205,15 @@ public :
     static fclaw2d_solver_patch_data_new_t f_manyclaw_patch_data_new;
     static fclaw2d_solver_patch_data_delete_t f_manyclaw_patch_data_delete;
 
+    // ----------------------------------------------------------------
+    // User data
+    // ----------------------------------------------------------------
+    void* user_patch_data();
+    void set_user_patch_data(void* user_data);
+    static fclaw2d_solver_patch_data_new_t f_user_patch_data_new;
+    static fclaw2d_solver_patch_data_delete_t f_user_patch_data_delete;
+
+
 protected :
 
     int  m_mx;
@@ -276,6 +285,7 @@ protected :
     void *m_manyclaw_patch_data;
 
     // Add user data (for coefficients, for example)
+    void * m_user_patch_data;
 }; // End class ClawPatch
 
 #endif

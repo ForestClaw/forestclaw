@@ -7,9 +7,10 @@ void solver_default(void** solverdata)
     *solverdata = (void*) NULL;
 }
 
-// -----------------------------------------------------
-// Wave propagation new/delete
-// -----------------------------------------------------
+/* -----------------------------------------------------
+   Solver new/delete functions.  This really needs to be
+   made more general (via some kind of registration?)
+   ----------------------------------------------------- */
 fclaw2d_solver_patch_data_new_t
     ClawPatch::f_waveprop_patch_data_new = &solver_default;
 fclaw2d_solver_patch_data_delete_t
@@ -19,6 +20,11 @@ fclaw2d_solver_patch_data_new_t
     ClawPatch::f_manyclaw_patch_data_new = &solver_default;
 fclaw2d_solver_patch_data_delete_t
     ClawPatch::f_manyclaw_patch_data_delete = &solver_default;
+
+fclaw2d_solver_patch_data_new_t
+    ClawPatch::f_user_patch_data_new = &solver_default;
+fclaw2d_solver_patch_data_delete_t
+    ClawPatch::f_user_patch_data_delete = &solver_default;
 
 // -----------------------------------------------------
 // User data new/delete
@@ -34,6 +40,7 @@ ClawPatch::~ClawPatch()
 {
     ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
     ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
+    ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
 }
 
 
@@ -87,6 +94,7 @@ void ClawPatch::define(const double&  a_xlower,
 
     ClawPatch::f_waveprop_patch_data_new(&m_waveprop_patch_data);
     ClawPatch::f_manyclaw_patch_data_new(&m_manyclaw_patch_data);
+    ClawPatch::f_user_patch_data_new(&m_user_patch_data);
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
