@@ -104,25 +104,8 @@ void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        /* Modified clawpack aux routine that passes in mapping terms */
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-        double *area = cp->area();
-
-        setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-                         maux,aux,xp,yp,zp,xd,yd,zd,area);
-    }
-    else
-    {
-        /* Standard clawpack aux routine */
-        setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux, aux);
-    }
+    /* Standard clawpack aux routine */
+    setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux, aux);
 }
 
 void amr_manyclaw_qinit(fclaw2d_domain_t *domain,
@@ -156,22 +139,7 @@ void amr_manyclaw_qinit(fclaw2d_domain_t *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-
-        qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-                        dx,dy,q,maux,aux,xp,yp,zp,xd,yd,zd,this_block_idx);
-    }
-    else
-    {
-        qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
-    }
+    qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
 void amr_manyclaw_b4step2(fclaw2d_domain_t *domain,
@@ -205,22 +173,7 @@ void amr_manyclaw_b4step2(fclaw2d_domain_t *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-
-        b4step2_manifold_(maxmx, maxmy, mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
-                          t,dt,maux,aux,xp,yp,zp,xd,yd,zd);
-    }
-    else
-    {
-        b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
-    }
+    b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
 }
 
 void amr_manyclaw_src2(fclaw2d_domain_t *domain,
@@ -258,22 +211,7 @@ void amr_manyclaw_src2(fclaw2d_domain_t *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-
-        src2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                      maux,aux,t,dt,xp,yp,zp,xd,yd,zd);
-    }
-    else
-    {
-        src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
-    }
+    src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
 }
 
 
@@ -345,27 +283,7 @@ void amr_manyclaw_bc2(fclaw2d_domain *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* Should I also have a 'mapped' version of this? */
-    if (gparms->manifold)
-    {
-        double *xp = cp->xp();
-        double *yp = cp->yp();
-        double *zp = cp->zp();
-        double *xd = cp->xd();
-        double *yd = cp->yd();
-        double *zd = cp->zd();
-        double *xface_normals = cp->xface_normals();
-        double *yface_normals = cp->yface_normals();
-
-
-        bc2_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                      maux,aux,t,dt,mthbc,
-                      xp,yp,zp,xd,yd,zd,xface_normals,yface_normals);
-    }
-    else
-    {
-        bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
-    }
+    bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
 }
 
 
