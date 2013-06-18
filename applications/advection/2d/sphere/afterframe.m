@@ -15,7 +15,7 @@ setviews;
 NoQuery = 0;
 prt = false;
 if (prt)
-  filename = 'swirl000.png';
+  filename = 'sphere000.png';
   str = num2str(Frame);
   len = length(str);
   filename(8-len+1:8) = str;
