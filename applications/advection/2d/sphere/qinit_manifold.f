@@ -13,20 +13,22 @@
       double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j
+      integer i,j, m
       double precision x,y,z
 
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
-            x = xp(i,j)
-            y = yp(i,j)
-            z = zp(i,j)
+      do m = 1,meqn
+         do j = 1-mbc,my+mbc
+            do i = 1-mbc,mx+mbc
+               x = xp(i,j)
+               y = yp(i,j)
+               z = zp(i,j)
 
-            if (x .le. 0) then
-               q(i,j,1) = 1.d0
-            else
-               q(i,j,1) = 0.d0
-            endif
+               if (x .le. 0) then
+                  q(i,j,m) = 1.d0
+               else
+                  q(i,j,m) = 0.d0
+               endif
+            enddo
          enddo
       enddo
 

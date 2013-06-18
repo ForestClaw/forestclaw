@@ -13,16 +13,14 @@
       qmin = 100.d0
       qmax = -100.d0
       tag_patch = 0
-      do mq = 1,meqn
-         do i = 1-mbc,mx+mbc
-            do j = 1-mbc,my+mbc
-               qmin = min(q(i,j,mq),qmin)
-               qmax = max(q(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.25d0) then
-                  tag_patch = 1
-                  return
-               endif
-            enddo
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
+            qmin = min(q(i,j,1),qmin)
+            qmax = max(q(i,j,1),qmax)
+            if (qmax - qmin .gt. 0.25d0) then
+               tag_patch = 1
+               return
+            endif
          enddo
       enddo
 
