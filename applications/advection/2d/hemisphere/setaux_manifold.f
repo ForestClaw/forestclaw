@@ -3,8 +3,8 @@
      &      maux,aux,xp,yp,zp,xd,yd,zd,area)
       implicit none
 
-      integer maxmx, maxmy,mbc, mx, my, maux
-      double precision xlower, ylower, dx, dy
+      integer maxmx, maxmy, mbc, mx,my, meqn, maux
+      double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -30,7 +30,6 @@
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
-
             if ((i .ge. 1 .and. i .le. mx) .and.
      &            (j .ge. 1 .and. j .le. my)) then
                sum = sum + area(i,j)

@@ -1,6 +1,6 @@
       subroutine qinit_manifold(maxmx,maxmy,meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,maux,aux,
-     &      xp,yp,zp,xd,yd,zd,this_block_idx)
+     &      xp,yp,zp)
 
       implicit none
 
@@ -12,10 +12,6 @@
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-
-      double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
 
       integer i,j
       double precision x,y,z

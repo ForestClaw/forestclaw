@@ -39,6 +39,7 @@ default: $(TARGET)
 
 
 exampleobjs = \
+	hemisphere_user.o \
 	ghost_twopatch.o \
 	velocity_wind.o \
 	tag4refinement.o \
