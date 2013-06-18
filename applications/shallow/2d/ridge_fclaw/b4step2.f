@@ -1,4 +1,3 @@
-c     ============================================
       subroutine b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,
      &      xlower,ylower,dx,dy,time,dt,maux,aux)
       implicit none
@@ -13,14 +12,6 @@ c     ============================================
       double precision erx, ery, erz, qn
 
       integer i,j, rf
-c      common /xlyl/ xlow,ylow
-
-c      common /comq0/ q0sum
-c      common /comfine/ dxmin, dymin
-
-      xlow = xlower
-      ylow = ylower
-c
 
 c     # We may not even need this if we project out the correct surface
 c     # normal from the velocities.
@@ -39,13 +30,6 @@ c     # normal from the velocities.
             q(i,j,4) = q(i,j,4) - qn*erz
          enddo
       enddo
-
-      return
-
-
-
-
-
 
       return
       end
