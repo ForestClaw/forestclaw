@@ -58,6 +58,7 @@ void ridge_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
+    set_maptype_()
     amr_waveprop_setprob(domain);
 }
 

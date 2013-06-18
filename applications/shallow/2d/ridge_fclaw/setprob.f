@@ -5,6 +5,8 @@
       common /cprob/ ampl, tol1, tol2
       common /sw/  g
 
+      double precision rot_angle(2)
+
       call settsunami
       call setgauges
 c
@@ -18,9 +20,9 @@ c     # rotation rate:
 c     Omega = 0.0d0    ! 1/sec
 c
 c     # graviational constant
-c     g =  11489.57219e0 
+c     g =  11489.57219e0
       g =  1.d0  ! when using geopotential height
-      
+
       read(7,*) x1, y1, z1
 c     # normalize to have length 1 in case it didn't:
       Px = x1
@@ -35,5 +37,13 @@ c     # amplitude of initial Gaussian:
       read(7,*) ampl
 c     # refinement tolerances used in flag2refine:
       read(7,*) tol1, tol2
+
+c     # Set mapping scaling
+      scale = Rsphere
+      rot_angle(1) = 0
+      rot_angle(2) = 0
+      call setup_mappedgrid(rot_angle,scale)
+
+
       return
       end
