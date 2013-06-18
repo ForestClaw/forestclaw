@@ -44,7 +44,7 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &sphere_patch_setup;
     sf->f_patch_initialize         = &sphere_qinit;
-    sf->f_patch_physical_bc        = &amr_waveprop_bc2;
+    sf->f_patch_physical_bc        = &sphere_patch_physical_bc;
     sf->f_patch_single_step_update = &sphere_update;
 
     amr_waveprop_link_to_clawpatch();
@@ -146,6 +146,18 @@ void sphere_qinit(fclaw2d_domain_t *domain,
     qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,
                     xp,yp,zp);
 }
+
+void sphere_patch_physical_bc(fclaw2d_domain *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt,
+                             fclaw_bool intersects_bc[])
+{
+    // The sphere has no physical boundaries
+}
+
 
 void sphere_b4step2(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
