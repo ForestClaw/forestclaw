@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
 
+#include "ridge_user.H"
+
 int
 main (int argc, char **argv)
 {
@@ -85,7 +87,7 @@ main (int argc, char **argv)
 
   /* Link solvers to the domain */
   link_problem_setup(domain,amr_waveprop_setprob);
-  amr_waveprop_link_solvers(domain);
+  ridge_link_solvers(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation
