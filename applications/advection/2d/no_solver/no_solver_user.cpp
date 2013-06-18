@@ -47,23 +47,26 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
                                 int this_patch_idx)
 {
 
-    const amr_options_t *gparms              = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-
     set_block_(&this_block_idx);
 
-    double* q = cp->q();
-
+    // Global parameters
+    const amr_options_t *gparms              = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
+    // Parameters specific to this patch
+    ClawPatch *cp                            = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
+    // Pointers needed for the fortran
+    double* q = cp->q();
+
+    // Call to initialization function.
     initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 }
 
