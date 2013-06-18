@@ -1,6 +1,6 @@
       subroutine b4step2_manifold(maxmx,maxmy,mbc,mx,my,meqn,q,
      &      xlower,ylower,dx,dy,time,dt,maux,aux,
-     &      xp,yp,zp,xd,yd,zd)
+     &      xd,yd,zd)
       implicit none
 
       integer maxmx, maxmy, mbc, mx, my, meqn, maux

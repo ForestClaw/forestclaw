@@ -35,6 +35,7 @@ default: $(TARGET)
 .PHONY: clean realclean default $(TARGET)
 
 exampleobjs = \
+	sphere_user.o \
 	ghost_twopatch.o \
 	velocity_wind.o \
 	tag4refinement.o \
