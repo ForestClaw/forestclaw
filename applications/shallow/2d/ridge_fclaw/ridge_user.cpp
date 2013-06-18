@@ -92,7 +92,6 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
     int mbc = gparms->mbc;
-    int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
     int refratio = gparms->refratio;
     int level = this_patch->level;
@@ -114,7 +113,7 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
     double *xnormals = cp->xface_normals();
     double *ynormals = cp->yface_normals();
     double *xtangents = cp->xface_tangents();
-    double *ynormals = cp->yface_normals();
+    double *ytangents = cp->yface_tangents();
     double *surfnormals = cp->surf_normals();
 
     /* ----------------------------------------------------------- */

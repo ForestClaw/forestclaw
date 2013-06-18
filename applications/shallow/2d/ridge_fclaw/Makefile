@@ -14,10 +14,12 @@ exampleobjs = \
 	ghost_twopatch.o \
 	tag4refinement.o \
 	mapc2m.o \
-	rpn2swsphere.o \
+	rpn2swsphere_fw.o \
 	rpt2swq.o \
 	qinit.o \
 	b4step2.o \
+	setgauges.o \
+	settsunami_geo.o \
 	setaux_ridge.o \
 	src2.o \
 	setprob.o \

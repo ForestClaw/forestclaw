@@ -37,6 +37,21 @@ extern "C"
 #endif
 #endif
 
+extern "C"
+{
+
+    void setaux_ridge_(const int& maxmx, const int& maxmy, const int& mbc,
+                       const int& mx, const int& my,
+                       const double& xlower, const double& ylower,
+                       const double& dx, const double& dy,
+                       const int& maux, double aux[],
+                       double xnormals[], double ynormals[],
+                       double xtangents[], double ytangents[],
+                       double surfnormals[], const int& level,
+                       const int& maxlevel, const int& refratio);
+
+}
+
 void ridge_link_solvers(fclaw2d_domain_t *domain);
 
 void ridge_problem_setup(fclaw2d_domain_t* domain);

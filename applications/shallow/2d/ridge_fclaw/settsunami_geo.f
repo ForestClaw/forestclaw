@@ -6,22 +6,22 @@ c=========================================================================
       character*20 fname
       logical foundFile
 
-      include "call.i"
-      include "geo.i"
-
-      write(parmunit,*) ' '
-      write(parmunit,*) '--------------------------------------------'
-      write(parmunit,*) 'SETTSUNAMI:'
-      write(parmunit,*) '-----------'
-
-c       # read user parameters from settsunami.data
-
+c      include "call.i"
+c      include "geo.i"
+c
+c      write(parmunit,*) ' '
+c      write(parmunit,*) '--------------------------------------------'
+c      write(parmunit,*) 'SETTSUNAMI:'
+c      write(parmunit,*) '-----------'
+c
+cc       # read user parameters from settsunami.data
+c
       fname  = 'settsunami.data'
-      inquire(file=fname,exist=foundFile)
-      if (.not. foundFile) then
-        write(*,*) 'You must provide a file ', fname
-        stop
-      endif
+c      inquire(file=fname,exist=foundFile)
+c      if (.not. foundFile) then
+c        write(*,*) 'You must provide a file ', fname
+c        stop
+c      endif
 
       open(unit=7,file=fname,status='old',form='formatted')
 
@@ -35,13 +35,13 @@ c       # read user parameters from settsunami.data
       read(7,*) frictiondepth
       close(7)
 
-      write(parmunit,*) '   drytolerance:',drytolerance
-      write(parmunit,*) '   wavetolerance:',wavetolerance
-      write(parmunit,*) '   maxleveldeep:', maxleveldeep
-      write(parmunit,*) '   depthdeep:', depthdeep
-      write(parmunit,*) '   ifriction:', ifriction
-      write(parmunit,*) '   Manning coefficient:',coeffmanning
-      write(parmunit,*) '   frictiondepth:',frictiondepth
+c      write(parmunit,*) '   drytolerance:',drytolerance
+c      write(parmunit,*) '   wavetolerance:',wavetolerance
+c      write(parmunit,*) '   maxleveldeep:', maxleveldeep
+c      write(parmunit,*) '   depthdeep:', depthdeep
+c      write(parmunit,*) '   ifriction:', ifriction
+c      write(parmunit,*) '   Manning coefficient:',coeffmanning
+c      write(parmunit,*) '   frictiondepth:',frictiondepth
 
       return
       end

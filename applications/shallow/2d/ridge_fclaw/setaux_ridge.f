@@ -4,6 +4,7 @@
       implicit none
 
       integer maxmx, maxmy, mbc, mx,my, maux
+      integer level, maxlevel, refratio
       double precision xlower, ylower, dx,dy
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,maux)
 
@@ -37,8 +38,8 @@ c     19  bathymetry - averaged over all possible finer cells
       call  assign_comp_centers(maxmx,maxmy,mbc,mx,my,
      &      xlower,ylower,dx,dy,maux,aux)
 
-      call assign_capacity(mx,my,mbc,dx,dy,xlower, ylower,
-     &      area,level,maxlevel,refratio,aux,maux)
+      call assign_capacity(maxmx, maxmy, mx,my,mbc,dx,dy,xlower, ylower,
+     &      level,maxlevel,refratio,aux,maux)
 
       call assign_normals(maxmx,maxmy,mx,my,mbc,
      &      xnormals,ynormals,xtangents,ytangents,
@@ -73,7 +74,7 @@ c     18  yc at cell center
       end
 
       subroutine assign_normals(maxmx, maxmy, mx,my,mbc,
-     &      xnormals,ynormals, xtangents,xtangents,
+     &      xnormals,ynormals, xtangents,ytangents,
      &      surfnormals,aux,maux)
       implicit none
 
@@ -138,15 +139,15 @@ c     16  erz = z-component of unit vector in radial direction at cell ctr
       end
 
 
-      subroutine assign_capacity(mx,my,mbc,dx,dy,xlower, ylower,
-     &      area,level,maxlevel,refratio,aux,maux)
+      subroutine assign_capacity(maxmx, maxmy, mx,my,mbc,dx,dy,
+     &      xlower, ylower, level,maxlevel,refratio,aux,maux)
       implicit none
 
-      integer mx,my,mbc,level, refratio,maxlevel, maux
+      integer maxmx, maxmy, mx,my,mbc,level, refratio,maxlevel, maux
       double precision dx,dy, xlower, ylower
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j,ii,jj, ir, rfactor, icell, jcell
+      integer i,j,ii,jj,icell, jcell
       double precision sum_area, xcorner, ycorner
       double precision xp1,yp1,zp1
       double precision quad(0:1,0:1,3)
@@ -154,12 +155,12 @@ c     16  erz = z-component of unit vector in radial direction at cell ctr
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,maux)
 
       double precision dxf, dyf, xdf, ydf, total_area, a
-      double precision xef, yef, xe,ye, area1
-      integer k, m
+      double precision xef, yef, xe,ye, area1, areab
+      integer k, m, ir, jr
 
       integer rmax, rfactor
       parameter(rmax = 64)
-      double precision area_ref(rmax,rmax)
+      double precision area_ref(rmax,rmax), avg_bath, areafact
 
       rfactor = 1
       do ir = level,maxlevel-1
