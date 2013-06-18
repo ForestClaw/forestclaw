@@ -7,6 +7,10 @@
 
       double precision rot_angle(2)
 
+      common /compi/ pi
+
+      pi = 4.d0*atan(1.d0)
+
       call settsunami
       call setgauges
 c

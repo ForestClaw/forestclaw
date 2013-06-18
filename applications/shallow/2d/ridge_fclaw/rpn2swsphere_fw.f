@@ -167,8 +167,8 @@ c
          fwave(i,3,3) = (a3*(u(i)+a(i))*eny + a3*v(i)*ety)*sk
          fwave(i,4,3) = (a3*(u(i)+a(i))*enz + a3*v(i)*etz)*sk
 
-  281    format(2i4,5d12.4)
-  283    format(8x,5d12.4)
+c  281    format(2i4,5d12.4)
+c  283    format(8x,5d12.4)
    20 continue
 c
 c

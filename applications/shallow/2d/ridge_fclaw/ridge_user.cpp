@@ -45,7 +45,7 @@ void ridge_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &ridge_patch_setup;
     sf->f_patch_initialize         = &ridge_patch_initialize;
-    sf->f_patch_physical_bc        = &ridge_patch_physical_bc;
+    sf->f_patch_physical_bc        = &amr_waveprop_bc2;
     sf->f_patch_single_step_update = &ridge_patch_single_step_update;
 
     // This sets any static functions needed to construct data associated with
@@ -58,7 +58,7 @@ void ridge_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    set_maptype_()
+    set_maptype_();
     amr_waveprop_setprob(domain);
 }
 

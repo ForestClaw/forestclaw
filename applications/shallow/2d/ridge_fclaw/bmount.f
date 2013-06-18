@@ -1,7 +1,3 @@
-c
-c
-c
-c     ============================================================
       double precision function bmount(xc,yc)
 c     ============================================================
 c
@@ -20,6 +16,5 @@ c     # compute latitude:
 
       thetam = -pi/6.d0 !position of ridge
       bmount = bmount + 3.d4*dexp(-1000.d0*(theta-thetam)**2)
-
       return
       end
