@@ -123,15 +123,17 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
     int maux;
     amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
 
-
     /* ------------------------------------------------------------------- */
     // Make call to our own version of setaux.  Here, we have included metric
     // terms that we need for SWE.
+
     setaux_ridge_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux,
                   xnormals,ynormals,
                   xtangents,ytangents,
                   surfnormals,
                   level,maxlevel,refratio);
+
+
 
 }
 

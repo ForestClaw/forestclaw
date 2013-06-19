@@ -21,9 +21,9 @@ c
 
 c     # symmetry axis (Px,Py,Pz) set in setprob.f
 
-       do 20 i=1,mx
+       do 20 i=1-mbc,mx+mbc
 	  xc = xlower + (i-0.5d0)*dx
-          do 20 j=1,my
+          do 20 j=1-mbc,my+mbc
 	     yc = ylower + (j-0.5d0)*dy
 c
 c            # set the clawpack initial values:
