@@ -79,13 +79,12 @@ c     #
       end
 
 
-      subroutine dump_patch(mx,my,mbc,meqn,q)
+      subroutine dump_patch(mx,my,mbc,meqn,mq,q)
       implicit none
       integer mx,my,mbc,meqn,mq
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
 
-      mq = 1
       do j = my+mbc,1-mbc,-1
          write(6,100) j, (q(i,j,mq),i = 1-mbc,mx+mbc)
       enddo
