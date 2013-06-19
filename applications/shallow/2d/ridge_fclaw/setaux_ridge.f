@@ -35,7 +35,6 @@ c     17  xc at cell center
 c     18  yc at cell center
 c     19  bathymetry - averaged over all possible finer cells
 
-
       call  assign_comp_centers(maxmx,maxmy,mbc,mx,my,
      &      xlower,ylower,dx,dy,maux,aux)
 
@@ -44,7 +43,8 @@ c     &      dx,dy,xlower, ylower,
 c     &      level,maxlevel,refratio,aux,maux)
 
       call assign_area(maxmx, maxmy,mx,my,mbc,
-     &      xlower,ylower,dx,dy,refratio,aux,maux)
+     &      xlower,ylower,dx,dy,refratio,level, maxlevel,
+     &      aux,maux)
 
 
       call assign_normals(maxmx,maxmy,mx,my,mbc,
@@ -105,14 +105,17 @@ c     4  enz = z-component of normal vector to left edge in tangent plane
 c     5  etx = x-component of tangent vector to left edge in tangent plane
 c     6  ety = y-component of tangent vector to left edge in tangent plane
 c     7  etz = z-component of tangent vector to left edge in tangent plane
-      do j = 1-mbc,my+mbc
-         do i = 2-mbc,mx+mbc
+      open(10,file='xnormals.dat')
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
             do m = 1,3
                aux(i,j,1+m) = xnormals(i,j,m)
                aux(i,j,4+m) = xtangents(i,j,m)
             enddo
+            write(10,'(2I5,3E16.4)') i,j,(xnormals(i,j,m),m=1,3)
          enddo
       enddo
+      close(10)
 
 c     # Assign y-face normals and tangents
 c     8  enx = x-component of normal vector to bottom edge in tangent plane
@@ -120,35 +123,47 @@ c     9  eny = y-component of normal vector to bottom edge in tangent plane
 c     10  enz = z-component of normal vector to bottom edge in tangent plane
 c     11  etx = x-component of tangent vector to bottom edge in tangent plane
 c     12  ety = y-component of tangent vector to bottom edge in tangent plane
-c     13  etz = z-component of tangent vector to bottom edge in tangent plane
-      do j = 2-mbc,my+mbc
+c     13  etz = z-component of tangent vector to bottom edge in tangent
+c     plane
+      open(10,file='ynormals.dat')
+      do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             do m = 1,3
                aux(i,j,7+m) = ynormals(i,j,m)
                aux(i,j,10+m) = ytangents(i,j,m)
             enddo
+            write(10,'(2I5,3E16.4)') i,j,(ynormals(i,j,m),m=1,3)
          enddo
       enddo
+      close(10)
+
 
 c     # Compute a surface normal. Use the sum of normals.
 c     14  erx = x-component of unit vector in radial direction at cell ctr
 c     15  ery = y-component of unit vector in radial direction at cell ctr
-c     16  erz = z-component of unit vector in radial direction at cell ctr
+c     16  erz = z-component of unit vector in radial direction at cell
+c     ctr
+      open(10,file='surf_normals.dat')
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             do m = 1,3
                aux(i,j,13+m) = surfnormals(i,j,m)
             enddo
+            write(10,*) i,j,(surfnormals(i,j,m),m=1,3)
          enddo
+         write(10,*) ' '
       enddo
+      close(10)
 
       end
 
       subroutine assign_area(maxmx, maxmy,mx,my,mbc,
-     &      xlower,ylower,dx,dy,rfactor,aux,maux)
+     &      xlower,ylower,dx,dy,refratio,level, maxlevel,
+     &      aux,maux)
       implicit none
 
       integer maxmx, maxmy, mbc, mx,my, maux
+      integer refratio, level, maxlevel
       double precision xlower,ylower,dx,dy
 
       integer rmax, rfactor
@@ -167,6 +182,12 @@ c     16  erz = z-component of unit vector in radial direction at cell ctr
 
       double precision avg_bath, areab
       double precision get_area_approx
+
+
+      rfactor = 1
+      do ir = level,maxlevel-1
+         rfactor = rfactor*refratio
+      enddo
 
       if (rfactor .gt. rmax) then
          write(6,*) 'compute_area : Increase size of rmax to ',

@@ -50,6 +50,13 @@ extern "C"
                        double surfnormals[], const int& level,
                        const int& maxlevel, const int& refratio);
 
+    void write_qfile_geo_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+                          const int& mx, const int& my,
+                          const double& xlower, const double& ylower,
+                          const double& dx, const double& dy, double q[],
+                          const int& iframe,
+                          const int& patch_idx,const int& level,const int& blockno,
+                          const int& maux, double aux[]);
 }
 
 void ridge_link_solvers(fclaw2d_domain_t *domain);
@@ -80,6 +87,10 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
                                       int this_patch_idx,
                                       double t,
                                       double dt);
+
+void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                        int this_block_idx, int this_patch_idx,
+                        int iframe,int num,int matlab_level);
 
 #ifdef __cplusplus
 #if 0

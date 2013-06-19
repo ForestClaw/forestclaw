@@ -179,6 +179,48 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
+void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                        int this_block_idx, int this_patch_idx,
+                        int iframe,int num,int matlab_level)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ----------------------------------------------------------- */
+    // Get newly created aux array
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+
+    /* ------------------------------------------------------------- */
+    // This opens a file for append.  Now, the style is in the 'clawout' style.
+    write_qfile_geo_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                     iframe,num,matlab_level,this_block_idx,maux,aux);
+}
 
 #ifdef __cplusplus
 #if 0

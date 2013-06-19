@@ -23,6 +23,7 @@ exampleobjs = \
 	setaux_ridge.o \
 	src2.o \
 	setprob.o \
+	output_geo.o \
 	bmount.o
 
 # Solver routines (several solvers can be added here)

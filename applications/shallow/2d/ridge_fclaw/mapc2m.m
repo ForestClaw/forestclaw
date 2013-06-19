@@ -9,8 +9,20 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 %    by Donna A. Calhoun, Christiane Helzel, and Randall J. LeVeque,
 %    http://www.amath.washington.edu/~rjl/pubs/circles
 
+global rsphere;
+global creatingclines
+
 
 [xp,yp,zp] = mapc2m_pillow(xc1,yc1);
+
+if (creatingclines == 1)
+    s = 1.05;
+else
+    s = 1.0;
+end
+xp = s*rsphere*xp;
+yp = s*rsphere*yp;
+zp = s*rsphere*zp;
 
 return;
 

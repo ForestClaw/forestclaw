@@ -16,13 +16,17 @@ c     # at face 'iface'.
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j,ibc,jbc,mq
+      integer i,j,ibc,jbc,mq, mq_dump
 
       if (iblock .eq. 1) then
 c        # Only initiate exchange from block 0.  I am not sure if the
 c        # saves any work, but seems silly to exchange twice.
          return
       endif
+
+      mq_dump = 2
+c      write(6,*) 'In face exchange'
+c      call dump_patch(mx,my,mbc,meqn,mq_dump, qthis)
 
       do mq = 1,meqn
          if (iface .eq. 0) then
@@ -55,6 +59,12 @@ c        # saves any work, but seems silly to exchange twice.
             enddo
          endif
       enddo
+
+c      write(6,*) 'done with face exchange'
+c      call dump_patch(mx,my,mbc,meqn,mq_dump, qthis)
+
+c      stop
+
       end
 
 
@@ -143,6 +153,7 @@ c        # saves any work, but seems silly to exchange twice.
             enddo
          endif
       enddo
+
       end
 
 
@@ -155,7 +166,13 @@ c     # Exchange ghost cells at block corner
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer mq, ibc, jbc
+      integer mq, ibc, jbc, mq_dump
+
+      if (iblock .eq. 1) then
+c        # Only initiate exchange from block 0.  I am not sure if the
+c        # saves any work, but seems silly to exchange twice.
+         return
+      endif
 
       do mq = 1,meqn
          if (icorner .eq. 0) then
@@ -190,6 +207,8 @@ c     # Exchange ghost cells at block corner
             enddo
          endif
       enddo
+
+
       end
 
 

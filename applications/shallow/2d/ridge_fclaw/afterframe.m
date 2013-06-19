@@ -14,12 +14,29 @@ axis(rsphere*1.1*[-1 1 -1 1 -1 1]);
 daspect([1 1 1]);
 axis off;
 
+if (~draw_mesh)
+  c1 = -1;
+  c2 = 3;
+  s = 0.001;
+  ca = [c1-s c2+s];
+  colormap(winter);
 
-axis image;
-showpatchborders;
-setpatchborderprops(1:8,'linewidth',2);
-showgridlines(1:3);
-colormap(winter);
+  caxis(ca);
+  % set(gca,'climmode','auto');
+
+  cv = linspace(ca(1),ca(2),11);
+  cv(1) = [];
+  cv(2) = [];
+  drawcontourlines(cv);
+  % hidecontourlines;
+  % showgridlines;
+  showpatchborders;
+  setpatchborderprops(1:6,'linewidth',2);
+else
+  colormap(white);
+  showpatchborders;
+  showgridlines([1 2]);
+end;
 
 setviews;
 % u = rrot(:,1);
@@ -28,7 +45,6 @@ setviews;
 % setcam(20*v);
 
 prt = false;
-MaxFrames  = 30;
 if (prt)
   NoQuery = false;
   nstr = num2str(Frame);

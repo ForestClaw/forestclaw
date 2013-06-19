@@ -4,7 +4,7 @@ function [xp,yp,zp] = mapc2m_pillow(xc1,yc1)
 % determine sign of z-coordinate.
 %
 
-comp_grid = true;
+comp_grid = false;
 
 % First, get into [-1 1] from [0,1]
 xc = 2*xc1 - 1;

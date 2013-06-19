@@ -87,6 +87,7 @@ main (int argc, char **argv)
 
   /* Link solvers to the domain */
   link_problem_setup(domain,amr_waveprop_setprob);
+  link_patch_output(domain,ridge_patch_output);
   ridge_link_solvers(domain);
 
   /* --------------------------------------------------
