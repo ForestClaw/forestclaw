@@ -308,6 +308,7 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_inter
     {
         // We know we are at a block corner, which is handled differently than a corner that is
         // only at an edge, but not at a corner.
+        printf("Exchanging at block corner\n");
         mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
                                         a_corner, m_blockno);
     }

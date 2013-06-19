@@ -198,17 +198,14 @@ c     # computed at the center of the mesh cell.
       double precision xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
 
-      INTEGER i,j,m
-      DOUBLE PRECISION taud(3),taup(3),nv(3), sp
-
-      INTEGER version
-
-      DATA version /1/
+      INTEGER i,j,m, ibc, jbc
+      DOUBLE PRECISION taud(3),taup(3),nv(3), sp, xv(3)
 
 c     # Compute normals at all interior edges.
 
+
 c     # Get x-face normals
-      DO j = 1-mbc,my+mbc+1
+      DO j =  -mbc,my+mbc+1
          DO i = 1-mbc,mx+mbc+1
 
             taud(1) = xp(i,j) - xp(i-1,j)
@@ -219,7 +216,7 @@ c     # Get x-face normals
             taup(2) = yd(i,j+1) - yd(i,j)
             taup(3) = zd(i,j+1) - zd(i,j)
 
-            CALL get_normal(taup,taud,nv)
+            CALL get_normal(taup,taud,nv,sp)
 
             DO m = 1,3
                xnormals(i,j,m) = nv(m)
@@ -227,8 +224,9 @@ c     # Get x-face normals
          ENDDO
       ENDDO
 
+
       DO j = 1-mbc,my+mbc+1
-         DO i = 1-mbc,mx+mbc+1
+         DO i =  -mbc,mx+mbc+1
 c           # Now do y-faces
             taud(1) = xp(i,j) - xp(i,j-1)
             taud(2) = yp(i,j) - yp(i,j-1)
@@ -238,7 +236,7 @@ c           # Now do y-faces
             taup(2) = yd(i+1,j) - yd(i,j)
             taup(3) = zd(i+1,j) - zd(i,j)
 
-            CALL get_normal(taup,taud,nv)
+            CALL get_normal(taup,taud,nv,sp)
 
 c           # nv has unit length
             DO m = 1,3
@@ -246,6 +244,7 @@ c           # nv has unit length
             ENDDO
          ENDDO
       ENDDO
+
 
       END SUBROUTINE compute_normals
 
@@ -279,7 +278,7 @@ c     # Get x-face normals
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
             DO m = 1,3
-               xtangents(i,j,m) = taup(m)/tlen
+               xtangents(i,j,m) = taup(m)
             ENDDO
             edge_lengths(i,j,1) = tlen
          ENDDO
@@ -295,7 +294,7 @@ c           # Now do y-faces
 
 c           # nv has unit length
             DO m = 1,3
-               ytangents(i,j,m) = taup(m)/tlen
+               ytangents(i,j,m) = taup(m)
             ENDDO
             edge_lengths(i,j,2) = tlen
          ENDDO
@@ -345,10 +344,10 @@ c     # Formulas work for both left and bottom edges.
 c     #
 c     # Neither version depends on any knowledge of the surface normals.
 
-      subroutine get_normal(taup,taud,nv)
+      subroutine get_normal(taup,taud,nv,sp)
       implicit none
 
-      double precision taup(3),taud(3),nv(3)
+      double precision taup(3),taud(3),nv(3), sp
       integer version
 
       data version /2/
@@ -356,7 +355,7 @@ c     # Neither version depends on any knowledge of the surface normals.
       if (version .eq .1) then
          call get_normal_ver1(taup,taud,nv)
       elseif (version .eq. 2) then
-         call get_normal_ver2(taup,taud,nv)
+         call get_normal_ver2(taup,taud,nv,sp)
       endif
 
       end
@@ -366,7 +365,7 @@ c     # Neither version depends on any knowledge of the surface normals.
 
       double precision taup(3),taud(3),nv(3)
       double precision sp,sd,dt,ct,st,c1,c2
-      double precision tp(3), td(3)
+      double precision tp(3), td(3), nlen
 
       integer m
 
@@ -378,6 +377,7 @@ c     # Neither version depends on any knowledge of the surface normals.
       enddo
       sp = sqrt(sp)
       sd = sqrt(sd)
+
 
 c     # st = sin(theta)
 c     # ct = cos(theta)
@@ -394,10 +394,16 @@ c     # theta = angle between taup and taud
       c2 = -ct/st
       do m = 1,3
          nv(m) = c1*td(m) + c2*tp(m)
+         nlen = nlen + nv(m)*nv(m)
       enddo
+c      if (nlen .eq. 0) then
+c         write(6,*) 'nlen == 0'
+c      endif
+
+
       end
 
-      subroutine get_normal_ver2(taup,taud,nv)
+      subroutine get_normal_ver2(taup,taud,nv,sp)
       implicit none
 
       double precision taup(3),taud(3),nv(3), sp
@@ -428,7 +434,7 @@ c      c2 = ai2/nlen
 c         nv(m) = c1*taud(m) + c2*taup(m)
          nv(m) = nv(m)/nlen
       enddo
-c      sp = sqrt(aii)
+      sp = sqrt(aii)
 
 
       end
@@ -455,12 +461,12 @@ c      sp = sqrt(aii)
             enddo
             nlen = 0
             do m = 1,3
-               nv(m) = nv(m) +
+               nv(m) =
      &               edge_lengths(i+1,j,1)*xnormals(i+1,j,m) -
      &               edge_lengths(i,j,1)*xnormals(i,j,m) +
      &               edge_lengths(i,j+1,2)*ynormals(i,j+1,m) -
      &               edge_lengths(i,j,2)*ynormals(i,j,m)
-               nlen = nlen + nv(m)**2
+               nlen = nlen + nv(m)*nv(m)
             enddo
             nlen = sqrt(nlen)
             do m = 1,3

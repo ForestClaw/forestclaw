@@ -89,6 +89,6 @@ c     #
          write(6,100) j, (q(i,j,mq),i = 1-mbc,mx+mbc)
       enddo
       write(6,*) ' '
-  100 format(I5,50F12.4)
+  100 format(I5,50E12.4)
 
       end

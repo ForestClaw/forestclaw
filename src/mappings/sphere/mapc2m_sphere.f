@@ -38,12 +38,11 @@ c     # Translate and flip [-3,-1]x[-1,1] into [1,-1]x[-1,1]
          blockno = get_block()
       endif
 
-
 c     # Map xc and yc from ghost cells to interior
-      d = max(xc - 1,0.d0) + max(-1 - xc,0.d0)
+      d = -max(xc - 1.0,0.d0) - max(-1 - xc,0.d0)
       x1 = ((1-d)/(1+d))*xc
 
-      d = max(yc - 1,0.d0) + max(-1 - yc,0.d0)
+      d = -max(yc - 1,0.d0) - max(-1 - yc,0.d0)
       y1 = ((1-d)/(1+d))*yc
 
 

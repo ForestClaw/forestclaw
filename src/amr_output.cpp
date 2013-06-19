@@ -42,8 +42,6 @@ void cb_amrout(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
     (ddata->f_patch_output)(domain,this_patch,this_block_idx,
                             this_patch_idx,iframe,num,matlab_level);
-
-    // cp->write_patch_data(iframe, num, matlab_level);
 }
 
 void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
