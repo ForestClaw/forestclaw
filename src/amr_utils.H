@@ -75,6 +75,7 @@ void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
 
 void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
+void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_output);
 
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 

@@ -12,6 +12,11 @@ typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t* domain);
 
+typedef void (*fclaw2d_patch_output_t)(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+                                       int this_block_idx, int this_patch_idx,
+                                       int iframe, int num, int matlab_level);
+
+
 typedef struct fclaw2d_domain_data
 {
     const amr_options_t *amropts;
@@ -25,6 +30,7 @@ typedef struct fclaw2d_domain_data
     double curr_time;
 
     fclaw2d_problem_setup_t f_problem_setup;
+    fclaw2d_patch_output_t f_patch_output;
 
     fclaw2d_solver_functions_t* solver_functions;
 

@@ -46,7 +46,7 @@ typedef struct fclaw2d_solver_functions fclaw2d_solver_functions_t;
 
 
 
-typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
+// typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
 
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -93,7 +93,6 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      int this_patch_idx,
                                                      double t,
                                                      double dt);
-
 
 struct fclaw2d_solver_functions
 {

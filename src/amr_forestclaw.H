@@ -56,6 +56,9 @@ void regrid(fclaw2d_domain_t **domain);
 
 // amr_output.cpp
 void amrout(fclaw2d_domain_t *domain, int iframe);
+void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+                          int this_block_idx, int this_patch_idx,
+                          int iframe,int num,int matlab_level);
 
 
 // -------------------------------------------
