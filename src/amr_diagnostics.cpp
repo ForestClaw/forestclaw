@@ -60,7 +60,8 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
     if (patch_no == dump_patch + numb4)
     {
         ClawPatch *cp = get_clawpatch(patch);
-        cp->dump();
+        int mq = 1;
+        cp->dump(mq);
     }
 }
 

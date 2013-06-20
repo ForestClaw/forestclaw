@@ -421,7 +421,8 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
     if (this_block_idx == 0)
     {
         fprintf(fid,"patchno = %d\n",this_patch_idx);
-        cp->dump();
+        int mq = 1;
+        cp->dump(mq);
     }
 
 }

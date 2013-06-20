@@ -755,11 +755,11 @@ double ClawPatch::compute_sum()
     return sum;
 }
 
-void ClawPatch::dump()
+void ClawPatch::dump(int mq)
 {
     double *q;
     q = m_griddata.dataPtr();
-    dump_patch_(m_mx,m_my,m_mbc,m_meqn,q);
+    dump_patch_(m_mx,m_my,m_mbc,m_meqn,mq,q);
 }
 
 void ClawPatch::dump_last()

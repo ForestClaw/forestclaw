@@ -143,7 +143,7 @@ public :
                           const int& a_level);
     double compute_sum();
 
-    void dump();
+    void dump(int mq);
     void dump_last();
     void dump_time_interp();
 
