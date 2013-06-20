@@ -39,28 +39,62 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-
     fclaw_bool init_flag = *((fclaw_bool *) user);
     const amr_options_t *gparms = get_domain_parms(domain);
     int maxlevel = gparms->maxlevel;
     fclaw_bool patch_refined = false;
 
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-    // call fortran routine
-
+    // ClawPatch *cp = get_clawpatch(this_patch);
 
     int level = this_patch->level;
     set_debug_info_(this_block_idx, this_patch_idx, level);
 
     if (level < maxlevel)
     {
-        patch_refined = cp->tag_for_refinement(init_flag);
+        int initflag = init_flag ? 1 : 0;
+        fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+
+        patch_refined =
+            (ddata->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
+                                            this_patch_idx,initflag);
+
+        // patch_refined = cp->tag_for_refinement(init_flag);
         if (patch_refined)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
         }
     }
+}
+
+fclaw_bool patch_tag4refinement_default(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        int initflag)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,
+                    dx, dy,q,initflag,tag_patch);
+    return tag_patch == 1;
 }
 
 /* Tag family for coarsening */
@@ -108,11 +142,31 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         {
             cp_siblings[i] = get_clawpatch(&sibling_patch[i]);
         }
+
         // Pass all four sibling patches into a single routine to see if
         // they can be coarsened.
-        patch_coarsened = cp_new_coarse->tag_for_coarsening(cp_siblings,refratio,
-                                                            NumSiblings,
-                                                            p4est_refineFactor);
+
+        cp_new_coarse->coarsen_from_fine_family(cp_siblings,refratio,NumSiblings,
+                                                p4est_refineFactor);
+
+        fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+        patch_coarsened =
+            (ddata->f_patch_tag4coarsening)(domain,sibling_patch,this_block_idx,
+                                            sibling0_patch_idx,cp_new_coarse);
+
+        /*
+        fclaw_bool pc1;
+        pc1 = cp_new_coarse->tag_for_coarsening(cp_siblings,refratio,
+                                                NumSiblings,
+                                                p4est_refineFactor);
+
+        if (pc1 != patch_coarsened)
+        {
+            printf("Different coarsening\n");
+        }
+        */
+
+
         if (patch_coarsened)
         {
             for (int i = 0; i < NumSiblings; i++)
@@ -124,6 +178,39 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         delete cp_new_coarse;
     }
 }
+
+fclaw_bool patch_tag4coarsening_default(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *sibling_patch,
+                                        int this_block_idx,
+                                        int sibling0_patch_idx,
+                                        ClawPatch* cp_new_coarse)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = cp_new_coarse;
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
+                    dx,dy,qcoarse,tag_patch);
+    return tag_patch == 0;
+}
+
 
 void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      fclaw2d_patch_t * old_patch,

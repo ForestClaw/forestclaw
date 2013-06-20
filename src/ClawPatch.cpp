@@ -619,7 +619,7 @@ fclaw_bool ClawPatch::tag_for_refinement(fclaw_bool a_init_flag)
     double *q = m_griddata.dataPtr();
     int tag_patch;  // == 0 or 1
     int iflag = a_init_flag ? 1 : 0;
-    tag_for_refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,
+    tag4refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,
                         m_dx, m_dy,q,iflag,tag_patch);
     return tag_patch == 1;
 }
@@ -629,11 +629,13 @@ fclaw_bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
                                    const int& a_num_siblings,
                                    const int& a_p4est_refineFactor)
 {
+    /*
     this->coarsen_from_fine_family(a_cp_siblings,a_refratio,a_num_siblings,
                                    a_p4est_refineFactor);
+    */
     int tag_patch;
     double *qcoarse = m_griddata.dataPtr();
-    tag_for_coarsening_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx,m_dy,
+    tag4coarsening_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx,m_dy,
                               qcoarse,tag_patch);
     return tag_patch == 0;
 }

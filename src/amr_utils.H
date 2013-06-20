@@ -76,6 +76,10 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
 void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
 void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_output);
+void link_patch_tag4refinement(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_tag4refinement_t f_patch_tag4refinement);
+void link_patch_tag4coarsening(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening);
 
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 

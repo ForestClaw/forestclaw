@@ -16,6 +16,17 @@ typedef void (*fclaw2d_patch_output_t)(fclaw2d_domain_t* domain, fclaw2d_patch_t
                                        int this_block_idx, int this_patch_idx,
                                        int iframe, int num, int matlab_level);
 
+typedef fclaw_bool (*fclaw2d_patch_tag4refinement_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *this_patch,
+                                                     int this_block_idx, int this_patch_idx,
+                                                     int initflag);
+
+typedef fclaw_bool (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *sibling_patch,
+                                                     int this_block_idx,
+                                                     int sibling0_patch_idx,
+                                                     ClawPatch *cp_new_coarse);
+
 
 typedef struct fclaw2d_domain_data
 {
@@ -31,6 +42,8 @@ typedef struct fclaw2d_domain_data
 
     fclaw2d_problem_setup_t f_problem_setup;
     fclaw2d_patch_output_t f_patch_output;
+    fclaw2d_patch_tag4refinement_t f_patch_tag4refinement;
+    fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening;
 
     fclaw2d_solver_functions_t* solver_functions;
 

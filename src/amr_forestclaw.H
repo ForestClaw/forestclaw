@@ -60,6 +60,16 @@ void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
                           int this_block_idx, int this_patch_idx,
                           int iframe,int num,int matlab_level);
 
+fclaw_bool patch_tag4coarsening_default(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *sibling_patch,
+                                        int this_block_idx,
+                                        int sibling0_patch_idx,
+                                        ClawPatch* cp_new_coarse);
+
+fclaw_bool patch_tag4refinement_default(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        int initflag);
 
 // -------------------------------------------
 // Routines needed to fill in ghost cells

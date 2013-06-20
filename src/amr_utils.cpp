@@ -61,6 +61,8 @@ void init_domain_data(fclaw2d_domain_t *domain)
     /* I put this here because somehow it is not part of a 'solver' */
     ddata->f_problem_setup = &problem_setup_default;
     ddata->f_patch_output = &patch_output_default;
+    ddata->f_patch_tag4refinement = &patch_tag4refinement_default;
+    ddata->f_patch_tag4coarsening = &patch_tag4coarsening_default;
 
     fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
     initialize_solver_functions(solver_functions);
@@ -121,6 +123,8 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
     ddata_new->f_problem_setup = ddata_old->f_problem_setup;
     ddata_new->f_patch_output = ddata_old->f_patch_output;
+    ddata_new->f_patch_tag4refinement = ddata_old->f_patch_tag4refinement;
+    ddata_new->f_patch_tag4coarsening = ddata_old->f_patch_tag4coarsening;
 
     ddata_new->curr_time = ddata_old->curr_time;
 
@@ -180,6 +184,21 @@ void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->f_patch_output = f_patch_output;
 }
+
+void link_patch_tag4refinement(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_tag4refinement_t f_patch_tag4refinement)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_patch_tag4refinement = f_patch_tag4refinement;
+}
+
+void link_patch_tag4coarsening(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_patch_tag4coarsening = f_patch_tag4coarsening;
+}
+
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
