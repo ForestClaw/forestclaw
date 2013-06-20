@@ -1,4 +1,4 @@
-      subroutine tag_for_refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+      subroutine tag4refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
      &      q,init_flag, tag_patch)
       implicit none
 
@@ -16,7 +16,7 @@
          do j = 1,my
             qmin = min(q(i,j,1),qmin)
             qmax = max(q(i,j,1),qmax)
-            if (qmax - qmin .gt. 0.25d0) then
+            if (qmax - qmin .gt. 0.5d0) then
                tag_patch = 1
                return
             endif
@@ -26,7 +26,7 @@
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag_for_coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+      subroutine tag4coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
      &      qcoarsened, tag_patch)
       implicit none
 
@@ -34,7 +34,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision xlower, ylower, dx, dy
       double precision qcoarsened(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq
+      integer i,j
       double precision qmin, qmax
 
 c     # The difference between this and the true "refinement" above is
