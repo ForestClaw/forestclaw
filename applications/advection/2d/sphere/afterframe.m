@@ -12,6 +12,9 @@ setpatchborderprops(1:6,'linewidth',2);
 showpatchborders();
 setviews;
 
+view([200.5 32]);
+
+
 NoQuery = 0;
 prt = false;
 if (prt)
