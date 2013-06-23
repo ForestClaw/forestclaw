@@ -41,7 +41,4 @@
       call mapc2m(xc,yc,xp,yp,zp)
 
       fdisc = xp
-
-
-
       end
