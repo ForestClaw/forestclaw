@@ -13,6 +13,9 @@ hidepatchborders;
 showpatchborders(1:5);
 setviews;
 
+view([200.5 32]);
+
+
 NoQuery = 0;
 prt = false;
 if (prt)
