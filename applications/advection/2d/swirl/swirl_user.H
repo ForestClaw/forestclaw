@@ -66,6 +66,18 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt);
 
+fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag);
+
+fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *sibling_patch,
+                                      int this_block_idx,
+                                      int sibling0_patch_idx,
+                                      ClawPatch* cp_new_coarse);
+
+
 #ifdef __cplusplus
 #if 0
 {

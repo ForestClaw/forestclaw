@@ -10,12 +10,12 @@ FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 # -----------------------------------------------------------
 # Define local objects here
 exampleobjs = \
+	swirl_user.o \
 	ghost_twopatch.o \
 	tag4refinement.o \
 	psi.o \
 	rpn2ad1.o \
 	rpt2ad1.o \
-	swirl_user.o \
 	qinit.o \
 	b4step2.o \
 	setaux.o \

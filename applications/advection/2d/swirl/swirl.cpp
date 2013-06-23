@@ -90,18 +90,19 @@ main (int argc, char **argv)
   set_waveprop_parms(domain,waveprop_parms);
 
   /* ---------------------------------------------------------------
-     Define the solver
+     Define the solver and link in other problem/user specific
+     routines
      --------------------------------------------------------------- */
 
   /* Using user defined functions just to demonstrate how one might setup
      something that depends on more than one solver (although only one is used
      here) */
   link_problem_setup(domain,swirl_problem_setup);
+
   swirl_link_solvers(domain);
 
-  /* Plain vanilla waveprop algorithm.  This version doesn't require swirl_user.{H,cpp} */
-  /* link_problem_setup(domain,amr_waveprop_setprob); */
-  /* amr_waveprop_link_solvers(domain); */
+  link_patch_tag4refinement(domain,swirl_patch_tag4refinement);
+  link_patch_tag4coarsening(domain,swirl_patch_tag4coarsening);
 
   /* ---------------------------------------------------------------
      Run
