@@ -33,6 +33,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
      - interpolating/coarsening as needed
    ---------------------------------------------------------------- */
 
+
+/* -----------------------------------------------------------------
+   User defined routines for linking in customized tagging routines
+   ----------------------------------------------------------------- */
+void link_patch_tag4refinement(fclaw2d_domain_t* domain,
+                        fclaw2d_patch_tag4refinement_t f_patch_tag4refinement)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_patch_tag4refinement = f_patch_tag4refinement;
+}
+
+void link_patch_tag4coarsening(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_patch_tag4coarsening = f_patch_tag4coarsening;
+}
+
+fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag)
+{
+    // Default : Don't refine
+    return fclaw_false;
+}
+
+fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *sibling_patch,
+                                      int this_block_idx,
+                                      int sibling0_patch_idx,
+                                      ClawPatch* cp_new_coarse)
+{
+    // Default : Don't coarsen
+    return fclaw_false;
+}
+
+
+
+/* -----------------------------------------------------------------
+   Callback routine for tagging
+   ----------------------------------------------------------------- */
 void cb_tag4refinement(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
@@ -41,60 +83,24 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 {
     fclaw_bool init_flag = *((fclaw_bool *) user);
     const amr_options_t *gparms = get_domain_parms(domain);
+
     int maxlevel = gparms->maxlevel;
-    fclaw_bool patch_refined = false;
-
-    // ClawPatch *cp = get_clawpatch(this_patch);
-
     int level = this_patch->level;
-    set_debug_info_(this_block_idx, this_patch_idx, level);
 
     if (level < maxlevel)
     {
         int initflag = init_flag ? 1 : 0;
         fclaw2d_domain_data_t* ddata = get_domain_data(domain);
 
-        patch_refined =
+        fclaw_bool refine_patch =
             (ddata->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
                                             this_patch_idx,initflag);
 
-        // patch_refined = cp->tag_for_refinement(init_flag);
-        if (patch_refined)
+        if (refine_patch)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
         }
     }
-}
-
-fclaw_bool patch_tag4refinement_default(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int this_block_idx, int this_patch_idx,
-                                        int initflag)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch;  // == 0 or 1
-    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,
-                    dx, dy,q,initflag,tag_patch);
-    return tag_patch == 1;
 }
 
 /* Tag family for coarsening */
@@ -106,9 +112,8 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                                void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    int minlevel = gparms->minlevel;
-    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
 
+    int minlevel = gparms->minlevel;
     int level = sibling_patch[0].level;
 
     // Make this information accessible to Fortran
@@ -179,37 +184,6 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
     }
 }
 
-fclaw_bool patch_tag4coarsening_default(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *sibling_patch,
-                                        int this_block_idx,
-                                        int sibling0_patch_idx,
-                                        ClawPatch* cp_new_coarse)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = cp_new_coarse;
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch;  // == 0 or 1
-    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
-                    dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
 
 
 void cb_domain_adapt(fclaw2d_domain_t * old_domain,

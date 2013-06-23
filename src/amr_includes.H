@@ -35,5 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "ClawPatch.H"
+#include "amr_regrid.H"
 
 #endif
