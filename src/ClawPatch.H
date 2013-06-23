@@ -112,11 +112,13 @@ public :
     // ----------------------------------------------------------------
     // Tagging, refining and coarsening
     // ----------------------------------------------------------------
+    /*
     fclaw_bool tag_for_refinement(fclaw_bool init_flag);
     fclaw_bool tag_for_coarsening(ClawPatch *cp_siblings[],
                             const int& refratio,
                             const int& num_siblings,
                             const int& p4est_refineFactor);
+    */
 
     void interpolate_to_fine_patch(ClawPatch* a_fine,
                                    const int& a_igrid,
