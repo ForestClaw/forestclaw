@@ -90,6 +90,9 @@ main (int argc, char **argv)
 
   hemisphere_link_solvers(domain);
 
+  link_patch_tag4refinement(domain,hemisphere_patch_tag4refinement);
+  link_patch_tag4coarsening(domain,hemisphere_patch_tag4coarsening);
+
   /* --------------------------------------------------
      Initialize and run the simulation
      -------------------------------------------------- */
