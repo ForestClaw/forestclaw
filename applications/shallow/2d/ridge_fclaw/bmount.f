@@ -1,20 +1,22 @@
       double precision function bmount(xc,yc)
-c     ============================================================
-c
-      implicit double precision (a-h,o-z)
-c
+      implicit none
+
+      double precision xc,yc
+      double precision Rsphere, Omega, Px, Py, Pz
+      double precision theta,thetam
+      double precision pi, xp, yp, zp
+
       common /comsphere/ Rsphere, Omega
       common /comic/ Px,Py,Pz
+      common /compi/ pi
 
-
-      pi = 4.d0*datan(1.d0)
       bmount = -4.d4
 
 c     # compute latitude:
       call mapc2m(xc,yc,xp,yp,zp)
-      theta = dasin((xp*Px + yp*Py + zp*Pz) / Rsphere)
+      theta = asin((xp*Px + yp*Py + zp*Pz) / Rsphere)
 
       thetam = -pi/6.d0 !position of ridge
-      bmount = bmount + 3.d4*dexp(-1000.d0*(theta-thetam)**2)
+      bmount = bmount + 3.d4*exp(-1000.d0*(theta-thetam)**2)
       return
       end
