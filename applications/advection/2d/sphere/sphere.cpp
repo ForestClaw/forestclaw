@@ -90,6 +90,9 @@ main (int argc, char **argv)
 
   sphere_link_solvers(domain);
 
+  link_patch_tag4refinement(domain,sphere_patch_tag4refinement);
+  link_patch_tag4coarsening(domain,sphere_patch_tag4coarsening);
+
   /* --------------------------------------------------
      Initialize and run the simulation
      -------------------------------------------------- */

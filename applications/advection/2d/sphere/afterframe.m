@@ -7,7 +7,7 @@ axis off;
 yrbcolormap;
 caxis([0 1]);
 
-showgridlines(1:4)
+showgridlines(1:3)
 setpatchborderprops(1:6,'linewidth',2);
 showpatchborders();
 setviews;

@@ -16,7 +16,7 @@
          do j = 1,my
             qmin = min(q(i,j,1),qmin)
             qmax = max(q(i,j,1),qmax)
-            if (qmax - qmin .gt. 0.5d0) then
+            if (qmax - qmin .gt. 0.25d0) then
                tag_patch = 1
                return
             endif

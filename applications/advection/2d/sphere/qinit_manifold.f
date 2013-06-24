@@ -1,6 +1,5 @@
       subroutine qinit_manifold(maxmx,maxmy,meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,q,maux,aux,
-     &      xp,yp,zp)
+     &      xlower,ylower,dx,dy,q,maux,aux, xp,yp,zp)
 
       implicit none
 

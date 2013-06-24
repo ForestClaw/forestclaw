@@ -222,6 +222,71 @@ double sphere_update(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
+/* -----------------------------------------------------------------
+   Default routine for tagging patches for refinement and coarsening
+   ----------------------------------------------------------------- */
+fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       int this_block_idx, int this_patch_idx,
+                                       int initflag)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    return tag_patch == 1;
+}
+
+fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *sibling_patch,
+                                       int this_block_idx,
+                                       int sibling0_patch_idx,
+                                       ClawPatch* cp_new_coarse)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = cp_new_coarse;
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    return tag_patch == 0;
+}
+
+
 
 
 #ifdef __cplusplus
