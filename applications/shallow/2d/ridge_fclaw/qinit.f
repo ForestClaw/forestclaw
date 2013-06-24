@@ -1,23 +1,22 @@
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
-c     =====================================================
-c
-c      # Set initial conditions for q
-c      # -------To test well-balancing ----------
-c
-       implicit double precision (a-h,o-z)
-       dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-       dimension aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
-       common /comic/ Px,Py,Pz
-       common /comsphere/ Rsphere, Omega
-       common /cprob/ ampl, tol1, tol2
+      subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+     &      dx,dy,q,maux,aux)
+      implicit none
 
-       common /comfine/ dxmin, dymin
-       common /comq0/ q0sum
+      integer maxmx, maxmy, meqn, mbc, mx, my, maux
+      double precision xlower, ylower, dx,dy
+      double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
+      integer i,j
+      double precision xc,yc,bot,theta, theta2, q1, R, u0
+      double precision Px, Py, Pz, Rsphere, Omega, ampl,tol1, tol2
+      double precision pi, xp, yp, zp
 
-c
-      pi = 4.d0*datan(1.d0)
+      common /comic/ Px,Py,Pz
+      common /comsphere/ Rsphere, Omega
+      common /cprob/ ampl, tol1, tol2
+
+      pi = 4.d0*atan(1.d0)
 
 c     # symmetry axis (Px,Py,Pz) set in setprob.f
 
@@ -39,7 +38,7 @@ c            # ampl is now read from setprob.data
 c            ampl = 5000.d0
 c            ampl = 10.d0
              call mapc2m(xc,yc,xp,yp,zp)
-             theta = dasin((xp*Px + yp*Py + zp*Pz) / Rsphere)
+             theta = asin((xp*Px + yp*Py + zp*Pz) / Rsphere)
              theta2 = pi/6.d0
              q1 = exp(-1000.d0*(theta-theta2)**2)
              R = max(sqrt(xp**2 + yp**2), 1.d-10)
