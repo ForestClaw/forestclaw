@@ -22,16 +22,14 @@ if (~draw_mesh)
   colormap(winter);
 
   caxis(ca);
-  % set(gca,'climmode','auto');
 
   cv = linspace(ca(1),ca(2),11);
   cv(1) = [];
   cv(2) = [];
   drawcontourlines(cv);
-  % hidecontourlines;
-  % showgridlines;
   showpatchborders;
   setpatchborderprops(1:6,'linewidth',2);
+  % showgridlines(1:4);
 else
   colormap(white);
   showpatchborders;
@@ -39,10 +37,6 @@ else
 end;
 
 setviews;
-% u = rrot(:,1);
-% v = rrot(:,2);
-% w = rrot(:,3);
-% setcam(20*v);
 
 prt = false;
 if (prt)
