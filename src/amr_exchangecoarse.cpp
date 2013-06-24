@@ -406,6 +406,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     cp->time_interpolate(alpha);
 }
 
+/*
 static
 void cb_dump_patch(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
@@ -424,6 +425,7 @@ void cb_dump_patch(fclaw2d_domain_t *domain,
     }
 
 }
+*/
 
 
 
