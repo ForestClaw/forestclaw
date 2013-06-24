@@ -222,6 +222,87 @@ void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                      iframe,num,matlab_level,this_block_idx,maux,aux);
 }
 
+
+fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                int this_patch_idx, int this_block_idx, int initflag)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    /* ----------------------------------------------------------- */
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+
+
+    /* ----------------------------------------------------------- */
+    int tag_patch;
+    ridge_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+                        q,maux,aux,initflag,tag_patch);
+    return tag_patch == 1;
+}
+
+fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *sibling_patch,
+                                int this_block_idx,
+                                int sibling0_patch_idx,
+                                ClawPatch* cp_new_coarse)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = cp_new_coarse;
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    double *aux;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+
+    /* ----------------------------------------------------------- */
+    int tag_patch;  // == 0 or 1
+    ridge_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
+                          dx,dy,qcoarse,maux,aux, tag_patch);
+    return tag_patch == 0;
+}
+
+
 #ifdef __cplusplus
 #if 0
 {

@@ -57,6 +57,19 @@ extern "C"
                           const int& iframe,
                           const int& patch_idx,const int& level,const int& blockno,
                           const int& maux, double aux[]);
+
+    void ridge_tag4refinement_(const int& mx,const int& my,const int& mbc,
+                               const int& meqn, const double& xlower,
+                               const double& ylower, const double& dx, const double& dy,
+                               double q[], const int& maux,
+                               double aux[], const int& initflag, int& tag_patch);
+
+    void ridge_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+                               const int& meqn,const double& xlower,
+                               const double& ylower, const double& dx, const double& dy,
+                               double qcoarsened[], const int& maux,
+                               double aux[], int& tag_patch);
+
 }
 
 void ridge_link_solvers(fclaw2d_domain_t *domain);
@@ -91,6 +104,18 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
 void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                         int this_block_idx, int this_patch_idx,
                         int iframe,int num,int matlab_level);
+
+fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *sibling_patch,
+                                int this_block_idx,
+                                int sibling0_patch_idx,
+                                ClawPatch* cp_new_coarse);
+
+fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                int initflag);
+
 
 #ifdef __cplusplus
 #if 0

@@ -13,6 +13,7 @@ exampleobjs = \
 	ridge_user.o \
 	ghost_twopatch.o \
 	tag4refinement.o \
+	tag4refinement_default.o \
 	mapc2m.o \
 	rpn2swsphere_fw.o \
 	rpt2swq.o \
