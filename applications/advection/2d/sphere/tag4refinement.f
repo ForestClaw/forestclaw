@@ -7,8 +7,7 @@
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq,m
-      double precision xc,yc, qmin, qmax
-      double precision dq, dqi, dqj
+      double precision qmin, qmax
 
       qmin = 100.d0
       qmax = -100.d0
