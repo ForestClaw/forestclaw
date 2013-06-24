@@ -39,10 +39,10 @@ c     # Translate and flip [-3,-1]x[-1,1] into [1,-1]x[-1,1]
       endif
 
 c     # Map xc and yc from ghost cells to interior
-      d = -max(xc - 1.0,0.d0) - max(-1 - xc,0.d0)
+      d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)
       x1 = ((1-d)/(1+d))*xc
 
-      d = -max(yc - 1,0.d0) - max(-1 - yc,0.d0)
+      d = max(yc - 1,0.d0) + max(-1 - yc,0.d0)
       y1 = ((1-d)/(1+d))*yc
 
 
@@ -60,7 +60,7 @@ c     # Set z value
 
 c     # Values that are outside of [-1,1]x[-1,1] (in ghost cell regions)
 c     # to the lower hemisphere
-      if (abs(yc) .gt. 1 .or. abs(xc) .gt. 1) then
+      if (xor(abs(yc) .gt. 1, abs(xc) .gt. 1)) then
          zp = -zp
       endif
 
