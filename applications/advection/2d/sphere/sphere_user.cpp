@@ -35,6 +35,7 @@ extern "C"
 #endif
 #endif
 
+
 void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -44,8 +45,6 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &sphere_patch_setup;
     sf->f_patch_initialize         = &sphere_qinit;
-    sf->f_patch_physical_bc        = &sphere_patch_physical_bc;
-    // sf->f_patch_physical_bc        = &amr_waveprop_bc2;
     sf->f_patch_single_step_update = &sphere_update;
 
     amr_waveprop_link_to_clawpatch();
@@ -176,20 +175,14 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
 
     /* ----------------------------------------------------------- */
     // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
     /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
     double *aux;
     int maux;
     amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
@@ -204,8 +197,7 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------- */
     // Classic call to b4step2(..)
-    b4step2_manifold_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux,
-                      xd,yd,zd);
+    b4step2_manifold_(maxmx,maxmy,mbc,mx,my,dx,dy,t,maux,aux,xd,yd,zd);
 }
 
 double sphere_update(fclaw2d_domain_t *domain,
@@ -256,10 +248,9 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *sibling_patch,
-                                       int this_block_idx,
-                                       int sibling0_patch_idx,
-                                       ClawPatch* cp_new_coarse)
+                                       fclaw2d_patch_t *this_patch,
+                                       int blockno,
+                                       int patchno)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -271,7 +262,7 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // Patch specific parameters
-    ClawPatch *cp = cp_new_coarse;
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
@@ -279,10 +270,10 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------------ */
     // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
+    double* q = cp->q();
 
     int tag_patch;  // == 0 or 1
-    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
     return tag_patch == 0;
 }
 

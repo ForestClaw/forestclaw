@@ -1,4 +1,5 @@
 #include "ClawPatch.H"
+#include "fclaw2d_typedefs.h"
 #include "amr_includes.H"
 
 
@@ -41,6 +42,25 @@ ClawPatch::~ClawPatch()
     ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
     ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
     ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
+}
+
+void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+                   int blockno, int patchno)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int level = this_patch->level;
+
+    ClawPatch *cp = new ClawPatch();
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               blockno,
+               level,
+               gparms);
+
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    pdata->cp = cp;
 }
 
 
@@ -734,7 +754,7 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
     compute_tangents_(mx,my,mbc,xd,yd,zd,xtangents,ytangents,edge_lengths);
 
     compute_surf_normals_(mx,my,mbc,xnormals,ynormals,edge_lengths,
-                          curvature, surfnormals);
+                          curvature, surfnormals,area);
 }
 
 

@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SPHERE_USER_H
 
 #include "amr_forestclaw.H"
-#include "amr_waveprop.H"
+// #include "amr_waveprop.H"
 
 extern "C"
 {
@@ -47,11 +47,9 @@ extern "C"
                           double xd[], double yd[], double zd[],double area[]);
 
     void b4step2_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                           const int& mx, const int& my, const int& meqn,
-                           double q[], const double& xlower, const double& ylower,
+                           const int& mx, const int& my,
                            const double& dx, const double& dy,
-                           const double& t, const double& dt,
-                           const int& maux, double aux[],
+                           const double& t, const int& maux, double aux[],
                            double xd[], double yd[], double zd[]);
 }
 
@@ -72,32 +70,32 @@ void sphere_patch_setup(fclaw2d_domain_t *domain,
                             int this_patch_idx);
 
 void sphere_qinit(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx);
+                  fclaw2d_patch_t *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx);
 
 void sphere_b4step2(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt);
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    double t,
+                    double dt);
 
 void sphere_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double dt,
                               fclaw_bool intersects_bc[]);
 
 
 double sphere_update(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         double t,
-                         double dt);
+                     fclaw2d_patch_t *this_patch,
+                     int this_block_idx,
+                     int this_patch_idx,
+                     double t,
+                     double dt);
 
 fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
@@ -105,10 +103,9 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        int initflag);
 
 fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *sibling_patch,
-                                       int this_block_idx,
-                                       int sibling0_patch_idx,
-                                       ClawPatch* cp_new_coarse);
+                                       fclaw2d_patch_t *this_patch,
+                                       int blockno,
+                                       int patchno);
 
 #ifdef __cplusplus
 #if 0

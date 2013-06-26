@@ -54,14 +54,13 @@ main (int argc, char **argv)
   gparms = amr_options_new (options); // Sets default values
   waveprop_parms = amr_waveprop_parms_new(options);
 
-  /* Parse command line */
   amr_options_parse (options, argc, argv, lp);  // Reads options from a file
 
-  /* Postprocess arrays */
-  amr_postprocess_parms(gparms);
+  amr_postprocess_parms (gparms);
   amr_waveprop_postprocess_parms(waveprop_parms);
 
-  amr_checkparms(gparms);
+  /* Read in waveprop parms, process and check them */
+  amr_checkparms (gparms);
   amr_waveprop_checkparms(waveprop_parms,gparms);
 
   /* ---------------------------------------------------------------
@@ -69,9 +68,6 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
   /* For sphere */
   domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
-
-  /* For hemisphere */
-  /* domain = fclaw2d_domain_new_unitsquare (mpicomm,gparms->minlevel); */
 
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
@@ -90,8 +86,9 @@ main (int argc, char **argv)
 
   sphere_link_solvers(domain);
 
-  link_patch_tag4refinement(domain,sphere_patch_tag4refinement);
-  link_patch_tag4coarsening(domain,sphere_patch_tag4coarsening);
+  link_regrid_functions(domain,
+                        sphere_patch_tag4refinement,
+                        sphere_patch_tag4coarsening);
 
   /* --------------------------------------------------
      Initialize and run the simulation
