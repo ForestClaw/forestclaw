@@ -25,52 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
+#include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
-
-/* -----------------------------------------------------------------
-   Regridding
-     - Initialization routines
-     - cell tagging
-     - interpolating/coarsening as needed
-   ---------------------------------------------------------------- */
-
-
-/* -----------------------------------------------------------------
-   User defined routines for linking in customized tagging routines
-   ----------------------------------------------------------------- */
-void link_patch_tag4refinement(fclaw2d_domain_t* domain,
-                        fclaw2d_patch_tag4refinement_t f_patch_tag4refinement)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->f_patch_tag4refinement = f_patch_tag4refinement;
-}
-
-void link_patch_tag4coarsening(fclaw2d_domain_t* domain,
-                               fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->f_patch_tag4coarsening = f_patch_tag4coarsening;
-}
-
-fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag)
-{
-    // Default : Don't refine
-    return fclaw_false;
-}
-
-fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *sibling_patch,
-                                      int this_block_idx,
-                                      int sibling0_patch_idx,
-                                      ClawPatch* cp_new_coarse)
-{
-    // Default : Don't coarsen
-    return fclaw_false;
-}
-
 
 
 /* -----------------------------------------------------------------
@@ -91,11 +47,11 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
     if (level < maxlevel)
     {
         int initflag = init_flag ? 1 : 0;
-        fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
 
         fclaw_bool refine_patch =
-            (ddata->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
-                                            this_patch_idx,initflag);
+            (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
+                                         this_patch_idx,initflag);
 
         if (refine_patch)
         {
@@ -107,81 +63,57 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 /* Tag family for coarsening */
 static
 void cb_tag4coarsening(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *sibling_patch,
-                               int this_block_idx,
-                               int sibling0_patch_idx,
-                               void *user)
+                       fclaw2d_patch_t *fine_patches,
+                       int blockno,
+                       int fine0_patchno,
+                       void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-
     int minlevel = gparms->minlevel;
-    int level = sibling_patch[0].level;
 
-    // Make this information accessible to Fortran
-    set_debug_info_(this_block_idx, sibling0_patch_idx, level);
+    int level = fine_patches[0].level;
 
     if (level > minlevel)
     {
-        int refratio = gparms->refratio;
-        fclaw_bool patch_coarsened = false;
+        /* --------------------------------------------------------------
+           Create temporary patch to hold coarsened data that we will use
+           to determine if we need to coarsen data
+          ----------------------------------------------------------------- */
 
-        ClawPatch *cp_new_coarse = new ClawPatch();
+        fclaw2d_patch_t *temp_coarse_patch = new fclaw2d_patch_t;
+        init_patch_data(temp_coarse_patch);
 
-        // Create a new coarse grid patch that contains the siblings;
-        // Average siblings to this patch and test whether coarse
-        // patch should be refined.  If not, then we coarsen the
-        // sibling "family" of patches.
-        cp_new_coarse->define(sibling_patch[0].xlower,
-                              sibling_patch[0].ylower,
-                              sibling_patch[NumSiblings-1].xupper,
-                              sibling_patch[NumSiblings-1].yupper,
-                              this_block_idx,
-                              level,
-                              gparms);
+        temp_coarse_patch->xlower = fine_patches[0].xlower;
+        temp_coarse_patch->ylower = fine_patches[0].ylower;
+        temp_coarse_patch->xupper = fine_patches[NumSiblings-1].xupper;
+        temp_coarse_patch->yupper = fine_patches[NumSiblings-1].yupper;
+        temp_coarse_patch->level  = level;
+        int coarse_patchno = -1;
 
-        // cp_new_coarse->setup_patch(level, maxlevel, refratio);
-        // Create a fake patch? Don't set up the patch?
-        // set_user_patch_setup(new_domain,&new_patch[igrid],blockno,new_patchno);
+        set_clawpatch(domain,temp_coarse_patch,blockno,coarse_patchno);
 
-        ClawPatch *cp_siblings[NumSiblings];
-        for (int i = 0; i < NumSiblings; i++)
-        {
-            cp_siblings[i] = get_clawpatch(&sibling_patch[i]);
-        }
+        patch_average2coarse(domain,fine_patches,temp_coarse_patch,
+                             blockno, fine0_patchno, coarse_patchno);
 
-        // Pass all four sibling patches into a single routine to see if
-        // they can be coarsened.
 
-        cp_new_coarse->coarsen_from_fine_family(cp_siblings,refratio,NumSiblings,
-                                                p4est_refineFactor);
-
-        fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-        patch_coarsened =
-            (ddata->f_patch_tag4coarsening)(domain,sibling_patch,this_block_idx,
-                                            sibling0_patch_idx,cp_new_coarse);
-
-        /*
-        fclaw_bool pc1;
-        pc1 = cp_new_coarse->tag_for_coarsening(cp_siblings,refratio,
-                                                NumSiblings,
-                                                p4est_refineFactor);
-
-        if (pc1 != patch_coarsened)
-        {
-            printf("Different coarsening\n");
-        }
-        */
-
+        /* --------------------------------------------------------------
+           Test to see if temporary patch needs refining.  If so, then we
+           shouldn't coarsen it.
+          ----------------------------------------------------------------- */
+        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
+        fclaw_bool patch_coarsened =
+            (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
+                                         coarse_patchno);
+        delete temp_coarse_patch;
 
         if (patch_coarsened)
         {
-            for (int i = 0; i < NumSiblings; i++)
+            for (int igrid = 0; igrid < NumSiblings; igrid++)
             {
-                int sibling_patch_idx = sibling0_patch_idx + i;
-                fclaw2d_patch_mark_coarsen(domain, this_block_idx, sibling_patch_idx);
+                int fine_patchno = fine0_patchno + igrid;
+                fclaw2d_patch_mark_coarsen(domain, blockno, fine_patchno);
             }
         }
-        delete cp_new_coarse;
     }
 }
 
@@ -197,113 +129,88 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      void *user)
 {
 
-    const amr_options_t *gparms = get_domain_parms(old_domain);
+    // const amr_options_t *gparms = get_domain_parms(old_domain);
 
-    /* const int num_siblings = get_siblings_per_patch(old_domain); */
-    fclaw_bool init_grid = *(fclaw_bool *) user;
-
+    /*
     // const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
     int refratio = gparms->refratio;
+    */
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        // Grid was not coarsened or refined, so we can just copy
-        // the pointer
-        ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
-        fclaw_bool old_code = fclaw_true;
-        if (old_code)
-        {
-            // This produces what appear to be correct results
-            ClawPatch *cp_new = new ClawPatch();
-            int level = new_patch->level;
-            cp_new->define(old_patch->xlower,
-                           old_patch->ylower,
-                           old_patch->xupper,
-                           old_patch->yupper,
-                           blockno,
-                           level,
-                           gparms);
+        // Grid doesn't change
+        set_clawpatch(new_domain,new_patch,blockno,new_patchno);
 
-            set_patch_data(&new_patch[0],cp_new);
+        // Setup new patch using solver specific routine
+        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+        (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
 
-            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-            (sf->f_patch_setup)(new_domain,&new_patch[0],blockno,new_patchno);
-
-            cp_new->copyFrom(cp_old);
-        }
-        else
-        {
-            // whereas this version has memory problems.
-            set_patch_data(&new_patch[0],cp_old);
-            set_patch_data(&old_patch[0],NULL);
-        }
+        // Need a copy function in regrid_functions
+        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
+        (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
+                                    new_patchno);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
-        // New grids are FINER grids
-        ClawPatch *cp_old = get_clawpatch(&old_patch[0]);
+        // Old grid is the coarse patch; new grids are the finer patches
 
+        fclaw2d_patch_t *coarse_patch = old_patch;
+        int coarse_patchno = old_patchno;
+
+        fclaw2d_patch_t *fine_siblings = new_patch;
+
+        // Loop over four siblings (z-ordering)
         for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
-            ClawPatch *cp_new = new ClawPatch();
-            int level = new_patch->level;
+            fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
+            int fine_patchno = new_patchno + igrid;
+            // int fine_level = fine_patch->level;
 
-            cp_new->define(new_patch[igrid].xlower,
-                           new_patch[igrid].ylower,
-                           new_patch[igrid].xupper,
-                           new_patch[igrid].yupper,
-                           blockno,
-                           level,
-                           gparms);
+            // Create new ClawPatch and assign patch pointer to it.
+            set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
 
-            set_patch_data(&new_patch[igrid],cp_new);
+            // Do one-time setup on new patch
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+            (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
 
-            (sf->f_patch_setup)(new_domain,&new_patch[igrid],blockno,new_patchno);
+            // This is only used here, since only in the initial grid layout do we
+            //  create fine grids from coarser grids.
+            fclaw_bool initial_grid = *(fclaw_bool *) user;
 
-            // int level = new_patch[igrid].level;
-            // cp_new->setup_patch(level, maxlevel, refratio);
-            if (init_grid)
+            // Initialize new fine patch by either calling an init function or
+            // by interpolating from coarser grid.
+            if (initial_grid)
             {
-                (sf->f_patch_initialize)(new_domain,&new_patch[igrid],blockno,new_patchno);
+                (sf->f_patch_initialize)(new_domain,fine_patch,blockno,fine_patchno);
             }
             else
             {
-                cp_old->interpolate_to_fine_patch(cp_new,igrid,p4est_refineFactor,refratio);
+                fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
+                (rf->f_patch_interpolate2fine)(new_domain,coarse_patch,fine_patch,
+                                               blockno,coarse_patchno,fine_patchno,igrid);
+
+                // cp_old->interpolate_to_fine_patch(cp_new,igrid,p4est_refineFactor,refratio);
             }
         }
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
-        // newsize == DOUBLESIZE (must remember  : DOUBLESIZE means a coarser grid!)
-        // new grid is a COARSE grid
-        ClawPatch *cp_new = new ClawPatch();
-        int level = new_patch->level;
-        cp_new->define(new_patch[0].xlower,
-                       new_patch[0].ylower,
-                       new_patch[0].xupper,
-                       new_patch[0].yupper,
-                       blockno,
-                       level,
-                       gparms);
-        set_patch_data(&new_patch[0],cp_new);
+        // Old grids are the finer grids;  new grid is the coarsened grid
+        fclaw2d_patch_t *fine_siblings = old_patch;
+        int fine_patchno = old_patchno;
+
+        fclaw2d_patch_t *coarse_patch = new_patch;
+        int coarse_patchno = new_patchno;
+
+        set_clawpatch(new_domain,coarse_patch,blockno,coarse_patchno);
 
         fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        (sf->f_patch_setup)(new_domain,&new_patch[0],blockno,new_patchno);
+        (sf->f_patch_setup)(new_domain,coarse_patch,blockno,coarse_patchno);
 
-        /*
-        int level = new_patch[0].level;
-        cp_new->setup_patch(level, maxlevel, refratio);
-        */
+        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
+        (rf->f_patch_average2coarse)(new_domain,fine_siblings,coarse_patch,
+                                     blockno,coarse_patchno, fine_patchno);
 
-        ClawPatch *cp_siblings[NumSiblings]; // An array of pointers?
-        for (int i = 0; i < NumSiblings; i++)
-        {
-            cp_siblings[i] = get_clawpatch(&old_patch[i]);
-        }
-        // This duplicates the work we did to determine if we even need to coarsen. Oh well.
-        cp_new->coarsen_from_fine_family(cp_siblings, refratio, NumSiblings,
-                                         p4est_refineFactor);
     }
     else
     {
