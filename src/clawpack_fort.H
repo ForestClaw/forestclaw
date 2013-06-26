@@ -173,16 +173,6 @@ void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
 /* ----------------------------------------------------------------------------------
    Tagging for refinement/coarsening
    ---------------------------------------------------------------------------------- */
-void tag4refinement_(const int& mx,const int& my,const int& mbc,
-                             const int& meqn, const double& xlower,
-                             const double& ylower, const double& dx, const double& dy,
-                             double q[], const int& init_flag, int& tag_patch);
-
-void tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                     const int& meqn,const double& xlower,
-                     const double& ylower, const double& dx, const double& dy,
-                     double qcoarsened[], int& tag_patch);
-
 void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, double qcoarse[], double qfine[],
                                 const int& p4est_refineFactor,
