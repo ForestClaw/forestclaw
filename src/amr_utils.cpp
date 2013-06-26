@@ -61,12 +61,15 @@ void init_domain_data(fclaw2d_domain_t *domain)
     /* I put this here because somehow it is not part of a 'solver' */
     ddata->f_problem_setup = &problem_setup_default;
     ddata->f_patch_output = &patch_output_default;
-    ddata->f_patch_tag4refinement = &patch_tag4refinement_dummy;
-    ddata->f_patch_tag4coarsening = &patch_tag4coarsening_dummy;
 
     fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
     initialize_solver_functions(solver_functions);
     ddata->solver_functions = solver_functions;
+
+    fclaw2d_regrid_functions_t* regrid_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_regrid_functions_t, 1);
+    initialize_regrid_functions(regrid_functions);
+    ddata->regrid_functions = regrid_functions;
+
 }
 
 
@@ -123,12 +126,11 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
     ddata_new->f_problem_setup = ddata_old->f_problem_setup;
     ddata_new->f_patch_output = ddata_old->f_patch_output;
-    ddata_new->f_patch_tag4refinement = ddata_old->f_patch_tag4refinement;
-    ddata_new->f_patch_tag4coarsening = ddata_old->f_patch_tag4coarsening;
 
     ddata_new->curr_time = ddata_old->curr_time;
 
     copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
+    copy_regrid_functions(ddata_old->regrid_functions,ddata_new->regrid_functions);
 }
 
 
@@ -215,12 +217,6 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t *) patch->user;
 
     return pdata->cp;
-}
-
-fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain)
-{
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    return ddata->solver_functions;
 }
 
 /* end of helper functions */

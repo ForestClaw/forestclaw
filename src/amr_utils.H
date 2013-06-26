@@ -44,6 +44,7 @@ extern "C"
 #endif
 #endif
 
+
 // -----------------------------------------------------------------
 // Check parms
 // -----------------------------------------------------------------
@@ -68,21 +69,17 @@ fclaw2d_patch_data_t  *get_patch_data(fclaw2d_patch_t *patch);
 /* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
-/* void set_domain_data(fclaw2d_domain_t *domain, const amr_options_t *gparms); */
 void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
+
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
 
+/* -----------------------------------------------------------------
+   Link routines that don't have any other place to go...
+   ----------------------------------------------------------------- */
 void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
 void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_output);
-
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-
-fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain);
-
-
-/* I am not really sure what 'capi' stands for... */
 
 #if 0 /* moved into fclaw2d_capi.h */
 
@@ -92,16 +89,6 @@ fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain);
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);
-
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-/* const int get_refratio(fclaw2d_domain_t *domain); */
-
-/*
-const int get_corners_per_patch(fclaw2d_domain_t *domain);
-const int get_faces_per_patch(fclaw2d_domain_t *domain);
-const int get_siblings_per_patch(fclaw2d_domain_t *domain);
-const int get_p4est_refineFactor(fclaw2d_domain_t *domain);
-*/
 
 // Misc. routines
 int num_patches(fclaw2d_domain_t *domain, int level,int include_shadow);

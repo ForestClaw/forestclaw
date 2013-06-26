@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_SOLVERS_H
 #define FCLAW2D_SOLVERS_H
 
-#include <sc_options.h>
+// #include <sc_options.h>
 #include "fclaw2d_defs.H"
 
 #ifdef __cplusplus
@@ -37,16 +37,15 @@ extern "C"
 #endif
 #endif
 
+typedef struct fclaw2d_solver_functions fclaw2d_solver_functions_t;
+// typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
+
+
 void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
-typedef struct fclaw2d_solver_functions fclaw2d_solver_functions_t;
-
-
-
-// typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
 
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -94,6 +93,8 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      double t,
                                                      double dt);
 
+
+
 struct fclaw2d_solver_functions
 {
     fclaw2d_patch_setup_t f_patch_setup;
@@ -125,6 +126,8 @@ struct fclaw2d_solver_patch_data
     void* solver_data;
 }
 */
+
+fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain);
 
 void initialize_solver_functions(fclaw2d_solver_functions_t* solver_functions);
 

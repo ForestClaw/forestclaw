@@ -233,7 +233,7 @@ void compute_tangents_(const int& mx, const int& my, const int& mbc,
 
 void compute_surf_normals_(const int& mx, const int& my, const int& mbc,
                            double xnormals[],double ynormals[],double edge_lengths[],
-                           double curvature[], double surfnormals[]);
+                           double curvature[], double surfnormals[], double area[]);
 
 
 /* ----------------------------------------------------------------------------------

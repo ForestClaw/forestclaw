@@ -24,11 +24,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <p4est_base.h>
+
 #include "amr_utils.H"
 #include "amr_single_step.h"
 #include "amr_mol.H"
+
 #include "fclaw2d_solvers.H"
-#include "fclaw2d_defs.H"
 
 void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -128,4 +129,10 @@ void copy_solver_functions(fclaw2d_solver_functions_t* old_solver_functions,
     newsf->f_patch_single_step_update = oldsf->f_patch_single_step_update;
     newsf->f_level_ode_solver         = oldsf->f_level_ode_solver;
     newsf->f_patch_ode_solver_rhs     = oldsf->f_patch_ode_solver_rhs;
+}
+
+fclaw2d_solver_functions_t* get_solver_functions(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    return ddata->solver_functions;
 }

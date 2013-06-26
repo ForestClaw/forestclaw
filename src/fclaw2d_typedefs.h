@@ -23,7 +23,6 @@ typedef struct fclaw2d_domain_data
 
     /* Some solver parms */
     void* waveprop_parms;
-
     void* manyclaw_parms;
 
     /* Time at start of each subcycled time step */
@@ -31,9 +30,8 @@ typedef struct fclaw2d_domain_data
 
     fclaw2d_problem_setup_t f_problem_setup;
     fclaw2d_patch_output_t f_patch_output;
-    fclaw2d_patch_tag4refinement_t f_patch_tag4refinement;
-    fclaw2d_patch_tag4coarsening_t f_patch_tag4coarsening;
 
+    fclaw2d_regrid_functions_t* regrid_functions;
     fclaw2d_solver_functions_t* solver_functions;
 
 } fclaw2d_domain_data_t;
