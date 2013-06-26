@@ -27,10 +27,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SPHERE_USER_H
 
 #include "amr_forestclaw.H"
-// #include "amr_waveprop.H"
 
 extern "C"
 {
+    void sphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
+                                const int& meqn, const double& xlower,
+                                const double& ylower, const double& dx, const double& dy,
+                                double q[], const int& init_flag, int& tag_patch);
+
+    void sphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+                                const int& meqn,const double& xlower,
+                                const double& ylower, const double& dx, const double& dy,
+                                double qcoarsened[], int& tag_patch);
+
     void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
                          const int& mbc, const int& mx, const int& my,
                          const double& xlower, const double& ylower,
