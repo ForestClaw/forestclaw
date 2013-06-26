@@ -223,8 +223,10 @@ void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
 }
 
 
-fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                int this_patch_idx, int this_block_idx, int initflag)
+fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx, int initflag)
 {
     // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
@@ -263,13 +265,12 @@ fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_
 }
 
 fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *sibling_patch,
-                                int this_block_idx,
-                                int sibling0_patch_idx,
-                                ClawPatch* cp_new_coarse)
+                                fclaw2d_patch_t *this_patch,
+                                int this_blockno,
+                                int this_patchno)
 {
     // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
+    set_block_(&this_blockno);
 
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -281,7 +282,7 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // Patch specific parameters
-    ClawPatch *cp = cp_new_coarse;
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
@@ -289,7 +290,7 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------------ */
     // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
+    double* q = cp->q();
 
     double *aux;
     int maux;
@@ -298,7 +299,8 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
     /* ----------------------------------------------------------- */
     int tag_patch;  // == 0 or 1
     ridge_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
-                          dx,dy,qcoarse,maux,aux, tag_patch);
+                          dx,dy,q,maux,aux,tag_patch);
+
     return tag_patch == 0;
 }
 
