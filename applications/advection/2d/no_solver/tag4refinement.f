@@ -1,5 +1,5 @@
-      subroutine tag_for_refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      q,init_flag, tag_patch)
+      subroutine no_solver_tag4refinement(mx,my,mbc,meqn,xlower,ylower
+     &      ,dx,dy,q,init_flag, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
@@ -16,9 +16,8 @@
 
 c     # Refine based only on first variable in system.
       mq = 1
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-
+      do i = 1,mx
+         do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
             if (qmax - qmin .gt. 0.5d0) then
@@ -31,8 +30,8 @@ c     # Refine based only on first variable in system.
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag_for_coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      qcoarsened, tag_patch)
+      subroutine no_solver_tag4coarsening(mx,my,mbc,meqn,
+     &      xlower,ylower,dx,dy,qcoarsened, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch

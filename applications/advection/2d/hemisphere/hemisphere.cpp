@@ -89,9 +89,8 @@ main (int argc, char **argv)
   link_problem_setup(domain,amr_waveprop_setprob);
 
   hemisphere_link_solvers(domain);
-
-  link_patch_tag4refinement(domain,hemisphere_patch_tag4refinement);
-  link_patch_tag4coarsening(domain,hemisphere_patch_tag4coarsening);
+  link_regrid_functions(domain,hemisphere_patch_tag4refinement,
+                        hemisphere_patch_tag4coarsening);
 
   /* --------------------------------------------------
      Initialize and run the simulation

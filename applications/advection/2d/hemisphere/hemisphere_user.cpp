@@ -243,10 +243,9 @@ fclaw_bool hemisphere_patch_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 fclaw_bool hemisphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *sibling_patch,
-                                           int this_block_idx,
-                                           int sibling0_patch_idx,
-                                           ClawPatch* cp_new_coarse)
+                                           fclaw2d_patch_t *this_patch,
+                                           int blockno,
+                                           int patchno)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -258,7 +257,7 @@ fclaw_bool hemisphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // Patch specific parameters
-    ClawPatch *cp = cp_new_coarse;
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();

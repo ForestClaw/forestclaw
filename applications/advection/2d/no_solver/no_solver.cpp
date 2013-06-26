@@ -92,6 +92,9 @@ main (int argc, char **argv)
   fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
   sf->f_patch_initialize = &no_solver_patch_initialize;
 
+  link_regrid_functions(domain,no_solver_patch_tag4refinement,
+                        no_solver_patch_tag4coarsening);
+
 
   /* ---------------------------------------------------------------
      Initialize and run (but with out updating anything)

@@ -96,10 +96,9 @@ fclaw_bool hemisphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                            int initflag);
 
 fclaw_bool hemisphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *sibling_patch,
-                                           int this_block_idx,
-                                           int sibling0_patch_idx,
-                                           ClawPatch* cp_new_coarse);
+                                           fclaw2d_patch_t *this_patch,
+                                           int blockno,
+                                           int patchno);
 
 #ifdef __cplusplus
 #if 0

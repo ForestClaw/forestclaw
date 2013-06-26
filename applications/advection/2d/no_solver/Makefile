@@ -24,6 +24,14 @@ solver_includes :=
 solver_objs +=
 solver_includes +=
 
+exampleobjs = \
+	no_solver_user.o \
+	initialize_ac.o \
+	initialize.o \
+	ghost_twopatch.o \
+	tag4refinement.o
+
+
 # make sure that the first make target is the executable
 default: $(TARGET)
 
@@ -36,20 +44,13 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src $(solver_objs) -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< $(solver_objs) -o $@
+	$(FC) -Wall $(FFLAGS) -I$(FORTRAN_INC) -c $< $(solver_objs) -o $@
 
 
 .PHONY: clean realclean default $(TARGET)
 
-exampleobjs = \
-	no_solver_user.o \
-	initialize.o \
-	ghost_twopatch.o \
-	tag4refinement.o
-
-
 GeoFiles := \
-      $(FORESTCLAW)/AMRClaw/src2d/mappings/set_maptype_cart.o
+      $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs) $(GeoFiles)
 

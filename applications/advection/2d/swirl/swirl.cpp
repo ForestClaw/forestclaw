@@ -101,8 +101,7 @@ main (int argc, char **argv)
 
   swirl_link_solvers(domain);
 
-  link_patch_tag4refinement(domain,swirl_patch_tag4refinement);
-  link_patch_tag4coarsening(domain,swirl_patch_tag4coarsening);
+  link_regrid_functions(domain,swirl_patch_tag4refinement,swirl_patch_tag4coarsening);
 
   /* ---------------------------------------------------------------
      Run

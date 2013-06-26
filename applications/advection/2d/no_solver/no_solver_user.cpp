@@ -50,14 +50,14 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     set_block_(&this_block_idx);
 
     // Global parameters
-    const amr_options_t *gparms              = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
     // Parameters specific to this patch
-    ClawPatch *cp                            = get_clawpatch(this_patch);
+    ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
@@ -67,8 +67,79 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     // Call to initialization function.
-    initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
+    // Initialize with a disk
+    // initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
+
+    // Initialize with a more interesting initial condition
+    initialize_ac(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 }
+
+/* -----------------------------------------------------------------
+   Default routine for tagging patches for refinement and coarsening
+   ----------------------------------------------------------------- */
+fclaw_bool no_solver_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          int initflag)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    no_solver_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    return tag_patch == 1;
+}
+
+fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int blockno,
+                                          int patchno)
+{
+    // This might come in handy if we want to debug a coarsening routine without
+    // worrying about solvers.
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    int tag_patch;  // == 0 or 1
+    no_solver_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    return tag_patch == 0;
+}
+
 
 #ifdef __cplusplus
 #if 0
