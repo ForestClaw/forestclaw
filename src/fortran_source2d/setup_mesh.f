@@ -440,7 +440,7 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
       end
 
       SUBROUTINE compute_surf_normals(mx,my,mbc,
-     &      xnormals,ynormals,edge_lengths,curvature,surfnormals)
+     &      xnormals,ynormals,edge_lengths,curvature,surfnormals,area)
       IMPLICIT NONE
 
       INTEGER mx,my,mbc
@@ -450,6 +450,7 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
       double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
       double precision  surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
       double precision    curvature(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision         area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       INTEGER i,j,m
       DOUBLE PRECISION nv(3), sp, nlen
@@ -472,7 +473,7 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
             do m = 1,3
                surfnormals(i,j,m) = nv(m)/nlen
             enddo
-            curvature(i,j) = nlen
+            curvature(i,j) = 0.5d0*nlen/area(i,j)
          enddo
       enddo
 
