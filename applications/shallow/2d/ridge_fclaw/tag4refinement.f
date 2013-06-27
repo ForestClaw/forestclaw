@@ -1,8 +1,9 @@
       subroutine ridge_tag4refinement(mx,my,mbc,meqn,
-     &      xlower,ylower, dx,dy,q,maux,aux,initflag,tag_patch)
+     &      xlower,ylower, dx,dy,q,level,maux,aux,initflag,tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, initflag, maux
+      integer level
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
@@ -16,16 +17,12 @@
       tag_patch = 0
       do i = 1,mx
          do j = 1,my
-            if (initflag .eq. 1) then
-               tag_patch = 0
-            else
+            eta = q(i,j,1) + aux(i,j,19)
+            if (abs(eta) .gt. tol1 .or.
+     &            (abs(eta) .gt. tol1 .and. level .gt. 0)) then
                tag_patch = 1
+               return
             endif
-c            eta = q(i,j,1) + aux(i,j,19)
-c            if (abs(eta) .gt. tol1) then
-c               tag_patch = 1
-c               return
-c            endif
          enddo
       enddo
 
@@ -33,10 +30,10 @@ c            endif
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
       subroutine ridge_tag4coarsening(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,qcoarsened, maux,aux,initflag,tag_patch)
+     &      xlower,ylower,dx,dy,qcoarsened, maux,aux,tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, maux, initflag
+      integer mx,my, mbc, meqn, tag_patch, maux
       double precision xlower, ylower, dx, dy
       double precision qcoarsened(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
