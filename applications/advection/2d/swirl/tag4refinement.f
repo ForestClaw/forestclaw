@@ -10,9 +10,15 @@
       double precision xc,yc, qmin, qmax
       double precision dq, dqi, dqj
 
+      if (init_flag .eq. 1) then
+         tag_patch = 0
+      else
+         tag_patch = 1
+      endif
+      return
+
       qmin = 100.d0
       qmax = -100.d0
-      tag_patch = 0
 
 c     # Refine based only on first variable in system.
       mq = 1
@@ -57,9 +63,12 @@ c     # coarsening criteria different from the refinement criteria.
 c     # Also, we don't check for an init_flag, since it is unlikely that
 c     # we would coarsen an initial grid.
 
+      tag_patch = 0
+      return
+
+
       qmin = 100.d0
       qmax = -100.d0
-      tag_patch = 0
       mq = 1
       do i = 1,mx
          do j = 1,my
