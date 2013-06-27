@@ -88,9 +88,10 @@ main (int argc, char **argv)
   /* Link solvers to the domain */
   link_problem_setup(domain,amr_waveprop_setprob);
   link_patch_output(domain,ridge_patch_output);
-  link_regrid_functions(domain,ridge_tag4refinement,ridge_tag4coarsening);
+  // link_regrid_functions(domain,ridge_tag4refinement,ridge_tag4coarsening);
 
   ridge_link_solvers(domain);
+  ridge_link_regrid_functions(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation

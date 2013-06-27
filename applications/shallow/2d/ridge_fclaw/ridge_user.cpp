@@ -53,6 +53,16 @@ void ridge_link_solvers(fclaw2d_domain_t *domain)
     amr_waveprop_link_to_clawpatch();
 }
 
+
+void ridge_link_regrid_functions(fclaw2d_domain_t* domain)
+{
+    fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
+
+    rf->f_patch_tag4refinement = &ridge_tag4refinement;
+    rf->f_patch_tag4coarsening = &ridge_tag4coarsening;
+    rf->f_patch_interpolate2fine = &ridge_interpolate2fine;
+}
+
 void ridge_problem_setup(fclaw2d_domain_t* domain)
 {
     /* Setup any fortran common blocks for general problem
@@ -259,8 +269,9 @@ fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     int tag_patch;
+    int level = this_patch->level;
     ridge_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-                        q,maux,aux,initflag,tag_patch);
+                          q,level,maux,aux,initflag,tag_patch);
     return tag_patch == 1;
 }
 
@@ -298,10 +309,56 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     int tag_patch;  // == 0 or 1
+    int level = this_patch->level; // Level of coarsened patch
+    int initflag = 0;
+    ridge_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+                          q,level,maux,aux,initflag,tag_patch);
+    /*
     ridge_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
                           dx,dy,q,maux,aux,tag_patch);
+    */
 
     return tag_patch == 0;
+}
+
+void ridge_interpolate2fine(fclaw2d_domain_t* domain, fclaw2d_patch_t *coarse_patch,
+                                fclaw2d_patch_t* fine_patch,
+                                int this_blockno, int coarse_patchno,
+                                int fine_patchno, int igrid)
+
+{
+    const amr_options_t* gparms = get_domain_parms(domain);
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    int refratio = gparms->refratio;
+
+    ClawPatch *cp_coarse = get_clawpatch(coarse_patch);
+    double *qcoarse = cp_coarse->q();
+
+    double *aux_coarse;
+    int maux;
+    amr_waveprop_get_auxarray(domain,cp_coarse,&aux_coarse,&maux);
+
+    ClawPatch *cp_fine = get_clawpatch(fine_patch);
+    double *qfine = cp_fine->q();
+
+    double *aux_fine;
+    amr_waveprop_get_auxarray(domain,cp_fine,&aux_fine,&maux);
+
+    // Use linear interpolation with limiters.
+    interpolate_geo_(mx,my,mbc,meqn,qcoarse,qfine,maux,aux_coarse,
+                     aux_fine, p4est_refineFactor, refratio,igrid);
+    if (gparms->manifold)
+    {
+        double *areacoarse = cp_coarse->area();
+        double *areafine = cp_fine->area();
+
+        fixcapaq2_(mx, my, mbc, meqn, qcoarse, qfine, areacoarse, areafine,
+                   p4est_refineFactor, refratio, igrid);
+    }
 }
 
 

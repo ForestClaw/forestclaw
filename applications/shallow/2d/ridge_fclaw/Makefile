@@ -17,6 +17,7 @@ exampleobjs = \
 	rpn2swsphere_fw.o \
 	rpt2swq.o \
 	qinit.o \
+	interpolate_geo.o \
 	b4step2.o \
 	setgauges.o \
 	settsunami_geo.o \

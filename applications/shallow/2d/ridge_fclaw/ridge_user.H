@@ -61,7 +61,7 @@ extern "C"
     void ridge_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                const int& meqn, const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
-                               double q[], const int& maux,
+                               double q[], const int& level, const int& maux,
                                double aux[], const int& initflag, int& tag_patch);
 
     void ridge_tag4coarsening_(const int& mx,const int& my,const int& mbc,
@@ -70,9 +70,17 @@ extern "C"
                                double qcoarsened[], const int& maux,
                                double aux[], int& tag_patch);
 
+    void interpolate_geo_(const int& mx, const int& my, const int& mbc,
+                          const int& meqn, double qcoarse[], double qfine[],
+                          const int& maux, double aux_coarse[], double aux_fine[],
+                          const int& p4est_refineFactor, const int& refratio,
+                          const int& igrid);
+
 }
 
 void ridge_link_solvers(fclaw2d_domain_t *domain);
+void ridge_link_regrid_functions(fclaw2d_domain_t* domain);
+
 
 void ridge_problem_setup(fclaw2d_domain_t* domain);
 
@@ -114,6 +122,12 @@ fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx, int this_patch_idx,
                                 int initflag);
+
+void ridge_interpolate2fine(fclaw2d_domain_t* domain, fclaw2d_patch_t *coarse_patch,
+                            fclaw2d_patch_t* fine_patch,
+                            int this_blockno, int coarse_patchno,
+                            int fine_patchno, int igrid);
+
 
 
 #ifdef __cplusplus
