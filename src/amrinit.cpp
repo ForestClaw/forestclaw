@@ -147,9 +147,6 @@ void amrinit (fclaw2d_domain_t **domain)
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
 
     // Set problem dependent parameters for Riemann solvers, etc.
-    // Values are typically stored in Fortran common blocks, and are not
-    // available outside of Fortran.
-
     (ddata->f_problem_setup)(*domain);
 
     double t = 0;

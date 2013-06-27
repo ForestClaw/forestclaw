@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
-
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
@@ -91,15 +90,18 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 
         set_clawpatch(domain,temp_coarse_patch,blockno,coarse_patchno);
 
-        patch_average2coarse(domain,fine_patches,temp_coarse_patch,
-                             blockno, fine0_patchno, coarse_patchno);
+        // One-time setup of patch
+        fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+        (sf->f_patch_setup)(domain,temp_coarse_patch,blockno,coarse_patchno);
 
+        fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
+        (rf->f_patch_average2coarse)(domain,fine_patches,temp_coarse_patch,
+                                     blockno,coarse_patchno, fine0_patchno);
 
         /* --------------------------------------------------------------
            Test to see if temporary patch needs refining.  If so, then we
            shouldn't coarsen it.
           ----------------------------------------------------------------- */
-        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
         fclaw_bool patch_coarsened =
             (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
                                          coarse_patchno);
