@@ -28,75 +28,127 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "fclaw2d_solvers.H"
 
-#include "ClawPatch.H"
+// Put this here so that I don't have to include "ClawPatch.H"
+void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+                   int blockno, int patchno);
 
-void cb_tag4refinement(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       void *user);
-
-void cb_domain_adapt(fclaw2d_domain_t * old_domain,
-                     fclaw2d_patch_t * old_patch,
-                     fclaw2d_domain_t * new_domain,
-                     fclaw2d_patch_t * new_patch,
-                     fclaw2d_patch_relation_t newsize,
-                     int blockno,
-                     int old_patchno, int new_patchno,
-                     void *user);
-
-
+// This is essentially the same function that is in amr_regrid.cpp
 static
-    void cb_initialize_base(fclaw2d_domain_t *domain,
+void cb_tag4refinement_init(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    ClawPatch *cp = new ClawPatch();
+
+    int maxlevel = gparms->maxlevel;
     int level = this_patch->level;
+    int initflag = 1;
 
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               this_block_idx,
-               level,
-               gparms);
-    set_patch_data(this_patch,cp);
-
-    /* The user can now retrieve the ClawPatch from 'this_patch' and set
-       up whatever they need to set up. */
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-    (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
-}
-
-static
-void set_base_level(fclaw2d_domain_t *domain, const int& level)
-{
-    fclaw2d_domain_iterate_level(domain, level, cb_initialize_base,(void *) NULL);
+    if (level < maxlevel)
+    {
+        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
+        fclaw_bool refine_patch =
+            (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
+                                         this_patch_idx,initflag);
+        if (refine_patch)
+        {
+            fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+        }
+    }
 }
 
 /* -----------------------------------------------------------------
    Initial grid
    ----------------------------------------------------------------- */
 static
-void cb_amrinit(fclaw2d_domain_t *domain,
-                fclaw2d_patch_t *this_patch,
-                int this_block_idx,
-                int this_patch_idx,
-                void *user)
+void cb_initialize (fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    void *user)
 {
+    set_clawpatch(domain,this_patch,this_block_idx, this_patch_idx);
+
     fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+
+    // One-time setup of patch
+    (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
+
+    // Set initial values on patch
     (sf->f_patch_initialize)(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
+static
+void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
+                           fclaw2d_patch_t * old_patch,
+                           fclaw2d_domain_t * new_domain,
+                           fclaw2d_patch_t * new_patch,
+                           fclaw2d_patch_relation_t newsize,
+                           int blockno,
+                           int old_patchno, int new_patchno,
+                           void *user)
+{
+    if (newsize == FCLAW2D_PATCH_SAMESIZE)
+    {
+        // Grid doesn't change
+        set_clawpatch(new_domain,new_patch,blockno,new_patchno);
+
+        // Setup new patch using solver specific routine
+        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+        (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
+
+        // Need a copy function in regrid_functions
+        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
+        (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
+                                    new_patchno);
+    }
+    else if (newsize == FCLAW2D_PATCH_HALFSIZE)
+    {
+        // Patch has been refined.
+        fclaw2d_patch_t *fine_siblings = new_patch;
+
+        // Loop over four siblings (z-ordering) and interpolate
+        // data from coarser parent grid to each finer sibling grid.
+        for (int igrid = 0; igrid < NumSiblings; igrid++)
+        {
+            fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
+            int fine_patchno = new_patchno + igrid;
+
+            // Create new ClawPatch and assign patch pointer to it.
+            set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
+
+            // Do one-time setup on new patch
+            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+            (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
+
+            // This is only used here, since only in the initial grid layout do we
+            // create fine grids from coarser grids.
+            (sf->f_patch_initialize)(new_domain,fine_patch,blockno,fine_patchno);
+        }
+    }
+    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
+    {
+        // We don't coarsen for the initial time step
+    }
+    else
+    {
+        printf("cb_adapt_domain : newsize not recognized\n");
+        exit(1);
+    }
+}
+
+
 // Initialize a base level of grids
-void amrinit(fclaw2d_domain_t **domain)
+void amrinit (fclaw2d_domain_t **domain)
 {
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+
+    // Set problem dependent parameters for Riemann solvers, etc.
+    // Values are typically stored in Fortran common blocks, and are not
+    // available outside of Fortran.
 
     (ddata->f_problem_setup)(*domain);
 
@@ -107,24 +159,11 @@ void amrinit(fclaw2d_domain_t **domain)
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
-    // Set problem dependent parameters for Riemann solvers, etc.
-    // Values are typically stored in Fortran common blocks, and are not
-    // available outside of Fortran.
-
     init_block_and_patch_data(*domain);  /* Allocate block and patch data */
 
-    // This function is redundant, and should be made more general.
-    cout << "Setting base level " << endl;
-    set_base_level(*domain,minlevel);
-
-    cout << "Done with amr_set_base_level " << endl;
-
-
     // Initialize base level grid - combine with 'amr_set_base_level' above?
-    fclaw2d_domain_iterate_level(*domain, minlevel, cb_amrinit,
+    fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
-
-    cout << "Done with domain adaptation " << endl;
 
     int num = (*domain)->num_blocks;
     for (int i = 0; i < num; i++)
@@ -137,22 +176,17 @@ void amrinit(fclaw2d_domain_t **domain)
 
     // Refine as needed.
 
-    bool init_flag = true;
     for (int level = minlevel; level < maxlevel; level++)
     {
-        cout << "amrinit : level = " << level << endl << endl;
-
         // TODO: don't use level_refined since it is not agreed upon in parallel
         // the fclaw2d_domain_adapt and _partition calls work fine in parallel
 
         fclaw2d_domain_iterate_level(*domain, level,
-                                     cb_tag4refinement,
-                                     (void *) &init_flag);
+                                     cb_tag4refinement_init,
+                                     (void *) NULL);
 
         // Rebuild domain if necessary
-        cout << "amrinit : Building new domain " << endl;
         fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-        cout << "amrinit : Done building new domain " << endl << endl;
 
         if (new_domain != NULL)
         {
@@ -178,18 +212,9 @@ void amrinit(fclaw2d_domain_t **domain)
                 set_block_data(block,gparms->mthbc);
             }
 
-
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
-                                           cb_domain_adapt,
-                                           (void *) &init_flag);
-
-            // Set some of the user data types.  Some of this is done
-            // in 'amr_set_base_level',
-            // I should probably come up with a more general way to do this.
-
-            // Not needed, because of copy above.
-            // set_domain_data(new_domain, gparms);
-            // set_domain_time(new_domain,t);
+                                           cb_domain_adapt_init,
+                                           (void *) NULL);
 
             int new_level = level+1;
             // Upon initialization, we don't do any ghost cell exchanges, because we assume
@@ -221,7 +246,5 @@ void amrinit(fclaw2d_domain_t **domain)
             // exit loop;  we are done refining
             break;
         }
-        cout << "amrinit : done with level " << endl << endl;;
     }
-    cout << "Done with building initial grid structure " << endl;
 }
