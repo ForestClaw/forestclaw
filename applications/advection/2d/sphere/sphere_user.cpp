@@ -45,6 +45,8 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &sphere_patch_setup;
     sf->f_patch_initialize         = &sphere_qinit;
+    sf->f_patch_physical_bc        = &sphere_patch_physical_bc;
+    // sf->f_patch_physical_bc        = &amr_waveprop_bc2;
     sf->f_patch_single_step_update = &sphere_update;
 
     amr_waveprop_link_to_clawpatch();
