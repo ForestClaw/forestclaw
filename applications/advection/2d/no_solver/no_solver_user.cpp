@@ -71,7 +71,7 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     // initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 
     // Initialize with a more interesting initial condition
-    initialize_ac(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
+    initialize_ac_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 }
 
 /* -----------------------------------------------------------------
