@@ -142,9 +142,6 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
                   xtangents,ytangents,
                   surfnormals,
                   level,maxlevel,refratio);
-
-
-
 }
 
 void ridge_patch_initialize(fclaw2d_domain_t *domain,
@@ -309,14 +306,17 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     int tag_patch;  // == 0 or 1
+
+    /*
     int level = this_patch->level; // Level of coarsened patch
     int initflag = 0;
     ridge_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,
                           q,level,maux,aux,initflag,tag_patch);
-    /*
+    */
+
     ridge_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
                           dx,dy,q,maux,aux,tag_patch);
-    */
+
 
     return tag_patch == 0;
 }
