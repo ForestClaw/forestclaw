@@ -18,6 +18,8 @@ typedef void (*fclaw2d_solver_patch_data_delete_t)(void **solverdata);
 void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
                    int blockno, int patchno);
 
+void delete_clawpatch(fclaw2d_patch_t* this_patch);
+
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 
 class ClawPatch

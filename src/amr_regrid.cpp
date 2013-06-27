@@ -105,6 +105,9 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         fclaw_bool patch_coarsened =
             (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
                                          coarse_patchno);
+
+        // not deleting ClawPatch - need to fix this!
+        delete_clawpatch(temp_coarse_patch);
         delete temp_coarse_patch;
 
         if (patch_coarsened)

@@ -1,6 +1,7 @@
 #include "ClawPatch.H"
 #include "fclaw2d_typedefs.h"
 #include "amr_includes.H"
+#include "amr_utils.H"
 
 
 void solver_default(void** solverdata)
@@ -27,22 +28,10 @@ fclaw2d_solver_patch_data_new_t
 fclaw2d_solver_patch_data_delete_t
     ClawPatch::f_user_patch_data_delete = &solver_default;
 
-// -----------------------------------------------------
-// User data new/delete
-// -----------------------------------------------------
 
-// This constructors includes all of parameters that are patch independent.
-// All of this could also be in some sort of "set_params" function...
-ClawPatch::ClawPatch()
-{
-}
-
-ClawPatch::~ClawPatch()
-{
-    ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
-    ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
-    ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
-}
+/* -----------------------------------------------------
+   Some external functions that work with ClawPatches.
+   ----------------------------------------------------- */
 
 void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
                    int blockno, int patchno)
@@ -61,6 +50,31 @@ void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
 
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
     pdata->cp = cp;
+}
+
+void delete_clawpatch(fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    delete cp;
+}
+
+// -----------------------------------------------------
+// User data new/delete
+// -----------------------------------------------------
+
+// This constructors includes all of parameters that are patch independent.
+// All of this could also be in some sort of "set_params" function...
+ClawPatch::ClawPatch()
+{
+}
+
+ClawPatch::~ClawPatch()
+{
+    ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
+    ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
+    ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
+    // All other data arrays get deleted automatically by the FArrayBox
+    // destructor
 }
 
 
