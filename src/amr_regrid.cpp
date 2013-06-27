@@ -32,13 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
+static
 void cb_tag4refinement(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        void *user)
 {
-    fclaw_bool init_flag = *((fclaw_bool *) user);
     const amr_options_t *gparms = get_domain_parms(domain);
 
     int maxlevel = gparms->maxlevel;
@@ -46,13 +46,12 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 
     if (level < maxlevel)
     {
-        int initflag = init_flag ? 1 : 0;
         fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
 
+        int initflag = 0;
         fclaw_bool refine_patch =
             (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
                                          this_patch_idx,initflag);
-
         if (refine_patch)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
@@ -118,7 +117,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 }
 
 
-
+static
 void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      fclaw2d_patch_t * old_patch,
                      fclaw2d_domain_t * new_domain,
@@ -128,14 +127,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      int old_patchno, int new_patchno,
                      void *user)
 {
-
-    // const amr_options_t *gparms = get_domain_parms(old_domain);
-
-    /*
-    // const int p4est_refineFactor = get_p4est_refineFactor(old_domain);
-    int refratio = gparms->refratio;
-    */
-
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
         // Grid doesn't change
@@ -164,7 +155,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
-            // int fine_level = fine_patch->level;
 
             // Create new ClawPatch and assign patch pointer to it.
             set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
@@ -173,24 +163,11 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
             (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
 
-            // This is only used here, since only in the initial grid layout do we
-            //  create fine grids from coarser grids.
-            fclaw_bool initial_grid = *(fclaw_bool *) user;
-
             // Initialize new fine patch by either calling an init function or
             // by interpolating from coarser grid.
-            if (initial_grid)
-            {
-                (sf->f_patch_initialize)(new_domain,fine_patch,blockno,fine_patchno);
-            }
-            else
-            {
-                fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
-                (rf->f_patch_interpolate2fine)(new_domain,coarse_patch,fine_patch,
-                                               blockno,coarse_patchno,fine_patchno,igrid);
-
-                // cp_old->interpolate_to_fine_patch(cp_new,igrid,p4est_refineFactor,refratio);
-            }
+            fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
+            (rf->f_patch_interpolate2fine)(new_domain,coarse_patch,fine_patch,
+                                           blockno,coarse_patchno,fine_patchno,igrid);
         }
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
@@ -210,7 +187,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
         (rf->f_patch_average2coarse)(new_domain,fine_siblings,coarse_patch,
                                      blockno,coarse_patchno, fine_patchno);
-
     }
     else
     {
@@ -225,8 +201,6 @@ void regrid(fclaw2d_domain_t **domain)
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double t = get_domain_time(*domain);
-
-    fclaw_bool init_flag = false;
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
@@ -243,7 +217,7 @@ void regrid(fclaw2d_domain_t **domain)
 
     // Then refine.
     fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
-                                   (void *) &init_flag);
+                                   (void *) NULL);
 
     // Rebuild domain if necessary
     // Will return be NULL if no refining was done?
@@ -274,7 +248,7 @@ void regrid(fclaw2d_domain_t **domain)
         }
 
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
-                                       (void *) &init_flag);
+                                       (void *) NULL);
 
         // Set some of the user data types.  Some of this is done in
         // 'amr_set_base_level',
