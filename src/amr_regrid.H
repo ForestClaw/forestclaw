@@ -90,8 +90,6 @@ void initialize_regrid_functions(fclaw2d_regrid_functions_t *regrid_functions);
 void copy_regrid_functions(fclaw2d_regrid_functions_t *old_functions,
                            fclaw2d_regrid_functions_t *new_functions);
 
-fclaw2d_regrid_functions* get_regrid_functions(fclaw2d_domain_t* domain);
-
 void patch_average2coarse(fclaw2d_domain_t *domain, fclaw2d_patch_t *fine_siblings,
                           fclaw2d_patch_t *coarse_patch, int blockno, int fine_patchno,
                           int coarse_patchno);

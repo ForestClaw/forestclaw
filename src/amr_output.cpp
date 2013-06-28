@@ -47,9 +47,6 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
     // Get total number of patches
     int ngrids = 0;
     for(int i = 0; i < domain->num_blocks; i++)
@@ -57,17 +54,6 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         fclaw2d_block_t *block = &domain->blocks[i];
         ngrids += block->num_patches;
     }
-
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    // Write out header file containing global information for 'iframe'
-    int meqn = gparms->meqn;
-    int maux = 0;
-    write_tfile_(iframe,time,meqn,ngrids,maux);
-
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
 
     fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
 }
