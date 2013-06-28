@@ -44,42 +44,6 @@ void cb_amrout(fclaw2d_domain_t *domain,
                             this_patch_idx,iframe,num,matlab_level);
 }
 
-void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                          int this_block_idx, int this_patch_idx,
-                          int iframe,int num,int matlab_level)
-{
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
-    /* ------------------------------------------------------------- */
-    // This opens a file for append.  Now, the style is in the 'clawout' style.
-    write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                 iframe,num,matlab_level,this_block_idx);
-}
 
 void amrout(fclaw2d_domain_t *domain, int iframe)
 {
