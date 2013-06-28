@@ -18,8 +18,8 @@
       do i = 1,mx
          do j = 1,my
             eta = q(i,j,1) + aux(i,j,19)
-            if (abs(eta) .gt. tol1 .or.
-     &            (abs(eta) .gt. tol1 .and. level .gt. 0)) then
+            if (abs(eta) .gt. tol2 .or.
+     &            (abs(eta) .gt. tol1 .and. level .le. 1)) then
                tag_patch = 1
                return
             endif
@@ -30,10 +30,10 @@
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
       subroutine ridge_tag4coarsening(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,qcoarsened, maux,aux,tag_patch)
+     &      xlower,ylower,dx,dy,qcoarsened, level,maux,aux,tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, maux
+      integer mx,my, mbc, meqn, tag_patch, maux, level
       double precision xlower, ylower, dx, dy
       double precision qcoarsened(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
@@ -54,7 +54,8 @@ c     # we would coarsen an initial grid.
       do i = 1,mx
          do j = 1,my
             eta = qcoarsened(i,j,1) + aux(i,j,19)
-            if (abs(eta) .gt. tol1) then
+            if (abs(eta) .gt. tol2 .or.
+     &            (abs(eta) .gt. tol1 .and. level .le. 1)) then
                tag_patch = 1
                return
             endif

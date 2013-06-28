@@ -70,9 +70,6 @@ main (int argc, char **argv)
   /* For sphere */
   domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
 
-  /* For hemisphere */
-  /* domain = fclaw2d_domain_new_unitsquare (mpicomm,gparms->minlevel); */
-
   fclaw2d_domain_list_levels(domain, lp);
   fclaw2d_domain_list_neighbors(domain, lp);
 
@@ -87,8 +84,7 @@ main (int argc, char **argv)
 
   /* Link solvers to the domain */
   link_problem_setup(domain,amr_waveprop_setprob);
-  link_patch_output(domain,ridge_patch_output);
-  // link_regrid_functions(domain,ridge_tag4refinement,ridge_tag4coarsening);
+  link_output_functions(domain,ridge_write_header,ridge_write_output);
 
   ridge_link_solvers(domain);
   ridge_link_regrid_functions(domain);

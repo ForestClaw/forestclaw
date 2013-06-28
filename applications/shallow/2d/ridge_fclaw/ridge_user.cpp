@@ -186,7 +186,25 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
-void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void ridge_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    double time = get_domain_time(domain);
+
+    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+
+    // Write out header file containing global information for 'iframe'
+    int meqn = gparms->meqn + 1;
+    int maux = 0;
+    write_tfile_(iframe,time,meqn,ngrids,maux);
+
+    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
+    // 0010, 0114), and closes the file.
+    new_qfile_(iframe);
+}
+
+
+void ridge_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                         int this_block_idx, int this_patch_idx,
                         int iframe,int num,int matlab_level)
 {
@@ -307,15 +325,9 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
     /* ----------------------------------------------------------- */
     int tag_patch;  // == 0 or 1
 
-    /*
-    int level = this_patch->level; // Level of coarsened patch
-    int initflag = 0;
-    ridge_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-                          q,level,maux,aux,initflag,tag_patch);
-    */
-
+    int level = this_patch->level;
     ridge_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,
-                          dx,dy,q,maux,aux,tag_patch);
+                          dx,dy,q,level,maux,aux,tag_patch);
 
 
     return tag_patch == 0;
@@ -351,14 +363,15 @@ void ridge_interpolate2fine(fclaw2d_domain_t* domain, fclaw2d_patch_t *coarse_pa
     // Use linear interpolation with limiters.
     interpolate_geo_(mx,my,mbc,meqn,qcoarse,qfine,maux,aux_coarse,
                      aux_fine, p4est_refineFactor, refratio,igrid);
-    if (gparms->manifold)
-    {
-        double *areacoarse = cp_coarse->area();
-        double *areafine = cp_fine->area();
 
-        fixcapaq2_(mx, my, mbc, meqn, qcoarse, qfine, areacoarse, areafine,
-                   p4est_refineFactor, refratio, igrid);
-    }
+    /* ------------------------------------------------------------
+       Fix so interpolation is conservative
+       ------------------------------------------------------------ */
+    double *areacoarse = cp_coarse->area();
+    double *areafine = cp_fine->area();
+
+    fixcapaq2_(mx, my, mbc, meqn, qcoarse, qfine, areacoarse, areafine,
+               p4est_refineFactor, refratio, igrid);
 }
 
 

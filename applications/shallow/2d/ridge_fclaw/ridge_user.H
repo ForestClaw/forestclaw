@@ -67,7 +67,8 @@ extern "C"
     void ridge_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                const int& meqn,const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
-                               double qcoarsened[], const int& maux,
+                               double qcoarsened[], const int& level,
+                               const int& maux,
                                double aux[], int& tag_patch);
 
     void interpolate_geo_(const int& mx, const int& my, const int& mbc,
@@ -109,9 +110,12 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt);
 
-void ridge_patch_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void ridge_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                         int this_block_idx, int this_patch_idx,
                         int iframe,int num,int matlab_level);
+
+void ridge_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
+
 
 fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,

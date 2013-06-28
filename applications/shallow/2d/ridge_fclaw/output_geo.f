@@ -58,7 +58,7 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
                endif
             enddo
             surface = q(i,j,1) + aux(i,j,19)
-            write(matunit1,120) surface, (q(i,j,mq),mq=2,meqn)
+            write(matunit1,120) (q(i,j,mq),mq=1,meqn), surface
          enddo
          write(matunit1,*) ' '
       enddo
