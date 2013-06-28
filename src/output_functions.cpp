@@ -26,6 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "amr_output.H"
 
+fclaw2d_output_functions_t* get_output_functions(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    return ddata->output_functions;
+}
+
 void link_output_functions(fclaw2d_domain_t* domain,
                            fclaw2d_patch_write_header_t patch_write_header,
                            fclaw2d_patch_write_output_t patch_write_output)
@@ -35,13 +41,6 @@ void link_output_functions(fclaw2d_domain_t* domain,
     of->f_patch_write_header = patch_write_header;
     of->f_patch_write_output = patch_write_output;
 }
-
-fclaw2d_output_functions_t* get_output_functions(fclaw2d_domain_t *domain)
-{
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    return ddata->output_functions;
-}
-
 
 void initialize_output_functions(fclaw2d_output_functions_t *output_functions)
 {

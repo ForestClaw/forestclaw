@@ -23,9 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// #include "ClawPatch.H"
 #include "amr_utils.H"
-
 #include "amr_regrid.H"
 
 
@@ -172,6 +170,7 @@ void copy_regrid_functions(fclaw2d_regrid_functions_t* old_regrid_functions,
     newrf->f_patch_average2coarse = oldrf->f_patch_average2coarse;
     newrf->f_patch_copy2samesize = oldrf->f_patch_copy2samesize;
 }
+
 fclaw2d_regrid_functions_t* get_regrid_functions(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
