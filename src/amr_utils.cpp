@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_utils.H"
 #include <p4est_base.h>
-#include "amr_single_step.h"
-#include "amr_mol.H"
+
+#include "amr_utils.H"
+// #include "amr_single_step.h"
+// #include "amr_mol.H"
 #include "fclaw2d_solvers.H"
 
 int pow_int(int a, int n)
@@ -52,7 +53,7 @@ void problem_setup_default(fclaw2d_domain_t* domain)
 // assigning default values to items?
 void init_domain_data(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
+    fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC(fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
     ddata->amropts = NULL;
@@ -60,16 +61,18 @@ void init_domain_data(fclaw2d_domain_t *domain)
 
     /* I put this here because somehow it is not part of a 'solver' */
     ddata->f_problem_setup = &problem_setup_default;
-    ddata->f_patch_output = &patch_output_default;
 
-    fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_solver_functions_t, 1);
+    fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC(fclaw2d_solver_functions_t, 1);
     initialize_solver_functions(solver_functions);
     ddata->solver_functions = solver_functions;
 
-    fclaw2d_regrid_functions_t* regrid_functions = FCLAW2D_ALLOC_ZERO(fclaw2d_regrid_functions_t, 1);
+    fclaw2d_regrid_functions_t* regrid_functions = FCLAW2D_ALLOC(fclaw2d_regrid_functions_t, 1);
     initialize_regrid_functions(regrid_functions);
     ddata->regrid_functions = regrid_functions;
 
+    fclaw2d_output_functions_t* output_functions = FCLAW2D_ALLOC(fclaw2d_output_functions_t, 1);
+    initialize_output_functions(output_functions);
+    ddata->output_functions = output_functions;
 }
 
 
@@ -124,13 +127,13 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     ddata_new->waveprop_parms = ddata_old->waveprop_parms;
     ddata_new->manyclaw_parms = ddata_old->manyclaw_parms;
 
-    ddata_new->f_problem_setup = ddata_old->f_problem_setup;
-    ddata_new->f_patch_output = ddata_old->f_patch_output;
-
     ddata_new->curr_time = ddata_old->curr_time;
+
+    ddata_new->f_problem_setup = ddata_old->f_problem_setup;
 
     copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
     copy_regrid_functions(ddata_old->regrid_functions,ddata_new->regrid_functions);
+    copy_output_functions(ddata_old->output_functions,ddata_new->output_functions);
 }
 
 
@@ -179,12 +182,6 @@ void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_prob
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->f_problem_setup = f_problem_setup;
-}
-
-void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_output)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->f_patch_output = f_patch_output;
 }
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)

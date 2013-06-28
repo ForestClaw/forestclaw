@@ -79,7 +79,6 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
    Link routines that don't have any other place to go...
    ----------------------------------------------------------------- */
 void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
-void link_patch_output(fclaw2d_domain_t* domain, fclaw2d_patch_output_t f_patch_output);
 
 #if 0 /* moved into fclaw2d_capi.h */
 

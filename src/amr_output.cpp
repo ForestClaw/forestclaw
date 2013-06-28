@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
+#include "amr_output.H"
 
 static
 void cb_amrout(fclaw2d_domain_t *domain,
@@ -36,12 +37,15 @@ void cb_amrout(fclaw2d_domain_t *domain,
 {
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int num = this_block->num_patches_before + this_patch_idx + 1;
-    int matlab_level = this_patch->level + 1;  // Matlab wants levels to start at 1.
+    int patch_num = this_block->num_patches_before + this_patch_idx;
 
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    (ddata->f_patch_output)(domain,this_patch,this_block_idx,
-                            this_patch_idx,iframe,num,matlab_level);
+    /* the user can also get this, but maybe we don't want the user
+       to have access? */
+    int level = this_patch->level;
+
+    fclaw2d_output_functions_t* of = get_output_functions(domain);
+    (of->f_patch_write_output)(domain,this_patch,this_block_idx,
+                               this_patch_idx,iframe,patch_num,level);
 }
 
 
@@ -54,6 +58,9 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         fclaw2d_block_t *block = &domain->blocks[i];
         ngrids += block->num_patches;
     }
+
+    fclaw2d_output_functions_t* of = get_output_functions(domain);
+    (of->f_patch_write_header)(domain,iframe,ngrids);
 
     fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
 }

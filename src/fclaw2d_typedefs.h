@@ -6,16 +6,13 @@
 #include "forestclaw2d.h"
 #include "fclaw2d_solvers.H"
 #include "amr_regrid.H"
+#include "amr_output.H"
 
 class ClawPatch;
 
 typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t* domain);
-
-typedef void (*fclaw2d_patch_output_t)(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-                                       int this_block_idx, int this_patch_idx,
-                                       int iframe, int num, int matlab_level);
 
 typedef struct fclaw2d_domain_data
 {
@@ -29,10 +26,10 @@ typedef struct fclaw2d_domain_data
     double curr_time;
 
     fclaw2d_problem_setup_t f_problem_setup;
-    fclaw2d_patch_output_t f_patch_output;
 
     fclaw2d_regrid_functions_t* regrid_functions;
     fclaw2d_solver_functions_t* solver_functions;
+    fclaw2d_output_functions_t* output_functions;
 
 } fclaw2d_domain_data_t;
 

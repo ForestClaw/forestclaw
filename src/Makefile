@@ -28,6 +28,7 @@ fclawobjs = \
 	amr_utils.o \
 	amr_options.o \
 	regrid_functions.o \
+	output_functions.o \
 	fclaw2d_convenience.o \
 	fclaw2d_solvers.o \
 	fclaw2d_map.o \
