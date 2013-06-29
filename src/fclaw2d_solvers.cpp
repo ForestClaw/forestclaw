@@ -72,7 +72,7 @@ double amr_dummy_patch_ode_solver_rhs(fclaw2d_domain_t *domain,
                                       double *rhs)
 {
     /* Do nothing */
-    return 0;
+    return 1;
 }
 
 double amr_dummy_level_single_step(fclaw2d_domain_t *domain,
@@ -80,7 +80,7 @@ double amr_dummy_level_single_step(fclaw2d_domain_t *domain,
                                    double t, double dt)
 {
     /* Do nothing */
-    return 0;
+    return 1;
 }
 
 double amr_dummy_patch_single_step_update(fclaw2d_domain_t *domain,
@@ -91,7 +91,7 @@ double amr_dummy_patch_single_step_update(fclaw2d_domain_t *domain,
                                           double dt)
 {
     /* Do nothing */
-    return 0;
+    return 1;
 }
 
 
