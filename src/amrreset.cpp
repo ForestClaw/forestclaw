@@ -53,6 +53,7 @@ void amrreset(fclaw2d_domain_t **domain)
         FCLAW2D_FREE (bd);
         block->user = NULL;
     }
+    // This was the fix that was needed!
     delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
     FCLAW2D_FREE (dd);
     (*domain)->user = NULL;

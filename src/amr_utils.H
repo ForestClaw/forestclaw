@@ -59,6 +59,8 @@ void init_block_data(fclaw2d_block_t *block);
 void init_patch_data(fclaw2d_patch_t *patch);
 void init_block_and_patch_data(fclaw2d_domain_t *domain);
 
+void delete_domain_data(fclaw2d_domain_t* domain);
+
 /* -----------------------------------------------------------------
    Return pointer to user data
    ---------------------------------------------------------------- */

@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_base.h>
 
 #include "amr_utils.H"
-// #include "amr_single_step.h"
-// #include "amr_mol.H"
 #include "fclaw2d_solvers.H"
 
 int pow_int(int a, int n)
@@ -53,7 +51,8 @@ void problem_setup_default(fclaw2d_domain_t* domain)
 // assigning default values to items?
 void init_domain_data(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = FCLAW2D_ALLOC(fclaw2d_domain_data_t, 1);
+    fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
+    ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
     ddata->amropts = NULL;
@@ -75,6 +74,32 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->output_functions = output_functions;
 }
 
+void delete_domain_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
+
+    fclaw2d_solver_functions_t *sf = (fclaw2d_solver_functions_t*) ddata->solver_functions;
+    if (sf != NULL)
+    {
+        FCLAW2D_FREE(sf);
+        ddata->solver_functions = (fclaw2d_solver_functions_t*) NULL;
+    }
+
+    fclaw2d_regrid_functions_t *rf = (fclaw2d_regrid_functions_t*) ddata->regrid_functions;
+    if (rf != NULL)
+    {
+        FCLAW2D_FREE(rf);
+        ddata->regrid_functions = (fclaw2d_regrid_functions_t*) NULL;
+    }
+
+
+    fclaw2d_output_functions_t *of = (fclaw2d_output_functions_t*) ddata->output_functions;
+    if (of != NULL)
+    {
+        FCLAW2D_FREE(of);
+        ddata->output_functions = (fclaw2d_output_functions_t*) NULL;
+    }
+}
 
 void init_block_data(fclaw2d_block_t *block)
 {
