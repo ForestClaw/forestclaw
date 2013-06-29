@@ -497,7 +497,7 @@ amr_waveprop_parms_t*  amr_waveprop_parms_new(sc_options_t *opt)
 
     amr_waveprop_parms_t *waveprop_parms;
 
-    waveprop_parms = SC_ALLOC_ZERO (amr_waveprop_parms_t, 1);
+    waveprop_parms = FCLAW2D_ALLOC_ZERO(amr_waveprop_parms_t, 1);
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &waveprop_parms->order_string, NULL,
@@ -590,8 +590,9 @@ void amr_waveprop_postprocess_parms(amr_waveprop_parms_t* waveprop_parms)
 
 void amr_waveprop_parms_delete(amr_waveprop_parms_t* waveprop_parms)
 {
-    SC_FREE(waveprop_parms->order);
-    SC_FREE(waveprop_parms->mthlim);
+    FCLAW2D_FREE(waveprop_parms->order);
+    FCLAW2D_FREE(waveprop_parms->mthlim);
+    FCLAW2D_FREE(waveprop_parms);
 }
 
 static
