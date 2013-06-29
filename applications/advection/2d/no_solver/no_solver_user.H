@@ -36,13 +36,7 @@ extern "C"
                      const int& mbc,
                      const double& xlower, const double& ylower,
                      const double& dx, const double& dy,
-                     double q[]);
-
-    void initialize_ac_(const int& mx, const int& my, const int& meqn,
-                        const int& mbc,
-                        const double& xlower, const double& ylower,
-                        const double& dx, const double& dy,
-                        double q[]);
+                     double *q);
 
     void no_solver_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                    const int& meqn, const double& xlower,

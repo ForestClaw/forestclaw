@@ -5,8 +5,18 @@
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
-      integer i, j
+      integer i, j, mq, ichoice
       double precision xlow, ylow,wl
+
+      common /com_init/ ichoice
+
+      if (meqn .gt. 2) then
+         write(6,*) 'initialize (initialize.f) : meqn > 2'
+         stop
+      endif
+
+      ichoice = 1
+
 
       do i = 1-mbc,mx+mbc
          xlow = xlower + (i-1)*dx
@@ -23,15 +33,4 @@
       enddo
 
       return
-      end
-
-      double precision function fdisc(x,y)
-      implicit none
-
-      double precision x,y, r
-
-      r = sqrt((x-0.5d0)**2 + (y-0.5d0)**2)
-
-      fdisc = r-0.25d0
-
       end

@@ -66,12 +66,7 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     // Pointers needed for the fortran
     double* q = cp->q();
 
-    // Call to initialization function.
-    // Initialize with a disk
-    // initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
-
-    // Initialize with a more interesting initial condition
-    initialize_ac_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
+    initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 }
 
 /* -----------------------------------------------------------------
