@@ -27,7 +27,6 @@ solver_includes +=
 exampleobjs = \
 	no_solver_user.o \
 	initialize.o \
-	fdisc.o \
 	ghost_twopatch.o \
 	tag4refinement.o
 
