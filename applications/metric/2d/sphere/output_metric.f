@@ -9,6 +9,8 @@
       double precision xlower, ylower,dx,dy
 
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
+      double precision qv(2)
+      integer m,mfields
 
       character*10 matname1
       integer matunit1
@@ -50,15 +52,17 @@ c        # Format statement 109 below will not work.
       endif
 
 c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
+      mfields = 2
       do j = 1,my
          do i = 1,mx
-            do mq = 1,meqn
-               if (abs(q(i,j,mq)) .lt. 1d-99) then
-                  q(i,j,mq) = 0.d0
+            qv(1) = curvature(i,j)
+            qv(2) = log10(abs(curvature(i,j)-1))
+            do m = 1,mfields
+               if (abs(qv(m)) .lt. 1d-99) then
+                  qv(m) = 0.d0
                endif
             enddo
-            write(matunit1,120) curvature(i,j),
-     &            log10(abs(curvature(i,j)-1))
+            write(matunit1,120) (qv(m),m=1,mfields)
          enddo
          write(matunit1,*) ' '
       enddo
