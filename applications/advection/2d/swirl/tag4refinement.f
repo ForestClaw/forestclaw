@@ -12,6 +12,7 @@
 
       qmin = 100.d0
       qmax = -100.d0
+      tag_patch = 0
 
 c     # Refine based only on first variable in system.
       mq = 1

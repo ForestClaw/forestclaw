@@ -137,7 +137,7 @@ fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    int tag_patch;  // == 0 or 1
+    int tag_patch = 0;
     swirl_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
     return tag_patch == 1;
 }
@@ -167,7 +167,7 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     // Pointers needed to pass to Fortran
     double* qcoarse = cp->q();
 
-    int tag_patch;  // == 0 or 1
+    int tag_patch = 1;  // == 0 or 1
     swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
 }
