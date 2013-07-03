@@ -99,6 +99,8 @@ void delete_domain_data(fclaw2d_domain_t* domain)
         FCLAW2D_FREE(of);
         ddata->output_functions = (fclaw2d_output_functions_t*) NULL;
     }
+
+
 }
 
 void init_block_data(fclaw2d_block_t *block)
@@ -114,6 +116,11 @@ void init_patch_data(fclaw2d_patch_t *patch)
     patch->user = (void *) pdata;
 }
 
+void delete_patch_data(fclaw2d_patch_t *patch)
+{
+    fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t*) patch->user;
+    FCLAW2D_FREE(pd);
+}
 
 // -----------------------------------------------------------------
 // Return pointer to user data
