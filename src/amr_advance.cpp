@@ -304,7 +304,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     // Be sure that all levels have exchanged with their coarser level.
     // This is needed so that when we regrid, we have valid ghost cell data for
     // interpolation to finer grids.
-    all_exchange(domain,a_time_stepper);
+    // all_exchange(domain,a_time_stepper);
 
     return maxcfl;
 }
