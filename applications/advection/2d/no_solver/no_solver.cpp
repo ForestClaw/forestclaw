@@ -85,16 +85,8 @@ main (int argc, char **argv)
      Don't do any solve or run.  This is just to test that we can
      compile without any solver routines.
      --------------------------------------------------------------- */
-  link_problem_setup(domain,no_solver_setprob);
 
-
-  /* Initialize data but don't do anything */
-  fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-  sf->f_patch_initialize = &no_solver_patch_initialize;
-
-  link_regrid_functions(domain,no_solver_patch_tag4refinement,
-                        no_solver_patch_tag4coarsening);
-
+  no_solver_linker(domain);
 
   /* ---------------------------------------------------------------
      Initialize and run (but with out updating anything)
