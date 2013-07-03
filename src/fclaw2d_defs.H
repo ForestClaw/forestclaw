@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DEFS_H
 #define FCLAW2D_DEFS_H
 
+#include <math.h>
+
 /* Some convenient preprocessor directives */
 
 #define FCLAW_SPACEDIM 2
@@ -49,5 +51,7 @@ static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 #define fclaw_bool bool
 #define fclaw_true true
 #define fclaw_false false
+
+#define fclaw_nan NAN
 
 #endif
