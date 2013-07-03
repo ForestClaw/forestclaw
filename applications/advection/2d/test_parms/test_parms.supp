@@ -1,0 +1,84 @@
+{
+   bootstrap (in /usr/lib/dyld)
+   Memcheck:Leak
+   ...
+   fun:_ZN13dyldbootstrap5startEPK12macho_headeriPPKclS2_Pm
+}
+
+{
+   objc_init
+   Memcheck:Leak
+   ...
+   fun:_objc_init
+}
+
+{
+   map_images (in /usr/lib/libobjc.A.dylib)
+   Memcheck:Leak
+   ...
+   fun:map_images
+}
+
+{
+   libSystem_initializer
+   Memcheck:Leak
+   ...
+   fun:libSystem_initializer
+}
+{
+   _libxpc_initializer
+   Memcheck:Leak
+   ...
+   fun:_libxpc_initializer
+}
+{
+   libSystem_initializer
+   Memcheck:Leak
+   ...
+   fun:libSystem_initializer
+}
+
+{
+   fprintf__snprintf_chk
+   Memcheck:Leak
+   ...
+   fun:__snprintf_chk
+}
+
+{
+   fprintf
+   Memcheck:Leak
+   ...
+   fun:fprintf
+}
+
+{
+   fputc (in /usr/lib/system/libsystem_c.dylib)
+   Memcheck:Leak
+   ...
+   fun:fputc
+}
+
+{
+   snprintf
+   Memcheck:Leak
+   ...
+   fun:snprintf
+}
+
+{
+   basename (/usr/lib/system/libsystem_c.dylib)
+   Memcheck:Leak
+   ...
+   fun:basename
+}
+
+# Known fortran memory bug?
+# See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=55469
+
+{
+   _gfortrani_get_mem (known bug in gfortran?)
+   Memcheck:Leak
+   fun:malloc
+   fun:_gfortrani_get_mem
+}
