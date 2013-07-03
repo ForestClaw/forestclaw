@@ -109,8 +109,7 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
         // Patch has been refined.
         fclaw2d_patch_t *fine_siblings = new_patch;
 
-        // Loop over four siblings (z-ordering) and interpolate
-        // data from coarser parent grid to each finer sibling grid.
+        // Loop over four siblings (z-ordering) and initialize each one
         for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
