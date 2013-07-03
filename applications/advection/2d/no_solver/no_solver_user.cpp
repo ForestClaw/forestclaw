@@ -35,6 +35,20 @@ extern "C"
 #endif
 #endif
 
+void no_solver_linker(fclaw2d_domain_t* domain)
+{
+    link_problem_setup(domain,no_solver_setprob);
+
+    /* Initialize data but don't do anything */
+
+    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    sf->f_patch_initialize = &no_solver_patch_initialize;
+    sf->f_patch_single_step_update = &no_solver_update;
+
+    link_regrid_functions(domain,no_solver_patch_tag4refinement,
+                          no_solver_patch_tag4coarsening);
+}
+
 void no_solver_setprob(fclaw2d_domain_t* domain)
 {
     set_maptype_();
@@ -68,6 +82,22 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
 
     initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
 }
+
+double no_solver_update(fclaw2d_domain_t *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+
+    // save the current time step for time interpolation.  Otherwise, we get
+    // unitialized values.
+    cp->save_current_step();  // Save for time interpolation
+    return 1.0;
+}
+
 
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
@@ -134,6 +164,7 @@ fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
     no_solver_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
 }
+
 
 
 #ifdef __cplusplus

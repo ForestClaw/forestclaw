@@ -47,13 +47,21 @@ extern "C"
                                    const int& meqn,const double& xlower,
                                    const double& ylower, const double& dx, const double& dy,
                                    double qcoarsened[], int& tag_patch);
-
 }
+
+void no_solver_linker(fclaw2d_domain_t* domain);
 
 void no_solver_patch_initialize(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx);
+
+double no_solver_update(fclaw2d_domain_t *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt);
 
 fclaw_bool no_solver_patch_tag4refinement(fclaw2d_domain_t *domain,
                                           fclaw2d_patch_t *this_patch,
