@@ -288,7 +288,6 @@ void ClawPatch::restore_step()
 void ClawPatch::time_interpolate(const double& alpha)
 {
     set_block_(&m_blockno);
-    // double alpha = double(a_fine_step)/double(a_refratio);
 
     double *qlast = m_griddata_last.dataPtr();
     double *qcurr = m_griddata.dataPtr();
