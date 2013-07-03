@@ -59,9 +59,7 @@ main (int argc, char **argv)
 
   /* Parse any command line arguments.  Argument gparms is no longer needed
      as an input since the array conversion is now done in 'postprocess' */
-#if 0
-  amr_options_parse(options, gparms, argc, argv, lp);
-#endif
+
   amr_options_parse(options,argc,argv,lp);
 
   /* Any arrays are converted here */
@@ -105,9 +103,9 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Run
      --------------------------------------------------------------- */
+
   amrinit(&domain);
   amrrun(&domain);
-
   amrreset(&domain);
 
   sc_options_destroy(options);         /* this could be moved up */
