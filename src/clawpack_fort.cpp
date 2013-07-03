@@ -45,16 +45,6 @@ FArrayBox::~FArrayBox()
     }
 }
 
-// Might think about making this obsolete
-void FArrayBox::define(int a_size, const Box& a_box)
-{
-    if (m_data != NULL)
-    {
-        delete [] m_data;
-    }
-    m_data = new double[a_size];
-}
-
 void FArrayBox::set_dataPtr(int a_size)
 {
     if (a_size < 0)
@@ -76,6 +66,13 @@ void FArrayBox::set_dataPtr(int a_size)
         {
             delete [] m_data;
             m_data = new double[a_size];
+            /*
+            double x_unitialized = fclaw_nan;
+            for(int i = 0; i < a_size; i++)
+            {
+                m_data[i] = x_unitialized;
+            }
+            */
         }
         else
         {
@@ -95,8 +92,6 @@ void FArrayBox::define(const Box& a_box, int a_fields)
         printf("Box::ur = (%d %d)\n",a_box.bigEnd(0), a_box.bigEnd(1));
         exit(1);
     }
-
-    // define(box_size*a_fields,a_box);
 
     set_dataPtr(box_size*a_fields);
 

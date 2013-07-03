@@ -244,6 +244,10 @@ void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
                   const double& dx,
                   const double& dy, double q[], double& sum);
 
+void interpdata_(const int& m,double qlast[],double qcurr[], double qinterp[],
+                 const double& alpha);
+
+
 int get_debug_flag_();
 void set_debug_flag_(const int& iflag);
 void set_debug_on_();
@@ -288,11 +292,7 @@ public:
 
     FArrayBox();
     ~FArrayBox();
-    // FArrayBox(const FArrayBox& fbox);
-    void define(int a_size, const Box& a_box);
     void define(const Box& a_box, int a_fields);
-    void set_dataPtr(int size);
-
     double* dataPtr();
     Box box();
     int fields();
@@ -303,6 +303,8 @@ private:
     int m_size;
     Box m_box;
     int m_fields;
+    void set_dataPtr(int size);
+
 };
 
 #endif
