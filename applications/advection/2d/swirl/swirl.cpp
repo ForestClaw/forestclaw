@@ -43,7 +43,6 @@ main (int argc, char **argv)
   amr_options_t         *gparms;
   amr_waveprop_parms_t  *waveprop_parms;
 
-
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
