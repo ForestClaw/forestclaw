@@ -11,19 +11,12 @@ FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 # Define local objects here
 exampleobjs = \
 	test_parms_user.o \
-	ghost_twopatch.o \
-	tag4refinement.o \
-	psi.o \
-	rpn2ad1.o \
-	rpt2ad1.o \
-	qinit.o \
-	b4step2.o \
-	setaux.o \
-	setprob.o
+	ghost_twopatch.o
 
 # Solver routines (several solvers can be added here)
 include Makefile.waveprop.inc
-solverobjs = $(waveprop_objs)
+
+solverobjs =
 solverincludes = $(waveprop_includes)
 
 # Mapping routines
