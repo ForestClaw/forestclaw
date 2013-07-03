@@ -78,7 +78,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
            to determine if we need to coarsen data
           ----------------------------------------------------------------- */
 
-        fclaw2d_patch_t *temp_coarse_patch = new fclaw2d_patch_t;
+        fclaw2d_patch_t *temp_coarse_patch = FCLAW2D_ALLOC(fclaw2d_patch_t,1);
         init_patch_data(temp_coarse_patch);
 
         temp_coarse_patch->xlower = fine_patches[0].xlower;
@@ -106,9 +106,9 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
             (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
                                          coarse_patchno);
 
-        // not deleting ClawPatch - need to fix this!
         delete_clawpatch(temp_coarse_patch);
-        delete temp_coarse_patch;
+        delete_patch_data(temp_coarse_patch);
+        FCLAW2D_FREE(temp_coarse_patch);
 
         if (patch_coarsened)
         {
