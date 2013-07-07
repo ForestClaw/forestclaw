@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_waveprop.H"
 #include "test_parms_user.H"
 
-#if 1
+#if 0
 #define TEST_ALLOC_ZERO SC_ALLOC_ZERO
 #define TEST_FREE       SC_FREE
 #else
@@ -81,7 +81,7 @@ void test_parms_postprocess_parms(amr_waveprop_parms_t* waveprop_parms)
 
 void test_parms_delete(amr_waveprop_parms_t* waveprop_parms)
 {
-    TEST_FREE(waveprop_parms->order);
+    SC_FREE(waveprop_parms->order);
     TEST_FREE(waveprop_parms);
     waveprop_parms = NULL;
 }
