@@ -33,7 +33,8 @@ extern "C"
     void sphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, const double& xlower,
                                 const double& ylower, const double& dx, const double& dy,
-                                double q[], const int& init_flag, int& tag_patch);
+                                double q[], const int& init_flag, const int& blockno,
+                                int& tag_patch);
 
     void sphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn,const double& xlower,

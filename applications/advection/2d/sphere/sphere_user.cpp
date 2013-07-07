@@ -242,14 +242,16 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    int tag_patch;  // == 0 or 1
-    sphere_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    int tag_patch = 0;  // == 0 or 1
+
+    sphere_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
+                           this_block_idx,tag_patch);
     return tag_patch == 1;
 }
 
 fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
-                                       int blockno,
+                                       int blockno_idx,
                                        int patchno)
 {
     /* ----------------------------------------------------------- */

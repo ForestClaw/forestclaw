@@ -1,13 +1,14 @@
       subroutine sphere_tag4refinement(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy, q,init_flag, tag_patch)
+     &      xlower,ylower,dx,dy, q,init_flag, blockno, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, init_flag
+      integer mx,my, mbc, meqn, tag_patch, init_flag, blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq,m
       double precision qmin, qmax
+
 
       qmin = 100.d0
       qmax = -100.d0
