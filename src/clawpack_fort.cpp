@@ -29,6 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "clawpack_fort.H"
 
+static
+void set_snan(double& f)
+{
+    *((long long*)&f) = 0x7ff0000000000001LL;
+}
+
 FArrayBox::FArrayBox()
 {
     m_data = NULL;
@@ -42,6 +48,7 @@ FArrayBox::~FArrayBox()
     if (m_data != NULL)
     {
         delete [] m_data;
+        m_data = NULL;
     }
 }
 
@@ -66,13 +73,23 @@ void FArrayBox::set_dataPtr(int a_size)
         {
             delete [] m_data;
             m_data = new double[a_size];
-            /*
-            double x_unitialized = fclaw_nan;
+
+
+            /* Difference in nan values :
+               The first one is not trapped; the second one is.
+
+               (gdb) print fnan1
+               $13 = nan(0x8000000000000)
+               (gdb) print fnan2
+               $14 = nan(0x000000001)
+            */
+            double fnan1 = NAN;
+            double fnan2;
+            set_snan(fnan2);
             for(int i = 0; i < a_size; i++)
             {
-                m_data[i] = x_unitialized;
+                m_data[i] = fnan2;
             }
-            */
         }
         else
         {
