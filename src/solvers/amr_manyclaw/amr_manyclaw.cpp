@@ -440,7 +440,7 @@ amr_manyclaw_parms_t*  amr_manyclaw_parms_new(sc_options_t *opt)
 
     amr_manyclaw_parms_t *manyclaw_parms;
 
-    manyclaw_parms = SC_ALLOC_ZERO (amr_manyclaw_parms_t, 1);
+    manyclaw_parms = FCLAW2D_ALLOC_ZERO (amr_manyclaw_parms_t, 1);
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &manyclaw_parms->order_string, NULL,
@@ -531,6 +531,7 @@ void amr_manyclaw_parms_delete(amr_manyclaw_parms_t* manyclaw_parms)
 {
     SC_FREE(manyclaw_parms->order);
     SC_FREE(manyclaw_parms->mthlim);
+    FCLAW2D_FREE(manyclaw_parms);
 }
 
 static
