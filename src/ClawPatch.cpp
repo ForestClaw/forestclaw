@@ -82,7 +82,7 @@ size_t pack_size(fclaw2d_domain_t* domain)
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
     size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
-    return size;
+    return size*sizeof(double);
 }
 
 
