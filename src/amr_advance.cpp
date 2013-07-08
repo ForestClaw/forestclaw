@@ -250,37 +250,6 @@ double advance_level(fclaw2d_domain_t *domain,
     return time_data.maxcfl;  // Maximum from level iteration
 }
 
-static
-void all_exchange(fclaw2d_domain_t* domain,
-                  subcycle_manager *a_time_stepper)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int maxlevel = gparms->maxlevel;
-    int minlevel = gparms->minlevel;
-    double t = a_time_stepper->level_time(minlevel);
-    fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
-
-    for(int level = maxlevel; level > minlevel; level--)
-    {
-        /* Boundary conditions on finer grid should be set so that they can
-           be used in setting corners on coarser grids, if needed. */
-        if (!a_time_stepper->exchanged_with_coarser(level))
-        {
-            if (verbose)
-            {
-                cout << " --> Exchange between fine level " << level <<
-                    " and coarse level " << level-1 << endl;
-            }
-            set_phys_bc(domain,level,t);
-            double alpha = 0;  // assume no time interpolation
-            exchange_with_coarse(domain,level,t,alpha);
-
-            set_phys_bc(domain,level,t);
-            a_time_stepper->increment_coarse_exchange_counter(level);
-            a_time_stepper->increment_fine_exchange_counter(level-1);
-        }
-    }
-}
 
 
 /* -------------------------------------------------------------
@@ -301,10 +270,5 @@ double advance_all_levels(fclaw2d_domain_t *domain,
         double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
         maxcfl = max(cfl_step,maxcfl);
     }
-    // Be sure that all levels have exchanged with their coarser level.
-    // This is needed so that when we regrid, we have valid ghost cell data for
-    // interpolation to finer grids.
-    // all_exchange(domain,a_time_stepper);
-
     return maxcfl;
 }
