@@ -677,7 +677,7 @@ c              # Fill in interpolated values on fine grid cell
                   endif
                elseif (icorner_coarse .eq. 3) then
                   if (is_block_bdry(1) .eq. 1) then
-                     qfine(1-ibc,my+jbc,mq) = value
+                     qfine(mx+ibc,1-jbc,mq) = value
                   elseif (is_block_bdry(3) .eq. 1) then
                      qfine(1-ibc,my+jbc,mq) = value
                   endif
