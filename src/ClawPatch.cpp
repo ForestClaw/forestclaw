@@ -64,23 +64,25 @@ void delete_clawpatch(fclaw2d_patch_t* this_patch)
 void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    cp->m_griddata.copyToMemory(qdata);
+    cp->pack_griddata(qdata);
 }
 
 void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                       int this_block_idx, int this_patch_idx, double *qdata)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    cp->m_griddata.copyFromMemory(qdata);
+    cp->unpack_griddata(qdata);
 }
 
-size_t pack_size(fclaw2d_domain_t* domain);
+size_t pack_size(fclaw2d_domain_t* domain)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-    // This could of course change depending on what I do in pack and unpack, above.
-    int size = cp->m_griddata.size();
-    return size*sizeof(double);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
+    return size;
 }
 
 
@@ -308,6 +310,16 @@ void ClawPatch::save_step()
 void ClawPatch::restore_step()
 {
     m_griddata = m_griddata_save;
+}
+
+void ClawPatch::pack_griddata(double *q)
+{
+    m_griddata.copyToMemory(q);
+}
+
+void ClawPatch::unpack_griddata(double *q)
+{
+    m_griddata.copyFromMemory(q);
 }
 
 

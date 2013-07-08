@@ -169,32 +169,6 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 }
 
 
-void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
-{
-    double t = get_domain_time(old_domain);
-
-    // Allocate memory for user data types (but they don't get set)
-    init_domain_data(new_domain);
-    copy_domain_data(old_domain,new_domain);
-
-    // Why isn't this done in copy_domain_data?
-    set_domain_time(new_domain,t);
-
-    // Allocate memory for new blocks and patches.
-    init_block_and_patch_data(new_domain);
-
-    // Physical BCs are needed in boundary level exchange
-    // Assume only one block, since we are assuming mthbc
-    int num = new_domain->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &new_domain->blocks[i];
-        // This is kind of dumb for now, since block won't in general
-        // have the same physical boundary conditions types.
-        set_block_data(block,gparms->mthbc);
-    }
-}
-
 
 void set_block_data(fclaw2d_block_t *block, const int mthbc[])
 {

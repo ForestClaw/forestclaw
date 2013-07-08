@@ -149,7 +149,6 @@ void amrinit (fclaw2d_domain_t **domain)
     (ddata->f_problem_setup)(*domain);
 
     double t = 0;
-    int init_flag = 1;
 
     set_domain_time(*domain,t);
 
@@ -171,19 +170,20 @@ void amrinit (fclaw2d_domain_t **domain)
 
     set_phys_bc(*domain,minlevel,t);
 
-    // Refine as needed.
-
-    // for (int level = minlevel; level < maxlevel; level++)
-    while (level < maxlevel || done_refining)
+    // Refine as needed, one level at a time.
+    for (int level = minlevel; level < maxlevel; level++)
     {
-        fclaw2d_domain_iterate_level(*domain, level,cb_tag4refinement_init,
+        // Tag each level, one at at time, and rebuild domain after each
+        // level.
+
+        fclaw2d_domain_iterate_level(*domain, level, cb_tag4refinement_init,
                                      (void *) NULL);
 
-        // Rebuild domain if necessary
+        // Construct new domain based on tagged patches.
         fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-        fclaw_bool new_refinement = new_domain != NULL;
+        fclaw_bool have_new_refinement = new_domain != NULL;
 
-        if (new_refinement)
+        if (have_new_refinement)
         {
             // Set up all data structures for new domain, but don't yet
             // populate with data
@@ -194,10 +194,8 @@ void amrinit (fclaw2d_domain_t **domain)
                                            cb_domain_adapt_init,
                                            (void *) NULL);
 
-            // Upon initialization, we don't do any ghost cell exchanges, because we assume
-            // that the initial conditions have set all internal ghost cells.
-
-            // But we may boundary need ghost cell values.
+            // Set boundary need ghost cell values so they are available
+            // for using at tagging criteria, if necessary.
             int new_level = level+1;
             set_phys_bc(new_domain,new_level,t);
 
@@ -205,10 +203,12 @@ void amrinit (fclaw2d_domain_t **domain)
             amrreset(domain);
             *domain = new_domain;
 
+            // Repartition domain to new processors.
             repartition_domain(domain);
 
 #if 0
-            fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
+            fclaw2d_domain_t *domain_partitioned =
+                fclaw2d_domain_partition (*domain);
             if (domain_partitioned != NULL)
             {
                 rebuild_domain(*domain,new_domain);
@@ -226,9 +226,8 @@ void amrinit (fclaw2d_domain_t **domain)
         }
         else
         {
-            // exit loop;  we are done refining
+            /* We are done refining - exit for loop. */
             break;
         }
     }
-
 }

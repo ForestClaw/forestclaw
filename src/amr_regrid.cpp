@@ -253,7 +253,7 @@ void regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
 
         // Repartition for load balancing
-        repartition_domain(domain)
+        repartition_domain(domain);
 
 #if 0
         // allocate memory for parallel transfor of patches

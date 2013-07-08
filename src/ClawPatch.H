@@ -53,6 +53,9 @@ public :
     void save_current_step();
     void restore_step();
 
+    void pack_griddata(double* qdata);
+    void unpack_griddata(double* qdata);
+
     void time_interpolate(const double& alpha);
 
     // ----------------------------------------------------------------
