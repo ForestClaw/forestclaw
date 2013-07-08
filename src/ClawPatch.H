@@ -22,6 +22,13 @@ void delete_clawpatch(fclaw2d_patch_t* this_patch);
 
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 
+
+int pack_size(fclaw2d_domain_t* domain,
+              fclaw2d_patch_t* this_patch, int blockno, int patchno)
+void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data);
+void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                      int this_block_idx, int this_patch_idx, double *qdata);
+
 class ClawPatch
 {
 public :

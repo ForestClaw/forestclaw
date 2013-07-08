@@ -97,17 +97,17 @@ void FArrayBox::set_dataPtr(int a_size)
         {
             delete [] m_data;
             m_data = new double[a_size];
-            double qnan, snan;
-            set_qnan(qnan);
-            set_snan(snan);
-            for(int i = 0; i < a_size; i++)
-            {
-                m_data[i] = snan;
-            }
         }
         else
         {
             // Don't do anything;  m_data is already the right size
+        }
+        double qnan, snan;
+        set_qnan(qnan);
+        set_snan(snan);
+        for(int i = 0; i < a_size; i++)
+        {
+            m_data[i] = snan;
         }
     }
 }
@@ -129,6 +129,22 @@ void FArrayBox::define(const Box& a_box, int a_fields)
     m_size = box_size*a_fields;
     m_fields = a_fields;
     m_box = a_box;
+}
+
+void FArrayBox::copyToMemory(double *data)
+{
+    for(int i = 0; i < m_size; i++)
+    {
+        data[i] = m_data[i];
+    }
+}
+
+void FArrayBox::copyFromMemory(double *data)
+{
+    for(int i = 0; i < m_size; i++)
+    {
+        m_data[i] = data[i];
+    }
 }
 
 

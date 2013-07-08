@@ -298,6 +298,8 @@ public:
     int fields();
     int size();
     void operator=(const FArrayBox& fbox);
+    void copyToMemory(double *data);
+    void copyFromMemory(double *data);
 private:
     double *m_data;
     int m_size;
