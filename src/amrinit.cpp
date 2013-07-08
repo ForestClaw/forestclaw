@@ -149,6 +149,7 @@ void amrinit (fclaw2d_domain_t **domain)
     (ddata->f_problem_setup)(*domain);
 
     double t = 0;
+    int init_flag = 1;
 
     set_domain_time(*domain,t);
 
@@ -172,60 +173,45 @@ void amrinit (fclaw2d_domain_t **domain)
 
     // Refine as needed.
 
-    for (int level = minlevel; level < maxlevel; level++)
+    // for (int level = minlevel; level < maxlevel; level++)
+    while (level < maxlevel || done_refining)
     {
-        // TODO: don't use level_refined since it is not agreed upon in parallel
-        // the fclaw2d_domain_adapt and _partition calls work fine in parallel
-
-        fclaw2d_domain_iterate_level(*domain, level,
-                                     cb_tag4refinement_init,
+        fclaw2d_domain_iterate_level(*domain, level,cb_tag4refinement_init,
                                      (void *) NULL);
 
         // Rebuild domain if necessary
         fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+        fclaw_bool new_refinement = new_domain != NULL;
 
-        if (new_domain != NULL)
+        if (new_refinement)
         {
-            // This is just for fun; remove when it gets annoying.
-            // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+            // Set up all data structures for new domain, but don't yet
+            // populate with data
+            rebuild_domain(*domain,new_domain);
 
-            // Allocate memory for user data types (but they don't get set)
-            init_domain_data(new_domain);
-            copy_domain_data(*domain,new_domain);
-
-            // Initialize new grids.  Assume that all ghost cells are filled
-            //in by qinit.
-            init_block_and_patch_data(new_domain);
-
-            // Physical BCs are needed in boundary level exchange
-            // Assume only one block, since we are assuming mthbc
-            int num = new_domain->num_blocks;
-            for (int i = 0; i < num; i++)
-            {
-                fclaw2d_block_t *block = &new_domain->blocks[i];
-                // This is kind of dumb for now, since block won't in general
-                // have the same physical boundary conditions types.
-                set_block_data(block,gparms->mthbc);
-            }
-
+            // Re-initialize finer grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt_init,
                                            (void *) NULL);
 
-            int new_level = level+1;
             // Upon initialization, we don't do any ghost cell exchanges, because we assume
             // that the initial conditions have set all internal ghost cells.
+
+            // But we may boundary need ghost cell values.
+            int new_level = level+1;
             set_phys_bc(new_domain,new_level,t);
 
             // free all memory associated with old domain
             amrreset(domain);
             *domain = new_domain;
 
-            fclaw2d_domain_t *domain_partitioned =
-                fclaw2d_domain_partition (*domain);
+            repartition_domain(domain);
+
+#if 0
+            fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
             if (domain_partitioned != NULL)
             {
-                // TODO: allocate patch and block etc. memory for domain_partitioned
+                rebuild_domain(*domain,new_domain);
 
                 // TODO: write a function to transfer values in parallel */
 
@@ -236,6 +222,7 @@ void amrinit (fclaw2d_domain_t **domain)
                 /* internal clean up */
                 fclaw2d_domain_complete(*domain);
             }
+#endif
         }
         else
         {
@@ -243,4 +230,5 @@ void amrinit (fclaw2d_domain_t **domain)
             break;
         }
     }
+
 }

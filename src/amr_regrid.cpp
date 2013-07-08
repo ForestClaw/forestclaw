@@ -212,6 +212,7 @@ void regrid(fclaw2d_domain_t **domain)
 
     for(int level = maxlevel; level > minlevel; level--)
     {
+        // Make sure all ghost cells are valid.
         double alpha = 0;
         exchange_with_coarse(*domain,level,t,alpha);
     }
@@ -225,67 +226,50 @@ void regrid(fclaw2d_domain_t **domain)
                                    (void *) NULL);
 
     // Rebuild domain if necessary
-    // Will return be NULL if no refining was done?
+    // Will return be NULL if no refining was done
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+    fclaw_bool have_new_refinement = new_domain != NULL;
 
-    if (new_domain != NULL)
+    if (have_new_refinement)
     {
-        // This is just for fun; remove when it gets annoying.
-        // fclaw2d_domain_list_adapted(*domain, new_domain, SC_LP_STATISTICS);
+        // allocate memory for user patch data and user domain data in the new
+        // domain;  copy data from the old to new the domain.
+        rebuild_domain(*domain, new_domain);
 
-        // Allocate memory for user data types (but they don't get set)
-        init_domain_data(new_domain);
-        copy_domain_data(*domain,new_domain);
-        set_domain_time(new_domain,t);
-
-        // Average or interpolate to new grids.
-        init_block_and_patch_data(new_domain);
-
-        // Physical BCs are needed in boundary level exchange
-        // Assume only one block, since we are assuming mthbc
-        int num = new_domain->num_blocks;
-        for (int i = 0; i < num; i++)
-        {
-            fclaw2d_block_t *block = &new_domain->blocks[i];
-            // This is kind of dumb for now, since block won't in general
-            // have the same physical boundary conditions types.
-            set_block_data(block,gparms->mthbc);
-        }
-
+        // Average to new coarse grids and interpolate to new fine grids
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
                                        (void *) NULL);
 
-        // Set some of the user data types.  Some of this is done in
-        // 'amr_set_base_level',
-        // I should probably come up with a more general way to do this.
-        // set_domain_data(new_domain, gparms);
-
-        // Level stuff to make sure all
+        // Do a level exchange to make sure all data is valid;
+        // Coarse and fine grid exchanges will happen during time stepping as needed.
         for (int level = minlevel; level <= maxlevel; level++)
         {
-            // Only do a level exchange;  Coarse and fine grid exchanges will happen
-            // during time stepping as needed.
             level_exchange(new_domain,level);
             set_phys_bc(new_domain,level,t);
         }
 
-        // free all memory associated with old domain
+        // free memory associated with old domain
         amrreset(domain);
         *domain = new_domain;
 
+        // Repartition for load balancing
+        repartition_domain(domain)
+
+#if 0
         // allocate memory for parallel transfor of patches
-        // TODO: change data size (in bytes per patch) below.
-        size_t data_size = 4159;
+        // use data size (in bytes per patch) below.
+        size_t data_size = pack_size(*domain);
         void ** patch_data = NULL;
         fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
 
-        // TODO: for all (patch i) { pack its numerical data into patch_data[i] }
+        // For all (patch i) { pack its numerical data into patch_data[i] }
+        fclaw2d_domain_iterate_patches(*domain, cb_pack_patches,
+                                       (void *) patch_data);
 
 
         // this call creates a new domain that is valid after partitioning
         // and transfers the data packed above to the new owner processors
-        fclaw2d_domain_t *domain_partitioned =
-            fclaw2d_domain_partition (*domain);
+        fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
 
         if (domain_partitioned != NULL)
         {
@@ -298,6 +282,8 @@ void regrid(fclaw2d_domain_t **domain)
                                                      data_size, &patch_data);
 
             // TODO: for all (patch i) { unpack numerical data from patch_data[i] }
+            fclaw2d_domain_iterate_patches(domain_partioned, cb_unpack_patches,
+                                           (void *) patch_data);
 
             /* then the old domain is no longer necessary */
             amrreset(domain);
@@ -309,5 +295,6 @@ void regrid(fclaw2d_domain_t **domain)
 
         // free the data that was used in the parallel transfer of patches
         fclaw2d_domain_free_after_partition (*domain, &patch_data);
+#endif
     }
 }

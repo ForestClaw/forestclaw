@@ -19,6 +19,7 @@ fclawobjs = \
 	amr_regrid.o \
 	amr_output.o \
 	amr_diagnostics.o \
+	amr_repartition_domain.o \
 	amr_exchangecoarse.o \
 	amr_levelexchange.o \
 	amr_mol.o \

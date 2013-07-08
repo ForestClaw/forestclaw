@@ -75,8 +75,9 @@ fclaw2d_patch_data_t  *get_patch_data(fclaw2d_patch_t *patch);
 void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
 
-
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
+
+void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
 
 /* -----------------------------------------------------------------
    Link routines that don't have any other place to go...

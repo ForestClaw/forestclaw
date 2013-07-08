@@ -61,35 +61,26 @@ void delete_clawpatch(fclaw2d_patch_t* this_patch)
     }
 }
 
-void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data)
+void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
 {
-    // Pack everything that I need to recreate the state of this patch
     ClawPatch *cp = get_clawpatch(this_patch);
-
-    cp->m_griddata.copyToMemory(data);
+    cp->m_griddata.copyToMemory(qdata);
 }
 
 void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                       int this_block_idx, int this_patch_idx, double *qdata)
 {
-    set_clawpatch(domain,this_patch,this_block_idx, this_patch_idx);
-
-    // Setup new patch using solver specific routine
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-    (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
-
     ClawPatch *cp = get_clawpatch(this_patch);
     cp->m_griddata.copyFromMemory(qdata);
 }
 
-int pack_size(fclaw2d_domain_t* domain,fclaw2d_patch_t* this_patch,
-              int blockno, int patchno)
+size_t pack_size(fclaw2d_domain_t* domain);
 {
     ClawPatch *cp = get_clawpatch(this_patch);
 
     // This could of course change depending on what I do in pack and unpack, above.
     int size = cp->m_griddata.size();
-    return size;
+    return size*sizeof(double);
 }
 
 
