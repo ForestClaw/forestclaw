@@ -568,6 +568,27 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
 }
 
 void
+fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
+                                          size_t data_size,
+                                          void ***patch_data)
+{
+    P4EST_ASSERT (*patch_data == NULL);
+}
+
+void
+fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
+                                         size_t data_size, void ***patch_data)
+{
+}
+
+void
+fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
+                                     void ***patch_data)
+{
+    *patch_data = NULL;
+}
+
+void
 fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
                                void **patch_data, void **ghost_data)
 {

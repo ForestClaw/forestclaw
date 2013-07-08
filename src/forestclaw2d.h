@@ -318,6 +318,41 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
+/** Allocate data buffer for parallel transfer of all patches.
+ * \param [in,out] domain       The memory lives inside this domain.
+ * \param [in] data_size        Number of bytes per patch to transfer.
+ * \param [in,out] patch_data   Address of an array of void pointers.
+ *                              Data is allocated by this function.  After the
+ *                              call, *patch_data holds one pointer per patch
+ *                              that points to exactly data_size bytes of
+ *                              memory that can be written to by forestclaw.
+ *                              *patch_data must be NULL before the call.
+ */
+void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
+                                               size_t data_size,
+                                               void ***patch_data);
+
+/** Reallocate data buffer to reflect patch data after partition.
+ * \param [in,out] domain       The memory lives inside this domain.
+ * \param [in] data_size        Number of bytes per patch to transfer.
+ * \param [in,out] patch_data   Address of an array of void pointers.
+ *                              Data is reallocated by this function.  After the
+ *                              call, *patch_data holds one pointer per patch
+ *                              that points to exactly data_size bytes of
+ *                              memory that can be read from by forestclaw.
+ */
+void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
+                                              size_t data_size,
+                                              void ***patch_data);
+
+/** Free buffers that were used in transfering data during partition.
+ * \param [in,out] domain       The memory lives inside this domain.
+ * \param [in,out] patch_data   Address of an array of void pointers to free.
+ *                              *patch_data will be NULL after the call.
+ */
+void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
+                                          void ***patch_data);
+
 /** Exchange data for parallel ghost neighbors.
  * This function gathers data from parallel neighbor (ghost) patches.
  * We assume that the data size for all patches is the same.

@@ -273,14 +273,31 @@ void regrid(fclaw2d_domain_t **domain)
         amrreset(domain);
         *domain = new_domain;
 
+        // allocate memory for parallel transfor of patches
+        // TODO: change data size (in bytes per patch) below.
+        size_t data_size = 4159;
+        void ** patch_data = NULL;
+        fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
+
+        // TODO: for all (patch i) { pack its numerical data into patch_data[i] }
+
+
+        // this call creates a new domain that is valid after partitioning
+        // and transfers the data packed above to the new owner processors
         fclaw2d_domain_t *domain_partitioned =
             fclaw2d_domain_partition (*domain);
 
         if (domain_partitioned != NULL)
         {
             // TODO: allocate patch and block etc. memory for domain_partitioned
+            // this refers to data inside forestclaw, clawpatch, etc.
 
-            // TODO: write a function to transfer values in parallel */
+
+            // update patch array to point to the numerical data that was received
+            fclaw2d_domain_retrieve_after_partition (domain_partitioned,
+                                                     data_size, &patch_data);
+
+            // TODO: for all (patch i) { unpack numerical data from patch_data[i] }
 
             /* then the old domain is no longer necessary */
             amrreset(domain);
@@ -289,5 +306,8 @@ void regrid(fclaw2d_domain_t **domain)
             /* internal clean up */
             fclaw2d_domain_complete(*domain);
         }
+
+        // free the data that was used in the parallel transfer of patches
+        fclaw2d_domain_free_after_partition (*domain, &patch_data);
     }
 }
