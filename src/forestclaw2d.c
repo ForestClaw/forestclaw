@@ -478,18 +478,9 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
                            int patchno)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    int totalpatchno;
-    fclaw2d_block_t *block;
 
-    P4EST_ASSERT (domain->pp_owned);
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    block = domain->blocks + blockno;
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
-    totalpatchno = block->num_patches_before + patchno;
-    P4EST_ASSERT (0 <= totalpatchno
-                  && totalpatchno < domain->num_patches_all);
-
-    wrap->flags[totalpatchno] = P4EST_WRAP_REFINE;
+    p4est_wrap_mark_refine (wrap,
+                            (p4est_locidx_t) blockno, (p4est_locidx_t) patchno);
 }
 
 void
@@ -497,18 +488,9 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
                             int patchno)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    int totalpatchno;
-    fclaw2d_block_t *block;
 
-    P4EST_ASSERT (domain->pp_owned);
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    block = domain->blocks + blockno;
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
-    totalpatchno = block->num_patches_before + patchno;
-    P4EST_ASSERT (0 <= totalpatchno
-                  && totalpatchno < domain->num_patches_all);
-
-    wrap->flags[totalpatchno] = P4EST_WRAP_COARSEN;
+    p4est_wrap_mark_coarsen (wrap,
+                             (p4est_locidx_t) blockno, (p4est_locidx_t) patchno);
 }
 
 void
