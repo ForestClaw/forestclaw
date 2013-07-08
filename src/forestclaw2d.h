@@ -334,7 +334,6 @@ void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
 
 /** Reallocate data buffer to reflect patch data after partition.
  * \param [in,out] domain       The memory lives inside this domain.
- * \param [in] data_size        Number of bytes per patch to transfer.
  * \param [in,out] patch_data   Address of an array of void pointers.
  *                              Data is reallocated by this function.  After the
  *                              call, *patch_data holds one pointer per patch
@@ -342,7 +341,6 @@ void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
  *                              memory that can be read from by forestclaw.
  */
 void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
-                                              size_t data_size,
                                               void ***patch_data);
 
 /** Free buffers that were used in transfering data during partition.

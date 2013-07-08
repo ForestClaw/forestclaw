@@ -608,7 +608,7 @@ fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
 
 void
 fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
-                                         size_t data_size, void ***patch_data)
+                                         void ***patch_data)
 {
     *patch_data = P4EST_REALLOC (*patch_data, void *, domain->num_patches_all);
     fclaw2d_domain_assign_for_partition (domain, *patch_data);
