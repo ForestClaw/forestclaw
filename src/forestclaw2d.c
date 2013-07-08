@@ -277,7 +277,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
         P4EST_ASSERT (ghost->p.piggy3.which_tree < wrap->conn->num_trees);
         *blockno = (int) ghost->p.piggy3.which_tree;
         *patchno = (int) qtq;
-#if 0 /* this is the convention we are NOT using */
+#if 0                           /* this is the convention we are NOT using */
         *patchno = (int) ghost->p.piggy3.local_num;
         P4EST_ASSERT (*patchno == (int) mesh->ghost_to_index[qtq]);
 #endif
@@ -455,13 +455,15 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         *rproc = *(int *) sc_array_index (rparr, 0);
         rq = p4est_quadrant_array_index (qarr, 0);
         *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
-        *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;  /* ghost index */
+        *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;    /* ghost index */
         P4EST_ASSERT (*rproc == domain->mpirank ||
-                      (*rpatchno >= 0 && *rpatchno < domain->num_ghost_patches));
-        P4EST_ASSERT (*rproc != domain->mpirank ||
-                      (*rblockno >= 0 && *rblockno < domain->num_blocks &&
-                       *rpatchno >= 0 &&
-                       *rpatchno < domain->blocks[*rblockno].num_patches));
+                      (*rpatchno >= 0
+                       && *rpatchno < domain->num_ghost_patches));
+        P4EST_ASSERT (*rproc != domain->mpirank
+                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                          && *rpatchno >= 0
+                          && *rpatchno <
+                          domain->blocks[*rblockno].num_patches));
     }
 
     sc_array_reset (earr);
@@ -567,12 +569,13 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
 
 void
 fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
-                               void ** patch_data, void ** ghost_data)
+                               void **patch_data, void **ghost_data)
 {
-  /* This function does nothing in serial or without data. */
-  if (data_size == 0) {
-    return;
-  }
+    /* This function does nothing in serial or without data. */
+    if (data_size == 0)
+    {
+        return;
+    }
 
-  /* TODO: implement parallel version */
+    /* TODO: implement parallel version */
 }

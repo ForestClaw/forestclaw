@@ -335,8 +335,7 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
  */
 void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
                                        size_t data_size,
-                                       void ** patch_data,
-                                       void ** ghost_data);
+                                       void **patch_data, void **ghost_data);
 
 #ifdef __cplusplus
 #if 0
