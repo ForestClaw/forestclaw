@@ -29,9 +29,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "clawpack_fort.H"
 
+
+/* Difference in nan values :
+   The first one is not trapped; the second one is.
+
+   (gdb) print qnan
+   $13 = nan(0x8000000000000)
+   (gdb) print snan
+   $14 = nan(0x000000001)
+*/
+
+static
+void set_qnan(double& f)
+{
+    /*
+     The quiet nan from math.h
+    */
+    f = NAN;
+}
+
+
 static
 void set_snan(double& f)
 {
+    /* From :
+      "NaNs, Uninitialized Variables, and C++"
+      http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
+    */
     *((long long*)&f) = 0x7ff0000000000001LL;
 }
 
@@ -73,22 +97,12 @@ void FArrayBox::set_dataPtr(int a_size)
         {
             delete [] m_data;
             m_data = new double[a_size];
-
-
-            /* Difference in nan values :
-               The first one is not trapped; the second one is.
-
-               (gdb) print fnan1
-               $13 = nan(0x8000000000000)
-               (gdb) print fnan2
-               $14 = nan(0x000000001)
-            */
-            double fnan1 = NAN;
-            double fnan2;
-            set_snan(fnan2);
+            double qnan, snan;
+            set_qnan(qnan);
+            set_snan(snan);
             for(int i = 0; i < a_size; i++)
             {
-                m_data[i] = fnan2;
+                m_data[i] = snan;
             }
         }
         else
