@@ -216,7 +216,9 @@ fclaw2d_patch_relation_t;
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
  * \param [in] faceno   Number of the patch face: left, right, bottom, top.
- * \param [out] rproc   Processor number of neighbor patches.
+ * \param [out] rproc   Processor number of neighbor patches.  Exception:
+ *                      If the neighbor is a bigger patch, rproc[1] contains
+ *                      the number of the small patch as one of two half faces.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
  *                              The patch number is relative to its block.

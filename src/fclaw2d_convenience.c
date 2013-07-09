@@ -45,12 +45,17 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     int levels[2], global_levels[2];
     p4est_qcoord_t qh;
     p4est_connectivity_t *conn = wrap->conn;
+    p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
+#ifdef P4EST_DEBUG
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+#endif
     p4est_tree_t *tree;
     p4est_quadrant_t *quad;
     fclaw2d_domain_t *domain;
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
     fclaw2d_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
+    
 
 #ifdef P4EST_DEBUG
     memset (currentbylevel, 0,
@@ -62,7 +67,9 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpirank = wrap->p4est->mpirank;
     domain->pp = (void *) wrap;
     domain->pp_owned = 1;
-    domain->num_ghost_patches = (int) wrap->ghost->ghosts.elem_count;
+    domain->num_ghost_patches = (int) ghost->ghosts.elem_count;
+    P4EST_ASSERT (domain->num_ghost_patches ==
+                  (int) mesh->ghost_num_quadrants);
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->patch_to_block =

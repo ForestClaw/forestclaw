@@ -56,6 +56,7 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  *                              project numerical values to the adapted domain.
  *                              If adapted, no queries are allowed afterwards.
  * \return                      Adapted domain if refinement occurred, or NULL.
+ *                              The return value is identical across all ranks.
  */
 fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 
@@ -66,6 +67,7 @@ fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
  *                              transfer numerical values to the new partition.
  *                              If partitioned, no queries allowed afterwards.
  * \return                      Partitioned domain if different, or NULL.
+ *                              The return value is identical across all ranks.
  */
 fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain);
 

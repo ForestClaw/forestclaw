@@ -245,7 +245,8 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
                                int *patchno)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    p4est_quadrant_t *ghost;
+    p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
+    p4est_quadrant_t *gq;
     p4est_topidx_t nt;
     fclaw2d_block_t *block;
 
@@ -270,15 +271,15 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     {
         /* off-processor ghost neighbor */
         qtq -= mesh->local_num_quadrants;
-        P4EST_ASSERT (qtq >= 0 && qtq < domain->num_ghost_patches);
+        P4EST_ASSERT (qtq >= 0 && qtq < mesh->ghost_num_quadrants);
         *proc = mesh->ghost_to_proc[qtq];
-        ghost = p4est_quadrant_array_index (&wrap->ghost->ghosts, qtq);
-        P4EST_ASSERT (0 <= ghost->p.piggy3.which_tree);
-        P4EST_ASSERT (ghost->p.piggy3.which_tree < wrap->conn->num_trees);
-        *blockno = (int) ghost->p.piggy3.which_tree;
+        gq = p4est_quadrant_array_index (&ghost->ghosts, qtq);
+        P4EST_ASSERT (0 <= gq->p.piggy3.which_tree);
+        P4EST_ASSERT (gq->p.piggy3.which_tree < wrap->conn->num_trees);
+        *blockno = (int) gq->p.piggy3.which_tree;
         *patchno = (int) qtq;
 #if 0                           /* this is the convention we are NOT using */
-        *patchno = (int) ghost->p.piggy3.local_num;
+        *patchno = (int) gq->p.piggy3.local_num;
         P4EST_ASSERT (*patchno == (int) mesh->ghost_to_index[qtq]);
 #endif
     }
@@ -301,6 +302,9 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t qtq, *qth;
     p4est_tree_t *tree;
     fclaw2d_block_t *block;
+
+    P4EST_ASSERT (domain->num_ghost_patches ==
+                  (int) mesh->ghost_num_quadrants);
 
     P4EST_ASSERT (domain->pp_owned);
 
@@ -393,6 +397,9 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
+#ifdef P4EST_DEBUG
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+#endif
     const p4est_topidx_t nt = (p4est_topidx_t) blockno;
     const p4est_quadrant_t *q;
     p4est_quadrant_t r, *rq;
@@ -402,6 +409,9 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     sc_array_t sqarr, *qarr = &sqarr;
     fclaw2d_block_t *block;
     fclaw2d_patch_relation_t prel;
+
+    P4EST_ASSERT (domain->num_ghost_patches ==
+                  (int) mesh->ghost_num_quadrants);
 
     P4EST_ASSERT (domain->pp_owned);
 
@@ -458,11 +468,10 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;    /* ghost index */
         P4EST_ASSERT (*rproc == domain->mpirank ||
                       (*rpatchno >= 0
-                       && *rpatchno < domain->num_ghost_patches));
+                       && *rpatchno < mesh->ghost_num_quadrants));
         P4EST_ASSERT (*rproc != domain->mpirank
                       || (*rblockno >= 0 && *rblockno < domain->num_blocks
-                          && *rpatchno >= 0
-                          && *rpatchno <
+                          && *rpatchno >= 0 && *rpatchno <
                           domain->blocks[*rblockno].num_patches));
     }
 
