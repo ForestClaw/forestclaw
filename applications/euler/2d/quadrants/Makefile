@@ -30,7 +30,7 @@ geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
 
 # Specify location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib/gcc/x86_64-apple-darwin10/4.6.2 -lgfortran
+FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
