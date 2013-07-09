@@ -27,14 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "no_solver_user.H"
 #include "amr_utils.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
     link_problem_setup(domain,no_solver_setprob);
@@ -164,12 +156,3 @@ fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
     no_solver_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
