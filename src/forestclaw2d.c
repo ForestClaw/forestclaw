@@ -480,7 +480,8 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     p4est_wrap_mark_refine (wrap,
-                            (p4est_locidx_t) blockno, (p4est_locidx_t) patchno);
+                            (p4est_locidx_t) blockno,
+                            (p4est_locidx_t) patchno);
 }
 
 void
@@ -490,7 +491,8 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     p4est_wrap_mark_coarsen (wrap,
-                             (p4est_locidx_t) blockno, (p4est_locidx_t) patchno);
+                             (p4est_locidx_t) blockno,
+                             (p4est_locidx_t) patchno);
 }
 
 void
@@ -550,23 +552,30 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
 }
 
 static void
-fclaw2d_domain_assign_for_partition (fclaw2d_domain_t * domain, void **patch_data)
+fclaw2d_domain_assign_for_partition (fclaw2d_domain_t * domain,
+                                     void **patch_data)
 {
-    int              blockno, patchno;
-    size_t           zz;
+    int blockno, patchno;
+    size_t zz;
     fclaw2d_block_t *block;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    p4est_tree_t    *tree;
+    p4est_tree_t *tree;
     p4est_quadrant_t *q;
- 
-    for (zz = 0, blockno = 0; blockno < domain->num_blocks; ++blockno) {
+
+    for (zz = 0, blockno = 0; blockno < domain->num_blocks; ++blockno)
+    {
         block = domain->blocks + blockno;
-        tree = p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) blockno);
+        tree =
+            p4est_tree_array_index (wrap->p4est->trees,
+                                    (p4est_topidx_t) blockno);
 
-        for (patchno = 0; patchno < block->num_patches; ++zz, ++patchno) {
-            P4EST_ASSERT (zz == (size_t) (block->num_patches_before + patchno));
+        for (patchno = 0; patchno < block->num_patches; ++zz, ++patchno)
+        {
+            P4EST_ASSERT (zz ==
+                          (size_t) (block->num_patches_before + patchno));
 
-            q = p4est_quadrant_array_index (&tree->quadrants, (p4est_locidx_t) patchno);
+            q = p4est_quadrant_array_index (&tree->quadrants,
+                                            (p4est_locidx_t) patchno);
             patch_data[zz] = q->p.user_data;
         }
     }
@@ -582,8 +591,9 @@ fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
 
     P4EST_ASSERT (*patch_data == NULL);
 
-    p4est_reset_data (wrap->p4est, data_size, NULL, wrap->p4est->user_pointer);
-    
+    p4est_reset_data (wrap->p4est, data_size, NULL,
+                      wrap->p4est->user_pointer);
+
     *patch_data = P4EST_ALLOC (void *, domain->num_patches_all);
     fclaw2d_domain_assign_for_partition (domain, *patch_data);
 }
@@ -592,7 +602,8 @@ void
 fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
                                          void ***patch_data)
 {
-    *patch_data = P4EST_REALLOC (*patch_data, void *, domain->num_patches_all);
+    *patch_data =
+        P4EST_REALLOC (*patch_data, void *, domain->num_patches_all);
     fclaw2d_domain_assign_for_partition (domain, *patch_data);
 }
 
