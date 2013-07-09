@@ -602,10 +602,10 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
-    p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
-
     P4EST_FREE (*patch_data);
     *patch_data = NULL;
+
+    p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
 
 void

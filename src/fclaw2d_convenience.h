@@ -50,6 +50,7 @@ fclaw2d_domain_t *fclaw2d_domain_new_disk (MPI_Comm mpicomm,
 void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
+ * All refine and coarsen markers are cancelled when this function is done.
  * \param [in,out] domain       Current domain with set adaptation markers.
  *                              It stays alive because it is needed to
  *                              project numerical values to the adapted domain.
@@ -59,6 +60,7 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 
 /** Create a repartitioned domain after fclaw2d_domain_adapt returned non-NULL.
+ * All refine and coarsen markers are cancelled when this function is done.
  * \param [in,out] domain       Current domain that was adapted previously.
  *                              It stays alive because it is needed to
  *                              transfer numerical values to the new partition.
