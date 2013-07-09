@@ -135,11 +135,11 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
         // Grid doesn't change
-        set_clawpatch(new_domain,new_patch,blockno,new_patchno);
+        // set_clawpatch(new_domain,new_patch,blockno,new_patchno);
 
         // Setup new patch using solver specific routine
         fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
+        // (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
 
         // Need a copy function in regrid_functions
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
@@ -162,11 +162,11 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             int fine_patchno = new_patchno + igrid;
 
             // Create new ClawPatch and assign patch pointer to it.
-            set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
+            // set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
 
             // Do one-time setup on new patch
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-            (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
+            // (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
 
             // Initialize new fine patch by either calling an init function or
             // by interpolating from coarser grid.
@@ -184,10 +184,10 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
 
-        set_clawpatch(new_domain,coarse_patch,blockno,coarse_patchno);
+        // set_clawpatch(new_domain,coarse_patch,blockno,coarse_patchno);
 
         fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        (sf->f_patch_setup)(new_domain,coarse_patch,blockno,coarse_patchno);
+        // (sf->f_patch_setup)(new_domain,coarse_patch,blockno,coarse_patchno);
 
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
         (rf->f_patch_average2coarse)(new_domain,fine_siblings,coarse_patch,
