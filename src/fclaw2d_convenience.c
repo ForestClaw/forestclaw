@@ -70,6 +70,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->num_ghost_patches = (int) ghost->ghosts.elem_count;
     P4EST_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
+    domain->num_exchange_patches = 0;
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->patch_to_block =

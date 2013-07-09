@@ -629,6 +629,21 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
+                                         size_t data_size, void ***ghost_data)
+{
+    int i;
+
+    P4EST_ASSERT (*ghost_data == NULL);
+
+    *ghost_data = P4EST_ALLOC (void *, domain->num_ghost_patches);
+    for (i = 0; i < domain->num_ghost_patches; ++i)
+    {
+        (*ghost_data)[i] = (void *) P4EST_ALLOC (char, data_size);
+    }
+}
+
+void
 fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
                                void **patch_data, void **ghost_data)
 {
@@ -639,4 +654,56 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
     }
 
     /* TODO: implement parallel version */
+}
+
+void
+fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain, void ***ghost_data)
+{
+    int i;
+
+    for (i = 0; i < domain->num_ghost_patches; ++i)
+    {
+        P4EST_FREE ((*ghost_data)[i]);
+    }
+    P4EST_FREE (*ghost_data);
+    *ghost_data = NULL;
+}
+
+void
+usage_example (fclaw2d_domain_t * domain)
+{
+    int nb, np;
+    size_t zz;
+    size_t data_size = 2143;
+    void **patch_data, **ghost_data = NULL;
+
+    /* we just created a grid by init or regrid */
+    patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
+    fclaw2d_domain_allocate_before_exchange (domain, data_size, &ghost_data);
+
+    /* i am assuming that the data that we want to send exists somewhere */
+    /* you can do this by an iterator instead */
+    zz = 0;
+    for (nb = 0; nb < domain->num_blocks; ++nb) {
+        for (np = 0; np < domain->blocks[nb].num_patches; ++np) {
+            if (domain->blocks[nb].patches[np].flags &
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) {
+                patch_data[zz++] = NULL;     /* TODO: put this patch's data location */
+            }
+        }
+    }
+    P4EST_ASSERT (zz == domain->num_exchange_patches);
+
+    /* now this is the time stepping sub-loop for a fixed grid layout*/
+    while (1) {
+        /* whenever needed in time stepping for the current grid layout */
+        fclaw2d_domain_ghost_exchange (domain, data_size, patch_data, ghost_data);
+
+        /* use received data at will;
+           index ghost_data[i] with i in [0, domain->num_ghost_patches[ */
+    }
+
+    /* we're about to regrid or terminate the program */
+    fclaw2d_domain_free_after_exchange (domain, &ghost_data);
+    P4EST_FREE (patch_data);
 }

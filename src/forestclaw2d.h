@@ -88,6 +88,10 @@ struct fclaw2d_domain
     int global_minlevel, global_maxlevel;       /* global */
     int possible_maxlevel;      /* theoretical maximum */
     int num_ghost_patches;      /* off-proc patches relevant to this proc */
+    int num_exchange_patches;   /* # my patches relevant to other procs.
+                                   Identified by this expression to be true:
+                                   (patch->flags & 
+                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */
@@ -353,24 +357,51 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
 void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
                                           void ***patch_data);
 
+/** Allocate buffer to hold the data from off-processor patches.
+ * This function will allocate domain->num_ghost_patches many pointers.
+ * Free this by fclaw2d_domain_free_after_exchange before regridding.
+ * \param [in] domain           The domain is not modified.
+ * \param [in] data_size        Number of bytes per patch to exchange.
+ * \param [in,out] ghost_data   Address of an array of void pointers.
+ *                              Data is allocated by this function.  After the
+ *                              call, *ghost_data holds an array of
+                                domain->num_exchange_patches many pointers,
+ *                              each pointing to exactly data_size bytes of
+ *                              memory that can be read from by forestclaw
+ *                              after every fclaw2d_domain_parallel_exchange.
+ *                              *ghost_data must be NULL before the call.
+ */
+void fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
+                                              size_t data_size,
+                                              void ***ghost_data);
+
 /** Exchange data for parallel ghost neighbors.
  * This function gathers data from parallel neighbor (ghost) patches.
+ * It can be called multiple times on the same allocated buffers.
  * We assume that the data size for all patches is the same.
  * \param [in] domain           Used to access forest and ghost metadata.
- *                              #(local patches) is domain->num_patches_all.
- *                              #(off-proc patches) is domain->num_ghost_patches.
+ *                              #(sent patches) is domain->num_exchange_patches.
+ *                              #(received patches) is domain->num_ghost_patches.
  * \param [in] data_size        Number of bytes per patch to transfer.
- * \param [in] patch_data       One pointer per processor-local patch as input.
- *                              It is only ever dereferenced for patches that
+ * \param [in] patch_data       One pointer per processor-local exchange patch in
+ *                              order. This only applies to local patches that
  *                              touch the parallel boundary from the inside, i.e.,
  *                              if (flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY).
- *                              The pointers to the others' data can be NULL.
  * \param [in,out] ghost_data   One pointer per off-processor patch as output.
  *                              The memory must be pre-allocated.
  */
 void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
                                        size_t data_size,
                                        void **patch_data, void **ghost_data);
+
+/** Free buffers used in exchanging off-processor data during time stepping.
+ * This should be done just before regridding.
+ * \param [in] domain           The domain is not modified.
+ * \param [in,out] ghost_data   Address of an array of void pointers to free.
+ *                              *ghost_data will be NULL after the call.
+ */
+void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
+                                         void ***ghost_data);
 
 #ifdef __cplusplus
 #if 0
