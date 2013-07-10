@@ -39,8 +39,8 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     m_refratio = gparms->refratio;
 
     /* query the levels that exist on this processor */
-    m_minlevel = domain->minlevel_all;
-    m_maxlevel = domain->maxlevel_all;
+    m_minlevel = domain->global_minlevel;
+    m_maxlevel = domain->global_maxlevel;
     m_levels.resize(m_maxlevel + 1);
 
     fclaw_bool subcycle = gparms->subcycle;

@@ -40,8 +40,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     int face;
     int nb;
     int num_patches_all;
-    int tree_minlevel, minlevel_all;
-    int tree_maxlevel, maxlevel_all;
+    int tree_minlevel, local_minlevel;
+    int tree_maxlevel, local_maxlevel;
     int levels[2], global_levels[2];
     p4est_qcoord_t qh;
     p4est_connectivity_t *conn = wrap->conn;
@@ -77,8 +77,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
     domain->possible_maxlevel = P4EST_QMAXLEVEL;
     num_patches_all = 0;
-    minlevel_all = domain->possible_maxlevel;
-    maxlevel_all = 0;
+    local_minlevel = domain->possible_maxlevel;
+    local_maxlevel = -1;
     for (i = 0; i < nb; ++i)
     {
         block = domain->blocks + i;
@@ -86,7 +86,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         tree =
             p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
         tree_minlevel = domain->possible_maxlevel;
-        tree_maxlevel = 0;
+        tree_maxlevel = -1;
         block->xlower = 0.;
         block->xupper = 1.;
         block->ylower = 0.;
@@ -140,25 +140,29 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
             tree_minlevel = SC_MIN (tree_minlevel, level);
             tree_maxlevel = SC_MAX (tree_maxlevel, level);
         }
-        P4EST_ASSERT (tree_maxlevel == (int) tree->maxlevel);
-        minlevel_all = SC_MIN (minlevel_all, tree_minlevel);
-        maxlevel_all = SC_MAX (maxlevel_all, tree_maxlevel);
+        P4EST_ASSERT (block->num_patches == 0 ||
+                      tree_maxlevel == (int) tree->maxlevel);
+        local_minlevel = SC_MIN (local_minlevel, tree_minlevel);
+        local_maxlevel = SC_MAX (local_maxlevel, tree_maxlevel);
         block->minlevel = tree_minlevel;
         block->maxlevel = tree_maxlevel;
     }
     P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
     domain->num_patches_all = num_patches_all;
-    domain->minlevel_all = minlevel_all;
-    domain->maxlevel_all = maxlevel_all;
+    domain->local_minlevel = local_minlevel;
+    domain->local_maxlevel = local_maxlevel;
 
     /* parallel communication of minimum and maximum levels */
-    levels[0] = domain->minlevel_all;
-    levels[1] = -domain->maxlevel_all;
+    levels[0] = domain->local_minlevel;
+    levels[1] = -domain->local_maxlevel;
     mpiret = MPI_Allreduce (levels, global_levels, 2, MPI_INT, MPI_MIN,
                             domain->mpicomm);
     SC_CHECK_MPI (mpiret);
     domain->global_minlevel = global_levels[0];
     domain->global_maxlevel = -global_levels[1];
+    P4EST_ASSERT (0 <= domain->global_minlevel);
+    P4EST_ASSERT (domain->global_minlevel <= domain->global_maxlevel);
+    P4EST_ASSERT (domain->global_maxlevel <= domain->possible_maxlevel);
 
     return domain;
 }
@@ -298,17 +302,12 @@ fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
     int level;
     int count, count_all;
 
-    P4EST_ASSERT (0 <= domain->minlevel_all &&
-                  domain->minlevel_all <= domain->possible_maxlevel);
-    P4EST_ASSERT (0 <= domain->maxlevel_all &&
-                  domain->maxlevel_all <= domain->possible_maxlevel);
-    P4EST_ASSERT (domain->minlevel_all <= domain->maxlevel_all);
+    P4EST_LOGF (lp, "Local minimum/maximum levels: %2d %2d\n",
+                domain->local_minlevel, domain->local_maxlevel);
     P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
                        domain->global_minlevel, domain->global_maxlevel);
-    P4EST_LOGF (lp, "Minimum/maximum levels: %2d %2d\n",
-                domain->minlevel_all, domain->maxlevel_all);
     count_all = 0;
-    for (level = domain->minlevel_all; level <= domain->maxlevel_all; ++level)
+    for (level = domain->local_minlevel; level <= domain->local_maxlevel; ++level)
     {
         count = 0;
         fclaw2d_domain_iterate_level (domain, level,

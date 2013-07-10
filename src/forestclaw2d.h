@@ -73,7 +73,9 @@ struct fclaw2d_block
     int is_boundary[4];         /* physical boundary flag */
     int num_patches;            /* local patches in this block */
     int num_patches_before;     /* in all previous blocks */
-    int minlevel, maxlevel;     /* local over this block */
+    int minlevel, maxlevel;     /* local over this block.  If this proc doesn't
+                                   store any patches in this block, we set
+                                   maxlevel < 0 <= minlevel. */
     fclaw2d_patch_t *patches;   /* allocated storage */
     fclaw2d_patch_t **patchbylevel;     /* array of pointers */
     void *user;
@@ -84,9 +86,11 @@ struct fclaw2d_domain
     MPI_Comm mpicomm;           /* MPI communicator */
     int mpisize, mpirank;       /* MPI variables */
     int num_patches_all;        /* sum over all blocks */
-    int minlevel_all, maxlevel_all;     /* proc local */
-    int global_minlevel, global_maxlevel;       /* global */
-    int possible_maxlevel;      /* theoretical maximum */
+    int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
+                                   store any patches at all, we set
+                                   local_maxlevel < 0 <= local_minlevel. */
+    int global_minlevel, global_maxlevel;       /* global, well-defined */
+    int possible_maxlevel;      /* theoretical maximum that can be reached */
     int num_ghost_patches;      /* off-proc patches relevant to this proc */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
