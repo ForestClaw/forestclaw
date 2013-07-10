@@ -166,10 +166,6 @@ void amrinit (fclaw2d_domain_t **domain)
 #if 0
     init_block_and_patch_data(*domain);  /* Allocate block and patch data */
 
-    // Initialize base level grid - combine with 'amr_set_base_level' above?
-    fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
-                                 (void *) NULL);
-
     int num = (*domain)->num_blocks;
     for (int i = 0; i < num; i++)
     {
@@ -177,6 +173,10 @@ void amrinit (fclaw2d_domain_t **domain)
         set_block_data(block,gparms->mthbc);
     }
 #endif
+
+    // Initialize base level grid - combine with 'amr_set_base_level' above?
+    fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
+                                 (void *) NULL);
 
     set_phys_bc(*domain,minlevel,t);
 
@@ -215,8 +215,6 @@ void amrinit (fclaw2d_domain_t **domain)
 
             // Repartition domain to new processors.
             repartition_domain(domain);
-
-
 
 #if 0
             fclaw2d_domain_t *domain_partitioned =
