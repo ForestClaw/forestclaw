@@ -734,22 +734,25 @@ void
 fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
 {
     int mpiret;
+    int i;
     MPI_Status status;
 
     if (domain->mpirank > 0) {
-        mpiret = MPI_Recv (NULL, 0, MPI_INT, domain->mpirank - 1,
+        mpiret = MPI_Recv (&i, 1, MPI_INT, domain->mpirank - 1,
             FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm, &status);
         SC_CHECK_MPI (mpiret);
+        P4EST_ASSERT (i == 0);
     }
 }
 
 void
 fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
 {
+    int i = 0;
     int mpiret;
 
     if (domain->mpirank + 1 < domain->mpisize) {
-        mpiret = MPI_Send (NULL, 0, MPI_INT, domain->mpirank + 1,
+        mpiret = MPI_Send (&i, 1, MPI_INT, domain->mpirank + 1,
             FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm);
         SC_CHECK_MPI (mpiret);
     }
