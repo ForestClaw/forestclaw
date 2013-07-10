@@ -39,8 +39,8 @@ void no_solver_linker(fclaw2d_domain_t* domain)
 
 
     fclaw2d_output_functions* of = get_output_functions(domain);
-    of->f_patch_write_header = &vtk_write_header;
-    of->f_patch_write_output = &vtk_write_output;
+    of->f_patch_write_header = &matlab_parallel_write_header;
+    of->f_patch_write_output = &matlab_parallel_write_output;
 
     link_regrid_functions(domain,no_solver_patch_tag4refinement,
                           no_solver_patch_tag4coarsening);
@@ -165,27 +165,30 @@ fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
 }
 
 
-void vtk_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
+    if (domain->mpirank == 0)
+    {
+        const amr_options_t *gparms = get_domain_parms(domain);
+        double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+        printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
-    // Write out header file containing global information for 'iframe'
-    int meqn = gparms->meqn;
-    int maux = 0;
-    write_tfile_(iframe,time,meqn,ngrids,maux);
+        // Write out header file containing global information for 'iframe'
+        int meqn = gparms->meqn;
+        int maux = 0;
+        write_tfile_(iframe,time,meqn,ngrids,maux);
 
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
+        // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
+        // 0010, 0114), and closes the file.
+        new_qfile_(iframe);
+    }
 }
 
 
-void vtk_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                      int this_block_idx, int this_patch_idx,
-                      int iframe,int num,int level)
+void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level)
 {
     // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
@@ -217,6 +220,7 @@ void vtk_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
     int matlab_level = level + 1;
+
     write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                  iframe,num,matlab_level,this_block_idx);
 }
