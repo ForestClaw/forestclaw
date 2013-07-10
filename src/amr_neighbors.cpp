@@ -201,14 +201,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                            icorner, &rproc, corner_block_idx,
                                            corner_patch_idx, &neighbor_type);
 
-        if (rproc != domain->mpirank)
-        {
-            *ref_flag_ptr = NULL;
-            return;
-        }
-
-
-
     }
     if (!has_corner_neighbor)
     {
