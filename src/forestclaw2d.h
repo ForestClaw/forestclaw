@@ -427,6 +427,24 @@ void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
 void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                          fclaw2d_domain_exchange_t * e);
 
+/** Serialize a section of code.
+ * THIS IS NOT SCALABLE.
+ * WILL BE HORRIBLY SLOW FOR LARGE NUMBERS OF PROCESSORS.
+ * A processor returns from this function only after all lower-numbered
+ * processors have called fclaw2d_domain_serialization_leave.
+ * \param [in] domain           The domain is not modified.
+ */
+void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
+
+/** Serialize a section of code.
+ * THIS IS NOT SCALABLE.
+ * WILL BE HORRIBLY SLOW FOR LARGE NUMBERS OF PROCESSORS.
+ * A processor must call this function to allow all higher-numbered
+ * processors to return from fclaw2d_domain_serialization_enter.
+ * \param [in] domain           The domain is not modified.
+ */
+void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

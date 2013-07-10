@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
+#define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
+
 double
 fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
 {
@@ -726,4 +728,29 @@ usage_example (fclaw2d_domain_t * domain)
 
     /* we're about to regrid or terminate the program */
     fclaw2d_domain_free_after_exchange (domain, e);
+}
+
+void
+fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
+{
+    int mpiret;
+    MPI_Status status;
+
+    if (domain->mpirank > 0) {
+        mpiret = MPI_Recv (NULL, 0, MPI_INT, domain->mpirank - 1,
+            FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm, &status);
+        SC_CHECK_MPI (mpiret);
+    }
+}
+
+void
+fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
+{
+    int mpiret;
+
+    if (domain->mpirank + 1 < domain->mpisize) {
+        mpiret = MPI_Send (NULL, 0, MPI_INT, domain->mpirank + 1,
+            FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm);
+        SC_CHECK_MPI (mpiret);
+    }
 }
