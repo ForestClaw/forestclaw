@@ -96,6 +96,7 @@ struct fclaw2d_domain
                                            store any patches at all, we set
                                            local_maxlevel < 0 <= local_minlevel. */
     int64_t global_num_patches; /* sum of local_num_patches over all procs */
+    int64_t global_num_patches_before;  /* Number of patches on lower procs */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
     int num_blocks;

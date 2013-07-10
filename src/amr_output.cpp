@@ -37,7 +37,11 @@ void cb_amrout(fclaw2d_domain_t *domain,
 {
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
+    int64_t patch_num =
+      domain->global_num_patches_before +
+      (int64_t) (this_block->num_patches_before + this_patch_idx);
+
+    /* TODO Enable 64bit integers for global counters and indices */
 
     /* the user can also get this, but maybe we don't want the user
        to have access? */
@@ -45,7 +49,7 @@ void cb_amrout(fclaw2d_domain_t *domain,
 
     fclaw2d_output_functions_t* of = get_output_functions(domain);
     (of->f_patch_write_output)(domain,this_patch,this_block_idx,
-                               this_patch_idx,iframe,patch_num,level);
+                               this_patch_idx,iframe,(int) patch_num,level);
 }
 
 

@@ -183,6 +183,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     P4EST_ASSERT (domain->global_minlevel <= domain->global_maxlevel);
     P4EST_ASSERT (domain->global_maxlevel <= domain->possible_maxlevel);
     domain->global_num_patches = (int64_t) wrap->p4est->global_num_quadrants;
+    domain->global_num_patches_before =
+        (int64_t) wrap->p4est->global_first_quadrant[domain->mpirank];
 
     return domain;
 }
