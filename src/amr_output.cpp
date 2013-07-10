@@ -59,6 +59,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         ngrids += block->num_patches;
     }
 
+    ngrids = domain->global_num_patches;
     fclaw2d_output_functions_t* of = get_output_functions(domain);
     (of->f_patch_write_header)(domain,iframe,ngrids);
 

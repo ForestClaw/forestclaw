@@ -74,10 +74,10 @@ fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                           int blockno,
                                           int patchno);
 
-void vtk_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
+void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
 
-void vtk_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                         int this_block_idx, int this_patch_idx,
-                      int iframe,int num,int level);
+void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level);
 
 #endif
