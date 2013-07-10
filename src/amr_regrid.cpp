@@ -138,7 +138,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         // set_clawpatch(new_domain,new_patch,blockno,new_patchno);
 
         // Setup new patch using solver specific routine
-        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+        // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
         // (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
 
         // Need a copy function in regrid_functions
@@ -165,7 +165,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
             // set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
 
             // Do one-time setup on new patch
-            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+            // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
             // (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
 
             // Initialize new fine patch by either calling an init function or
@@ -186,7 +186,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
         // set_clawpatch(new_domain,coarse_patch,blockno,coarse_patchno);
 
-        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+        // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
         // (sf->f_patch_setup)(new_domain,coarse_patch,blockno,coarse_patchno);
 
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);

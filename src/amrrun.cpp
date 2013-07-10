@@ -93,8 +93,8 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     int minlevel = gparms->minlevel;
     int verbosity = gparms->verbosity;
 
-    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
-
+    // unused
+    // fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
 
     double t0 = 0;
 
@@ -212,7 +212,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                         cout << "regridding at step " << n << endl;
                     }
                     regrid(domain);
-                    ddata = get_domain_data(*domain);
+                    // ddata = get_domain_data(*domain);
                 }
             }
             else
@@ -241,7 +241,8 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     amrout(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    // unused
+    // fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
@@ -334,7 +335,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
                     cout << "regridding at step " << n << endl;
                 }
                 regrid(domain);
-                ddata = get_domain_data(*domain);
+                // ddata = get_domain_data(*domain);
             }
         }
         else
@@ -358,7 +359,8 @@ static void outstyle_4(fclaw2d_domain_t **domain)
     amrout(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+    // unused
+    // fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
@@ -414,7 +416,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
                     cout << "regridding at step " << n << endl;
                 }
                 regrid(domain);
-                ddata = get_domain_data(*domain);
+                // ddata = get_domain_data(*domain);
             }
         }
         else
