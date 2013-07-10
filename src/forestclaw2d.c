@@ -748,8 +748,8 @@ fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
 void
 fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
 {
-    int i = 0;
     int mpiret;
+    int i = 0;
 
     if (domain->mpirank + 1 < domain->mpisize) {
         mpiret = MPI_Send (&i, 1, MPI_INT, domain->mpirank + 1,
