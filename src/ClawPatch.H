@@ -300,6 +300,10 @@ protected :
 
     FArrayBox m_curvature;  // ???
 
+    void swap_exchange_data(fclaw_bool a_time_interp);
+    void reset_exchange_data(fclaw_bool a_time_interp);
+
+
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_waveprop_patch_data;
     /* Data associated with the wave propagation algorithm (ClawPack) */
