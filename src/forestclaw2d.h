@@ -104,6 +104,11 @@ struct fclaw2d_domain
     void *user;
 };
 
+/** Compute and return the maximum over all processors of a double value.
+ * The minimum can be computed by using this function on the negative value.
+ */
+double fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d);
+
 /** Return the space dimension. */
 int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
 
