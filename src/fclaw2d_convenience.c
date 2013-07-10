@@ -39,7 +39,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     int level;
     int face;
     int nb;
-    int num_patches_all;
+    int local_num_patches;
     int tree_minlevel, local_minlevel;
     int tree_maxlevel, local_maxlevel;
     int levels[2], global_levels[2];
@@ -76,13 +76,13 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->patch_to_block =
         P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
     domain->possible_maxlevel = P4EST_QMAXLEVEL;
-    num_patches_all = 0;
+    local_num_patches = 0;
     local_minlevel = domain->possible_maxlevel;
     local_maxlevel = -1;
     for (i = 0; i < nb; ++i)
     {
         block = domain->blocks + i;
-        block->num_patches_before = num_patches_all;
+        block->num_patches_before = local_num_patches;
         tree =
             p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
         tree_minlevel = domain->possible_maxlevel;
@@ -136,7 +136,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
                 currentbylevel[level]->u.next = patch;
                 currentbylevel[level] = patch;
             }
-            domain->patch_to_block[num_patches_all++] = i;
+            domain->patch_to_block[local_num_patches++] = i;
             tree_minlevel = SC_MIN (tree_minlevel, level);
             tree_maxlevel = SC_MAX (tree_maxlevel, level);
         }
@@ -147,8 +147,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         block->minlevel = tree_minlevel;
         block->maxlevel = tree_maxlevel;
     }
-    P4EST_ASSERT (num_patches_all == (int) wrap->p4est->local_num_quadrants);
-    domain->num_patches_all = num_patches_all;
+    P4EST_ASSERT (local_num_patches == (int) wrap->p4est->local_num_quadrants);
+    domain->local_num_patches = local_num_patches;
     domain->local_minlevel = local_minlevel;
     domain->local_maxlevel = local_maxlevel;
 
@@ -182,6 +182,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     P4EST_ASSERT (0 <= domain->global_minlevel);
     P4EST_ASSERT (domain->global_minlevel <= domain->global_maxlevel);
     P4EST_ASSERT (domain->global_maxlevel <= domain->possible_maxlevel);
+    domain->global_num_patches = (int64_t) wrap->p4est->global_num_quadrants;
 
     return domain;
 }
@@ -338,7 +339,7 @@ fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
         P4EST_LOGF (lp, "Patches on level %2d: %9d\n", level, count);
         count_all += count;
     }
-    P4EST_ASSERT (count_all == domain->num_patches_all);
+    P4EST_ASSERT (count_all == domain->local_num_patches);
 }
 
 typedef struct fclaw2d_domain_list_neighbors
@@ -394,7 +395,7 @@ fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
     fclaw2d_domain_iterate_patches (domain,
                                     fclaw2d_domain_list_neighbors_callback,
                                     &ln);
-    P4EST_ASSERT (ln.count == domain->num_patches_all);
+    P4EST_ASSERT (ln.count == domain->local_num_patches);
 }
 
 static void

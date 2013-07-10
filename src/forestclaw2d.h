@@ -91,10 +91,11 @@ struct fclaw2d_domain
 {
     MPI_Comm mpicomm;           /* MPI communicator */
     int mpisize, mpirank;       /* MPI variables */
-    int num_patches_all;        /* sum over all blocks */
+    int local_num_patches;      /* sum of patches over all blocks on this proc */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
                                            store any patches at all, we set
                                            local_maxlevel < 0 <= local_minlevel. */
+    int64_t global_num_patches; /* sum of local_num_patches over all procs */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
     int num_blocks;
