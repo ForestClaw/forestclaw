@@ -87,15 +87,15 @@ struct fclaw2d_domain
     int mpisize, mpirank;       /* MPI variables */
     int num_patches_all;        /* sum over all blocks */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
-                                   store any patches at all, we set
-                                   local_maxlevel < 0 <= local_minlevel. */
+                                           store any patches at all, we set
+                                           local_maxlevel < 0 <= local_minlevel. */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
     int num_ghost_patches;      /* off-proc patches relevant to this proc */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags & 
-                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
+                                   FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int *patch_to_block;        /* allocated storage */

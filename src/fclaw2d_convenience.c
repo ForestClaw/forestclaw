@@ -55,7 +55,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
     fclaw2d_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
-    
+
 
 #ifdef P4EST_DEBUG
     memset (currentbylevel, 0,
@@ -307,7 +307,8 @@ fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
     P4EST_GLOBAL_LOGF (lp, "Global minimum/maximum levels: %2d %2d\n",
                        domain->global_minlevel, domain->global_maxlevel);
     count_all = 0;
-    for (level = domain->local_minlevel; level <= domain->local_maxlevel; ++level)
+    for (level = domain->local_minlevel; level <= domain->local_maxlevel;
+         ++level)
     {
         count = 0;
         fclaw2d_domain_iterate_level (domain, level,

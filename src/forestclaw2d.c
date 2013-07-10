@@ -669,7 +669,8 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
 }
 
 void
-fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain, void ***ghost_data)
+fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
+                                    void ***ghost_data)
 {
     int i;
 
@@ -696,20 +697,25 @@ usage_example (fclaw2d_domain_t * domain)
     /* i am assuming that the data that we want to send exists somewhere */
     /* you can do this by an iterator instead */
     zz = 0;
-    for (nb = 0; nb < domain->num_blocks; ++nb) {
-        for (np = 0; np < domain->blocks[nb].num_patches; ++np) {
+    for (nb = 0; nb < domain->num_blocks; ++nb)
+    {
+        for (np = 0; np < domain->blocks[nb].num_patches; ++np)
+        {
             if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) {
-                patch_data[zz++] = NULL;     /* TODO: put this patch's data location */
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            {
+                patch_data[zz++] = NULL;        /* TODO: put this patch's data location */
             }
         }
     }
     P4EST_ASSERT (zz == domain->num_exchange_patches);
 
-    /* now this is the time stepping sub-loop for a fixed grid layout*/
-    while (1) {
+    /* now this is the time stepping sub-loop for a fixed grid layout */
+    while (1)
+    {
         /* whenever needed in time stepping for the current grid layout */
-        fclaw2d_domain_ghost_exchange (domain, data_size, patch_data, ghost_data);
+        fclaw2d_domain_ghost_exchange (domain, data_size, patch_data,
+                                       ghost_data);
 
         /* use received data at will;
            index ghost_data[i] with i in [0, domain->num_ghost_patches[ */
