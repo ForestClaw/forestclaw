@@ -55,6 +55,8 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
+    ddata->domain_exchange = NULL;
+
     ddata->amropts = NULL;
     ddata->curr_time = 0;
 
@@ -154,6 +156,11 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     /* Has the data already been allocated? */
     fclaw2d_domain_data_t *ddata_new = get_domain_data(new_domain);
 
+    /*
+       We don't need to copy domain_exchange, since it is rebuilt whenever
+       we create a new domain.
+    */
+
     /* Copy data members */
     ddata_new->amropts = ddata_old->amropts;
     ddata_new->waveprop_parms = ddata_old->waveprop_parms;
@@ -239,6 +246,23 @@ double get_domain_time(fclaw2d_domain_t *domain)
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     return ddata->curr_time;
 }
+
+fclaw2d_domain_exchange_t*
+    get_domain_exchange_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    return ddata->domain_exchange;
+}
+
+void set_domain_exchange_data(fclaw2d_domain_t* domain,fclaw2d_domain_exchange_t *e)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->domain_exchange = e;
+}
+
+
+
+
 
 // Will change the name of this to 'get_clawpatch' eventually
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)

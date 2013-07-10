@@ -31,6 +31,9 @@ typedef struct fclaw2d_domain_data
     fclaw2d_solver_functions_t* solver_functions;
     fclaw2d_output_functions_t* output_functions;
 
+    // This should not be copied, but needs to be redone for every new domain;
+    fclaw2d_domain_exchange_t* domain_exchange;
+
 } fclaw2d_domain_data_t;
 
 typedef struct fclaw2d_block_data

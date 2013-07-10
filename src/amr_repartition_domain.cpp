@@ -28,9 +28,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
+static
+fclaw2d_domain_exchange_t* setup_parallel_ghost_patches(fclaw2d_domain_t* domain)
+{
+    int nb, np;
+    size_t zz;
+    size_t data_size =  pack_size(domain);
+    fclaw2d_domain_exchange_t *e;
+
+    /* we just created a grid by init or regrid */
+    e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
+
+    /* i am assuming that the data that we want to send exists somewhere */
+    /* you can do this by an iterator instead */
+    zz = 0;
+    for (nb = 0; nb < domain->num_blocks; ++nb)
+    {
+        for (np = 0; np < domain->blocks[nb].num_patches; ++np)
+        {
+            if (domain->blocks[nb].patches[np].flags &
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            {
+                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
+                ClawPatch *cp = get_clawpatch(this_patch);
+                double *q = cp->q();
+                e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
+            }
+        }
+    }
+    return e;
+}
+
 
 static
-void cb_rebuild_patches(fclaw2d_domain_t *domain,
+    void cb_build_patches(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
@@ -70,7 +101,47 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
         set_block_data(block,gparms->mthbc);
     }
 
-    fclaw2d_domain_iterate_patches(new_domain, cb_rebuild_patches,(void *) NULL);
+    fclaw2d_domain_iterate_patches(new_domain, cb_build_patches,(void *) NULL);
+
+    // Set up the parallel ghost patch data structure.
+    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(new_domain);
+    if (e_old != NULL)
+    {
+        fclaw2d_domain_free_after_exchange (new_domain, e_old);
+    }
+    fclaw2d_domain_exchange_t* e = setup_parallel_ghost_patches(new_domain);
+    set_domain_exchange_data(new_domain,e);
+}
+
+void build_initial_domain(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    // Allocate memory for new blocks and patches.
+    init_block_and_patch_data(domain);
+
+    // Physical BCs are needed in boundary level exchange
+    // Assume only one block, since we are assuming mthbc
+    int num = domain->num_blocks;
+    for (int i = 0; i < num; i++)
+    {
+        // This assumes that each block has the same physical
+        // boundary conditions, which doesn't make much sense...
+        fclaw2d_block_t *block = &domain->blocks[i];
+        set_block_data(block,gparms->mthbc);
+    }
+
+    // Construct new patches
+    fclaw2d_domain_iterate_patches(domain, cb_build_patches,(void *) NULL);
+
+    // Set up the parallel ghost patch data structure.
+    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(domain);
+    if (e_old != NULL)
+    {
+        fclaw2d_domain_free_after_exchange (domain, e_old);
+    }
+    fclaw2d_domain_exchange_t* e = setup_parallel_ghost_patches(domain);
+    set_domain_exchange_data(domain,e);
 }
 
 
@@ -145,42 +216,15 @@ void repartition_domain(fclaw2d_domain_t** domain)
 }
 
 
-#if 0
-void setup_parallel_ghost_patches(fclaw2d_domain_t* domain)
-{
-    size_t zz;
-    size_t data_size =  pack_size(domain);
-    void **patch_data, **ghost_data = NULL;
 
-    /* we just created a grid by init or regrid */
-    patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
-    fclaw2d_domain_allocate_before_exchange (domain, data_size, &ghost_data);
+/* Put this whereever parallel exchanges are needed
 
-    /* i am assuming that the data that we want to send exists somewhere */
-    /* you can do this by an iterator instead */
-    zz = 0;
-    for (nb = 0; nb < domain->num_blocks; ++nb)
-    {
-        for (np = 0; np < domain->blocks[nb].num_patches; ++np)
-        {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-            {
-                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                ClawPatch *cp = get_clawpatch(this_patch);
-                double *q = cp->q();
-                patch_data[zz++] = (void*) q;        /* Put this patch's data location */
-            }
-        }
-    }
-}
+    fclaw2d_domain_ghost_exchange (domain, e);
 
-    fclaw2d_domain_ghost_exchange (domain, data_size, patch_data, ghost_data);
+*/
 
-    // Do time stepping...
 
-    /* we're about to regrid or terminate the program */
-    fclaw2d_domain_free_after_exchange (domain, &ghost_data);
-    P4EST_FREE (patch_data);
-}
-#endif
+/*
+
+    fclaw2d_domain_free_after_exchange (domain, e);
+*/

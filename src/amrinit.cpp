@@ -69,12 +69,14 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
+    /*
     set_clawpatch(domain,this_patch,this_block_idx, this_patch_idx);
-
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
 
     // One-time setup of patch
     (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
+    */
+
+    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
 
     // Set initial values on patch
     (sf->f_patch_initialize)(domain,this_patch,this_block_idx,this_patch_idx);
@@ -158,6 +160,10 @@ void amrinit (fclaw2d_domain_t **domain)
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
+    build_initial_domain(*domain);
+
+
+#if 0
     init_block_and_patch_data(*domain);  /* Allocate block and patch data */
 
     // Initialize base level grid - combine with 'amr_set_base_level' above?
@@ -170,6 +176,7 @@ void amrinit (fclaw2d_domain_t **domain)
         fclaw2d_block_t *block = &(*domain)->blocks[i];
         set_block_data(block,gparms->mthbc);
     }
+#endif
 
     set_phys_bc(*domain,minlevel,t);
 
@@ -208,6 +215,8 @@ void amrinit (fclaw2d_domain_t **domain)
 
             // Repartition domain to new processors.
             repartition_domain(domain);
+
+
 
 #if 0
             fclaw2d_domain_t *domain_partitioned =
