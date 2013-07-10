@@ -273,6 +273,9 @@ protected :
     /* Time interpolated grid data */
     FArrayBox m_griddata_time_interp;
 
+    /* Needed as temporary storage to get ghost exchanges to work */
+    FArrayBox m_griddata_temp;
+
     /* Last time step, needed to get time interpolated data */
     FArrayBox m_griddata_last;
 
