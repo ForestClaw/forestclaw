@@ -162,6 +162,8 @@ static void outstyle_1(fclaw2d_domain_t **domain)
 
             double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
+            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+
             printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
 
@@ -295,6 +297,10 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         time_stepper.set_dt_minlevel(dt_minlevel);
 
         double maxcfl_step = advance_all_levels(*domain, &time_stepper);
+
+        // This is a collective communication - everybody needs to wait here.
+        maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+
 
         printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
