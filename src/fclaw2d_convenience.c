@@ -133,7 +133,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
             {
                 /* next pointer of previous patch by level in this block */
                 P4EST_ASSERT (currentbylevel[level] != NULL);
-                currentbylevel[level]->next = patch;
+                currentbylevel[level]->u.next = patch;
                 currentbylevel[level] = patch;
             }
             domain->patch_to_block[num_patches_all++] = i;
@@ -151,6 +151,25 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->num_patches_all = num_patches_all;
     domain->local_minlevel = local_minlevel;
     domain->local_maxlevel = local_maxlevel;
+
+    /* allocate ghost patches */
+    domain->ghost_patches =
+        P4EST_ALLOC_ZERO (fclaw2d_patch_t, domain->num_ghost_patches);
+    for (i = 0; i < domain->num_ghost_patches; ++i)
+    {
+        patch = domain->ghost_patches + i;
+        quad = p4est_quadrant_array_index (&ghost->ghosts, (size_t) i);
+        patch->level = level = (int) quad->level;
+        patch->flags =
+            p4est_quadrant_child_id (quad) | FCLAW2D_PATCH_IS_GHOST;
+        P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
+        qh = P4EST_QUADRANT_LEN (level);
+        patch->xlower = quad->x * fclaw2d_smallest_h;
+        patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+        patch->ylower = quad->y * fclaw2d_smallest_h;
+        patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+        patch->u.blockno = (int) quad->p.which_tree;
+    }
 
     /* parallel communication of minimum and maximum levels */
     levels[0] = domain->local_minlevel;
@@ -231,6 +250,8 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     }
     P4EST_FREE (domain->patch_to_block);
     P4EST_FREE (domain->blocks);
+
+    P4EST_FREE (domain->ghost_patches);
 
     if (domain->pp_owned)
     {

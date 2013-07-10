@@ -143,7 +143,7 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
     {
         block = domain->blocks + i;
         for (patch = block->patchbylevel[level];
-             patch != NULL; patch = patch->next)
+             patch != NULL; patch = patch->u.next)
         {
             j = (int) (patch - block->patches);
             P4EST_ASSERT (0 <= j && j < block->num_patches);

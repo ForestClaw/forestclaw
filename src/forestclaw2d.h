@@ -44,7 +44,8 @@ typedef enum
 {
     FCLAW2D_PATCH_CHILDID = 0x7,
     FCLAW2D_PATCH_FIRST_SIBLING = 0x8,
-    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10
+    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10,
+    FCLAW2D_PATCH_IS_GHOST = 0x20
 }
 fclaw2d_patch_flags_t;
 
@@ -62,7 +63,12 @@ struct fclaw2d_patch
     int flags;                  /* flags that encode tree information */
     double xlower, xupper;
     double ylower, yupper;
-    fclaw2d_patch_t *next;      /* next patch same level same block */
+    union
+    {
+        fclaw2d_patch_t *next;  /* local: next patch same level same block */
+        int blockno;            /* off-proc: this patch's block number */
+    }
+    u;
     void *user;
 };
 
@@ -91,14 +97,15 @@ struct fclaw2d_domain
                                            local_maxlevel < 0 <= local_minlevel. */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
-    int num_ghost_patches;      /* off-proc patches relevant to this proc */
+    int num_blocks;
+    fclaw2d_block_t *blocks;    /* allocated storage */
+    int *patch_to_block;        /* allocated storage, one per local patch */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags & 
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
-    int num_blocks;
-    fclaw2d_block_t *blocks;    /* allocated storage */
-    int *patch_to_block;        /* allocated storage */
+    int num_ghost_patches;      /* # off-proc patches relevant to this proc */
+    fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
     void *pp;                   /* opaque backend data */
     int pp_owned;               /* The pp member is owned by this domain */
     void *user;
