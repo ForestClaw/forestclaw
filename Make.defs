@@ -1,0 +1,17 @@
+# Definitions for a ForestClaw build
+
+# Copy this to a local version Make.defs.local
+
+# Location of gfortran library
+FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
+
+# Compile with MPI or not.
+FCLAW_MPI = True
+
+ifeq ($(FCLAW_MPI),True)
+P4EST_CXX = mpicxx
+P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local
+else
+P4EST_CXX = c++
+P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build/local
+endif

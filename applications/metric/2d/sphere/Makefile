@@ -3,6 +3,8 @@
 TARGET = sphere
 GEO = sphere
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -27,7 +29,6 @@ geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
 OBJECTS = $(TARGET).o $(exampleobjs) $(geoobjs)
 
 # Specify location of fortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 FORT_INC = $(FORESTCLAW)/src/fortran_source2d
 
 # -----------------------------------------------------------

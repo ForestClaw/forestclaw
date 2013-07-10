@@ -4,6 +4,8 @@
 TARGET = quadrants
 GEO = cart
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -28,9 +30,6 @@ solverincludes = $(waveprop_includes)
 geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
-
-# Specify location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.

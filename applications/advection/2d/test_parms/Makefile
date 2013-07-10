@@ -3,6 +3,8 @@
 TARGET = test_parms
 GEO = cart
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -22,9 +24,6 @@ solverincludes = $(waveprop_includes)
 geoobjs =
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
-
-# Specify location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.

@@ -3,6 +3,8 @@
 TARGET = sphere
 GEO = sphere
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -31,9 +33,6 @@ solverincludes = $(waveprop_includes)
 geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
-
-# Specify location of fortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.

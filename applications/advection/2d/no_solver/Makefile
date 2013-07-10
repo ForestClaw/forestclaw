@@ -3,11 +3,11 @@
 TARGET = no_solver
 GEO = cart
 
+include $(FORESTCLAW)/Make.defs.local
 
 
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
 FORTRAN_INC = $(FORTRAN_SRC)

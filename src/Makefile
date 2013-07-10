@@ -1,6 +1,7 @@
 # Makefile in src
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
+include $(FORESTCLAW)/Make.defs.local
 
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
@@ -35,6 +36,12 @@ fclawobjs = \
 	fclaw2d_map.o \
         fclaw2d_p4est.o \
 	forestclaw2d.o \
+	mappings/set_maptype.o \
+	mappings/scale_rot_map.o \
+	mappings/block.o \
+	mappings/cart/mapc2m_cart.o \
+	mappings/disk/mapc2m_disk.o \
+	mappings/sphere/mapc2m_sphere.o \
 	$(FORTRAN_SRC)/philim.o \
 	$(FORTRAN_SRC)/claw_out2.o \
 	$(FORTRAN_SRC)/mapc2p.o \
@@ -43,13 +50,7 @@ fclawobjs = \
 	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
 	$(FORTRAN_SRC)/claw2d_utils.o \
 	$(FORTRAN_SRC)/debug.o \
-	$(FORTRAN_SRC)/cellave2.o \
-	$(FORESTCLAW)/src/mappings/set_maptype.o \
-	$(FORESTCLAW)/src/mappings/scale_rot_map.o \
-	$(FORESTCLAW)/src/mappings/block.o \
-	$(FORESTCLAW)/src/mappings/cart/mapc2m_cart.o \
-	$(FORESTCLAW)/src/mappings/disk/mapc2m_disk.o \
-	$(FORESTCLAW)/src/mappings/sphere/mapc2m_sphere.o
+	$(FORTRAN_SRC)/cellave2.o
 
 libforestclaw.a: $(fclawobjs)
 	ar cru $@ $^
