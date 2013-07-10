@@ -58,7 +58,7 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     // Get total number of patches
     int ngrids = domain->global_num_patches;
     fclaw2d_output_functions_t* of = get_output_functions(domain);
-   
+
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */

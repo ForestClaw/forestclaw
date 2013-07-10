@@ -433,6 +433,8 @@ void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
  * WILL BE HORRIBLY SLOW FOR LARGE NUMBERS OF PROCESSORS.
  * A processor returns from this function only after all lower-numbered
  * processors have called fclaw2d_domain_serialization_leave.
+ * No collective communication routines must be called between the calls
+ * to this function and fclaw2d_domain_serialization_leave.
  * \param [in] domain           The domain is not modified.
  */
 void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
