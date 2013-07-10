@@ -640,27 +640,31 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
 
-void
+fclaw2d_domain_exchange_t *
 fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
-                                         size_t data_size, void ***ghost_data)
+                                         size_t data_size)
 {
     int i;
+    fclaw2d_domain_exchange_t *e;
 
-    P4EST_ASSERT (*ghost_data == NULL);
-
-    *ghost_data = P4EST_ALLOC (void *, domain->num_ghost_patches);
+    e = P4EST_ALLOC (fclaw2d_domain_exchange_t, 1);
+    e->data_size = data_size;
+    e->patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
+    e->ghost_data = P4EST_ALLOC (void *, domain->num_ghost_patches);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
-        (*ghost_data)[i] = (void *) P4EST_ALLOC (char, data_size);
+        e->ghost_data[i] = (void *) P4EST_ALLOC (char, data_size);
     }
+
+    return e;
 }
 
 void
-fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
-                               void **patch_data, void **ghost_data)
+fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
+                               fclaw2d_domain_exchange_t * e)
 {
     /* This function does nothing in serial or without data. */
-    if (data_size == 0)
+    if (e->data_size == 0)
     {
         return;
     }
@@ -670,16 +674,17 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain, size_t data_size,
 
 void
 fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
-                                    void ***ghost_data)
+                                    fclaw2d_domain_exchange_t * e)
 {
     int i;
 
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
-        P4EST_FREE ((*ghost_data)[i]);
+        P4EST_FREE (e->ghost_data[i]);
     }
-    P4EST_FREE (*ghost_data);
-    *ghost_data = NULL;
+    P4EST_FREE (e->ghost_data);
+    P4EST_FREE (e->patch_data);
+    P4EST_FREE (e);
 }
 
 void
@@ -688,11 +693,10 @@ usage_example (fclaw2d_domain_t * domain)
     int nb, np;
     size_t zz;
     size_t data_size = 2143;
-    void **patch_data, **ghost_data = NULL;
+    fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by init or regrid */
-    patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
-    fclaw2d_domain_allocate_before_exchange (domain, data_size, &ghost_data);
+    e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* i am assuming that the data that we want to send exists somewhere */
     /* you can do this by an iterator instead */
@@ -704,7 +708,7 @@ usage_example (fclaw2d_domain_t * domain)
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {
-                patch_data[zz++] = NULL;        /* TODO: put this patch's data location */
+                e->patch_data[zz++] = NULL;     /* TODO: put this patch's data location */
             }
         }
     }
@@ -714,14 +718,12 @@ usage_example (fclaw2d_domain_t * domain)
     while (1)
     {
         /* whenever needed in time stepping for the current grid layout */
-        fclaw2d_domain_ghost_exchange (domain, data_size, patch_data,
-                                       ghost_data);
+        fclaw2d_domain_ghost_exchange (domain, e);
 
         /* use received data at will;
            index ghost_data[i] with i in [0, domain->num_ghost_patches[ */
     }
 
     /* we're about to regrid or terminate the program */
-    fclaw2d_domain_free_after_exchange (domain, &ghost_data);
-    P4EST_FREE (patch_data);
+    fclaw2d_domain_free_after_exchange (domain, e);
 }

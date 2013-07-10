@@ -366,51 +366,58 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
 void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
                                           void ***patch_data);
 
+/** Data structure for storing allocated data for parallel exchange. */
+typedef struct fclaw2d_domain_exchange
+{
+    size_t data_size;
+    /*
+       One pointer per processor-local exchange patch in order, for a total
+       count of domain->num_exchange_patches.  This applies precisely to local
+       patches that touch the parallel boundary from the inside, i.e., if
+       (flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY).
+     */
+    void **patch_data;
+    /*
+       Array of domain->num_ghost_patches many void pointers, each pointing to
+       exactly data_size bytes of memory that can be read from by forestclaw
+       after each fclaw2d_domain_parallel_exchange.
+     */
+    void **ghost_data;
+}
+fclaw2d_domain_exchange_t;
+
 /** Allocate buffer to hold the data from off-processor patches.
- * This function will allocate domain->num_ghost_patches many pointers.
  * Free this by fclaw2d_domain_free_after_exchange before regridding.
  * \param [in] domain           The domain is not modified.
  * \param [in] data_size        Number of bytes per patch to exchange.
- * \param [in,out] ghost_data   Address of an array of void pointers.
- *                              Data is allocated by this function.  After the
- *                              call, *ghost_data holds an array of
-                                domain->num_exchange_patches many pointers,
- *                              each pointing to exactly data_size bytes of
- *                              memory that can be read from by forestclaw
- *                              after every fclaw2d_domain_parallel_exchange.
- *                              *ghost_data must be NULL before the call.
+ * \return                      Allocated data structure.
+ *                              The pointers in patch_data[i] need to be set
+ *                              after this call by forestclaw.
  */
-void fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
-                                              size_t data_size,
-                                              void ***ghost_data);
+fclaw2d_domain_exchange_t
+    * fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
+                                               size_t data_size);
 
 /** Exchange data for parallel ghost neighbors.
- * This function gathers data from parallel neighbor (ghost) patches.
+ * This function receives data from parallel neighbor (ghost) patches.
  * It can be called multiple times on the same allocated buffers.
  * We assume that the data size for all patches is the same.
  * \param [in] domain           Used to access forest and ghost metadata.
  *                              #(sent patches) is domain->num_exchange_patches.
  *                              #(received patches) is domain->num_ghost_patches.
- * \param [in] data_size        Number of bytes per patch to transfer.
- * \param [in] patch_data       One pointer per processor-local exchange patch in
- *                              order. This only applies to local patches that
- *                              touch the parallel boundary from the inside, i.e.,
- *                              if (flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY).
- * \param [in,out] ghost_data   One pointer per off-processor patch as output.
- *                              The memory must be pre-allocated.
+ * \param [in] e                Allocated buffers whose e->patch_data[i] pointers
+ *                              must have been set properly by forestclaw.
  */
 void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
-                                       size_t data_size,
-                                       void **patch_data, void **ghost_data);
+                                       fclaw2d_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.
  * \param [in] domain           The domain is not modified.
- * \param [in,out] ghost_data   Address of an array of void pointers to free.
- *                              *ghost_data will be NULL after the call.
+ * \param [in] e                Allocated buffers.
  */
 void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
-                                         void ***ghost_data);
+                                         fclaw2d_domain_exchange_t * e);
 
 #ifdef __cplusplus
 #if 0
