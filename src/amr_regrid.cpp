@@ -255,6 +255,10 @@ void regrid(fclaw2d_domain_t **domain)
         // Repartition for load balancing
         repartition_domain(domain);
 
+        // get ghost patches for this processor
+        // setup_ghost_patches(domain);
+
+
 #if 0
         // allocate memory for parallel transfor of patches
         // use data size (in bytes per patch) below.

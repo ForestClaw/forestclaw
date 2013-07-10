@@ -143,3 +143,45 @@ void repartition_domain(fclaw2d_domain_t** domain)
     // free the data that was used in the parallel transfer of patches
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
 }
+
+
+#if 0
+static
+void cb_pack_patches_for_ghost_exchange(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx,
+                                        int this_patch_idx,
+                                        void *user)
+{
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    fclaw2d_patch_t **patch_data = (fclaw2d_patch_t**) &((void*) user)[patch_num];
+
+    if (this_patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+    {
+        patch_data = this_patch;     /* TODO: put this patch's data location */
+    }
+}
+
+
+void setup_parallel_ghost_patches(fclaw2d_domain_t* domain)
+{
+    size_t data_size =  pack_size(domain);
+    void **patch_data, **ghost_data = NULL;
+
+    /* we just created a grid by init or regrid */
+    patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
+    fclaw2d_domain_iterate_patches(domain, cb_pack_patches_for_ghost_exchange,
+                                   (void *) patch_data);
+
+    fclaw2d_domain_allocate_before_exchange (domain, data_size, &ghost_data);
+
+    fclaw2d_domain_ghost_exchange (domain, data_size, patch_data, ghost_data);
+
+    // Do time stepping...
+
+    /* we're about to regrid or terminate the program */
+    fclaw2d_domain_free_after_exchange (domain, &ghost_data);
+    P4EST_FREE (patch_data);
+}
+#endif
