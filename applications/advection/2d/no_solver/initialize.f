@@ -1,7 +1,8 @@
-      subroutine initialize(mx,my,meqn,mbc,xlower,ylower,dx,dy,q)
+      subroutine initialize(mx,my,meqn,mbc,xlower,ylower,
+     &      dx,dy,q,mpirank)
       implicit none
 
-      integer maxmx, maxmy, meqn, mbc, mx, my
+      integer maxmx, maxmy, meqn, mbc, mx, my, mpirank
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
@@ -20,7 +21,11 @@
 
                call cellave2(xlow,ylow,dx,dy,wl)
 
-               q(i,j,mq) = wl
+               if (mq .eq. 1) then
+                  q(i,j,mq) = wl
+               else
+                  q(i,j,mq) = mpirank
+               endif
             enddo
          enddo
       enddo

@@ -36,7 +36,7 @@ extern "C"
                      const int& mbc,
                      const double& xlower, const double& ylower,
                      const double& dx, const double& dy,
-                     double *q);
+                     double *q, const int& mpirank);
 
     void no_solver_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                    const int& meqn, const double& xlower,

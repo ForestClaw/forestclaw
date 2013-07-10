@@ -72,7 +72,9 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     // Pointers needed for the fortran
     double* q = cp->q();
 
-    initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q);
+    int mpirank = domain->mpirank;
+
+    initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,mpirank);
 }
 
 double no_solver_update(fclaw2d_domain_t *domain,
