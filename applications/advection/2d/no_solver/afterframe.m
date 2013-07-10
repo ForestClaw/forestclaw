@@ -2,7 +2,15 @@ s = 1e-2;
 axis([-1-s 1+s -1-s 1+s])
 daspect([1 1 1]);
 axis off;
-yrbcolormap;
+
+if (mq == 1)
+    yrbcolormap;
+    caxis([0 1]);
+else
+    cm = [1 0 0; 0 1 0; 0 0 1];
+    colormap(cm);
+    caxis([0 2]);
+end;
 
 showgridlines([1:4]);
 showpatchborders;
