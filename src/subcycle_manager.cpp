@@ -38,7 +38,8 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     m_initial_time = a_initial_t; // Time at start of subcycling.
     m_refratio = gparms->refratio;
 
-    /* query the levels that exist on this processor */
+    /* query the levels that exist in the domain as a whole,
+     * regardless of the levels on this processor */
     m_minlevel = domain->global_minlevel;
     m_maxlevel = domain->global_maxlevel;
     m_levels.resize(m_maxlevel + 1);
