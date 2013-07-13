@@ -647,15 +647,21 @@ fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
                                          size_t data_size)
 {
     int i;
+    char *m;
     fclaw2d_domain_exchange_t *e;
 
     e = P4EST_ALLOC (fclaw2d_domain_exchange_t, 1);
     e->data_size = data_size;
     e->patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
     e->ghost_data = P4EST_ALLOC (void *, domain->num_ghost_patches);
+    e->ghost_contiguous_memory = m = P4EST_ALLOC (char,
+                                                  (size_t)
+                                                  domain->num_ghost_patches *
+                                                  data_size);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
-        e->ghost_data[i] = (void *) P4EST_ALLOC (char, data_size);
+        e->ghost_data[i] = m;
+        m += data_size;
     }
 
     return e;
@@ -665,25 +671,19 @@ void
 fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                                fclaw2d_domain_exchange_t * e)
 {
-    /* This function does nothing in serial or without data. */
-    if (e->data_size == 0)
-    {
-        return;
-    }
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
 
-    /* TODO: implement parallel version */
+    p4est_ghost_exchange_custom_data (wrap->p4est, ghost, e->data_size,
+                                      e->patch_data,
+                                      e->ghost_contiguous_memory);
 }
 
 void
 fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e)
 {
-    int i;
-
-    for (i = 0; i < domain->num_ghost_patches; ++i)
-    {
-        P4EST_FREE (e->ghost_data[i]);
-    }
+    P4EST_FREE (e->ghost_contiguous_memory);
     P4EST_FREE (e->ghost_data);
     P4EST_FREE (e->patch_data);
     P4EST_FREE (e);

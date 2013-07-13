@@ -392,6 +392,12 @@ typedef struct fclaw2d_domain_exchange
        after each fclaw2d_domain_parallel_exchange.
      */
     void **ghost_data;
+    /*
+       Memory where the ghost patch data actually lives.
+       The above array ghost_data points into this memory.
+       It will not be necessary to dereference this memory explicitly.
+     */
+    char *ghost_contiguous_memory;
 }
 fclaw2d_domain_exchange_t;
 
