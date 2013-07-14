@@ -286,7 +286,8 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     P4EST_ASSERT (domain->pp_owned);
-    if (p4est_wrap_partition (wrap))
+    /* TODO:  This is still switched off.  Debug what we have first. */
+    if (p4est_wrap_partition (wrap, 0))
     {
         domain->pp_owned = 0;
         return fclaw2d_domain_new (wrap);
