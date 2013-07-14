@@ -56,7 +56,6 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     fclaw2d_patch_t *patch;
     fclaw2d_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
 
-
 #ifdef P4EST_DEBUG
     memset (currentbylevel, 0,
             sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
