@@ -282,7 +282,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_partition (fclaw2d_domain_t * domain)
+fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 

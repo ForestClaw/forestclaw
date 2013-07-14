@@ -177,6 +177,9 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
 
 void repartition_domain(fclaw2d_domain_t** domain)
 {
+    // will need to access the subcyle switch
+    const amr_options_t *gparms = get_domain_parms(*domain);
+
     // allocate memory for parallel transfor of patches
     // use data size (in bytes per patch) below.
     size_t data_size = pack_size(*domain);
@@ -186,10 +189,10 @@ void repartition_domain(fclaw2d_domain_t** domain)
     // For all (patch i) { pack its numerical data into patch_data[i] }
     fclaw2d_domain_iterate_patches(*domain, cb_pack_patches,(void *) patch_data);
 
-
     // this call creates a new domain that is valid after partitioning
     // and transfers the data packed above to the new owner processors
-    fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
+    fclaw2d_domain_t *domain_partitioned =
+        fclaw2d_domain_partition (*domain, gparms->subcycle ? 1 : 0);
     fclaw_bool have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)

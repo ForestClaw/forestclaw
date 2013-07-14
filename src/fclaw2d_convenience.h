@@ -66,10 +66,16 @@ fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
  *                              It stays alive because it is needed to
  *                              transfer numerical values to the new partition.
  *                              If partitioned, no queries allowed afterwards.
+ * \param [in] weight_exponent  The patches are weighted with an integer factor
+ *                              2 ** (level * exponent).  If the exponent is 0,
+ *                              all patches have equal weight.  If it is 1,
+ *                              smaller patches are considered more expensive
+ *                              by a factor two per level increase.
  * \return                      Partitioned domain if different, or NULL.
  *                              The return value is identical across all ranks.
  */
-fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain);
+fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain,
+                                            int weight_exponent);
 
 /** Clean up after fclaw2d_domain_partition returned non-NULL.
  * \param [in,out] domain       Current domain that was partitioned.
