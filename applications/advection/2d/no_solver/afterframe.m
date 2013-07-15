@@ -14,8 +14,16 @@ else
   npmax = 10;
   cm = rand(npmax,3);
   colormap(cm);
-  colorbar;
   caxis([1 npmax+1]);
+
+  % Fix colorbar
+  colorbar;
+  o = findobj('Tag','Colorbar');
+  set(o,'ytick',(1:(np+1)) + 0.5);
+  set(o,'yticklabel',(1:np));
+  set(o,'ylim',[qmin+1 qmax+2]);
+  set(o,'ticklength',[0 0])
+  set(o,'fontsize',16,'fontweight','bold')
 end
 
 setpatchborderprops(1:7,'linewidth',2);
