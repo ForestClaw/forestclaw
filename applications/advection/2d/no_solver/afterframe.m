@@ -6,16 +6,15 @@ axis off;
 if (mq == 1)
     yrbcolormap;
     caxis([0 1]);
-else
-    cm = [1 0 0; 0 1 0; 0 0 1];
-    colormap(cm);
-    caxis([0 2]);
+  else
+    cm = colorcube;
+    colormap(cm(1:end-7,:));
+    colorbar;
 end;
 
 showgridlines([1:4]);
 showpatchborders;
 setpatchborderprops(1:7,'linewidth',2);
-caxis([0 1]);
 
 view(2);
 
