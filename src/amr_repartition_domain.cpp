@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
+
+
 static
 fclaw2d_domain_exchange_t* setup_parallel_ghost_patches(fclaw2d_domain_t* domain)
 {
@@ -218,16 +220,25 @@ void repartition_domain(fclaw2d_domain_t** domain)
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
 }
 
+static
+void cb_proc_info (fclaw2d_domain_t *domain,
+                   fclaw2d_patch_t *this_patch,
+                   int this_block_idx,
+                   int this_patch_idx,
+                   void *user)
+{
+    int mpirank = domain->mpirank;
+    int level = this_patch->level;
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int64_t patch_num =
+        domain->global_num_patches_before +
+        (int64_t) (this_block->num_patches_before + this_patch_idx);
+    printf("%5d %5d %5d %5d\n",mpirank, (int) patch_num,level,this_patch_idx);
+}
 
 
-/* Put this whereever parallel exchanges are needed
 
-    fclaw2d_domain_ghost_exchange (domain, e);
-
-*/
-
-
-/*
-
-    fclaw2d_domain_free_after_exchange (domain, e);
-*/
+void amr_print_patches_and_procs(fclaw2d_domain_t *domain)
+{
+        fclaw2d_domain_iterate_patches(domain, cb_proc_info,(void *) NULL);
+}

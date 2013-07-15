@@ -108,6 +108,8 @@ fclaw2d_regrid_functions_t* get_regrid_functions(fclaw2d_domain_t *domain);
 void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
 void repartition_domain(fclaw2d_domain_t** domain);
 void build_initial_domain(fclaw2d_domain_t* domain);
+void amr_print_patches_and_procs(fclaw2d_domain_t *domain);
+
 
 
 /* ------------------------------------------------------------------------- */

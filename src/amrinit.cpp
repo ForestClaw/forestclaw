@@ -119,12 +119,15 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
 
+            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+
+            /*
             // Create new ClawPatch and assign patch pointer to it.
-            // set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
+            set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
 
             // Do one-time setup on new patch
-            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-            // (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
+            (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
+            */
 
 
             // This is only used here, since only in the initial grid layout do we
@@ -157,11 +160,7 @@ void amrinit (fclaw2d_domain_t **domain)
 
     set_domain_time(*domain,t);
 
-    int minlevel = gparms->minlevel;
-    int maxlevel = gparms->maxlevel;
-
     build_initial_domain(*domain);
-
 
 #if 0
     init_block_and_patch_data(*domain);  /* Allocate block and patch data */
@@ -174,6 +173,9 @@ void amrinit (fclaw2d_domain_t **domain)
     }
 #endif
 
+    int minlevel = gparms->minlevel;
+    int maxlevel = gparms->maxlevel;
+
     // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
@@ -185,6 +187,7 @@ void amrinit (fclaw2d_domain_t **domain)
     {
         // Tag each level, one at at time, and rebuild domain after each
         // level.
+
 
         fclaw2d_domain_iterate_level(*domain, level, cb_tag4refinement_init,
                                      (void *) NULL);
@@ -214,7 +217,20 @@ void amrinit (fclaw2d_domain_t **domain)
             *domain = new_domain;
 
             // Repartition domain to new processors.
+            if ((*domain)->mpirank == 0)
+            {
+                printf("\n\n");
+                printf("Before partitioning\n");
+                amr_print_patches_and_procs(*domain);
+            }
             repartition_domain(domain);
+
+            if ((*domain)->mpirank == 0)
+            {
+                printf("After partitioning\n\n");
+                amr_print_patches_and_procs(*domain);
+            }
+
 
 #if 0
             fclaw2d_domain_t *domain_partitioned =

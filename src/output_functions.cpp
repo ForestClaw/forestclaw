@@ -69,7 +69,10 @@ void matlab_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    if (domain->mpirank == 0)
+    {
+        printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    }
 
     // Write out header file containing global information for 'iframe'
     int meqn = gparms->meqn;
