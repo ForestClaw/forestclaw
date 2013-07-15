@@ -1,7 +1,7 @@
 # Makefile in src
 
-include $(P4EST_DIR)/etc/Makefile.p4est.mk
 include $(FORESTCLAW)/Make.defs.local
+include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
