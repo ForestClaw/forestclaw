@@ -79,7 +79,6 @@ if (cm_index)
 
   set(p,'CDataMapping','direct');  % Scale into current color map.
   set(p,'FaceColor','flat');       % Single color per cell
-
 else
   set(p,'CData',q);                % Data to use for coloring.
   set(p,'CDataMapping','scaled');  % Scale into current color map.

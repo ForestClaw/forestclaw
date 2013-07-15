@@ -8,7 +8,6 @@
 
       integer i,j, mq,m
       double precision xc,yc, qmin, qmax
-      double precision dq, dqi, dqj
 
       qmin = 100.d0
       qmax = -100.d0
@@ -20,6 +19,7 @@ c     # Refine based only on first variable in system.
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
+            xc = xlower + (i-0.5)*dx
             if (qmax - qmin .gt. 0.5d0) then
                tag_patch = 1
                return
