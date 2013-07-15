@@ -8,13 +8,13 @@ if (mq == 1)
     caxis([0 1]);
   else
     cm = colorcube;
-    colormap(cm(1:end-7,:));
+    colormap(cm(1:end-10,:));
     colorbar;
+    caxis([qmin qmax]+1);
 end;
 
-showgridlines([1:4]);
-showpatchborders;
 setpatchborderprops(1:7,'linewidth',2);
+showpatchborders;
 
 view(2);
 
@@ -31,3 +31,4 @@ if (prt)
 end;
 
 clear afterframe;
+clear setcolors;
