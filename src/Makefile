@@ -35,6 +35,7 @@ fclawobjs = \
 	fclaw2d_solvers.o \
 	fclaw2d_map.o \
         fclaw2d_p4est.o \
+	fclaw2d_vtk.o \
 	forestclaw2d.o \
 	mappings/set_maptype.o \
 	mappings/scale_rot_map.o \
