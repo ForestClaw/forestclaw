@@ -48,14 +48,6 @@ typedef fclaw_bool (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
                                                      int this_blockno,
                                                      int this_patchno);
 
-void tag4refinement_(const int& mx, const int& my, const int&mbc, const int& meqn,
-                    const double& xlower, const double& ylower, const double& dx,
-                    const double& dy, double q[], const int& initflag, int& tag_patch);
-
-void tag4coarsening_(const int& mx, const int& my, const int&mbc, const int& meqn,
-                     const double& xlower, const double& ylower, const double& dx,
-                     const double& dy, double q[], int& tag_patch);
-
 typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_domain_t* domain,
                                                  fclaw2d_patch_t *coarse_patch,
                                                  fclaw2d_patch_t* fine_patch,
@@ -76,15 +68,15 @@ typedef void (*fclaw2d_patch_copy2samesize_t)(fclaw2d_domain_t* domain,
 
 /* ------------------------------------------------------------------------- */
 
-fclaw_bool patch_tag4refinement(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx, int this_patch_idx,
-                                int initflag);
+fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag);
 
-fclaw_bool patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_blockno,
-                                int this_patchno);
+fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_blockno,
+                                      int this_patchno);
 
 /* ------------------------------------------------------------------------- */
 

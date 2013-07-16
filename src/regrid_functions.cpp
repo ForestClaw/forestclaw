@@ -44,67 +44,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     rf->f_patch_copy2samesize = &patch_copy2samesize;
 };
 
-fclaw_bool patch_tag4refinement(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx, int this_patch_idx,
-                                int initflag)
+fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno,
+                                      int patchno)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch = 0;
-    /* This is a user supplied fortran function */
-    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
+    return fclaw_true;  /* don't coarsen */
 }
 
-fclaw_bool patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int blockno,
-                                int patchno)
+fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch = 1;  // == 0 or 1
-
-    /* This is a user supplied fortran function */
-    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
+    return fclaw_false;  /* don't coarsen */
 }
 
 
@@ -195,8 +148,8 @@ void initialize_regrid_functions(fclaw2d_regrid_functions_t* regrid_functions)
 {
     fclaw2d_regrid_functions_t *rf = regrid_functions;
 
-    rf->f_patch_tag4refinement = &patch_tag4refinement;
-    rf->f_patch_tag4coarsening = &patch_tag4coarsening;
+    rf->f_patch_tag4refinement = &patch_tag4refinement_dummy;
+    rf->f_patch_tag4coarsening = &patch_tag4coarsening_dummy;
     rf->f_patch_interpolate2fine = &patch_interpolate2fine;
     rf->f_patch_average2coarse = &patch_average2coarse;
     rf->f_patch_copy2samesize = &patch_copy2samesize;

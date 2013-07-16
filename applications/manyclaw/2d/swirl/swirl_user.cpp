@@ -47,6 +47,9 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
     sf->f_patch_single_step_update = &swirl_patch_single_step_update;
 
+    link_regrid_functions(domain,swirl_patch_tag4refinement,
+                          swirl_patch_tag4coarsening);
+
     amr_manyclaw_link_to_clawpatch();
 }
 
@@ -145,6 +148,70 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                        this_patch_idx,t,dt);
     return maxcfl;
 }
+
+fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    int tag_patch = 0;
+    /* This is a user supplied fortran function */
+    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    return tag_patch == 1;
+}
+
+fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno,
+                                      int patchno)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    int tag_patch = 1;  // == 0 or 1
+
+    /* This is a user supplied fortran function */
+    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    return tag_patch == 0;
+}
+
 
 
 #ifdef __cplusplus
