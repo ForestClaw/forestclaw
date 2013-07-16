@@ -162,17 +162,6 @@ void amrinit (fclaw2d_domain_t **domain)
 
     build_initial_domain(*domain);
 
-#if 0
-    init_block_and_patch_data(*domain);  /* Allocate block and patch data */
-
-    int num = (*domain)->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &(*domain)->blocks[i];
-        set_block_data(block,gparms->mthbc);
-    }
-#endif
-
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
@@ -187,7 +176,6 @@ void amrinit (fclaw2d_domain_t **domain)
     {
         // Tag each level, one at at time, and rebuild domain after each
         // level.
-
 
         fclaw2d_domain_iterate_level(*domain, level, cb_tag4refinement_init,
                                      (void *) NULL);
@@ -230,25 +218,6 @@ void amrinit (fclaw2d_domain_t **domain)
                 printf("After partitioning\n\n");
                 amr_print_patches_and_procs(*domain);
             }
-
-
-#if 0
-            fclaw2d_domain_t *domain_partitioned =
-                fclaw2d_domain_partition (*domain);
-            if (domain_partitioned != NULL)
-            {
-                rebuild_domain(*domain,new_domain);
-
-                // TODO: write a function to transfer values in parallel */
-
-                /* then the old domain is no longer necessary */
-                amrreset(domain);
-                *domain = domain_partitioned;
-
-                /* internal clean up */
-                fclaw2d_domain_complete(*domain);
-            }
-#endif
         }
         else
         {
