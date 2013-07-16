@@ -159,6 +159,9 @@ void cb_pack_patches(fclaw2d_domain_t *domain,
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 
+    int patch_num_global = patch_num + domain->global_num_patches_before;
+    printf("Packing patch %d on proc %d\n",patch_num_global,domain->mpirank);
+
     pack_clawpatch(this_patch,patch_data);
 }
 
@@ -172,6 +175,9 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
+
+    int patch_num_global = patch_num + domain->global_num_patches_before;
+    printf("Unpacking patch %d n proc %d\n",patch_num_global,domain->mpirank);
 
     unpack_clawpatch(domain,this_patch,this_block_idx,this_patch_idx,
                      patch_data);
