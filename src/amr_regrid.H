@@ -106,7 +106,11 @@ void patch_copy2samesize(fclaw2d_domain_t* domain, fclaw2d_patch_t *old_patch,
 fclaw2d_regrid_functions_t* get_regrid_functions(fclaw2d_domain_t *domain);
 
 void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
-void repartition_domain(fclaw2d_domain_t** domain);
+
+/** Repartition all patches in parallel.
+ * \param [in] mode             A level for amrinit, -1 for running simulation.
+ */
+void repartition_domain(fclaw2d_domain_t** domain, int mode);
 void build_initial_domain(fclaw2d_domain_t* domain);
 
 

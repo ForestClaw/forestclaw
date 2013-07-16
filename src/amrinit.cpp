@@ -147,6 +147,8 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 // Initialize a base level of grids
 void amrinit (fclaw2d_domain_t **domain)
 {
+    char basename[BUFSIZ];
+
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
 
@@ -179,6 +181,12 @@ void amrinit (fclaw2d_domain_t **domain)
                                  (void *) NULL);
 
     set_phys_bc(*domain,minlevel,t);
+
+    // VTK output during amrinit
+    if (gparms->vtkout & 1) {
+        snprintf (basename, BUFSIZ, "init_level_%02d", minlevel);
+        amr_output_write_vtk (*domain, basename);
+    }
 
     // Refine as needed, one level at a time.
     for (int level = minlevel; level < maxlevel; level++)
@@ -213,8 +221,14 @@ void amrinit (fclaw2d_domain_t **domain)
             amrreset(domain);
             *domain = new_domain;
 
+            // VTK output during amrinit
+            if (gparms->vtkout & 1) {
+                snprintf (basename, BUFSIZ, "init_level_%02d_adapt", level);
+                amr_output_write_vtk (*domain, basename);
+            }
+
             // Repartition domain to new processors.
-            repartition_domain(domain);
+            repartition_domain(domain, level);
 
 #if 0
             fclaw2d_domain_t *domain_partitioned =

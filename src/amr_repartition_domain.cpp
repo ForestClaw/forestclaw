@@ -175,8 +175,10 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
                      patch_data);
 }
 
-void repartition_domain(fclaw2d_domain_t** domain)
+void repartition_domain(fclaw2d_domain_t** domain, int mode)
 {
+    char basename[BUFSIZ];
+
     // will need to access the subcyle switch
     const amr_options_t *gparms = get_domain_parms(*domain);
 
@@ -209,6 +211,12 @@ void repartition_domain(fclaw2d_domain_t** domain)
         /* then the old domain is no longer necessary */
         amrreset(domain);
         *domain = domain_partitioned;
+
+        // VTK output during amrinit
+        if (mode >= 0 && gparms->vtkout & 1) {
+            snprintf (basename, BUFSIZ, "init_level_%02d_partition", mode);
+            amr_output_write_vtk (*domain, basename);
+        }
 
         /* internal clean up */
         fclaw2d_domain_complete(*domain);

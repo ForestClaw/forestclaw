@@ -58,6 +58,9 @@ struct amr_options
     double *tout;
     int nstep;
 
+    /* VTK output control */
+    int vtkout;
+
     int verbosity;
 
     /* wave prop parameters */
