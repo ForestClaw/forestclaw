@@ -1,4 +1,4 @@
-      subroutine tag_for_refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+      subroutine tag4refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
      &      q,init_flag, tag_patch)
       implicit none
 
@@ -40,7 +40,7 @@ c     # Refine based only on first variable in system.
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag_for_coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+      subroutine tag4coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
      &      qcoarsened, tag_patch)
       implicit none
 
