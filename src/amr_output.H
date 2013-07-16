@@ -75,6 +75,14 @@ struct fclaw2d_output_functions
     fclaw2d_patch_write_output_t   f_patch_write_output;
 };
 
+/* --------------------------------------------------------------------
+ * Write a one-stop function that creates a big VTK file in parallel.
+ * The file extension is basename.vtu.  It contains per-patch data for
+ * mpirank, blockno, and global patchno, and the meqn-vector data.
+ * Function will be refactored into our callback structure eventually.
+ * -------------------------------------------------------------------- */
+
+void amr_output_write_vtk (fclaw2d_domain_t *domain, const char *basename);
 
 #ifdef __cplusplus
 #if 0

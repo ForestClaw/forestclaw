@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "clawpack_fort.H"
 #include "amr_output.H"
+#include <fclaw2d_vtk.h>
 
 static
 void cb_amrout(fclaw2d_domain_t *domain,
@@ -72,4 +73,86 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
 
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
+}
+
+static void
+amr_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
+                              fclaw2d_patch_t * this_patch,
+                              int this_block_idx, int this_patch_idx,
+                              char *a)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int mx = gparms->mx;
+    const int my = gparms->my;
+
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    const double xlower = cp->xlower();
+    const double ylower = cp->ylower();
+    const double dx = cp->dx();
+    const double dy = cp->dy();
+
+    // Enumerate point coordinates in the patch
+    float * f = (float *) a;
+    int i, j;
+    for (j = 0; j <= my; ++j)
+    {
+       const float y = ylower + j * dy;
+       for (i = 0; i <= mx; ++i)
+       {
+           *f++ = xlower + i * dx;
+           *f++ = y;
+           *f++ = 0.;
+       }
+    }
+}
+
+static void
+amr_output_vtk_value_cb (fclaw2d_domain_t * domain,
+                         fclaw2d_patch_t * this_patch,
+                         int this_block_idx, int this_patch_idx, char *a)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    const int mx = gparms->mx;
+    const int my = gparms->my;
+    const int mbc = gparms->mbc;
+    const int meqn = gparms->meqn;
+    const int xlane = mx + 2 * mbc;
+    const int ylane = my + 2 * mbc;
+
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    const double *q = cp->q();
+
+    // Enumerate equation data in the patch
+    float * f = (float *) a;
+    int i, j, k;
+    for (j = 0; j < my; ++j)
+    {
+        for (i = 0; i < mx; ++i)
+        {
+            for (k = 0; k < meqn; ++k)
+            {
+                *f++ = (float) q[(k * ylane + j + mbc) * xlane + i + mbc];
+            }
+        }
+    }
+}
+
+void
+amr_output_write_vtk (fclaw2d_domain_t *domain, const char *basename)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_vtk_write_file (domain, basename, gparms->mx, gparms->my,
+                            gparms->meqn, amr_output_vtk_coordinate_cb,
+                            amr_output_vtk_value_cb);
 }
