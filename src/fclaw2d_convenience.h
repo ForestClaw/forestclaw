@@ -56,7 +56,7 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  *                              project numerical values to the adapted domain.
  *                              If adapted, no queries are allowed afterwards.
  * \return                      Adapted domain if refinement occurred, or NULL.
- *                              The return value is identical across all ranks.
+ *                              The return status is identical across all ranks.
  */
 fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 
@@ -72,7 +72,7 @@ fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
  *                              smaller patches are considered more expensive
  *                              by a factor two per level increase.
  * \return                      Partitioned domain if different, or NULL.
- *                              The return value is identical across all ranks.
+ *                              The return status is identical across all ranks.
  */
 fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain,
                                             int weight_exponent);

@@ -146,7 +146,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
         block->minlevel = tree_minlevel;
         block->maxlevel = tree_maxlevel;
     }
-    P4EST_ASSERT (local_num_patches == (int) wrap->p4est->local_num_quadrants);
+    P4EST_ASSERT (local_num_patches ==
+                  (int) wrap->p4est->local_num_quadrants);
     domain->local_num_patches = local_num_patches;
     domain->local_minlevel = local_minlevel;
     domain->local_maxlevel = local_maxlevel;
@@ -286,7 +287,7 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     P4EST_ASSERT (domain->pp_owned);
-    /* TODO:  This is still switched off.  Debug what we have first. */
+    /* TODO:  The weighting is still off.  Debug what we have first. */
     if (p4est_wrap_partition (wrap, 0))
     {
         domain->pp_owned = 0;
@@ -358,7 +359,6 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
 {
     fclaw2d_domain_list_neighbors_t *ln = user;
     fclaw2d_patch_relation_t fnt;
-    int hasnb;
     int faceno, cornerno;
     int rproc[2], rblockno, rpatchno[2], rfaceno;
 
@@ -377,9 +377,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
     }
     for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
     {
-        hasnb = fclaw2d_patch_corner_neighbors (domain, block_no, patch_no,
-                                                cornerno, rproc, &rblockno,
-                                                rpatchno, &fnt);
+        (void) fclaw2d_patch_corner_neighbors (domain, block_no, patch_no,
+                                               cornerno, rproc, &rblockno,
+                                               rpatchno, &fnt);
         P4EST_LOGF (ln->lp, "Block %d patch %d corner %d neighbor %d\n",
                     block_no, patch_no, cornerno, fnt);
     }
