@@ -27,14 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_waveprop.H"
 #include "swirl_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -171,11 +163,3 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
