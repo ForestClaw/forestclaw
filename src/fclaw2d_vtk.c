@@ -102,7 +102,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
     retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                "blockno,patchno\">\n") < 0;
+                                "blockno,patchno\" Vectors=\"meqn\">\n") < 0;
     retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
                                 "Name=\"mpirank\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
@@ -117,6 +117,11 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 "Name=\"patchno\" format=\"appended\" "
                                 "offset=\"%lld\">\n", s->inttype,
                                 (long long) s->offset_patchno) < 0;
+    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "    <DataArray type=\"Float32\" "
+                                "Name=\"meqn\" NumberOfComponents=\"%d\" "
+                                "format=\"appended\" offset=\"%lld\">\n",
+                                s->meqn, (long long) s->offset_meqn) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </CellData>\n") < 0;
     retval = retval || fprintf (file, "   <PointData>\n") < 0;
@@ -307,6 +312,20 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
+write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+               int blockno, int patchno, void *user)
+{
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    int mpiret;
+    MPI_Status mpistatus;
+
+    s->value_cb (domain, patch, blockno, patchno, s->buf);
+    mpiret = MPI_File_write (s->mpifile, s->buf, s->psize_meqn, MPI_BYTE,
+                             &mpistatus);
+    SC_CHECK_MPI (mpiret);
+}
+
+static void
 fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
                          fclaw2d_patch_callback_t cb)
@@ -388,6 +407,8 @@ fclaw2d_vtk_write_data (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
                              write_blockno_cb);
     fclaw2d_vtk_write_field (domain, s, s->offset_patchno, s->psize_patchno,
                              write_patchno_cb);
+    fclaw2d_vtk_write_field (domain, s, s->offset_meqn, s->psize_meqn,
+                             write_meqn_cb);
 
     /* collectively close the file */
     mpiret = MPI_File_close (&s->mpifile);
