@@ -18,23 +18,7 @@ c        # setaux should be used for all time.
          return
       endif
 
-      vt = cos(pi2*(time+dt/2.d0)/tperiod)
-
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-c           # coordinates of lower left corner of grid cell:
-            xll = xlower + (i-1)*dx
-            yll = ylower + (j-1)*dy
-
-c           # difference stream function psi to get normal velocities:
-            aux(i,j,1) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
-            aux(i,j,2) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
-c
-c           # multiply by time-factor:
-            aux(i,j,1) = vt * aux(i,j,1)
-            aux(i,j,2) = vt * aux(i,j,2)
-         enddo
-      enddo
+C     No aux array
 
       return
       end

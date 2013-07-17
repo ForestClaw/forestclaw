@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_manyclaw.H"
 #include "amr_options.h"
 
-#include "swirl_user.H"
+#include "simple_user.H"
 
 int
 main (int argc, char **argv)
@@ -93,14 +93,14 @@ main (int argc, char **argv)
      Define the problem setup and solvers
      --------------------------------------------------------------- */
 
-  link_problem_setup(domain,swirl_problem_setup);
+  link_problem_setup(domain,simple_problem_setup);
 
   /* Using user defined functions just to demonstrate how one might setup
      something that depends on more than one solver (although only one is used
      here) */
-  swirl_link_solvers(domain);
+  simple_link_solvers(domain);
 
-  /* Plain vanilla manyclaw algorithm.  This version doesn't require swirl_user.{H,cpp} */
+  /* Plain vanilla manyclaw algorithm.  This version doesn't require simple_user.{H,cpp} */
   /* amr_manyclaw_link_solvers(domain); */
 
   /* ---------------------------------------------------------------

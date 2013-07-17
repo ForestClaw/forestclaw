@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_manyclaw.H"
-#include "swirl_user.H"
+#include "simple_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -35,17 +35,17 @@ extern "C"
 #endif
 #endif
 
-void swirl_link_solvers(fclaw2d_domain_t *domain)
+void simple_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
 
-    sf->f_patch_setup              = &swirl_patch_setup;
-    sf->f_patch_initialize         = &swirl_patch_initialize;
-    sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
-    sf->f_patch_single_step_update = &swirl_patch_single_step_update;
+    sf->f_patch_setup              = &simple_patch_setup;
+    sf->f_patch_initialize         = &simple_patch_initialize;
+    sf->f_patch_physical_bc        = &simple_patch_physical_bc;
+    sf->f_patch_single_step_update = &simple_patch_single_step_update;
 
     amr_manyclaw_link_to_clawpatch();
 }
@@ -66,14 +66,14 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
    amr_manyclaw_src2(...)     --> src2_(...)
 
    The routines below are linked to ForestClaw routines with a call to
-   'swirl_link_solvers'
+   'simple_link_solvers'
 
-   User defined 'swirl' routines            linked to ForestClaw as :
+   User defined 'simple' routines            linked to ForestClaw as :
    -------------------------------------------------------------------
-   swirl_patch_setup(...)               --> patch_setup(...) (call setaux, etc)
-   swirl_patch_initialize(...)          --> patch_initialize(...)  (call qinit, etc)
-   swirl_patch_physical_bc(...)         --> patch_physical_bc(...) (call bc2, etc)
-   swirl_patch_single_step_update(...)  --> patch_single_step_update(...)
+   simple_patch_setup(...)               --> patch_setup(...) (call setaux, etc)
+   simple_patch_initialize(...)          --> patch_initialize(...)  (call qinit, etc)
+   simple_patch_physical_bc(...)         --> patch_physical_bc(...) (call bc2, etc)
+   simple_patch_single_step_update(...)  --> patch_single_step_update(...)
                                             (call b4step2, step2, src2, etc)
 
 
@@ -81,21 +81,21 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
    It is not done above because this is not technically part of a 'solver'. But the
    user could call a solver dependent function here.
 
-   User defined 'swirl' routine            linked to ForestClaw as :
+   User defined 'simple' routine            linked to ForestClaw as :
    -------------------------------------------------------------------
-   swirl_problem_setup(...)             --> problem_setup(...) (call setprob, etc)
+   simple_problem_setup(...)             --> problem_setup(...) (call setprob, etc)
 
 
    --------------------------------------------------------------------------------- */
 
-void swirl_problem_setup(fclaw2d_domain_t* domain)
+void simple_problem_setup(fclaw2d_domain_t* domain)
 {
     /* This is called once at the start of the run */
     amr_manyclaw_setprob(domain);
 }
 
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
+void simple_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
@@ -106,7 +106,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
 
 
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+void simple_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -116,7 +116,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
 }
 
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
+void simple_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -130,7 +130,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
 }
 
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+double simple_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
