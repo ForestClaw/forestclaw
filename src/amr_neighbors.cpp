@@ -30,6 +30,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Several routines that interact with p4est to get neighbor and corner information,
 // and to determine if we are at physical boundaries or not.
 // ------------------------------------------------------------------------------
+
+void update_ghost_patches(fclaw2d_domain_t *domain)
+{
+    /* This patch has to put its boundary patch data into its communication array */
+    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+
+    /* Now it has to build off-processor patches with new data */
+}
+
+
+
+
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,

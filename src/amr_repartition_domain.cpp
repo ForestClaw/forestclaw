@@ -28,10 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
+static build_boundary_patches(fclaw2d_domain_t* domain)
+{
 
+}
 
 static
-fclaw2d_domain_exchange_t* setup_parallel_ghost_patches(fclaw2d_domain_t* domain)
+fclaw2d_domain_exchange_t* store_boundary_patch_data(fclaw2d_domain_t* domain)
 {
     int nb, np;
     size_t zz;
