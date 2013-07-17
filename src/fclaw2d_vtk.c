@@ -66,7 +66,6 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     }
 
     /* stop writing after first unsuccessful operation */
-    /* TODO: change position to float64 */
     retval = 0;
     retval = retval || fprintf (file, "<?xml version=\"1.0\"?>\n") < 0;
     retval = retval || fprintf (file, "<VTKFile type=\"UnstructuredGrid\" "
@@ -78,7 +77,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 (long long) s->global_num_points,
                                 (long long) s->global_num_cells) < 0;
     retval = retval || fprintf (file, "   <Points>\n") < 0;
-    retval = retval || fprintf (file, "    <DataArray type=\"Float32\" "
+    retval = retval || fprintf (file, "    <DataArray type=\"Float64\" "
                                 "Name=\"Position\" NumberOfComponents=\"3\" "
                                 "format=\"appended\" offset=\"%lld\">\n",
                                 (long long) s->offset_position) < 0;
@@ -470,7 +469,7 @@ fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
     s->value_cb = value_cb;
 
     /* compute data size per patch for the various VTK data arrays */
-    s->psize_position = s->points_per_patch * 3 * sizeof (float);
+    s->psize_position = s->points_per_patch * 3 * sizeof (double);
     s->psize_connectivity = s->cells_per_patch * 4 * s->intsize;
     s->psize_offsets = s->cells_per_patch * s->intsize;
     s->psize_types = s->cells_per_patch * 1;

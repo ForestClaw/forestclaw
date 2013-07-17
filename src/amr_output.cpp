@@ -97,16 +97,16 @@ amr_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
     const double dy = cp->dy();
 
     // Enumerate point coordinates in the patch
-    float * f = (float *) a;
+    double * d = (double *) a;
     int i, j;
     for (j = 0; j <= my; ++j)
     {
-       const float y = ylower + j * dy;
+       const double y = ylower + j * dy;
        for (i = 0; i <= mx; ++i)
        {
-           *f++ = xlower + i * dx;
-           *f++ = y;
-           *f++ = 0.;
+           *d++ = xlower + i * dx;
+           *d++ = y;
+           *d++ = 0.;
        }
     }
 }
