@@ -12,10 +12,7 @@ FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 exampleobjs = \
 	ghost_twopatch.o \
 	tag4refinement.o \
-	psi.o \
-	rpn2ad1.o \
-	rpt2ad1.o \
-	swirl_user.o \
+	simple_user.o \
 	qinit.o \
 	b4step2.o \
 	setaux.o \
