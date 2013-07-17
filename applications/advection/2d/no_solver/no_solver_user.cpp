@@ -94,6 +94,10 @@ double no_solver_update(fclaw2d_domain_t *domain,
     // save the current time step for time interpolation.  Otherwise, we get
     // unitialized values.
     cp->save_current_step();  // Save for time interpolation
+
+    // Reinitialize with new proc data
+    no_solver_patch_initialize(domain,this_patch, this_block_idx,this_patch_idx);
+
     return 1.0;
 }
 

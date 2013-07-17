@@ -309,10 +309,13 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         // This is a collective communication - everybody needs to wait here.
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
-        printf("Level %d step %5d (%5d) : dt = %12.3e; maxcfl \
+        if ((*domain)->mpirank == 0)
+        {
+            printf("Level %d step %5d : dt = %12.3e; maxcfl \
                     (step) = %8.3f; Final time = %12.4f\n",
-               time_stepper.minlevel(),n+1,(*domain)->mpirank,
-               dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+                   time_stepper.minlevel(),n+1,
+                   dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+        }
 
 
         if (maxcfl_step > gparms->max_cfl)

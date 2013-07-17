@@ -70,8 +70,6 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
         (of->f_patch_write_header)(domain,iframe,ngrids);
     }
 
-    printf("proc %d is writing out output...\n",domain->mpirank);
-
     fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */

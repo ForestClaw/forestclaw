@@ -12,7 +12,10 @@ if (mq == 1)
 else
   cm_index = true;  % Used by setcolors.m
   npmax = 10;
-  colormap(multicolormap(npmax));
+  if (Frame == 0)
+    cm = multicolormap(npmax);
+  end
+  colormap(cm);
   caxis([1 npmax+1]);
 
   % Fix colorbar

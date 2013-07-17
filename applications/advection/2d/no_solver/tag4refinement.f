@@ -21,7 +21,7 @@ c     # Refine based only on first variable in system.
             qmax = max(q(i,j,mq),qmax)
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dx
-            if (xc .lt. 0 .and. yc .lt. 0) then
+            if (qmax - qmin .gt. 0.5) then
                tag_patch = 1
                return
             endif

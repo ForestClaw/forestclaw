@@ -205,19 +205,8 @@ void amrinit (fclaw2d_domain_t **domain)
             *domain = new_domain;
 
             // Repartition domain to new processors.
-            if ((*domain)->mpirank == 0)
-            {
-                printf("\n\n");
-                printf("Before partitioning\n");
-                amr_print_patches_and_procs(*domain);
-            }
             repartition_domain(domain);
 
-            if ((*domain)->mpirank == 0)
-            {
-                printf("After partitioning\n\n");
-                amr_print_patches_and_procs(*domain);
-            }
         }
         else
         {
