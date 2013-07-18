@@ -127,6 +127,10 @@ amr_options_new (sc_options_t * opt)
      */
     sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
                         "VTK output method");
+    sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
+                        "VTK visual spacing");
+    sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
+                        "VTK write variant");
 
 
     /* At this point amropt->order is allocated. Set defaults if desired. */

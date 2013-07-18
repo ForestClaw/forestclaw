@@ -443,6 +443,7 @@ fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 int
 fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
                         int mx, int my, int meqn,
+                        double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb)
 {

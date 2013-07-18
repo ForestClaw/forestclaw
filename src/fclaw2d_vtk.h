@@ -52,11 +52,17 @@ typedef void
                                  char *a);
 
 /** Write a file in VTK format for the whole domain in parallel.
+ * \param [in] vtkspace     Relative width of visual separation of patches.
+ *                          Between 0. (none) and 1. (patch width becomes 0).
+ * \param [in] vtkwrite     Mode of writing:
+ *                          0 for MPI_File_write_all (faster),
+ *                          1 for MPI_File_write (less memory usage).
  * \return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
 int fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
                             int mx, int my, int meqn,
+                            double vtkspace, int vtkwrite,
                             fclaw2d_vtk_patch_data_t coordinate_cb,
                             fclaw2d_vtk_patch_data_t value_cb);
 

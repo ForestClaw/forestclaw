@@ -152,7 +152,9 @@ amr_output_write_vtk (fclaw2d_domain_t *domain, const char *basename)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
-    fclaw2d_vtk_write_file (domain, basename, gparms->mx, gparms->my,
-                            gparms->meqn, amr_output_vtk_coordinate_cb,
+    fclaw2d_vtk_write_file (domain, basename,
+                            gparms->mx, gparms->my, gparms->meqn,
+                            gparms->vtkspace, gparms->vtkwrite,
+                            amr_output_vtk_coordinate_cb,
                             amr_output_vtk_value_cb);
 }
