@@ -40,9 +40,9 @@ extern "C"
 typedef struct amr_options amr_options_t;
 
 
-typedef void* (*fclaw2d_user_parms_new_t)(sc_options_t *opt);
+typedef void *(*fclaw2d_user_parms_new_t) (sc_options_t * opt);
 
-typedef void (*fclaw2d_user_parms_destroy_t)(amr_options_t *gparms);
+typedef void (*fclaw2d_user_parms_destroy_t) (amr_options_t * gparms);
 
 
 struct amr_options
@@ -137,7 +137,8 @@ amr_options_t *amr_options_new (sc_options_t * opt);
 void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                         int argc, char **argv, int log_priority);
 #endif
-void amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority);
+void amr_options_parse (sc_options_t * opt, int argc, char **argv,
+                        int log_priority);
 
 
 /** Clean up option storage.
@@ -146,8 +147,8 @@ void amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_prior
 void amr_options_destroy (amr_options_t * amropt);
 
 
-void amr_postprocess_parms(amr_options_t* amropt);
-void amr_checkparms(amr_options_t* amropt);
+void amr_postprocess_parms (amr_options_t * amropt);
+void amr_checkparms (amr_options_t * amropt);
 
 #ifdef __cplusplus
 #if 0

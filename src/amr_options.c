@@ -90,7 +90,7 @@ amr_options_convert_arrays (amr_options_t * amropt)
 
 
 amr_options_t *
-    amr_options_new (sc_options_t * opt)
+amr_options_new (sc_options_t * opt)
 {
     amr_options_t *amropt;
 
@@ -135,10 +135,10 @@ amr_options_t *
                         "Verbosity mode [0]");
 
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
-                        "Maximum CFL allowed [1]");
+                           "Maximum CFL allowed [1]");
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                        "Maximum CFL allowed [0.9]");
+                           "Maximum CFL allowed [0.9]");
 
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
@@ -166,10 +166,10 @@ amr_options_t *
                         0, "Regrid every ''regrid_interval'' steps");
 
 
-    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0,"xlower (ax)");
-    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1,"xupper (bx)");
-    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0,"ylower (ay)");
-    sc_options_add_double (opt, 0, "by", &amropt->by, 1,"yupper (by)");
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower (ax)");
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper (bx)");
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower (ay)");
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper (by)");
 
 #if 0
     /* bool is not allocated, disable for now */
@@ -182,38 +182,45 @@ amr_options_t *
     amropt->mapped = bool[0] == 'T' ? 1 : 0;
 #endif
 
-    /* -------------------------------------------------------------------*/
+    /* ------------------------------------------------------------------- */
     /* Right now all switch options default to false, need to change that */
     /* I am okay with them being set to false by default, since I expect that
        user will set everything in the input file
-    */
-    sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,"Solution is on manifold [F]");
-    sc_options_add_switch (opt, 0, "mapped",   &amropt->mapped,  "Use mapped grid [F]");
+     */
+    sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
+                           "Solution is on manifold [F]");
+    sc_options_add_switch (opt, 0, "mapped", &amropt->mapped,
+                           "Use mapped grid [F]");
     sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
                            "Use fixed coarse grid time step [F]");
-    sc_options_add_switch (opt, 0, "check_conservation", &amropt->check_conservation,
+    sc_options_add_switch (opt, 0, "check_conservation",
+                           &amropt->check_conservation,
                            "Check conservation [F]");
-    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,"Use subcycling in time [F]");
-    /* -------------------------------------------------------------------*/
+    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
+                           "Use subcycling in time [F]");
+    /* ------------------------------------------------------------------- */
 
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
        ----------------------------------------------------------------------- */
-    sc_options_add_inifile (opt, 'F', "inifile","Read waveprop options from this file");
+    sc_options_add_inifile (opt, 'F', "inifile",
+                            "Read waveprop options from this file");
 
     /* -----------------------------------------------------------------------
        This is the default file that will be read if no command line options are
        given.  This file is tracked by Git.
        ----------------------------------------------------------------------- */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_defaults.ini");
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
+                     "fclaw2d_defaults.ini");
 
-    amr_postprocess_parms(amropt);
+    amr_postprocess_parms (amropt);
 
     return amropt;
 }
 
-void amr_postprocess_parms(amr_options_t *amropt)
+void
+amr_postprocess_parms (amr_options_t * amropt)
 {
     /* -----------------------------------------------------------------------
        This has to happen after parameters have been parsed, but before we
@@ -228,19 +235,21 @@ void amr_postprocess_parms(amr_options_t *amropt)
 /* -----------------------------------------------------------------
    Check input parms
    ----------------------------------------------------------------- */
-void amr_checkparms(amr_options_t *gparms)
+void
+amr_checkparms (amr_options_t * gparms)
 {
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
     {
-        double dT_outer = gparms->tfinal/gparms->nout;
+        double dT_outer = gparms->tfinal / gparms->nout;
         double dT_inner = gparms->initial_dt;
-        int nsteps = dT_outer/dT_inner;
-        if (fabs(nsteps*dT_inner - dT_outer) > 1e-8)
+        int nsteps = dT_outer / dT_inner;
+        if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
         {
-            printf("For fixed dt, initial time step size must divide tfinal/nout "
-                   "exactly.\n");
-            exit(1);
+            printf
+                ("For fixed dt, initial time step size must divide tfinal/nout "
+                 "exactly.\n");
+            exit (1);
         }
     }
 
@@ -255,9 +264,8 @@ void
 amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                    int argc, char **argv, int log_priority)
 #endif
-
-void
-amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority)
+     void amr_options_parse (sc_options_t * opt, int argc, char **argv,
+                             int log_priority)
 {
     int retval;
 
@@ -284,7 +292,7 @@ amr_options_parse (sc_options_t * opt, int argc, char **argv, int log_priority)
 
 
 void
-    amr_options_destroy (amr_options_t * amropt)
+amr_options_destroy (amr_options_t * amropt)
 {
     /* These are now stored under amropt->waveprop_parms */
     /* SC_FREE (amropt->->order); */
