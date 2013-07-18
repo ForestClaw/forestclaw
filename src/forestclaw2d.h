@@ -104,7 +104,7 @@ struct fclaw2d_domain
     int *patch_to_block;        /* allocated storage, one per local patch */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
-                                   (patch->flags & 
+                                   (patch->flags &
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     int num_ghost_patches;      /* # off-proc patches relevant to this proc */
     fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
@@ -317,7 +317,7 @@ void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
 
 /** Callback prototype used in fclaw2d_domain_iterate_adapted.
  * The newsize value informs on refine/coarsen/noop status.
- * If refined (new patch is HALFSIZE), the old patch is old_patch[0] and the 
+ * If refined (new patch is HALFSIZE), the old patch is old_patch[0] and the
  * new patches are given by new_patch[0] through new_patch[3]. The new_patchno
  * numbers are consecutive as well.
  * If noop (new patch is SAMESIZE), only old_patch[0] and new_patch[0] matter.
@@ -335,7 +335,7 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
 /** Iterate over the previous and the adapted domain simultaneously.
  * \param [in,out] old_domain   Domain before adaptation.
  * \param [in,out] new_domain   Domain after adaptation.
- * \param [in] mcb              Callback 
+ * \param [in] mcb              Callback
  */
 void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_domain_t * new_domain,
@@ -423,7 +423,7 @@ fclaw2d_domain_exchange_t
  * \param [in] e                Allocated buffers whose e->patch_data[i] pointers
  *                              must have been set properly by forestclaw.
  */
-void fclaw2d_domain_parallel_exchange (fclaw2d_domain_t * domain,
+void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                                        fclaw2d_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
