@@ -34,6 +34,7 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        init_patch_data(ghost_patch);
         int blockno = ghost_patch->u.blockno;
 
         /* not clear how useful this patchno is.  In any case, it isn't
@@ -82,6 +83,9 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
 
     /* Store e so we can retrieve it later */
     set_domain_exchange_data(domain,e);
+
+    /* Build patches that can be filled later with q data */
+    build_ghost_patches(domain);
 }
 
 
@@ -236,7 +240,7 @@ void build_initial_domain(fclaw2d_domain_t* domain)
     {
         fclaw2d_domain_free_after_exchange (domain, e_old);
     }
-    build_ghost_patches(domain);
+    setup_parallel_ghost_exchange(domain);
 }
 
 

@@ -26,16 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 
-/* NOTE: Do we need the extern "C" here?  We're passing callbacks
-   to C iterators but maybe C++ handles it just fine. */
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
 /* -----------------------------------------------------------------
    Exchange corner and face information at same level
    ----------------------------------------------------------------- */
@@ -59,6 +49,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int neighbor_patch_idx[p4est_refineFactor];
         int ref_flag;   // = -1, 0, 1
         int *ref_flag_ptr = &ref_flag;
+        fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
 
         get_face_neighbors(domain,
                            this_block_idx,
@@ -66,6 +57,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            iface,
                            &neighbor_block_idx,
                            neighbor_patch_idx,
+                           ghost_patches,
                            &ref_flag_ptr);
 
         if (ref_flag_ptr == NULL)
@@ -75,8 +67,11 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         else if (ref_flag == 0)
         {
             // We have a neighbor patch at the same level
+            /*
             fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
             fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
+            */
+            fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
             if (this_block_idx == neighbor_block_idx)
             {
@@ -158,6 +153,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
+            fclaw2d_patch_t *ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -165,6 +161,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
+                                &ghost_patch,
                                 &ref_flag_ptr,
                                 is_block_corner);
 
@@ -175,8 +172,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == 0)
             {
+                /*
                 fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
                 fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
+                */
+                fclaw2d_patch_t* corner_patch = ghost_patch;
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 if (this_block_idx == corner_block_idx)
                 {
@@ -198,18 +198,13 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     }
 }
 
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif
-
 /* -------------------------------------------------------------------
    Main routine in this file
    ------------------------------------------------------------------- */
 void level_exchange(fclaw2d_domain_t *domain, int level)
 {
+    exchange_ghost_patch_data(domain);
+
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_level_face_exchange, (void *) NULL);
 

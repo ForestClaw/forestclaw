@@ -94,7 +94,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
-                         fclaw2d_patch_t* ghost_patches[],
+                         fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
                          fclaw_bool is_block_corner);
 

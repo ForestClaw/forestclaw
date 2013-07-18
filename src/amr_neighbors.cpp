@@ -31,17 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // and to determine if we are at physical boundaries or not.
 // ------------------------------------------------------------------------------
 
-void update_ghost_patches(fclaw2d_domain_t *domain)
-{
-    /* This patch has to put its boundary patch data into its communication array */
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
-
-    /* Now it has to build off-processor patches with new data */
-}
-
-
-
-
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
@@ -89,7 +78,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         // Edge is a physical boundary
         // Set the pointer to NULL rather than come up with some bogus value for ref_flag.
         *ref_flag_ptr = NULL;
-     }
+    }
     else
     {
         // This is demonstration code to infer the patch transformation.
@@ -116,6 +105,11 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             **ref_flag_ptr = 1; /* patches are at one level finer */
             num_neighbors = p4est_refineFactor;
         }
+        else
+        {
+            // This didn't compile for me...
+            // *(int *) 0 = 0;     // This must not happen
+        }
 
         for(int ir = 0; ir < num_neighbors; ir++)
         {
@@ -123,7 +117,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             if (rproc[ir] == domain->mpirank)
             {
                 /* neighbor patch is local */
-                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
                 neighbor_patch = &neighbor_block->patches[rpatchno[ir]];
             }
             else if (rproc[ir] != domain->mpirank)
@@ -134,11 +128,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             neighbor_patch_idx[ir] = rpatchno[ir];
             ghost_patches[ir] = neighbor_patch;
         }
-        else
-        {
-            // This didn't compile for me...
-            // *(int *) 0 = 0;     // This must not happen
-        }
     }
 }
 
@@ -148,10 +137,11 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int icorner,
                          int *corner_block_idx,
                          int *corner_patch_idx,
+                         fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
-                         fclaw2d_patch_t* ghost_patch,
                          fclaw_bool is_block_corner)
 {
+    int rproc_corner;
 
     /* Code is now back in state it was before I added stuff */
     fclaw2d_patch_relation_t neighbor_type;
@@ -163,10 +153,10 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     if (is_sphere_grid && is_block_corner)
     {
         has_corner_neighbor = fclaw_true;  // By definition
-        int rproc[p4est_refineFactor];
         int rpatchno[p4est_refineFactor];
+        int rproc[p4est_refineFactor];
         int rfaceno;
-        int iface;
+        int igrid;
         // int ftransform[9];
 
         /* Use only faces 0 or 1 to get block data. */
@@ -198,16 +188,17 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                 neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
             {
                 // This patch shares face 'iface' with a single patch.
-                iface = 0;
+                igrid = 0;
             }
             else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
             {
                 // On bottom corners, we want to take the first patch in the list;
                 // On top corners, we take the last patch in the list.
-                iface = (icorner/2)*(p4est_refineFactor - 1);
+                igrid = (icorner/2)*(p4est_refineFactor - 1);
             }
         }
-        corner_patch_idx = rpatchno[iface];
+        *corner_patch_idx = rpatchno[igrid];
+        rproc_corner = rproc[igrid];
     }
     else
     {
@@ -218,27 +209,26 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
            FCLAW2D_PATCH_SAMESIZE,
            FCLAW2D_PATCH_DOUBLESIZE
            --------------------------- */
-        int rproc;
         has_corner_neighbor =
             fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
-                                           icorner, &rproc, corner_block_idx,
+                                           icorner, &rproc_corner, corner_block_idx,
                                            corner_patch_idx, &neighbor_type);
     }
     if (!has_corner_neighbor)
     {
         *ref_flag_ptr = NULL;
-        ghost_patch = NULL;
+        *ghost_patch = NULL;
     }
     else
     {
-        if (domain->mpirank != rproc[iface])
+        if (domain->mpirank != rproc_corner)
         {
-            ghost_patch = domain->ghost_patches[corner_patch_idx];
+            *ghost_patch = &domain->ghost_patches[*corner_patch_idx];
         }
         else
         {
-            fclaw2d_block_t *neighbor_block = &domain->blocks[corner_block_idx];
-            ghost_patch = &neighbor_block->patches[corner_patch_idx];
+            fclaw2d_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
+            *ghost_patch = &neighbor_block->patches[*corner_patch_idx];
         }
 
         if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)

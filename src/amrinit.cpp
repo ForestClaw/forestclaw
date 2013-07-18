@@ -94,15 +94,6 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 {
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        /*
-        // Grid doesn't change
-        set_clawpatch(new_domain,new_patch,blockno,new_patchno);
-
-        // Setup new patch using solver specific routine
-        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
-        */
-
         // Need a copy function in regrid_functions
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
         (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
@@ -120,15 +111,6 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             int fine_patchno = new_patchno + igrid;
 
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-
-            /*
-            // Create new ClawPatch and assign patch pointer to it.
-            set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
-
-            // Do one-time setup on new patch
-            (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
-            */
-
 
             // This is only used here, since only in the initial grid layout do we
             // create fine grids from coarser grids.
@@ -189,6 +171,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // Set up all data structures for new domain, but don't yet
             // populate with data
             rebuild_domain(*domain,new_domain);
+
 
             // Re-initialize finer grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
