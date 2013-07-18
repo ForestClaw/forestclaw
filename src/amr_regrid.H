@@ -105,9 +105,12 @@ void patch_copy2samesize(fclaw2d_domain_t* domain, fclaw2d_patch_t *old_patch,
 
 fclaw2d_regrid_functions_t* get_regrid_functions(fclaw2d_domain_t *domain);
 
+void build_initial_domain(fclaw2d_domain_t* domain);
 void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
 void repartition_domain(fclaw2d_domain_t** domain);
-void build_initial_domain(fclaw2d_domain_t* domain);
+void exchange_ghost_patch_data(fclaw2d_domain_t* domain);
+
+
 void amr_print_patches_and_procs(fclaw2d_domain_t *domain);
 
 
