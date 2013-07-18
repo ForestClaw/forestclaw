@@ -48,6 +48,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int iside,
                         int *neighbor_block_idx,
                         int neighbor_patch_idx[],
+                        fclaw2d_patch_t* ghost_patches[],
                         int **ref_flag_ptr)
 {
     int rproc[p4est_refineFactor];
@@ -55,6 +56,12 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     int rpatchno[p4est_refineFactor];
     int rfaceno;
     int ftransform[9];
+    int num_neighbors;
+
+    for(int ir = 0; ir < p4est_refineFactor; ir++)
+    {
+        ghost_patches[ir] = NULL;
+    }
 
     fclaw2d_patch_relation_t neighbor_type =
         fclaw2d_patch_face_neighbors(domain,
@@ -67,11 +74,13 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                                      &rfaceno);
 
 
-    // neighbor_type is one of :
-    // FCLAW2D_PATCH_BOUNDARY,
-    // FCLAW2D_PATCH_HALFSIZE,
-    // FCLAW2D_PATCH_SAMESIZE,
-    // FCLAW2D_PATCH_DOUBLESIZE
+    /* ------------------------------
+      neighbor_type is one of :
+      FCLAW2D_PATCH_BOUNDARY,
+      FCLAW2D_PATCH_HALFSIZE,
+      FCLAW2D_PATCH_SAMESIZE,
+      FCLAW2D_PATCH_DOUBLESIZE
+      ------------------------------- */
 
     *neighbor_block_idx = rblockno;
 
@@ -91,41 +100,39 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
         }
 
-        if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
         {
-            // Neighbors are finer grids
-            **ref_flag_ptr = 1;
-            for(int ir = 0; ir < p4est_refineFactor; ir++)
-            {
-                if (rproc[ir] != domain->mpirank)
-                {
-                    *ref_flag_ptr = NULL;
-                    continue;
-                }
-                neighbor_patch_idx[ir] = rpatchno[ir];
-            }
-        }
-        else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
-        {
-            // Neighbor is at the same level
-            if (rproc[0] != domain->mpirank)
-            {
-                *ref_flag_ptr = NULL;
-                return;
-            }
             **ref_flag_ptr = 0;
-            neighbor_patch_idx[0] = rpatchno[0];
+            num_neighbors = 1;
         }
         else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
         {
-            // Neighbor is a coarser grid
-            if (rproc[0] != domain->mpirank)
-            {
-                *ref_flag_ptr = NULL;
-                return;
-            }
             **ref_flag_ptr = -1;
-            neighbor_patch_idx[0] = rpatchno[0];
+            num_neighbors = 1;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            /* Patch has two neighbors */
+            **ref_flag_ptr = 1; /* patches are at one level finer */
+            num_neighbors = p4est_refineFactor;
+        }
+
+        for(int ir = 0; ir < num_neighbors; ir++)
+        {
+            fclaw2d_patch_t *neighbor_patch;
+            if (rproc[ir] == domain->mpirank)
+            {
+                /* neighbor patch is local */
+                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
+                neighbor_patch = &neighbor_block->patches[rpatchno[ir]];
+            }
+            else if (rproc[ir] != domain->mpirank)
+            {
+                /* neighbor patch is on a remote processor */
+                neighbor_patch = &domain->ghost_patches[rpatchno[ir]];
+            }
+            neighbor_patch_idx[ir] = rpatchno[ir];
+            ghost_patches[ir] = neighbor_patch;
         }
         else
         {
@@ -142,6 +149,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_block_idx,
                          int *corner_patch_idx,
                          int **ref_flag_ptr,
+                         fclaw2d_patch_t* ghost_patch,
                          fclaw_bool is_block_corner)
 {
 
@@ -149,19 +157,20 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     fclaw2d_patch_relation_t neighbor_type;
     fclaw_bool has_corner_neighbor;
 
-    // hack for now
+    /* This will be made more general once we figure out what we do with
+       block corners */
     fclaw_bool is_sphere_grid = issphere_();
-    // Things seem to work without my 'fix'.  But will investigate this.
-    // fclaw_bool is_sphere_grid = fclaw_false;
     if (is_sphere_grid && is_block_corner)
     {
         has_corner_neighbor = fclaw_true;  // By definition
         int rproc[p4est_refineFactor];
         int rpatchno[p4est_refineFactor];
         int rfaceno;
+        int iface;
         // int ftransform[9];
 
-        int iface = icorner % 2;    // Use only faces 0 or 1 to get block data.
+        /* Use only faces 0 or 1 to get block data. */
+        int iface = icorner % 2;
         neighbor_type =
             fclaw2d_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -179,7 +188,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         }
         else if (rfaceno != iface)
         {
-            printf("Something went wrong; faces should have same number\n");
+            printf("Something went wrong; faces should have same number \
+                    (for sphere grid)\n");
             exit(1);
         }
         else
@@ -188,47 +198,61 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                 neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
             {
                 // This patch shares face 'iface' with a single patch.
-                *corner_patch_idx = rpatchno[0];
+                iface = 0;
             }
             else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
             {
                 // On bottom corners, we want to take the first patch in the list;
                 // On top corners, we take the last patch in the list.
-                int iface = (icorner/2)*(p4est_refineFactor - 1);
-                *corner_patch_idx = rpatchno[iface];
+                iface = (icorner/2)*(p4est_refineFactor - 1);
             }
         }
+        corner_patch_idx = rpatchno[iface];
     }
     else
     {
-        // Not a sphere grid or not a corner block (or neither)
-        // neighbor_type is one of :
-        // FCLAW2D_PATCH_BOUNDARY,
-        // FCLAW2D_PATCH_HALFSIZE,
-        // FCLAW2D_PATCH_SAMESIZE,
-        // FCLAW2D_PATCH_DOUBLESIZE
+        /* ---------------------------
+           neighbor_type is one of :
+           FCLAW2D_PATCH_BOUNDARY,
+           FCLAW2D_PATCH_HALFSIZE,
+           FCLAW2D_PATCH_SAMESIZE,
+           FCLAW2D_PATCH_DOUBLESIZE
+           --------------------------- */
         int rproc;
         has_corner_neighbor =
             fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                            icorner, &rproc, corner_block_idx,
                                            corner_patch_idx, &neighbor_type);
-
     }
     if (!has_corner_neighbor)
     {
         *ref_flag_ptr = NULL;
-    }
-    else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
-    {
-        **ref_flag_ptr = 1;
-    }
-    else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
-    {
-        **ref_flag_ptr = 0;
+        ghost_patch = NULL;
     }
     else
     {
-        **ref_flag_ptr = -1;
+        if (domain->mpirank != rproc[iface])
+        {
+            ghost_patch = domain->ghost_patches[corner_patch_idx];
+        }
+        else
+        {
+            fclaw2d_block_t *neighbor_block = &domain->blocks[corner_block_idx];
+            ghost_patch = &neighbor_block->patches[corner_patch_idx];
+        }
+
+        if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            **ref_flag_ptr = 1;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+        {
+            **ref_flag_ptr = 0;
+        }
+        else
+        {
+            **ref_flag_ptr = -1;
+        }
     }
 }
 
@@ -256,15 +280,17 @@ void get_block_boundary(fclaw2d_domain_t *domain,
                                          &rblockno,
                                          rpatchno,
                                          &rfaceno);
-        // neighbor_type is one of :
-        // FCLAW2D_PATCH_BOUNDARY,
-        // FCLAW2D_PATCH_HALFSIZE,
-        // FCLAW2D_PATCH_SAMESIZE,
-        // FCLAW2D_PATCH_DOUBLESIZE
+        /* --------------------------
+           neighbor_type is one of :
+           FCLAW2D_PATCH_BOUNDARY,
+           FCLAW2D_PATCH_HALFSIZE,
+           FCLAW2D_PATCH_SAMESIZE,
+           FCLAW2D_PATCH_DOUBLESIZE
+           --------------------------*/
 
         if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
         {
-            // 'iside' is a physical boundary
+            /* 'iside' is a physical boundary */
             intersects_block[iside] = true;
         }
         else
