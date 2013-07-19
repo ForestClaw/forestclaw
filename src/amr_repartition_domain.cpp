@@ -201,13 +201,11 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
 
     fclaw2d_domain_iterate_patches(new_domain, cb_build_patches,(void *) NULL);
 
-    // Set up the parallel ghost patch data structure.
-    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(new_domain);
-    if (e_old != NULL)
-    {
-        fclaw2d_domain_free_after_exchange (new_domain, e_old);
-    }
+    // Free old parallel ghost patch data structure, must exist by construction.
+    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(old_domain);
+    fclaw2d_domain_free_after_exchange (old_domain, e_old);
 
+    // Set up the parallel ghost patch data structure.
     setup_parallel_ghost_exchange(new_domain);
 }
 
@@ -233,11 +231,6 @@ void build_initial_domain(fclaw2d_domain_t* domain)
     fclaw2d_domain_iterate_patches(domain, cb_build_patches,(void *) NULL);
 
     // Set up the parallel ghost patch data structure.
-    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(domain);
-    if (e_old != NULL)
-    {
-        fclaw2d_domain_free_after_exchange (domain, e_old);
-    }
     setup_parallel_ghost_exchange(domain);
 }
 

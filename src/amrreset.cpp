@@ -53,12 +53,11 @@ void amrreset(fclaw2d_domain_t **domain)
         FCLAW2D_FREE (bd);
         block->user = NULL;
     }
-    // This was the fix that was needed!
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(*domain);
-    if (e != NULL)
-    {
-        fclaw2d_domain_free_after_exchange (*domain, e);
-    }
+
+
+    // Free old parallel ghost patch data structure, must exist by construction.
+    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(*domain);
+    fclaw2d_domain_free_after_exchange (*domain, e_old);
 
     delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
     FCLAW2D_FREE (dd);
