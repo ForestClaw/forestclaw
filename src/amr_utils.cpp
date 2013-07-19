@@ -94,7 +94,6 @@ void delete_domain_data(fclaw2d_domain_t* domain)
         ddata->regrid_functions = (fclaw2d_regrid_functions_t*) NULL;
     }
 
-
     fclaw2d_output_functions_t *of = (fclaw2d_output_functions_t*) ddata->output_functions;
     if (of != NULL)
     {
@@ -102,7 +101,8 @@ void delete_domain_data(fclaw2d_domain_t* domain)
         ddata->output_functions = (fclaw2d_output_functions_t*) NULL;
     }
 
-
+    FCLAW2D_FREE (ddata);
+    domain->user = NULL;
 }
 
 void init_block_data(fclaw2d_block_t *block)

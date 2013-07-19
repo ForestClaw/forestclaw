@@ -28,9 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void amrreset(fclaw2d_domain_t **domain)
 {
-    fclaw2d_domain_data_t *dd;
-    dd = (fclaw2d_domain_data_t *) (*domain)->user;
-
     for(int i = 0; i < (*domain)->num_blocks; i++)
     {
         fclaw2d_block_t *block = (*domain)->blocks + i;
@@ -54,15 +51,12 @@ void amrreset(fclaw2d_domain_t **domain)
         block->user = NULL;
     }
 
-
     // Free old parallel ghost patch data structure, must exist by construction.
     delete_ghost_patches(*domain);
     fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 
     delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
-    FCLAW2D_FREE (dd);
-    (*domain)->user = NULL;
 
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
