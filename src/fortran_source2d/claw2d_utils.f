@@ -4,14 +4,16 @@ c    # ------------------------------------------------------------------
 
 c     # Exchange edge ghost data with neighboring grid at same level.
       subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,qneighbor,
-     &      idir)
+     &      iface)
       implicit none
 
-      integer mx,my,mbc,meqn,idir
+      integer mx,my,mbc,meqn,iface
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j,ibc,jbc,mq
+      integer i,j,ibc,jbc,mq, idir
+
+      idir = iface/2
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
@@ -21,8 +23,11 @@ c     # 'qneighbor'
                do mq = 1,meqn
 c                 # Exchange at high side of 'this' grid in
 c                 # x-direction (idir == 0)
-                  qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
-                  qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
+                  if (iface .eq. 0) then
+                     qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
+                  elseif (iface .eq. 1) then
+                     qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
+                  endif
                enddo
             enddo
          enddo
@@ -32,8 +37,11 @@ c                 # x-direction (idir == 0)
                do mq = 1,meqn
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
-                  qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
-                  qneighbor(i,jbc-mbc,mq) = qthis(i,my-mbc+jbc,mq)
+                  if (iface .eq. 2) then
+                     qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
+                  elseif (iface .eq. 3) then
+                     qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
+                  endif
                enddo
             enddo
          enddo
@@ -240,25 +248,23 @@ c                       # qfine is at top edge of coarse grid
 
       integer mq, ibc, jbc
 
-c     # Only exchanging high side corners
-
-c     # We only need to worry about corners 1 and 3 (lr and ur).
-c     # for the  complete exchange.  The other corners are somebody
-c     # else's (lr,ur) corners.
+c     # Do exchanges for all corners
       do mq = 1,meqn
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Exchange initiated only at high side (1,3) corners
-               if (icorner_this .eq. 1) then
+               if (icorner_this .eq. 0) then
+                  qthis(1-ibc,1-jbc,mq) =
+     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
+               else if (icorner_this .eq. 1) then
                   qthis(mx+ibc,1-jbc,mq) =
      &                  qneighbor(ibc,my+1-jbc,mq)
-                  qneighbor(1-ibc,my+jbc,mq) =
-     &                  qthis(mx+1-ibc,jbc,mq)
+               elseif (icorner_this .eq. 2) then
+                  qthis(1-ibc,my+jbc,mq) =
+     &                  qneighbor(mx+1-ibc,jbc,mq)
                elseif (icorner_this .eq. 3) then
                   qthis(mx+ibc,my+jbc,mq) =
      &                  qneighbor(ibc,jbc,mq)
-                  qneighbor(1-ibc,1-jbc,mq) =
-     &                  qthis(mx+1-ibc,my+1-jbc,mq)
                endif
             enddo
          enddo

@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_level_face_exchange(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx,
-                               int this_patch_idx,
-                               void *user)
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            void *user)
 {
     // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     ClawPatch *this_cp = get_clawpatch(this_patch);
@@ -66,22 +66,13 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         }
         else if (ref_flag == 0)
         {
-            // We have a neighbor patch at the same level
-            /*
-            fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-            fclaw2d_patch_t *neighbor_patch = &neighbor_block->patches[neighbor_patch_idx[0]];
-            */
+            /* We have a neighbor patch at the same level */
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
             if (this_block_idx == neighbor_block_idx)
             {
-                if (iface % 2 == 1)
-                {
-                    // Do high side exchange only
-                    int idir = iface/2;   // this rounds down, right?  1/2 = 0; 3/2 = 1, etc.
-                    // Exchange between 'this_patch' and 'neighbor patch(es)' in direction 'idir'
-                    this_cp->exchange_face_ghost(idir,neighbor_cp);
-                }
+                // Exchange between 'this_patch' and 'neighbor patch(es)' at face 'iface'
+                this_cp->exchange_face_ghost(iface,neighbor_cp);
             }
             else
             {
@@ -172,20 +163,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == 0)
             {
-                /*
-                fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                */
                 fclaw2d_patch_t* corner_patch = ghost_patch;
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 if (this_block_idx == corner_block_idx)
                 {
-                    // Exchanging at the same level on the same block.
-                    if (icorner % 2 == 1)
-                    {
-                        // Only initiate exchanges from high side corners when on the same block
-                        this_cp->exchange_corner_ghost(icorner,corner_cp);
-                    }
+                    this_cp->exchange_corner_ghost(icorner,corner_cp);
                 }
                 else
                 {

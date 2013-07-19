@@ -352,11 +352,11 @@ void ClawPatch::time_interpolate(const double& alpha)
    Single level exchanges
    ---------------------------------------------------------------- */
 
-void ClawPatch::exchange_face_ghost(const int& a_idir, ClawPatch *neighbor_cp)
+void ClawPatch::exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
 {
     double *qthis = m_griddata.dataPtr();
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
-    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_idir);
+    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface);
 }
 
 void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
