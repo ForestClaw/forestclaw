@@ -27,6 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "no_solver_user.H"
 #include "amr_utils.H"
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
     link_problem_setup(domain,no_solver_setprob);
@@ -96,7 +105,9 @@ double no_solver_update(fclaw2d_domain_t *domain,
     cp->save_current_step();  // Save for time interpolation
 
     // Reinitialize with new proc data
+    /*
     no_solver_patch_initialize(domain,this_patch, this_block_idx,this_patch_idx);
+    */
 
     return 1.0;
 }
@@ -225,3 +236,10 @@ void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
     write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                  iframe,num,matlab_level,this_block_idx);
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

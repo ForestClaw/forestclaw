@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "no_solver_user.H"
 
+extern "C"
+{
+    void debug_gdb();
+}
+
 int
 main (int argc, char **argv)
 {
@@ -44,6 +49,8 @@ main (int argc, char **argv)
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+
+  debug_gdb();
 
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and

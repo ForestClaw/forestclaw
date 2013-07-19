@@ -37,7 +37,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int iside,
                         int *neighbor_block_idx,
                         int neighbor_patch_idx[],
-                        fclaw2d_patch_t* ghost_patches[],
+                        fclaw2d_patch_t* neighbor_patches[],
                         int **ref_flag_ptr)
 {
     int rproc[p4est_refineFactor];
@@ -49,7 +49,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
     for(int ir = 0; ir < p4est_refineFactor; ir++)
     {
-        ghost_patches[ir] = NULL;
+        neighbor_patches[ir] = NULL;
     }
 
     fclaw2d_patch_relation_t neighbor_type =
@@ -113,20 +113,20 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
         for(int ir = 0; ir < num_neighbors; ir++)
         {
-            fclaw2d_patch_t *neighbor_patch;
+            fclaw2d_patch_t *neighbor;
             if (rproc[ir] == domain->mpirank)
             {
                 /* neighbor patch is local */
                 fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
-                neighbor_patch = &neighbor_block->patches[rpatchno[ir]];
+                neighbor = &neighbor_block->patches[rpatchno[ir]];
             }
             else if (rproc[ir] != domain->mpirank)
             {
                 /* neighbor patch is on a remote processor */
-                neighbor_patch = &domain->ghost_patches[rpatchno[ir]];
+                neighbor = &domain->ghost_patches[rpatchno[ir]];
             }
             neighbor_patch_idx[ir] = rpatchno[ir];
-            ghost_patches[ir] = neighbor_patch;
+            neighbor_patches[ir] = neighbor;
         }
     }
 }

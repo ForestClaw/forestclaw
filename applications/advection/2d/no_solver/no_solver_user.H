@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
+
 extern "C"
 {
     void no_solver_setprob(fclaw2d_domain_t* domain);
@@ -48,6 +49,15 @@ extern "C"
                                    const double& ylower, const double& dx, const double& dy,
                                    double qcoarsened[], int& tag_patch);
 }
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 
 void no_solver_linker(fclaw2d_domain_t* domain);
 
@@ -79,5 +89,12 @@ void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrid
 void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level);
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif

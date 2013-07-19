@@ -28,7 +28,8 @@ exampleobjs = \
 	no_solver_user.o \
 	initialize.o \
 	ghost_twopatch.o \
-	tag4refinement.o
+	tag4refinement.o \
+	debug_gdb.o
 
 
 # make sure that the first make target is the executable
@@ -36,14 +37,14 @@ default: $(TARGET)
 
 .cpp.o:
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I. -I$(FORESTCLAW)/src $(solver_objs) -c $< -o $@
+	-I. -I$(FORESTCLAW)/src  -c $< -o $@
 
 .c.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/AMRClaw/src -I. -I$(FORESTCLAW)/src $(solver_objs) -c $< -o $@
+	${CC} $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	-I. -I$(FORESTCLAW)/src -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -I$(FORTRAN_INC) -c $< $(solver_objs) -o $@
+	$(FC) -Wall $(FFLAGS) -I$(FORTRAN_INC) -c $<  -o $@
 
 
 .PHONY: clean realclean default $(TARGET)
