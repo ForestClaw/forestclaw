@@ -379,6 +379,9 @@ void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 typedef struct fclaw2d_domain_exchange
 {
     size_t data_size;
+    /* These two members are for consistency checking */
+    int num_exchange_patches;
+    int num_ghost_patches;
     /*
        One pointer per processor-local exchange patch in order, for a total
        count of domain->num_exchange_patches.  This applies precisely to local
