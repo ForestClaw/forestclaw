@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "clawpack_fort.H"
 
+#include <manyclaw/manyclaw.h>
+
 /* I know this is one 'extern C' too many, but I like the indentation here */
 extern "C"
 {
