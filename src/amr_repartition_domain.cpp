@@ -96,7 +96,7 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain)
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
 
     /* Store local boundary data */
-    size_t zz = 0;
+    int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
         for (int np = 0; np < domain->blocks[nb].num_patches; ++np)

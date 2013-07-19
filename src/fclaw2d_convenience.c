@@ -38,7 +38,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     int i, j;
     int level;
     int face;
-    int nb;
+    int nb, nm, mirror_quadrant_num;
     int local_num_patches;
     int tree_minlevel, local_minlevel;
     int tree_maxlevel, local_maxlevel;
@@ -50,7 +50,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
 #endif
     p4est_tree_t *tree;
-    p4est_quadrant_t *quad;
+    p4est_quadrant_t *quad, *mirror;
     fclaw2d_domain_t *domain;
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
@@ -66,10 +66,23 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpirank = wrap->p4est->mpirank;
     domain->pp = (void *) wrap;
     domain->pp_owned = 1;
+    nm = 0;
+    domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
+    if (domain->num_exchange_patches > 0) {
+        mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
+        mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
+        P4EST_ASSERT (mirror_quadrant_num >= 0);
+        P4EST_ASSERT (mirror_quadrant_num <
+                      (int) wrap->p4est->local_num_quadrants);
+    }
+    else
+    {
+        mirror = NULL;
+        mirror_quadrant_num = -1;
+    }
     domain->num_ghost_patches = (int) ghost->ghosts.elem_count;
     P4EST_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
-    domain->num_exchange_patches = 0;
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->patch_to_block =
@@ -118,6 +131,21 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
                 patch->flags |= FCLAW2D_PATCH_FIRST_SIBLING;
             }
             P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
+            if (mirror_quadrant_num == local_num_patches) {
+                patch->flags |= FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY;
+                if (++nm < domain->num_exchange_patches) {
+                    mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
+                    mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
+                    P4EST_ASSERT (mirror_quadrant_num > local_num_patches);
+                    P4EST_ASSERT (mirror_quadrant_num <
+                                  (int) wrap->p4est->local_num_quadrants);
+                }
+                else
+                {
+                    mirror = NULL;
+                    mirror_quadrant_num = -1;
+                }
+            }
             qh = P4EST_QUADRANT_LEN (level);
             patch->xlower = quad->x * fclaw2d_smallest_h;
             patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
@@ -148,6 +176,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     }
     P4EST_ASSERT (local_num_patches ==
                   (int) wrap->p4est->local_num_quadrants);
+    P4EST_ASSERT (nm == domain->num_exchange_patches);
     domain->local_num_patches = local_num_patches;
     domain->local_minlevel = local_minlevel;
     domain->local_maxlevel = local_maxlevel;
