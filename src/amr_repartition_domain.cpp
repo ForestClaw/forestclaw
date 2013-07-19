@@ -79,20 +79,6 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
        remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
-    /* Store e so we can retrieve it later */
-    set_domain_exchange_data(domain,e);
-
-    /* Build patches that can be filled later with q data */
-    build_ghost_patches(domain);
-}
-
-
-
-/* This is called anytime we need to update ghost patch data */
-void exchange_ghost_patch_data(fclaw2d_domain_t* domain)
-{
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
-
     /* Store local boundary data */
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
@@ -109,6 +95,20 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain)
             }
         }
     }
+
+    /* Store e so we can retrieve it later */
+    set_domain_exchange_data(domain,e);
+
+    /* Build patches that can be filled later with q data */
+    build_ghost_patches(domain);
+}
+
+
+
+/* This is called anytime we need to update ghost patch data */
+void exchange_ghost_patch_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
 
     /* Do exchange to update ghost patch data */
     fclaw2d_domain_ghost_exchange(domain, e);
