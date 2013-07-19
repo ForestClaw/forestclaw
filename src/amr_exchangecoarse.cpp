@@ -124,6 +124,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
+            fclaw2d_patch_t *ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -131,6 +132,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
+                                &ghost_patch,
                                 &ref_flag_ptr,
                                 is_block_corner);
 
@@ -227,6 +229,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
+            fclaw2d_patch_t *ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -234,6 +237,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
+                                &ghost_patch,
                                 &ref_flag_ptr,
                                 is_block_corner);
 
@@ -297,6 +301,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                                          // indices.
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
+            fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -304,6 +309,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
+                               ghost_patches,
                                &ref_flag_ptr);
 
             if (ref_flag_ptr == NULL)
@@ -354,6 +360,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int neighbor_patch_idx[p4est_refineFactor];
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
+            fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -361,6 +368,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
+                               ghost_patches,
                                &ref_flag_ptr);
 
             if (ref_flag_ptr == NULL)

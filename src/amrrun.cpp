@@ -164,12 +164,18 @@ static void outstyle_1(fclaw2d_domain_t **domain)
 
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
-            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-                   time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+            if ((*domain)->mpirank == 0)
+            {
+                printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
+                       time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+            }
 
             if (maxcfl_step > gparms->max_cfl)
             {
-                printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                if ((*domain)->mpirank == 0)
+                {
+                    printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                }
                 if (!gparms->use_fixed_dt)
                 {
                     restore_time_step(*domain);
@@ -187,8 +193,11 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 if (took_small_step)
                 {
                     double dt0 =  dt_minlevel*reduce_factor;
-                    printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
-                           100.0*dt0/dt_level0);
+                    if ((*domain)->mpirank == 0)
+                    {
+                        printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
+                               100.0*dt0/dt_level0);
+                    }
                 }
 
                 // New time step, which should give a cfl close to the desired cfl.
@@ -211,10 +220,9 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 {
                     if (verbosity == 1)
                     {
-                        cout << "regridding at step " << n << endl;
+                        printf("regridding at step %d\n",n);
                     }
                     regrid(domain);
-                    // ddata = get_domain_data(*domain);
                 }
             }
             else
@@ -301,13 +309,21 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         // This is a collective communication - everybody needs to wait here.
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
+        if ((*domain)->mpirank == 0)
+        {
+            printf("Level %d step %5d : dt = %12.3e; maxcfl \
+                    (step) = %8.3f; Final time = %12.4f\n",
+                   time_stepper.minlevel(),n+1,
+                   dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+        }
 
-        printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-               time_stepper.minlevel(),n+1,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
 
         if (maxcfl_step > gparms->max_cfl)
         {
-            printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+            if ((*domain)->mpirank == 0)
+            {
+                printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+            }
             if (!gparms->use_fixed_dt)
             {
                 restore_time_step(*domain);
@@ -338,7 +354,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             {
                 if (verbosity == 1)
                 {
-                    cout << "regridding at step " << n << endl;
+                    printf("regridding at step %d\n",n);
                 }
                 regrid(domain);
                 // ddata = get_domain_data(*domain);

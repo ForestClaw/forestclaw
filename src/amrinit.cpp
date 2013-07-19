@@ -94,15 +94,6 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 {
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        /*
-        // Grid doesn't change
-        set_clawpatch(new_domain,new_patch,blockno,new_patchno);
-
-        // Setup new patch using solver specific routine
-        fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
-        */
-
         // Need a copy function in regrid_functions
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
         (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
@@ -119,13 +110,7 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
 
-            // Create new ClawPatch and assign patch pointer to it.
-            // set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
-
-            // Do one-time setup on new patch
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-            // (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
-
 
             // This is only used here, since only in the initial grid layout do we
             // create fine grids from coarser grids.
@@ -159,22 +144,10 @@ void amrinit (fclaw2d_domain_t **domain)
 
     set_domain_time(*domain,t);
 
-    int minlevel = gparms->minlevel;
-    int maxlevel = gparms->maxlevel;
-
     build_initial_domain(*domain);
 
-
-#if 0
-    init_block_and_patch_data(*domain);  /* Allocate block and patch data */
-
-    int num = (*domain)->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &(*domain)->blocks[i];
-        set_block_data(block,gparms->mthbc);
-    }
-#endif
+    int minlevel = gparms->minlevel;
+    int maxlevel = gparms->maxlevel;
 
     // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
@@ -207,6 +180,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // populate with data
             rebuild_domain(*domain,new_domain);
 
+
             // Re-initialize finer grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt_init,
@@ -230,23 +204,6 @@ void amrinit (fclaw2d_domain_t **domain)
             // Repartition domain to new processors.
             repartition_domain(domain, level);
 
-#if 0
-            fclaw2d_domain_t *domain_partitioned =
-                fclaw2d_domain_partition (*domain);
-            if (domain_partitioned != NULL)
-            {
-                rebuild_domain(*domain,new_domain);
-
-                // TODO: write a function to transfer values in parallel */
-
-                /* then the old domain is no longer necessary */
-                amrreset(domain);
-                *domain = domain_partitioned;
-
-                /* internal clean up */
-                fclaw2d_domain_complete(*domain);
-            }
-#endif
         }
         else
         {
