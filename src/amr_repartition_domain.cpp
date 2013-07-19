@@ -46,6 +46,17 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
     }
 }
 
+void delete_ghost_patches(fclaw2d_domain_t* domain)
+{
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+
+        delete_clawpatch(ghost_patch);
+    }
+}
+
+
 static
 void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
 {

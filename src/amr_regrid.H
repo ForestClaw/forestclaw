@@ -113,6 +113,7 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
  */
 void repartition_domain(fclaw2d_domain_t** domain, int mode);
 void exchange_ghost_patch_data(fclaw2d_domain_t* domain);
+void delete_ghost_patches(fclaw2d_domain_t *domain);
 
 
 void amr_print_patches_and_procs(fclaw2d_domain_t *domain);
