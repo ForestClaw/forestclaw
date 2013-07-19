@@ -311,8 +311,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
 
         if ((*domain)->mpirank == 0)
         {
-            printf("Level %d step %5d : dt = %12.3e; maxcfl \
-                    (step) = %8.3f; Final time = %12.4f\n",
+            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n+1,
                    dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
         }
