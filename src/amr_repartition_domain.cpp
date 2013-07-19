@@ -63,9 +63,6 @@ void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e
         double *q = (double*) e->ghost_data[patchno];
 
         unpack_clawpatch(domain, ghost_patch,blockno, patchno, q);
-
-        // should not be needed here
-        // set_clawpatch(domain,ghost_patch,blockno,patchno);
     }
 }
 
