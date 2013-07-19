@@ -42,6 +42,7 @@ main (int argc, char **argv)
 
 
   lp = SC_LP_PRODUCTION;
+  lp = SC_LP_DEBUG;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
