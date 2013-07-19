@@ -106,7 +106,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
             (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
                                          coarse_patchno);
 
-        delete_clawpatch(temp_coarse_patch);
+        delete_clawpatch(domain, temp_coarse_patch);
         delete_patch_data(temp_coarse_patch);
         FCLAW2D_FREE(temp_coarse_patch);
 

@@ -52,7 +52,7 @@ void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
     pdata->cp = cp;
 }
 
-void delete_clawpatch(fclaw2d_patch_t* this_patch)
+void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     if (cp != NULL)
