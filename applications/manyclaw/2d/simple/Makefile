@@ -1,6 +1,6 @@
 # Makefile for sphere example
 
-TARGET = swirl
+TARGET = simple
 GEO = cart
 
 # -----------------------------------------------------------
@@ -21,6 +21,7 @@ exampleobjs = \
 # Solver routines (several solvers can be added here)
 include Makefile.manyclaw.inc
 solverobjs = $(manyclaw_objs)
+solverlinkers = $(manyclaw_linkers)
 solverincludes = $(manyclaw_includes)
 
 # Mapping routines
@@ -41,11 +42,11 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 default: $(TARGET)
 
 .cpp.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
+	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	-I$(FORESTCLAW)/src -I. ${solverincludes} ${solverlinkers} -c $< -o $@
 
 .c.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .f.o:
@@ -54,7 +55,7 @@ default: $(TARGET)
 .PHONY: clean realclean default $(TARGET)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
-	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
+	$(P4EST_CC) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
 	$(P4EST_LIBS) -o $@
 
 clean:

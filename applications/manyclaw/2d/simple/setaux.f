@@ -20,17 +20,5 @@ c     #   aux(i,j,2) is edge velocity at "bottom" boundary of grid point (i,j)
 c     # constant velocities which are used if tperiod=0 is specified
 c     # in setprob.data
 
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-c           # coordinates of lower left corner of grid cell:
-            xll = xlower + (i-1)*dx
-            yll = ylower + (j-1)*dy
-
-c           # difference stream function psi to get normal velocities:
-            aux(i,j,1) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
-            aux(i,j,2) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
-         enddo
-      enddo
-
       return
       end
