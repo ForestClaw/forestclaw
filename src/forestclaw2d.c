@@ -677,9 +677,11 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
 
+#if 0
     P4EST_LDEBUGF ("Patches exchange %d %d, ghost %d %d\n",
                    e->num_exchange_patches, (int) ghost->mirrors.elem_count,
                    e->num_ghost_patches, (int) ghost->ghosts.elem_count);
+#endif
 
     P4EST_ASSERT (e->num_exchange_patches == (int) ghost->mirrors.elem_count);
     P4EST_ASSERT (e->num_ghost_patches == (int) ghost->ghosts.elem_count);
@@ -692,14 +694,6 @@ void
 fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e)
 {
-#ifdef P4EST_DEBUG
-    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
-    p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
-
-    P4EST_ASSERT (e->num_exchange_patches == (int) ghost->mirrors.elem_count);
-    P4EST_ASSERT (e->num_ghost_patches == (int) ghost->ghosts.elem_count);
-#endif
-
     P4EST_FREE (e->ghost_contiguous_memory);
     P4EST_FREE (e->ghost_data);
     P4EST_FREE (e->patch_data);
