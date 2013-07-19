@@ -28,8 +28,7 @@ exampleobjs = \
 	no_solver_user.o \
 	initialize.o \
 	ghost_twopatch.o \
-	tag4refinement.o \
-	debug_gdb.o
+	tag4refinement.o
 
 
 # make sure that the first make target is the executable
