@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 
 // Put this here so that I don't have to include "ClawPatch.H"
-void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-                   int blockno, int patchno);
+// void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+//                    int blockno, int patchno);
 
 // This is essentially the same function that is in amr_regrid.cpp
 static
