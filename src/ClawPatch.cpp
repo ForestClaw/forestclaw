@@ -50,15 +50,20 @@ void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
 
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
     pdata->cp = cp;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_set_clawpatch;
 }
 
 void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
-    if (cp != NULL)
-    {
-        delete cp;
-    }
+    // We expect this ClawPatch to exist.
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    delete pdata->cp;
+    pdata->cp = NULL;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_delete_clawpatch;
 }
 
 void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)

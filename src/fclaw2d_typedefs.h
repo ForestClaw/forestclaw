@@ -16,6 +16,8 @@ typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t* domain);
 
 typedef struct fclaw2d_domain_data
 {
+    int count_set_clawpatch, count_delete_clawpatch;
+
     const amr_options_t *amropts;
 
     /* Some solver parms */

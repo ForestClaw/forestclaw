@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void amrreset(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
+
     for(int i = 0; i < (*domain)->num_blocks; i++)
     {
         fclaw2d_block_t *block = (*domain)->blocks + i;
@@ -36,14 +38,13 @@ void amrreset(fclaw2d_domain_t **domain)
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t *) patch->user;
-            ClawPatch *cp = pd->cp;
+            fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t *) patch->user;
+            delete pdata->cp;
+            pdata->cp = NULL;
+            
+            ++ddata->count_delete_clawpatch;
 
-            if (cp != NULL)
-            {
-                delete cp;
-            }
-            FCLAW2D_FREE (pd);
+            FCLAW2D_FREE (pdata);
             patch->user = NULL;
         }
 
@@ -55,6 +56,13 @@ void amrreset(fclaw2d_domain_t **domain)
     delete_ghost_patches(*domain);
     fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
+
+    // Output memory discrepancy for the ClawPatch
+    if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {
+        printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
+                (*domain)->mpirank,
+                ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
+    }
 
     delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
 

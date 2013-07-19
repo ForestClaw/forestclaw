@@ -55,6 +55,8 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
     domain->user = (void *) ddata;
 
+    ddata->count_set_clawpatch = ddata->count_delete_clawpatch = 0;
+
     ddata->domain_exchange = NULL;
 
     ddata->amropts = NULL;
