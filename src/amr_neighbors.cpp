@@ -182,21 +182,25 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                     (for sphere grid)\n");
             exit(1);
         }
+
+        if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
+            neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+        {
+            // This patch shares face 'iface' with a single patch.
+            igrid = 0;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            // On bottom corners, we want to take the first patch in the list;
+            // On top corners, we take the last patch in the list.
+            igrid = (icorner/2)*(p4est_refineFactor - 1);
+        }
         else
         {
-            if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
-                neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
-            {
-                // This patch shares face 'iface' with a single patch.
-                igrid = 0;
-            }
-            else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
-            {
-                // On bottom corners, we want to take the first patch in the list;
-                // On top corners, we take the last patch in the list.
-                igrid = (icorner/2)*(p4est_refineFactor - 1);
-            }
+            printf("Something went wrong;  this should not be a boundary\n");
+            exit(1);
         }
+
         *corner_patch_idx = rpatchno[igrid];
         rproc_corner = rproc[igrid];
     }
