@@ -60,6 +60,14 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     int ngrids = domain->global_num_patches;
     fclaw2d_output_functions_t* of = get_output_functions(domain);
 
+    // Output VTK as while we're at it
+    const amr_options_t *gparms = get_domain_parms(domain);
+    if (gparms->vtkout & 2) {
+        char basename[BUFSIZ];
+        snprintf (basename, BUFSIZ, "frame_%04d", iframe);
+        amr_output_write_vtk (domain, basename);
+    }
+
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */

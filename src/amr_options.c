@@ -123,7 +123,8 @@ amr_options_new (sc_options_t * opt)
     /* This is a hack to control the VTK output while still in development.
      * The values are numbers which can be bitwise-or'd together.
      * 0 - no VTK output ever.
-     * 1 - debug output for all stages of amrinit.
+     * 1 - output for all stages of amrinit.
+     * 2 - output whenever amr_output() is called.
      */
     sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
                         "VTK output method");
