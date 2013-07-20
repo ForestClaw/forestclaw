@@ -56,7 +56,8 @@ public :
     void pack_griddata(double* qdata);
     void unpack_griddata(double* qdata);
 
-    void time_interpolate(const double& alpha);
+    void setup_time_interpolate(const double& alpha);
+    void reset_time_interpolate();
 
     // ----------------------------------------------------------------
     // Internal boundary conditions
@@ -299,10 +300,6 @@ protected :
     FArrayBox m_edge_lengths;
 
     FArrayBox m_curvature;  // ???
-
-    void swap_exchange_data(fclaw_bool a_time_interp);
-    void reset_exchange_data(fclaw_bool a_time_interp);
-
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_waveprop_patch_data;

@@ -142,10 +142,6 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             else if (ref_flag == 1)
             {
                 // Corner neighbor at a finer level.
-                /*
-                fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                */
                 ClawPatch *corner_cp = get_clawpatch(ghost_patch);
 
                 fclaw_bool &time_interp = *((fclaw_bool*) user);
@@ -422,30 +418,21 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
 
     double &alpha = *((double*) user);
-    cp->time_interpolate(alpha);
+    cp->setup_time_interpolate(alpha);
 }
 
-/*
 static
-void cb_dump_patch(fclaw2d_domain_t *domain,
-                   fclaw2d_patch_t *this_patch,
-                   int this_block_idx,
-                   int this_patch_idx,
-                   void *user)
+void cb_reset_time_interp(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
 {
     // This is called for all patches at a level coarser than the one we have.
     ClawPatch *cp = get_clawpatch(this_patch);
-
-    FILE *fid = (FILE*) user;
-    if (this_block_idx == 0)
-    {
-        fprintf(fid,"patchno = %d\n",this_patch_idx);
-        int mq = 1;
-        cp->dump(mq);
-    }
-
+    cp->reset_time_interpolate();
 }
-*/
+
 
 
 
@@ -517,12 +504,11 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  cb_corner_interpolate,
                                  (void *) &time_interp);
 
-    /*
-    FILE *fid = fopen("patch.dat","w");
-    fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 cb_dump_patch,
-                                 (void *) fid);
-    fclose(fid);
-    */
+    if (time_interp)
+    {
+        fclaw2d_domain_iterate_level(domain, coarser_level,
+                                     cb_reset_time_interp,
+                                     (void *) NULL);
+    }
 
 }

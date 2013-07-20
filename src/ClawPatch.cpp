@@ -329,25 +329,6 @@ void ClawPatch::unpack_griddata(double *q)
 }
 
 
-void ClawPatch::time_interpolate(const double& alpha)
-{
-    set_block_(&m_blockno);
-
-    double *qlast = m_griddata_last.dataPtr();
-    double *qcurr = m_griddata.dataPtr();
-    double *qtimeinterp = m_griddata_time_interp.dataPtr();
-    int size = m_griddata.size();
-
-    // This works, even when we have a system (meqn > 1).  Note that all ghost values
-    // will be interpolated.
-    for(int i = 0; i < size; i++)
-    {
-        // There is surely a BLAS routine that does this...
-        qtimeinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
-    }
-}
-
-
 /* ----------------------------------------------------------------
    Single level exchanges
    ---------------------------------------------------------------- */
@@ -422,24 +403,32 @@ void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& 
                                 a_corner, a_side);
 }
 
-void ClawPatch::swap_exchange_data(fclaw_bool a_time_interp)
+void ClawPatch::setup_time_interpolate(const double& alpha)
 {
-    /* This is necessary so that the pointers stored for doing parallel
-       ghost exchanges are always pointing to the data we want to use
-    */
-    if (a_time_interp)
+    set_block_(&m_blockno);
+
+    double *qlast = m_griddata_last.dataPtr();
+    double *qcurr = m_griddata.dataPtr();
+    double *qtimeinterp = m_griddata_time_interp.dataPtr();
+    int size = m_griddata.size();
+
+    // This works, even when we have a system (meqn > 1).  Note that all ghost values
+    // will be interpolated.
+    for(int i = 0; i < size; i++)
     {
-        m_griddata_temp = m_griddata;
-        m_griddata = m_griddata_time_interp;
+        /* We can write into m_griddata, since we swapped out
+           original contents above */
+        qtimeinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
     }
+
+    /* This swaps m_griddata and m_griddata_time_interp */
+    m_griddata_temp = m_griddata;
+    m_griddata = m_griddata_time_interp;
 }
 
-void ClawPatch::reset_exchange_data(fclaw_bool a_time_interp)
+void ClawPatch::reset_time_interpolate()
 {
-    if (a_time_interp)
-    {
-        m_griddata = m_griddata_temp;
-    }
+    m_griddata = m_griddata_temp;
 }
 
 /* ----------------------------------------------------------------
@@ -453,19 +442,8 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    fclaw_bool a_time_interp,
                                    fclaw_bool a_block_boundary)
 {
-    swap_exchange_data(a_time_interp);
     double *qcoarse = m_griddata.dataPtr();
 
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
     {
         double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
@@ -494,7 +472,6 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                 a_p4est_refineFactor,a_refratio,igrid);
         }
     }
-    reset_exchange_data(a_time_interp);
 }
 
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
@@ -505,19 +482,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        fclaw_bool a_time_interp,
                                        fclaw_bool a_block_boundary)
 {
-    swap_exchange_data(a_time_interp);
     double *qcoarse = m_griddata.dataPtr();
-
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
 
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
@@ -534,34 +499,19 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                     a_p4est_refineFactor,a_refratio,igrid);
         }
     }
-    reset_exchange_data(a_time_interp);
 }
 
 //
 void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
                                      ClawPatch *cp_corner, fclaw_bool a_time_interp)
 {
-    // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    swap_exchange_data(a_time_interp);
 
     double *qcoarse = m_griddata.dataPtr();
-
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
 
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio,
                           qcoarse, qfine, a_coarse_corner);
-    reset_exchange_data(a_time_interp);
 }
 
 
@@ -573,18 +523,7 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
                                         fclaw_bool intersects_block[])
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    swap_exchange_data(a_time_interp);
     double *qcoarse = m_griddata.dataPtr();
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
 
     double *areacoarse = this->m_area.dataPtr();
     double *areafine = cp_corner->m_area.dataPtr();
@@ -609,7 +548,6 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
                                  areacoarse, areafine,
                                  a_coarse_corner, block_bdry);
     }
-    reset_exchange_data(a_time_interp);
 }
 
 
@@ -620,19 +558,8 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                             fclaw_bool intersects_block[])
 
 {
-    swap_exchange_data(a_time_interp);
     double *qcoarse = m_griddata.dataPtr();
 
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
 
     // qcorner is the finer level.
     double *qfine = cp_corner->m_griddata.dataPtr();
@@ -655,33 +582,20 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                      a_refratio, qcoarse, qfine,
                                      a_coarse_corner, bdry);
     }
-    reset_exchange_data(a_time_interp);
 }
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
                                          ClawPatch *cp_corner, fclaw_bool a_time_interp)
 
 {
-    swap_exchange_data(a_time_interp);
     double *qcoarse = m_griddata.dataPtr();
 
-    /*
-    if (a_time_interp)
-    {
-        qcoarse = m_griddata_time_interp.dataPtr();
-    }
-    else
-    {
-        qcoarse = m_griddata.dataPtr();
-    }
-    */
 
     // qcorner is the finer level.
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
                               a_refratio, qcoarse, qfine, a_coarse_corner);
-    reset_exchange_data(a_time_interp);
 }
 
 
