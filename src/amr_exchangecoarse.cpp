@@ -478,27 +478,39 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
    the finer grid
    -----------------------------------------------------------------------*/
 
-    // Iterate over coarser level and average from finer neighbors to coarse.
+    /* Iterate over coarser level and average from finer neighbors
+       to coarse.
+    */
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average,
                                  (void *) &time_interp);
 
-    /* Need a special iterator for all boundary patches */
+    /* TODO : iterate over all fine grids, looking for coarse grid patches which
+       need to have face averaged values.  These coarse ghost patches will not be
+       picked up by the iterator above. */
 
-    // DAC : This could be the problem!
-    // // Average fine grid corners to the coarse grid ghost cells
+    /* Average fine grid corners to the coarse grid ghost cells */
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_corner_average,
                                  (void *) &time_interp);
 
-    // Set coarse grid physical boundary conditions - this will help with
-    // interpolation to finer grids.
+    /* TODO : iterate over all fine grids, looking for coarse grid patches which
+       need to have corner averaged values.  These coarse ghost patches will not be
+       picked up by the iterator above. */
+
+    /* Set coarse grid physical boundary conditions - this will help with
+       interpolation to finer grids. */
     set_phys_bc(domain,coarser_level,t_level);
 
-    // Interpolate coarse grid to fine.
+    /* TODO : Need a special iterator for all coarse boundary patches so that they
+       get averaged values at physical boundaries. */
+
+    /* Interpolate from coarse grids to finer grids. */
     fclaw2d_domain_iterate_level(domain,coarser_level,
                                  cb_face_interpolate,
                                  (void *) &time_interp);
+
+
 
     // Interpolate coarse grid to fine grid ghost cells.
     fclaw2d_domain_iterate_level(domain,coarser_level,
