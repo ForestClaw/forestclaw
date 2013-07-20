@@ -29,18 +29,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_output.H"
 #include <fclaw2d_vtk.h>
 
-static
-void cb_amrout(fclaw2d_domain_t *domain,
-               fclaw2d_patch_t *this_patch,
-               int this_block_idx,
-               int this_patch_idx,
-               void *user)
+static void
+cb_amrout (fclaw2d_domain_t * domain,
+           fclaw2d_patch_t * this_patch,
+           int this_block_idx, int this_patch_idx, void *user)
 {
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
-      domain->global_num_patches_before +
-      (int64_t) (this_block->num_patches_before + this_patch_idx);
+        domain->global_num_patches_before +
+        (int64_t) (this_block->num_patches_before + this_patch_idx);
 
     /* TODO Enable 64bit integers for global counters and indices */
 
@@ -48,21 +46,24 @@ void cb_amrout(fclaw2d_domain_t *domain,
        to have access? */
     int level = this_patch->level;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    (of->f_patch_write_output)(domain,this_patch,this_block_idx,
-                               this_patch_idx,iframe,(int) patch_num,level);
+    fclaw2d_output_functions_t *of = get_output_functions (domain);
+    (of->f_patch_write_output) (domain, this_patch, this_block_idx,
+                                this_patch_idx, iframe, (int) patch_num,
+                                level);
 }
 
 
-void amrout(fclaw2d_domain_t *domain, int iframe)
+void
+amrout (fclaw2d_domain_t * domain, int iframe)
 {
     // Get total number of patches
     int ngrids = domain->global_num_patches;
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
+    fclaw2d_output_functions_t *of = get_output_functions (domain);
 
     // Output VTK as while we're at it
-    const amr_options_t *gparms = get_domain_parms(domain);
-    if (gparms->vtkout & 2) {
+    const amr_options_t *gparms = get_domain_parms (domain);
+    if (gparms->vtkout & 2)
+    {
         char basename[BUFSIZ];
         snprintf (basename, BUFSIZ, "frame_%04d", iframe);
         amr_output_write_vtk (domain, basename);
@@ -76,10 +77,10 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
     if (domain->mpirank == 0)
     {
         /* the header needs to be written by the first processor */
-        (of->f_patch_write_header)(domain,iframe,ngrids);
+        (of->f_patch_write_header) (domain, iframe, ngrids);
     }
 
-    fclaw2d_domain_iterate_patches(domain, cb_amrout, (void *) &iframe);
+    fclaw2d_domain_iterate_patches (domain, cb_amrout, (void *) &iframe);
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
@@ -87,36 +88,35 @@ void amrout(fclaw2d_domain_t *domain, int iframe)
 static void
 amr_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
                               fclaw2d_patch_t * this_patch,
-                              int this_block_idx, int this_patch_idx,
-                              char *a)
+                              int this_block_idx, int this_patch_idx, char *a)
 {
     // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
+    set_block_ (&this_block_idx);
 
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms (domain);
     const int mx = gparms->mx;
     const int my = gparms->my;
 
     // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    const double xlower = cp->xlower();
-    const double ylower = cp->ylower();
-    const double dx = cp->dx();
-    const double dy = cp->dy();
+    ClawPatch *cp = get_clawpatch (this_patch);
+    const double xlower = cp->xlower ();
+    const double ylower = cp->ylower ();
+    const double dx = cp->dx ();
+    const double dy = cp->dy ();
 
     // Enumerate point coordinates in the patch
-    double * d = (double *) a;
+    double *d = (double *) a;
     int i, j;
     for (j = 0; j <= my; ++j)
     {
-       const double y = ylower + j * dy;
-       for (i = 0; i <= mx; ++i)
-       {
-           *d++ = xlower + i * dx;
-           *d++ = y;
-           *d++ = 0.;
-       }
+        const double y = ylower + j * dy;
+        for (i = 0; i <= mx; ++i)
+        {
+            *d++ = xlower + i * dx;
+            *d++ = y;
+            *d++ = 0.;
+        }
     }
 }
 
@@ -126,10 +126,10 @@ amr_output_vtk_value_cb (fclaw2d_domain_t * domain,
                          int this_block_idx, int this_patch_idx, char *a)
 {
     // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
+    set_block_ (&this_block_idx);
 
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms (domain);
     const int mx = gparms->mx;
     const int my = gparms->my;
     const int mbc = gparms->mbc;
@@ -138,11 +138,11 @@ amr_output_vtk_value_cb (fclaw2d_domain_t * domain,
     const int ylane = my + 2 * mbc;
 
     // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    const double *q = cp->q();
+    ClawPatch *cp = get_clawpatch (this_patch);
+    const double *q = cp->q ();
 
     // Enumerate equation data in the patch
-    float * f = (float *) a;
+    float *f = (float *) a;
     int i, j, k;
     for (j = 0; j < my; ++j)
     {
@@ -157,9 +157,9 @@ amr_output_vtk_value_cb (fclaw2d_domain_t * domain,
 }
 
 void
-amr_output_write_vtk (fclaw2d_domain_t *domain, const char *basename)
+amr_output_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = get_domain_parms (domain);
 
     (void) fclaw2d_vtk_write_file (domain, basename,
                                    gparms->mx, gparms->my, gparms->meqn,
