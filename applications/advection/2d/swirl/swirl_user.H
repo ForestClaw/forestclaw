@@ -48,6 +48,20 @@ extern "C"
                                const int& meqn,const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
                                double qcoarsened[], int& tag_patch);
+
+    void swirl_write_tfile_(const int& iframe,const double& time,
+                            const int& mfields,const int& ngrids,
+                            const int& maux);
+
+    void swirl_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+                            const int& mbc, const int& mx,const int& my,
+                            const double& xlower,const double& ylower,
+                            const double& dx, const double& dy,
+                            double q[], const int& iframe,const int& patch_num,
+                            const int& level,const int& blockno,
+                            const int& mpirank);
+
+
 }
 
 
@@ -90,6 +104,11 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       int blockno,
                                       int patchno);
 
+void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                 int iframe,int num,int level);
+
+void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
 #ifdef __cplusplus
 #if 0

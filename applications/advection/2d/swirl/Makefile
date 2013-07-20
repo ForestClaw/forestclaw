@@ -21,7 +21,8 @@ exampleobjs = \
 	qinit.o \
 	b4step2.o \
 	setaux.o \
-	setprob.o
+	setprob.o \
+	swirl_output.o
 
 # Solver routines (several solvers can be added here)
 include Makefile.waveprop.inc

@@ -74,3 +74,12 @@ ContourValues = [];
   x0 = 0;
   y0 = 0;
   ScatterStyle = setplotstyle('bx','rx','gx');
+
+global cm_index;
+
+% Use this for plotting cool proc colors rather than actual data.
+if (mq == 1)
+  cm_index = true;
+else
+  cm_index = false;
+end

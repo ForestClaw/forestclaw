@@ -39,6 +39,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
     sf->f_patch_single_step_update = &swirl_patch_single_step_update;
 
+    fclaw2d_output_functions_t* of = get_output_functions(domain);
+    of->f_patch_write_header = &swirl_parallel_write_header;
+    of->f_patch_write_output = &swirl_parallel_write_output;
+
     amr_waveprop_link_to_clawpatch();
 }
 
@@ -162,4 +166,62 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     int tag_patch = 1;  // == 0 or 1
     swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
+}
+
+void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    double time = get_domain_time(domain);
+
+    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+
+    // Write out header file containing global information for 'iframe'
+    int mfields = gparms->meqn + 1;
+    int maux = 0;
+    swirl_write_tfile_(iframe,time,mfields,ngrids,maux);
+
+    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
+    // 0010, 0114), and closes the file.
+    new_qfile_(iframe);
+}
+
+
+void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------------- */
+    // This opens a file for append.  Now, the style is in the 'clawout' style.
+    int matlab_level = level + 1;
+
+    int mpirank = domain->mpirank;
+    swirl_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                        iframe,num,matlab_level,this_block_idx,mpirank);
 }
