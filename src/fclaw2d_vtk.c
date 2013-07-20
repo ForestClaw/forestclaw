@@ -46,11 +46,15 @@ typedef struct fclaw2d_vtk_state
     const char *inttype;
     fclaw2d_vtk_patch_data_t coordinate_cb;
     fclaw2d_vtk_patch_data_t value_cb;
+#ifdef P4EST_MPIIO
     MPI_File mpifile;
     MPI_Offset mpibegin;
+#endif
     char *buf;
 }
 fclaw2d_vtk_state_t;
+
+#ifdef P4EST_MPIIO
 
 static int
 fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
@@ -459,6 +463,8 @@ fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     return 0;
 }
 
+#endif /* P4EST_MPIIO */
+
 int
 fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
                         int mx, int my, int meqn,
@@ -466,6 +472,7 @@ fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb)
 {
+#ifdef P4EST_MPIIO
     int retval, gretval;
     int mpiret;
     fclaw2d_vtk_state_t ps, *s = &ps;
@@ -548,6 +555,7 @@ fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
     {
         return -1;
     }
+#endif /* P4EST_MPIIO */
 
     return 0;
 }
