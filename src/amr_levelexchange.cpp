@@ -50,6 +50,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int ref_flag;   // = -1, 0, 1
         int *ref_flag_ptr = &ref_flag;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
+        fclaw_bool is_ghost_patch[p4est_refineFactor];
 
         get_face_neighbors(domain,
                            this_block_idx,
@@ -58,7 +59,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            &neighbor_block_idx,
                            neighbor_patch_idx,
                            ghost_patches,
-                           &ref_flag_ptr);
+                           &ref_flag_ptr,
+                           is_ghost_patch);
 
         if (ref_flag_ptr == NULL)
         {
@@ -145,6 +147,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *ghost_patch;
+            fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -154,7 +157,8 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 &corner_patch_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                &is_ghost_patch);
 
             if (ref_flag_ptr == NULL)
             {

@@ -116,6 +116,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *ghost_patch;
+            fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -125,7 +126,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 &corner_patch_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                &is_ghost_patch);
 
             // Possible returns from ref_flag :
             // FCLAW2D_PATCH_BOUNDARY : ref_flag_ptr = NULL
@@ -223,6 +225,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *ghost_patch;
+            fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -232,7 +235,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 &corner_patch_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                &is_ghost_patch);
 
             if (ref_flag_ptr == NULL)
             {
@@ -297,6 +301,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
+            fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -305,7 +310,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
                                ghost_patches,
-                               &ref_flag_ptr);
+                               &ref_flag_ptr,
+                               is_ghost_patch);
 
             if (ref_flag_ptr == NULL)
             {
@@ -360,6 +366,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
+            fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -368,7 +375,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
                                ghost_patches,
-                               &ref_flag_ptr);
+                               &ref_flag_ptr,
+                               is_ghost_patch);
 
             if (ref_flag_ptr == NULL)
             {
@@ -451,9 +459,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
                           double alpha)
 {
-    /* Do parallel ghost exchange */
-    exchange_ghost_patch_data(domain);
-
     // Simple exchange - no time interpolation needed
     fclaw_bool time_interp = alpha > 0; //
     int coarser_level = level - 1;
@@ -465,6 +470,8 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                      (void *) &alpha);
     }
 
+    /* Do parallel ghost exchange _after_ we have time_interpolated data */
+    exchange_ghost_patch_data(domain);
 
 /* -------------------------------------------------------------------
    Fill coarse grid ghost cells at edges and corners that are shared with
@@ -475,6 +482,8 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average,
                                  (void *) &time_interp);
+
+    /* Need a special iterator for all boundary patches */
 
     // DAC : This could be the problem!
     // // Average fine grid corners to the coarse grid ghost cells
