@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_vtk.h"
+#include <p4est_config.h>
 
 typedef struct fclaw2d_vtk_state
 {
