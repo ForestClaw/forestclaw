@@ -63,7 +63,8 @@ typedef void (*fclaw2d_patch_physical_bc_t)(fclaw2d_domain *domain,
                                             int this_patch_idx,
                                             double t,
                                             double dt,
-                                            fclaw_bool *intersects_bc);
+                                            fclaw_bool *intersects_bc,
+                                            fclaw_bool time_interp);
 
 
 /* Interface to MOL solver */

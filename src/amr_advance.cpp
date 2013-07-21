@@ -73,6 +73,8 @@ double advance_level(fclaw2d_domain_t *domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
+    fclaw_bool time_interp = fclaw_false;
+
 
     double maxcfl = 0;
     if (verbose)
@@ -111,14 +113,13 @@ double advance_level(fclaw2d_domain_t *domain,
                         " without time interpolation" << endl;
                 }
                 double alpha = 0;  // No time interpolation
-
                 /* Boundary conditions on finer grid should be set so that they can
                    be used in setting corners on coarser grids, if needed. */
-                set_phys_bc(domain,a_level,t_level);
+                set_phys_bc(domain,a_level,t_level,time_interp);
 
                 exchange_with_coarse(domain,a_level,t_level,alpha);
 
-                set_phys_bc(domain,a_level,t_level);
+                set_phys_bc(domain,a_level,t_level,time_interp);
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
 
@@ -190,13 +191,16 @@ double advance_level(fclaw2d_domain_t *domain,
                        can only happen if refratio > 2) */
 
                     double  alpha = double(a_curr_fine_step)/refratio;
+                    fclaw_bool time_interp = fclaw_true;
                     if (verbose)
                     {
                         cout << " --> Doing time interpolatation from coarse grid at level "
                              << a_level-1 << " using alpha = " << alpha << endl;
                     }
                     exchange_with_coarse(domain,a_level,t_level,alpha);
-                    set_phys_bc(domain,a_level,t_level);
+
+                    time_interp = fclaw_false;
+                    set_phys_bc(domain,a_level,t_level,time_interp);
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
                 }  /* no subcycling */
             } /* Need time interpolated boundary conditions */
@@ -236,9 +240,8 @@ double advance_level(fclaw2d_domain_t *domain,
     a_time_stepper->increment_time(a_level);
 
     level_exchange(domain,a_level);
-    set_phys_bc(domain,a_level,t_level);
+    set_phys_bc(domain,a_level,t_level,time_interp);
 
-    set_phys_bc(domain,a_level,t_level);
     a_time_stepper->increment_level_exchange_counter(a_level);
 
     if (verbose)

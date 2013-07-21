@@ -72,7 +72,8 @@ void exchange_with_coarse(fclaw2d_domain_t *domain, int a_level,
                           double t_level,double alpha);
 
 // amr_physbc.cpp
-void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time);
+void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time,
+                 fclaw_bool time_interp);
 
 
 // -------------------------------------------

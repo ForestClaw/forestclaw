@@ -54,7 +54,8 @@ void amr_dummy_patch_physical_bc(fclaw2d_domain *domain,
                                  int this_patch_idx,
                                  double t,
                                  double dt,
-                                 fclaw_bool *intersects_bc)
+                                 fclaw_bool *intersects_bc,
+                                 fclaw_bool time_interp)
 {
     /* Do nothing */
 }

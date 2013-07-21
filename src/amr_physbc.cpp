@@ -33,8 +33,10 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
+    struct time_info_t {double level_time; fclaw_bool time_interp; } *t_info;
+    t_info = (time_info_t*) user;
+
     fclaw_bool intersects_bc[NumFaces];
-    double curr_time = *((double*) user);
     double dt = 1e20;
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
@@ -43,8 +45,9 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                               this_patch,
                               this_block_idx,
                               this_patch_idx,
-                              curr_time,dt,
-                              intersects_bc);
+                              t_info->level_time,dt,
+                              intersects_bc,
+                              t_info->time_interp);
 }
 
 
@@ -52,7 +55,11 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
    Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time)
+void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time,
+                 fclaw_bool time_interp)
 {
-    fclaw2d_domain_iterate_level(domain, a_level,cb_set_phys_bc,(void *) &a_level_time);
+    struct time_info_t {double level_time; fclaw_bool time_interp; } t_info;
+    t_info.level_time = a_level_time;
+    t_info.time_interp = time_interp;
+    fclaw2d_domain_iterate_level(domain, a_level,cb_set_phys_bc,(void *) &t_info);
 }

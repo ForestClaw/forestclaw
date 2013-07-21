@@ -161,7 +161,10 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
     restore_patch_data(domain,level,mol_data);
 
     level_exchange(domain,level);
-    set_phys_bc(domain,level, t_inner);
+
+
+    fclaw_bool time_interp = fclaw_false;
+    set_phys_bc(domain,level, t_inner,time_interp);
 
     /* Set ghost cell values at newly updated data on level 'level'. */
     if (t_inner > t_level)

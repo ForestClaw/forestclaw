@@ -245,7 +245,8 @@ void regrid(fclaw2d_domain_t **domain)
         for (int level = minlevel; level <= maxlevel; level++)
         {
             level_exchange(new_domain,level);
-            set_phys_bc(new_domain,level,t);
+            fclaw_bool time_interp = fclaw_false;
+            set_phys_bc(new_domain,level,t,time_interp);
         }
 
         // free memory associated with old domain

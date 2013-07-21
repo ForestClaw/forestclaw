@@ -112,7 +112,7 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
  * \param [in] mode             A level for amrinit, -1 for running simulation.
  */
 void repartition_domain(fclaw2d_domain_t** domain, int mode);
-void exchange_ghost_patch_data(fclaw2d_domain_t* domain);
+void exchange_ghost_patch_data(fclaw2d_domain_t* domain,fclaw_bool time_interp);
 void delete_ghost_patches(fclaw2d_domain_t *domain);
 
 

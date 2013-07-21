@@ -286,7 +286,8 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
                       int this_patch_idx,
                       double t,
                       double dt,
-                      fclaw_bool intersects_phys_bdry[])
+                      fclaw_bool intersects_phys_bdry[],
+                      fclaw_bool time_interp)
 {
     // In case this is needed by the setaux routine
     set_block_(&this_block_idx);
@@ -329,7 +330,15 @@ void amr_waveprop_bc2(fclaw2d_domain *domain,
 
     /* ------------------------------------------------------- */
     // Pointers needed to pass to Fortran
-    double* q = cp->q();
+
+
+    /*
+      We may be imposing boundary conditions on time-interpolated data;
+      and is being done just to help with fine grid interpolation.
+      In this case, this boundary condition won't be used to update
+      anything
+    */
+    double *q = cp->q_time_sync(time_interp);
 
     double *aux;
     int maux;

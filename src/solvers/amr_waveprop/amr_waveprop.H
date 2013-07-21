@@ -172,7 +172,8 @@ void amr_waveprop_bc2(fclaw2d_domain_t *domain,
                       int this_patch_idx,
                       double t,
                       double dt,
-                      fclaw_bool intersects_bc[]);
+                      fclaw_bool intersects_bc[],
+                      fclaw_bool time_interp);
 
 void amr_waveprop_src2(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,

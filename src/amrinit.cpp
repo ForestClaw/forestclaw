@@ -153,7 +153,8 @@ void amrinit (fclaw2d_domain_t **domain)
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
 
-    set_phys_bc(*domain,minlevel,t);
+    fclaw_bool time_interp = fclaw_false;
+    set_phys_bc(*domain,minlevel,t,time_interp);
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {
@@ -189,7 +190,8 @@ void amrinit (fclaw2d_domain_t **domain)
             // Set boundary need ghost cell values so they are available
             // for using at tagging criteria, if necessary.
             int new_level = level+1;
-            set_phys_bc(new_domain,new_level,t);
+            fclaw_bool time_interp = fclaw_false;
+            set_phys_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain
             amrreset(domain);
