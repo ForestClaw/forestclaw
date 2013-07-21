@@ -463,7 +463,13 @@ amr_manyclaw_parms_t*  amr_manyclaw_parms_new(sc_options_t *opt)
     amr_options_add_int_array (opt, 0, "mthlim", &manyclaw_parms->mthlim_string, NULL,
                                &manyclaw_parms->mthlim, manyclaw_parms->mwaves,
                                "Waves limiters (one for each wave)");
-    /* At this point amropt->mthlim is allocated. Set defaults if desired. */
+    /*
+     * At this point amropt->mthlim is allocated, but for precisely 1 wave,
+     * since that is the default value provided to manyclaw_parms->waves above.
+     * If the number of waves (manyclaw_parms->mwaves) is changed by option
+     * parsing, then this array needs to be converted anew. This can be done
+     * by calling amr_manyclaw_postprocess_parms.
+     */
 
 
     /* -----------------------------------------------------------------------

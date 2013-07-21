@@ -82,8 +82,8 @@ amr_options_convert_arrays (amr_options_t * amropt)
     amr_options_convert_int_array (amropt->order_string, &amropt->order,
                                    SpaceDim);
     amr_options_convert_int_array (amropt->mthlim_string, &amropt->mthlim,
-    amropt->mwaves);
-    */
+                                   amropt->mwaves);
+     */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
                                    NumFaces);
 }
