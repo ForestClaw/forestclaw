@@ -414,13 +414,16 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    // This is called for all patches at a level coarser than the one we have.
+    /* This is called for all patches on the coarse level */
     ClawPatch *cp = get_clawpatch(this_patch);
-
     double &alpha = *((double*) user);
-    cp->setup_time_interpolate(alpha);
+
+    /* This constructs a time interpolated version of the data on
+       the coarser grid */
+    cp->setup_for_time_interpolation(alpha);
 }
 
+#if 0
 static
 void cb_reset_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -428,10 +431,14 @@ void cb_reset_time_interp(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
+    struct time_interp_info {double alpha; fclaw_bool time_interp; } *t_info;
+    t_info = (time_interp_info*) user;
     // This is called for all patches at a level coarser than the one we have.
     ClawPatch *cp = get_clawpatch(this_patch);
-    cp->reset_time_interpolate();
+
+    cp->reset_after_time_interpolation();
 }
+#endif
 
 
 
@@ -449,16 +456,18 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     // Simple exchange - no time interpolation needed
     fclaw_bool time_interp = alpha > 0; //
     int coarser_level = level - 1;
+    int fine_level = level;
 
+    /* copy griddata to griddata_time_sync so that parallel exchange will work */
     if (time_interp)
     {
         fclaw2d_domain_iterate_level(domain, coarser_level,
                                      cb_setup_time_interp,
                                      (void *) &alpha);
     }
-
-    /* Do parallel ghost exchange _after_ we have time_interpolated data */
-    exchange_ghost_patch_data(domain);
+    /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
+       we are in the time interpolated case */
+    exchange_ghost_patch_data(domain,time_interp);
 
 /* -------------------------------------------------------------------
    Fill coarse grid ghost cells at edges and corners that are shared with
@@ -471,6 +480,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average,
                                  (void *) &time_interp);
+
 
     /* TODO : iterate over all fine grids, looking for coarse grid patches which
        need to have face averaged values.  These coarse ghost patches will not be
@@ -486,8 +496,12 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        picked up by the iterator above. */
 
     /* Set coarse grid physical boundary conditions - this will help with
-       interpolation to finer grids. */
-    set_phys_bc(domain,coarser_level,t_level);
+       interpolation to finer grids.
+
+       t_level is the time at the finer level,
+       i.e. coarse_time + alpha*dt_coarse
+    */
+    set_phys_bc(domain,coarser_level,t_level,time_interp);
 
     /* TODO : Need a special iterator for all coarse boundary patches so that they
        get averaged values at physical boundaries. */
@@ -504,11 +518,13 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  cb_corner_interpolate,
                                  (void *) &time_interp);
 
-    if (time_interp)
+    if (!time_interp)
     {
+        /*
         fclaw2d_domain_iterate_level(domain, coarser_level,
                                      cb_reset_time_interp,
-                                     (void *) NULL);
+                                     (void *) &t_info);
+        */
     }
 
 }

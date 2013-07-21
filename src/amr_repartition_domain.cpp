@@ -81,7 +81,7 @@ void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e
 
 /* This is called by rebuild_domain */
 static
-void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
+    void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
 {
     size_t data_size =  pack_size(domain);
     fclaw2d_domain_exchange_t *e;
@@ -91,6 +91,7 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
        remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
+#if 0
     /* Store local boundary data */
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
@@ -107,6 +108,7 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
             }
         }
     }
+#endif
 
     /* Store e so we can retrieve it later */
     set_domain_exchange_data(domain,e);
@@ -118,9 +120,28 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
 
 
 /* This is called anytime we need to update ghost patch data */
-void exchange_ghost_patch_data(fclaw2d_domain_t* domain)
+void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
 {
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+
+    /* Store pointers to local boundary data.  We need to do this here
+       because may be exchanging with time interpolated data. */
+    int zz = 0;
+    for (int nb = 0; nb < domain->num_blocks; ++nb)
+    {
+        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
+        {
+            if (domain->blocks[nb].patches[np].flags &
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            {
+                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
+                ClawPatch *cp = get_clawpatch(this_patch);
+                double *q = cp->q_time_sync(time_interp);
+                e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
+            }
+        }
+    }
+
 
     /* Do exchange to update ghost patch data */
     fclaw2d_domain_ghost_exchange(domain, e);

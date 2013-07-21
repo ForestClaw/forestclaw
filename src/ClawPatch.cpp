@@ -151,8 +151,7 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_last.define(box, m_meqn);
     m_griddata_save.define(box, m_meqn);
-    m_griddata_time_interp.define(box, m_meqn);
-    m_griddata_temp.define(box, m_meqn);
+    m_griddata_time_sync.define(box, m_meqn);
 
     m_manifold = gparms->manifold;
     if (m_manifold)
@@ -168,13 +167,6 @@ void ClawPatch::define(const double&  a_xlower,
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
     m_griddata = a_cp->m_griddata;
-    /*
-    // This should not be needed, as these various states will all be
-    // recreated in the next time step.
-    m_griddata_last = a_cp->m_griddata_last;
-    m_griddata_save = a_cp->m_griddata_save;
-    m_griddata_time_interp = a_cp->m_griddata_time_interp;
-    */
 }
 
 // This is used by level_step.
@@ -183,10 +175,21 @@ double* ClawPatch::q()
     return m_griddata.dataPtr();
 }
 
+// This is used by level_step.
+double* ClawPatch::q_time_sync(fclaw_bool time_interp)
+{
+    if (time_interp)
+        return m_griddata_time_sync.dataPtr();
+    else
+        return m_griddata.dataPtr();
+}
+
 void ClawPatch::save_current_step()
 {
     m_griddata_last = m_griddata; // Copy for time interpolation
 }
+
+
 
 double ClawPatch::dx()
 {
@@ -389,7 +392,7 @@ void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
 {
     double *q = m_griddata.dataPtr();
 
-    // No code yet
+    /* This routine doesn't do anything ... */
     set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
 }
 
@@ -403,33 +406,30 @@ void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& 
                                 a_corner, a_side);
 }
 
-void ClawPatch::setup_time_interpolate(const double& alpha)
+void ClawPatch::setup_for_time_interpolation(const double& alpha)
 {
-    set_block_(&m_blockno);
-
+    /* Store time interpolated data that will be use in coarse grid
+       exchanges */
     double *qlast = m_griddata_last.dataPtr();
     double *qcurr = m_griddata.dataPtr();
-    double *qtimeinterp = m_griddata_time_interp.dataPtr();
+    double *qsync = m_griddata_time_sync.dataPtr();
     int size = m_griddata.size();
 
-    // This works, even when we have a system (meqn > 1).  Note that all ghost values
-    // will be interpolated.
     for(int i = 0; i < size; i++)
     {
-        /* We can write into m_griddata, since we swapped out
-           original contents above */
-        qtimeinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
+        qsync[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
     }
-
-    /* This swaps m_griddata and m_griddata_time_interp */
-    m_griddata_temp = m_griddata;
-    m_griddata = m_griddata_time_interp;
 }
 
-void ClawPatch::reset_time_interpolate()
+#if 0
+void ClawPatch::reset_after_time_interpolation()
 {
-    m_griddata = m_griddata_temp;
+    /* If there is no time interpolation, we actually
+       want to keep the coarse grid values set in this
+       step. */
+    m_griddata = m_griddata_time_sync;
 }
+#endif
 
 /* ----------------------------------------------------------------
    Multi-level operations
@@ -442,7 +442,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    fclaw_bool a_time_interp,
                                    fclaw_bool a_block_boundary)
 {
-    double *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = q_time_sync(a_time_interp);
 
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
     {
@@ -482,7 +482,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        fclaw_bool a_time_interp,
                                        fclaw_bool a_block_boundary)
 {
-    double *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = q_time_sync(a_time_interp);
 
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
@@ -506,7 +506,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_re
                                      ClawPatch *cp_corner, fclaw_bool a_time_interp)
 {
 
-    double *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = q_time_sync(a_time_interp);
 
     double *qfine = cp_corner->m_griddata.dataPtr();
 
@@ -523,7 +523,8 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
                                         fclaw_bool intersects_block[])
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    double *qcoarse = m_griddata.dataPtr();
+    double *qcoarse = q_time_sync(a_time_interp);
+
 
     double *areacoarse = this->m_area.dataPtr();
     double *areafine = cp_corner->m_area.dataPtr();
@@ -558,10 +559,10 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                             fclaw_bool intersects_block[])
 
 {
-    double *qcoarse = m_griddata.dataPtr();
+    // double *qcoarse = m_griddata_time_sync.dataPtr();
+    double *qcoarse = q_time_sync(a_time_interp);
 
-
-    // qcorner is the finer level.
+    /* qcorner is the finer level. */
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     if (is_block_corner)
@@ -588,8 +589,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
                                          ClawPatch *cp_corner, fclaw_bool a_time_interp)
 
 {
-    double *qcoarse = m_griddata.dataPtr();
-
+    double *qcoarse = q_time_sync(a_time_interp);
 
     // qcorner is the finer level.
     double *qfine = cp_corner->m_griddata.dataPtr();
@@ -608,7 +608,7 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
                                           const int& a_p4est_refineFactor,
                                           const int& a_refratio)
 {
-    double *qcoarse = q();
+    double *qcoarse = m_griddata.dataPtr();
     double *qfine = a_fine->q();
 
     // Use linear interpolation with limiters.
@@ -821,6 +821,7 @@ void ClawPatch::dump_last()
     }
 }
 
+#if 0
 void ClawPatch::dump_time_interp()
 {
     double *q;
@@ -836,3 +837,4 @@ void ClawPatch::dump_time_interp()
         printf("\n");
     }
 }
+#endif

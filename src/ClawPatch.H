@@ -56,8 +56,9 @@ public :
     void pack_griddata(double* qdata);
     void unpack_griddata(double* qdata);
 
-    void setup_time_interpolate(const double& alpha);
-    void reset_time_interpolate();
+    void setup_for_time_interpolation(const double& alpha);
+    void reset_after_time_interpolation();
+    double* q_time_sync(fclaw_bool time_interp);
 
     // ----------------------------------------------------------------
     // Internal boundary conditions
@@ -271,17 +272,14 @@ protected :
     /* Current time step */
     FArrayBox m_griddata;
 
-    /* Time interpolated grid data */
-    FArrayBox m_griddata_time_interp;
-
-    /* Needed as temporary storage to get ghost exchanges to work */
-    FArrayBox m_griddata_temp;
-
     /* Last time step, needed to get time interpolated data */
     FArrayBox m_griddata_last;
 
     /* Save last time step in case we need to retake a time step */
     FArrayBox m_griddata_save;
+
+    /* Store time synchronized coarse grid data for time interpolation */
+    FArrayBox m_griddata_time_sync;
 
     FArrayBox m_xp;
     FArrayBox m_yp;
