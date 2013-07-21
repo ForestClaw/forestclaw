@@ -83,10 +83,11 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              int this_patch_idx,
                              double t,
                              double dt,
-                             fclaw_bool intersects_bc[])
+                             fclaw_bool intersects_bc[],
+                             fclaw_bool time_interp)
 {
     amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc);
+                     t,dt,intersects_bc,time_interp);
 }
 
 

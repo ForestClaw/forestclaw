@@ -80,12 +80,13 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_patch_idx);
 
 void swirl_patch_physical_bc(fclaw2d_domain *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt,
-                        fclaw_bool intersects_bc[]);
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt,
+                             fclaw_bool intersects_bc[],
+                             fclaw_bool time_interp);
 
 double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
