@@ -91,24 +91,3 @@ void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch)
     fclaw2d_domain_iterate_patches(domain, cb_dump_last_patch,
                                    &dump_patch);
 }
-
-static
-void cb_dump_time_interp_patch(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
-{
-    int dump_patch = *((int *) user);
-    int numb4 = domain->blocks[block_no].num_patches_before;
-    if (patch_no == dump_patch + numb4)
-    {
-        ClawPatch *cp = get_clawpatch(patch);
-        cp->dump_time_interp();
-    }
-}
-
-void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch)
-{
-    printf("Dumping patch (time_interp) %d\n",dump_patch);
-    fclaw2d_domain_iterate_patches(domain,
-                                   cb_dump_time_interp_patch,
-                                   &dump_patch);
-}
