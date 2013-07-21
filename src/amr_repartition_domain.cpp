@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_regrid.H"
 
 static
-void build_ghost_patches(fclaw2d_domain_t* domain)
+    void build_ghost_patches(fclaw2d_domain_t* domain)
 {
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
@@ -59,7 +59,8 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
 
 
 static
-void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
+    void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
+                              fclaw_bool time_interp)
 {
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
@@ -71,10 +72,10 @@ void unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e
            need to be passed in */
         int patchno = i;
 
-        /* access data stored on remote procs */
+        /* access data stored on remote procs.  This might be time interpolated data. */
         double *q = (double*) e->ghost_data[patchno];
 
-        unpack_clawpatch(domain, ghost_patch,blockno, patchno, q);
+        unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
     }
 }
 
@@ -124,8 +125,8 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
 {
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
 
-    /* Store pointers to local boundary data.  We need to do this here
-       because may be exchanging with time interpolated data. */
+    /* Store pointers to local boundary data.  We do this here
+       because we may be exchanging with time interpolated data. */
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
@@ -137,7 +138,7 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 ClawPatch *cp = get_clawpatch(this_patch);
                 double *q = cp->q_time_sync(time_interp);
-                e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
+                e->patch_data[zz++] = (void*) q;
             }
         }
     }
@@ -148,7 +149,7 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
 
     /* Store newly updated e->ghost_patch_data into ghost patches constructed
        locally */
-    unpack_ghost_patches(domain,e);
+    unpack_ghost_patches(domain,e, time_interp);
 }
 
 
@@ -199,8 +200,9 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 
+    fclaw_bool time_interp = fclaw_false;
     unpack_clawpatch(domain,this_patch,this_block_idx,this_patch_idx,
-                     patch_data);
+                     patch_data,time_interp);
 }
 
 

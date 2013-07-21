@@ -53,6 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    ******************************************************************************
 */
 
+struct exchange_info
+{
+    fclaw_bool time_interp;
+    fclaw_bool is_coarse;
+    fclaw_bool is_fine;
+    int level;
+};
+
 
 static
 void cb_corner_average(fclaw2d_domain_t *domain,
@@ -61,6 +69,12 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    exchange_info *e_info = (exchange_info*) user;
+    fclaw_bool time_interp = e_info->time_interp;
+    fclaw_bool is_coarse = e_info->is_coarse;
+    fclaw_bool is_fine = e_info->is_fine;
+
+
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
     fclaw_bool intersects_bc[NumFaces];
@@ -98,12 +112,14 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         if (is_phys_corner)
         {
             // We don't have to worry about this now.  It is
-            // now taken care of by smart sweeping in the bc2 routine.
+            // now taken care of by applying physical boundary conditions,
+            // first in x, then in y.
         }
         else if (corner_on_phys_face)
         {
-            // Again, smart sweeping on in the bc2 routine should take care of these
-            // corner cells.
+            // Taken care of by applying boundary conditions _after_ doing
+            // face exchanges or coarse/fine interpolation at a face that
+            // intersects (perpendicularly) the physical boundary.
         }
         else if (interior_corner)
         {
@@ -129,22 +145,24 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 is_block_corner,
                                 &is_ghost_patch);
 
-            // Possible returns from ref_flag :
-            // FCLAW2D_PATCH_BOUNDARY : ref_flag_ptr = NULL
-            // FCLAW2D_PATCH_HALFSIZE : ref_flag = 1 (one level finer)
-            // FCLAW2D_PATCH_SAMESIZE : ref_flag = 0 (same level)
-            // FCLAW2D_PATCH_DOUBLESIZE : ref_flag = -1 (one level coarser)
+            /* -------------------------------------
+               Possible returns from ref_flag :
+               FCLAW2D_PATCH_BOUNDARY : ref_flag_ptr = NULL
+               FCLAW2D_PATCH_HALFSIZE : ref_flag = 1 (one level finer)
+               FCLAW2D_PATCH_SAMESIZE : ref_flag = 0 (same level)
+               FCLAW2D_PATCH_DOUBLESIZE : ref_flag = -1 (one level coarser)
+               ------------------------------------- */
 
             if (ref_flag_ptr == NULL)
             {
                 // No corner neighbor
             }
-            else if (ref_flag == 1)
+            else if (ref_flag == 1 && is_coarse)
             {
-                // Corner neighbor at a finer level.
+                /* Corner neighbor at a finer level, and so we need to average
+                   that corner onto the coarser corner ghost cells */
                 ClawPatch *corner_cp = get_clawpatch(ghost_patch);
 
-                fclaw_bool &time_interp = *((fclaw_bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -153,6 +171,33 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 {
                     this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
                                                      is_block_corner,intersects_block);
+                }
+            }
+            else if (ref_flag == -1 && is_fine)
+            {
+                /* Corner is at at coarser level.  If the corner patch is a parallel
+                   ghost patch, then we should average onto it as well (even if it
+                   is technically read only)  Otherwise, it won't have good data for
+                   doing interpolation to this fine grid later */
+                if (is_ghost_patch)
+                {
+                    /* Corner is a ghost patch.  Do the same as above, but
+                       but from the perspective of the ghost (coarser) patch.*/
+                    ClawPatch *corner_cp = this_cp;
+                    ClawPatch *coarse_cp = get_clawpatch(ghost_patch);
+                    int icorner_coarse = 3-icorner;
+
+                    if (this_block_idx == corner_block_idx)
+                    {
+                        coarse_cp->average_corner_ghost(icorner_coarse,
+                                                      refratio,corner_cp,time_interp);
+                    }
+                    else
+                    {
+                        coarse_cp->mb_average_corner_ghost(icorner_coarse,
+                                                           refratio,corner_cp,time_interp,
+                                                           is_block_corner,intersects_block);
+                    }
                 }
             }
         }
@@ -166,6 +211,10 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            int this_patch_idx,
                            void *user)
 {
+    exchange_info *e_info = (exchange_info*) user;
+    fclaw_bool time_interp = e_info->time_interp;
+    fclaw_bool is_fine = e_info->is_fine;
+
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
     fclaw_bool intersects_bc[NumFaces];
@@ -241,13 +290,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             else if (ref_flag == 1)
             {
                 // This can be cleaned up by just returning the neighbor patch directly, no?
-                /*
-                fclaw2d_block_t *corner_block = &domain->blocks[corner_block_idx];
-                fclaw2d_patch_t *corner_patch = &corner_block->patches[corner_patch_idx];
-                */
                 ClawPatch *corner_cp = get_clawpatch(ghost_patch);
 
-                fclaw_bool &time_interp = *((fclaw_bool*) user);
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
@@ -257,6 +301,33 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                     this_cp->mb_interpolate_corner_ghost(icorner,refratio,
                                                          corner_cp,time_interp,
                                                          is_block_corner, intersects_block);
+                }
+            }
+            else if (ref_flag == -1 && is_fine)
+            {
+                /* Corner is at at coarser level.  If the corner patch is a parallel
+                   ghost patch, then we should average onto it as well (even if it
+                   is technically read only)  Otherwise, it won't have good data for
+                   doing interpolation to this fine grid later */
+                if (is_ghost_patch)
+                {
+                    /* Corner is a ghost patch.  Do the same as above, but
+                       but from the perspective of the ghost (coarser) patch.*/
+                    ClawPatch *corner_cp = this_cp;
+                    ClawPatch *coarse_cp = get_clawpatch(ghost_patch);
+                    int icorner_coarse = 3-icorner;
+
+                    if (this_block_idx == corner_block_idx)
+                    {
+                        coarse_cp->interpolate_corner_ghost(icorner_coarse,
+                                                            refratio,corner_cp,time_interp);
+                    }
+                    else
+                    {
+                        coarse_cp->mb_interpolate_corner_ghost(icorner_coarse,
+                                                               refratio,corner_cp,time_interp,
+                                                               is_block_corner,intersects_block);
+                    }
                 }
             }
         }
@@ -275,10 +346,18 @@ void cb_face_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    // const int p4est_refineFactor = get_p4est_refineFactor(domain);
+    exchange_info *e_info = (exchange_info*) user;
+    fclaw_bool time_interp = e_info->time_interp;
 
-    // We may need to average onto a time interpolated grid, not the actual solution.
-    fclaw_bool &time_interp = *((fclaw_bool*) user);
+    /* is_coarse == true : We are iterating over the coarser level -
+                    look for fine grid neighbors
+       is_fine == true : We are iterating over fine grids - look for
+                         coarse grid off-proc ghost patches that we may need
+                         to average to.
+    */
+    fclaw_bool is_coarse = e_info->is_coarse;
+    fclaw_bool is_fine = e_info->is_fine;
+
 
     // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -309,34 +388,90 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                &ref_flag_ptr,
                                is_ghost_patch);
 
+            fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)
             {
                 // no face neighor
             }
-            else if (ref_flag == 1)  // neighbors are at finer level
+            else if (ref_flag == 1 && is_coarse)  // neighbors are at finer level
             {
                 // Fill in ghost cells on 'this_patch' by averaging data from finer neighbors
-                /*
-                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                */
-                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
-                for (int ir = 0; ir < p4est_refineFactor; ir++)
-                {
-                    /*
-                    fclaw2d_patch_t *neighbor_patch =
-                        &neighbor_block->patches[neighbor_patch_idx[ir]];
-                    */
-                    fine_neighbor_cp[ir] = get_clawpatch(ghost_patches[ir]);
-                }
                 fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
-                // Fill in ghost cells on 'this_cp' by averaging from 'fine_neighbor_cp'
-
-                this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
-                                            fine_neighbor_cp,time_interp,block_boundary);
+                for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
+                {
+                    ClawPatch* fine_neighbor_cp = get_clawpatch(ghost_patches[igrid]);
+                    this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
+                                                fine_neighbor_cp,time_interp,block_boundary,
+                                                igrid);
+                }
             }
-        } // loop sides (iside = 0,1,2,3)
-    } // loop over directions (idir = 0,1,2)
+            else if (ref_flag == -1 && is_fine)
+            {
+                /* Found a fine grid with a coarse grid neighbor */
+                if (is_ghost_patch[0])
+                {
+                    ClawPatch *coarse_cp = get_clawpatch(ghost_patches[0]);
+                    ClawPatch *fine_cp = this_cp;
+                    /* Figure out which grid we got */
+                    int igrid;
+                    if (idir == 0)
+                    {
+                        /* this is a awkward;  is there a better way to do this? */
+                        double tol = 1e-12;
+                        double ylow_fine = fine_cp->ylower();
+                        double yhi_fine = fine_cp->yupper();
+                        double ylow_coarse = coarse_cp->ylower();
+                        double yhi_coarse = coarse_cp->yupper();
+                        if (fabs(ylow_fine - ylow_coarse) < tol)
+                            igrid = 0;
+                        else if (fabs(yhi_fine - yhi_coarse) < tol)
+                            igrid = 1;
+                        else
+                        {
+                            printf("amr_exchange_coarse; cannot find igrid\n");
+                            exit(1);
+                        }
+                    }
+                    else
+                    {
+                        /* this is a awkward;  is there a better way to do this? */
+                        double tol = 1e-12;
+                        double xlow_fine = fine_cp->xlower();
+                        double xhi_fine = fine_cp->xupper();
+                        double xlow_coarse = coarse_cp->xlower();
+                        double xhi_coarse = coarse_cp->xupper();
+                        if (fabs(xlow_fine - xlow_coarse) < tol)
+                            igrid = 0;
+                        else if (fabs(xhi_fine - xhi_coarse) < tol)
+                            igrid = 1;
+                        else
+                        {
+                            printf("amr_exchange_coarse; cannot find igrid\n");
+                            exit(1);
+                        }
+                    }
+                    /* Swap out coarse and fine */
+                    int iface_coarse;
+                    if (iface == 0)
+                        iface_coarse = 1;
+                    else if (iface == 1)
+                        iface_coarse = 0;
+                    else if (iface == 2)
+                        iface_coarse = 3;
+                    else if (iface == 3)
+                        iface_coarse = 2;
+
+                    coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
+                                                fine_cp,time_interp,block_boundary,
+                                                igrid);
+
+                }
+
+            } /* loop sides (iside = 0,1,2,3) */
+        } /* loop over directions (idir = 0,1) */
+    }
 }
+
 
 
 // Iterator over patches looking for finer neighbors
@@ -347,6 +482,11 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    exchange_info *e_info = (exchange_info*) user;
+    fclaw_bool time_interp = e_info->time_interp;
+    fclaw_bool is_coarse = e_info->is_coarse;
+    fclaw_bool is_fine = e_info->is_fine;
+
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
 
@@ -374,37 +514,88 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                &ref_flag_ptr,
                                is_ghost_patch);
 
+            fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)
             {
                 // no face neighbor - physical boundary?
             }
-            else if (ref_flag == 1)  // neighbors are at finer level
+            else if (ref_flag == 1 && is_coarse)  // neighbors are at finer level
             {
                 // Fill in ghost cells on 'neighbor_patch' by interpolation
-                /*
-                fclaw2d_block_t *neighbor_block = &domain->blocks[neighbor_block_idx];
-                */
-                ClawPatch *fine_neighbor_cp[p4est_refineFactor];
-                for (int ir = 0; ir < p4est_refineFactor; ir++)
+                for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
-                    /*
-                    fclaw2d_patch_t *neighbor_patch =
-                        &neighbor_block->patches[neighbor_patch_idx[ir]];
-                    */
-                    fine_neighbor_cp[ir] = get_clawpatch(ghost_patches[ir]);
+                    ClawPatch *fine_neighbor_cp = get_clawpatch(ghost_patches[igrid]);
+                    this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
+                                                    refratio,fine_neighbor_cp,time_interp,
+                                                    block_boundary,igrid);
                 }
+            }
+            else if (ref_flag == -1 && is_fine)
+            {
+                /* This fine grid has a coarse parallel ghost patch */
+                if (is_ghost_patch[0])
+                {
+                    ClawPatch *coarse_cp = get_clawpatch(ghost_patches[0]);
+                    ClawPatch *fine_cp = this_cp;
+                    /* Figure out which grid we got */
+                    int igrid;
+                    if (idir == 0)
+                    {
+                        /* this is a awkward;  is there a better way to do this? */
+                        double tol = 1e-12;
+                        double ylow_fine = fine_cp->ylower();
+                        double yhi_fine = fine_cp->yupper();
+                        double ylow_coarse = coarse_cp->ylower();
+                        double yhi_coarse = coarse_cp->yupper();
+                        if (fabs(ylow_fine - ylow_coarse) < tol)
+                            igrid = 0;
+                        else if (fabs(yhi_fine - yhi_coarse) < tol)
+                            igrid = 1;
+                        else
+                        {
+                            printf("amr_exchange_coarse; cannot find igrid\n");
+                            exit(1);
+                        }
+                    }
+                    else
+                    {
+                        /* this is a awkward;  is there a better way to do this? */
+                        double tol = 1e-12;
+                        double xlow_fine = this_cp->xlower();
+                        double xhi_fine = this_cp->xupper();
+                        double xlow_coarse = coarse_cp->xlower();
+                        double xhi_coarse = coarse_cp->xupper();
+                        if (fabs(xlow_fine - xlow_coarse) < tol)
+                            igrid = 0;
+                        else if (fabs(xhi_fine - xhi_coarse) < tol)
+                            igrid = 1;
+                        else
+                        {
+                            printf("amr_exchange_coarse; cannot find igrid\n");
+                            exit(1);
+                        }
+                    }
+                    /* Swap out coarse and fine */
+                    int iface_coarse;
+                    if (iface == 0)
+                        iface_coarse = 1;
+                    else if (iface == 1)
+                        iface_coarse = 0;
+                    else if (iface == 2)
+                        iface_coarse = 3;
+                    else if (iface == 3)
+                        iface_coarse = 2;
 
-                // Fill in fine grid ghost on 'fine_neighbor_cp' by interpolating from 'this_cp',
-                // doing time interpolation if necessary
-                fclaw_bool &time_interp = *((fclaw_bool*) user);
-                fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
-                this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
-                                                refratio,fine_neighbor_cp,time_interp,
-                                                block_boundary);
+                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
+                                                      fine_cp,time_interp,block_boundary,
+                                                      igrid);
+
+                }
             }
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
 }
+
 
 
 static
@@ -423,24 +614,6 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     cp->setup_for_time_interpolation(alpha);
 }
 
-#if 0
-static
-void cb_reset_time_interp(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
-{
-    struct time_interp_info {double alpha; fclaw_bool time_interp; } *t_info;
-    t_info = (time_interp_info*) user;
-    // This is called for all patches at a level coarser than the one we have.
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-    cp->reset_after_time_interpolation();
-}
-#endif
-
-
 
 
 /* ----------------------------------------------------------------------
@@ -453,78 +626,82 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
                           double alpha)
 {
+    exchange_info e_info;
     // Simple exchange - no time interpolation needed
     fclaw_bool time_interp = alpha > 0; //
+    int finer_level = level;
     int coarser_level = level - 1;
-    int fine_level = level;
+
+    e_info.time_interp = time_interp;
+    e_info.level = level;
 
     /* copy griddata to griddata_time_sync so that parallel exchange will work */
     if (time_interp)
     {
-        fclaw2d_domain_iterate_level(domain, coarser_level,
-                                     cb_setup_time_interp,
+        fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
                                      (void *) &alpha);
     }
+
     /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
        we are in the time interpolated case */
     exchange_ghost_patch_data(domain,time_interp);
 
-/* -------------------------------------------------------------------
-   Fill coarse grid ghost cells at edges and corners that are shared with
-   the finer grid
-   -----------------------------------------------------------------------*/
 
-    /* Iterate over coarser level and average from finer neighbors
-       to coarse.
-    */
+    /* Iterate over coarser level and average from finer neighbors to coarse. */
+    e_info.is_coarse = fclaw_true;
+    e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain, coarser_level,
-                                 cb_face_average,
-                                 (void *) &time_interp);
+                                 cb_face_average, (void *) &e_info);
 
+    /* Iterate over coarser level and average from finer neighbors to coarse. */
+    e_info.is_coarse = fclaw_false;
+    e_info.is_fine = fclaw_true;
+    fclaw2d_domain_iterate_level(domain, finer_level,
+                                 cb_face_average, (void *) &e_info);
 
-    /* TODO : iterate over all fine grids, looking for coarse grid patches which
-       need to have face averaged values.  These coarse ghost patches will not be
-       picked up by the iterator above. */
+    /* Average fine grid corners to the coarse grid ghost cells.  This will pick
+     any finer grid ghost patches and average them onto on-proc coarse grids*/
+    e_info.is_coarse = fclaw_true;
+    e_info.is_fine = fclaw_false;
+    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_average,
+                                 (void *) &e_info);
 
-    /* Average fine grid corners to the coarse grid ghost cells */
-    fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 cb_corner_average,
-                                 (void *) &time_interp);
+    /* Average fine grid corners to the coarse grid ghost cells.  This will pick
+     any finer grid ghost patches and average them onto on-proc coarse grids*/
+    e_info.is_coarse = fclaw_false;
+    e_info.is_fine = fclaw_true;
+    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_average,
+                                 (void *) &e_info);
 
-    /* TODO : iterate over all fine grids, looking for coarse grid patches which
-       need to have corner averaged values.  These coarse ghost patches will not be
-       picked up by the iterator above. */
 
     /* Set coarse grid physical boundary conditions - this will help with
-       interpolation to finer grids.
-
-       t_level is the time at the finer level,
-       i.e. coarse_time + alpha*dt_coarse
+       interpolation to finer grids. Time level 't_level' is the time
+       at the finer level, i.e. coarse_time + alpha*dt_coarse
     */
     set_phys_bc(domain,coarser_level,t_level,time_interp);
 
-    /* TODO : Need a special iterator for all coarse boundary patches so that they
-       get averaged values at physical boundaries. */
+    /* Interpolate from coarse grids to finer grids. */
+    e_info.is_coarse = fclaw_true;
+    e_info.is_fine = fclaw_false;
+    fclaw2d_domain_iterate_level(domain,coarser_level,cb_face_interpolate,
+                                 (void *) &e_info);
 
     /* Interpolate from coarse grids to finer grids. */
-    fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 cb_face_interpolate,
-                                 (void *) &time_interp);
+    e_info.is_coarse = fclaw_false;
+    e_info.is_fine = fclaw_true;
+    fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
+                                 (void *) &e_info);
 
+    /* Interpolate coarse grid to fine grid ghost cells. */
+    e_info.is_coarse = fclaw_true;
+    e_info.is_fine = fclaw_false;
+    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
+                                 (void *) &e_info);
 
-
-    // Interpolate coarse grid to fine grid ghost cells.
-    fclaw2d_domain_iterate_level(domain,coarser_level,
-                                 cb_corner_interpolate,
-                                 (void *) &time_interp);
-
-    if (!time_interp)
-    {
-        /*
-        fclaw2d_domain_iterate_level(domain, coarser_level,
-                                     cb_reset_time_interp,
-                                     (void *) &t_info);
-        */
-    }
+    /* Interpolate coarse grid to fine grid ghost cells. */
+    e_info.is_coarse = fclaw_false;
+    e_info.is_fine = fclaw_true;
+    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
+                                 (void *) &e_info);
 
 }

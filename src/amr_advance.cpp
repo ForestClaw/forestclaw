@@ -119,7 +119,10 @@ double advance_level(fclaw2d_domain_t *domain,
 
                 exchange_with_coarse(domain,a_level,t_level,alpha);
 
+                /* Set physicals BCs on the finer level, using any newly updated
+                   interior ghost cell data */
                 set_phys_bc(domain,a_level,t_level,time_interp);
+
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
 
@@ -199,8 +202,11 @@ double advance_level(fclaw2d_domain_t *domain,
                     }
                     exchange_with_coarse(domain,a_level,t_level,alpha);
 
+                    /* Apply BCs to finer grid.  We want to use current data, not time
+                       interpolated data */
                     time_interp = fclaw_false;
                     set_phys_bc(domain,a_level,t_level,time_interp);
+
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
                 }  /* no subcycling */
             } /* Need time interpolated boundary conditions */
@@ -239,6 +245,8 @@ double advance_level(fclaw2d_domain_t *domain,
     a_time_stepper->increment_step_counter(a_level);
     a_time_stepper->increment_time(a_level);
 
+    /* Make sure all ghost cells at this level have been updated;  Set physical
+       BCs after exchange to get any corner boundary ghost cells */
     level_exchange(domain,a_level);
     set_phys_bc(domain,a_level,t_level,time_interp);
 

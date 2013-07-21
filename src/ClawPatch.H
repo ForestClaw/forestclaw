@@ -26,7 +26,8 @@ ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 size_t pack_size(fclaw2d_domain_t* domain);
 void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data);
 void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata);
+                      int this_block_idx, int this_patch_idx, double *qdata,
+                      fclaw_bool time_interp);
 
 class ClawPatch
 {
@@ -55,6 +56,7 @@ public :
 
     void pack_griddata(double* qdata);
     void unpack_griddata(double* qdata);
+    void unpack_griddata_time_sync(double* qdata);
 
     void setup_for_time_interpolation(const double& alpha);
     void reset_after_time_interpolation();
@@ -76,17 +78,20 @@ public :
                             const int& a_iside,
                             const int& a_num_neighbors,
                             const int& a_refratio,
-                            ClawPatch **neighbor_cp,
-                            fclaw_bool a_time_interp, fclaw_bool a_block_boundary);
+                            ClawPatch *neighbor_cp,
+                            fclaw_bool a_time_interp,
+                            fclaw_bool a_block_boundary,
+                            const int& igrid);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
                                 const int& a_iside,
                                 const int& a_num_neighbors,
                                 const int& a_refratio,
-                                ClawPatch **a_neighbor_cp,
+                                ClawPatch *a_neighbor_cp,
                                 fclaw_bool a_time_interp,
-                                fclaw_bool a_block_boundary);
+                                fclaw_bool a_block_boundary,
+                                const int& igrid);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
@@ -196,6 +201,8 @@ public :
 
     double xlower();
     double ylower();
+    double xupper();
+    double yupper();
 
     double* q();
 

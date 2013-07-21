@@ -184,35 +184,12 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     }
 }
 
-#if 0
-static
-void cb_setup_for_exchange(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
-{
-    // This is called for all patches at a level coarser than the one we have.
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-    fclaw_bool alpha = 1.0; // not used.
-    fclaw_bool time_interp = fclaw_false;
-    cp->setup_for_time_interpolation(time_interp,alpha);
-}
-#endif
 
 /* -------------------------------------------------------------------
    Main routine in this file
    ------------------------------------------------------------------- */
 void level_exchange(fclaw2d_domain_t *domain, int level)
 {
-    /* copy mgriddata to mgriddata_time_sync so that the pointers used in
-       ghost_exchange are current.  But note that we still use mgriddata
-       in exchange, since*/
-    /*
-    fclaw2d_domain_iterate_level(domain, level, cb_setup_for_exchange,
-                                 (void *) NULL);
-    */
 
     fclaw_bool time_interp = fclaw_false;
     exchange_ghost_patch_data(domain,time_interp);

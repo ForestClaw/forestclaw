@@ -73,10 +73,14 @@ void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
 }
 
 void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata)
+                      int this_block_idx, int this_patch_idx, double *qdata,
+                      fclaw_bool time_interp)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    cp->unpack_griddata(qdata);
+    if (time_interp)
+        cp->unpack_griddata_time_sync(qdata);
+    else
+        cp->unpack_griddata(qdata);
 }
 
 size_t pack_size(fclaw2d_domain_t* domain)
@@ -211,6 +215,16 @@ double ClawPatch::ylower()
     return m_ylower;
 }
 
+double ClawPatch::xupper()
+{
+    return m_xupper;
+}
+
+double ClawPatch::yupper()
+{
+    return m_yupper;
+}
+
 double* ClawPatch::xp()
 {
     return m_xp.dataPtr();
@@ -331,6 +345,11 @@ void ClawPatch::unpack_griddata(double *q)
     m_griddata.copyFromMemory(q);
 }
 
+void ClawPatch::unpack_griddata_time_sync(double *q)
+{
+    m_griddata_time_sync.copyFromMemory(q);
+}
+
 
 /* ----------------------------------------------------------------
    Single level exchanges
@@ -438,12 +457,41 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_iface_coarse,
                                    const int& a_p4est_refineFactor,
                                    const int& a_refratio,
-                                   ClawPatch **neighbor_cp,
+                                   ClawPatch *neighbor_cp,
                                    fclaw_bool a_time_interp,
-                                   fclaw_bool a_block_boundary)
+                                   fclaw_bool a_block_boundary,
+                                   const int& igrid)
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
+    double *qfine = neighbor_cp->m_griddata.dataPtr();
+    if (m_manifold)
+    {
+        double *areacoarse = m_area.dataPtr();
+        double *areafine = neighbor_cp->m_area.dataPtr();
+        if (a_block_boundary)
+        {
+            mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+                                   areacoarse, areafine,
+                                   a_idir,a_iface_coarse,
+                                   a_p4est_refineFactor,a_refratio,igrid);
+        }
+        else
+        {
+            average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
+                                       areacoarse, areafine,
+                                       a_idir,a_iface_coarse,
+                                       a_p4est_refineFactor,a_refratio,igrid);
+        }
+    }
+    else
+    {
+        average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
+                            a_p4est_refineFactor,a_refratio,igrid);
+    }
+
+
+#if 0
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
     {
         double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
@@ -472,18 +520,35 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                 a_p4est_refineFactor,a_refratio,igrid);
         }
     }
+#endif
 }
 
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_iside,
                                        const int& a_p4est_refineFactor,
                                        const int& a_refratio,
-                                       ClawPatch **neighbor_cp,
+                                       ClawPatch *neighbor_cp,
                                        fclaw_bool a_time_interp,
-                                       fclaw_bool a_block_boundary)
+                                       fclaw_bool a_block_boundary,
+                                       const int& igrid)
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
+    double *qfine = neighbor_cp->m_griddata.dataPtr();
+
+    if (a_block_boundary)
+    {
+        mb_interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                                   a_p4est_refineFactor,a_refratio,igrid);
+    }
+    else
+    {
+        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                                a_p4est_refineFactor,a_refratio,igrid);
+    }
+
+
+#if 0
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
     {
         double *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
@@ -499,6 +564,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                     a_p4est_refineFactor,a_refratio,igrid);
         }
     }
+#endif
 }
 
 //
