@@ -4,7 +4,10 @@ include $(FORESTCLAW)/Make.defs.local
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+
+# Not every compiler likes this argument.  May live in Make.defs.local.
+#FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
 FORTRAN_INC = $(FORTRAN_SRC)
