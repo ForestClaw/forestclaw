@@ -38,7 +38,7 @@ int pow_int(int a, int n)
     return b;
 }
 
-void problem_setup_default(fclaw2d_domain_t* domain)
+static void problem_setup_default(fclaw2d_domain_t* domain)
 {
 }
 

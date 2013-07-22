@@ -28,7 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-/* Some convenient preprocessor directives */
+/* Some convenient preprocessor directives *
+ * TODO: Having static int in a .H file leads to multiple definitions.
+ *       Rather use extern const int declares and define them in a .c file.
+ */
 
 #define FCLAW_SPACEDIM 2
 static const int SpaceDim = FCLAW_SPACEDIM;
@@ -47,7 +50,8 @@ static const int NumCorners = FCLAW_NUM_CORNERS;
 #define FCLAW_NUM_SIBLINGS 4
 static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 
-/* change to P4EST_BOOL ? */
+/* change to P4EST_BOOL ?
+ * No, p4est does not know about bool and works with pure int */
 #define fclaw_bool bool
 #define fclaw_true true
 #define fclaw_false false

@@ -402,7 +402,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
                                             faceno, rproc, &rblockno,
                                             rpatchno, &rfaceno);
         P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
-                    block_no, patch_no, faceno, fnt);
+                    block_no, patch_no, faceno, (int) fnt);
     }
     for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
     {
@@ -410,7 +410,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
                                                cornerno, rproc, &rblockno,
                                                rpatchno, &fnt);
         P4EST_LOGF (ln->lp, "Block %d patch %d corner %d neighbor %d\n",
-                    block_no, patch_no, cornerno, fnt);
+                    block_no, patch_no, cornerno, (int) fnt);
     }
 
     ++ln->count;

@@ -44,13 +44,13 @@ public:
     level_data();
     ~level_data();
 
-    void define(const int& a_level,
-                const int& a_refratio,
-                const int& a_maxlevel,
-                const double& a_time,
-                const bool& a_subcycle);
+    void define(const int a_level,
+                const int a_refratio,
+                const int a_maxlevel,
+                const double a_time,
+                const bool a_subcycle);
 
-    void set_dt(const double& a_dt);
+    void set_dt(const double a_dt);
 
     void increment_step_counter();
     void increment_time();
@@ -86,18 +86,18 @@ public:
     ~subcycle_manager();
     void define(fclaw2d_domain_t *domain,
                 const amr_options_t *gparms,
-                const double& a_time);
+                const double a_time);
 
-    bool can_advance(const int& a_level, const int& a_from_step);
+    bool can_advance(const int a_level, const int a_from_step);
 
-    bool solution_updated(const int& a_level, const int& a_step);
-    bool level_exchange_done(const int& a_level);
-    bool exchanged_with_coarser(const int& a_level);
-    bool exchanged_with_finer(const int& a_level);
+    bool solution_updated(const int a_level, const int a_step);
+    bool level_exchange_done(const int a_level);
+    bool exchanged_with_coarser(const int a_level);
+    bool exchanged_with_finer(const int a_level);
 
-    int last_step(const int& a_level);
-    int step_inc(const int& a_level);
-    void increment_step_counter(const int& a_level);
+    int last_step(const int a_level);
+    int step_inc(const int a_level);
+    void increment_step_counter(const int a_level);
 
     bool nosubcycle();
     int verbosity();
@@ -105,23 +105,23 @@ public:
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
     // i.e. powers of ref_ratio.
-    double level_time(const int& a_level);   /// time() ?
+    double level_time(const int a_level);   /// time() ?
     double initial_time();
-    double dt(const int& level);
-    void increment_time(const int& a_level);
-    void set_dt_minlevel(const double& a_dt);
+    double dt(int level);
+    void increment_time(const int a_level);
+    void set_dt_minlevel(const double a_dt);
 
     int minlevel_factor();
     int maxlevel_factor();
 
-    bool is_coarsest(const int& a_level);
-    bool is_finest(const int& a_level);
+    bool is_coarsest(const int a_level);
+    bool is_finest(const int a_level);
     int minlevel();
     int maxlevel();
 
-    void increment_level_exchange_counter(const int& a_level);
-    void increment_coarse_exchange_counter(const int& a_level);
-    void increment_fine_exchange_counter(const int& a_level);
+    void increment_level_exchange_counter(const int a_level);
+    void increment_coarse_exchange_counter(const int a_level);
+    void increment_fine_exchange_counter(const int a_level);
 
 private :
     std::vector<level_data> m_levels;

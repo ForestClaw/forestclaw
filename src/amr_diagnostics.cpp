@@ -52,8 +52,9 @@ void check_conservation(fclaw2d_domain_t *domain)
 }
 
 // Dump current patch
-void cb_dump_patch(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+static void
+cb_dump_patch(fclaw2d_domain_t *domain,
+              fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
     int dump_patch = *((int *) user);
     int numb4 = domain->blocks[block_no].num_patches_before;
@@ -73,8 +74,9 @@ void dump_patch(fclaw2d_domain_t *domain, int dump_patch)
 }
 
 // Dump last patch
-void cb_dump_last_patch(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+static void
+cb_dump_last_patch(fclaw2d_domain_t *domain,
+                   fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
 {
     int dump_patch = *((int *) user);
     int numb4 = domain->blocks[block_no].num_patches_before;

@@ -67,7 +67,7 @@ amr_options_convert_int_array (const char *array_string,
         }
         else
         {
-            (*int_array)[i] = strtod (beginptr, &endptr);
+            (*int_array)[i] = (int) strtol (beginptr, &endptr, 10);
             beginptr = endptr;
         }
     }
@@ -249,7 +249,7 @@ amr_checkparms (amr_options_t * gparms)
     {
         double dT_outer = gparms->tfinal / gparms->nout;
         double dT_inner = gparms->initial_dt;
-        int nsteps = dT_outer / dT_inner;
+        int nsteps = (int) floor (dT_outer / dT_inner + .5);
         if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
         {
             printf

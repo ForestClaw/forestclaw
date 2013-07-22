@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est.h>
 
 static const double fclaw2d_p4est_root_len = (double) P4EST_ROOT_LEN;
-static const double fclaw2d_p4est_smallest_h = 1. / (double) P4EST_ROOT_LEN;
+/* static const double fclaw2d_p4est_smallest_h = 1. / (double) P4EST_ROOT_LEN; */
 
 static unsigned fclaw2d_p4est_magic;
 #define FCLAW2D_P4EST_MAGIC \

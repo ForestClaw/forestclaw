@@ -190,7 +190,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // Set boundary need ghost cell values so they are available
             // for using at tagging criteria, if necessary.
             int new_level = level+1;
-            fclaw_bool time_interp = fclaw_false;
+            time_interp = fclaw_false;
             set_phys_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain

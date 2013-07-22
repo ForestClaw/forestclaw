@@ -388,7 +388,6 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                &ref_flag_ptr,
                                is_ghost_patch);
 
-            fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)
             {
                 // no face neighor
@@ -407,6 +406,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == -1 && is_fine)
             {
+
                 /* Found a fine grid with a coarse grid neighbor */
                 if (is_ghost_patch[0])
                 {
@@ -461,6 +461,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                     else if (iface == 3)
                         iface_coarse = 2;
 
+                    fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                     coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
                                                 fine_cp,time_interp,block_boundary,
                                                 igrid);

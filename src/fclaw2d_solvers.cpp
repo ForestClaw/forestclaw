@@ -39,32 +39,36 @@ void amr_dummy_patch_setup(fclaw2d_domain_t *domain,
     /* Do nothing */
 }
 
-void amr_dummy_patch_initialize(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx)
+static void
+amr_dummy_patch_initialize(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx)
 {
     /* Do nothing */
 }
 
 
-void amr_dummy_patch_physical_bc(fclaw2d_domain *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double dt,
-                                 fclaw_bool *intersects_bc,
-                                 fclaw_bool time_interp)
+static void
+amr_dummy_patch_physical_bc(fclaw2d_domain *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double dt,
+                            fclaw_bool *intersects_bc,
+                            fclaw_bool time_interp)
 {
     /* Do nothing */
 }
 
-void amr_dummy_level_ode_solver(int neqn, double q[], double t, double dt)
+static void
+amr_dummy_level_ode_solver(int neqn, double q[], double t, double dt)
 {
     /* Do nothing */
 }
 
+static
 double amr_dummy_patch_ode_solver_rhs(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
@@ -76,6 +80,8 @@ double amr_dummy_patch_ode_solver_rhs(fclaw2d_domain_t *domain,
     return 1;
 }
 
+#if 0
+static
 double amr_dummy_level_single_step(fclaw2d_domain_t *domain,
                                    int level,
                                    double t, double dt)
@@ -83,7 +89,9 @@ double amr_dummy_level_single_step(fclaw2d_domain_t *domain,
     /* Do nothing */
     return 1;
 }
+#endif
 
+static
 double amr_dummy_patch_single_step_update(fclaw2d_domain_t *domain,
                                           fclaw2d_patch_t *this_patch,
                                           int this_block_idx,

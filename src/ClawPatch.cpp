@@ -4,7 +4,7 @@
 #include "amr_utils.H"
 
 
-void solver_default(void** solverdata)
+static void solver_default(void** solverdata)
 {
     *solverdata = (void*) NULL;
 }

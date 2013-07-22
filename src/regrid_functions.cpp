@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     rf->f_patch_interpolate2fine = &patch_interpolate2fine;
     rf->f_patch_average2coarse = &patch_average2coarse;
     rf->f_patch_copy2samesize = &patch_copy2samesize;
-};
+}
 
 fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
