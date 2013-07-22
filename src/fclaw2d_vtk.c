@@ -105,22 +105,8 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 (long long) s->offset_types) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
-#if 0
-    if (s->meqn == 1)
-    {
-        retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                    "blockno,patchno,meqn\">\n") < 0;
-    }
-    else
-    {
-        retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                    "blockno,patchno\" Vectors=\"meqn\">\n") <
-            0;
-    }
-#else
     retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                "blockno,patchno\">\n") < 0;
-#endif
+                                "blockno,patchno\" Fields=\"meqn\">\n") < 0;
     retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
                                 "Name=\"mpirank\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
