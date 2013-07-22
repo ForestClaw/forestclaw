@@ -128,22 +128,18 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 intersects_block[faces[0]] && intersects_block[faces[1]];
 
             int corner_block_idx;
-            int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
-            fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
                                 &corner_block_idx,
-                                &corner_patch_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner,
-                                &is_ghost_patch);
+                                is_block_corner);
 
             /* -------------------------------------
                Possible returns from ref_flag :
@@ -266,22 +262,18 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 intersects_block[faces[0]] && intersects_block[faces[1]];
 
             int corner_block_idx;
-            int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
-            fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
                                 &corner_block_idx,
-                                &corner_patch_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner,
-                                &is_ghost_patch);
+                                is_block_corner);
 
             if (ref_flag_ptr == NULL)
             {
@@ -371,22 +363,17 @@ void cb_face_average(fclaw2d_domain_t *domain,
         for (int iface = 2*idir; iface <= 2*idir + 1; iface++)
         {
             int neighbor_block_idx;
-            int neighbor_patch_idx[p4est_refineFactor];  // Be prepared to store 1 or more patch
-                                                         // indices.
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
-            fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
                                iface,
                                &neighbor_block_idx,
-                               neighbor_patch_idx,
                                neighbor_patches,
-                               &ref_flag_ptr,
-                               is_ghost_patch);
+                               &ref_flag_ptr);
 
             if (ref_flag_ptr == NULL)
             {
@@ -498,21 +485,17 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
         for (int iface = 2*idir; iface <= 2*idir + 1; iface++)
         {
             int neighbor_block_idx;
-            int neighbor_patch_idx[p4est_refineFactor];
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
-            fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
                                iface,
                                &neighbor_block_idx,
-                               neighbor_patch_idx,
                                neighbor_patches,
-                               &ref_flag_ptr,
-                               is_ghost_patch);
+                               &ref_flag_ptr);
 
             fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)

@@ -36,10 +36,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_patch_idx,
                         int iside,
                         int *neighbor_block_idx,
-                        int neighbor_patch_idx[],
                         fclaw2d_patch_t* neighbor_patches[],
-                        int **ref_flag_ptr,
-                        fclaw_bool is_ghost_patch[])
+                        int **ref_flag_ptr)
 {
     int rproc[p4est_refineFactor];
     int rblockno;
@@ -120,15 +118,12 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                 /* neighbor patch is local */
                 fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
                 neighbor = &neighbor_block->patches[rpatchno[ir]];
-                is_ghost_patch[ir] = fclaw_false;
             }
             else if (rproc[ir] != domain->mpirank)
             {
                 /* neighbor patch is on a remote processor */
                 neighbor = &domain->ghost_patches[rpatchno[ir]];
-                is_ghost_patch[ir] = fclaw_true;
             }
-            neighbor_patch_idx[ir] = rpatchno[ir];
             neighbor_patches[ir] = neighbor;
         }
     }
@@ -139,13 +134,12 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_patch_idx,
                          int icorner,
                          int *corner_block_idx,
-                         int *corner_patch_idx,
                          fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
-                         fclaw_bool is_block_corner,
-                         fclaw_bool *is_ghost_patch)
+                         fclaw_bool is_block_corner)
 {
     int rproc_corner;
+    int corner_patch_idx;
 
     /* Code is now back in state it was before I added stuff */
     fclaw2d_patch_relation_t neighbor_type;
@@ -205,7 +199,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             exit(1);
         }
 
-        *corner_patch_idx = rpatchno[igrid];
+        corner_patch_idx = rpatchno[igrid];
         rproc_corner = rproc[igrid];
     }
     else
@@ -220,7 +214,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         has_corner_neighbor =
             fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                            icorner, &rproc_corner, corner_block_idx,
-                                           corner_patch_idx, &neighbor_type);
+                                           &corner_patch_idx, &neighbor_type);
     }
     if (!has_corner_neighbor)
     {
@@ -231,14 +225,12 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     {
         if (domain->mpirank != rproc_corner)
         {
-            *is_ghost_patch = fclaw_true;
-            *ghost_patch = &domain->ghost_patches[*corner_patch_idx];
+            *ghost_patch = &domain->ghost_patches[corner_patch_idx];
         }
         else
         {
-            *is_ghost_patch = fclaw_false;
             fclaw2d_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
-            *ghost_patch = &neighbor_block->patches[*corner_patch_idx];
+            *ghost_patch = &neighbor_block->patches[corner_patch_idx];
         }
 
         if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)

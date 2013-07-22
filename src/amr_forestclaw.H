@@ -85,21 +85,17 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_patch_idx,
                         int iside,
                         int *neighbor_block_idx,
-                        int neighbor_patch_idx[],
                         fclaw2d_patch_t* ghost_patches[],
-                        int **ref_flag_ptr,
-                        fclaw_bool is_ghost_patch[]);
+                        int **ref_flag_ptr);
 
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
                          int icorner,
                          int *corner_block_idx,
-                         int *corner_patch_idx,
                          fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
-                         fclaw_bool is_block_corner,
-                         fclaw_bool *is_ghost_patch);
+                         fclaw_bool is_block_corner);
 
 void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_block_idx,
