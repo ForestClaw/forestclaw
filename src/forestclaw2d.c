@@ -108,6 +108,12 @@ fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch)
     return patch->flags & FCLAW2D_PATCH_FIRST_SIBLING ? 1 : 0;
 }
 
+int
+fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch)
+{
+    return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
+}
+
 void *
 fclaw2d_alloc (size_t size)
 {

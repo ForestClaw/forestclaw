@@ -163,6 +163,12 @@ int fclaw2d_patch_childid (const fclaw2d_patch_t * patch);
  */
 int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
 
+/** Check if a patch is a parallel ghost patch.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              True if patch is off-processor, false if local.
+ */
+int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
+
 void *fclaw2d_alloc (size_t size);
 void *fclaw2d_calloc (size_t nmemb, size_t size);
 void *fclaw2d_realloc (void *ptr, size_t size);
