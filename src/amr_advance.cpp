@@ -66,8 +66,8 @@ static void update_level_solution(fclaw2d_domain_t *domain,
 
 static
 double advance_level(fclaw2d_domain_t *domain,
-                   const int& a_level,
-                   const int& a_curr_fine_step,
+                   const int a_level,
+                   const int a_curr_fine_step,
                    subcycle_manager* a_time_stepper)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -194,7 +194,8 @@ double advance_level(fclaw2d_domain_t *domain,
                        can only happen if refratio > 2) */
 
                     double  alpha = double(a_curr_fine_step)/refratio;
-                    fclaw_bool time_interp = fclaw_true;
+                    /* TODO: Have commented this out; it had no effect! */
+                    // fclaw_bool time_interp = fclaw_true;
                     if (verbose)
                     {
                         cout << " --> Doing time interpolatation from coarse grid at level "
@@ -204,8 +205,9 @@ double advance_level(fclaw2d_domain_t *domain,
 
                     /* Apply BCs to finer grid.  We want to use current data, not time
                        interpolated data */
-                    time_interp = fclaw_false;
-                    set_phys_bc(domain,a_level,t_level,time_interp);
+                    /* TODO: This shadows a variable, I have renamed it! */
+                    fclaw_bool time_interp2 = fclaw_false;
+                    set_phys_bc(domain,a_level,t_level,time_interp2);
 
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
                 }  /* no subcycling */
