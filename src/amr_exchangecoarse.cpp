@@ -281,7 +281,6 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == 1)
             {
-                // This can be cleaned up by just returning the neighbor patch directly, no?
                 ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
 
                 if (this_block_idx == corner_block_idx)
