@@ -305,7 +305,8 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
 
         // VTK output during amrinit
         if (mode >= 0 && gparms->vtkout & 1) {
-            snprintf (basename, BUFSIZ, "init_level_%02d_partition", mode);
+            snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
+                      gparms->prefix, mode);
             amr_output_write_vtk (*domain, basename);
         }
 

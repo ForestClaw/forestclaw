@@ -134,12 +134,15 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
                         "VTK write variant");
 
-
-    /* At this point amropt->order is allocated. Set defaults if desired. */
-
+    /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
+    sc_options_add_switch (opt, 0, "serialout", &amropt->serialout,
+                           "Enable serial output [F]");
+    sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
+                           "Output file prefix [fort]");
 
+    /* more clawpack options */
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
                            "Maximum CFL allowed [1]");
 

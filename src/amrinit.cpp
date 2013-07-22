@@ -158,7 +158,8 @@ void amrinit (fclaw2d_domain_t **domain)
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {
-        snprintf (basename, BUFSIZ, "init_level_%02d", minlevel);
+        snprintf (basename, BUFSIZ, "%s_init_level_%02d",
+                  gparms->prefix, minlevel);
         amr_output_write_vtk (*domain, basename);
     }
 
@@ -199,7 +200,8 @@ void amrinit (fclaw2d_domain_t **domain)
 
             // VTK output during amrinit
             if (gparms->vtkout & 1) {
-                snprintf (basename, BUFSIZ, "init_level_%02d_adapt", level);
+                snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
+                          gparms->prefix, level);
                 amr_output_write_vtk (*domain, basename);
             }
 
