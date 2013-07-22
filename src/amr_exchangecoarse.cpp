@@ -131,7 +131,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
-            fclaw2d_patch_t *ghost_patch;
+            fclaw2d_patch_t *neighbor_patch;
             fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
@@ -140,7 +140,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                &ghost_patch,
+                                &neighbor_patch,
                                 &ref_flag_ptr,
                                 is_block_corner,
                                 &is_ghost_patch);
@@ -161,7 +161,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             {
                 /* Corner neighbor at a finer level, and so we need to average
                    that corner onto the coarser corner ghost cells */
-                ClawPatch *corner_cp = get_clawpatch(ghost_patch);
+                ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
 
                 if (this_block_idx == corner_block_idx)
                 {
@@ -179,12 +179,12 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                    ghost patch, then we should average onto it as well (even if it
                    is technically read only)  Otherwise, it won't have good data for
                    doing interpolation to this fine grid later */
-                if (is_ghost_patch)
+                if (fclaw2d_patch_is_ghost (neighbor_patch))
                 {
-                    /* Corner is a ghost patch.  Do the same as above, but
+                    /* Corner is a parallel ghost patch.  Do the same as above, but
                        but from the perspective of the ghost (coarser) patch.*/
                     ClawPatch *corner_cp = this_cp;
-                    ClawPatch *coarse_cp = get_clawpatch(ghost_patch);
+                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patch);
                     int icorner_coarse = 3-icorner;
 
                     if (this_block_idx == corner_block_idx)
@@ -269,7 +269,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             int corner_patch_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
-            fclaw2d_patch_t *ghost_patch;
+            fclaw2d_patch_t *neighbor_patch;
             fclaw_bool is_ghost_patch;
 
             get_corner_neighbor(domain,
@@ -278,7 +278,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 icorner,
                                 &corner_block_idx,
                                 &corner_patch_idx,
-                                &ghost_patch,
+                                &neighbor_patch,
                                 &ref_flag_ptr,
                                 is_block_corner,
                                 &is_ghost_patch);
@@ -290,7 +290,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             else if (ref_flag == 1)
             {
                 // This can be cleaned up by just returning the neighbor patch directly, no?
-                ClawPatch *corner_cp = get_clawpatch(ghost_patch);
+                ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
 
                 if (this_block_idx == corner_block_idx)
                 {
@@ -309,12 +309,12 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                    ghost patch, then we should average onto it as well (even if it
                    is technically read only)  Otherwise, it won't have good data for
                    doing interpolation to this fine grid later */
-                if (is_ghost_patch)
+                if (fclaw2d_patch_is_ghost (neighbor_patch))
                 {
-                    /* Corner is a ghost patch.  Do the same as above, but
+                    /* Corner is a parallel ghost patch.  Do the same as above, but
                        but from the perspective of the ghost (coarser) patch.*/
                     ClawPatch *corner_cp = this_cp;
-                    ClawPatch *coarse_cp = get_clawpatch(ghost_patch);
+                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patch);
                     int icorner_coarse = 3-icorner;
 
                     if (this_block_idx == corner_block_idx)
@@ -375,7 +375,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                                          // indices.
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
-            fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
+            fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
             fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
@@ -384,7 +384,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
-                               ghost_patches,
+                               neighbor_patches,
                                &ref_flag_ptr,
                                is_ghost_patch);
 
@@ -398,7 +398,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                 fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
-                    ClawPatch* fine_neighbor_cp = get_clawpatch(ghost_patches[igrid]);
+                    ClawPatch* fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
                     this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                                 fine_neighbor_cp,time_interp,block_boundary,
                                                 igrid);
@@ -406,11 +406,10 @@ void cb_face_average(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == -1 && is_fine)
             {
-
-                /* Found a fine grid with a coarse grid neighbor */
-                if (is_ghost_patch[0])
+                /* Found a fine grid with a parallel coarse grid neighbor? */
+                if (fclaw2d_patch_is_ghost (neighbor_patches[0]))
                 {
-                    ClawPatch *coarse_cp = get_clawpatch(ghost_patches[0]);
+                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
                     ClawPatch *fine_cp = this_cp;
                     /* Figure out which grid we got */
                     int igrid;
@@ -502,7 +501,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int neighbor_patch_idx[p4est_refineFactor];
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
-            fclaw2d_patch_t *ghost_patches[p4est_refineFactor];
+            fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
             fclaw_bool is_ghost_patch[p4est_refineFactor];
 
             get_face_neighbors(domain,
@@ -511,7 +510,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patch_idx,
-                               ghost_patches,
+                               neighbor_patches,
                                &ref_flag_ptr,
                                is_ghost_patch);
 
@@ -525,7 +524,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                 // Fill in ghost cells on 'neighbor_patch' by interpolation
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
-                    ClawPatch *fine_neighbor_cp = get_clawpatch(ghost_patches[igrid]);
+                    ClawPatch *fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
                     this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                     refratio,fine_neighbor_cp,time_interp,
                                                     block_boundary,igrid);
@@ -533,10 +532,10 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == -1 && is_fine)
             {
-                /* This fine grid has a coarse parallel ghost patch */
-                if (is_ghost_patch[0])
+                /* Found a fine grid with a parallel coarse grid neighbor? */
+                if (fclaw2d_patch_is_ghost (neighbor_patches[0]))
                 {
-                    ClawPatch *coarse_cp = get_clawpatch(ghost_patches[0]);
+                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
                     ClawPatch *fine_cp = this_cp;
                     /* Figure out which grid we got */
                     int igrid;
