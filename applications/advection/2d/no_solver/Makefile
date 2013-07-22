@@ -7,7 +7,7 @@ include $(FORESTCLAW)/Make.defs.local
 
 
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
 FORTRAN_INC = $(FORTRAN_SRC)
