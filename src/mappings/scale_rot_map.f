@@ -138,12 +138,15 @@ c      call set_rotation(rrot)
          enddo
       enddo
 
-      open(10,file='rrot.dat')
-      do i = 1,3
-         write(10,100) (rrot(i,j),j=1,3)
-      enddo
-      close(10)
-  100 format(3F24.16)
+c      Writing a file like this is problematic in parallel.
+c      Only one rank should write this file.
+c
+c      open(10,file='rrot.dat')
+c      do i = 1,3
+c         write(10,100) (rrot(i,j),j=1,3)
+c      enddo
+c      close(10)
+c  100 format(3F24.16)
 
       end
 

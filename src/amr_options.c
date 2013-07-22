@@ -285,12 +285,14 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
         sc_abort_collective ("Option parsing failed");
     }
     sc_options_print_summary (sc_package_id, log_priority, opt);
+#if 0
     if (sc_is_root ())
     {
         retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
                                   "fclaw2d_defaults.ini.used");
         SC_CHECK_ABORT (!retval, "Option save failed");
     }
+#endif
 
 #if 0
     /* This is now done in a post-processing step */
