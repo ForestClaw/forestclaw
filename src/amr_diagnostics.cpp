@@ -48,7 +48,10 @@ void check_conservation(fclaw2d_domain_t *domain)
     double sum = 0;
     fclaw2d_domain_iterate_patches(domain,cb_check_conservation,(void *) &sum);
 
-    printf("Total sum = %24.16f\n",sum);
+    sum = fclaw2d_domain_global_sum (domain, sum);
+    if (domain->mpirank == 0) {
+        printf("Total sum = %24.16f\n",sum);
+    }
 }
 
 // Dump current patch

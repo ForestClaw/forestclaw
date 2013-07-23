@@ -118,6 +118,10 @@ struct fclaw2d_domain
  */
 double fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d);
 
+/** Compute and return the sum over all processors of a double value.
+ */
+double fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d);
+
 /** Return the space dimension. */
 int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
 

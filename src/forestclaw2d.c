@@ -41,6 +41,18 @@ fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
     return gd;
 }
 
+double
+fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d)
+{
+    int mpiret;
+    double gd;
+
+    mpiret = MPI_Allreduce (&d, &gd, 1, MPI_DOUBLE, MPI_SUM, domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+
+    return gd;
+}
+
 int
 fclaw2d_domain_dimension (const fclaw2d_domain_t * domain)
 {
