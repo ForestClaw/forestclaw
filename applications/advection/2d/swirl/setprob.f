@@ -6,9 +6,10 @@
       common /compi/ pi
       common /comvt/ tperiod,pi2
 
-      open(unit=7,file='setprob.data')
-      read(7,*) tperiod
-      close(7)
+c      open(unit=7,file='setprob.data')
+c      read(7,*) tperiod
+c      close(7)
+      tperiod = 4.d0
 
       call set_maptype()
 
