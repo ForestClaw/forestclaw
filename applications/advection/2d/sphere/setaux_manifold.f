@@ -23,6 +23,7 @@
 
       common /compi/ pi
 
+c     # keep debug false since only one mpirank should print output
       debug = .false.
       dxdy = dx*dy
 

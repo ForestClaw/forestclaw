@@ -10,10 +10,11 @@
       pi = 4.d0*atan(1.d0)
 
 c     # read in data to see whether we should run with fixed rotation or not.
-      open(7,file='setprob.data')
-      read(7,*) kappa
-      read(7,*) Tfinal
-      close(7)
+c     # commented this out since it is overwritten below anyway.
+c      open(7,file='setprob.data')
+c      read(7,*) kappa
+c      read(7,*) Tfinal
+c      close(7)
 
 c     # These are the values that work well with the hemisphere.  Other
 c     # values don't work so well, since we don't have any inflow
