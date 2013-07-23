@@ -10,3 +10,9 @@ manyclaw_includes := -I$(AMR_MANYCLAW) -I$(AMR_MANYCLAW_FORTRAN) -I$(MANYCLAW) -
 
 manyclaw_objs = \
 	$(AMR_MANYCLAW)/amr_manyclaw.o \
+	$(AMR_MANYCLAW)/fortran_source/bc2_manyclaw.o \
+	$(AMR_MANYCLAW)/fortran_source/ClawPatch2.o \
+	$(AMR_MANYCLAW)/fortran_source/src2.o \
+	$(AMR_MANYCLAW)/fortran_source/step2.o \
+	$(AMR_MANYCLAW)/fortran_source/flux2.o \
+	$(AMR_MANYCLAW)/fortran_source/limiter.o

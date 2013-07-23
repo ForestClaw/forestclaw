@@ -3,9 +3,11 @@
 TARGET = simple
 GEO = cart
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
 # Define local objects here
@@ -14,6 +16,8 @@ exampleobjs = \
 	tag4refinement.o \
 	simple_user.o \
 	qinit.o \
+	rpn2ad1.o \
+	rpt2ad1.o \
 	b4step2.o \
 	setaux.o \
 	setprob.o
@@ -42,20 +46,17 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 default: $(TARGET)
 
 .cpp.o:
-	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} ${solverlinkers} -c $< -o $@
 
 .c.o:
 	$(P4EST_CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
-	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
-
-.f.o:
-	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
+	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@ -o $@
 
 .PHONY: clean realclean default $(TARGET)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
-	$(P4EST_CC) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
+	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
 	$(P4EST_LIBS) -o $@
 
 clean:
