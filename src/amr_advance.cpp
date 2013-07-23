@@ -73,7 +73,7 @@ double advance_level(fclaw2d_domain_t *domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
-    fclaw_bool time_interp = fclaw_false;
+    fclaw_bool time_interp_is_false = fclaw_false;
 
 
     double maxcfl = 0;
@@ -115,13 +115,13 @@ double advance_level(fclaw2d_domain_t *domain,
                 double alpha = 0;  // No time interpolation
                 /* Boundary conditions on finer grid should be set so that they can
                    be used in setting corners on coarser grids, if needed. */
-                set_phys_bc(domain,a_level,t_level,time_interp);
+                set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
                 exchange_with_coarse(domain,a_level,t_level,alpha);
 
                 /* Set physicals BCs on the finer level, using any newly updated
                    interior ghost cell data */
-                set_phys_bc(domain,a_level,t_level,time_interp);
+                set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
                 a_time_stepper->increment_coarse_exchange_counter(a_level);
                 a_time_stepper->increment_fine_exchange_counter(a_level-1);
@@ -194,8 +194,6 @@ double advance_level(fclaw2d_domain_t *domain,
                        can only happen if refratio > 2) */
 
                     double  alpha = double(a_curr_fine_step)/refratio;
-                    /* TODO: Have commented this out; it had no effect! */
-                    // fclaw_bool time_interp = fclaw_true;
                     if (verbose)
                     {
                         cout << " --> Doing time interpolatation from coarse grid at level "
@@ -206,8 +204,7 @@ double advance_level(fclaw2d_domain_t *domain,
                     /* Apply BCs to finer grid.  We want to use current data, not time
                        interpolated data */
                     /* TODO: This shadows a variable, I have renamed it! */
-                    fclaw_bool time_interp2 = fclaw_false;
-                    set_phys_bc(domain,a_level,t_level,time_interp2);
+                    set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
                     a_time_stepper->increment_coarse_exchange_counter(a_level);
                 }  /* no subcycling */
@@ -250,7 +247,7 @@ double advance_level(fclaw2d_domain_t *domain,
     /* Make sure all ghost cells at this level have been updated;  Set physical
        BCs after exchange to get any corner boundary ghost cells */
     level_exchange(domain,a_level);
-    set_phys_bc(domain,a_level,t_level,time_interp);
+    set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
     a_time_stepper->increment_level_exchange_counter(a_level);
 
