@@ -94,11 +94,11 @@ main (int argc, char **argv)
   /* Using user defined functions just to demonstrate how one might setup
      something that depends on more than one solver (although only one is used
      here) */
-  link_problem_setup(domain,swirl_problem_setup);
+  link_problem_setup(domain,quadrants_problem_setup);
 
-  swirl_link_solvers(domain);
+  quadrants_link_solvers(domain);
 
-  link_regrid_functions(domain,swirl_patch_tag4refinement,swirl_patch_tag4coarsening);
+  link_regrid_functions(domain,quadrants_patch_tag4refinement,quadrants_patch_tag4coarsening);
 
   /* ---------------------------------------------------------------
      Run
