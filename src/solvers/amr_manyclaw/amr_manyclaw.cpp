@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 #include "amr_manyclaw.H"
 
+#include <manyclaw/manyclaw.h>
 
 void set_manyclaw_parms(fclaw2d_domain_t* domain,amr_manyclaw_parms_t* manyclaw_parms)
 {
@@ -56,6 +57,20 @@ void amr_manyclaw_setprob(fclaw2d_domain_t* domain)
 {
     setprob_();
 }
+
+void manyclaw_set_solver(fclaw2d_domain_t *domain,
+                         fclaw2d_patch_t *this_patch,
+                         int this_block_idx,
+                         int this_patch_idx)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    amr_manyclaw_parms_t *manyclaw_parms = get_manyclaw_parms(domain);
+    ClawPatch *cp = get_clawpatch(this_patch);
+    amr_manyclaw_patch_data_t *mc_data = get_manyclaw_patch_data(cp);
+
+    mc_data->solver = new Solver;
+}
+
 
 
 /* This should only be called when a new ClawPatch is created. */
@@ -283,8 +298,8 @@ void amr_manyclaw_bc2(fclaw2d_domain *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* TODO Modify for ManyClaw ordering */
-    bc2_manyclaw_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
+    /* Modify for ManyClaw ordering */
+    bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
 }
 
 
@@ -559,7 +574,7 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
-    delete wp->solver;
+    delete manyclaw_patch_data->solver;
     delete manyclaw_patch_data;
 
     // or?

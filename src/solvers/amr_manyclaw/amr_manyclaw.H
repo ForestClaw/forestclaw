@@ -30,7 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "clawpack_fort.H"
 
-#include <manyclaw/manyclaw.h>
+// #include <manyclaw/manyclaw.h>
+
+struct Solver;
 
 /* I know this is one 'extern C' too many, but I like the indentation here */
 extern "C"
@@ -42,13 +44,10 @@ extern "C"
               const double& dx, const double& dy, const double q[], const int& maux,
               const double aux[], const double& t, const double& dt, const int mthbc[]);
 
-    void bc2_manifold_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-                       const int& mx, const int& my, const double& xlower, const double& ylower,
-                       const double& dx, const double& dy, const double q[], const int& maux,
-                       const double aux[], const double& t, const double& dt, const int mthbc[],
-                       double xp[], double yp[], double zp[],
-                       double xd[],double yd[],double zd[],
-                       const double xface_normals[], const double yface_normals[]);
+    void bc2_manyclaw_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
+              const int& mx, const int& my, const double& xlower, const double& ylower,
+              const double& dx, const double& dy, const double q[], const int& maux,
+              const double aux[], const double& t, const double& dt, const int mthbc[]);
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
                 const int& mbc, const int& mx, const int& my,
@@ -56,28 +55,11 @@ extern "C"
                 const double& dx, const double& dy,
                 double q[], const int& maux, double aux[]);
 
-    void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[],
-                         double xp[], double yp[], double zp[],
-                         double xd[], double yd[], double zd[],
-                         const int& blockno);
-
     void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
                  const int& mx, const int& my,
                  const double& xlower, const double& ylower,
                  const double& dx, const double& dy,
                  const int& maux, double aux[]);
-
-    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                          const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],double area[]);
 
     void b4step2_(const int& maxmx, const int& maxmy, const int& mbc,
                   const int& mx, const int& my, const int& meqn,
@@ -86,24 +68,6 @@ extern "C"
                   const double& t, const double& dt,
                   const int& maux, double aux[]);
 
-
-    void b4step2_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                          const int& mx, const int& my, const int& meqn,
-                          double q[], const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const double& t, const double& dt,
-                          const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[]);
-
-    void src2_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                        const int& mbc, const int& mx,const int& my,
-                        const double& xlower, const double& ylower,
-                        const double& dx, const double& dy, double q[],
-                        const int& maux, double aux[], const double& t,
-                        const double& dt,
-                        double xp[], double yp[], double zp[],
-                        double xd[], double yd[], double zd[]);
 
     void src2_(const int& maxmx, const int& maxmy, const int& meqn,
                const int& mbc, const int& mx,const int& my,
@@ -185,6 +149,7 @@ void amr_manyclaw_setprob(fclaw2d_domain_t* domain);
 struct amr_manyclaw_patch_data
 {
     FArrayBox auxarray;
+    Solver *solver;
     int maux;
 
     /* Add any data here that the patch may also need */
@@ -197,6 +162,10 @@ void amr_manyclaw_link_to_clawpatch();
 amr_manyclaw_parms_t* get_manyclaw_parms(fclaw2d_domain_t* domain);
 
 
+void manyclaw_set_solver(fclaw2d_domain_t *domain,
+                         fclaw2d_patch_t *this_patch,
+                         int this_block_idx,
+                         int this_patch_idx);
 
 void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
