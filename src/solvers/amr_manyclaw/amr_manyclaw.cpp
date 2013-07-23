@@ -68,7 +68,7 @@ void manyclaw_set_solver(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_manyclaw_patch_data_t *mc_data = get_manyclaw_patch_data(cp);
 
-    mc_data->solver = new Solver;
+    // mc_data->solver = new Solver;
 }
 
 
