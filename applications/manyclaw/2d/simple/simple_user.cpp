@@ -117,16 +117,17 @@ void simple_patch_initialize(fclaw2d_domain_t *domain,
 
 
 void simple_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[])
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double dt,
+                              fclaw_bool intersects_bc[],
+                              fclaw_bool time_interp)
 {
     /* This is called everytime a patch needs physical boundary conditions */
     amr_manyclaw_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc);
+                     t,dt,intersects_bc,time_interp);
 }
 
 
