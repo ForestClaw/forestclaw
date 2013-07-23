@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_manyclaw.H"
 #include "simple_user.H"
 
+#include <manyclaw/manyclaw.h>
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -101,6 +104,7 @@ void simple_patch_setup(fclaw2d_domain_t *domain,
                        int this_patch_idx)
 {
     /* This is called once when a new patch is created. */
+    manyclaw_set_solver(domain,this_patch,this_block_idx,this_patch_idx);
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 }
 

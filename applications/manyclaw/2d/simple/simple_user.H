@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SWIRL_USER_H
 
 #include "amr_forestclaw.H"
-#include <manyclaw/manyclaw.h>
 
 #ifdef __cplusplus
 extern "C"

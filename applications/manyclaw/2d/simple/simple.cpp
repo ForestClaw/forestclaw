@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
-#include "solvers/amr_manyclaw/amr_manyclaw.H"
+#include "amr_manyclaw.H"
 #include "amr_options.h"
 
 #include "simple_user.H"
