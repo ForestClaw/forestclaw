@@ -45,7 +45,7 @@ amr_manyclaw_parms_t* get_manyclaw_parms(fclaw2d_domain_t* domain)
 }
 
 static
-void reorder_data2new(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
+void reorder2new(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -59,7 +59,7 @@ void reorder_data2new(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
 }
 
 static
-void reorder_data2old(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
+void reorder2old(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -350,16 +350,12 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
 
     int level = this_patch->level;
 
-    // Global to all patches
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
     double* qold_mlast = cp->q();
-    double* qold = cp->newGrid();  /* A new grid that has the same size as q() */
 
-    reorder2new(domain,qold_mlast,qold);
+    FArrayBox qold_array = cp->newGrid();
+    double *qold = qold_array.dataPtr();  /* A new grid that has the same size as q() */
+
+    reorder2new(domain,cp,qold);
 
     double* aux = manyclaw_patch_data->auxarray.dataPtr();
     int maux = manyclaw_parms->maux;

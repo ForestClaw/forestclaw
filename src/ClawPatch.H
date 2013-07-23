@@ -61,6 +61,7 @@ public :
     void setup_for_time_interpolation(const double& alpha);
     void reset_after_time_interpolation();
     double* q_time_sync(fclaw_bool time_interp);
+    FArrayBox newGrid();
 
     // ----------------------------------------------------------------
     // Internal boundary conditions
