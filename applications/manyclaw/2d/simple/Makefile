@@ -33,9 +33,6 @@ geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
 
-# Specify location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
-
 # -----------------------------------------------------------
 # The rest of this is more or less default.
 # -----------------------------------------------------------
