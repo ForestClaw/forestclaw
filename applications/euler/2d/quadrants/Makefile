@@ -8,7 +8,7 @@ include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
+FFLAGS = -O0 -g -Wno-unused-variable ${LOCAL_FFLAGS}
 
 # -----------------------------------------------------------
 # Define local objects here
@@ -16,6 +16,7 @@ exampleobjs = \
 	quadrants_user.o \
 	ghost_twopatch.o \
 	tag4refinement.o \
+	quadrants_output.o \
 	rpn2eu4.o \
 	rpt2eu.o \
 	qinit.o \

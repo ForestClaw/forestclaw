@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef QUADRANTS_USER_H
+#define QUADRANTS_USER_H
 
 #include "amr_forestclaw.H"
 #include "amr_waveprop.H"
@@ -39,56 +39,75 @@ extern "C"
 
 extern "C"
 {
-    void swirl_tag4refinement_(const int& mx,const int& my,const int& mbc,
+    void quadrants_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                const int& meqn, const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
                                double q[], const int& init_flag, int& tag_patch);
 
-    void swirl_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+    void quadrants_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                const int& meqn,const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
                                double qcoarsened[], int& tag_patch);
+
+    void quadrants_write_tfile_(const int& iframe,const double& time,
+                                const int& mfields,const int& ngrids,
+                                const int& maux);
+
+    void quadrants_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+                                const int& mbc, const int& mx,const int& my,
+                                const double& xlower,const double& ylower,
+                                const double& dx, const double& dy,
+                                double q[], const int& iframe,const int& patch_num,
+                                const int& level,const int& blockno,
+                                const int& mpirank);
+
 }
 
 
-void swirl_link_solvers(fclaw2d_domain_t *domain);
+void quadrants_link_solvers(fclaw2d_domain_t *domain);
 
-void swirl_problem_setup(fclaw2d_domain_t* domain);
+void quadrants_problem_setup(fclaw2d_domain_t* domain);
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
+void quadrants_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+void quadrants_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt,
-                        fclaw_bool intersects_bc[]);
+void quadrants_patch_physical_bc(fclaw2d_domain *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt,
+                             fclaw_bool intersects_bc[],
+                             fclaw_bool time_interp);
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
                                       double t,
                                       double dt);
 
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool quadrants_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
                                       int initflag);
 
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool quadrants_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno);
+void quadrants_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+
+void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                     int this_block_idx, int this_patch_idx,
+                                     int iframe,int num,int level);
 
 
 #ifdef __cplusplus
