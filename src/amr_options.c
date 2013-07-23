@@ -207,6 +207,8 @@ amr_options_new (sc_options_t * opt)
                            "Check conservation [F]");
     sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
                            "Use subcycling in time [F]");
+    sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
+                           "No weighting when subcycling [F]");
     /* ------------------------------------------------------------------- */
 
     /* -----------------------------------------------------------------------

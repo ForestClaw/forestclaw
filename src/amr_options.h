@@ -93,6 +93,8 @@ struct amr_options
     int manifold;
     int mapped;
     int subcycle;
+    int noweightedp;            /**< Don't use weighted partition.
+                                     Only relevant when subcycling. */
     int check_conservation;
     int use_fixed_dt;
 

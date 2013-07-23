@@ -284,8 +284,9 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
 
     // this call creates a new domain that is valid after partitioning
     // and transfers the data packed above to the new owner processors
+    int exponent = gparms->subcycle && !gparms->noweightedp ? 1 : 0;
     fclaw2d_domain_t *domain_partitioned =
-        fclaw2d_domain_partition (*domain, gparms->subcycle ? 1 : 0);
+        fclaw2d_domain_partition (*domain, exponent);
     fclaw_bool have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)
