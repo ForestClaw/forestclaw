@@ -36,7 +36,6 @@ void set_manyclaw_parms(fclaw2d_domain_t* domain,amr_manyclaw_parms_t* manyclaw_
     ddata->manyclaw_parms = (void*) manyclaw_parms;
 }
 
-static
 amr_manyclaw_parms_t* get_manyclaw_parms(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
@@ -183,7 +182,7 @@ void amr_manyclaw_src2(fclaw2d_domain_t *domain,
                        double t,
                        double dt)
 {
-    const amr_options_t *gparms                    = get_domain_parms(domain);
+    const amr_options_t *gparms  = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
 
     /* Solver defined data;  see amr_manyclaw.H */
@@ -237,7 +236,8 @@ void amr_manyclaw_bc2(fclaw2d_domain *domain,
                       int this_patch_idx,
                       double t,
                       double dt,
-                      fclaw_bool intersects_phys_bdry[])
+                      fclaw_bool intersects_phys_bdry[],
+                      fclaw_bool time_interp)
 {
     const amr_options_t* gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
@@ -264,7 +264,7 @@ void amr_manyclaw_bc2(fclaw2d_domain *domain,
         }
     }
 
-    double* q = cp->q();
+    double* q = cp->q_time_sync(time_interp);
 
     int maux = manyclaw_parms->maux;
     double *aux = manyclaw_patch_data->auxarray.dataPtr();
@@ -283,7 +283,8 @@ void amr_manyclaw_bc2(fclaw2d_domain *domain,
     double dx = cp->dx();
     double dy = cp->dy();
 
-    bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
+    /* TODO Modify for ManyClaw ordering */
+    bc2_manyclaw_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
 }
 
 
@@ -558,6 +559,7 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
+    delete wp->solver;
     delete manyclaw_patch_data;
 
     // or?

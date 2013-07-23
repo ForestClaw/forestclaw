@@ -193,6 +193,10 @@ struct amr_manyclaw_patch_data
 
 void amr_manyclaw_link_to_clawpatch();
 
+/* Don't make this static */
+amr_manyclaw_parms_t* get_manyclaw_parms(fclaw2d_domain_t* domain);
+
+
 
 void amr_manyclaw_setaux(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
@@ -217,7 +221,8 @@ void amr_manyclaw_bc2(fclaw2d_domain_t *domain,
                       int this_patch_idx,
                       double t,
                       double dt,
-                      fclaw_bool intersects_bc[]);
+                      fclaw_bool intersects_bc[],
+                      fclaw_bool time_interp);
 
 
 /* A single step method that advances the solution a single step on a single grid
