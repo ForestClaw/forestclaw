@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_manyclaw.H"
 #include "simple_user.H"
 
-#include <manyclaw/manyclaw.h>
+// #include <manyclaw/manyclaw.h>
 
 
 #ifdef __cplusplus
