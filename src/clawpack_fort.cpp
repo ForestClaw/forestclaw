@@ -76,6 +76,14 @@ FArrayBox::~FArrayBox()
     }
 }
 
+FArrayBox::FArrayBox(const FArrayBox& A)
+{
+    m_box = A.m_box;
+    m_size = A.m_size;
+    m_fields = A.m_fields;
+    set_dataPtr(A.m_size);
+}
+
 void FArrayBox::set_dataPtr(int a_size)
 {
     if (a_size < 0)

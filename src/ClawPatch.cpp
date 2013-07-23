@@ -179,6 +179,16 @@ double* ClawPatch::q()
     return m_griddata.dataPtr();
 }
 
+FArrayBox ClawPatch::newGrid()
+{
+    /* Create a grid based on the size of the existing grids */
+    Box b = m_griddata.box();
+    int fields = m_griddata.fields();
+    FArrayBox A;
+    A.define(b,fields);
+    return A;
+}
+
 // This is used by level_step.
 double* ClawPatch::q_time_sync(fclaw_bool time_interp)
 {

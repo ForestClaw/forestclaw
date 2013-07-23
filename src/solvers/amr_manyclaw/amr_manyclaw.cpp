@@ -45,6 +45,36 @@ amr_manyclaw_parms_t* get_manyclaw_parms(fclaw2d_domain_t* domain)
 }
 
 static
+void reorder_data2new(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    double *qin = cp->q();
+
+    manyclaw_reorder2new_(mx,my,mbc, meqn,qin,qout);
+}
+
+static
+void reorder_data2old(fclaw2d_domain_t *domain, ClawPatch *cp, double *qout)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    double *qin = cp->q();
+
+    manyclaw_reorder2old_(mx,my,mbc, meqn,qin,qout);
+}
+
+
+
+static
 amr_manyclaw_patch_data_t* get_manyclaw_patch_data(ClawPatch *cp)
 {
     /* We need the this cast here, because ClawPatch::manyclaw_patch_data() only returns a
@@ -320,7 +350,16 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
 
     int level = this_patch->level;
 
-    double* qold = cp->q();
+    // Global to all patches
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    double* qold_mlast = cp->q();
+    double* qold = cp->newGrid();  /* A new grid that has the same size as q() */
+
+    reorder2new(domain,qold_mlast,qold);
 
     double* aux = manyclaw_patch_data->auxarray.dataPtr();
     int maux = manyclaw_parms->maux;
@@ -358,6 +397,8 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     /* This is more or less equivalent to the amrclaw routine 'stepgrid' and
        takes a step on a single grid and updates the grid with the new solution
     */
+
+
     clawpatch2_(maxm, meqn, maux, mbc, manyclaw_parms->method,
                 manyclaw_parms->mthlim, manyclaw_parms->mcapa, mwaves,
                 mx, my, qold,
@@ -574,7 +615,7 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
-    delete manyclaw_patch_data->solver;
+    // delete manyclaw_patch_data->solver;
     delete manyclaw_patch_data;
 
     // or?

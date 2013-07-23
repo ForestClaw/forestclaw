@@ -291,6 +291,7 @@ class FArrayBox
 public:
 
     FArrayBox();
+    FArrayBox(const FArrayBox& A);
     ~FArrayBox();
     void define(const Box& a_box, int a_fields);
     double* dataPtr();

@@ -76,6 +76,12 @@ extern "C"
                const int& maux, double aux[], const double& t,
                const double& dt);
 
+    void manyclaw_reorder2new_(const int& mx, const int& my, const int& mbc,
+                               const int& meqn, double qin[], double qout[]);
+
+    void manyclaw_reorder2old_(const int& mx, const int& my, const int& mbc,
+                               const int& meqn, double qin[], double qout[]);
+
 
     /* --------------------------------------------------------------------
        Time stepping
