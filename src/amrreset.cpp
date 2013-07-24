@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
                    (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
 } while (0)
-    
+
 
 void amrreset(fclaw2d_domain_t **domain)
 {
@@ -76,9 +76,9 @@ void amrreset(fclaw2d_domain_t **domain)
     // Evaluate timers if this domain has not been superseded yet.
     if (ddata->is_latest_domain) {
         sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
-    
+
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
- 
+
         FCLAW2D_STATS_SET (stats, ddata, INIT);
         FCLAW2D_STATS_SET (stats, ddata, REGRID);
         FCLAW2D_STATS_SET (stats, ddata, OUTPUT);

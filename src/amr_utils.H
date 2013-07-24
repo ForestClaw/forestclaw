@@ -49,18 +49,18 @@ extern "C"
 // Check parms
 // -----------------------------------------------------------------
 
-void check_amr_parms(amr_options_t *gparms);
+void check_amr_parms (amr_options_t * gparms);
 
 /* -----------------------------------------------------------------
    Initialize data
    ----------------------------------------------------------------- */
-void init_domain_data(fclaw2d_domain_t *domain);
-void init_block_data(fclaw2d_block_t *block);
-void init_patch_data(fclaw2d_patch_t *patch);
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
+void init_domain_data (fclaw2d_domain_t * domain);
+void init_block_data (fclaw2d_block_t * block);
+void init_patch_data (fclaw2d_patch_t * patch);
+void init_block_and_patch_data (fclaw2d_domain_t * domain);
 
-void delete_domain_data(fclaw2d_domain_t* domain);
-void delete_patch_data(fclaw2d_patch_t *patch);
+void delete_domain_data (fclaw2d_domain_t * domain);
+void delete_patch_data (fclaw2d_patch_t * patch);
 
 /* -----------------------------------------------------------------
    Work with timers
@@ -69,49 +69,53 @@ void delete_patch_data(fclaw2d_patch_t *patch);
 /** Get current wall clock time in seconds.
  */
 double fclaw2d_timer_wtime (void);
-void fclaw2d_timer_init (fclaw2d_timer_t *timer);
-void fclaw2d_timer_start (fclaw2d_timer_t *timer);
-void fclaw2d_timer_stop (fclaw2d_timer_t *timer);
+void fclaw2d_timer_init (fclaw2d_timer_t * timer);
+void fclaw2d_timer_start (fclaw2d_timer_t * timer);
+void fclaw2d_timer_stop (fclaw2d_timer_t * timer);
 
 /* -----------------------------------------------------------------
    Return pointer to user data
    ---------------------------------------------------------------- */
-fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);
-fclaw2d_block_data_t  *get_block_data(fclaw2d_block_t *block);
-fclaw2d_patch_data_t  *get_patch_data(fclaw2d_patch_t *patch);
+fclaw2d_domain_data_t *get_domain_data (fclaw2d_domain_t * domain);
+fclaw2d_block_data_t *get_block_data (fclaw2d_block_t * block);
+fclaw2d_patch_data_t *get_patch_data (fclaw2d_patch_t * patch);
 
 /* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp);
+void set_block_data (fclaw2d_block_t * block, const int mthbc[]);
+void set_patch_data (fclaw2d_patch_t * patch, ClawPatch * cp);
 
-void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain);
+void copy_domain_data (fclaw2d_domain_t * old_domain,
+                       fclaw2d_domain_t * new_domain);
 
 /* -----------------------------------------------------------------
    Link routines that don't have any other place to go...
    ----------------------------------------------------------------- */
-void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup);
+void link_problem_setup (fclaw2d_domain_t * domain,
+                         fclaw2d_problem_setup_t f_problem_setup);
 
-#if 0 /* moved into fclaw2d_capi.h */
+#if 0                           /* moved into fclaw2d_capi.h */
 
 /* -----------------------------------------------------------------
    Some helper functions that really do make things easier..
    ----------------------------------------------------------------- */
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
-void set_domain_time(fclaw2d_domain_t *domain, double time);
-double get_domain_time(fclaw2d_domain_t *domain);
+const amr_options_t *get_domain_parms (fclaw2d_domain_t * domain);
+void set_domain_time (fclaw2d_domain_t * domain, double time);
+double get_domain_time (fclaw2d_domain_t * domain);
 
 
 
 // Misc. routines
-int num_patches(fclaw2d_domain_t *domain, int level,int include_shadow);
-int pow_int(int a, int n);
+int num_patches (fclaw2d_domain_t * domain, int level, int include_shadow);
+int pow_int (int a, int n);
 
 #endif
 
-fclaw2d_domain_exchange_t* get_domain_exchange_data(fclaw2d_domain_t* domain);
-void set_domain_exchange_data(fclaw2d_domain_t* domain,fclaw2d_domain_exchange_t *e);
+fclaw2d_domain_exchange_t *get_domain_exchange_data (fclaw2d_domain_t *
+                                                     domain);
+void set_domain_exchange_data (fclaw2d_domain_t * domain,
+                               fclaw2d_domain_exchange_t * e);
 
 
 

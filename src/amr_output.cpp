@@ -91,7 +91,7 @@ amrout (fclaw2d_domain_t * domain, int iframe)
         fclaw2d_domain_serialization_leave (domain);
         /* END OF NON-SCALABLE CODE */
     }
-    
+
     // Record output time
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
 }

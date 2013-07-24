@@ -175,7 +175,7 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
         {
             double alpha = (t_inner - t_initial)/dt_coarse;
             printf("%d %16.8e %16.8e %16.8e\n",level,t_initial,t_inner,alpha);
-            
+
             // TODO: is there a timer running? Which one?
             exchange_with_coarse(domain, level, t_inner, alpha, FCLAW2D_TIMER_NONE);
         }

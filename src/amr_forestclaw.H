@@ -49,75 +49,75 @@ extern "C"
 // ----------------------------------------
 
 // amr_advance.cpp
-double advance_all_levels(fclaw2d_domain_t *domain,subcycle_manager *a_time_stepper);
+double advance_all_levels (fclaw2d_domain_t * domain,
+                           subcycle_manager * a_time_stepper);
 
 // amr_regrid.cpp
-void regrid(fclaw2d_domain_t **domain);
+void regrid (fclaw2d_domain_t ** domain);
 
 // amr_output.cpp
-void amrout(fclaw2d_domain_t *domain, int iframe);
-void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
-                          int this_block_idx, int this_patch_idx,
-                          int iframe,int num,int matlab_level);
+void amrout (fclaw2d_domain_t * domain, int iframe);
+void patch_output_default (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+                           int this_block_idx, int this_patch_idx,
+                           int iframe, int num, int matlab_level);
 
 // -------------------------------------------
 // Routines needed to fill in ghost cells
 // -------------------------------------------
 // amr_levelexchange.cpp
 // Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
-void level_exchange(fclaw2d_domain_t *domain, int a_level, fclaw2d_timer_names_t running);
+void level_exchange (fclaw2d_domain_t * domain, int a_level,
+                     fclaw2d_timer_names_t running);
 
 // amr_exchangecoarse.cpp
 // Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
-void exchange_with_coarse(fclaw2d_domain_t *domain, int a_level,
-                          double t_level,double alpha, fclaw2d_timer_names_t running);
+void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
+                           double t_level, double alpha,
+                           fclaw2d_timer_names_t running);
 
 // amr_physbc.cpp
-void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time,
-                 fclaw_bool time_interp);
+void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,
+                  fclaw_bool time_interp);
 
 
 // -------------------------------------------
 // Routines needed to communicate with p4est
 // -------------------------------------------
 // amr_neighbors.cpp
-void get_face_neighbors(fclaw2d_domain_t *domain,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        int iside,
-                        int *neighbor_block_idx,
-                        fclaw2d_patch_t* ghost_patches[],
-                        int **ref_flag_ptr);
-
-void get_corner_neighbor(fclaw2d_domain_t *domain,
+void get_face_neighbors (fclaw2d_domain_t * domain,
                          int this_block_idx,
                          int this_patch_idx,
-                         int icorner,
-                         int *corner_block_idx,
-                         fclaw2d_patch_t** ghost_patch,
-                         int **ref_flag_ptr,
-                         fclaw_bool is_block_corner);
+                         int iside,
+                         int *neighbor_block_idx,
+                         fclaw2d_patch_t * ghost_patches[],
+                         int **ref_flag_ptr);
 
-void get_block_boundary(fclaw2d_domain_t *domain,
+void get_corner_neighbor (fclaw2d_domain_t * domain,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          int icorner,
+                          int *corner_block_idx,
+                          fclaw2d_patch_t ** ghost_patch,
+                          int **ref_flag_ptr, fclaw_bool is_block_corner);
+
+void get_block_boundary (fclaw2d_domain_t * domain,
+                         int this_block_idx,
+                         int this_patch_idx, bool * intersects_block);
+
+void get_phys_boundary (fclaw2d_domain_t * domain,
                         int this_block_idx,
-                        int this_patch_idx,
-                        bool *intersects_block);
-
-void get_phys_boundary(fclaw2d_domain_t *domain,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       fclaw_bool *intersects_bc);
+                        int this_patch_idx, fclaw_bool * intersects_bc);
 
 // ----------------------------
 // Routines used by diagnostics
 // ----------------------------
 
 // amr_diagnostics.cpp
-void check_conservation(fclaw2d_domain_t *domain);
-void dump_patch(fclaw2d_domain_t *domain, int dump_patch);
-void dump_last_patch(fclaw2d_domain_t *domain, int dump_patch);
-void dump_time_interp_patch(fclaw2d_domain_t *domain, int dump_patch);
-void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
+void check_conservation (fclaw2d_domain_t * domain);
+void dump_patch (fclaw2d_domain_t * domain, int dump_patch);
+void dump_last_patch (fclaw2d_domain_t * domain, int dump_patch);
+void dump_time_interp_patch (fclaw2d_domain_t * domain, int dump_patch);
+void dump_auxarray (fclaw2d_domain_t * domain, int dump_patchno);
 
 
 

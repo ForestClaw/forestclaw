@@ -199,7 +199,7 @@ void level_exchange(fclaw2d_domain_t *domain, int level,
     // Do corner exchange only after physical boundary conditions have been set on all patches,
     // since corners may overlap phyical ghost cell region of neighboring patch.
     fclaw2d_domain_iterate_level(domain, level, cb_level_corner_exchange, (void *) NULL);
-    
+
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
     if (running != FCLAW2D_TIMER_NONE) {
