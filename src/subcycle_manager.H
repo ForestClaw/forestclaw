@@ -26,15 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SUBCYCLE_MANAGER_H
 #define SUBCYCLE_MANAGER_H
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
+/* this header file must come first */
+#include "fclaw2d_defs.H"
 
 #include "fclaw2d_convenience.h"
 #include "forestclaw2d.h"
 #include "amr_options.h"
 
-#include "fclaw2d_defs.H"
+#include <iostream>
+#include <cstdlib>
+#include <vector>
 
 
 class level_data

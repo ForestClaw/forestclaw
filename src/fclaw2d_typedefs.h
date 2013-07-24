@@ -1,7 +1,9 @@
 #ifndef FCLAW2D_TYPEDEFS_H
 #define FCLAW2D_TYPEDEFS_H
 
+/* this header file must come first */
 #include "fclaw2d_defs.H"
+
 #include "amr_options.h"
 #include "forestclaw2d.h"
 #include "fclaw2d_solvers.H"

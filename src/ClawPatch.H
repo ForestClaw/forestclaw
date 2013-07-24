@@ -1,14 +1,15 @@
 #ifndef __CLAWPATCH_H
 #define __CLAWPATCH_H
 
-#include <iostream>
-#include <vector>
-
-using namespace std;
+/* this header file must come first */
+#include "fclaw2d_defs.H"
 
 #include "amr_options.h"
 #include "clawpack_fort.H"
-#include "fclaw2d_defs.H"
+
+#include <iostream>
+#include <vector>
+
 
 class ClawPatch;
 

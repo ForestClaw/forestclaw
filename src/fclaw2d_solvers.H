@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_SOLVERS_H
 #define FCLAW2D_SOLVERS_H
 
-// #include <sc_options.h>
+/* this header file must come first */
 #include "fclaw2d_defs.H"
 
 #ifdef __cplusplus

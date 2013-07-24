@@ -26,7 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DEFS_H
 #define FCLAW2D_DEFS_H
 
-#include <math.h>
+/* Not nice for namespace cleanliness, but necessary to include mpi.h */
+#include <sc.h>
 
 /* Some convenient preprocessor directives *
  * TODO: Having static int in a .H file leads to multiple definitions.
