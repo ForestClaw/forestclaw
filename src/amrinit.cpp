@@ -250,6 +250,7 @@ void amrinit (fclaw2d_domain_t **domain)
         }
     }
     
+    // stop timer
     ddata = get_domain_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }

@@ -254,54 +254,10 @@ void regrid(fclaw2d_domain_t **domain)
         // free memory associated with old domain
         amrreset(domain);
         *domain = new_domain;
+        new_domain = NULL;
 
         // Repartition for load balancing
         repartition_domain(domain, -1);
 
-        // get ghost patches for this processor
-        // setup_ghost_patches(domain);
-
-
-#if 0
-        // allocate memory for parallel transfor of patches
-        // use data size (in bytes per patch) below.
-        size_t data_size = pack_size(*domain);
-        void ** patch_data = NULL;
-        fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
-
-        // For all (patch i) { pack its numerical data into patch_data[i] }
-        fclaw2d_domain_iterate_patches(*domain, cb_pack_patches,
-                                       (void *) patch_data);
-
-
-        // this call creates a new domain that is valid after partitioning
-        // and transfers the data packed above to the new owner processors
-        fclaw2d_domain_t *domain_partitioned = fclaw2d_domain_partition (*domain);
-
-        if (domain_partitioned != NULL)
-        {
-            // TODO: allocate patch and block etc. memory for domain_partitioned
-            // this refers to data inside forestclaw, clawpatch, etc.
-
-
-            // update patch array to point to the numerical data that was received
-            fclaw2d_domain_retrieve_after_partition (domain_partitioned,
-                                                     data_size, &patch_data);
-
-            // TODO: for all (patch i) { unpack numerical data from patch_data[i] }
-            fclaw2d_domain_iterate_patches(domain_partioned, cb_unpack_patches,
-                                           (void *) patch_data);
-
-            /* then the old domain is no longer necessary */
-            amrreset(domain);
-            *domain = domain_partitioned;
-
-            /* internal clean up */
-            fclaw2d_domain_complete(*domain);
-        }
-
-        // free the data that was used in the parallel transfer of patches
-        fclaw2d_domain_free_after_partition (*domain, &patch_data);
-#endif
     }
 }
