@@ -36,6 +36,8 @@ extern "C"
 #endif
 #endif
 
+/*************************** DATA TYPES ***********************************/
+
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 typedef struct fclaw2d_block fclaw2d_block_t;
 typedef struct fclaw2d_patch fclaw2d_patch_t;
@@ -113,14 +115,7 @@ struct fclaw2d_domain
     void *user;
 };
 
-/** Compute and return the maximum over all processors of a double value.
- * The minimum can be computed by using this function on the negative value.
- */
-double fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d);
-
-/** Compute and return the sum over all processors of a double value.
- */
-double fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d);
+/*************************** TOPOLOGICAL PROPERTIES ***********************/
 
 /** Return the space dimension. */
 int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
@@ -144,6 +139,8 @@ int fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain);
 /** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
 void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
+
+/*************************** PATCH FUNCTIONS ******************************/
 
 /** Return the dimension of a corner.
  * \param [in] patch    A patch with properly set member variables.
@@ -173,6 +170,8 @@ int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
  */
 int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
 
+/************************* ALLOCATION *************************************/
+
 void *fclaw2d_alloc (size_t size);
 void *fclaw2d_calloc (size_t nmemb, size_t size);
 void *fclaw2d_realloc (void *ptr, size_t size);
@@ -181,6 +180,8 @@ void fclaw2d_free (void *ptr);
 #define FCLAW2D_ALLOC_ZERO(t,n) (t *) fclaw2d_calloc ((n), sizeof (t))
 #define FCLAW2D_REALLOC(p,t,n)  (t *) fclaw2d_realloc ((p), (n) * sizeof (t))
 #define FCLAW2D_FREE(p)         fclaw2d_free (p)
+
+/***************************** PATCH ITERATORS ****************************/
 
 /** Callback prototype for the patch iterators.
  * \param [in] domain	General domain structure.
@@ -222,6 +223,8 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
 void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
                                       fclaw2d_patch_callback_t pcb,
                                       void *user);
+
+/************************ PATCH NEIGHBORS *********************************/
 
 /** Determine physical boundary status as 1, or 0 for neighbor patches.
  * \param [in] domain	Valid domain structure.
@@ -309,6 +312,8 @@ int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                     int *rproc, int *rblockno, int *rpatchno,
                                     fclaw2d_patch_relation_t * neighbor_size);
 
+/************************** ADAPT *****************************************/
+
 /** Mark a patch for refinement.
  * It is safe to call this function from an iterator callback except
  * fclaw2d_domain_iterate_adapted.
@@ -352,6 +357,8 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
+/*************************** PARTITION ************************************/
+
 /** Allocate data buffer for parallel transfer of all patches.
  * \param [in,out] domain       The memory lives inside this domain.
  * \param [in] data_size        Number of bytes per patch to transfer.
@@ -384,6 +391,8 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
  */
 void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
                                           void ***patch_data);
+
+/**************************** EXCHANGE ************************************/
 
 /** Data structure for storing allocated data for parallel exchange. */
 typedef struct fclaw2d_domain_exchange
@@ -437,7 +446,7 @@ fclaw2d_domain_exchange_t
  *                              must have been set properly by forestclaw.
  */
 void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
-                                       fclaw2d_domain_exchange_t * e);
+                                    fclaw2d_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.
@@ -446,6 +455,21 @@ void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
  */
 void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                          fclaw2d_domain_exchange_t * e);
+
+/************************ COMMUNICATION ***********************************/
+
+/** Compute and return the maximum over all processors of a double value.
+ * The minimum can be computed by using this function on the negative value.
+ */
+double fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d);
+
+/** Compute and return the sum over all processors of a double value.
+ */
+double fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d);
+
+/** Synchronize all processes.  Avoid using if at all possible.
+ */
+void fclaw2d_domain_barrier (fclaw2d_domain_t * domain);
 
 /** Serialize a section of code.
  * THIS IS NOT SCALABLE.

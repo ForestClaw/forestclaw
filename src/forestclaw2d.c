@@ -53,6 +53,15 @@ fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d)
     return gd;
 }
 
+void
+fclaw2d_domain_barrier (fclaw2d_domain_t * domain)
+{
+    int mpiret;
+
+    mpiret = MPI_Barrier (domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+}
+
 int
 fclaw2d_domain_dimension (const fclaw2d_domain_t * domain)
 {
