@@ -151,6 +151,10 @@ fclaw2d_timer_start (fclaw2d_timer_t *timer)
         timer->stopped = 0.;
         timer->running = 1;
     }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
 }
 
 void
@@ -160,6 +164,10 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
         timer->stopped = fclaw2d_timer_wtime ();
         timer->cumulative += timer->stopped - timer->started;
         timer->running = 0;
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
     }
 }
 
