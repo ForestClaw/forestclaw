@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_single_step.h"
-#include "amr_forestclaw.H"
+#include "amr_includes.H"
 
 static
     void cb_single_step(fclaw2d_domain_t *domain,

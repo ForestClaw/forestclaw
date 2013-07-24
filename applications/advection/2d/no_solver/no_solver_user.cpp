@@ -23,9 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
+#include "amr_includes.H"
 #include "no_solver_user.H"
-#include "amr_utils.H"
 
 #ifdef __cplusplus
 extern "C"

@@ -28,13 +28,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* NOTE: This file is meant to be included by .cpp files only. */
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "ClawPatch.H"
 #include "amr_regrid.H"
+
+#include <iostream>
+#include <cstdlib>
+#include <vector>
+
+using namespace std;
 
 #endif

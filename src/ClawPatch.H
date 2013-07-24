@@ -7,9 +7,6 @@
 #include "amr_options.h"
 #include "clawpack_fort.H"
 
-#include <iostream>
-#include <vector>
-
 
 class ClawPatch;
 

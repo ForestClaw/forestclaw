@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 
 #include "subcycle_manager.H"
-#include "amr_includes.H"
 #include "amr_regrid.H"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
