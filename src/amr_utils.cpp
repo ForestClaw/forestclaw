@@ -56,6 +56,7 @@ void init_domain_data(fclaw2d_domain_t *domain)
     domain->user = (void *) ddata;
 
     ddata->count_set_clawpatch = ddata->count_delete_clawpatch = 0;
+    ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
 
     ddata->domain_exchange = NULL;
 
@@ -126,6 +127,42 @@ void delete_patch_data(fclaw2d_patch_t *patch)
     FCLAW2D_FREE(pd);
 }
 
+/* -----------------------------------------------------------------
+   Work with timers
+   ----------------------------------------------------------------- */
+
+double
+fclaw2d_timer_wtime (void)
+{
+    return MPI_Wtime ();
+}
+
+void
+fclaw2d_timer_init (fclaw2d_timer_t *timer)
+{
+    memset (timer, 0, sizeof (fclaw2d_timer_t));
+}
+
+void
+fclaw2d_timer_start (fclaw2d_timer_t *timer)
+{
+    if (!timer->running) {
+        timer->started = fclaw2d_timer_wtime ();
+        timer->stopped = 0.;
+        timer->running = 1;
+    }
+}
+
+void
+fclaw2d_timer_stop (fclaw2d_timer_t *timer)
+{
+    if (timer->running) {
+        timer->stopped = fclaw2d_timer_wtime ();
+        timer->cumulative += timer->stopped - timer->started;
+        timer->running = 0;
+    }
+}
+
 // -----------------------------------------------------------------
 // Return pointer to user data
 // -----------------------------------------------------------------
@@ -157,6 +194,14 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
     /* Has the data already been allocated? */
     fclaw2d_domain_data_t *ddata_new = get_domain_data(new_domain);
+
+
+    /* Move timers over to the new domain */
+    ddata_old->is_latest_domain = 0;
+    memcpy (ddata_new->timers, ddata_old->timers,
+            sizeof (fclaw2d_timer_t) * FCLAW2D_TIMER_COUNT);
+    ddata_new->is_latest_domain = 1;
+
 
     /*
        We don't need to copy domain_exchange, since it is rebuilt whenever

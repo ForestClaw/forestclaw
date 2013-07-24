@@ -132,10 +132,19 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 // Initialize a base level of grids
 void amrinit (fclaw2d_domain_t **domain)
 {
+    int i;
     char basename[BUFSIZ];
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+
+    // This is where the timing starts.
+    ddata->is_latest_domain = 1;
+    for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
+        fclaw2d_timer_init (&ddata->timers[i]);
+    }
+    fclaw2d_domain_barrier (*domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
 
     // Set problem dependent parameters for Riemann solvers, etc.
     (ddata->f_problem_setup)(*domain);
@@ -162,6 +171,9 @@ void amrinit (fclaw2d_domain_t **domain)
                   gparms->prefix, minlevel);
         amr_output_write_vtk (*domain, basename);
     }
+
+    // Domain data may go out of scope now.
+    ddata = NULL;
 
     // Refine as needed, one level at a time.
     for (int level = minlevel; level < maxlevel; level++)
@@ -215,4 +227,7 @@ void amrinit (fclaw2d_domain_t **domain)
             break;
         }
     }
+    
+    ddata = get_domain_data(*domain);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }

@@ -63,6 +63,17 @@ void delete_domain_data(fclaw2d_domain_t* domain);
 void delete_patch_data(fclaw2d_patch_t *patch);
 
 /* -----------------------------------------------------------------
+   Work with timers
+   ----------------------------------------------------------------- */
+
+/** Get current wall clock time in seconds.
+ */
+double fclaw2d_timer_wtime (void);
+void fclaw2d_timer_init (fclaw2d_timer_t *timer);
+void fclaw2d_timer_start (fclaw2d_timer_t *timer);
+void fclaw2d_timer_stop (fclaw2d_timer_t *timer);
+
+/* -----------------------------------------------------------------
    Return pointer to user data
    ---------------------------------------------------------------- */
 fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain);

@@ -25,6 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
+#include <sc_statistics.h>
+
+#define FCLAW2D_STATS_SET(stats,ddata,NAME) \
+    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME, \
+                   (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME)
 
 void amrreset(fclaw2d_domain_t **domain)
 {
@@ -63,6 +68,18 @@ void amrreset(fclaw2d_domain_t **domain)
                 (*domain)->mpirank,
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
     }
+
+    // Evaluate timers if this domain has not been superseded yet.
+    if (ddata->is_latest_domain) {
+        sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
+ 
+        FCLAW2D_STATS_SET (stats, ddata, INIT);
+        FCLAW2D_STATS_SET (stats, ddata, REMESH);
+        sc_stats_compute ((*domain)->mpicomm, FCLAW2D_TIMER_COUNT, stats);
+        sc_stats_print (sc_package_id, SC_LP_PRODUCTION, FCLAW2D_TIMER_COUNT,
+                        stats, 1, 0);
+    }
+
 
     delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
 

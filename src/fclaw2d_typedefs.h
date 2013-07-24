@@ -41,10 +41,28 @@ typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
 
 typedef void (*fclaw2d_problem_setup_t) (fclaw2d_domain_t * domain);
 
+typedef enum
+{
+    FCLAW2D_TIMER_INIT,
+    FCLAW2D_TIMER_REMESH,
+    FCLAW2D_TIMER_COUNT
+}
+fclaw2d_timer_names_t;
+
+typedef struct
+{
+    int running;
+    double started, stopped;
+    double cumulative;
+}
+fclaw2d_timer_t;
+
 typedef struct fclaw2d_domain_data
 {
-    /* Debug counters */
+    /* Debug counters and timers */
     int count_set_clawpatch, count_delete_clawpatch;
+    int is_latest_domain;
+    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
     /* Our run time parameters live here */
     const amr_options_t *amropts;
