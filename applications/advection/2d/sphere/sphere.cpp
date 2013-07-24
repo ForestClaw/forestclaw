@@ -89,10 +89,6 @@ main (int argc, char **argv)
 
   sphere_link_solvers(domain);
 
-  link_regrid_functions(domain,
-                        sphere_patch_tag4refinement,
-                        sphere_patch_tag4coarsening);
-
   /* --------------------------------------------------
      Initialize and run the simulation
      -------------------------------------------------- */

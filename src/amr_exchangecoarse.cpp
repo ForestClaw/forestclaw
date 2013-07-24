@@ -435,17 +435,25 @@ void cb_face_average(fclaw2d_domain_t *domain,
                         }
                     }
                     /* Swap out coarse and fine */
-                    int iface_coarse;
-                    if (iface == 0)
-                        iface_coarse = 1;
-                    else if (iface == 1)
-                        iface_coarse = 0;
-                    else if (iface == 2)
-                        iface_coarse = 3;
-                    else if (iface == 3)
-                        iface_coarse = 2;
-
                     fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
+                    int iface_coarse;
+                    if (!block_boundary)
+                    {
+                        if (iface == 0)
+                            iface_coarse = 1;
+                        else if (iface == 1)
+                            iface_coarse = 0;
+                        else if (iface == 2)
+                            iface_coarse = 3;
+                        else if (iface == 3)
+                            iface_coarse = 2;
+                    }
+                    else
+                    {
+                        /* This only works for the sphere grid */
+                        iface_coarse = iface;
+                    }
+
                     coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
                                                 fine_cp,time_interp,block_boundary,
                                                 igrid);
@@ -558,14 +566,22 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                     }
                     /* Swap out coarse and fine */
                     int iface_coarse;
-                    if (iface == 0)
-                        iface_coarse = 1;
-                    else if (iface == 1)
-                        iface_coarse = 0;
-                    else if (iface == 2)
-                        iface_coarse = 3;
-                    else if (iface == 3)
-                        iface_coarse = 2;
+                    if (is_block_boundary)
+                    {
+                        if (iface == 0)
+                            iface_coarse = 1;
+                        else if (iface == 1)
+                            iface_coarse = 0;
+                        else if (iface == 2)
+                            iface_coarse = 3;
+                        else if (iface == 3)
+                            iface_coarse = 2;
+                    }
+                    else
+                    {
+                        /* This only works for the sphere grid */
+                        iface_coarse = iface;
+                    }
 
                     coarse_cp->interpolate_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,block_boundary,

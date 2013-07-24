@@ -61,6 +61,18 @@ extern "C"
                            const double& dx, const double& dy,
                            const double& t, const int& maux, double aux[],
                            double xd[], double yd[], double zd[]);
+
+    void sphere_write_tfile_(const int& iframe,const double& time,
+                            const int& mfields,const int& ngrids,
+                            const int& maux);
+
+    void sphere_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+                            const int& mbc, const int& mx,const int& my,
+                            const double& xlower,const double& ylower,
+                            const double& dx, const double& dy,
+                            double q[], const int& iframe,const int& patch_num,
+                            const int& level,const int& blockno,
+                            const int& mpirank);
 }
 
 #ifdef __cplusplus
@@ -116,6 +128,12 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno);
+
+void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+
+void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level);
 
 #ifdef __cplusplus
 #if 0

@@ -39,14 +39,21 @@ extern "C"
 void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
-
     sf->f_patch_setup              = &sphere_patch_setup;
     sf->f_patch_initialize         = &sphere_qinit;
     sf->f_patch_single_step_update = &sphere_update;
 
+    fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
+    rf->f_patch_tag4refinement = &sphere_patch_tag4refinement;
+    rf->f_patch_tag4coarsening = &sphere_patch_tag4coarsening;
+
+    fclaw2d_output_functions_t *of = get_output_functions(domain);
+    of->f_patch_write_header = &sphere_parallel_write_header;
+    of->f_patch_write_output = &sphere_parallel_write_output;
+
+    /* This is needed to get constructors for user data */
     amr_waveprop_link_to_clawpatch();
 }
 
@@ -279,6 +286,64 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
+void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    double time = get_domain_time(domain);
+
+    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+
+    /* Increase the number of fields by 1 so we can printout the mpi rank */
+    int mfields = gparms->meqn + 1;
+    int maux = 0;
+    sphere_write_tfile_(iframe,time,mfields,ngrids,maux);
+
+    /* This opens file 'fort.qXXXX' for replace
+       (where XXXX = <zero padding><iframe>, e.g. 0001, 0010, 0114),
+       and closes the file. */
+    new_qfile_(iframe);
+}
+
+
+void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------------- */
+    int matlab_level = level + 1;
+
+    int mpirank = domain->mpirank;
+    /* This opens a file for append and writes in the 'clawout' style. */
+    sphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                        iframe,num,matlab_level,this_block_idx,mpirank);
+}
 
 
 
