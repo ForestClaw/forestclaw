@@ -76,8 +76,9 @@ void amrreset(fclaw2d_domain_t **domain)
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WTIME]);
  
         FCLAW2D_STATS_SET (stats, ddata, INIT);
-        FCLAW2D_STATS_SET (stats, ddata, REMESH);
+        FCLAW2D_STATS_SET (stats, ddata, REGRID);
         FCLAW2D_STATS_SET (stats, ddata, OUTPUT);
+        FCLAW2D_STATS_SET (stats, ddata, COMPUTE);
         FCLAW2D_STATS_SET (stats, ddata, WTIME);
         sc_stats_compute ((*domain)->mpicomm, FCLAW2D_TIMER_COUNT, stats);
         sc_stats_print (sc_package_id, SC_LP_PRODUCTION, FCLAW2D_TIMER_COUNT,

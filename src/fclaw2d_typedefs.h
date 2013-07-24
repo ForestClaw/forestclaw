@@ -44,8 +44,9 @@ typedef void (*fclaw2d_problem_setup_t) (fclaw2d_domain_t * domain);
 typedef enum
 {
     FCLAW2D_TIMER_INIT,
-    FCLAW2D_TIMER_REMESH,
+    FCLAW2D_TIMER_REGRID,
     FCLAW2D_TIMER_OUTPUT,
+    FCLAW2D_TIMER_COMPUTE,
     FCLAW2D_TIMER_WTIME,
     FCLAW2D_TIMER_COUNT
 }

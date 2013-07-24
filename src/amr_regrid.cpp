@@ -209,6 +209,9 @@ void regrid(fclaw2d_domain_t **domain)
     const amr_options_t *gparms = get_domain_parms(*domain);
     double t = get_domain_time(*domain);
 
+    fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
@@ -222,6 +225,9 @@ void regrid(fclaw2d_domain_t **domain)
     // First determine which families should be coarsened.
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
                                     (void*) NULL);
+
+    // Domain data may go out of scope now.
+    ddata = NULL;
 
     // Then refine.
     fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
@@ -260,4 +266,8 @@ void regrid(fclaw2d_domain_t **domain)
         repartition_domain(domain, -1);
 
     }
+
+    // stop timer
+    ddata = get_domain_data(*domain);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 }
