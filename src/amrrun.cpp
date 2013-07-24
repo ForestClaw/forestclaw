@@ -124,7 +124,13 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             // Check to see if solution is still conservative
             if (cons_check)
             {
+                // Get current domain data since it may change during regrid
+                fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+
                 check_conservation(*domain);
+
+                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
 
             // Take a stable level 0 time step (use this as the base level time step even if
@@ -285,7 +291,13 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         // Check to see if solution is still conservative
         if (cons_check)
         {
+            // Get current domain data since it may change during regrid
+            fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+
             check_conservation(*domain);
+
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
 
         // Take a stable level 0 time step (use level 0 as the base level time step even if
@@ -407,7 +419,13 @@ static void outstyle_4(fclaw2d_domain_t **domain)
         // Check to see if solution is still conservative
         if (cons_check)
         {
+            // Get current domain data since it may change during regrid
+            fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+
             check_conservation(*domain);
+
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
 
         double dt_minlevel = initial_dt;
