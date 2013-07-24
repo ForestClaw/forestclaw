@@ -1,0 +1,24 @@
+#! /bin/sh
+
+echo "Working with $FORESTCLAW"
+if test ! -d $FORESTCLAW ; then
+        echo "Directory does not exist"
+        exit 1
+fi
+
+for NAME in no_solver swirl sphere hemisphere ; do
+        cd "$FORESTCLAW/applications/advection/2d/$NAME"
+        make realclean >/dev/null
+        rm -rf "$WORK/local/forestclaw/$NAME"
+done
+
+cd $FORESTCLAW/src
+make clean >/dev/null
+make -j12 >/dev/null
+
+for NAME in no_solver swirl sphere hemisphere ; do
+        cd "$FORESTCLAW/applications/advection/2d/$NAME"
+        make -j12 >/dev/null
+        cp -ai "$FORESTCLAW/applications/advection/2d/$NAME" \
+               "$WORK/local/forestclaw/"
+done

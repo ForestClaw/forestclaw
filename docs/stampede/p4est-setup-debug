@@ -1,0 +1,43 @@
+#! /bin/bash
+
+UNPACK="$HOME/nosave/unpack-debug"
+PRBASE="$WORK/local/p4est"
+WHERE="DEBUG"
+
+export CFLAGS="-Wall -O0 -g"
+
+function bdie () {
+	echo "$@"
+	exit 1
+}
+
+TGZ="$1"; shift
+if test ! -f "$TGZ" ; then
+	bdie "File with p4est .tar.gz not found"
+fi
+if ! (echo "$TGZ" | grep -q 'p4est.*.tar.gz') ; then
+	bdie "File mismatch"
+fi
+DIR=`echo "$TGZ" | sed 's/\(p4est.*\).tar.gz/\1/'`
+DIR=`basename $DIR`
+echo "Target directory: $DIR"
+if test -d "$UNPACK/$DIR" ; then
+	echo "Directory found"
+else
+	echo -n "Unpacking... "
+	tar -xvz -f "$TGZ" -C "$UNPACK" >/dev/null
+	echo "done"
+fi
+cd "$UNPACK/$DIR"
+if test ! -f src/p4est.h ; then
+	bdie "Header file missing"
+fi
+mkdir -p "$WHERE" && cd "$WHERE" || bdie "Error in mkdir or cd"
+../configure \
+	--prefix="$PRBASE/$DIR/$WHERE" \
+	--without-blas --enable-mpi --enable-mpiio --enable-debug \
+	"$@" || bdie "Error in configure"
+make -C sc -j 16 || bdie "Error in make sc"
+make -j 16 || bdie "Error in make p4est"
+make -j 8 install || bdie "Error in make install"
+echo "Successfully installed into $PRBASE/$DIR/$WHERE"
