@@ -98,7 +98,11 @@ void manyclaw_set_solver(fclaw2d_domain_t *domain,
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_manyclaw_patch_data_t *mc_data = get_manyclaw_patch_data(cp);
 
-    // mc_data->solver = new Solver;
+    int numcells[2] = {gparms->mx,gparms->my};
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    int mwaves = manyclaw_parms->mwaves;
+    mc_data->solver = new Solver(numcells,meqn,mbc,mwaves);
 }
 
 
@@ -227,14 +231,12 @@ void amr_manyclaw_src2(fclaw2d_domain_t *domain,
                        double t,
                        double dt)
 {
-    const amr_options_t *gparms  = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    amr_manyclaw_parms_t *manyclaw_parms = get_manyclaw_parms(domain);
+    ClawPatch *cp = get_clawpatch(this_patch);
 
     /* Solver defined data;  see amr_manyclaw.H */
     amr_manyclaw_patch_data_t *manyclaw_patch_data = get_manyclaw_patch_data(cp);
-
-    /* Parameters specific to manyclaw and read from fclaw2d_manyclaw.ini */
-    amr_manyclaw_parms_t *manyclaw_parms     = get_manyclaw_parms(domain);
 
     set_block_(&this_block_idx);
 
@@ -350,6 +352,8 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
 
     int level = this_patch->level;
 
+    cp->save_current_step();  /* Save in case we need to retake the step */
+
     double* qold_mlast = cp->q();
 
     FArrayBox qold_array = cp->newGrid();
@@ -359,8 +363,6 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
 
     double* aux = manyclaw_patch_data->auxarray.dataPtr();
     int maux = manyclaw_parms->maux;
-
-    cp->save_current_step();  // Save for time interpolation
 
     // Global to all patches
     int mx = gparms->mx;
@@ -394,12 +396,13 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
        takes a step on a single grid and updates the grid with the new solution
     */
 
-
+#if 0
     clawpatch2_(maxm, meqn, maux, mbc, manyclaw_parms->method,
                 manyclaw_parms->mthlim, manyclaw_parms->mcapa, mwaves,
                 mx, my, qold,
                 aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,
                 level,t, fp, fm, gp, gm);
+#endif
 
     delete [] fp;
     delete [] fm;
@@ -430,59 +433,6 @@ double amr_manyclaw_update(fclaw2d_domain_t *domain,
         amr_manyclaw_src2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
     }
     return maxcfl;
-}
-
-
-
-static
-void cb_dump_auxarray(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
-{
-    int dump_patchno = *((int *) user);
-
-    int numb4 = domain->blocks[this_block_idx].num_patches_before;
-    if (this_patch_idx == dump_patchno + numb4)
-    {
-        const amr_options_t* gparms              = get_domain_parms(domain);
-        ClawPatch *cp                            = get_clawpatch(this_patch);
-        amr_manyclaw_patch_data_t *manyclaw_patch_data = get_manyclaw_patch_data(cp);
-
-        double* aux = manyclaw_patch_data->auxarray.dataPtr();
-        int maux = manyclaw_patch_data->maux;
-
-        int mx = gparms->mx;
-        int my = gparms->my;
-        int mbc = gparms->mbc;
-
-        int k = 0;
-        for (int m = 0; m < maux; m++)
-        {
-            for(int j = 1-mbc; j <= my+mbc; j++)
-            {
-                for(int i = 1-mbc; i <= mx+mbc; i++)
-                {
-                    printf("q[%2d,%2d,%2d] = %24.16e\n",i,j,m,aux[k]);
-                    k++;
-                }
-                printf("\n");
-            }
-            printf("\n");
-            printf("\n");
-        }
-    }
-}
-
-
-void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
-{
-    printf("Dumping patch (time_interp) %d\n",dump_patchno);
-    fclaw2d_domain_iterate_patches(domain,
-                                   cb_dump_auxarray,
-                                   &dump_patchno);
-
 }
 
 
@@ -611,7 +561,7 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
-    // delete manyclaw_patch_data->solver;
+    delete manyclaw_patch_data->solver;
     delete manyclaw_patch_data;
 
     // or?

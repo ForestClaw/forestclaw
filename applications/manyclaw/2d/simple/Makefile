@@ -54,7 +54,7 @@ default: $(TARGET)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
-	$(P4EST_LIBS) -o $@
+	$(P4EST_LIBS) $(solverlinkers) -o $@
 
 clean:
 	rm -f *.o $(TARGET) $(exampleobjs)
