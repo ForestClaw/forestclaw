@@ -6,7 +6,6 @@ GEO = sphere
 include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
-FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
@@ -22,7 +21,8 @@ exampleobjs = \
 	qinit_manifold.o \
 	b4step2_manifold.o \
 	setaux_manifold.o \
-	setprob.o
+	setprob.o \
+	sphere_output.o
 
 # Solver routines (several solvers can be added here)
 include Makefile.waveprop.inc
