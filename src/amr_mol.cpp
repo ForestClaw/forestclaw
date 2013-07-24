@@ -159,7 +159,8 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
        ------------------------------------------------------------ */
     restore_patch_data(domain,level,mol_data);
 
-    level_exchange(domain,level);
+    // TODO: is there a timer running? Which one?
+    level_exchange(domain,level, FCLAW2D_TIMER_NONE);
 
 
     fclaw_bool time_interp = fclaw_false;
@@ -174,7 +175,9 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
         {
             double alpha = (t_inner - t_initial)/dt_coarse;
             printf("%d %16.8e %16.8e %16.8e\n",level,t_initial,t_inner,alpha);
-            exchange_with_coarse(domain, level, t_inner, alpha);
+            
+            // TODO: is there a timer running? Which one?
+            exchange_with_coarse(domain, level, t_inner, alpha, FCLAW2D_TIMER_NONE);
         }
     }
 

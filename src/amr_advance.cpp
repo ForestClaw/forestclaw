@@ -117,7 +117,8 @@ double advance_level(fclaw2d_domain_t *domain,
                    be used in setting corners on coarser grids, if needed. */
                 set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
-                exchange_with_coarse(domain,a_level,t_level,alpha);
+                exchange_with_coarse(domain,a_level,t_level,alpha,
+                                     FCLAW2D_TIMER_ADVANCE);
 
                 /* Set physicals BCs on the finer level, using any newly updated
                    interior ghost cell data */
@@ -199,7 +200,8 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " --> Doing time interpolatation from coarse grid at level "
                              << a_level-1 << " using alpha = " << alpha << endl;
                     }
-                    exchange_with_coarse(domain,a_level,t_level,alpha);
+                    exchange_with_coarse(domain,a_level,t_level,alpha,
+                                         FCLAW2D_TIMER_ADVANCE);
 
                     /* Apply BCs to finer grid.  We want to use current data, not time
                        interpolated data */
@@ -246,7 +248,7 @@ double advance_level(fclaw2d_domain_t *domain,
 
     /* Make sure all ghost cells at this level have been updated;  Set physical
        BCs after exchange to get any corner boundary ghost cells */
-    level_exchange(domain,a_level);
+    level_exchange(domain,a_level, FCLAW2D_TIMER_ADVANCE);
     set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
     a_time_stepper->increment_level_exchange_counter(a_level);
@@ -269,6 +271,10 @@ double advance_level(fclaw2d_domain_t *domain,
 double advance_all_levels(fclaw2d_domain_t *domain,
                           subcycle_manager *a_time_stepper)
 {
+    // Start timer for advancing the levels
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+
     // 'n_fine_steps' is the number of steps we must take on the finest level to equal one
     // step on the coarsest non-empty level, i.e. minlevel.
     int minlevel = a_time_stepper->minlevel();
@@ -280,5 +286,9 @@ double advance_all_levels(fclaw2d_domain_t *domain,
         double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
         maxcfl = max(cfl_step,maxcfl);
     }
+
+    // Stop the timer
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+    
     return maxcfl;
 }

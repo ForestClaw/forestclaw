@@ -43,11 +43,13 @@ typedef void (*fclaw2d_problem_setup_t) (fclaw2d_domain_t * domain);
 
 typedef enum
 {
+    FCLAW2D_TIMER_NONE = -1,
     FCLAW2D_TIMER_INIT,
     FCLAW2D_TIMER_REGRID,
     FCLAW2D_TIMER_OUTPUT,
     FCLAW2D_TIMER_CHECK,
     FCLAW2D_TIMER_ADVANCE,
+    FCLAW2D_TIMER_EXCHANGE,
     FCLAW2D_TIMER_WTIME,
     FCLAW2D_TIMER_COUNT
 }

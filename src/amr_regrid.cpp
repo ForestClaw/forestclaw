@@ -219,7 +219,7 @@ void regrid(fclaw2d_domain_t **domain)
     {
         // Make sure all ghost cells are valid.
         double alpha = 0;
-        exchange_with_coarse(*domain,level,t,alpha);
+        exchange_with_coarse(*domain,level,t,alpha, FCLAW2D_TIMER_REGRID);
     }
 
     // First determine which families should be coarsened.
@@ -252,7 +252,7 @@ void regrid(fclaw2d_domain_t **domain)
         // Coarse and fine grid exchanges will happen during time stepping as needed.
         for (int level = minlevel; level <= maxlevel; level++)
         {
-            level_exchange(new_domain,level);
+            level_exchange(new_domain,level, FCLAW2D_TIMER_REGRID);
             fclaw_bool time_interp = fclaw_false;
             set_phys_bc(new_domain,level,t,time_interp);
         }

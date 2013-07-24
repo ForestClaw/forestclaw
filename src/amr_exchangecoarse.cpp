@@ -605,14 +605,21 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 
 void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
-                          double alpha)
+                          double alpha, fclaw2d_timer_names_t running)
 {
-    exchange_info e_info;
+    // Use separate timer for all exchanges
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_stop (&ddata->timers[running]);
+    }
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+
     // Simple exchange - no time interpolation needed
     fclaw_bool time_interp = alpha > 0; //
     int finer_level = level;
     int coarser_level = level - 1;
 
+    exchange_info e_info;
     e_info.time_interp = time_interp;
     e_info.level = level;
 
@@ -685,4 +692,9 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
                                  (void *) &e_info);
 
+    // Stop timing
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_start (&ddata->timers[running]);
+    }
 }

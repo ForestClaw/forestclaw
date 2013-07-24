@@ -64,11 +64,13 @@ void patch_output_default(fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
 // Routines needed to fill in ghost cells
 // -------------------------------------------
 // amr_levelexchange.cpp
-void level_exchange(fclaw2d_domain_t *domain, int a_level);
+// Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
+void level_exchange(fclaw2d_domain_t *domain, int a_level, fclaw2d_timer_names_t running);
 
 // amr_exchangecoarse.cpp
+// Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
 void exchange_with_coarse(fclaw2d_domain_t *domain, int a_level,
-                          double t_level,double alpha);
+                          double t_level,double alpha, fclaw2d_timer_names_t running);
 
 // amr_physbc.cpp
 void set_phys_bc(fclaw2d_domain_t *domain, int a_level, double a_level_time,
