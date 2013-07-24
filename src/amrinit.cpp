@@ -145,7 +145,7 @@ void amrinit (fclaw2d_domain_t **domain)
     }
     fclaw2d_domain_barrier (*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_WTIME]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
 
     // Set problem dependent parameters for Riemann solvers, etc.
     (ddata->f_problem_setup)(*domain);

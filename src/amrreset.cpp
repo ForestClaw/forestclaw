@@ -77,7 +77,7 @@ void amrreset(fclaw2d_domain_t **domain)
     if (ddata->is_latest_domain) {
         sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
     
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WTIME]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
  
         FCLAW2D_STATS_SET (stats, ddata, INIT);
         FCLAW2D_STATS_SET (stats, ddata, REGRID);
@@ -85,9 +85,9 @@ void amrreset(fclaw2d_domain_t **domain)
         FCLAW2D_STATS_SET (stats, ddata, CHECK);
         FCLAW2D_STATS_SET (stats, ddata, ADVANCE);
         FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
-        FCLAW2D_STATS_SET (stats, ddata, WTIME);
+        FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
         sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
-                       ddata->timers[FCLAW2D_TIMER_WTIME].cumulative -
+                       ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                        (ddata->timers[FCLAW2D_TIMER_INIT].cumulative +
                         ddata->timers[FCLAW2D_TIMER_REGRID].cumulative +
                         ddata->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
