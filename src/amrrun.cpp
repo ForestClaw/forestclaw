@@ -238,10 +238,12 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     }
 }
 
+#if 0
 static void outstyle_2(fclaw2d_domain_t **domain)
 {
     // Output time at specific time steps.
 }
+#endif
 
 static void outstyle_3(fclaw2d_domain_t **domain)
 {
@@ -464,11 +466,12 @@ void amrrun(fclaw2d_domain_t **domain)
     {
         outstyle_1(domain);
     }
+#if 0
     else if (gparms->outstyle == 2)
     {
         outstyle_2(domain);
-        printf("Outstyle 2 not implemented yet\n");
     }
+#endif
     else if (gparms->outstyle == 3)
     {
         outstyle_3(domain);
@@ -476,5 +479,9 @@ void amrrun(fclaw2d_domain_t **domain)
     else if (gparms->outstyle == 4)
     {
         outstyle_4(domain);
+    }
+    else
+    {
+        printf("Outstyle %d not implemented yet\n", gparms->outstyle);
     }
 }
