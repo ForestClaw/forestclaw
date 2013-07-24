@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_regrid.H"
 
 static
-    void build_ghost_patches(fclaw2d_domain_t* domain)
+void build_ghost_patches(fclaw2d_domain_t* domain)
 {
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
@@ -305,12 +305,23 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
         /* then the old domain is no longer necessary */
         amrreset(domain);
         *domain = domain_partitioned;
+        domain_partitioned = NULL;
 
         // VTK output during amrinit
         if (mode >= 0 && gparms->vtkout & 1) {
+            // into timer
+            fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+
+            // output
             snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
                       gparms->prefix, mode);
             amr_output_write_vtk (*domain, basename);
+
+            // out of timer
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
         }
 
         /* internal clean up */

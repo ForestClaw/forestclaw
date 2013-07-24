@@ -45,6 +45,7 @@ typedef enum
 {
     FCLAW2D_TIMER_INIT,
     FCLAW2D_TIMER_REMESH,
+    FCLAW2D_TIMER_OUTPUT,
     FCLAW2D_TIMER_COUNT
 }
 fclaw2d_timer_names_t;

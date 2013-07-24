@@ -167,9 +167,18 @@ void amrinit (fclaw2d_domain_t **domain)
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {
+        // into timer
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+
+        // output
         snprintf (basename, BUFSIZ, "%s_init_level_%02d",
                   gparms->prefix, minlevel);
         amr_output_write_vtk (*domain, basename);
+
+        // out of timer
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
     }
 
     // Domain data may go out of scope now.
@@ -209,12 +218,24 @@ void amrinit (fclaw2d_domain_t **domain)
             // free all memory associated with old domain
             amrreset(domain);
             *domain = new_domain;
+            new_domain = NULL;
 
             // VTK output during amrinit
             if (gparms->vtkout & 1) {
+                // into timer
+                ddata = get_domain_data (*domain);
+                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
+                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+
+                // output
                 snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
                           gparms->prefix, level);
                 amr_output_write_vtk (*domain, basename);
+
+                // out of timer
+                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
+                ddata = NULL;
             }
 
             // Repartition domain to new processors.

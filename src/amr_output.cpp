@@ -57,6 +57,10 @@ cb_amrout (fclaw2d_domain_t * domain,
 void
 amrout (fclaw2d_domain_t * domain, int iframe)
 {
+    // Record output time
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+
     // Get total number of patches
     int ngrids = domain->global_num_patches;
     fclaw2d_output_functions_t *of = get_output_functions (domain);
@@ -87,6 +91,9 @@ amrout (fclaw2d_domain_t * domain, int iframe)
         fclaw2d_domain_serialization_leave (domain);
         /* END OF NON-SCALABLE CODE */
     }
+    
+    // Record output time
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
 }
 
 static void
