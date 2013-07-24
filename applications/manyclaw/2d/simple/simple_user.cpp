@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_manyclaw.H"
 #include "simple_user.H"
 
-// #include <manyclaw/manyclaw.h>
+#include <manyclaw/manyclaw.h>
 
 
 #ifdef __cplusplus
@@ -106,6 +106,10 @@ void simple_patch_setup(fclaw2d_domain_t *domain,
     /* This is called once when a new patch is created. */
     manyclaw_set_solver(domain,this_patch,this_block_idx,this_patch_idx);
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial,
+                                 updater_first_order_dimensional_splitting);
+
+
 }
 
 

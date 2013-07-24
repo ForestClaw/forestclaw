@@ -4,7 +4,7 @@ daspect([1 1 1]);
 axis off;
 yrbcolormap;
 
-showgridlines(1:4);
+showgridlines(1:2);
 showpatchborders;
 setpatchborderprops(1:7,'linewidth',2);
 caxis([0 1]);

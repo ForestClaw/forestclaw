@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "clawpack_fort.H"
 
-// #include <manyclaw/manyclaw.h>
+#include <manyclaw/manyclaw.h>
 
 struct Solver;
 
@@ -157,7 +157,8 @@ struct amr_manyclaw_patch_data
     FArrayBox auxarray;
     Solver *solver;
     int maux;
-
+    rp_grid_eval_t rp_grid_eval;
+    updater_t update;
     /* Add any data here that the patch may also need */
 };
 
@@ -216,6 +217,10 @@ double amr_manyclaw_step2_rhs(fclaw2d_domain_t *domain,
                               int this_patch_idx,
                               double t,
                               double *rhs);
+void manyclaw_set_riemann_solvers(fclaw2d_patch_t *this_patch,
+                                  rp_grid_eval_t rp_grid_eval, updater_t update);
+
+
 
 
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
