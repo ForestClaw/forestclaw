@@ -36,6 +36,9 @@ if (mq == 1)
   set(o,'fontsize',16,'fontweight','bold')
 else
   yrbcolormap;
+  hidepatchborders;
+  setpatchborderprops(1:10,'linewidth',2);
+  showpatchborders(1:5);
   showgridlines(1:4);
   caxis([0 1]);
 end;
