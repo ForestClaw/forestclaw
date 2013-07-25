@@ -6,7 +6,6 @@ GEO = cart
 include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
-FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
@@ -29,7 +28,7 @@ solverlinkers = $(manyclaw_linkers)
 solverincludes = $(manyclaw_includes)
 
 # Mapping routines
-geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
+geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
 

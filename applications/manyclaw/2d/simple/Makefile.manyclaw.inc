@@ -10,7 +10,6 @@ manyclaw_includes := -I$(AMR_MANYCLAW) -I$(AMR_MANYCLAW_FORTRAN) -I$(MANYCLAW) -
 
 manyclaw_objs = \
 	$(AMR_MANYCLAW)/amr_manyclaw.o \
-	$(AMR_MANYCLAW)/print_array.o \
 	$(AMR_MANYCLAW)/fortran_source/manyclaw_reorder.o \
 	$(AMR_MANYCLAW)/fortran_source/ClawPatch2.o \
 	$(AMR_MANYCLAW)/fortran_source/src2.o \
