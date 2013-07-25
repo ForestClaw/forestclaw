@@ -69,8 +69,11 @@ main (int argc, char **argv)
   /* For sphere */
   domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
 
-  fclaw2d_domain_list_levels(domain, lp);
-  fclaw2d_domain_list_neighbors(domain, lp);
+  if (gparms->verbosity > 0)
+  {
+      fclaw2d_domain_list_levels(domain, lp);
+      fclaw2d_domain_list_neighbors(domain, lp);
+  }
 
   /* ---------------------------------------------------------------
      Set domain data.
