@@ -3,27 +3,50 @@
 use strict;
 use Getopt::Std;
 
-my (%opt, $startproc);
+my (%opt, $average, $startproc, $found, $filestr);
 my ($procs, $numad, $tad, $tex);
 my (%proclist, %proclevels, %procad, %procex);
 my ($level, $adarr, $exarr, $step);
 
 # Process command line options
 
+$opt{a} = 0;
 $opt{s} = 1;
-getopts ("s:", \%opt);
+getopts ("as:", \%opt);
+$average = $opt{a};
 $startproc = $opt{s};
+
+if ($average) {
+	$filestr = "avg";
+}
+else {
+	$filestr = "max";
+}
 
 # Grab data from output files
 
 while (<>) {
 
-	if (m/Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+)/) {
-
+	$found = 0;
+	if ($average) {
+if (m:Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+):) {
+		$found = 1;
 		$procs = $1;
 		$numad = $2;
 		$tad = $3;
 		$tex = $4;
+}
+	}
+	else {
+if (m:Max/P (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+):) {
+		$found = 1;
+		$procs = $1;
+		$numad = $2;
+		$tad = $3;
+		$tex = $4;
+}
+	}
+	if ($found) {
 
 		if (!$proclist{$procs}) {
 			my (%adhash, %exhash);
