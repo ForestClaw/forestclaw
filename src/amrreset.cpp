@@ -103,6 +103,11 @@ void amrreset(fclaw2d_domain_t **domain)
                                stats[FCLAW2D_TIMER_ADVANCE].average,
                                stats[FCLAW2D_TIMER_EXCHANGE].average,
                                stats[FCLAW2D_TIMER_REGRID].average);
+        SC_GLOBAL_PRODUCTIONF ("Max/P %d advance %d %g exchange %g regrid %g\n",
+                               (*domain)->mpisize, ddata->count_amr_advance,
+                               stats[FCLAW2D_TIMER_ADVANCE].max,
+                               stats[FCLAW2D_TIMER_EXCHANGE].max,
+                               stats[FCLAW2D_TIMER_REGRID].max);
     }
 
 
