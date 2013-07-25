@@ -98,6 +98,11 @@ void amrreset(fclaw2d_domain_t **domain)
         sc_stats_compute ((*domain)->mpicomm, FCLAW2D_TIMER_COUNT, stats);
         sc_stats_print (sc_package_id, SC_LP_PRODUCTION, FCLAW2D_TIMER_COUNT,
                         stats, 1, 0);
+        SC_GLOBAL_PRODUCTIONF ("Procs %d advance %g exchange %g regrid %g\n",
+                               (*domain)->mpisize,
+                               stats[FCLAW2D_TIMER_ADVANCE].average,
+                               stats[FCLAW2D_TIMER_EXCHANGE].average,
+                               stats[FCLAW2D_TIMER_REGRID].average);
     }
 
 
