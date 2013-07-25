@@ -2401,3 +2401,630 @@ Level 7 step   601 : dt =    4.829e-04; maxcfl (step) =    0.900; Final time =  
 Level 7 step   602 : dt =    4.830e-04; maxcfl (step) =    0.900; Final time =       0.2733
 Level 7 step   603 : dt =    4.832e-04; maxcfl (step) =    0.900; Final time =       0.2737
 Level 7 step   604 : dt =    4.834e-04; maxcfl (step) =    0.900; Final time =       0.2742
+Level 7 step   605 : dt =    4.836e-04; maxcfl (step) =    0.900; Final time =       0.2747
+Level 7 step   606 : dt =    4.837e-04; maxcfl (step) =    0.900; Final time =       0.2752
+Level 7 step   607 : dt =    4.839e-04; maxcfl (step) =    0.900; Final time =       0.2757
+Level 7 step   608 : dt =    4.841e-04; maxcfl (step) =    0.900; Final time =       0.2762
+Level 7 step   609 : dt =    4.842e-04; maxcfl (step) =    0.900; Final time =       0.2766
+Level 7 step   610 : dt =    4.844e-04; maxcfl (step) =    0.900; Final time =       0.2771
+Level 7 step   611 : dt =    4.846e-04; maxcfl (step) =    0.900; Final time =       0.2776
+Level 7 step   612 : dt =    4.847e-04; maxcfl (step) =    0.900; Final time =       0.2781
+Level 7 step   613 : dt =    4.849e-04; maxcfl (step) =    0.900; Final time =       0.2786
+Level 7 step   614 : dt =    4.851e-04; maxcfl (step) =    0.900; Final time =       0.2791
+Level 7 step   615 : dt =    4.853e-04; maxcfl (step) =    0.900; Final time =       0.2796
+Level 7 step   616 : dt =    4.854e-04; maxcfl (step) =    0.900; Final time =       0.2800
+Level 7 step   617 : dt =    4.856e-04; maxcfl (step) =    0.900; Final time =       0.2805
+Level 7 step   618 : dt =    4.858e-04; maxcfl (step) =    0.900; Final time =       0.2810
+Level 7 step   619 : dt =    4.860e-04; maxcfl (step) =    0.900; Final time =       0.2815
+Level 7 step   620 : dt =    4.861e-04; maxcfl (step) =    0.900; Final time =       0.2820
+Level 7 step   621 : dt =    4.863e-04; maxcfl (step) =    0.900; Final time =       0.2825
+Level 7 step   622 : dt =    4.865e-04; maxcfl (step) =    0.900; Final time =       0.2830
+Level 7 step   623 : dt =    4.867e-04; maxcfl (step) =    0.900; Final time =       0.2834
+Level 7 step   624 : dt =    4.868e-04; maxcfl (step) =    0.900; Final time =       0.2839
+Level 7 step   625 : dt =    4.870e-04; maxcfl (step) =    0.900; Final time =       0.2844
+Level 7 step   626 : dt =    4.872e-04; maxcfl (step) =    0.900; Final time =       0.2849
+Level 7 step   627 : dt =    4.874e-04; maxcfl (step) =    0.900; Final time =       0.2854
+Level 7 step   628 : dt =    4.875e-04; maxcfl (step) =    0.900; Final time =       0.2859
+Level 7 step   629 : dt =    4.877e-04; maxcfl (step) =    0.900; Final time =       0.2864
+Level 7 step   630 : dt =    4.879e-04; maxcfl (step) =    0.900; Final time =       0.2869
+Level 7 step   631 : dt =    4.881e-04; maxcfl (step) =    0.900; Final time =       0.2873
+Level 7 step   632 : dt =    4.883e-04; maxcfl (step) =    0.900; Final time =       0.2878
+Level 7 step   633 : dt =    4.885e-04; maxcfl (step) =    0.900; Final time =       0.2883
+Level 7 step   634 : dt =    4.886e-04; maxcfl (step) =    0.900; Final time =       0.2888
+Level 7 step   635 : dt =    4.888e-04; maxcfl (step) =    0.900; Final time =       0.2893
+Level 7 step   636 : dt =    4.890e-04; maxcfl (step) =    0.900; Final time =       0.2898
+Level 7 step   637 : dt =    4.892e-04; maxcfl (step) =    0.900; Final time =       0.2903
+Level 7 step   638 : dt =    4.894e-04; maxcfl (step) =    0.900; Final time =       0.2908
+Level 7 step   639 : dt =    4.896e-04; maxcfl (step) =    0.900; Final time =       0.2913
+Level 7 step   640 : dt =    4.897e-04; maxcfl (step) =    0.900; Final time =       0.2917
+Level 7 step   641 : dt =    4.899e-04; maxcfl (step) =    0.900; Final time =       0.2922
+Level 7 step   642 : dt =    4.901e-04; maxcfl (step) =    0.900; Final time =       0.2927
+Level 7 step   643 : dt =    4.903e-04; maxcfl (step) =    0.900; Final time =       0.2932
+Level 7 step   644 : dt =    4.905e-04; maxcfl (step) =    0.900; Final time =       0.2937
+Level 7 step   645 : dt =    4.907e-04; maxcfl (step) =    0.900; Final time =       0.2942
+Level 7 step   646 : dt =    4.909e-04; maxcfl (step) =    0.900; Final time =       0.2947
+Level 7 step   647 : dt =    4.910e-04; maxcfl (step) =    0.900; Final time =       0.2952
+Level 7 step   648 : dt =    4.912e-04; maxcfl (step) =    0.900; Final time =       0.2957
+Level 7 step   649 : dt =    4.914e-04; maxcfl (step) =    0.900; Final time =       0.2962
+Level 7 step   650 : dt =    4.916e-04; maxcfl (step) =    0.900; Final time =       0.2967
+Level 7 step   651 : dt =    4.918e-04; maxcfl (step) =    0.900; Final time =       0.2971
+Level 7 step   652 : dt =    4.920e-04; maxcfl (step) =    0.900; Final time =       0.2976
+Level 7 step   653 : dt =    4.922e-04; maxcfl (step) =    0.900; Final time =       0.2981
+Level 7 step   654 : dt =    4.924e-04; maxcfl (step) =    0.900; Final time =       0.2986
+Level 7 step   655 : dt =    4.926e-04; maxcfl (step) =    0.900; Final time =       0.2991
+Level 7 step   656 : dt =    4.928e-04; maxcfl (step) =    0.900; Final time =       0.2996
+Level 7 step   657 : dt =    4.930e-04; maxcfl (step) =    0.900; Final time =       0.3001
+Level 7 step   658 : dt =    4.932e-04; maxcfl (step) =    0.900; Final time =       0.3006
+Level 7 step   659 : dt =    4.933e-04; maxcfl (step) =    0.900; Final time =       0.3011
+Level 7 step   660 : dt =    4.935e-04; maxcfl (step) =    0.900; Final time =       0.3016
+Level 7 step   661 : dt =    4.937e-04; maxcfl (step) =    0.900; Final time =       0.3021
+Level 7 step   662 : dt =    4.939e-04; maxcfl (step) =    0.900; Final time =       0.3026
+Level 7 step   663 : dt =    4.941e-04; maxcfl (step) =    0.900; Final time =       0.3031
+Level 7 step   664 : dt =    4.943e-04; maxcfl (step) =    0.900; Final time =       0.3036
+Level 7 step   665 : dt =    4.945e-04; maxcfl (step) =    0.900; Final time =       0.3041
+Level 7 step   666 : dt =    4.947e-04; maxcfl (step) =    0.900; Final time =       0.3045
+Level 7 step   667 : dt =    4.949e-04; maxcfl (step) =    0.900; Final time =       0.3050
+Level 7 step   668 : dt =    4.951e-04; maxcfl (step) =    0.900; Final time =       0.3055
+Level 7 step   669 : dt =    4.953e-04; maxcfl (step) =    0.900; Final time =       0.3060
+Level 7 step   670 : dt =    4.955e-04; maxcfl (step) =    0.900; Final time =       0.3065
+Level 7 step   671 : dt =    4.957e-04; maxcfl (step) =    0.900; Final time =       0.3070
+Level 7 step   672 : dt =    4.959e-04; maxcfl (step) =    0.900; Final time =       0.3075
+Level 7 step   673 : dt =    4.961e-04; maxcfl (step) =    0.900; Final time =       0.3080
+Level 7 step   674 : dt =    4.963e-04; maxcfl (step) =    0.900; Final time =       0.3085
+Level 7 step   675 : dt =    4.965e-04; maxcfl (step) =    0.900; Final time =       0.3090
+Level 7 step   676 : dt =    4.967e-04; maxcfl (step) =    0.900; Final time =       0.3095
+Level 7 step   677 : dt =    4.969e-04; maxcfl (step) =    0.900; Final time =       0.3100
+Level 7 step   678 : dt =    4.971e-04; maxcfl (step) =    0.900; Final time =       0.3105
+Level 7 step   679 : dt =    4.974e-04; maxcfl (step) =    0.900; Final time =       0.3110
+Level 7 step   680 : dt =    4.976e-04; maxcfl (step) =    0.900; Final time =       0.3115
+Level 7 step   681 : dt =    4.978e-04; maxcfl (step) =    0.900; Final time =       0.3120
+Level 7 step   682 : dt =    4.980e-04; maxcfl (step) =    0.900; Final time =       0.3125
+Level 7 step   683 : dt =    4.982e-04; maxcfl (step) =    0.900; Final time =       0.3130
+Level 7 step   684 : dt =    4.984e-04; maxcfl (step) =    0.900; Final time =       0.3135
+Level 7 step   685 : dt =    4.986e-04; maxcfl (step) =    0.900; Final time =       0.3140
+Level 7 step   686 : dt =    4.988e-04; maxcfl (step) =    0.900; Final time =       0.3145
+Level 7 step   687 : dt =    4.990e-04; maxcfl (step) =    0.900; Final time =       0.3150
+Level 7 step   688 : dt =    4.992e-04; maxcfl (step) =    0.900; Final time =       0.3155
+Level 7 step   689 : dt =    4.994e-04; maxcfl (step) =    0.900; Final time =       0.3160
+Level 7 step   690 : dt =    4.997e-04; maxcfl (step) =    0.900; Final time =       0.3165
+Level 7 step   691 : dt =    4.999e-04; maxcfl (step) =    0.900; Final time =       0.3170
+Level 7 step   692 : dt =    5.001e-04; maxcfl (step) =    0.900; Final time =       0.3175
+Level 7 step   693 : dt =    5.003e-04; maxcfl (step) =    0.900; Final time =       0.3180
+Level 7 step   694 : dt =    5.005e-04; maxcfl (step) =    0.900; Final time =       0.3185
+Level 7 step   695 : dt =    5.007e-04; maxcfl (step) =    0.900; Final time =       0.3190
+Level 7 step   696 : dt =    5.009e-04; maxcfl (step) =    0.900; Final time =       0.3195
+Level 7 step   697 : dt =    5.012e-04; maxcfl (step) =    0.900; Final time =       0.3200
+Level 7 step   698 : dt =    5.014e-04; maxcfl (step) =    0.900; Final time =       0.3205
+Level 7 step   699 : dt =    5.016e-04; maxcfl (step) =    0.900; Final time =       0.3210
+Level 7 step   700 : dt =    5.018e-04; maxcfl (step) =    0.900; Final time =       0.3215
+Level 7 step   701 : dt =    5.020e-04; maxcfl (step) =    0.900; Final time =       0.3220
+Level 7 step   702 : dt =    5.022e-04; maxcfl (step) =    0.900; Final time =       0.3225
+Level 7 step   703 : dt =    5.025e-04; maxcfl (step) =    0.900; Final time =       0.3230
+Level 7 step   704 : dt =    5.027e-04; maxcfl (step) =    0.900; Final time =       0.3235
+Level 7 step   705 : dt =    5.029e-04; maxcfl (step) =    0.900; Final time =       0.3240
+Level 7 step   706 : dt =    5.031e-04; maxcfl (step) =    0.900; Final time =       0.3245
+Level 7 step   707 : dt =    5.033e-04; maxcfl (step) =    0.900; Final time =       0.3250
+Level 7 step   708 : dt =    5.036e-04; maxcfl (step) =    0.900; Final time =       0.3255
+Level 7 step   709 : dt =    5.038e-04; maxcfl (step) =    0.900; Final time =       0.3260
+Level 7 step   710 : dt =    5.040e-04; maxcfl (step) =    0.900; Final time =       0.3265
+Level 7 step   711 : dt =    5.042e-04; maxcfl (step) =    0.900; Final time =       0.3270
+Level 7 step   712 : dt =    5.045e-04; maxcfl (step) =    0.900; Final time =       0.3275
+Level 7 step   713 : dt =    5.047e-04; maxcfl (step) =    0.900; Final time =       0.3280
+Level 7 step   714 : dt =    5.049e-04; maxcfl (step) =    0.900; Final time =       0.3285
+Level 7 step   715 : dt =    5.051e-04; maxcfl (step) =    0.900; Final time =       0.3290
+Level 7 step   716 : dt =    5.054e-04; maxcfl (step) =    0.900; Final time =       0.3295
+Level 7 step   717 : dt =    5.056e-04; maxcfl (step) =    0.900; Final time =       0.3301
+Level 7 step   718 : dt =    5.058e-04; maxcfl (step) =    0.900; Final time =       0.3306
+Level 7 step   719 : dt =    5.061e-04; maxcfl (step) =    0.900; Final time =       0.3311
+Level 7 step   720 : dt =    5.063e-04; maxcfl (step) =    0.900; Final time =       0.3316
+Level 7 step   721 : dt =    5.065e-04; maxcfl (step) =    0.900; Final time =       0.3321
+Level 7 step   722 : dt =    5.067e-04; maxcfl (step) =    0.900; Final time =       0.3326
+Level 7 step   723 : dt =    5.070e-04; maxcfl (step) =    0.900; Final time =       0.3331
+Level 7 step   724 : dt =    5.072e-04; maxcfl (step) =    0.900; Final time =       0.3336
+Level 7 step   725 : dt =    5.074e-04; maxcfl (step) =    0.900; Final time =       0.3341
+Level 7 step   726 : dt =    5.077e-04; maxcfl (step) =    0.900; Final time =       0.3346
+Level 7 step   727 : dt =    5.079e-04; maxcfl (step) =    0.900; Final time =       0.3351
+Level 7 step   728 : dt =    5.081e-04; maxcfl (step) =    0.900; Final time =       0.3356
+Level 7 step   729 : dt =    5.084e-04; maxcfl (step) =    0.900; Final time =       0.3361
+Level 7 step   730 : dt =    5.086e-04; maxcfl (step) =    0.900; Final time =       0.3366
+Level 7 step   731 : dt =    5.089e-04; maxcfl (step) =    0.900; Final time =       0.3372
+Level 7 step   732 : dt =    5.091e-04; maxcfl (step) =    0.900; Final time =       0.3377
+Level 7 step   733 : dt =    5.093e-04; maxcfl (step) =    0.900; Final time =       0.3382
+Level 7 step   734 : dt =    5.096e-04; maxcfl (step) =    0.900; Final time =       0.3387
+Level 7 step   735 : dt =    5.098e-04; maxcfl (step) =    0.900; Final time =       0.3392
+Level 7 step   736 : dt =    5.101e-04; maxcfl (step) =    0.900; Final time =       0.3397
+Level 7 step   737 : dt =    5.103e-04; maxcfl (step) =    0.900; Final time =       0.3402
+Level 7 step   738 : dt =    5.105e-04; maxcfl (step) =    0.900; Final time =       0.3407
+Level 7 step   739 : dt =    5.108e-04; maxcfl (step) =    0.900; Final time =       0.3412
+Level 7 step   740 : dt =    5.110e-04; maxcfl (step) =    0.900; Final time =       0.3417
+Level 7 step   741 : dt =    5.113e-04; maxcfl (step) =    0.900; Final time =       0.3423
+Level 7 step   742 : dt =    5.115e-04; maxcfl (step) =    0.900; Final time =       0.3428
+Level 7 step   743 : dt =    5.118e-04; maxcfl (step) =    0.900; Final time =       0.3433
+Level 7 step   744 : dt =    5.120e-04; maxcfl (step) =    0.900; Final time =       0.3438
+Level 7 step   745 : dt =    5.122e-04; maxcfl (step) =    0.900; Final time =       0.3443
+Level 7 step   746 : dt =    5.125e-04; maxcfl (step) =    0.900; Final time =       0.3448
+Level 7 step   747 : dt =    5.127e-04; maxcfl (step) =    0.900; Final time =       0.3453
+Level 7 step   748 : dt =    5.130e-04; maxcfl (step) =    0.900; Final time =       0.3458
+Level 7 step   749 : dt =    5.132e-04; maxcfl (step) =    0.900; Final time =       0.3464
+Level 7 step   750 : dt =    5.135e-04; maxcfl (step) =    0.900; Final time =       0.3469
+Level 7 step   751 : dt =    5.137e-04; maxcfl (step) =    0.900; Final time =       0.3474
+Level 7 step   752 : dt =    5.140e-04; maxcfl (step) =    0.900; Final time =       0.3479
+Level 7 step   753 : dt =    5.142e-04; maxcfl (step) =    0.900; Final time =       0.3484
+Level 7 step   754 : dt =    5.145e-04; maxcfl (step) =    0.900; Final time =       0.3489
+Level 7 step   755 : dt =    5.147e-04; maxcfl (step) =    0.900; Final time =       0.3494
+Level 7 step   756 : dt =    5.150e-04; maxcfl (step) =    0.900; Final time =       0.3500
+Level 7 step   757 : dt =    5.153e-04; maxcfl (step) =    0.900; Final time =       0.3505
+Level 7 step   758 : dt =    5.155e-04; maxcfl (step) =    0.900; Final time =       0.3510
+Level 7 step   759 : dt =    5.158e-04; maxcfl (step) =    0.900; Final time =       0.3515
+Level 7 step   760 : dt =    5.160e-04; maxcfl (step) =    0.900; Final time =       0.3520
+Level 7 step   761 : dt =    5.163e-04; maxcfl (step) =    0.900; Final time =       0.3525
+Level 7 step   762 : dt =    5.165e-04; maxcfl (step) =    0.900; Final time =       0.3531
+Level 7 step   763 : dt =    5.168e-04; maxcfl (step) =    0.900; Final time =       0.3536
+Level 7 step   764 : dt =    5.171e-04; maxcfl (step) =    0.900; Final time =       0.3541
+Level 7 step   765 : dt =    5.173e-04; maxcfl (step) =    0.900; Final time =       0.3546
+Level 7 step   766 : dt =    5.176e-04; maxcfl (step) =    0.900; Final time =       0.3551
+Level 7 step   767 : dt =    5.178e-04; maxcfl (step) =    0.900; Final time =       0.3556
+Level 7 step   768 : dt =    5.181e-04; maxcfl (step) =    0.900; Final time =       0.3562
+Level 7 step   769 : dt =    5.184e-04; maxcfl (step) =    0.900; Final time =       0.3567
+Level 7 step   770 : dt =    5.186e-04; maxcfl (step) =    0.900; Final time =       0.3572
+Level 7 step   771 : dt =    5.189e-04; maxcfl (step) =    0.900; Final time =       0.3577
+Level 7 step   772 : dt =    5.192e-04; maxcfl (step) =    0.900; Final time =       0.3582
+Level 7 step   773 : dt =    5.194e-04; maxcfl (step) =    0.900; Final time =       0.3588
+Level 7 step   774 : dt =    5.197e-04; maxcfl (step) =    0.900; Final time =       0.3593
+Level 7 step   775 : dt =    5.200e-04; maxcfl (step) =    0.900; Final time =       0.3598
+Level 7 step   776 : dt =    5.202e-04; maxcfl (step) =    0.900; Final time =       0.3603
+Level 7 step   777 : dt =    5.205e-04; maxcfl (step) =    0.900; Final time =       0.3608
+Level 7 step   778 : dt =    5.208e-04; maxcfl (step) =    0.900; Final time =       0.3614
+Level 7 step   779 : dt =    5.210e-04; maxcfl (step) =    0.900; Final time =       0.3619
+Level 7 step   780 : dt =    5.213e-04; maxcfl (step) =    0.900; Final time =       0.3624
+Level 7 step   781 : dt =    5.216e-04; maxcfl (step) =    0.900; Final time =       0.3629
+Level 7 step   782 : dt =    5.219e-04; maxcfl (step) =    0.900; Final time =       0.3634
+Level 7 step   783 : dt =    5.221e-04; maxcfl (step) =    0.900; Final time =       0.3640
+Level 7 step   784 : dt =    5.224e-04; maxcfl (step) =    0.900; Final time =       0.3645
+Level 7 step   785 : dt =    5.227e-04; maxcfl (step) =    0.900; Final time =       0.3650
+Level 7 step   786 : dt =    5.230e-04; maxcfl (step) =    0.900; Final time =       0.3655
+Level 7 step   787 : dt =    5.232e-04; maxcfl (step) =    0.900; Final time =       0.3661
+Level 7 step   788 : dt =    5.235e-04; maxcfl (step) =    0.900; Final time =       0.3666
+Level 7 step   789 : dt =    5.238e-04; maxcfl (step) =    0.900; Final time =       0.3671
+Level 7 step   790 : dt =    5.241e-04; maxcfl (step) =    0.900; Final time =       0.3676
+Level 7 step   791 : dt =    5.244e-04; maxcfl (step) =    0.900; Final time =       0.3681
+Level 7 step   792 : dt =    5.246e-04; maxcfl (step) =    0.900; Final time =       0.3687
+Level 7 step   793 : dt =    5.249e-04; maxcfl (step) =    0.900; Final time =       0.3692
+Level 7 step   794 : dt =    5.252e-04; maxcfl (step) =    0.900; Final time =       0.3697
+Level 7 step   795 : dt =    5.255e-04; maxcfl (step) =    0.900; Final time =       0.3702
+Level 7 step   796 : dt =    5.258e-04; maxcfl (step) =    0.900; Final time =       0.3708
+Level 7 step   797 : dt =    5.261e-04; maxcfl (step) =    0.900; Final time =       0.3713
+Level 7 step   798 : dt =    5.263e-04; maxcfl (step) =    0.900; Final time =       0.3718
+Level 7 step   799 : dt =    5.266e-04; maxcfl (step) =    0.900; Final time =       0.3724
+Level 7 step   800 : dt =    5.269e-04; maxcfl (step) =    0.900; Final time =       0.3729
+Level 7 step   801 : dt =    5.272e-04; maxcfl (step) =    0.900; Final time =       0.3734
+Level 7 step   802 : dt =    5.275e-04; maxcfl (step) =    0.900; Final time =       0.3739
+Level 7 step   803 : dt =    5.278e-04; maxcfl (step) =    0.900; Final time =       0.3745
+Level 7 step   804 : dt =    5.281e-04; maxcfl (step) =    0.900; Final time =       0.3750
+Level 7 step   805 : dt =    5.284e-04; maxcfl (step) =    0.900; Final time =       0.3755
+Level 7 step   806 : dt =    5.287e-04; maxcfl (step) =    0.900; Final time =       0.3760
+Level 7 step   807 : dt =    5.290e-04; maxcfl (step) =    0.899; Final time =       0.3766
+Level 7 step   808 : dt =    5.293e-04; maxcfl (step) =    0.899; Final time =       0.3771
+Level 7 step   809 : dt =    5.296e-04; maxcfl (step) =    0.899; Final time =       0.3776
+Level 7 step   810 : dt =    5.298e-04; maxcfl (step) =    0.899; Final time =       0.3782
+Level 7 step   811 : dt =    5.301e-04; maxcfl (step) =    0.899; Final time =       0.3787
+Level 7 step   812 : dt =    5.304e-04; maxcfl (step) =    0.899; Final time =       0.3792
+Level 7 step   813 : dt =    5.307e-04; maxcfl (step) =    0.899; Final time =       0.3798
+Level 7 step   814 : dt =    5.310e-04; maxcfl (step) =    0.899; Final time =       0.3803
+Level 7 step   815 : dt =    5.313e-04; maxcfl (step) =    0.899; Final time =       0.3808
+Level 7 step   816 : dt =    5.316e-04; maxcfl (step) =    0.899; Final time =       0.3814
+Level 7 step   817 : dt =    5.319e-04; maxcfl (step) =    0.899; Final time =       0.3819
+Level 7 step   818 : dt =    5.323e-04; maxcfl (step) =    0.899; Final time =       0.3824
+Level 7 step   819 : dt =    5.326e-04; maxcfl (step) =    0.899; Final time =       0.3829
+Level 7 step   820 : dt =    5.329e-04; maxcfl (step) =    0.899; Final time =       0.3835
+Level 7 step   821 : dt =    5.332e-04; maxcfl (step) =    0.899; Final time =       0.3840
+Level 7 step   822 : dt =    5.335e-04; maxcfl (step) =    0.899; Final time =       0.3845
+Level 7 step   823 : dt =    5.338e-04; maxcfl (step) =    0.899; Final time =       0.3851
+Level 7 step   824 : dt =    5.341e-04; maxcfl (step) =    0.899; Final time =       0.3856
+Level 7 step   825 : dt =    5.344e-04; maxcfl (step) =    0.899; Final time =       0.3861
+Level 7 step   826 : dt =    5.347e-04; maxcfl (step) =    0.899; Final time =       0.3867
+Level 7 step   827 : dt =    5.350e-04; maxcfl (step) =    0.899; Final time =       0.3872
+Level 7 step   828 : dt =    5.353e-04; maxcfl (step) =    0.899; Final time =       0.3878
+Level 7 step   829 : dt =    5.356e-04; maxcfl (step) =    0.899; Final time =       0.3883
+Level 7 step   830 : dt =    5.360e-04; maxcfl (step) =    0.899; Final time =       0.3888
+Level 7 step   831 : dt =    5.363e-04; maxcfl (step) =    0.899; Final time =       0.3894
+Level 7 step   832 : dt =    5.366e-04; maxcfl (step) =    0.899; Final time =       0.3899
+Level 7 step   833 : dt =    5.369e-04; maxcfl (step) =    0.899; Final time =       0.3904
+Level 7 step   834 : dt =    5.372e-04; maxcfl (step) =    0.899; Final time =       0.3910
+Level 7 step   835 : dt =    5.375e-04; maxcfl (step) =    0.899; Final time =       0.3915
+Level 7 step   836 : dt =    5.379e-04; maxcfl (step) =    0.899; Final time =       0.3920
+Level 7 step   837 : dt =    5.382e-04; maxcfl (step) =    0.899; Final time =       0.3926
+Level 7 step   838 : dt =    5.385e-04; maxcfl (step) =    0.899; Final time =       0.3931
+Level 7 step   839 : dt =    5.388e-04; maxcfl (step) =    0.899; Final time =       0.3937
+Level 7 step   840 : dt =    5.392e-04; maxcfl (step) =    0.899; Final time =       0.3942
+Level 7 step   841 : dt =    5.395e-04; maxcfl (step) =    0.899; Final time =       0.3947
+Level 7 step   842 : dt =    5.398e-04; maxcfl (step) =    0.899; Final time =       0.3953
+Level 7 step   843 : dt =    5.401e-04; maxcfl (step) =    0.899; Final time =       0.3958
+Level 7 step   844 : dt =    5.405e-04; maxcfl (step) =    0.899; Final time =       0.3964
+Level 7 step   845 : dt =    5.408e-04; maxcfl (step) =    0.899; Final time =       0.3969
+Level 7 step   846 : dt =    5.411e-04; maxcfl (step) =    0.899; Final time =       0.3974
+Level 7 step   847 : dt =    5.415e-04; maxcfl (step) =    0.899; Final time =       0.3980
+Level 7 step   848 : dt =    5.418e-04; maxcfl (step) =    0.899; Final time =       0.3985
+Level 7 step   849 : dt =    5.421e-04; maxcfl (step) =    0.899; Final time =       0.3991
+Level 7 step   850 : dt =    5.425e-04; maxcfl (step) =    0.899; Final time =       0.3996
+Level 7 step   851 : dt =    5.428e-04; maxcfl (step) =    0.899; Final time =       0.4002
+Level 7 step   852 : dt =    5.431e-04; maxcfl (step) =    0.899; Final time =       0.4007
+Level 7 step   853 : dt =    5.435e-04; maxcfl (step) =    0.899; Final time =       0.4012
+Level 7 step   854 : dt =    5.438e-04; maxcfl (step) =    0.899; Final time =       0.4018
+Level 7 step   855 : dt =    5.441e-04; maxcfl (step) =    0.899; Final time =       0.4023
+Level 7 step   856 : dt =    5.445e-04; maxcfl (step) =    0.899; Final time =       0.4029
+Level 7 step   857 : dt =    5.448e-04; maxcfl (step) =    0.899; Final time =       0.4034
+Level 7 step   858 : dt =    5.452e-04; maxcfl (step) =    0.899; Final time =       0.4040
+Level 7 step   859 : dt =    5.455e-04; maxcfl (step) =    0.899; Final time =       0.4045
+Level 7 step   860 : dt =    5.458e-04; maxcfl (step) =    0.899; Final time =       0.4051
+Level 7 step   861 : dt =    5.462e-04; maxcfl (step) =    0.899; Final time =       0.4056
+Level 7 step   862 : dt =    5.465e-04; maxcfl (step) =    0.899; Final time =       0.4061
+Level 7 step   863 : dt =    5.469e-04; maxcfl (step) =    0.899; Final time =       0.4067
+Level 7 step   864 : dt =    5.472e-04; maxcfl (step) =    0.899; Final time =       0.4072
+Level 7 step   865 : dt =    5.476e-04; maxcfl (step) =    0.899; Final time =       0.4078
+Level 7 step   866 : dt =    5.479e-04; maxcfl (step) =    0.899; Final time =       0.4083
+Level 7 step   867 : dt =    5.483e-04; maxcfl (step) =    0.899; Final time =       0.4089
+Level 7 step   868 : dt =    5.486e-04; maxcfl (step) =    0.899; Final time =       0.4094
+Level 7 step   869 : dt =    5.490e-04; maxcfl (step) =    0.899; Final time =       0.4100
+Level 7 step   870 : dt =    5.493e-04; maxcfl (step) =    0.899; Final time =       0.4105
+Level 7 step   871 : dt =    5.497e-04; maxcfl (step) =    0.899; Final time =       0.4111
+Level 7 step   872 : dt =    5.501e-04; maxcfl (step) =    0.899; Final time =       0.4116
+Level 7 step   873 : dt =    5.504e-04; maxcfl (step) =    0.899; Final time =       0.4122
+Level 7 step   874 : dt =    5.508e-04; maxcfl (step) =    0.899; Final time =       0.4127
+Level 7 step   875 : dt =    5.511e-04; maxcfl (step) =    0.899; Final time =       0.4133
+Level 7 step   876 : dt =    5.515e-04; maxcfl (step) =    0.899; Final time =       0.4138
+Level 7 step   877 : dt =    5.519e-04; maxcfl (step) =    0.899; Final time =       0.4144
+Level 7 step   878 : dt =    5.522e-04; maxcfl (step) =    0.899; Final time =       0.4149
+Level 7 step   879 : dt =    5.526e-04; maxcfl (step) =    0.899; Final time =       0.4155
+Level 7 step   880 : dt =    5.530e-04; maxcfl (step) =    0.899; Final time =       0.4160
+Level 7 step   881 : dt =    5.533e-04; maxcfl (step) =    0.899; Final time =       0.4166
+Level 7 step   882 : dt =    5.537e-04; maxcfl (step) =    0.899; Final time =       0.4172
+Level 7 step   883 : dt =    5.541e-04; maxcfl (step) =    0.899; Final time =       0.4177
+Level 7 step   884 : dt =    5.544e-04; maxcfl (step) =    0.899; Final time =       0.4183
+Level 7 step   885 : dt =    5.548e-04; maxcfl (step) =    0.899; Final time =       0.4188
+Level 7 step   886 : dt =    5.552e-04; maxcfl (step) =    0.899; Final time =       0.4194
+Level 7 step   887 : dt =    5.555e-04; maxcfl (step) =    0.899; Final time =       0.4199
+Level 7 step   888 : dt =    5.559e-04; maxcfl (step) =    0.899; Final time =       0.4205
+Level 7 step   889 : dt =    5.563e-04; maxcfl (step) =    0.899; Final time =       0.4210
+Level 7 step   890 : dt =    5.567e-04; maxcfl (step) =    0.899; Final time =       0.4216
+Level 7 step   891 : dt =    5.571e-04; maxcfl (step) =    0.899; Final time =       0.4222
+Level 7 step   892 : dt =    5.574e-04; maxcfl (step) =    0.899; Final time =       0.4227
+Level 7 step   893 : dt =    5.578e-04; maxcfl (step) =    0.899; Final time =       0.4233
+Level 7 step   894 : dt =    5.582e-04; maxcfl (step) =    0.899; Final time =       0.4238
+Level 7 step   895 : dt =    5.586e-04; maxcfl (step) =    0.899; Final time =       0.4244
+Level 7 step   896 : dt =    5.590e-04; maxcfl (step) =    0.899; Final time =       0.4249
+Level 7 step   897 : dt =    5.594e-04; maxcfl (step) =    0.899; Final time =       0.4255
+Level 7 step   898 : dt =    5.597e-04; maxcfl (step) =    0.899; Final time =       0.4261
+Level 7 step   899 : dt =    5.601e-04; maxcfl (step) =    0.899; Final time =       0.4266
+Level 7 step   900 : dt =    5.605e-04; maxcfl (step) =    0.899; Final time =       0.4272
+Level 7 step   901 : dt =    5.609e-04; maxcfl (step) =    0.899; Final time =       0.4277
+Level 7 step   902 : dt =    5.613e-04; maxcfl (step) =    0.899; Final time =       0.4283
+Level 7 step   903 : dt =    5.617e-04; maxcfl (step) =    0.899; Final time =       0.4289
+Level 7 step   904 : dt =    5.621e-04; maxcfl (step) =    0.899; Final time =       0.4294
+Level 7 step   905 : dt =    5.625e-04; maxcfl (step) =    0.899; Final time =       0.4300
+Level 7 step   906 : dt =    5.629e-04; maxcfl (step) =    0.899; Final time =       0.4306
+Level 7 step   907 : dt =    5.633e-04; maxcfl (step) =    0.899; Final time =       0.4311
+Level 7 step   908 : dt =    5.637e-04; maxcfl (step) =    0.899; Final time =       0.4317
+Level 7 step   909 : dt =    5.641e-04; maxcfl (step) =    0.899; Final time =       0.4322
+Level 7 step   910 : dt =    5.645e-04; maxcfl (step) =    0.899; Final time =       0.4328
+Level 7 step   911 : dt =    5.649e-04; maxcfl (step) =    0.899; Final time =       0.4334
+Level 7 step   912 : dt =    5.653e-04; maxcfl (step) =    0.899; Final time =       0.4339
+Level 7 step   913 : dt =    5.657e-04; maxcfl (step) =    0.899; Final time =       0.4345
+Level 7 step   914 : dt =    5.661e-04; maxcfl (step) =    0.899; Final time =       0.4351
+Level 7 step   915 : dt =    5.665e-04; maxcfl (step) =    0.899; Final time =       0.4356
+Level 7 step   916 : dt =    5.669e-04; maxcfl (step) =    0.899; Final time =       0.4362
+Level 7 step   917 : dt =    5.673e-04; maxcfl (step) =    0.899; Final time =       0.4368
+Level 7 step   918 : dt =    5.678e-04; maxcfl (step) =    0.899; Final time =       0.4373
+Level 7 step   919 : dt =    5.682e-04; maxcfl (step) =    0.899; Final time =       0.4379
+Level 7 step   920 : dt =    5.686e-04; maxcfl (step) =    0.899; Final time =       0.4385
+Level 7 step   921 : dt =    5.690e-04; maxcfl (step) =    0.899; Final time =       0.4390
+Level 7 step   922 : dt =    5.694e-04; maxcfl (step) =    0.899; Final time =       0.4396
+Level 7 step   923 : dt =    5.698e-04; maxcfl (step) =    0.899; Final time =       0.4402
+Level 7 step   924 : dt =    5.703e-04; maxcfl (step) =    0.899; Final time =       0.4408
+Level 7 step   925 : dt =    5.707e-04; maxcfl (step) =    0.899; Final time =       0.4413
+Level 7 step   926 : dt =    5.711e-04; maxcfl (step) =    0.899; Final time =       0.4419
+Level 7 step   927 : dt =    5.715e-04; maxcfl (step) =    0.899; Final time =       0.4425
+Level 7 step   928 : dt =    5.720e-04; maxcfl (step) =    0.899; Final time =       0.4430
+Level 7 step   929 : dt =    5.724e-04; maxcfl (step) =    0.899; Final time =       0.4436
+Level 7 step   930 : dt =    5.728e-04; maxcfl (step) =    0.899; Final time =       0.4442
+Level 7 step   931 : dt =    5.733e-04; maxcfl (step) =    0.899; Final time =       0.4448
+Level 7 step   932 : dt =    5.737e-04; maxcfl (step) =    0.899; Final time =       0.4453
+Level 7 step   933 : dt =    5.741e-04; maxcfl (step) =    0.899; Final time =       0.4459
+Level 7 step   934 : dt =    5.746e-04; maxcfl (step) =    0.899; Final time =       0.4465
+Level 7 step   935 : dt =    5.750e-04; maxcfl (step) =    0.899; Final time =       0.4471
+Level 7 step   936 : dt =    5.754e-04; maxcfl (step) =    0.899; Final time =       0.4476
+Level 7 step   937 : dt =    5.759e-04; maxcfl (step) =    0.899; Final time =       0.4482
+Level 7 step   938 : dt =    5.763e-04; maxcfl (step) =    0.899; Final time =       0.4488
+Level 7 step   939 : dt =    5.768e-04; maxcfl (step) =    0.899; Final time =       0.4494
+Level 7 step   940 : dt =    5.772e-04; maxcfl (step) =    0.899; Final time =       0.4499
+Level 7 step   941 : dt =    5.776e-04; maxcfl (step) =    0.899; Final time =       0.4505
+Level 7 step   942 : dt =    5.781e-04; maxcfl (step) =    0.899; Final time =       0.4511
+Level 7 step   943 : dt =    5.785e-04; maxcfl (step) =    0.899; Final time =       0.4517
+Level 7 step   944 : dt =    5.790e-04; maxcfl (step) =    0.899; Final time =       0.4523
+Level 7 step   945 : dt =    5.794e-04; maxcfl (step) =    0.899; Final time =       0.4528
+Level 7 step   946 : dt =    5.799e-04; maxcfl (step) =    0.899; Final time =       0.4534
+Level 7 step   947 : dt =    5.804e-04; maxcfl (step) =    0.899; Final time =       0.4540
+Level 7 step   948 : dt =    5.808e-04; maxcfl (step) =    0.899; Final time =       0.4546
+Level 7 step   949 : dt =    5.813e-04; maxcfl (step) =    0.899; Final time =       0.4552
+Level 7 step   950 : dt =    5.817e-04; maxcfl (step) =    0.899; Final time =       0.4557
+Level 7 step   951 : dt =    5.822e-04; maxcfl (step) =    0.899; Final time =       0.4563
+Level 7 step   952 : dt =    5.827e-04; maxcfl (step) =    0.899; Final time =       0.4569
+Level 7 step   953 : dt =    5.831e-04; maxcfl (step) =    0.899; Final time =       0.4575
+Level 7 step   954 : dt =    5.836e-04; maxcfl (step) =    0.899; Final time =       0.4581
+Level 7 step   955 : dt =    5.841e-04; maxcfl (step) =    0.899; Final time =       0.4587
+Level 7 step   956 : dt =    5.845e-04; maxcfl (step) =    0.899; Final time =       0.4592
+Level 7 step   957 : dt =    5.850e-04; maxcfl (step) =    0.899; Final time =       0.4598
+Level 7 step   958 : dt =    5.855e-04; maxcfl (step) =    0.899; Final time =       0.4604
+Level 7 step   959 : dt =    5.859e-04; maxcfl (step) =    0.899; Final time =       0.4610
+Level 7 step   960 : dt =    5.864e-04; maxcfl (step) =    0.899; Final time =       0.4616
+Level 7 step   961 : dt =    5.869e-04; maxcfl (step) =    0.899; Final time =       0.4622
+Level 7 step   962 : dt =    5.874e-04; maxcfl (step) =    0.899; Final time =       0.4628
+Level 7 step   963 : dt =    5.879e-04; maxcfl (step) =    0.899; Final time =       0.4633
+Level 7 step   964 : dt =    5.883e-04; maxcfl (step) =    0.899; Final time =       0.4639
+Level 7 step   965 : dt =    5.888e-04; maxcfl (step) =    0.899; Final time =       0.4645
+Level 7 step   966 : dt =    5.893e-04; maxcfl (step) =    0.899; Final time =       0.4651
+Level 7 step   967 : dt =    5.898e-04; maxcfl (step) =    0.899; Final time =       0.4657
+Level 7 step   968 : dt =    5.903e-04; maxcfl (step) =    0.899; Final time =       0.4663
+Level 7 step   969 : dt =    5.908e-04; maxcfl (step) =    0.899; Final time =       0.4669
+Level 7 step   970 : dt =    5.913e-04; maxcfl (step) =    0.899; Final time =       0.4675
+Level 7 step   971 : dt =    5.918e-04; maxcfl (step) =    0.899; Final time =       0.4681
+Level 7 step   972 : dt =    5.923e-04; maxcfl (step) =    0.899; Final time =       0.4687
+Level 7 step   973 : dt =    5.928e-04; maxcfl (step) =    0.899; Final time =       0.4692
+Level 7 step   974 : dt =    5.933e-04; maxcfl (step) =    0.899; Final time =       0.4698
+Level 7 step   975 : dt =    5.938e-04; maxcfl (step) =    0.899; Final time =       0.4704
+Level 7 step   976 : dt =    5.943e-04; maxcfl (step) =    0.899; Final time =       0.4710
+Level 7 step   977 : dt =    5.948e-04; maxcfl (step) =    0.899; Final time =       0.4716
+Level 7 step   978 : dt =    5.953e-04; maxcfl (step) =    0.899; Final time =       0.4722
+Level 7 step   979 : dt =    5.958e-04; maxcfl (step) =    0.899; Final time =       0.4728
+Level 7 step   980 : dt =    5.963e-04; maxcfl (step) =    0.899; Final time =       0.4734
+Level 7 step   981 : dt =    5.968e-04; maxcfl (step) =    0.899; Final time =       0.4740
+Level 7 step   982 : dt =    5.973e-04; maxcfl (step) =    0.899; Final time =       0.4746
+Level 7 step   983 : dt =    5.978e-04; maxcfl (step) =    0.899; Final time =       0.4752
+Level 7 step   984 : dt =    5.984e-04; maxcfl (step) =    0.899; Final time =       0.4758
+Level 7 step   985 : dt =    5.989e-04; maxcfl (step) =    0.899; Final time =       0.4764
+Level 7 step   986 : dt =    5.994e-04; maxcfl (step) =    0.899; Final time =       0.4770
+Level 7 step   987 : dt =    5.999e-04; maxcfl (step) =    0.899; Final time =       0.4776
+Level 7 step   988 : dt =    6.005e-04; maxcfl (step) =    0.899; Final time =       0.4782
+Level 7 step   989 : dt =    6.010e-04; maxcfl (step) =    0.899; Final time =       0.4788
+Level 7 step   990 : dt =    6.015e-04; maxcfl (step) =    0.899; Final time =       0.4794
+Level 7 step   991 : dt =    6.020e-04; maxcfl (step) =    0.899; Final time =       0.4800
+Level 7 step   992 : dt =    6.026e-04; maxcfl (step) =    0.899; Final time =       0.4806
+Level 7 step   993 : dt =    6.031e-04; maxcfl (step) =    0.899; Final time =       0.4812
+Level 7 step   994 : dt =    6.037e-04; maxcfl (step) =    0.899; Final time =       0.4818
+Level 7 step   995 : dt =    6.042e-04; maxcfl (step) =    0.899; Final time =       0.4824
+Level 7 step   996 : dt =    6.047e-04; maxcfl (step) =    0.899; Final time =       0.4830
+Level 7 step   997 : dt =    6.053e-04; maxcfl (step) =    0.899; Final time =       0.4836
+Level 7 step   998 : dt =    6.058e-04; maxcfl (step) =    0.899; Final time =       0.4842
+Level 7 step   999 : dt =    6.064e-04; maxcfl (step) =    0.899; Final time =       0.4848
+Level 7 step  1000 : dt =    6.069e-04; maxcfl (step) =    0.899; Final time =       0.4854
+Level 7 step  1001 : dt =    6.075e-04; maxcfl (step) =    0.899; Final time =       0.4861
+Level 7 step  1002 : dt =    6.080e-04; maxcfl (step) =    0.899; Final time =       0.4867
+Level 7 step  1003 : dt =    6.086e-04; maxcfl (step) =    0.899; Final time =       0.4873
+Level 7 step  1004 : dt =    6.091e-04; maxcfl (step) =    0.899; Final time =       0.4879
+Level 7 step  1005 : dt =    6.097e-04; maxcfl (step) =    0.899; Final time =       0.4885
+Level 7 step  1006 : dt =    6.103e-04; maxcfl (step) =    0.899; Final time =       0.4891
+Level 7 step  1007 : dt =    6.108e-04; maxcfl (step) =    0.899; Final time =       0.4897
+Level 7 step  1008 : dt =    6.114e-04; maxcfl (step) =    0.899; Final time =       0.4903
+Level 7 step  1009 : dt =    6.120e-04; maxcfl (step) =    0.899; Final time =       0.4909
+Level 7 step  1010 : dt =    6.125e-04; maxcfl (step) =    0.899; Final time =       0.4915
+Level 7 step  1011 : dt =    6.131e-04; maxcfl (step) =    0.899; Final time =       0.4922
+Level 7 step  1012 : dt =    6.137e-04; maxcfl (step) =    0.899; Final time =       0.4928
+Level 7 step  1013 : dt =    6.143e-04; maxcfl (step) =    0.899; Final time =       0.4934
+Level 7 step  1014 : dt =    6.148e-04; maxcfl (step) =    0.899; Final time =       0.4940
+Level 7 step  1015 : dt =    6.154e-04; maxcfl (step) =    0.899; Final time =       0.4946
+Level 7 step  1016 : dt =    6.160e-04; maxcfl (step) =    0.899; Final time =       0.4952
+Level 7 step  1017 : dt =    6.166e-04; maxcfl (step) =    0.899; Final time =       0.4959
+Level 7 step  1018 : dt =    6.172e-04; maxcfl (step) =    0.899; Final time =       0.4965
+Level 7 step  1019 : dt =    6.178e-04; maxcfl (step) =    0.899; Final time =       0.4971
+Level 7 step  1020 : dt =    6.184e-04; maxcfl (step) =    0.899; Final time =       0.4977
+Level 7 step  1021 : dt =    6.190e-04; maxcfl (step) =    0.899; Final time =       0.4983
+Level 7 step  1022 : dt =    6.196e-04; maxcfl (step) =    0.899; Final time =       0.4989
+Level 7 step  1023 : dt =    6.202e-04; maxcfl (step) =    0.899; Final time =       0.4996
+Level 7 step  1024 : dt =    4.371e-04; maxcfl (step) =    0.633; Final time =       0.5000
+   WARNING : Took small time step which was   70.4% of desired dt.
+[libsc] Statistics for INIT
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         1.30565 (0 = 0%)
+[libsc]    Minimum attained at rank     0: 1.30565
+[libsc]    Maximum attained at rank     0: 1.30565
+[libsc] Statistics for REGRID
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for OUTPUT
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for CHECK
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for ADVANCE
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         3970.46 (0 = 0%)
+[libsc]    Minimum attained at rank     0: 3970.46
+[libsc]    Maximum attained at rank     0: 3970.46
+[libsc] Statistics for EXCHANGE
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         78.9773 (0 = 0%)
+[libsc]    Minimum attained at rank     0: 78.9773
+[libsc]    Maximum attained at rank     0: 78.9773
+[libsc] Statistics for WALLTIME
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         4069.81 (0 = 0%)
+[libsc]    Minimum attained at rank     0: 4069.81
+[libsc]    Maximum attained at rank     0: 4069.81
+[libsc] Statistics for UNACCOUNTED
+[libsc]    Global number of values:     1
+[libsc]    Mean value (std. dev.):         19.0696 (0 = 0%)
+[libsc]    Minimum attained at rank     0: 19.0696
+[libsc]    Maximum attained at rank     0: 19.0696
+[libsc] Procs 1 advance 1026 3970.46 exchange 78.9773 regrid 0
+ 
+TACC: Shutdown complete. Exiting.
+Level 8
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=8 --maxlevel=8
+TACC: Starting up job 1218007
+TACC: Setting up parallel environment for MVAPICH2+mpispawn.
+TACC: Starting parallel tasks...
+[libsc] This is libsc 0.7.2.138-dcc0
+[libsc] CC                       mpicc
+[libsc] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
+[libsc] CFLAGS                   -Wall -xhost -opt-prefetch
+[libsc] CPP                      mpicc -E
+[libsc] CPPFLAGS                 
+[libsc] F77                      mpif77
+[libsc] FFLAGS                   
+[libsc] LDFLAGS                  
+[libsc] BLAS_LIBS                
+[libsc] LAPACK_LIBS              
+[libsc] LIBS                     -llua 
+[libsc] FLIBS                    
+[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] CC                       mpicc
+[p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
+[p4est] CFLAGS                   -Wall -xhost -opt-prefetch
+[p4est] CPP                      mpicc -E
+[p4est] CPPFLAGS                 
+[p4est] LDFLAGS                  
+[p4est] LIBS                     -llua 
+[libsc] Options:
+[libsc]    mx: 16
+[libsc]    my: 16
+[libsc]    initial_dt: 0.005
+[libsc]    outstyle: 1
+[libsc]    tfinal: 0.5
+[libsc]    nout: 1
+[libsc]    nstep: 1
+[libsc]    vtkout: 0
+[libsc]    vtkspace: 0
+[libsc]    vtkwrite: 0
+[libsc]    verbosity: 0
+[libsc]    serialout: false
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    max_cfl: 1
+[libsc]    desired_cfl: 0.9
+[libsc]    meqn: 1
+[libsc]    mbc: 2
+[libsc]    mthbc: 1 1 1 1
+[libsc]    refratio: 2
+[libsc]    minlevel: 8
+[libsc]    maxlevel: 8
+[libsc]    regrid_interval: 0
+[libsc]    ax: 0
+[libsc]    bx: 1
+[libsc]    ay: 0
+[libsc]    by: 1
+[libsc]    manifold: false
+[libsc]    mapped: false
+[libsc]    use_fixed_dt: false
+[libsc]    check_conservation: false
+[libsc]    subcycle: false
+[libsc]    noweightedp: false
+[libsc]    order: 2 2
+[libsc]    mcapa: 0
+[libsc]    maux: 2
+[libsc]    src_term: 0
+[libsc]    mwaves: 1
+[libsc]    mthlim: 4
+[libsc] Arguments: none
+[p4est] Into p4est_new with min quadrants 0 level 8 uniform 1
+[p4est] New p4est with 1 trees on 1 processors
+[p4est] Done p4est_new with 65536 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_nodes_new_local
+[p4est] Done p4est_nodes_new_local
+Level 8 step     0 : dt =    5.000e-03; maxcfl (step) =   20.480; Final time =       0.0050
+   WARNING : Maximum CFL exceeded; retaking time step
+Level 8 step     0 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0002
+Level 8 step     1 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0004
+Level 8 step     2 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0007
+Level 8 step     3 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0009
+Level 8 step     4 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0011
+Level 8 step     5 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0013
+Level 8 step     6 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0015
+Level 8 step     7 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0018
+Level 8 step     8 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0020
+Level 8 step     9 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0022
+Level 8 step    10 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0024
+Level 8 step    11 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0026
+Level 8 step    12 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0029
+Level 8 step    13 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0031
+Level 8 step    14 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0033
+Level 8 step    15 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0035
+Level 8 step    16 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0037
+Level 8 step    17 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0040
+Level 8 step    18 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0042
+Level 8 step    19 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0044
+Level 8 step    20 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0046
+Level 8 step    21 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0048
+Level 8 step    22 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0051
+Level 8 step    23 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0053
+Level 8 step    24 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0055
+Level 8 step    25 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0057
+Level 8 step    26 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0059
+Level 8 step    27 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0062
+Level 8 step    28 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0064
+Level 8 step    29 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0066
+Level 8 step    30 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0068
+Level 8 step    31 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0070
+Level 8 step    32 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0073
+Level 8 step    33 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0075
+Level 8 step    34 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0077
+Level 8 step    35 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0079
+Level 8 step    36 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0081
+Level 8 step    37 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0083
+Level 8 step    38 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0086
+Level 8 step    39 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0088
+Level 8 step    40 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0090
+Level 8 step    41 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0092
+Level 8 step    42 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0094
+Level 8 step    43 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0097
+Level 8 step    44 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0099
+Level 8 step    45 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0101
+Level 8 step    46 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0103
+Level 8 step    47 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0105
+Level 8 step    48 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0108
+Level 8 step    49 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0110
+Level 8 step    50 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0112
+Level 8 step    51 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0114
+Level 8 step    52 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0116
+Level 8 step    53 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0119
+Level 8 step    54 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0121
+Level 8 step    55 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0123
+Level 8 step    56 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0125
+Level 8 step    57 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0127
+Level 8 step    58 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0130
+Level 8 step    59 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0132
+Level 8 step    60 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0134
+Level 8 step    61 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0136
+Level 8 step    62 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0138
+Level 8 step    63 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0141
+Level 8 step    64 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0143
+Level 8 step    65 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0145
+Level 8 step    66 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0147
+Level 8 step    67 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0149
+Level 8 step    68 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0152
+Level 8 step    69 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0154
+Level 8 step    70 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0156
+Level 8 step    71 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0158
+Level 8 step    72 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0160
+Level 8 step    73 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0163
+Level 8 step    74 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0165
+Level 8 step    75 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0167
+Level 8 step    76 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0169
+Level 8 step    77 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0171
+Level 8 step    78 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0174
+Level 8 step    79 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0176
+Level 8 step    80 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0178
+Level 8 step    81 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0180
+Level 8 step    82 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0182
+Level 8 step    83 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0185
+Level 8 step    84 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0187
+Level 8 step    85 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0189
+Level 8 step    86 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0191
+Level 8 step    87 : dt =    2.198e-04; maxcfl (step) =    0.900; Final time =       0.0193

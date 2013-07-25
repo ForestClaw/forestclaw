@@ -10,7 +10,7 @@ my ($level, $adarr, $exarr, $step);
 
 while (<>) {
 
-	if (m/Procs (\d+) advance (\d+) ([0-9.]+) exchange ([0-9.]+)/) {
+	if (m/Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+)/) {
 
 		$procs = $1;
 		$numad = $2;
