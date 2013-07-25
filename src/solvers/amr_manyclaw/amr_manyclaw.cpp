@@ -427,7 +427,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
                     mx, my,&solver->amdq[0], &solver->apdq[0], &solver->wave[0],
                     &solver->wave_speed[0],mbc, meqn, dtdx);
 
-    cflgrid = mc_data->solver->cfl(dtdx);
+    cflgrid = mc_data->solver->cfl(mx, my, mbc, meqn, mwaves, dtdx);
 
 #if 0
     clawpatch2_(maxm, meqn, maux, mbc, manyclaw_parms->method,
