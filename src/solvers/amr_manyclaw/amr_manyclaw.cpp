@@ -393,7 +393,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     // Specific to solver
     int mwaves = manyclaw_parms->mwaves;
 
-    int maxm = max(mx,my);
+    // int maxm = max(mx,my);
 
     double cflgrid;
 
@@ -418,10 +418,6 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     mc_data->rp_grid_eval(&qold[0], &aux[0],
                           mx, my, &solver->amdq[0], &solver->apdq[0],
                           &solver->wave[0], &solver->wave_speed[0]);
-
-    printf("dtdx = %16.8f\n",dtdx);
-    print_array_(mx,my,mbc,meqn,&solver->amdq[0]);
-
 
     mc_data->update(&qold[0], &aux[0],
                     mx, my,&solver->amdq[0], &solver->apdq[0], &solver->wave[0],
