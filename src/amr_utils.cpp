@@ -56,6 +56,7 @@ void init_domain_data(fclaw2d_domain_t *domain)
     domain->user = (void *) ddata;
 
     ddata->count_set_clawpatch = ddata->count_delete_clawpatch = 0;
+    ddata->count_amr_advance = 0;
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
 
     ddata->domain_exchange = NULL;
@@ -209,6 +210,7 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     memcpy (ddata_new->timers, ddata_old->timers,
             sizeof (fclaw2d_timer_t) * FCLAW2D_TIMER_COUNT);
     ddata_new->is_latest_domain = 1;
+    ddata_new->count_amr_advance = ddata_old->count_amr_advance;
 
 
     /*

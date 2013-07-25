@@ -68,6 +68,7 @@ typedef struct fclaw2d_domain_data
 {
     /* Debug counters and timers */
     int count_set_clawpatch, count_delete_clawpatch;
+    int count_amr_advance;
     int is_latest_domain;
     fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
