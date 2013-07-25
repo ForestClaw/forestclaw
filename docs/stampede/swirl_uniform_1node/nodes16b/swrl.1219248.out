@@ -4649,3 +4649,396 @@ Level 8 step  1698 : dt =    2.711e-04; maxcfl (step) =    0.900; Final time =  
 Level 8 step  1699 : dt =    2.712e-04; maxcfl (step) =    0.900; Final time =       0.3991
 Level 8 step  1700 : dt =    2.713e-04; maxcfl (step) =    0.900; Final time =       0.3994
 Level 8 step  1701 : dt =    2.714e-04; maxcfl (step) =    0.900; Final time =       0.3997
+Level 8 step  1702 : dt =    2.715e-04; maxcfl (step) =    0.900; Final time =       0.3999
+Level 8 step  1703 : dt =    2.715e-04; maxcfl (step) =    0.900; Final time =       0.4002
+Level 8 step  1704 : dt =    2.716e-04; maxcfl (step) =    0.900; Final time =       0.4005
+Level 8 step  1705 : dt =    2.717e-04; maxcfl (step) =    0.900; Final time =       0.4008
+Level 8 step  1706 : dt =    2.718e-04; maxcfl (step) =    0.900; Final time =       0.4010
+Level 8 step  1707 : dt =    2.719e-04; maxcfl (step) =    0.900; Final time =       0.4013
+Level 8 step  1708 : dt =    2.720e-04; maxcfl (step) =    0.900; Final time =       0.4016
+Level 8 step  1709 : dt =    2.720e-04; maxcfl (step) =    0.900; Final time =       0.4018
+Level 8 step  1710 : dt =    2.721e-04; maxcfl (step) =    0.900; Final time =       0.4021
+Level 8 step  1711 : dt =    2.722e-04; maxcfl (step) =    0.900; Final time =       0.4024
+Level 8 step  1712 : dt =    2.723e-04; maxcfl (step) =    0.900; Final time =       0.4027
+Level 8 step  1713 : dt =    2.724e-04; maxcfl (step) =    0.900; Final time =       0.4029
+Level 8 step  1714 : dt =    2.725e-04; maxcfl (step) =    0.900; Final time =       0.4032
+Level 8 step  1715 : dt =    2.726e-04; maxcfl (step) =    0.900; Final time =       0.4035
+Level 8 step  1716 : dt =    2.726e-04; maxcfl (step) =    0.900; Final time =       0.4038
+Level 8 step  1717 : dt =    2.727e-04; maxcfl (step) =    0.900; Final time =       0.4040
+Level 8 step  1718 : dt =    2.728e-04; maxcfl (step) =    0.900; Final time =       0.4043
+Level 8 step  1719 : dt =    2.729e-04; maxcfl (step) =    0.900; Final time =       0.4046
+Level 8 step  1720 : dt =    2.730e-04; maxcfl (step) =    0.900; Final time =       0.4048
+Level 8 step  1721 : dt =    2.731e-04; maxcfl (step) =    0.900; Final time =       0.4051
+Level 8 step  1722 : dt =    2.732e-04; maxcfl (step) =    0.900; Final time =       0.4054
+Level 8 step  1723 : dt =    2.732e-04; maxcfl (step) =    0.900; Final time =       0.4057
+Level 8 step  1724 : dt =    2.733e-04; maxcfl (step) =    0.900; Final time =       0.4059
+Level 8 step  1725 : dt =    2.734e-04; maxcfl (step) =    0.900; Final time =       0.4062
+Level 8 step  1726 : dt =    2.735e-04; maxcfl (step) =    0.900; Final time =       0.4065
+Level 8 step  1727 : dt =    2.736e-04; maxcfl (step) =    0.900; Final time =       0.4068
+Level 8 step  1728 : dt =    2.737e-04; maxcfl (step) =    0.900; Final time =       0.4070
+Level 8 step  1729 : dt =    2.738e-04; maxcfl (step) =    0.900; Final time =       0.4073
+Level 8 step  1730 : dt =    2.739e-04; maxcfl (step) =    0.900; Final time =       0.4076
+Level 8 step  1731 : dt =    2.739e-04; maxcfl (step) =    0.900; Final time =       0.4079
+Level 8 step  1732 : dt =    2.740e-04; maxcfl (step) =    0.900; Final time =       0.4081
+Level 8 step  1733 : dt =    2.741e-04; maxcfl (step) =    0.900; Final time =       0.4084
+Level 8 step  1734 : dt =    2.742e-04; maxcfl (step) =    0.900; Final time =       0.4087
+Level 8 step  1735 : dt =    2.743e-04; maxcfl (step) =    0.900; Final time =       0.4089
+Level 8 step  1736 : dt =    2.744e-04; maxcfl (step) =    0.900; Final time =       0.4092
+Level 8 step  1737 : dt =    2.745e-04; maxcfl (step) =    0.900; Final time =       0.4095
+Level 8 step  1738 : dt =    2.746e-04; maxcfl (step) =    0.900; Final time =       0.4098
+Level 8 step  1739 : dt =    2.746e-04; maxcfl (step) =    0.900; Final time =       0.4100
+Level 8 step  1740 : dt =    2.747e-04; maxcfl (step) =    0.900; Final time =       0.4103
+Level 8 step  1741 : dt =    2.748e-04; maxcfl (step) =    0.900; Final time =       0.4106
+Level 8 step  1742 : dt =    2.749e-04; maxcfl (step) =    0.900; Final time =       0.4109
+Level 8 step  1743 : dt =    2.750e-04; maxcfl (step) =    0.900; Final time =       0.4111
+Level 8 step  1744 : dt =    2.751e-04; maxcfl (step) =    0.900; Final time =       0.4114
+Level 8 step  1745 : dt =    2.752e-04; maxcfl (step) =    0.900; Final time =       0.4117
+Level 8 step  1746 : dt =    2.753e-04; maxcfl (step) =    0.900; Final time =       0.4120
+Level 8 step  1747 : dt =    2.754e-04; maxcfl (step) =    0.900; Final time =       0.4122
+Level 8 step  1748 : dt =    2.755e-04; maxcfl (step) =    0.900; Final time =       0.4125
+Level 8 step  1749 : dt =    2.755e-04; maxcfl (step) =    0.900; Final time =       0.4128
+Level 8 step  1750 : dt =    2.756e-04; maxcfl (step) =    0.900; Final time =       0.4131
+Level 8 step  1751 : dt =    2.757e-04; maxcfl (step) =    0.900; Final time =       0.4133
+Level 8 step  1752 : dt =    2.758e-04; maxcfl (step) =    0.900; Final time =       0.4136
+Level 8 step  1753 : dt =    2.759e-04; maxcfl (step) =    0.900; Final time =       0.4139
+Level 8 step  1754 : dt =    2.760e-04; maxcfl (step) =    0.900; Final time =       0.4142
+Level 8 step  1755 : dt =    2.761e-04; maxcfl (step) =    0.900; Final time =       0.4145
+Level 8 step  1756 : dt =    2.762e-04; maxcfl (step) =    0.900; Final time =       0.4147
+Level 8 step  1757 : dt =    2.763e-04; maxcfl (step) =    0.900; Final time =       0.4150
+Level 8 step  1758 : dt =    2.764e-04; maxcfl (step) =    0.900; Final time =       0.4153
+Level 8 step  1759 : dt =    2.765e-04; maxcfl (step) =    0.900; Final time =       0.4156
+Level 8 step  1760 : dt =    2.765e-04; maxcfl (step) =    0.900; Final time =       0.4158
+Level 8 step  1761 : dt =    2.766e-04; maxcfl (step) =    0.900; Final time =       0.4161
+Level 8 step  1762 : dt =    2.767e-04; maxcfl (step) =    0.900; Final time =       0.4164
+Level 8 step  1763 : dt =    2.768e-04; maxcfl (step) =    0.900; Final time =       0.4167
+Level 8 step  1764 : dt =    2.769e-04; maxcfl (step) =    0.900; Final time =       0.4169
+Level 8 step  1765 : dt =    2.770e-04; maxcfl (step) =    0.900; Final time =       0.4172
+Level 8 step  1766 : dt =    2.771e-04; maxcfl (step) =    0.900; Final time =       0.4175
+Level 8 step  1767 : dt =    2.772e-04; maxcfl (step) =    0.900; Final time =       0.4178
+Level 8 step  1768 : dt =    2.773e-04; maxcfl (step) =    0.900; Final time =       0.4180
+Level 8 step  1769 : dt =    2.774e-04; maxcfl (step) =    0.900; Final time =       0.4183
+Level 8 step  1770 : dt =    2.775e-04; maxcfl (step) =    0.900; Final time =       0.4186
+Level 8 step  1771 : dt =    2.776e-04; maxcfl (step) =    0.900; Final time =       0.4189
+Level 8 step  1772 : dt =    2.777e-04; maxcfl (step) =    0.900; Final time =       0.4192
+Level 8 step  1773 : dt =    2.777e-04; maxcfl (step) =    0.900; Final time =       0.4194
+Level 8 step  1774 : dt =    2.778e-04; maxcfl (step) =    0.900; Final time =       0.4197
+Level 8 step  1775 : dt =    2.779e-04; maxcfl (step) =    0.900; Final time =       0.4200
+Level 8 step  1776 : dt =    2.780e-04; maxcfl (step) =    0.900; Final time =       0.4203
+Level 8 step  1777 : dt =    2.781e-04; maxcfl (step) =    0.900; Final time =       0.4205
+Level 8 step  1778 : dt =    2.782e-04; maxcfl (step) =    0.900; Final time =       0.4208
+Level 8 step  1779 : dt =    2.783e-04; maxcfl (step) =    0.900; Final time =       0.4211
+Level 8 step  1780 : dt =    2.784e-04; maxcfl (step) =    0.900; Final time =       0.4214
+Level 8 step  1781 : dt =    2.785e-04; maxcfl (step) =    0.900; Final time =       0.4217
+Level 8 step  1782 : dt =    2.786e-04; maxcfl (step) =    0.900; Final time =       0.4219
+Level 8 step  1783 : dt =    2.787e-04; maxcfl (step) =    0.900; Final time =       0.4222
+Level 8 step  1784 : dt =    2.788e-04; maxcfl (step) =    0.900; Final time =       0.4225
+Level 8 step  1785 : dt =    2.789e-04; maxcfl (step) =    0.900; Final time =       0.4228
+Level 8 step  1786 : dt =    2.790e-04; maxcfl (step) =    0.900; Final time =       0.4231
+Level 8 step  1787 : dt =    2.791e-04; maxcfl (step) =    0.900; Final time =       0.4233
+Level 8 step  1788 : dt =    2.792e-04; maxcfl (step) =    0.900; Final time =       0.4236
+Level 8 step  1789 : dt =    2.793e-04; maxcfl (step) =    0.900; Final time =       0.4239
+Level 8 step  1790 : dt =    2.794e-04; maxcfl (step) =    0.900; Final time =       0.4242
+Level 8 step  1791 : dt =    2.795e-04; maxcfl (step) =    0.900; Final time =       0.4245
+Level 8 step  1792 : dt =    2.796e-04; maxcfl (step) =    0.900; Final time =       0.4247
+Level 8 step  1793 : dt =    2.797e-04; maxcfl (step) =    0.900; Final time =       0.4250
+Level 8 step  1794 : dt =    2.797e-04; maxcfl (step) =    0.900; Final time =       0.4253
+Level 8 step  1795 : dt =    2.798e-04; maxcfl (step) =    0.900; Final time =       0.4256
+Level 8 step  1796 : dt =    2.799e-04; maxcfl (step) =    0.900; Final time =       0.4259
+Level 8 step  1797 : dt =    2.800e-04; maxcfl (step) =    0.900; Final time =       0.4261
+Level 8 step  1798 : dt =    2.801e-04; maxcfl (step) =    0.900; Final time =       0.4264
+Level 8 step  1799 : dt =    2.802e-04; maxcfl (step) =    0.900; Final time =       0.4267
+Level 8 step  1800 : dt =    2.803e-04; maxcfl (step) =    0.900; Final time =       0.4270
+Level 8 step  1801 : dt =    2.804e-04; maxcfl (step) =    0.900; Final time =       0.4273
+Level 8 step  1802 : dt =    2.805e-04; maxcfl (step) =    0.900; Final time =       0.4275
+Level 8 step  1803 : dt =    2.806e-04; maxcfl (step) =    0.900; Final time =       0.4278
+Level 8 step  1804 : dt =    2.807e-04; maxcfl (step) =    0.900; Final time =       0.4281
+Level 8 step  1805 : dt =    2.808e-04; maxcfl (step) =    0.900; Final time =       0.4284
+Level 8 step  1806 : dt =    2.809e-04; maxcfl (step) =    0.900; Final time =       0.4287
+Level 8 step  1807 : dt =    2.810e-04; maxcfl (step) =    0.900; Final time =       0.4289
+Level 8 step  1808 : dt =    2.811e-04; maxcfl (step) =    0.900; Final time =       0.4292
+Level 8 step  1809 : dt =    2.812e-04; maxcfl (step) =    0.900; Final time =       0.4295
+Level 8 step  1810 : dt =    2.813e-04; maxcfl (step) =    0.900; Final time =       0.4298
+Level 8 step  1811 : dt =    2.814e-04; maxcfl (step) =    0.900; Final time =       0.4301
+Level 8 step  1812 : dt =    2.815e-04; maxcfl (step) =    0.900; Final time =       0.4303
+Level 8 step  1813 : dt =    2.816e-04; maxcfl (step) =    0.900; Final time =       0.4306
+Level 8 step  1814 : dt =    2.817e-04; maxcfl (step) =    0.900; Final time =       0.4309
+Level 8 step  1815 : dt =    2.818e-04; maxcfl (step) =    0.900; Final time =       0.4312
+Level 8 step  1816 : dt =    2.819e-04; maxcfl (step) =    0.900; Final time =       0.4315
+Level 8 step  1817 : dt =    2.820e-04; maxcfl (step) =    0.900; Final time =       0.4318
+Level 8 step  1818 : dt =    2.821e-04; maxcfl (step) =    0.900; Final time =       0.4320
+Level 8 step  1819 : dt =    2.822e-04; maxcfl (step) =    0.900; Final time =       0.4323
+Level 8 step  1820 : dt =    2.823e-04; maxcfl (step) =    0.900; Final time =       0.4326
+Level 8 step  1821 : dt =    2.824e-04; maxcfl (step) =    0.900; Final time =       0.4329
+Level 8 step  1822 : dt =    2.825e-04; maxcfl (step) =    0.900; Final time =       0.4332
+Level 8 step  1823 : dt =    2.826e-04; maxcfl (step) =    0.900; Final time =       0.4334
+Level 8 step  1824 : dt =    2.827e-04; maxcfl (step) =    0.900; Final time =       0.4337
+Level 8 step  1825 : dt =    2.828e-04; maxcfl (step) =    0.900; Final time =       0.4340
+Level 8 step  1826 : dt =    2.829e-04; maxcfl (step) =    0.900; Final time =       0.4343
+Level 8 step  1827 : dt =    2.830e-04; maxcfl (step) =    0.900; Final time =       0.4346
+Level 8 step  1828 : dt =    2.831e-04; maxcfl (step) =    0.900; Final time =       0.4349
+Level 8 step  1829 : dt =    2.832e-04; maxcfl (step) =    0.900; Final time =       0.4351
+Level 8 step  1830 : dt =    2.833e-04; maxcfl (step) =    0.900; Final time =       0.4354
+Level 8 step  1831 : dt =    2.834e-04; maxcfl (step) =    0.900; Final time =       0.4357
+Level 8 step  1832 : dt =    2.835e-04; maxcfl (step) =    0.900; Final time =       0.4360
+Level 8 step  1833 : dt =    2.836e-04; maxcfl (step) =    0.900; Final time =       0.4363
+Level 8 step  1834 : dt =    2.838e-04; maxcfl (step) =    0.900; Final time =       0.4366
+Level 8 step  1835 : dt =    2.839e-04; maxcfl (step) =    0.900; Final time =       0.4368
+Level 8 step  1836 : dt =    2.840e-04; maxcfl (step) =    0.900; Final time =       0.4371
+Level 8 step  1837 : dt =    2.841e-04; maxcfl (step) =    0.900; Final time =       0.4374
+Level 8 step  1838 : dt =    2.842e-04; maxcfl (step) =    0.900; Final time =       0.4377
+Level 8 step  1839 : dt =    2.843e-04; maxcfl (step) =    0.900; Final time =       0.4380
+Level 8 step  1840 : dt =    2.844e-04; maxcfl (step) =    0.900; Final time =       0.4383
+Level 8 step  1841 : dt =    2.845e-04; maxcfl (step) =    0.900; Final time =       0.4386
+Level 8 step  1842 : dt =    2.846e-04; maxcfl (step) =    0.900; Final time =       0.4388
+Level 8 step  1843 : dt =    2.847e-04; maxcfl (step) =    0.900; Final time =       0.4391
+Level 8 step  1844 : dt =    2.848e-04; maxcfl (step) =    0.900; Final time =       0.4394
+Level 8 step  1845 : dt =    2.849e-04; maxcfl (step) =    0.900; Final time =       0.4397
+Level 8 step  1846 : dt =    2.850e-04; maxcfl (step) =    0.900; Final time =       0.4400
+Level 8 step  1847 : dt =    2.851e-04; maxcfl (step) =    0.900; Final time =       0.4403
+Level 8 step  1848 : dt =    2.852e-04; maxcfl (step) =    0.900; Final time =       0.4405
+Level 8 step  1849 : dt =    2.853e-04; maxcfl (step) =    0.900; Final time =       0.4408
+Level 8 step  1850 : dt =    2.854e-04; maxcfl (step) =    0.900; Final time =       0.4411
+Level 8 step  1851 : dt =    2.855e-04; maxcfl (step) =    0.900; Final time =       0.4414
+Level 8 step  1852 : dt =    2.856e-04; maxcfl (step) =    0.900; Final time =       0.4417
+Level 8 step  1853 : dt =    2.857e-04; maxcfl (step) =    0.900; Final time =       0.4420
+Level 8 step  1854 : dt =    2.859e-04; maxcfl (step) =    0.900; Final time =       0.4423
+Level 8 step  1855 : dt =    2.860e-04; maxcfl (step) =    0.900; Final time =       0.4425
+Level 8 step  1856 : dt =    2.861e-04; maxcfl (step) =    0.900; Final time =       0.4428
+Level 8 step  1857 : dt =    2.862e-04; maxcfl (step) =    0.900; Final time =       0.4431
+Level 8 step  1858 : dt =    2.863e-04; maxcfl (step) =    0.900; Final time =       0.4434
+Level 8 step  1859 : dt =    2.864e-04; maxcfl (step) =    0.900; Final time =       0.4437
+Level 8 step  1860 : dt =    2.865e-04; maxcfl (step) =    0.900; Final time =       0.4440
+Level 8 step  1861 : dt =    2.866e-04; maxcfl (step) =    0.900; Final time =       0.4443
+Level 8 step  1862 : dt =    2.867e-04; maxcfl (step) =    0.900; Final time =       0.4446
+Level 8 step  1863 : dt =    2.868e-04; maxcfl (step) =    0.900; Final time =       0.4448
+Level 8 step  1864 : dt =    2.869e-04; maxcfl (step) =    0.900; Final time =       0.4451
+Level 8 step  1865 : dt =    2.870e-04; maxcfl (step) =    0.900; Final time =       0.4454
+Level 8 step  1866 : dt =    2.871e-04; maxcfl (step) =    0.900; Final time =       0.4457
+Level 8 step  1867 : dt =    2.873e-04; maxcfl (step) =    0.900; Final time =       0.4460
+Level 8 step  1868 : dt =    2.874e-04; maxcfl (step) =    0.900; Final time =       0.4463
+Level 8 step  1869 : dt =    2.875e-04; maxcfl (step) =    0.900; Final time =       0.4466
+Level 8 step  1870 : dt =    2.876e-04; maxcfl (step) =    0.900; Final time =       0.4468
+Level 8 step  1871 : dt =    2.877e-04; maxcfl (step) =    0.900; Final time =       0.4471
+Level 8 step  1872 : dt =    2.878e-04; maxcfl (step) =    0.900; Final time =       0.4474
+Level 8 step  1873 : dt =    2.879e-04; maxcfl (step) =    0.900; Final time =       0.4477
+Level 8 step  1874 : dt =    2.880e-04; maxcfl (step) =    0.900; Final time =       0.4480
+Level 8 step  1875 : dt =    2.881e-04; maxcfl (step) =    0.900; Final time =       0.4483
+Level 8 step  1876 : dt =    2.882e-04; maxcfl (step) =    0.900; Final time =       0.4486
+Level 8 step  1877 : dt =    2.884e-04; maxcfl (step) =    0.900; Final time =       0.4489
+Level 8 step  1878 : dt =    2.885e-04; maxcfl (step) =    0.900; Final time =       0.4492
+Level 8 step  1879 : dt =    2.886e-04; maxcfl (step) =    0.900; Final time =       0.4494
+Level 8 step  1880 : dt =    2.887e-04; maxcfl (step) =    0.900; Final time =       0.4497
+Level 8 step  1881 : dt =    2.888e-04; maxcfl (step) =    0.900; Final time =       0.4500
+Level 8 step  1882 : dt =    2.889e-04; maxcfl (step) =    0.900; Final time =       0.4503
+Level 8 step  1883 : dt =    2.890e-04; maxcfl (step) =    0.900; Final time =       0.4506
+Level 8 step  1884 : dt =    2.891e-04; maxcfl (step) =    0.900; Final time =       0.4509
+Level 8 step  1885 : dt =    2.892e-04; maxcfl (step) =    0.900; Final time =       0.4512
+Level 8 step  1886 : dt =    2.894e-04; maxcfl (step) =    0.900; Final time =       0.4515
+Level 8 step  1887 : dt =    2.895e-04; maxcfl (step) =    0.900; Final time =       0.4518
+Level 8 step  1888 : dt =    2.896e-04; maxcfl (step) =    0.900; Final time =       0.4520
+Level 8 step  1889 : dt =    2.897e-04; maxcfl (step) =    0.900; Final time =       0.4523
+Level 8 step  1890 : dt =    2.898e-04; maxcfl (step) =    0.900; Final time =       0.4526
+Level 8 step  1891 : dt =    2.899e-04; maxcfl (step) =    0.900; Final time =       0.4529
+Level 8 step  1892 : dt =    2.900e-04; maxcfl (step) =    0.900; Final time =       0.4532
+Level 8 step  1893 : dt =    2.902e-04; maxcfl (step) =    0.900; Final time =       0.4535
+Level 8 step  1894 : dt =    2.903e-04; maxcfl (step) =    0.900; Final time =       0.4538
+Level 8 step  1895 : dt =    2.904e-04; maxcfl (step) =    0.900; Final time =       0.4541
+Level 8 step  1896 : dt =    2.905e-04; maxcfl (step) =    0.900; Final time =       0.4544
+Level 8 step  1897 : dt =    2.906e-04; maxcfl (step) =    0.900; Final time =       0.4547
+Level 8 step  1898 : dt =    2.907e-04; maxcfl (step) =    0.900; Final time =       0.4549
+Level 8 step  1899 : dt =    2.908e-04; maxcfl (step) =    0.900; Final time =       0.4552
+Level 8 step  1900 : dt =    2.910e-04; maxcfl (step) =    0.900; Final time =       0.4555
+Level 8 step  1901 : dt =    2.911e-04; maxcfl (step) =    0.900; Final time =       0.4558
+Level 8 step  1902 : dt =    2.912e-04; maxcfl (step) =    0.900; Final time =       0.4561
+Level 8 step  1903 : dt =    2.913e-04; maxcfl (step) =    0.900; Final time =       0.4564
+Level 8 step  1904 : dt =    2.914e-04; maxcfl (step) =    0.900; Final time =       0.4567
+Level 8 step  1905 : dt =    2.915e-04; maxcfl (step) =    0.900; Final time =       0.4570
+Level 8 step  1906 : dt =    2.917e-04; maxcfl (step) =    0.900; Final time =       0.4573
+Level 8 step  1907 : dt =    2.918e-04; maxcfl (step) =    0.900; Final time =       0.4576
+Level 8 step  1908 : dt =    2.919e-04; maxcfl (step) =    0.900; Final time =       0.4579
+Level 8 step  1909 : dt =    2.920e-04; maxcfl (step) =    0.900; Final time =       0.4582
+Level 8 step  1910 : dt =    2.921e-04; maxcfl (step) =    0.900; Final time =       0.4584
+Level 8 step  1911 : dt =    2.922e-04; maxcfl (step) =    0.900; Final time =       0.4587
+Level 8 step  1912 : dt =    2.924e-04; maxcfl (step) =    0.900; Final time =       0.4590
+Level 8 step  1913 : dt =    2.925e-04; maxcfl (step) =    0.900; Final time =       0.4593
+Level 8 step  1914 : dt =    2.926e-04; maxcfl (step) =    0.900; Final time =       0.4596
+Level 8 step  1915 : dt =    2.927e-04; maxcfl (step) =    0.900; Final time =       0.4599
+Level 8 step  1916 : dt =    2.928e-04; maxcfl (step) =    0.900; Final time =       0.4602
+Level 8 step  1917 : dt =    2.929e-04; maxcfl (step) =    0.900; Final time =       0.4605
+Level 8 step  1918 : dt =    2.931e-04; maxcfl (step) =    0.900; Final time =       0.4608
+Level 8 step  1919 : dt =    2.932e-04; maxcfl (step) =    0.900; Final time =       0.4611
+Level 8 step  1920 : dt =    2.933e-04; maxcfl (step) =    0.900; Final time =       0.4614
+Level 8 step  1921 : dt =    2.934e-04; maxcfl (step) =    0.900; Final time =       0.4617
+Level 8 step  1922 : dt =    2.935e-04; maxcfl (step) =    0.900; Final time =       0.4620
+Level 8 step  1923 : dt =    2.937e-04; maxcfl (step) =    0.900; Final time =       0.4623
+Level 8 step  1924 : dt =    2.938e-04; maxcfl (step) =    0.900; Final time =       0.4625
+Level 8 step  1925 : dt =    2.939e-04; maxcfl (step) =    0.900; Final time =       0.4628
+Level 8 step  1926 : dt =    2.940e-04; maxcfl (step) =    0.900; Final time =       0.4631
+Level 8 step  1927 : dt =    2.941e-04; maxcfl (step) =    0.900; Final time =       0.4634
+Level 8 step  1928 : dt =    2.943e-04; maxcfl (step) =    0.900; Final time =       0.4637
+Level 8 step  1929 : dt =    2.944e-04; maxcfl (step) =    0.900; Final time =       0.4640
+Level 8 step  1930 : dt =    2.945e-04; maxcfl (step) =    0.900; Final time =       0.4643
+Level 8 step  1931 : dt =    2.946e-04; maxcfl (step) =    0.900; Final time =       0.4646
+Level 8 step  1932 : dt =    2.948e-04; maxcfl (step) =    0.900; Final time =       0.4649
+Level 8 step  1933 : dt =    2.949e-04; maxcfl (step) =    0.900; Final time =       0.4652
+Level 8 step  1934 : dt =    2.950e-04; maxcfl (step) =    0.900; Final time =       0.4655
+Level 8 step  1935 : dt =    2.951e-04; maxcfl (step) =    0.900; Final time =       0.4658
+Level 8 step  1936 : dt =    2.952e-04; maxcfl (step) =    0.900; Final time =       0.4661
+Level 8 step  1937 : dt =    2.954e-04; maxcfl (step) =    0.900; Final time =       0.4664
+Level 8 step  1938 : dt =    2.955e-04; maxcfl (step) =    0.900; Final time =       0.4667
+Level 8 step  1939 : dt =    2.956e-04; maxcfl (step) =    0.900; Final time =       0.4670
+Level 8 step  1940 : dt =    2.957e-04; maxcfl (step) =    0.900; Final time =       0.4673
+Level 8 step  1941 : dt =    2.959e-04; maxcfl (step) =    0.900; Final time =       0.4676
+Level 8 step  1942 : dt =    2.960e-04; maxcfl (step) =    0.900; Final time =       0.4679
+Level 8 step  1943 : dt =    2.961e-04; maxcfl (step) =    0.900; Final time =       0.4682
+Level 8 step  1944 : dt =    2.962e-04; maxcfl (step) =    0.900; Final time =       0.4684
+Level 8 step  1945 : dt =    2.964e-04; maxcfl (step) =    0.900; Final time =       0.4687
+Level 8 step  1946 : dt =    2.965e-04; maxcfl (step) =    0.900; Final time =       0.4690
+Level 8 step  1947 : dt =    2.966e-04; maxcfl (step) =    0.900; Final time =       0.4693
+Level 8 step  1948 : dt =    2.967e-04; maxcfl (step) =    0.900; Final time =       0.4696
+Level 8 step  1949 : dt =    2.969e-04; maxcfl (step) =    0.900; Final time =       0.4699
+Level 8 step  1950 : dt =    2.970e-04; maxcfl (step) =    0.900; Final time =       0.4702
+Level 8 step  1951 : dt =    2.971e-04; maxcfl (step) =    0.900; Final time =       0.4705
+Level 8 step  1952 : dt =    2.972e-04; maxcfl (step) =    0.900; Final time =       0.4708
+Level 8 step  1953 : dt =    2.974e-04; maxcfl (step) =    0.900; Final time =       0.4711
+Level 8 step  1954 : dt =    2.975e-04; maxcfl (step) =    0.900; Final time =       0.4714
+Level 8 step  1955 : dt =    2.976e-04; maxcfl (step) =    0.900; Final time =       0.4717
+Level 8 step  1956 : dt =    2.977e-04; maxcfl (step) =    0.900; Final time =       0.4720
+Level 8 step  1957 : dt =    2.979e-04; maxcfl (step) =    0.900; Final time =       0.4723
+Level 8 step  1958 : dt =    2.980e-04; maxcfl (step) =    0.900; Final time =       0.4726
+Level 8 step  1959 : dt =    2.981e-04; maxcfl (step) =    0.900; Final time =       0.4729
+Level 8 step  1960 : dt =    2.983e-04; maxcfl (step) =    0.900; Final time =       0.4732
+Level 8 step  1961 : dt =    2.984e-04; maxcfl (step) =    0.900; Final time =       0.4735
+Level 8 step  1962 : dt =    2.985e-04; maxcfl (step) =    0.900; Final time =       0.4738
+Level 8 step  1963 : dt =    2.986e-04; maxcfl (step) =    0.900; Final time =       0.4741
+Level 8 step  1964 : dt =    2.988e-04; maxcfl (step) =    0.900; Final time =       0.4744
+Level 8 step  1965 : dt =    2.989e-04; maxcfl (step) =    0.900; Final time =       0.4747
+Level 8 step  1966 : dt =    2.990e-04; maxcfl (step) =    0.900; Final time =       0.4750
+Level 8 step  1967 : dt =    2.992e-04; maxcfl (step) =    0.900; Final time =       0.4753
+Level 8 step  1968 : dt =    2.993e-04; maxcfl (step) =    0.900; Final time =       0.4756
+Level 8 step  1969 : dt =    2.994e-04; maxcfl (step) =    0.900; Final time =       0.4759
+Level 8 step  1970 : dt =    2.995e-04; maxcfl (step) =    0.900; Final time =       0.4762
+Level 8 step  1971 : dt =    2.997e-04; maxcfl (step) =    0.900; Final time =       0.4765
+Level 8 step  1972 : dt =    2.998e-04; maxcfl (step) =    0.900; Final time =       0.4768
+Level 8 step  1973 : dt =    2.999e-04; maxcfl (step) =    0.900; Final time =       0.4771
+Level 8 step  1974 : dt =    3.001e-04; maxcfl (step) =    0.900; Final time =       0.4774
+Level 8 step  1975 : dt =    3.002e-04; maxcfl (step) =    0.900; Final time =       0.4777
+Level 8 step  1976 : dt =    3.003e-04; maxcfl (step) =    0.900; Final time =       0.4780
+Level 8 step  1977 : dt =    3.005e-04; maxcfl (step) =    0.900; Final time =       0.4783
+Level 8 step  1978 : dt =    3.006e-04; maxcfl (step) =    0.900; Final time =       0.4786
+Level 8 step  1979 : dt =    3.007e-04; maxcfl (step) =    0.900; Final time =       0.4789
+Level 8 step  1980 : dt =    3.009e-04; maxcfl (step) =    0.900; Final time =       0.4792
+Level 8 step  1981 : dt =    3.010e-04; maxcfl (step) =    0.900; Final time =       0.4795
+Level 8 step  1982 : dt =    3.011e-04; maxcfl (step) =    0.900; Final time =       0.4798
+Level 8 step  1983 : dt =    3.013e-04; maxcfl (step) =    0.900; Final time =       0.4801
+Level 8 step  1984 : dt =    3.014e-04; maxcfl (step) =    0.900; Final time =       0.4804
+Level 8 step  1985 : dt =    3.015e-04; maxcfl (step) =    0.900; Final time =       0.4807
+Level 8 step  1986 : dt =    3.017e-04; maxcfl (step) =    0.900; Final time =       0.4810
+Level 8 step  1987 : dt =    3.018e-04; maxcfl (step) =    0.900; Final time =       0.4813
+Level 8 step  1988 : dt =    3.019e-04; maxcfl (step) =    0.900; Final time =       0.4816
+Level 8 step  1989 : dt =    3.021e-04; maxcfl (step) =    0.900; Final time =       0.4819
+Level 8 step  1990 : dt =    3.022e-04; maxcfl (step) =    0.900; Final time =       0.4822
+Level 8 step  1991 : dt =    3.023e-04; maxcfl (step) =    0.900; Final time =       0.4825
+Level 8 step  1992 : dt =    3.025e-04; maxcfl (step) =    0.900; Final time =       0.4828
+Level 8 step  1993 : dt =    3.026e-04; maxcfl (step) =    0.900; Final time =       0.4831
+Level 8 step  1994 : dt =    3.027e-04; maxcfl (step) =    0.900; Final time =       0.4834
+Level 8 step  1995 : dt =    3.029e-04; maxcfl (step) =    0.900; Final time =       0.4837
+Level 8 step  1996 : dt =    3.030e-04; maxcfl (step) =    0.900; Final time =       0.4840
+Level 8 step  1997 : dt =    3.032e-04; maxcfl (step) =    0.900; Final time =       0.4843
+Level 8 step  1998 : dt =    3.033e-04; maxcfl (step) =    0.900; Final time =       0.4846
+Level 8 step  1999 : dt =    3.034e-04; maxcfl (step) =    0.900; Final time =       0.4849
+Level 8 step  2000 : dt =    3.036e-04; maxcfl (step) =    0.900; Final time =       0.4852
+Level 8 step  2001 : dt =    3.037e-04; maxcfl (step) =    0.900; Final time =       0.4855
+Level 8 step  2002 : dt =    3.038e-04; maxcfl (step) =    0.900; Final time =       0.4858
+Level 8 step  2003 : dt =    3.040e-04; maxcfl (step) =    0.900; Final time =       0.4862
+Level 8 step  2004 : dt =    3.041e-04; maxcfl (step) =    0.900; Final time =       0.4865
+Level 8 step  2005 : dt =    3.043e-04; maxcfl (step) =    0.900; Final time =       0.4868
+Level 8 step  2006 : dt =    3.044e-04; maxcfl (step) =    0.900; Final time =       0.4871
+Level 8 step  2007 : dt =    3.045e-04; maxcfl (step) =    0.900; Final time =       0.4874
+Level 8 step  2008 : dt =    3.047e-04; maxcfl (step) =    0.900; Final time =       0.4877
+Level 8 step  2009 : dt =    3.048e-04; maxcfl (step) =    0.900; Final time =       0.4880
+Level 8 step  2010 : dt =    3.050e-04; maxcfl (step) =    0.900; Final time =       0.4883
+Level 8 step  2011 : dt =    3.051e-04; maxcfl (step) =    0.900; Final time =       0.4886
+Level 8 step  2012 : dt =    3.052e-04; maxcfl (step) =    0.900; Final time =       0.4889
+Level 8 step  2013 : dt =    3.054e-04; maxcfl (step) =    0.900; Final time =       0.4892
+Level 8 step  2014 : dt =    3.055e-04; maxcfl (step) =    0.900; Final time =       0.4895
+Level 8 step  2015 : dt =    3.057e-04; maxcfl (step) =    0.900; Final time =       0.4898
+Level 8 step  2016 : dt =    3.058e-04; maxcfl (step) =    0.900; Final time =       0.4901
+Level 8 step  2017 : dt =    3.060e-04; maxcfl (step) =    0.900; Final time =       0.4904
+Level 8 step  2018 : dt =    3.061e-04; maxcfl (step) =    0.900; Final time =       0.4907
+Level 8 step  2019 : dt =    3.062e-04; maxcfl (step) =    0.900; Final time =       0.4910
+Level 8 step  2020 : dt =    3.064e-04; maxcfl (step) =    0.900; Final time =       0.4913
+Level 8 step  2021 : dt =    3.065e-04; maxcfl (step) =    0.900; Final time =       0.4916
+Level 8 step  2022 : dt =    3.067e-04; maxcfl (step) =    0.900; Final time =       0.4920
+Level 8 step  2023 : dt =    3.068e-04; maxcfl (step) =    0.900; Final time =       0.4923
+Level 8 step  2024 : dt =    3.070e-04; maxcfl (step) =    0.900; Final time =       0.4926
+Level 8 step  2025 : dt =    3.071e-04; maxcfl (step) =    0.900; Final time =       0.4929
+Level 8 step  2026 : dt =    3.072e-04; maxcfl (step) =    0.900; Final time =       0.4932
+Level 8 step  2027 : dt =    3.074e-04; maxcfl (step) =    0.900; Final time =       0.4935
+Level 8 step  2028 : dt =    3.075e-04; maxcfl (step) =    0.900; Final time =       0.4938
+Level 8 step  2029 : dt =    3.077e-04; maxcfl (step) =    0.900; Final time =       0.4941
+Level 8 step  2030 : dt =    3.078e-04; maxcfl (step) =    0.900; Final time =       0.4944
+Level 8 step  2031 : dt =    3.080e-04; maxcfl (step) =    0.900; Final time =       0.4947
+Level 8 step  2032 : dt =    3.081e-04; maxcfl (step) =    0.900; Final time =       0.4950
+Level 8 step  2033 : dt =    3.083e-04; maxcfl (step) =    0.900; Final time =       0.4953
+Level 8 step  2034 : dt =    3.084e-04; maxcfl (step) =    0.900; Final time =       0.4956
+Level 8 step  2035 : dt =    3.086e-04; maxcfl (step) =    0.900; Final time =       0.4960
+Level 8 step  2036 : dt =    3.087e-04; maxcfl (step) =    0.900; Final time =       0.4963
+Level 8 step  2037 : dt =    3.089e-04; maxcfl (step) =    0.900; Final time =       0.4966
+Level 8 step  2038 : dt =    3.090e-04; maxcfl (step) =    0.900; Final time =       0.4969
+Level 8 step  2039 : dt =    3.092e-04; maxcfl (step) =    0.900; Final time =       0.4972
+Level 8 step  2040 : dt =    3.093e-04; maxcfl (step) =    0.900; Final time =       0.4975
+Level 8 step  2041 : dt =    3.095e-04; maxcfl (step) =    0.900; Final time =       0.4978
+Level 8 step  2042 : dt =    3.096e-04; maxcfl (step) =    0.900; Final time =       0.4981
+Level 8 step  2043 : dt =    3.098e-04; maxcfl (step) =    0.900; Final time =       0.4984
+Level 8 step  2044 : dt =    3.099e-04; maxcfl (step) =    0.900; Final time =       0.4987
+Level 8 step  2045 : dt =    3.101e-04; maxcfl (step) =    0.900; Final time =       0.4990
+Level 8 step  2046 : dt =    3.102e-04; maxcfl (step) =    0.900; Final time =       0.4994
+Level 8 step  2047 : dt =    3.104e-04; maxcfl (step) =    0.900; Final time =       0.4997
+Level 8 step  2048 : dt =    3.105e-04; maxcfl (step) =    0.900; Final time =       0.5000
+Level 8 step  2049 : dt =    2.028e-05; maxcfl (step) =    0.059; Final time =       0.5000
+   WARNING : Took small time step which was    6.5% of desired dt.
+[libsc] Statistics for INIT
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         0.165649 (0.00132 = 0.797%)
+[libsc]    Minimum attained at rank    23: 0.164202
+[libsc]    Maximum attained at rank    28: 0.171327
+[libsc] Statistics for REGRID
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for OUTPUT
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         7.6741e-07 (6.94e-07 = 90.5%)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     8: 2.14577e-06
+[libsc] Statistics for CHECK
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for ADVANCE
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         1018.86 (45.9 = 4.51%)
+[libsc]    Minimum attained at rank     8: 969.296
+[libsc]    Maximum attained at rank     1: 1113.05
+[libsc] Statistics for EXCHANGE
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         93.6933 (49.2 = 52.5%)
+[libsc]    Minimum attained at rank    10: 15.7196
+[libsc]    Maximum attained at rank     4: 154.191
+[libsc] Statistics for WALLTIME
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         1146.07 (0.000247 = 2.15e-05%)
+[libsc]    Minimum attained at rank    26: 1146.07
+[libsc]    Maximum attained at rank     8: 1146.07
+[libsc] Statistics for UNACCOUNTED
+[libsc]    Global number of values:    32
+[libsc]    Mean value (std. dev.):         33.3511 (29.1 = 87.4%)
+[libsc]    Minimum attained at rank     4: 10.5494
+[libsc]    Maximum attained at rank    10: 134.57
+[libsc] Procs 32 advance 2051 1018.86 exchange 93.6933 regrid 0
+[libsc] Max/P 32 advance 2051 1113.05 exchange 154.191 regrid 0
+ 
+TACC: Shutdown complete. Exiting.
