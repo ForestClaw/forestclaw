@@ -4,7 +4,9 @@ use strict;
 
 my ($procs, $numad, $tad, $tex);
 my (%proclist, %proclevels, %procad, %procex);
-my ($level, $adarr, $exarr);
+my ($level, $adarr, $exarr, $step);
+
+# Grab data from output files
 
 while (<>) {
 
@@ -21,12 +23,12 @@ while (<>) {
 			$proclevels{$procs} = 1;
 			$procad{$procs} = \%adhash;
 			$procex{$procs} = \%exhash;
-			print "New proc $procs at $proclevels{$procs}\n";
+			#print "New proc $procs at $proclevels{$procs}\n";
 
 		}
 		else {
 			$proclevels{$procs}++;
-			print "Exi proc $procs at $proclevels{$procs}\n";
+			#print "Exi proc $procs at $proclevels{$procs}\n";
 		}
 
 		$level = $proclevels{$procs};
@@ -37,12 +39,49 @@ while (<>) {
 	}
 }
 
+# Create strong scaling analysis
+
+open ADFILE, ">advance_strong.txt";
+open EXFILE, ">exchange_strong.txt";
+
 foreach $procs (sort { $a <=> $b } keys %proclist) {
-	print "Procs for $procs\n";
+	print ADFILE "$procs";
+	print EXFILE "$procs";
 
 	$adarr = $procad{$procs};
+	$exarr = $procex{$procs};
 	foreach $level (sort { $a <=> $b } keys %$adarr) {
-		print "$level\n";
+		print ADFILE "\t$adarr->{$level}";
+		print EXFILE "\t$exarr->{$level}";
 	}
 
+	print ADFILE "\n";
+	print EXFILE "\n";
 }
+
+close ADFILE;
+close EXFILE;
+
+# Create weak scaling analysis
+
+open ADFILE, ">advance_weak.txt";
+open EXFILE, ">exchange_weak.txt";
+
+foreach $step (0, 1, 2) {
+	$procs = 2 ** (2 * $step);
+	print ADFILE "$procs";
+	print EXFILE "$procs";
+
+	$adarr = $procad{$procs};
+	$exarr = $procex{$procs};
+	for ($level = 3; $level <= 8; ++$level) {
+		print ADFILE "\t$adarr->{$level - (2 - $step)}";
+		print EXFILE "\t$exarr->{$level - (2 - $step)}";
+	}
+
+	print ADFILE "\n";
+	print EXFILE "\n";
+}
+
+close ADFILE;
+close EXFILE;
