@@ -26,12 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
+
 #include "fclaw2d_typedefs.h"
 
 #include "forestclaw2d.h"
 
 #include "subcycle_manager.H"
 #include "amr_regrid.H"
+#include "ClawPatch.H"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
 
