@@ -1,10 +1,12 @@
 #! /bin/bash
 
-if test -z "$1" ; then
-	echo "Argument: the size of mx = my"
+if test -z "$3" ; then
+	echo "Arguments: startnumprocs, maxnumprocs, mxy"
 	exit 1
 fi
-MX="$1"
+SNP="$1"
+MNP="$2"
+MXY="$3"
 
 (cat <<EOF
 # This is the Gnuplot script
@@ -18,8 +20,8 @@ set format y "%.2e"
 
 # Strong scaling plots
 
-set xtics scale 0,0 1,2,16
-set title "Advection, strong scaling for mx = my = $MX, uniform grid"
+set xtics scale 0,0 $SNP,2,$MNP
+set title "Advection, strong scaling for mx = my = $MXY, uniform grid"
 
 set ylabel "Compute time per time step (seconds)"
 set output "advance_strong.eps"
@@ -45,8 +47,8 @@ plot "exchange_strong.txt" using 1:2 title "Level 1", \
 
 # Weak scaling plots
 
-set xtics scale 0,0 1,4,16
-set title "Advection, weak scaling for mx = my = $MX, uniform grid"
+set xtics scale 0,0 $SNP,4,$MNP
+set title "Advection, weak scaling for mx = my = $MXY, uniform grid"
 
 set ylabel "Compute time per time step (seconds)"
 set output "advance_weak.eps"

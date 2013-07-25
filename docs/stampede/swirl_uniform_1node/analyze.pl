@@ -1,10 +1,18 @@
 #! /usr/bin/perl
 
 use strict;
+use Getopt::Std;
 
+my (%opt, $startproc);
 my ($procs, $numad, $tad, $tex);
 my (%proclist, %proclevels, %procad, %procex);
 my ($level, $adarr, $exarr, $step);
+
+# Process command line options
+
+$opt{s} = 1;
+getopts ("s:", \%opt);
+$startproc = $opt{s};
 
 # Grab data from output files
 
@@ -68,7 +76,7 @@ open ADFILE, ">advance_weak.txt";
 open EXFILE, ">exchange_weak.txt";
 
 foreach $step (0, 1, 2) {
-	$procs = 2 ** (2 * $step);
+	$procs = $startproc * 2 ** (2 * $step);
 	print ADFILE "$procs";
 	print EXFILE "$procs";
 
