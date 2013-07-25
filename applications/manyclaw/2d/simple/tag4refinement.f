@@ -1,5 +1,5 @@
-      subroutine tag_for_refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      q,init_flag, tag_patch)
+      subroutine simple_tag4refinement(mx,my,mbc,meqn,
+     &      xlower,ylower,dx,dy,q,init_flag, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
@@ -16,20 +16,21 @@
 
 c     # Refine based only on first variable in system.
       mq = 1
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
+      do i = 1,mx
+         do j = 1,my
 
-            if (init_flag .eq. 1) then
+c            if (init_flag .eq. 1) then
+            if (.false.) then
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
-               if (abs(xc - 0.5d0) < dx) then
+               if (abs(xc - 0.5d0) .lt. dx) then
                   tag_patch = 1
                   return
                endif
             else
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.5d0) then
+               if (qmax - qmin .gt. 0.25d0) then
                   tag_patch = 1
                   return
                endif
@@ -40,8 +41,8 @@ c     # Refine based only on first variable in system.
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag_for_coarsening(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      qcoarsened, tag_patch)
+      subroutine simple_tag4coarsening(mx,my,mbc,meqn,
+     &      xlower,ylower,dx,dy, qcoarsened, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch
@@ -57,9 +58,9 @@ c     # coarsening criteria different from the refinement criteria.
 c     # Also, we don't check for an init_flag, since it is unlikely that
 c     # we would coarsen an initial grid.
 
+      tag_patch = 0
       qmin = 100.d0
       qmax = -100.d0
-      tag_patch = 0
       mq = 1
       do i = 1,mx
          do j = 1,my

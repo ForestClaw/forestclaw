@@ -98,6 +98,9 @@ void simple_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &simple_patch_physical_bc;
     sf->f_patch_single_step_update = &simple_patch_single_step_update;
 
+    link_regrid_functions(domain,simple_patch_tag4refinement,
+                          simple_patch_tag4coarsening);
+
     amr_manyclaw_link_to_clawpatch();
 }
 
@@ -117,7 +120,7 @@ void simple_patch_setup(fclaw2d_domain_t *domain,
     /* This is called once when a new patch is created. */
     manyclaw_set_solver(domain,this_patch,this_block_idx,this_patch_idx);
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_tbb,
+    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial,
                                  updater_first_order_dimensional_splitting);
 
 
@@ -165,6 +168,71 @@ double simple_patch_single_step_update(fclaw2d_domain_t *domain,
                                        this_patch_idx,t,dt);
     return maxcfl;
 }
+
+/* -----------------------------------------------------------------
+   Default routine for tagging patches for refinement and coarsening
+   ----------------------------------------------------------------- */
+fclaw_bool simple_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          int initflag)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    int tag_patch = 0;
+    simple_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    return tag_patch == 1;
+}
+
+fclaw_bool simple_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno,
+                                      int patchno)
+{
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* qcoarse = cp->q();
+
+    int tag_patch = 1;  // == 0 or 1
+    simple_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    return tag_patch == 0;
+}
+
+
 
 
 #ifdef __cplusplus

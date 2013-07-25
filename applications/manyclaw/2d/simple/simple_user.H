@@ -28,6 +28,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
+
+extern "C"
+{
+    void simple_tag4refinement_(const int& mx,const int& my,const int& mbc,
+                               const int& meqn, const double& xlower,
+                               const double& ylower, const double& dx, const double& dy,
+                               double q[], const int& init_flag, int& tag_patch);
+
+    void simple_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+                               const int& meqn,const double& xlower,
+                               const double& ylower, const double& dx, const double& dy,
+                               double qcoarsened[], int& tag_patch);
+
+}
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -69,6 +85,17 @@ double simple_patch_single_step_update(fclaw2d_domain_t *domain,
                                        int this_patch_idx,
                                        double t,
                                        double dt);
+
+fclaw_bool simple_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       int this_block_idx, int this_patch_idx,
+                                       int initflag);
+
+fclaw_bool simple_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       int blockno,
+                                       int patchno);
+
 
 #ifdef __cplusplus
 #if 0

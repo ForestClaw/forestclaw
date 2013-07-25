@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "subcycle_manager.H"
 #include "amr_regrid.H"
+#include "amr_utils.H"
 #include "ClawPatch.H"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
