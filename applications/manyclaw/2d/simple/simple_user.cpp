@@ -38,6 +38,54 @@ extern "C"
 #endif
 #endif
 
+/* -----------------------------------------------------------
+   Routines below call standard Clawpack routines indirectly through
+   calls to ManyClaw interfaces, found in
+             forestclaw/src/solvers/amr_manyclaw/amr_manyclaw.cpp
+
+   There are three groups of function pointers that need to be set somewhere.
+   fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
+   fclaw2d_solver_functions_t *rf = get_regrid_functions(domain);
+   fclaw2d_solver_functions_t *of = get_output_functions(domain);
+
+   Solver functions (must all be defined).
+   -------------------------------------------------------------------
+   sf->f_patch_setup(...)                      --> patch_setup(...) (call setaux, etc)
+   sf->f_patch_initialize(...)                 --> patch_initialize(...)  (call qinit, etc)
+   sf->f_patch_physical_bc(...)                --> patch_physical_bc(...) (call bc2, etc)
+   sf->f_patch_single_step_update(...)         --> patch_single_step_update(...)
+                                                   (call b4step2, step2, src2, etc)
+
+   Manyclaw versions of solver functions that can be called
+   --------------------------------------------------------
+   amr_manyclaw_setprob(...)  --> setprob_()
+   amr_manyclaw_setaux(...)   --> setaux_(...)
+   amr_manyclaw_qinit(...)    --> qinit_(...)
+   amr_manyclaw_bc2(...)      --> bc2_(...)
+   amr_manyclaw_b4step2(...)  --> b4step2_(...)
+   amr_manyclaw_step2(...)    --> step2_(...) (the amrclaw version;  doesn't update)
+   amr_manyclaw_src2(...)     --> src2_(...)
+
+   The routines below are linked to ForestClaw routines with a call to
+   'simple_link_solvers'
+
+
+
+   Tagging for refinement and coarsening
+   -----------------------------------------
+
+
+   This routine is linked to a problem setup routine using 'link_problem_setup'.
+   It is not done above because this is not technically part of a 'solver'. But the
+   user could call a solver dependent function here.
+
+   User defined 'simple' routine            linked to ForestClaw as :
+   -------------------------------------------------------------------
+   simple_problem_setup(...)             --> problem_setup(...) (call setprob, etc)
+
+
+   --------------------------------------------------------------------------------- */
+
 void simple_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -53,43 +101,6 @@ void simple_link_solvers(fclaw2d_domain_t *domain)
     amr_manyclaw_link_to_clawpatch();
 }
 
-/* -----------------------------------------------------------
-   Routines below call standard Clawpack routines indirectly through
-   calls to ManyClaw interfaces, found in
-             forestclaw/src/solvers/amr_manyclaw/amr_manyclaw.cpp
-
-   Calls to Clawpack routines are as follows :
-   -------------------------------------------
-   amr_manyclaw_setprob(...)  --> setprob_()
-   amr_manyclaw_setaux(...)   --> setaux_(...)
-   amr_manyclaw_qinit(...)    --> qinit_(...)
-   amr_manyclaw_bc2(...)      --> bc2_(...)
-   amr_manyclaw_b4step2(...)  --> b4step2_(...)
-   amr_manyclaw_step2(...)    --> step2_(...) (the amrclaw version;  doesn't update)
-   amr_manyclaw_src2(...)     --> src2_(...)
-
-   The routines below are linked to ForestClaw routines with a call to
-   'simple_link_solvers'
-
-   User defined 'simple' routines            linked to ForestClaw as :
-   -------------------------------------------------------------------
-   simple_patch_setup(...)               --> patch_setup(...) (call setaux, etc)
-   simple_patch_initialize(...)          --> patch_initialize(...)  (call qinit, etc)
-   simple_patch_physical_bc(...)         --> patch_physical_bc(...) (call bc2, etc)
-   simple_patch_single_step_update(...)  --> patch_single_step_update(...)
-                                            (call b4step2, step2, src2, etc)
-
-
-   This routine is linked to a problem setup routine using 'link_problem_setup'.
-   It is not done above because this is not technically part of a 'solver'. But the
-   user could call a solver dependent function here.
-
-   User defined 'simple' routine            linked to ForestClaw as :
-   -------------------------------------------------------------------
-   simple_problem_setup(...)             --> problem_setup(...) (call setprob, etc)
-
-
-   --------------------------------------------------------------------------------- */
 
 void simple_problem_setup(fclaw2d_domain_t* domain)
 {
