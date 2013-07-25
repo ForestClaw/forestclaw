@@ -1,5 +1,11 @@
 #! /bin/bash
 
+if test -z "$1" ; then
+	echo "Argument: the size of mx = my"
+	exit 1
+fi
+MX="$1"
+
 (cat <<EOF
 # This is the Gnuplot script
 
@@ -13,7 +19,7 @@ set format y "%.2e"
 # Strong scaling plots
 
 set xtics scale 0,0 1,2,16
-set title "Advection, strong scaling for mx = my = 8, uniform grid"
+set title "Advection, strong scaling for mx = my = $MX, uniform grid"
 
 set ylabel "Compute time per time step (seconds)"
 set output "advance_strong.eps"
@@ -40,7 +46,7 @@ plot "exchange_strong.txt" using 1:2 title "Level 1", \
 # Weak scaling plots
 
 set xtics scale 0,0 1,4,16
-set title "Advection, weak scaling for mx = my = 8, uniform grid"
+set title "Advection, weak scaling for mx = my = $MX, uniform grid"
 
 set ylabel "Compute time per time step (seconds)"
 set output "advance_weak.eps"
