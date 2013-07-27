@@ -100,9 +100,6 @@ main (int argc, char **argv)
      here) */
   simple_link_solvers(domain);
 
-  /* Plain vanilla manyclaw algorithm.  This version doesn't require simple_user.{H,cpp} */
-  /* amr_manyclaw_link_solvers(domain); */
-
   /* ---------------------------------------------------------------
      Run
      --------------------------------------------------------------- */
