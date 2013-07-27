@@ -3,8 +3,9 @@
 TARGET = swirl
 GEO = cart
 
+include $(FORESTCLAW)/Make.defs.local
+
 # -----------------------------------------------------------
-FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 
 # -----------------------------------------------------------
@@ -24,15 +25,13 @@ exampleobjs = \
 # Solver routines (several solvers can be added here)
 include Makefile.manyclaw.inc
 solverobjs = $(manyclaw_objs)
+solverlinkers = $(manyclaw_linkers)
 solverincludes = $(manyclaw_includes)
 
 # Mapping routines
-geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
+geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
-
-# Specify location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
@@ -48,7 +47,7 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .c.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .f.o:
@@ -58,7 +57,7 @@ default: $(TARGET)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
-	$(P4EST_LIBS) -o $@
+	$(P4EST_LIBS) $(solverlinkers) -o $@
 
 clean:
 	rm -f *.o $(TARGET) $(exampleobjs)

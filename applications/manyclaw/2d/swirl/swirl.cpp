@@ -100,15 +100,11 @@ main (int argc, char **argv)
      here) */
   swirl_link_solvers(domain);
 
-  /* Plain vanilla manyclaw algorithm.  This version doesn't require swirl_user.{H,cpp} */
-  /* amr_manyclaw_link_solvers(domain); */
-
   /* ---------------------------------------------------------------
      Run
      --------------------------------------------------------------- */
   amrinit(&domain);
   amrrun(&domain);
-
   amrreset(&domain);
 
   sc_options_destroy(options);         /* this could be moved up */

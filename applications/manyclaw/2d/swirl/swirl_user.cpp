@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_manyclaw.H"
 #include "swirl_user.H"
 
+
+#include <manyclaw/manyclaw.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -104,7 +107,10 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_patch_idx)
 {
     /* This is called once when a new patch is created. */
+    manyclaw_set_solver(domain,this_patch,this_block_idx,this_patch_idx);
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial,
+                                 updater_first_order_dimensional_splitting);
 }
 
 
@@ -125,11 +131,12 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              int this_patch_idx,
                              double t,
                              double dt,
-                             fclaw_bool intersects_bc[])
+                             fclaw_bool intersects_bc[],
+                             fclaw_bool time_interp)
 {
     /* This is called everytime a patch needs physical boundary conditions */
     amr_manyclaw_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc);
+                     t,dt,intersects_bc,time_interp);
 }
 
 
