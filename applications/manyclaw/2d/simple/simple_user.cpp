@@ -122,8 +122,6 @@ void simple_patch_setup(fclaw2d_domain_t *domain,
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial,
                                  updater_first_order_dimensional_splitting);
-
-
 }
 
 
