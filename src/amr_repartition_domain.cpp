@@ -168,7 +168,6 @@ void cb_build_patches(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    // Grid doesn't change
     set_clawpatch(domain,this_patch,this_block_idx,this_patch_idx);
 
     // Setup new patch using solver specific routine
@@ -245,6 +244,10 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
 void build_initial_domain(fclaw2d_domain_t* domain)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
+
+    // init_domain_data(*domain) is not called here, because it is
+    // called in <main>.cpp.  This allows the user to grap gparms,
+    // setup_problem(), etc before getting here .
 
     // Allocate memory for new blocks and patches.
     init_block_and_patch_data(domain);
