@@ -16,9 +16,7 @@ c     #     0.1  otherwise
        double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
        integer i, j,mq
-       double precision xlow, ylow, s, r2, xc,yc, w
-       xc = 0.2d0
-       yc = 0.21d0
+       double precision xlow, ylow, w
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
@@ -28,14 +26,6 @@ c     #     0.1  otherwise
                 ylow = ylower + (j-1)*dy
                 call cellave2(xlow,ylow,dx,dy,w)
                 q(i,j,mq) = w
-
-
-c                s = 0.5d0
-c                if (xi .lt. s) then
-c                   q(i,j,mq) = 0.d0
-c                else
-c                   q(i,j,mq) = 1.d0
-c                endif
 
              enddo
           enddo
@@ -50,11 +40,9 @@ c                endif
       double precision xc,yc
       double precision xs,ys, rs
 
-      xs = 0.5d0
-      ys = 0.5d0
+      xs = 0.25d0
+      ys = 0.25d0
 
       rs = sqrt((xc - xs)**2 + (yc - ys)**2)
-
-
-      fdisc = rs - 0.25d0
+      fdisc = rs - 0.2d0
       end
