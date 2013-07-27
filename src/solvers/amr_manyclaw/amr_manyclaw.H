@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct Solver;
 
-/* I know this is one 'extern C' too many, but I like the indentation here */
 extern "C"
 {
     void setprob_();
@@ -83,20 +82,10 @@ extern "C"
                                const int& meqn, double qin[], double qout[]);
 
 
-    /* --------------------------------------------------------------------
-       Time stepping
-       -------------------------------------------------------------------- */
-    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc,
-                     const int method[], const int mthlim[], const int& mcapa,
-                     const int& mwaves, const int& mx, const int& my, double qold[],
-                     double auxold[], const double& dx, const double& dy, const double& dt,
-                     const double& cfl, double work[], const int& mwork, const double& xlower,
-                     const double& ylower, const int& level, const double& t, double fp[],
-                     double fm[], double gp[], double gm[]);
+    void print_array_(const int& mx,const int& my,const int& mbc,
+                      const int& meqn,double q[]);
+
 }
-
-
-
 
 
 #ifdef __cplusplus
@@ -155,11 +144,16 @@ void amr_manyclaw_setprob(fclaw2d_domain_t* domain);
 struct amr_manyclaw_patch_data
 {
     FArrayBox auxarray;
-    Solver *solver;
     int maux;
+
+    /* Manyclaw solver object */
+    Solver solver;
+
+    /* Riemann solver and update routines */
     rp_grid_eval_t rp_grid_eval;
     updater_t update;
-    /* Add any data here that the patch may also need */
+
+    /* Add any other data here that the patch may also need */
 };
 
 
@@ -217,10 +211,10 @@ double amr_manyclaw_step2_rhs(fclaw2d_domain_t *domain,
                               int this_patch_idx,
                               double t,
                               double *rhs);
+
+
 void manyclaw_set_riemann_solvers(fclaw2d_patch_t *this_patch,
                                   rp_grid_eval_t rp_grid_eval, updater_t update);
-
-
 
 
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);

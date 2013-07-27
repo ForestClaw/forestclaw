@@ -31,13 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <manyclaw/manyclaw.h>
 
-extern "C"
-{
-    void print_array_(const int& mx,const int& my,const int& mbc,
-                      const int& meqn,double q[]);
-}
-
-
 void set_manyclaw_parms(fclaw2d_domain_t* domain,amr_manyclaw_parms_t* manyclaw_parms)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
@@ -111,12 +104,16 @@ void manyclaw_set_solver(fclaw2d_domain_t *domain,
     amr_manyclaw_parms_t *manyclaw_parms = get_manyclaw_parms(domain);
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_manyclaw_patch_data_t *mc_data = get_manyclaw_patch_data(cp);
+    Solver &solver = mc_data->solver;
 
-    int numcells[2] = {gparms->mx,gparms->my};
+    /* Define the 'Solver' object */
+    int mx = gparms->mx;
+    int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
     int mwaves = manyclaw_parms->mwaves;
-    mc_data->solver = new Solver(numcells,meqn,mbc,mwaves);
+    int numcells[2] = {mx, my};
+    solver.define(numcells,meqn,mbc,mwaves);
 }
 
 
@@ -178,6 +175,7 @@ void amr_manyclaw_qinit(fclaw2d_domain_t *domain,
     const amr_options_t *gparms              = get_domain_parms(domain);
     ClawPatch *cp                            = get_clawpatch(this_patch);
     amr_manyclaw_parms_t *manyclaw_parms     = get_manyclaw_parms(domain);
+
     amr_manyclaw_patch_data_t *manyclaw_patch_data = get_manyclaw_patch_data(cp);
 
     set_block_(&this_block_idx);
@@ -364,19 +362,12 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
 
     set_block_(&this_block_idx);
 
-    int level = this_patch->level;
+    // int level = this_patch->level;
 
     cp->save_current_step();  /* Save in case we need to retake the step */
 
-    double* qold_mlast = cp->q();
-
-    FArrayBox qold_array = cp->newGrid();
-    double *qold = qold_array.dataPtr();  /* A new grid that has the same size as q() */
-
-    reorder2new(domain,qold_mlast,qold);
-
     double* aux = mc_data->auxarray.dataPtr();
-    int maux = manyclaw_parms->maux;
+    // int maux = manyclaw_parms->maux;
 
     // Global to all patches
     int mx = gparms->mx;
@@ -385,62 +376,46 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     int meqn = gparms->meqn;
 
     // Specific to the patch
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
+    // double xlower = cp->xlower();
+    // double ylower = cp->ylower();
     double dx = cp->dx();
-    double dy = cp->dy();
+    // double dy = cp->dy();
 
     // Specific to solver
     int mwaves = manyclaw_parms->mwaves;
 
-    // int maxm = max(mx,my);
-
-    double cflgrid;
-
-#if 0
-    int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
-    double* work = new double[mwork];
-
-    int size = meqn*(mx+2*mbc)*(my+2*mbc);
-    double* fp = new double[size];
-    double* fm = new double[size];
-    double* gp = new double[size];
-    double* gm = new double[size];
-#endif
-
-    /* This is more or less equivalent to the amrclaw routine 'stepgrid' and
-       takes a step on a single grid and updates the grid with the new solution
+    /* ManyClaw update :
+       This takes a step on a single grid and updates the grid with the
+       & new solution
     */
 
-    Solver *solver = mc_data->solver;
+    Solver &solver = mc_data->solver;
     double dtdx = dt/dx;
 
-    mc_data->rp_grid_eval(&qold[0], &aux[0],
-                          mx, my, &solver->amdq[0], &solver->apdq[0],
-                          &solver->wave[0], &solver->wave_speed[0]);
+    double* qold_mlast = cp->q();
+    FArrayBox qold_mfirst_array = cp->newGrid(); /* Create a scratch grid */
+    double *qold_mfirst = qold_mfirst_array.dataPtr();
+    reorder2new(domain,qold_mlast,qold_mfirst);
 
-    mc_data->update(&qold[0], &aux[0],
-                    mx, my,&solver->amdq[0], &solver->apdq[0], &solver->wave[0],
-                    &solver->wave_speed[0],mbc, meqn, dtdx);
+    mc_data->rp_grid_eval(&qold_mfirst[0], &aux[0],
+                          mx, my,
+                          &solver.amdq[0],
+                          &solver.apdq[0],
+                          &solver.wave[0],
+                          &solver.wave_speed[0]);
 
-    cflgrid = mc_data->solver->cfl(mx, my, mbc, meqn, mwaves, dtdx);
+    mc_data->update(&qold_mfirst[0], &aux[0],
+                    mx, my,
+                    &solver.amdq[0],
+                    &solver.apdq[0],
+                    &solver.wave[0],
+                    &solver.wave_speed[0],
+                    mbc, meqn, dtdx);
 
-#if 0
-    clawpatch2_(maxm, meqn, maux, mbc, manyclaw_parms->method,
-                manyclaw_parms->mthlim, manyclaw_parms->mcapa, mwaves,
-                mx, my, qold,
-                aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,
-                level,t, fp, fm, gp, gm);
+    reorder2old(domain,qold_mfirst,qold_mlast);
 
-    delete [] fp;
-    delete [] fm;
-    delete [] gp;
-    delete [] gm;
+    double cflgrid = solver.cfl(mx, my, mbc, meqn, mwaves, dtdx);
 
-    delete [] work;
-#endif
-
-    reorder2old(domain,qold,cp->q());
 
     return cflgrid;
 }
@@ -592,7 +567,6 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
-    delete manyclaw_patch_data->solver;
     delete manyclaw_patch_data;
 
     // or?
