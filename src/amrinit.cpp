@@ -69,13 +69,6 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    /*
-    set_clawpatch(domain,this_patch,this_block_idx, this_patch_idx);
-
-    // One-time setup of patch
-    (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
-    */
-
     fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
 
     // Set initial values on patch
@@ -117,6 +110,7 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             (sf->f_patch_initialize)(new_domain,fine_patch,blockno,fine_patchno);
         }
     }
+
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
         // We don't coarsen for the initial time step
