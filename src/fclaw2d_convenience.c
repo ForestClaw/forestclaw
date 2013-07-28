@@ -85,8 +85,6 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
                   (int) mesh->ghost_num_quadrants);
     domain->num_blocks = nb = (int) conn->num_trees;
     domain->blocks = P4EST_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
-    domain->patch_to_block =
-        P4EST_ALLOC (int, wrap->p4est->local_num_quadrants);
     domain->possible_maxlevel = P4EST_QMAXLEVEL;
     local_num_patches = 0;
     local_minlevel = domain->possible_maxlevel;
@@ -163,9 +161,10 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
                 currentbylevel[level]->u.next = patch;
                 currentbylevel[level] = patch;
             }
-            domain->patch_to_block[local_num_patches++] = i;
+            P4EST_ASSERT (i == (int) mesh->quad_to_tree[local_num_patches]);
             tree_minlevel = SC_MIN (tree_minlevel, level);
             tree_maxlevel = SC_MAX (tree_maxlevel, level);
+            local_num_patches++;
         }
         P4EST_ASSERT (block->num_patches == 0 ||
                       tree_maxlevel == (int) tree->maxlevel);
@@ -280,7 +279,6 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
         P4EST_FREE (block->patches);
         P4EST_FREE (block->patchbylevel);
     }
-    P4EST_FREE (domain->patch_to_block);
     P4EST_FREE (domain->blocks);
 
     P4EST_FREE (domain->ghost_patches);
