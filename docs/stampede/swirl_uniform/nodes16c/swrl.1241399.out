@@ -1,6 +1,6 @@
 Level 1
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=1 --maxlevel=1
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=1 --maxlevel=1
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -16,7 +16,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -37,7 +37,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -57,7 +57,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -65,12 +65,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 1 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 4 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 1 maxlevel 1
 Level 1 step     0 : dt =    5.000e-03; maxcfl (step) =    0.159; Final time =       0.0050
 Level 1 step     1 : dt =    2.831e-02; maxcfl (step) =    0.900; Final time =       0.0333
 Level 1 step     2 : dt =    2.832e-02; maxcfl (step) =    0.898; Final time =       0.0616
@@ -91,51 +90,52 @@ Level 1 step    16 : dt =    3.692e-02; maxcfl (step) =    0.856; Final time =  
 Level 1 step    17 : dt =    1.567e-03; maxcfl (step) =    0.035; Final time =       0.5000
    WARNING : Took small time step which was    4.0% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.000452995 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.000452995
-[libsc]    Maximum attained at rank     0: 0.000452995
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000868029 (0.000516 = 59.4%)
+[libsc]    Minimum attained at rank   242: 0.000268936
+[libsc]    Maximum attained at rank   227: 0.00262499
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0 (0)
-[libsc]    Minimum attained at rank     0: 0
-[libsc]    Maximum attained at rank     0: 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.88127e-07 (4.32e-07 = 230%)
+[libsc]    Minimum attained at rank     1: 0
+[libsc]    Maximum attained at rank   142: 2.38419e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0184016 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0184016
-[libsc]    Maximum attained at rank     0: 0.0184016
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         6.73318e-05 (0.000494 = 734%)
+[libsc]    Minimum attained at rank    35: 0
+[libsc]    Maximum attained at rank   255: 0.00436378
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0126615 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0126615
-[libsc]    Maximum attained at rank     0: 0.0126615
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00192754 (0.00291 = 151%)
+[libsc]    Minimum attained at rank   179: 1.21593e-05
+[libsc]    Maximum attained at rank   225: 0.00852895
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0317149 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0317149
-[libsc]    Maximum attained at rank     0: 0.0317149
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0174251 (0.00429 = 24.6%)
+[libsc]    Minimum attained at rank   104: 0.00579691
+[libsc]    Maximum attained at rank    54: 0.0204468
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.000198841 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.000198841
-[libsc]    Maximum attained at rank     0: 0.000198841
-[libsc] Procs 1 advance 18 0.0184016 exchange 0.0126615 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.014562 (0.0046 = 31.6%)
+[libsc]    Minimum attained at rank   105: 0.00480652
+[libsc]    Maximum attained at rank    50: 0.0199823
+[libsc] Procs 256 advance 18 6.73318e-05 exchange 0.00192754 regrid 0
+[libsc] Max/P 256 advance 18 0.00436378 exchange 0.00852895 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 2
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=2 --maxlevel=2
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=2 --maxlevel=2
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -151,7 +151,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -172,7 +172,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -192,7 +192,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -200,12 +200,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 2 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 16 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 2 maxlevel 2
 Level 2 step     0 : dt =    5.000e-03; maxcfl (step) =    0.319; Final time =       0.0050
 Level 2 step     1 : dt =    1.409e-02; maxcfl (step) =    0.900; Final time =       0.0191
 Level 2 step     2 : dt =    1.409e-02; maxcfl (step) =    0.899; Final time =       0.0332
@@ -241,51 +240,52 @@ Level 2 step    31 : dt =    1.863e-02; maxcfl (step) =    0.877; Final time =  
 Level 2 step    32 : dt =    1.786e-02; maxcfl (step) =    0.818; Final time =       0.5000
    WARNING : Took small time step which was   93.4% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.00139117 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.00139117
-[libsc]    Maximum attained at rank     0: 0.00139117
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000686784 (0.000185 = 27%)
+[libsc]    Minimum attained at rank   171: 0.000221014
+[libsc]    Maximum attained at rank   239: 0.00140905
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         2.51457e-07 (4.89e-07 = 194%)
 [libsc]    Minimum attained at rank     0: 0
-[libsc]    Maximum attained at rank     0: 0
+[libsc]    Maximum attained at rank   233: 2.86102e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.127039 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.127039
-[libsc]    Maximum attained at rank     0: 0.127039
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000450439 (0.00172 = 381%)
+[libsc]    Minimum attained at rank    75: 1.90735e-06
+[libsc]    Maximum attained at rank    15: 0.00766969
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.00103402 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.00103402
-[libsc]    Maximum attained at rank     0: 0.00103402
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000157968 (0.000549 = 347%)
+[libsc]    Minimum attained at rank   104: 1.64509e-05
+[libsc]    Maximum attained at rank   159: 0.00328732
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.130145 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.130145
-[libsc]    Maximum attained at rank     0: 0.130145
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0119969 (0.000135 = 1.13%)
+[libsc]    Minimum attained at rank   230: 0.011843
+[libsc]    Maximum attained at rank   181: 0.0121531
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.000680447 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.000680447
-[libsc]    Maximum attained at rank     0: 0.000680447
-[libsc] Procs 1 advance 33 0.127039 exchange 0.00103402 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0107015 (0.00232 = 21.6%)
+[libsc]    Minimum attained at rank   207: 0.000684738
+[libsc]    Maximum attained at rank   121: 0.0118389
+[libsc] Procs 256 advance 33 0.000450439 exchange 0.000157968 regrid 0
+[libsc] Max/P 256 advance 33 0.00766969 exchange 0.00328732 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 3
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=3 --maxlevel=3
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=3 --maxlevel=3
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -301,7 +301,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -322,7 +322,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -342,7 +342,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -350,12 +350,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 3 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 64 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 3 maxlevel 3
 Level 3 step     0 : dt =    5.000e-03; maxcfl (step) =    0.640; Final time =       0.0050
 Level 3 step     1 : dt =    7.034e-03; maxcfl (step) =    0.900; Final time =       0.0120
 Level 3 step     2 : dt =    7.035e-03; maxcfl (step) =    0.900; Final time =       0.0191
@@ -423,51 +422,52 @@ Level 3 step    63 : dt =    9.642e-03; maxcfl (step) =    0.887; Final time =  
 Level 3 step    64 : dt =    6.086e-03; maxcfl (step) =    0.553; Final time =       0.5000
    WARNING : Took small time step which was   62.2% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.00518298 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.00518298
-[libsc]    Maximum attained at rank     0: 0.00518298
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000769427 (0.000254 = 33%)
+[libsc]    Minimum attained at rank    52: 0.000231981
+[libsc]    Maximum attained at rank    15: 0.00162196
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         1.90735e-06 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 1.90735e-06
-[libsc]    Maximum attained at rank     0: 1.90735e-06
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.36904e-07 (3.46e-07 = 253%)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank    42: 1.19209e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.998043 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.998043
-[libsc]    Maximum attained at rank     0: 0.998043
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00341387 (0.00589 = 173%)
+[libsc]    Minimum attained at rank    10: 4.05312e-06
+[libsc]    Maximum attained at rank   203: 0.0149286
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0089283 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0089283
-[libsc]    Maximum attained at rank     0: 0.0089283
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.000755618 (0.00128 = 170%)
+[libsc]    Minimum attained at rank   140: 3.40939e-05
+[libsc]    Maximum attained at rank   231: 0.00439143
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         1.0158 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 1.0158
-[libsc]    Maximum attained at rank     0: 1.0158
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0204915 (4.32e-05 = 0.211%)
+[libsc]    Minimum attained at rank   196: 0.020412
+[libsc]    Maximum attained at rank   180: 0.020555
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0036478 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0036478
-[libsc]    Maximum attained at rank     0: 0.0036478
-[libsc] Procs 1 advance 65 0.998043 exchange 0.0089283 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0155525 (0.00724 = 46.6%)
+[libsc]    Minimum attained at rank   211: 0.00166655
+[libsc]    Maximum attained at rank    52: 0.0202529
+[libsc] Procs 256 advance 65 0.00341387 exchange 0.000755618 regrid 0
+[libsc] Max/P 256 advance 65 0.0149286 exchange 0.00439143 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 4
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=4 --maxlevel=4
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=4 --maxlevel=4
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -483,7 +483,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -504,7 +504,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -524,7 +524,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -532,12 +532,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 4 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 256 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 4 maxlevel 4
 Level 4 step     0 : dt =    5.000e-03; maxcfl (step) =    1.280; Final time =       0.0050
    WARNING : Maximum CFL exceeded; retaking time step
 Level 4 step     0 : dt =    3.516e-03; maxcfl (step) =    0.900; Final time =       0.0035
@@ -671,51 +670,52 @@ Level 4 step   127 : dt =    4.902e-03; maxcfl (step) =    0.893; Final time =  
 Level 4 step   128 : dt =    1.845e-03; maxcfl (step) =    0.334; Final time =       0.5000
    WARNING : Took small time step which was   37.3% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.02038 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.02038
-[libsc]    Maximum attained at rank     0: 0.02038
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00135969 (0.000396 = 29.1%)
+[libsc]    Minimum attained at rank    69: 0.000684977
+[libsc]    Maximum attained at rank    14: 0.00293088
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         3.241e-07 (5.46e-07 = 169%)
 [libsc]    Minimum attained at rank     0: 0
-[libsc]    Maximum attained at rank     0: 0
+[libsc]    Maximum attained at rank   195: 2.38419e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         7.99586 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 7.99586
-[libsc]    Maximum attained at rank     0: 7.99586
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.027483 (0.00126 = 4.6%)
+[libsc]    Minimum attained at rank   142: 0.0260866
+[libsc]    Maximum attained at rank    57: 0.034584
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0880263 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0880263
-[libsc]    Maximum attained at rank     0: 0.0880263
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00595038 (0.00164 = 27.5%)
+[libsc]    Minimum attained at rank   255: 0.00222111
+[libsc]    Maximum attained at rank    58: 0.0133696
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         8.13102 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 8.13102
-[libsc]    Maximum attained at rank     0: 8.13102
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.048954 (1.07e-05 = 0.0219%)
+[libsc]    Minimum attained at rank   103: 0.048929
+[libsc]    Maximum attained at rank   241: 0.0489872
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0267498 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0267498
-[libsc]    Maximum attained at rank     0: 0.0267498
-[libsc] Procs 1 advance 130 7.99586 exchange 0.0880263 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0141606 (0.00172 = 12.1%)
+[libsc]    Minimum attained at rank    59: 0.00751996
+[libsc]    Maximum attained at rank    85: 0.0178878
+[libsc] Procs 256 advance 130 0.027483 exchange 0.00595038 regrid 0
+[libsc] Max/P 256 advance 130 0.034584 exchange 0.0133696 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 5
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=5 --maxlevel=5
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=5 --maxlevel=5
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -731,7 +731,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -752,7 +752,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -772,7 +772,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -780,12 +780,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 5 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 1024 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 5 maxlevel 5
 Level 5 step     0 : dt =    5.000e-03; maxcfl (step) =    2.560; Final time =       0.0050
    WARNING : Maximum CFL exceeded; retaking time step
 Level 5 step     0 : dt =    1.758e-03; maxcfl (step) =    0.900; Final time =       0.0018
@@ -1047,51 +1046,52 @@ Level 5 step   255 : dt =    2.468e-03; maxcfl (step) =    0.897; Final time =  
 Level 5 step   256 : dt =    1.059e-03; maxcfl (step) =    0.384; Final time =       0.5000
    WARNING : Took small time step which was   42.7% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.0810599 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.0810599
-[libsc]    Maximum attained at rank     0: 0.0810599
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00141005 (0.000321 = 22.7%)
+[libsc]    Minimum attained at rank   235: 0.000874043
+[libsc]    Maximum attained at rank     2: 0.00267601
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         9.53674e-07 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 9.53674e-07
-[libsc]    Maximum attained at rank     0: 9.53674e-07
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         3.52971e-07 (5.52e-07 = 156%)
+[libsc]    Minimum attained at rank     1: 0
+[libsc]    Maximum attained at rank   136: 3.09944e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         62.268 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 62.268
-[libsc]    Maximum attained at rank     0: 62.268
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.214328 (0.00865 = 4.04%)
+[libsc]    Minimum attained at rank   158: 0.204764
+[libsc]    Maximum attained at rank    39: 0.238887
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.686552 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.686552
-[libsc]    Maximum attained at rank     0: 0.686552
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0225611 (0.00947 = 42%)
+[libsc]    Minimum attained at rank   255: 0.00523996
+[libsc]    Maximum attained at rank    50: 0.041029
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         63.2516 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 63.2516
-[libsc]    Maximum attained at rank     0: 63.2516
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.258594 (1.2e-05 = 0.00464%)
+[libsc]    Minimum attained at rank   248: 0.258565
+[libsc]    Maximum attained at rank   225: 0.258622
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.215955 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.215955
-[libsc]    Maximum attained at rank     0: 0.215955
-[libsc] Procs 1 advance 258 62.268 exchange 0.686552 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0202938 (0.00678 = 33.4%)
+[libsc]    Minimum attained at rank    39: 0.00721836
+[libsc]    Maximum attained at rank   239: 0.0388486
+[libsc] Procs 256 advance 258 0.214328 exchange 0.0225611 regrid 0
+[libsc] Max/P 256 advance 258 0.238887 exchange 0.041029 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 6
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=6 --maxlevel=6
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=6 --maxlevel=6
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -1107,7 +1107,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -1128,7 +1128,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -1148,7 +1148,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -1156,12 +1156,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 6 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 4096 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 6 maxlevel 6
 Level 6 step     0 : dt =    5.000e-03; maxcfl (step) =    5.120; Final time =       0.0050
    WARNING : Maximum CFL exceeded; retaking time step
 Level 6 step     0 : dt =    8.789e-04; maxcfl (step) =    0.900; Final time =       0.0009
@@ -1679,51 +1678,52 @@ Level 6 step   511 : dt =    1.238e-03; maxcfl (step) =    0.898; Final time =  
 Level 6 step   512 : dt =    6.475e-04; maxcfl (step) =    0.469; Final time =       0.5000
    WARNING : Took small time step which was   52.2% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0.329707 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 0.329707
-[libsc]    Maximum attained at rank     0: 0.329707
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.00240824 (0.000365 = 15.1%)
+[libsc]    Minimum attained at rank    45: 0.00172186
+[libsc]    Maximum attained at rank     6: 0.00389194
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         2.38419e-06 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 2.38419e-06
-[libsc]    Maximum attained at rank     0: 2.38419e-06
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         2.98955e-07 (5.25e-07 = 176%)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank   123: 2.14577e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         499.81 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 499.81
-[libsc]    Maximum attained at rank     0: 499.81
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.6973 (0.07 = 4.12%)
+[libsc]    Minimum attained at rank   151: 1.62484
+[libsc]    Maximum attained at rank   203: 1.90547
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         7.84086 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 7.84086
-[libsc]    Maximum attained at rank     0: 7.84086
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.159999 (0.0761 = 47.6%)
+[libsc]    Minimum attained at rank     0: 0.0268259
+[libsc]    Maximum attained at rank   228: 0.295075
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         510.326 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 510.326
-[libsc]    Maximum attained at rank     0: 510.326
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.98273 (7.27e-05 = 0.00366%)
+[libsc]    Minimum attained at rank   237: 1.98263
+[libsc]    Maximum attained at rank    60: 1.98283
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         2.34553 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 2.34553
-[libsc]    Maximum attained at rank     0: 2.34553
-[libsc] Procs 1 advance 514 499.81 exchange 7.84086 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.123018 (0.0578 = 46.9%)
+[libsc]    Minimum attained at rank   228: 0.0342174
+[libsc]    Maximum attained at rank     0: 0.31004
+[libsc] Procs 256 advance 514 1.6973 exchange 0.159999 regrid 0
+[libsc] Max/P 256 advance 514 1.90547 exchange 0.295075 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 7
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=7 --maxlevel=7
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=7 --maxlevel=7
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -1739,7 +1739,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -1760,7 +1760,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -1780,7 +1780,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -1788,12 +1788,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 7 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 16384 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 7 maxlevel 7
 Level 7 step     0 : dt =    5.000e-03; maxcfl (step) =   10.240; Final time =       0.0050
    WARNING : Maximum CFL exceeded; retaking time step
 Level 7 step     0 : dt =    4.395e-04; maxcfl (step) =    0.900; Final time =       0.0004
@@ -2823,51 +2822,52 @@ Level 7 step  1023 : dt =    6.202e-04; maxcfl (step) =    0.899; Final time =  
 Level 7 step  1024 : dt =    4.371e-04; maxcfl (step) =    0.633; Final time =       0.5000
    WARNING : Took small time step which was   70.4% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         1.30565 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 1.30565
-[libsc]    Maximum attained at rank     0: 1.30565
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0062302 (0.000277 = 4.44%)
+[libsc]    Minimum attained at rank   125: 0.00543189
+[libsc]    Maximum attained at rank   132: 0.007128
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         0 (0)
-[libsc]    Minimum attained at rank     0: 0
-[libsc]    Maximum attained at rank     0: 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         3.92087e-07 (5.48e-07 = 140%)
+[libsc]    Minimum attained at rank     2: 0
+[libsc]    Maximum attained at rank   167: 2.14577e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         3970.46 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 3970.46
-[libsc]    Maximum attained at rank     0: 3970.46
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         13.6026 (0.655 = 4.82%)
+[libsc]    Minimum attained at rank   132: 12.9428
+[libsc]    Maximum attained at rank   105: 16.0221
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         78.9773 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 78.9773
-[libsc]    Maximum attained at rank     0: 78.9773
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.29677 (0.757 = 58.4%)
+[libsc]    Minimum attained at rank   255: 0.134803
+[libsc]    Maximum attained at rank   110: 3.23825
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         4069.81 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 4069.81
-[libsc]    Maximum attained at rank     0: 4069.81
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         16.499 (3.58e-05 = 0.000217%)
+[libsc]    Minimum attained at rank    65: 16.4989
+[libsc]    Maximum attained at rank   180: 16.499
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         19.0696 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 19.0696
-[libsc]    Maximum attained at rank     0: 19.0696
-[libsc] Procs 1 advance 1026 3970.46 exchange 78.9773 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.59332 (0.588 = 36.9%)
+[libsc]    Minimum attained at rank   107: 0.264425
+[libsc]    Maximum attained at rank   180: 3.12061
+[libsc] Procs 256 advance 1026 13.6026 exchange 1.29677 regrid 0
+[libsc] Max/P 256 advance 1026 16.0221 exchange 3.23825 regrid 0
  
 TACC: Shutdown complete. Exiting.
 Level 8
-Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1218007             --minlevel=8 --maxlevel=8
-TACC: Starting up job 1218007
+Starting /work/00846/carsten/local/forestclaw/swirl/swirl -F swirl_defaults.ini             -W /work/00846/carsten/local/forestclaw/swirl/fclaw2d_waveprop.ini             --prefix=/scratch/00846/carsten/forestclaw/swrl.1241399             --minlevel=8 --maxlevel=8
+TACC: Starting up job 1241399
 TACC: Setting up parallel environment for MVAPICH2+mpispawn.
 TACC: Starting parallel tasks...
 [libsc] This is libsc 0.7.2.138-dcc0
@@ -2883,7 +2883,7 @@ TACC: Starting parallel tasks...
 [libsc] LAPACK_LIBS              
 [libsc] LIBS                     -llua 
 [libsc] FLIBS                    
-[p4est] This is p4est 0.3.4.1.173-159d9
+[p4est] This is p4est 0.3.4.1.188-7059
 [p4est] CC                       mpicc
 [p4est] C_VERSION                GNU ld version 2.20.51.0.2-5.36.el6 20100205
 [p4est] CFLAGS                   -Wall -xhost -opt-prefetch
@@ -2904,7 +2904,7 @@ TACC: Starting parallel tasks...
 [libsc]    vtkwrite: 0
 [libsc]    verbosity: 0
 [libsc]    serialout: false
-[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1218007
+[libsc]    prefix: /scratch/00846/carsten/forestclaw/swrl.1241399
 [libsc]    max_cfl: 1
 [libsc]    desired_cfl: 0.9
 [libsc]    meqn: 1
@@ -2924,7 +2924,7 @@ TACC: Starting parallel tasks...
 [libsc]    check_conservation: false
 [libsc]    subcycle: false
 [libsc]    noweightedp: false
-[libsc]    order: 2 2
+[libsc]    order: 1 1
 [libsc]    mcapa: 0
 [libsc]    maux: 2
 [libsc]    src_term: 0
@@ -2932,12 +2932,11 @@ TACC: Starting parallel tasks...
 [libsc]    mthlim: 4
 [libsc] Arguments: none
 [p4est] Into p4est_new with min quadrants 0 level 8 uniform 1
-[p4est] New p4est with 1 trees on 1 processors
+[p4est] New p4est with 1 trees on 256 processors
 [p4est] Done p4est_new with 65536 total quadrants
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
-[p4est] Into p4est_nodes_new_local
-[p4est] Done p4est_nodes_new_local
+Global minlevel 8 maxlevel 8
 Level 8 step     0 : dt =    5.000e-03; maxcfl (step) =   20.480; Final time =       0.0050
    WARNING : Maximum CFL exceeded; retaking time step
 Level 8 step     0 : dt =    2.197e-04; maxcfl (step) =    0.900; Final time =       0.0002
@@ -4992,45 +4991,46 @@ Level 8 step  2048 : dt =    3.105e-04; maxcfl (step) =    0.900; Final time =  
 Level 8 step  2049 : dt =    2.028e-05; maxcfl (step) =    0.059; Final time =       0.5000
    WARNING : Took small time step which was    6.5% of desired dt.
 [libsc] Statistics for INIT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         5.27744 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 5.27744
-[libsc]    Maximum attained at rank     0: 5.27744
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.0218662 (0.00048 = 2.19%)
+[libsc]    Minimum attained at rank   202: 0.0210578
+[libsc]    Maximum attained at rank     9: 0.0245681
 [libsc] Statistics for REGRID
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for OUTPUT
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         1.19209e-06 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 1.19209e-06
-[libsc]    Maximum attained at rank     0: 1.19209e-06
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         5.43892e-07 (6.04e-07 = 111%)
+[libsc]    Minimum attained at rank     1: 0
+[libsc]    Maximum attained at rank    33: 2.14577e-06
 [libsc] Statistics for CHECK
-[libsc]    Global number of values:     1
+[libsc]    Global number of values:   256
 [libsc]    Mean value (std. dev.):         0 (0)
 [libsc]    Minimum attained at rank     0: 0
 [libsc]    Maximum attained at rank     0: 0
 [libsc] Statistics for ADVANCE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         33253.4 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 33253.4
-[libsc]    Maximum attained at rank     0: 33253.4
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         109.01 (4.81 = 4.41%)
+[libsc]    Minimum attained at rank   161: 104.073
+[libsc]    Maximum attained at rank    81: 125.019
 [libsc] Statistics for EXCHANGE
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         654.088 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 654.088
-[libsc]    Maximum attained at rank     0: 654.088
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         9.52532 (5.2 = 54.6%)
+[libsc]    Minimum attained at rank     0: 1.29961
+[libsc]    Maximum attained at rank    86: 22.215
 [libsc] Statistics for WALLTIME
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         34065 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 34065
-[libsc]    Maximum attained at rank     0: 34065
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         127.834 (4.43e-05 = 3.46e-05%)
+[libsc]    Minimum attained at rank   219: 127.834
+[libsc]    Maximum attained at rank     7: 127.835
 [libsc] Statistics for UNACCOUNTED
-[libsc]    Global number of values:     1
-[libsc]    Mean value (std. dev.):         152.246 (0 = 0%)
-[libsc]    Minimum attained at rank     0: 152.246
-[libsc]    Maximum attained at rank     0: 152.246
-[libsc] Procs 1 advance 2051 33253.4 exchange 654.088 regrid 0
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         9.27761 (3.48 = 37.5%)
+[libsc]    Minimum attained at rank    80: 1.17648
+[libsc]    Maximum attained at rank   179: 20.4811
+[libsc] Procs 256 advance 2051 109.01 exchange 9.52532 regrid 0
+[libsc] Max/P 256 advance 2051 125.019 exchange 22.215 regrid 0
  
 TACC: Shutdown complete. Exiting.
