@@ -45,6 +45,17 @@ plot "exchange_strong.txt" using 1:2 title "Level 1", \
      "exchange_strong.txt" using 1:8 title "Level 7", \
      "exchange_strong.txt" using 1:9 title "Level 8"
 
+set ylabel "Regrid time per time step (seconds)"
+set output "regrid_strong.eps"
+plot "regrid_strong.txt" using 1:2 title "Level 1", \
+     "regrid_strong.txt" using 1:3 title "Level 2", \
+     "regrid_strong.txt" using 1:4 title "Level 3", \
+     "regrid_strong.txt" using 1:5 title "Level 4", \
+     "regrid_strong.txt" using 1:6 title "Level 5", \
+     "regrid_strong.txt" using 1:7 title "Level 6", \
+     "regrid_strong.txt" using 1:8 title "Level 7", \
+     "regrid_strong.txt" using 1:9 title "Level 8"
+
 # Weak scaling plots
 
 set xtics scale 0,0 $SNP,4,$MNP
@@ -67,6 +78,15 @@ plot "exchange_weak.txt" using 1:2 title "Levels 1-3", \
      "exchange_weak.txt" using 1:5 title "Levels 4-6", \
      "exchange_weak.txt" using 1:6 title "Levels 5-7", \
      "exchange_weak.txt" using 1:7 title "Levels 6-8"
+
+set ylabel "Regrid time per time step (seconds)"
+set output "regrid_weak.eps"
+plot "regrid_weak.txt" using 1:2 title "Levels 1-3", \
+     "regrid_weak.txt" using 1:3 title "Levels 2-4", \
+     "regrid_weak.txt" using 1:4 title "Levels 3-5", \
+     "regrid_weak.txt" using 1:5 title "Levels 4-6", \
+     "regrid_weak.txt" using 1:6 title "Levels 5-7", \
+     "regrid_weak.txt" using 1:7 title "Levels 6-8"
 
 EOF
 ) | gnuplot
