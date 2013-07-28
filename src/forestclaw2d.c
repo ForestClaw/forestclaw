@@ -319,10 +319,6 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
         P4EST_ASSERT (gq->p.piggy3.which_tree < wrap->conn->num_trees);
         *blockno = (int) gq->p.piggy3.which_tree;
         *patchno = (int) qtq;
-#if 0                           /* this is the convention we are NOT using */
-        *patchno = (int) gq->p.piggy3.local_num;
-        P4EST_ASSERT (*patchno == (int) mesh->ghost_to_index[qtq]);
-#endif
     }
 }
 
