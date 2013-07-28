@@ -16,6 +16,7 @@ set style data linespoints
 
 set logscale xy
 set xlabel "Number of cores"
+# set yrange [1e-5:1]
 set format y "%.2e"
 
 # Strong scaling plots
