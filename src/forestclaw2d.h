@@ -103,7 +103,6 @@ struct fclaw2d_domain
     int possible_maxlevel;      /* theoretical maximum that can be reached */
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
-    int *patch_to_block;        /* allocated storage, one per local patch */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags &
