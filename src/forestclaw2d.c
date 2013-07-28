@@ -246,7 +246,9 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq;
     p4est_tree_t *tree;
+#ifdef P4EST_DEBUG
     fclaw2d_block_t *block;
+#endif
 
     P4EST_ASSERT (domain->pp_owned);
     anyboundary = 0;
@@ -255,7 +257,9 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
     P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
+#ifdef P4EST_DEBUG
     block = domain->blocks + blockno;
+#endif
     P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
@@ -288,7 +292,6 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_quadrant_t *gq;
-    p4est_topidx_t nt;
     fclaw2d_block_t *block;
 
     P4EST_ASSERT (domain->pp_owned);
@@ -300,9 +303,8 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
         /* processor-local neighbor */
         *proc = domain->mpirank;
         *blockno = (int) mesh->quad_to_tree[qtq];
-        nt = (p4est_topidx_t) * blockno;
-        P4EST_ASSERT (wrap->p4est->first_local_tree <= nt);
-        P4EST_ASSERT (nt <= wrap->p4est->last_local_tree);
+        P4EST_ASSERT ((int) wrap->p4est->first_local_tree <= *blockno);
+        P4EST_ASSERT (*blockno <= (int) wrap->p4est->last_local_tree);
         block = domain->blocks + *blockno;
         qtq -= block->num_patches_before;
         P4EST_ASSERT (0 <= qtq && qtq < block->num_patches);
@@ -338,7 +340,9 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq, *qth;
     p4est_tree_t *tree;
+#ifdef P4EST_DEBUG
     fclaw2d_block_t *block;
+#endif
 
     P4EST_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
@@ -349,7 +353,9 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
     P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
+#ifdef P4EST_DEBUG
     block = domain->blocks + blockno;
+#endif
     P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
