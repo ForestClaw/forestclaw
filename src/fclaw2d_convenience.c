@@ -437,7 +437,6 @@ fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
                                       void *user)
 {
     int lp = *(int *) user;
-    int level;
     int k;
 
     P4EST_ASSERT (old_domain->pp == new_domain->pp);
@@ -455,12 +454,11 @@ fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
     if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
         /* refinement */
-        level = old_patch->level + 1;
         P4EST_ASSERT (new_patchno + P4EST_CHILDREN <=
                       new_domain->blocks[blockno].num_patches);
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
-            P4EST_ASSERT (new_patch[k].level == level);
+            P4EST_ASSERT (new_patch[k].level == old_patch->level + 1);
             P4EST_ASSERT (fclaw2d_patch_childid (&new_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d refinement %d to %d\n",
@@ -469,12 +467,11 @@ fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
         /* coarsening */
-        level = new_patch->level + 1;
         P4EST_ASSERT (old_patchno + P4EST_CHILDREN <=
                       old_domain->blocks[blockno].num_patches);
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
-            P4EST_ASSERT (old_patch[k].level == level);
+            P4EST_ASSERT (old_patch[k].level == new_patch->level + 1);
             P4EST_ASSERT (fclaw2d_patch_childid (&old_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d coarsening %d to %d\n",

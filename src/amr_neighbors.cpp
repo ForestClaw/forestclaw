@@ -106,8 +106,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         }
         else
         {
-            // This didn't compile for me...
-            // *(int *) 0 = 0;     // This must not happen
+            printf ("Illegal fclaw2d_patch_face_neighbors return value\n");
+            exit (1);
         }
 
         for(int ir = 0; ir < num_neighbors; ir++)
@@ -119,7 +119,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                 fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
                 neighbor = &neighbor_block->patches[rpatchno[ir]];
             }
-            else if (rproc[ir] != domain->mpirank)
+            else
             {
                 /* neighbor patch is on a remote processor */
                 neighbor = &domain->ghost_patches[rpatchno[ir]];
