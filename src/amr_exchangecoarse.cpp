@@ -674,7 +674,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,coarser_level,cb_face_interpolate,
                                  (void *) &e_info);
 
-    /* Interpolate from coarse grids to finer grids. */
+    /* Interpolate from coarse grids to finer grids. TODO: comment correct?? */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
@@ -686,7 +686,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
                                  (void *) &e_info);
 
-    /* Interpolate coarse grid to fine grid ghost cells. */
+    /* Interpolate coarse grid to fine grid ghost cells. TODO: correct?? */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
