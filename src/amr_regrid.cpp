@@ -276,4 +276,7 @@ void regrid(fclaw2d_domain_t **domain)
     // Stop timer
     ddata = get_domain_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+
+    // Count calls to this function
+    ++ddata->count_amr_regrid;
 }
