@@ -120,7 +120,9 @@ void simple_patch_setup(fclaw2d_domain_t *domain,
     /* This is called once when a new patch is created. */
     manyclaw_set_solver(domain,this_patch,this_block_idx,this_patch_idx);
     amr_manyclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial,
+    advection_rp_aux_global_t* aux_global = new advection_rp_aux_global_t;
+    aux_global->u[0] = 1.0; aux_global->u[1] = 1.0;
+    manyclaw_set_riemann_solvers(this_patch,advection_rp_grid_eval_serial, &aux_global,
                                  updater_first_order_dimensional_splitting);
 }
 
