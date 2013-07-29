@@ -125,6 +125,7 @@ static
 /* This is called anytime we need to update ghost patch data */
 void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
 {
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
 
     /* Store pointers to local boundary data.  We do this here
@@ -152,6 +153,9 @@ void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
     /* Store newly updated e->ghost_patch_data into ghost patches constructed
        locally */
     unpack_ghost_patches(domain,e, time_interp);
+
+    /* Count calls to this function */
+    ++ddata->count_ghost_exchange;
 }
 
 
