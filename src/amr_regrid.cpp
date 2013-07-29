@@ -226,9 +226,6 @@ void regrid(fclaw2d_domain_t **domain)
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
                                     (void*) NULL);
 
-    // Domain data may go out of scope now.
-    ddata = NULL;
-
     // Then refine.
     fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
                                    (void *) NULL);
@@ -237,6 +234,9 @@ void regrid(fclaw2d_domain_t **domain)
     // Will return be NULL if no refining was done
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
     fclaw_bool have_new_refinement = new_domain != NULL;
+
+    // Domain data may go out of scope now.
+    ddata = NULL;
 
     if (have_new_refinement)
     {
