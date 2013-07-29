@@ -1,12 +1,12 @@
 # -*- Makefile -*-
 
-MANYCLAW = $(FORESTCLAW)/../ManyClaw
+MANYCLAW = $(MANYCLAW_DIR)
 
 AMR_MANYCLAW = $(FORESTCLAW)/src/solvers/amr_manyclaw
 AMR_MANYCLAW_FORTRAN = $(AMR_MANYCLAW)/fortran_source
 
-manyclaw_linkers := -lmanyclaw -L$(MANYCLAW)/lib -L/opt/local/lib -ltbb
-manyclaw_includes := -I$(AMR_MANYCLAW) -I$(AMR_MANYCLAW_FORTRAN) -I$(MANYCLAW) -I/opt/local/include
+manyclaw_linkers := -lmanyclaw -L$(MANYCLAW)/lib -L$(TBBROOT)/lib/intel64/gcc4.4 -ltbb
+manyclaw_includes := -I$(AMR_MANYCLAW) -I$(AMR_MANYCLAW_FORTRAN) -I$(MANYCLAW) -I$(TBBROOT)/include
 
 manyclaw_objs = \
 	$(AMR_MANYCLAW)/amr_manyclaw.o \

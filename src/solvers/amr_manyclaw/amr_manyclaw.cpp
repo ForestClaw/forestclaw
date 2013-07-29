@@ -87,11 +87,14 @@ void amr_manyclaw_setprob(fclaw2d_domain_t* domain)
 }
 
 void manyclaw_set_riemann_solvers(fclaw2d_patch_t *this_patch,
-                                  rp_grid_eval_t rp_grid_eval, updater_t update)
+                                  rp_grid_eval_t rp_grid_eval, 
+				  void* aux_global,
+				  updater_t update)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     amr_manyclaw_patch_data_t *mc_data = get_manyclaw_patch_data(cp);
     mc_data->rp_grid_eval = rp_grid_eval;
+    mc_data->aux_global = aux_global;
     mc_data->update = update;
 }
 
@@ -367,6 +370,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     cp->save_current_step();  /* Save in case we need to retake the step */
 
     double* aux = mc_data->auxarray.dataPtr();
+    void* aux_global  = mc_data->aux_global;
     // int maux = manyclaw_parms->maux;
 
     // Global to all patches
@@ -397,7 +401,7 @@ double amr_manyclaw_step2(fclaw2d_domain_t *domain,
     double *qold_mfirst = qold_mfirst_array.dataPtr();
     reorder2new(domain,qold_mlast,qold_mfirst);
 
-    mc_data->rp_grid_eval(&qold_mfirst[0], &aux[0],
+    mc_data->rp_grid_eval(&qold_mfirst[0], &aux[0], aux_global,
                           mx, my,
                           &solver.amdq[0],
                           &solver.apdq[0],
@@ -567,6 +571,7 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
+    delete manyclaw_patch_data->aux_global;
     delete manyclaw_patch_data;
 
     // or?

@@ -154,6 +154,7 @@ struct amr_manyclaw_patch_data
     updater_t update;
 
     /* Add any other data here that the patch may also need */
+    void* aux_global;
 };
 
 
@@ -214,7 +215,9 @@ double amr_manyclaw_step2_rhs(fclaw2d_domain_t *domain,
 
 
 void manyclaw_set_riemann_solvers(fclaw2d_patch_t *this_patch,
-                                  rp_grid_eval_t rp_grid_eval, updater_t update);
+                                  rp_grid_eval_t rp_grid_eval,
+				  void* aux_global,
+				  updater_t update);
 
 
 void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
