@@ -6553,3 +6553,552 @@ Level 3 step    38 : dt =    8.938e-03; maxcfl (step) =    0.890; Final time =  
 [p4est] Into p4est_ghost_new CORNER
 [p4est] Done p4est_ghost_new
 Global minlevel 3 maxlevel 8
+Level 3 step    39 : dt =    9.037e-03; maxcfl (step) =    0.890; Final time =       0.4503
+[p4est] Into p4est_refine with 3169 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3424 total quadrants
+[p4est] Into p4est_coarsen with 3424 total quadrants
+[p4est] Done p4est_coarsen with 2386 total quadrants
+[p4est] Into p4est_balance CORNER with 2386 total quadrants
+[p4est] Done p4est_balance with 3178 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3178 total quadrants
+[p4est] Done p4est_partition shipped 2628 quadrants 82.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    40 : dt =    9.142e-03; maxcfl (step) =    0.889; Final time =       0.4594
+[p4est] Into p4est_refine with 3178 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3484 total quadrants
+[p4est] Into p4est_coarsen with 3484 total quadrants
+[p4est] Done p4est_coarsen with 2476 total quadrants
+[p4est] Into p4est_balance CORNER with 2476 total quadrants
+[p4est] Done p4est_balance with 3256 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3256 total quadrants
+[p4est] Done p4est_partition shipped 2359 quadrants 72.5%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    41 : dt =    9.252e-03; maxcfl (step) =    0.889; Final time =       0.4686
+[p4est] Into p4est_refine with 3256 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3514 total quadrants
+[p4est] Into p4est_coarsen with 3514 total quadrants
+[p4est] Done p4est_coarsen with 2461 total quadrants
+[p4est] Into p4est_balance CORNER with 2461 total quadrants
+[p4est] Done p4est_balance with 3283 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3283 total quadrants
+[p4est] Done p4est_partition shipped 2913 quadrants 88.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    42 : dt =    9.368e-03; maxcfl (step) =    0.888; Final time =       0.4780
+[p4est] Into p4est_refine with 3283 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3550 total quadrants
+[p4est] Into p4est_coarsen with 3550 total quadrants
+[p4est] Done p4est_coarsen with 2491 total quadrants
+[p4est] Into p4est_balance CORNER with 2491 total quadrants
+[p4est] Done p4est_balance with 3352 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3352 total quadrants
+[p4est] Done p4est_partition shipped 2395 quadrants 71.4%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    43 : dt =    9.490e-03; maxcfl (step) =    0.888; Final time =       0.4875
+[p4est] Into p4est_refine with 3352 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3613 total quadrants
+[p4est] Into p4est_coarsen with 3613 total quadrants
+[p4est] Done p4est_coarsen with 2533 total quadrants
+[p4est] Into p4est_balance CORNER with 2533 total quadrants
+[p4est] Done p4est_balance with 3397 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3397 total quadrants
+[p4est] Done p4est_partition shipped 2546 quadrants 74.9%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    44 : dt =    9.619e-03; maxcfl (step) =    0.887; Final time =       0.4971
+[p4est] Into p4est_refine with 3397 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3703 total quadrants
+[p4est] Into p4est_coarsen with 3703 total quadrants
+[p4est] Done p4est_coarsen with 2572 total quadrants
+[p4est] Into p4est_balance CORNER with 2572 total quadrants
+[p4est] Done p4est_balance with 3370 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3370 total quadrants
+[p4est] Done p4est_partition shipped 2862 quadrants 84.9%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    45 : dt =    9.756e-03; maxcfl (step) =    0.887; Final time =       0.5069
+[p4est] Into p4est_refine with 3370 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3658 total quadrants
+[p4est] Into p4est_coarsen with 3658 total quadrants
+[p4est] Done p4est_coarsen with 2569 total quadrants
+[p4est] Into p4est_balance CORNER with 2569 total quadrants
+[p4est] Done p4est_balance with 3472 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3472 total quadrants
+[p4est] Done p4est_partition shipped 3067 quadrants 88.3%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    46 : dt =    9.904e-03; maxcfl (step) =    0.886; Final time =       0.5168
+[p4est] Into p4est_refine with 3472 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3709 total quadrants
+[p4est] Into p4est_coarsen with 3709 total quadrants
+[p4est] Done p4est_coarsen with 2530 total quadrants
+[p4est] Into p4est_balance CORNER with 2530 total quadrants
+[p4est] Done p4est_balance with 3418 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3418 total quadrants
+[p4est] Done p4est_partition shipped 2606 quadrants 76.2%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    47 : dt =    1.006e-02; maxcfl (step) =    0.886; Final time =       0.5268
+[p4est] Into p4est_refine with 3418 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3721 total quadrants
+[p4est] Into p4est_coarsen with 3721 total quadrants
+[p4est] Done p4est_coarsen with 2674 total quadrants
+[p4est] Into p4est_balance CORNER with 2674 total quadrants
+[p4est] Done p4est_balance with 3562 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3562 total quadrants
+[p4est] Done p4est_partition shipped 2940 quadrants 82.5%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    48 : dt =    1.022e-02; maxcfl (step) =    0.885; Final time =       0.5371
+[p4est] Into p4est_refine with 3562 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3835 total quadrants
+[p4est] Into p4est_coarsen with 3835 total quadrants
+[p4est] Done p4est_coarsen with 2611 total quadrants
+[p4est] Into p4est_balance CORNER with 2611 total quadrants
+[p4est] Done p4est_balance with 3403 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3403 total quadrants
+[p4est] Done p4est_partition shipped 2610 quadrants 76.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    49 : dt =    1.040e-02; maxcfl (step) =    0.884; Final time =       0.5475
+[p4est] Into p4est_refine with 3403 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3742 total quadrants
+[p4est] Into p4est_coarsen with 3742 total quadrants
+[p4est] Done p4est_coarsen with 2695 total quadrants
+[p4est] Into p4est_balance CORNER with 2695 total quadrants
+[p4est] Done p4est_balance with 3637 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3637 total quadrants
+[p4est] Done p4est_partition shipped 2878 quadrants 79.1%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    50 : dt =    1.058e-02; maxcfl (step) =    0.883; Final time =       0.5580
+[p4est] Into p4est_refine with 3637 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3871 total quadrants
+[p4est] Into p4est_coarsen with 3871 total quadrants
+[p4est] Done p4est_coarsen with 2620 total quadrants
+[p4est] Into p4est_balance CORNER with 2620 total quadrants
+[p4est] Done p4est_balance with 3502 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3502 total quadrants
+[p4est] Done p4est_partition shipped 2721 quadrants 77.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    51 : dt =    1.078e-02; maxcfl (step) =    0.882; Final time =       0.5688
+[p4est] Into p4est_refine with 3502 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3868 total quadrants
+[p4est] Into p4est_coarsen with 3868 total quadrants
+[p4est] Done p4est_coarsen with 2806 total quadrants
+[p4est] Into p4est_balance CORNER with 2806 total quadrants
+[p4est] Done p4est_balance with 3670 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3670 total quadrants
+[p4est] Done p4est_partition shipped 3240 quadrants 88.3%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    52 : dt =    1.100e-02; maxcfl (step) =    0.881; Final time =       0.5798
+[p4est] Into p4est_refine with 3670 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3961 total quadrants
+[p4est] Into p4est_coarsen with 3961 total quadrants
+[p4est] Done p4est_coarsen with 2731 total quadrants
+[p4est] Into p4est_balance CORNER with 2731 total quadrants
+[p4est] Done p4est_balance with 3532 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3532 total quadrants
+[p4est] Done p4est_partition shipped 2945 quadrants 83.4%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    53 : dt =    1.124e-02; maxcfl (step) =    0.880; Final time =       0.5911
+[p4est] Into p4est_refine with 3532 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3895 total quadrants
+[p4est] Into p4est_coarsen with 3895 total quadrants
+[p4est] Done p4est_coarsen with 2794 total quadrants
+[p4est] Into p4est_balance CORNER with 2794 total quadrants
+[p4est] Done p4est_balance with 3640 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3640 total quadrants
+[p4est] Done p4est_partition shipped 2992 quadrants 82.2%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    54 : dt =    1.148e-02; maxcfl (step) =    0.879; Final time =       0.6025
+[p4est] Into p4est_refine with 3640 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3916 total quadrants
+[p4est] Into p4est_coarsen with 3916 total quadrants
+[p4est] Done p4est_coarsen with 2797 total quadrants
+[p4est] Into p4est_balance CORNER with 2797 total quadrants
+[p4est] Done p4est_balance with 3652 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3652 total quadrants
+[p4est] Done p4est_partition shipped 3214 quadrants 88%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    55 : dt =    1.175e-02; maxcfl (step) =    0.878; Final time =       0.6143
+[p4est] Into p4est_refine with 3652 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3889 total quadrants
+[p4est] Into p4est_coarsen with 3889 total quadrants
+[p4est] Done p4est_coarsen with 2737 total quadrants
+[p4est] Into p4est_balance CORNER with 2737 total quadrants
+[p4est] Done p4est_balance with 3595 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3595 total quadrants
+[p4est] Done p4est_partition shipped 2745 quadrants 76.4%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    56 : dt =    1.205e-02; maxcfl (step) =    0.877; Final time =       0.6263
+[p4est] Into p4est_refine with 3595 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 3955 total quadrants
+[p4est] Into p4est_coarsen with 3955 total quadrants
+[p4est] Done p4est_coarsen with 2830 total quadrants
+[p4est] Into p4est_balance CORNER with 2830 total quadrants
+[p4est] Done p4est_balance with 3898 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3898 total quadrants
+[p4est] Done p4est_partition shipped 3341 quadrants 85.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    57 : dt =    1.237e-02; maxcfl (step) =    0.875; Final time =       0.6387
+[p4est] Into p4est_refine with 3898 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4201 total quadrants
+[p4est] Into p4est_coarsen with 4201 total quadrants
+[p4est] Done p4est_coarsen with 2842 total quadrants
+[p4est] Into p4est_balance CORNER with 2842 total quadrants
+[p4est] Done p4est_balance with 3835 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3835 total quadrants
+[p4est] Done p4est_partition shipped 3151 quadrants 82.2%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    58 : dt =    1.272e-02; maxcfl (step) =    0.873; Final time =       0.6514
+[p4est] Into p4est_refine with 3835 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4186 total quadrants
+[p4est] Into p4est_coarsen with 4186 total quadrants
+[p4est] Done p4est_coarsen with 2917 total quadrants
+[p4est] Into p4est_balance CORNER with 2917 total quadrants
+[p4est] Done p4est_balance with 3901 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3901 total quadrants
+[p4est] Done p4est_partition shipped 2949 quadrants 75.6%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    59 : dt =    1.311e-02; maxcfl (step) =    0.871; Final time =       0.6645
+[p4est] Into p4est_refine with 3901 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4243 total quadrants
+[p4est] Into p4est_coarsen with 4243 total quadrants
+[p4est] Done p4est_coarsen with 2926 total quadrants
+[p4est] Into p4est_balance CORNER with 2926 total quadrants
+[p4est] Done p4est_balance with 3910 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3910 total quadrants
+[p4est] Done p4est_partition shipped 2853 quadrants 73%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    60 : dt =    1.354e-02; maxcfl (step) =    0.869; Final time =       0.6781
+[p4est] Into p4est_refine with 3910 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4198 total quadrants
+[p4est] Into p4est_coarsen with 4198 total quadrants
+[p4est] Done p4est_coarsen with 2902 total quadrants
+[p4est] Into p4est_balance CORNER with 2902 total quadrants
+[p4est] Done p4est_balance with 3901 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3901 total quadrants
+[p4est] Done p4est_partition shipped 3200 quadrants 82%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    61 : dt =    1.401e-02; maxcfl (step) =    0.867; Final time =       0.6921
+[p4est] Into p4est_refine with 3901 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4255 total quadrants
+[p4est] Into p4est_coarsen with 4255 total quadrants
+[p4est] Done p4est_coarsen with 3022 total quadrants
+[p4est] Into p4est_balance CORNER with 3022 total quadrants
+[p4est] Done p4est_balance with 4000 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4000 total quadrants
+[p4est] Done p4est_partition shipped 3422 quadrants 85.5%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    62 : dt =    1.455e-02; maxcfl (step) =    0.864; Final time =       0.7066
+[p4est] Into p4est_refine with 4000 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4312 total quadrants
+[p4est] Into p4est_coarsen with 4312 total quadrants
+[p4est] Done p4est_coarsen with 2950 total quadrants
+[p4est] Into p4est_balance CORNER with 2950 total quadrants
+[p4est] Done p4est_balance with 3961 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3961 total quadrants
+[p4est] Done p4est_partition shipped 2890 quadrants 73%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    63 : dt =    1.516e-02; maxcfl (step) =    0.860; Final time =       0.7218
+[p4est] Into p4est_refine with 3961 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4324 total quadrants
+[p4est] Into p4est_coarsen with 4324 total quadrants
+[p4est] Done p4est_coarsen with 2977 total quadrants
+[p4est] Into p4est_balance CORNER with 2977 total quadrants
+[p4est] Done p4est_balance with 4012 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4012 total quadrants
+[p4est] Done p4est_partition shipped 3533 quadrants 88.1%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    64 : dt =    1.586e-02; maxcfl (step) =    0.856; Final time =       0.7377
+[p4est] Into p4est_refine with 4012 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4393 total quadrants
+[p4est] Into p4est_coarsen with 4393 total quadrants
+[p4est] Done p4est_coarsen with 3073 total quadrants
+[p4est] Into p4est_balance CORNER with 3073 total quadrants
+[p4est] Done p4est_balance with 4051 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4051 total quadrants
+[p4est] Done p4est_partition shipped 3444 quadrants 85%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    65 : dt =    1.667e-02; maxcfl (step) =    0.851; Final time =       0.7543
+[p4est] Into p4est_refine with 4051 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4306 total quadrants
+[p4est] Into p4est_coarsen with 4306 total quadrants
+[p4est] Done p4est_coarsen with 3022 total quadrants
+[p4est] Into p4est_balance CORNER with 3022 total quadrants
+[p4est] Done p4est_balance with 3997 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 3997 total quadrants
+[p4est] Done p4est_partition shipped 2915 quadrants 72.9%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    66 : dt =    1.762e-02; maxcfl (step) =    0.845; Final time =       0.7720
+[p4est] Into p4est_refine with 3997 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4333 total quadrants
+[p4est] Into p4est_coarsen with 4333 total quadrants
+[p4est] Done p4est_coarsen with 3103 total quadrants
+[p4est] Into p4est_balance CORNER with 3103 total quadrants
+[p4est] Done p4est_balance with 4114 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4114 total quadrants
+[p4est] Done p4est_partition shipped 3452 quadrants 83.9%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    67 : dt =    1.876e-02; maxcfl (step) =    0.838; Final time =       0.7907
+[p4est] Into p4est_refine with 4114 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4408 total quadrants
+[p4est] Into p4est_coarsen with 4408 total quadrants
+[p4est] Done p4est_coarsen with 3046 total quadrants
+[p4est] Into p4est_balance CORNER with 3046 total quadrants
+[p4est] Done p4est_balance with 4102 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4102 total quadrants
+[p4est] Done p4est_partition shipped 3534 quadrants 86.2%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    68 : dt =    2.015e-02; maxcfl (step) =    0.828; Final time =       0.8109
+[p4est] Into p4est_refine with 4102 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4483 total quadrants
+[p4est] Into p4est_coarsen with 4483 total quadrants
+[p4est] Done p4est_coarsen with 3130 total quadrants
+[p4est] Into p4est_balance CORNER with 3130 total quadrants
+[p4est] Done p4est_balance with 4228 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4228 total quadrants
+[p4est] Done p4est_partition shipped 3693 quadrants 87.3%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    69 : dt =    2.191e-02; maxcfl (step) =    0.815; Final time =       0.8328
+[p4est] Into p4est_refine with 4228 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4609 total quadrants
+[p4est] Into p4est_coarsen with 4609 total quadrants
+[p4est] Done p4est_coarsen with 3172 total quadrants
+[p4est] Into p4est_balance CORNER with 3172 total quadrants
+[p4est] Done p4est_balance with 4306 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4306 total quadrants
+[p4est] Done p4est_partition shipped 3421 quadrants 79.4%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    70 : dt =    2.419e-02; maxcfl (step) =    0.797; Final time =       0.8570
+[p4est] Into p4est_refine with 4306 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4648 total quadrants
+[p4est] Into p4est_coarsen with 4648 total quadrants
+[p4est] Done p4est_coarsen with 3163 total quadrants
+[p4est] Into p4est_balance CORNER with 3163 total quadrants
+[p4est] Done p4est_balance with 4237 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4237 total quadrants
+[p4est] Done p4est_partition shipped 3049 quadrants 72%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    71 : dt =    2.732e-02; maxcfl (step) =    0.770; Final time =       0.8843
+[p4est] Into p4est_refine with 4237 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4612 total quadrants
+[p4est] Into p4est_coarsen with 4612 total quadrants
+[p4est] Done p4est_coarsen with 3244 total quadrants
+[p4est] Into p4est_balance CORNER with 3244 total quadrants
+[p4est] Done p4est_balance with 4378 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4378 total quadrants
+[p4est] Done p4est_partition shipped 2834 quadrants 64.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    72 : dt =    3.193e-02; maxcfl (step) =    0.726; Final time =       0.9162
+[p4est] Into p4est_refine with 4378 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4633 total quadrants
+[p4est] Into p4est_coarsen with 4633 total quadrants
+[p4est] Done p4est_coarsen with 3127 total quadrants
+[p4est] Into p4est_balance CORNER with 3127 total quadrants
+[p4est] Done p4est_balance with 4228 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4228 total quadrants
+[p4est] Done p4est_partition shipped 3166 quadrants 74.9%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    73 : dt =    3.957e-02; maxcfl (step) =    0.645; Final time =       0.9558
+[p4est] Into p4est_refine with 4228 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4561 total quadrants
+[p4est] Into p4est_coarsen with 4561 total quadrants
+[p4est] Done p4est_coarsen with 3181 total quadrants
+[p4est] Into p4est_balance CORNER with 3181 total quadrants
+[p4est] Done p4est_balance with 4267 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4267 total quadrants
+[p4est] Done p4est_partition shipped 3186 quadrants 74.7%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+Level 3 step    74 : dt =    4.422e-02; maxcfl (step) =    0.370; Final time =       1.0000
+   WARNING : Took small time step which was   80.1% of desired dt.
+[p4est] Into p4est_refine with 4267 total quadrants, allowed level 29
+[p4est] Done p4est_refine with 4552 total quadrants
+[p4est] Into p4est_coarsen with 4552 total quadrants
+[p4est] Done p4est_coarsen with 3211 total quadrants
+[p4est] Into p4est_balance CORNER with 3211 total quadrants
+[p4est] Done p4est_balance with 4306 total quadrants
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+[p4est] Into p4est_partition with 4306 total quadrants
+[p4est] Done p4est_partition shipped 3617 quadrants 84%
+[p4est] Into p4est_ghost_new CORNER
+[p4est] Done p4est_ghost_new
+Global minlevel 3 maxlevel 8
+[libsc] Statistics for INIT
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.165592 (0.000104 = 0.0627%)
+[libsc]    Minimum attained at rank   185: 0.165441
+[libsc]    Maximum attained at rank   223: 0.165942
+[libsc] Statistics for REGRID
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         1.5453 (0.0307 = 1.98%)
+[libsc]    Minimum attained at rank   234: 1.50593
+[libsc]    Maximum attained at rank     0: 1.83864
+[libsc] Statistics for OUTPUT
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         3.50177e-07 (5.47e-07 = 156%)
+[libsc]    Minimum attained at rank     3: 0
+[libsc]    Maximum attained at rank   160: 2.38419e-06
+[libsc] Statistics for CHECK
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0 (0)
+[libsc]    Minimum attained at rank     0: 0
+[libsc]    Maximum attained at rank     0: 0
+[libsc] Statistics for ADVANCE
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         4.52607 (0.213 = 4.71%)
+[libsc]    Minimum attained at rank   204: 4.01872
+[libsc]    Maximum attained at rank   235: 5.13221
+[libsc] Statistics for EXCHANGE
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         11.8114 (0.216 = 1.82%)
+[libsc]    Minimum attained at rank    16: 11.2476
+[libsc]    Maximum attained at rank    99: 12.2837
+[libsc] Statistics for WALLTIME
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         18.1532 (0.000598 = 0.00329%)
+[libsc]    Minimum attained at rank     9: 18.1525
+[libsc]    Maximum attained at rank    83: 18.1563
+[libsc] Statistics for UNACCOUNTED
+[libsc]    Global number of values:   256
+[libsc]    Mean value (std. dev.):         0.104838 (0.0526 = 50.1%)
+[libsc]    Minimum attained at rank   233: 0.0594299
+[libsc]    Maximum attained at rank   174: 0.441165
+[libsc] Procs 256 advance 75 4.52607 exchange 11.8114 regrid 1.5453
+[libsc] Max/P 256 advance 75 5.13221 exchange 12.2837 regrid 1.83864
+ 
+TACC: Shutdown complete. Exiting.
