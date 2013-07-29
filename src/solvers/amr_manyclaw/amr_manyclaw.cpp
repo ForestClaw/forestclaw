@@ -571,7 +571,6 @@ static
 void amr_manyclaw_patch_data_delete(void **wp)
 {
     amr_manyclaw_patch_data_t *manyclaw_patch_data = (amr_manyclaw_patch_data_t*) *wp;
-    delete manyclaw_patch_data->aux_global;
     delete manyclaw_patch_data;
 
     // or?
