@@ -417,6 +417,8 @@ coprocessor) and the host.
 % CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
 % that would mean a whole leaf.
 
+\alert{Thought: Should we swap sections 3. and 4.?}
+
 For hyperbolic problems, we integrate the solution on a single uniform patch,
 containing $m^d$ cells, using the wave propagation algorithm described by R. J.
 LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
@@ -494,7 +496,7 @@ q_t + ({\bf u}\cdot \nabla) q = 0 ,
 where the velocity field ${\bf u} = (u(\xi,\eta,t), v(\xi,\eta,t)$ is
 a prescribed function of computational coordinates.  The relevant
 numerical parameters that are set in each case include the size of the
-patch on each leaf ($m=8$ in each case), and the minimum and maximum
+patch on each leaf ($m=8$ or $m=16$), and the minimum and maximum
 refinement levels, which in turn fix minimum and maximum effective grid
 resolutions.
 
