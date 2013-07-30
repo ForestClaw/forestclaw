@@ -189,7 +189,42 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                     }
                     else
                     {
-                        int icorner_coarse = icorner;
+                        int icorner_coarse;
+                        if (is_block_corner)
+                        {
+                            icorner_coarse = icorner;
+                        }
+                        else
+                        {
+                            if (icorner == 0)
+                            {
+                                if (intersects_block[0])
+                                    icorner_coarse = 2;
+                                else if (intersects_block[2])
+                                    icorner_coarse = 1;
+                            }
+                            else if (icorner == 1)
+                            {
+                                if (intersects_block[1])
+                                    icorner_coarse = 3;
+                                else if (intersects_block[2])
+                                    icorner_coarse = 0;
+                            }
+                            else if (icorner == 2)
+                            {
+                                if (intersects_block[0])
+                                    icorner_coarse = 0;
+                                else if (intersects_block[3])
+                                    icorner_coarse = 3;
+                            }
+                            else if (icorner == 3)
+                            {
+                                if (intersects_block[1])
+                                    icorner_coarse = 1;
+                                else if (intersects_block[3])
+                                    icorner_coarse = 2;
+                            }
+                        }
                         coarse_cp->mb_average_corner_ghost(icorner_coarse,
                                                            refratio,corner_cp,time_interp,
                                                            is_block_corner,intersects_block);
@@ -296,11 +331,11 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == -1 && is_fine)
             {
-                /* Corner is at at coarser level.  If the corner patch is a parallel
+                /* Corner is at a coarser level.  If the corner patch is a parallel
                    ghost patch, then we should average onto it as well (even if it
                    is technically read only)  Otherwise, it won't have good data for
                    doing interpolation to this fine grid later */
-                if (fclaw2d_patch_is_ghost (neighbor_patch))
+                if (fclaw2d_patch_is_ghost(neighbor_patch))
                 {
                     /* Corner is a parallel ghost patch.  Do the same as above, but
                        but from the perspective of the ghost (coarser) patch.*/
@@ -309,7 +344,6 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
                     if (this_block_idx == corner_block_idx)
                     {
-                        /* Works only for the sphere grid */
                         int icorner_coarse = 3-icorner;
                         coarse_cp->interpolate_corner_ghost(icorner_coarse,
                                                             refratio,corner_cp,time_interp);
@@ -317,7 +351,42 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                     else
                     {
                         /* Works only for the sphere grid */
-                        int icorner_coarse = icorner;
+                        int icorner_coarse;
+                        if (is_block_corner)
+                        {
+                            icorner_coarse = icorner;
+                        }
+                        else
+                        {
+                            if (icorner == 0)
+                            {
+                                if (intersects_block[0])
+                                    icorner_coarse = 2;
+                                else if (intersects_block[2])
+                                    icorner_coarse = 1;
+                            }
+                            else if (icorner == 1)
+                            {
+                                if (intersects_block[1])
+                                    icorner_coarse = 3;
+                                else if (intersects_block[2])
+                                    icorner_coarse = 0;
+                            }
+                            else if (icorner == 2)
+                            {
+                                if (intersects_block[0])
+                                    icorner_coarse = 0;
+                                else if (intersects_block[3])
+                                    icorner_coarse = 3;
+                            }
+                            else if (icorner == 3)
+                            {
+                                if (intersects_block[1])
+                                    icorner_coarse = 1;
+                                else if (intersects_block[3])
+                                    icorner_coarse = 2;
+                            }
+                        }
                         coarse_cp->mb_interpolate_corner_ghost(icorner_coarse,
                                                                refratio,corner_cp,time_interp,
                                                                is_block_corner,intersects_block);
