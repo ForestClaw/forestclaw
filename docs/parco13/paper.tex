@@ -29,6 +29,7 @@
 
 \newcommand{\comment}[1]{\textcolor{green}{[DAC: #1]}\xspace}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
+\newcommand{\cO}{\mathcal{O}}
 \newcommand{\sR}{\mathbb{R}}
 \newcommand{\dt}{\mathrm{d}t}
 \newcommand{\clawpack}{{\sc Clawpack}\xspace}
@@ -237,26 +238,25 @@ external hexahedral mesh generators, eliminating the need to encode it by hand.
 A main challenge is presented by the fact that the patch neighborhood
 is only known to \pforest.  This patch connectivity information needs
 to be propagated to the numerical code in \forestclaw that implements
-the interaction with neighbor patches via the use of a layer of ghost
-cells surrounding each patch.  \alert{To this end}, we define an interface
-that allows read-only access to the sequence of blocks,
-the list of patches for each, and a lookup of neighbor patches (and
-their relative orientation which is nontrivial between blocks).
+the interaction with neighbor patches via the use of a layer of (typically two)
+ghost cells surrounding each patch.  To this end, we have designed an
+interface that provides read-only access to the sequence of blocks, the list of
+patches for each, and a constant-time lookup of neighbor patches (and their
+relative orientation which is nontrivial between blocks).
+% Since a neighbor patch has $m \ge 4$ cells in each direction, the required
+% ghost cells are available by construction.
 Suitably informed by \pforest, \forestclaw stores only the patches local to
-each MPI rank.  \alert{The exchange of ghost} data and parallel repartitioning is
-provided transparently by \pforest.  Mesh modification directives, such as
-adaptive refinement and coarsening, are called from \forestclaw and relayed to
-\pforest.
+each MPI rank.
 
-\alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.
-%
-Quote: How is AMR working in detail. For example: Figure 1 shows a
-2:1 refinement, thus refinement of a single patch could affect a whole region
-of the computational domain. + The underlying equations are known to
-Forestclaw: How is is the information shared with p4est (equation dependent
-refinement criteria, refinement and coarsening strategies (interpolation,
-integration).
-}
+Mesh modification directives, such as adaptive refinement and coarsening, are
+called from \forestclaw and executed as black-box operations inside \pforest.
+The only information that flows back to \pforest is a set of per-patch
+refinement and coarsening flags, which are computed from the numerical state in
+\forestclaw.  Our current algorithm requires neighbor patches to have a size
+difference of at most a factor of two (the 2:1 balance condition).  This condition
+can have nonlocal effects on the refinement pattern and is enforced by
+special-purpose parallel algorithms in \pforest \cite{IsaacBursteddeGhattas12}.
+
 
 % Forestclaw would support swapping out p4est or \clawpack
 
@@ -309,7 +309,7 @@ augmented where necessary with information about one layer of ghost leaves
 (see \Fig{cubed3}).
 
 \forestclaw uses iterators over all rank-local leaves, optionally restricted to
-a given level.  Random access is possible and used when executing $O(1)$ time
+a given level.  Random access is possible and used when executing $\cO(1)$ time
 neighbor lookups.  Looping over the patches in the order prescribed by the
 forest
 \alert{Review 2 - Explain the preceding paragraph in more detail}
@@ -320,6 +320,21 @@ accessing neighbors only relative to the current patch leads to a high
 percentage of cache reuse
 \cite{BursteddeBurtscherGhattasEtAl09}.
 % since the ghost patches are likely closeby with respect to the $z$-order.
+
+
+
+\alert{The exchange of ghost} data and parallel repartitioning is
+provided transparently by \pforest.
+\alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.
+%
+Quote: How is AMR working in detail. For example: Figure 1 shows a
+2:1 refinement, thus refinement of a single patch could affect a whole region
+of the computational domain. + The underlying equations are known to
+Forestclaw: How is is the information shared with p4est (equation dependent
+refinement criteria, refinement and coarsening strategies (interpolation,
+integration).
+}
+
 
 When \forestclaw accesses neighbor patches, they can be on the same or a
 different block.  In the latter case, coordinate transformations are carried
@@ -336,7 +351,12 @@ or recent geometric adaptive multigrid schemes
 \cite{SundarBirosBursteddeEtAl12}.
 
 The threaded parallelism over the degrees of freedom of a patch can be handled
-by \forestclaw alone without the need to involve \pforest.  Additionally many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for the integration of the hyperbolic system on a leaf-patch thereby allowing for hybrid parallelism.  The design of leaf-patches then can enable efficient management of data local to many-core architectures (e.g. the Xeon Phi), and the host.
+by \forestclaw alone without the need to involve \pforest.  Additionally,
+many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for
+the integration of the hyperbolic system on a leaf-patch thereby allowing for
+hybrid parallelism.  The design of leaf-patches then can enable efficient
+management of data local to many-core architectures (for example the Xeon Phi
+coprocessor) and the host.
 
 % Trees have different coordinate systems.
 % neighbor block: permutation of patch points due to non-aligned coordinate
