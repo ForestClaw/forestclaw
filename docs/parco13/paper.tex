@@ -455,7 +455,7 @@ As mentioned in the previous section, this procedure can be extended
 transparently to distributed parallelism by defining an abstract exchange
 routine for ghost patch data.
 
-Grid refinement and coarsening requires interpolation from coarse grids
+Mesh refinement and coarsening requires interpolation from coarse grids
 to newly created fine grids, and the averaging of fine grid data to a newly
 created underlying coarse grid.  This operation is rank-local, analogous to the
 general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
@@ -497,7 +497,7 @@ where the velocity field ${\bf u} = (u(\xi,\eta,t), v(\xi,\eta,t)$ is
 a prescribed function of computational coordinates.  The relevant
 numerical parameters that are set in each case include the size of the
 patch on each leaf ($m=8$ or $m=16$), and the minimum and maximum
-refinement levels, which in turn fix minimum and maximum effective grid
+refinement levels, which in turn fix minimum and maximum effective mesh
 resolutions.
 
 In both examples, a patch is tagged for refinement if the
@@ -536,6 +536,45 @@ ${u}$ simulates rigid body rotation.  We show the results at an intermediate
 time in \Fig{results2d}.
 \end{description}
 
+\begin{figure}
+\begin{center}
+  \includegraphics[angle=-90,width=.8\columnwidth]{pdf/uni_advance_strong-crop}
+  \\[1ex]
+  \includegraphics[angle=-90,width=.8\columnwidth]{pdf/uni_exchange_strong-crop}
+\end{center}
+\caption{Strong scaling of MPI parallelism for advection on a uniform mesh.
+  Top: run time of time integration.  Bottom: time spent in local and parallel
+  neighbor exchanges.  The number of patches is $2^{2 \ell}$ at level $\ell$.
+  The flat lines for the smaller runs are caused by having
+  less patches than MPI processes, leaving some of them idle.  For each data point
+  we use the maximum time required across all processes.}
+\label{fig:uniscale}
+\end{figure}%
+We begin our analysis of Example 1 with uniform-mesh experiments run on TACC's
+\emph{Stampede} supercomputer at different levels of resolution.  First of all,
+we use 1 to 16 MPI processes on one 16-core compute node, obtaining a strong
+scaling efficiency for the time integration between 97\%--103\% depending on
+the resolution (from levels 1 and 8).  Then, we examine processor counts from
+16 to 256 using 16 cores per node.  The scaling behavior remains linear for
+the time integration itself, and mostly linear for the local and parallel
+neighbor exchanges which require about 10\% of the time integration run time;
+see Figure~\ref{fig:uniscale}.  Due to space constraints we omit the
+corresponding weak scaling results, which are nearly optimal as well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 The results in this section are preliminary and will be extended in the final
 version.  We have so far exercised \forestclaw for two 2D manifolds,
 % namely the
@@ -562,6 +601,7 @@ author would like to also acknowledge the Isaac Newton Institute
 \forestclaw was done. The leaf/patch paradigm was independently
 presented by B.\ as part of a talk at the SCI Institute, Salt Lake City, Utah,
 USA in July 2011.
+\alert{Add TACC Stampede grants}
 
 
 %%%%%%%%%%% The bibliography starts:
