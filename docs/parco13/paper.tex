@@ -23,6 +23,7 @@
 \usepackage{cite}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{tikz}
 \usepackage{url}
 \usepackage{xspace}
 
@@ -145,8 +146,9 @@ higher order methods have also been constructed by widening the stencil, for ins
 To facilitate hardware acceleration for parallel dynamic AMR, we
 build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
-identifies each octree leaf with a mesh element.  \alert{The presented work goes beyond the traditional high-order element and defines each element to
-be a dense computational patch with $m^d$ DOFs.}  In fact, this approach
+identifies each octree leaf with a mesh element.  The presented work does not
+construct a traditional high-order element but defines each element to be a
+dense computational patch with $m^d$ DOFs.  In fact, this approach
 resembles block-structured AMR \cite{be-ol:1984, be-co:1989,
 % be-le:1991 (cited below)
 ColellaGravesKeenEtAl07,
@@ -162,7 +164,12 @@ It has been designed to solve hyperbolic conservation laws
 % on a uniform compute patch
 and successfully used in the context of block-structured AMR
 \cite{be-le:1991, amrclaw, Berger:2011du}.
-\comment{Review 1 points out that the statement in red may not be what we are intending to say here.  Mainly the distinction between claiming better convergence then a high-order method (which I think is not what we are saying) and just stating that our elements are patches themselves as opposed to a single DOF.}
+% \comment{Review 1 points out that the statement in red may not be what we are
+% intending to say here.  Mainly the distinction between claiming better
+% convergence then a high-order method (which I think is not what we are saying)
+% and just stating that our elements are patches themselves as opposed to a
+% single DOF.}
+% CB: reworded the criticized statement above.
 
 In this paper we describe our design for the coupling of forest-of-octree AMR
 with \clawpack at the leaf level.  We comment on challenges that arise in
@@ -273,15 +280,25 @@ integration).
 \begin{center}
 \includegraphics[width=.4\columnwidth]{../figs_misc/forest_stacked}
 \hspace{.05\columnwidth}
-\includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
+\begin{tikzpicture}[every node/.style={anchor=south west,inner sep=0pt},
+                    x=1mm, y=1mm]
+  \node at (0,0) {
+    \includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
+  };
+  \node [fill=white, inner sep=2pt] at (28, 10) {1};
+  \node [fill=white, inner sep=2pt] at (5, 27) {2};
+  \node [fill=white, inner sep=2pt] at (41, 27) {2};
+  \node [fill=white, inner sep=2pt] at (28, 36) {3};
+\end{tikzpicture}
+%\includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
 \end{center}
 \caption{Left: Forest of two quadtrees, partitioned among three MPI processes.
 Each quadtree has its own coordinate orientation.  The situation in 3D
 (octrees) is analogous.  Right: The leaves in a forest of six quadtrees that
 serves as the computational domain for the cubed sphere.  An adhoc refinement
 pattern has been 2:1 balanced in terms of neighbor sizes and partitioned
-between five MPI processes (the three middle ones are shown from black to
-white).}
+between five MPI processes (the three middle ones out of $0 \ldots 4$
+are shown from black to white).}
 \label{fig:cubed3}
 \end{figure}
 
