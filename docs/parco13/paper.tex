@@ -23,11 +23,13 @@
 \usepackage{cite}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{tikz}
 \usepackage{url}
 \usepackage{xspace}
 
 \newcommand{\comment}[1]{\textcolor{green}{[DAC: #1]}\xspace}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}\xspace}
+\newcommand{\cO}{\mathcal{O}}
 \newcommand{\sR}{\mathbb{R}}
 \newcommand{\dt}{\mathrm{d}t}
 \newcommand{\clawpack}{{\sc Clawpack}\xspace}
@@ -72,16 +74,16 @@
 The University of Texas at Austin, USA}
 
 \begin{abstract}
-We present a new hybrid paradigm for parallel adaptive mesh
-refinement (AMR) that combines the scalability and lightweight architecture of
-tree-based AMR with the computational efficiency of patch-based solvers for
-hyperbolic conservation laws.  The key idea is to interpret each leaf of the AMR
-hierarchy as one uniform compute patch in $\sR^d$ with $m^d$ degrees of freedom,
-where $m$ is customarily between 8 and 32.  Thus, computation on each patch can
-be optimized for speed, while we inherit the flexibility of adaptive meshes.  In
-our work we choose to work with the \pforest AMR library since it allows us to
-compose the mesh from multiple mapped octrees and enables the cubed sphere and
-other nontrivial multiblock geometries.
+We present a new hybrid paradigm for parallel adaptive mesh refinement (AMR)
+that combines the scalability and lightweight architecture of tree-based AMR
+with the computational efficiency of patch-based solvers for hyperbolic
+conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
+as one uniform compute patch in $\sR^d$ with $m^d$ degrees of freedom, where $m$ is
+customarily between 8 and 32.  Thus, computation on each patch can be optimized
+for speed, while we inherit the flexibility of adaptive meshes.  In our work we
+choose to work with the \pforest AMR library since it allows us to compose the mesh
+from multiple mapped octrees and enables the cubed sphere and other
+nontrivial multiblock geometries.
 \end{abstract}
 
 \begin{keyword}
@@ -145,8 +147,9 @@ higher order methods have also been constructed by widening the stencil, for ins
 To facilitate hardware acceleration for parallel dynamic AMR, we
 build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
-identifies each octree leaf with a mesh element.  \alert{The presented work goes beyond the traditional high-order element and defines each element to
-be a dense computational patch with $m^d$ DOFs.}  In fact, this approach
+identifies each octree leaf with a mesh element.  The presented work does not
+construct a traditional high-order element but defines each element to be a
+dense computational patch with $m^d$ DOFs.  In fact, this approach
 resembles block-structured AMR \cite{be-ol:1984, be-co:1989,
 % be-le:1991 (cited below)
 ColellaGravesKeenEtAl07,
@@ -162,7 +165,12 @@ It has been designed to solve hyperbolic conservation laws
 % on a uniform compute patch
 and successfully used in the context of block-structured AMR
 \cite{be-le:1991, amrclaw, Berger:2011du}.
-\comment{Review 1 points out that the statement in red may not be what we are intending to say here.  Mainly the distinction between claiming better convergence then a high-order method (which I think is not what we are saying) and just stating that our elements are patches themselves as opposed to a single DOF.}
+% \comment{Review 1 points out that the statement in red may not be what we are
+% intending to say here.  Mainly the distinction between claiming better
+% convergence then a high-order method (which I think is not what we are saying)
+% and just stating that our elements are patches themselves as opposed to a
+% single DOF.}
+% CB: reworded the criticized statement above.
 
 In this paper we describe our design for the coupling of forest-of-octree AMR
 with \clawpack at the leaf level.  We comment on challenges that arise in
@@ -230,18 +238,25 @@ external hexahedral mesh generators, eliminating the need to encode it by hand.
 A main challenge is presented by the fact that the patch neighborhood
 is only known to \pforest.  This patch connectivity information needs
 to be propagated to the numerical code in \forestclaw that implements
-the interaction with neighbor patches via the use of a layer of ghost
-cells surrounding each patch.  \alert{To this end}, we define an interface
-that allows read-only access to the sequence of blocks,
-the list of patches for each, and a lookup of neighbor patches (and
-their relative orientation which is nontrivial between blocks).
+the interaction with neighbor patches via the use of a layer of (typically two)
+ghost cells surrounding each patch.  To this end, we have designed an
+interface that provides read-only access to the sequence of blocks, the list of
+patches for each, and a constant-time lookup of neighbor patches (and their
+relative orientation which is nontrivial between blocks).
+% Since a neighbor patch has $m \ge 4$ cells in each direction, the required
+% ghost cells are available by construction.
 Suitably informed by \pforest, \forestclaw stores only the patches local to
-each MPI rank.  \alert{The exchange of ghost} data and parallel repartitioning is
-provided transparently by \pforest.  Mesh modification directives, such as
-adaptive refinement and coarsening, are called from \forestclaw and relayed to
-\pforest.
+each MPI rank.
 
-\alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.}
+Mesh modification directives, such as adaptive refinement and coarsening, are
+called from \forestclaw and executed as black-box operations inside \pforest.
+The only information that flows into \pforest is a set of per-patch
+refinement and coarsening flags, which are computed from the numerical state in
+\forestclaw.  Our current algorithm requires neighbor patches to have a size
+difference of at most a factor of two (the 2:1 balance condition).  This condition
+can have nonlocal effects on the refinement pattern and is enforced by
+special-purpose parallel algorithms in \pforest \cite{IsaacBursteddeGhattas12}.
+
 
 % Forestclaw would support swapping out p4est or \clawpack
 
@@ -265,15 +280,25 @@ adaptive refinement and coarsening, are called from \forestclaw and relayed to
 \begin{center}
 \includegraphics[width=.4\columnwidth]{../figs_misc/forest_stacked}
 \hspace{.05\columnwidth}
-\includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
+\begin{tikzpicture}[every node/.style={anchor=south west,inner sep=0pt},
+                    x=1mm, y=1mm]
+  \node at (0,0) {
+    \includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
+  };
+  \node [fill=white, inner sep=2pt] at (28, 10) {1};
+  \node [fill=white, inner sep=2pt] at (5, 27) {2};
+  \node [fill=white, inner sep=2pt] at (41, 27) {2};
+  \node [fill=white, inner sep=2pt] at (28, 36) {3};
+\end{tikzpicture}
+%\includegraphics[width=.4\columnwidth]{../figs_misc/cubed3}
 \end{center}
 \caption{Left: Forest of two quadtrees, partitioned among three MPI processes.
 Each quadtree has its own coordinate orientation.  The situation in 3D
 (octrees) is analogous.  Right: The leaves in a forest of six quadtrees that
 serves as the computational domain for the cubed sphere.  An adhoc refinement
 pattern has been 2:1 balanced in terms of neighbor sizes and partitioned
-between five MPI processes (the three middle ones are shown from black to
-white).}
+between five MPI processes (the three middle ones out of $0 \ldots 4$
+are shown from black to white).}
 \label{fig:cubed3}
 \end{figure}
 
@@ -283,11 +308,15 @@ space filling curve.  Each MPI rank has a local view on its own partition,
 augmented where necessary with information about one layer of ghost leaves
 (see \Fig{cubed3}).
 
-\forestclaw uses iterators over all rank-local leaves, optionally restricted to
-a given level.  Random access is possible and used when executing $O(1)$ time
-neighbor lookups.  Looping over the patches in the order prescribed by the
-forest
-\alert{Review 2 - Explain the preceding paragraph in more detail}
+\forestclaw uses iterators over all rank-local leaves to execute numerical
+tasks one patch at a time, optionally restricted to a given refinement level.
+Random access to patches is possible and used when dereferencing the results
+from
+% executing
+% $\cO(1)$ time
+neighbor lookups.  Looping over the patches in the order
+prescribed by the forest
+% \alert{Review 2 - Explain the preceding paragraph in more detail}
 % \comment{tree?}
 % CB: I think forest is fine here.
 and
@@ -300,18 +329,75 @@ When \forestclaw accesses neighbor patches, they can be on the same or a
 different block.  In the latter case, coordinate transformations are carried
 out.  The structure of \forestclaw is oblivious to the fact that it only has a
 local view of the distributed mesh and data which relieves the developer from
-programming to the MPI interface.  Parallel neighbor exchanges are hidden
-inside \pforest and called by \forestclaw at well-defined synchronization
-points.  There is one such parallel data exchange per time step for a global
-value of $\dt$, the time step length, or one exchange per discretization level per time step if $\dt$
-is chosen per-patch depending on its size (this is sometimes called
-sub-cycling).  When using sub-cycling, the load balance is attained per level as
-it is done for example in Chombo \cite{ColellaGravesKeenEtAl07}
-or recent geometric adaptive multigrid schemes
+programming to the MPI interface.
+% Parallel neighbor exchanges are hidden
+% inside \pforest and called by \forestclaw
+% % at well-defined synchronization points
+% as follows.
+
+With MPI parallelism, neighbor patches can be either local or assigned to a
+different process (ghost patches).  Since this must make no difference
+numerically, we need to ensure that the values of ghost patches are current
+whenever they are accessed.  To this end, we allocate storage for a layer of
+ghost patches in \forestclaw, which we can pass to a general-purpose \pforest
+routine that communicates local leaf data to all processes that view a
+particular leaf as a ghost.  If we call this routine before we go through the
+local neighbor interactions, we can handle ghost values implicitly by neighbor
+lookups without querying if they are local or remote.
+
+% \alert{The exchange of ghost} data and parallel repartitioning is
+% provided transparently by \pforest.
+% \alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.
+% %
+% Quote: How is AMR working in detail. For example: Figure 1 shows a
+% 2:1 refinement, thus refinement of a single patch could affect a whole region
+% of the computational domain. + The underlying equations are known to
+% Forestclaw: How is is the information shared with p4est (equation dependent
+% refinement criteria, refinement and coarsening strategies (interpolation,
+% integration).
+% }
+% CB: Is this addressed sufficiently now?
+
+% count of exchanges with and without sub-cycling
+In the context of finite-element or finite-difference methods, there should be
+one such parallel data exchange per time step for a global value of the time
+step length $\dt$, or one exchange per discretization level per time step if
+$\dt$ is chosen per-patch depending on its size (this is sometimes called
+sub-cycling).  In the tradition of block-structured AMR codes, interaction
+between neighbor patches is done in a hierarchy from coarse to fine levels, and
+then correction factors are propagated back from fine to coarse levels, requiring
+an exchange at each level.  With sub-cycling, this entails a recursion with an
+operation count that is exponential in the difference between the largest and
+the smallest refinement level, with the benefit that $\dt$ matches the CFL
+condition at each level.  While a large number of exchanges per time step can
+present a scaling bottleneck due to the inherent synchronization and latency
+losses, the expectation is still that the time to solution improves when
+switching from uniform to adaptive meshes, since we are computing with fewer
+patches, and improves again when enabling sub-cycling, since we take larger
+time steps on the coarser levels.
+
+% load balance / (weighted) partition
+The space-filling curve paradigm allows for lightweight repartitioning
+algorithms.  Even uniform meshes benefit from this approach since the number of
+processors does not need to be commensurable with the number of patches in each
+space dimension.  For adaptive meshes, we repartiton after every refinement
+operation and transfer the numerical data accordingly; see \cite[Fig.\
+4]{BursteddeGhattasStadlerEtAl08} for the overall procedure.  When using
+sub-cycling, we have the option to assign a weight to each patch based on its
+level, determined by the expected number of sub-cycles per coarse-level time
+step, and partition to equidistribute the cumulative weight between the
+processors.  Currently, we are not enforcing a load balance that is attained
+separately for each level, as it is done for example in Chombo
+\cite{ColellaGravesKeenEtAl07} or recent geometric adaptive multigrid schemes
 \cite{SundarBirosBursteddeEtAl12}.
 
 The threaded parallelism over the degrees of freedom of a patch can be handled
-by \forestclaw alone without the need to involve \pforest.  Additionally many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for the integration of the hyperbolic system on a leaf-patch thereby allowing for hybrid parallelism.  The design of leaf-patches then can enable efficient management of data local to many-core architectures (e.g. the Xeon Phi), and the host.
+by \forestclaw alone without the need to involve \pforest.  Additionally,
+many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for
+the integration of the hyperbolic system on a leaf-patch thereby allowing for
+hybrid parallelism.  The design of leaf-patches then can enable efficient
+management of data local to many-core architectures (for example the Xeon Phi
+coprocessor) and the host.
 
 % Trees have different coordinate systems.
 % neighbor block: permutation of patch points due to non-aligned coordinate
@@ -330,6 +416,8 @@ by \forestclaw alone without the need to involve \pforest.  Additionally many-co
 
 % CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
 % that would mean a whole leaf.
+
+\alert{Thought: Should we swap sections 3. and 4.?}
 
 For hyperbolic problems, we integrate the solution on a single uniform patch,
 containing $m^d$ cells, using the wave propagation algorithm described by R. J.
@@ -396,8 +484,8 @@ The numerical results to date have been designed to verify that
 interface layer between \pforest and \forestclaw is sufficiently
 flexible and robust.  Of particular importance was ensuring that all
 ghost cell transfers (including averaging and
-interpolation) have been implemented correctly.
-The basic \clawpack algorithm and corresponding code have been
+interpolation) are implemented correctly.
+The basic \clawpack algorithm and corresponding code are
 thoroughly tested and need no further verification in our context.
 
 In both sets of numerical results, we solve a scalar advection
@@ -408,7 +496,7 @@ q_t + ({\bf u}\cdot \nabla) q = 0 ,
 where the velocity field ${\bf u} = (u(\xi,\eta,t), v(\xi,\eta,t)$ is
 a prescribed function of computational coordinates.  The relevant
 numerical parameters that are set in each case include the size of the
-patch on each leaf ($m=8$ in each case), and the minimum and maximum
+patch on each leaf ($m=8$ or $m=16$), and the minimum and maximum
 refinement levels, which in turn fix minimum and maximum effective grid
 resolutions.
 
