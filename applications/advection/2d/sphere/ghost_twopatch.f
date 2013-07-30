@@ -412,9 +412,11 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(0) .eq. 1) then
+c                          # get info from fine block corner 2
                            kf = areafine(ifine,my+1-jfine)
                            qf =   qfine(ifine,my+1-jfine,mq)
                         elseif (is_block_bdry(2) .eq. 1) then
+c                          # get info from fine block corner 1
                            kf = areafine(mx+1-ifine,jfine)
                            qf =   qfine(mx+1-ifine,jfine,mq)
                         endif
@@ -435,9 +437,11 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(1) .eq. 1) then
+c                          # get info from fine block corner 3
                            kf = areafine(mx+1-ifine,my+1-jfine)
                            qf =   qfine(mx+1-ifine,my+1-jfine,mq)
                         elseif (is_block_bdry(2) .eq. 1) then
+c                          # get info from fine block corner 0
                            kf = areafine(ifine,jfine)
                            qf =   qfine(ifine,jfine,mq)
                         endif
@@ -458,9 +462,11 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(0) .eq. 1) then
+c                          # get info from fine block corner 0
                            kf = areafine(ifine,jfine)
                            qf =   qfine(ifine,jfine,mq)
                         elseif (is_block_bdry(3) .eq. 1) then
+c                          # get info from fine block corner 3
                            kf = areafine(mx+1-ifine,my+1-jfine)
                            qf =   qfine(mx+1-ifine,my+1-jfine,mq)
                         endif
@@ -481,9 +487,11 @@ c                 # Average fine grid corners onto coarse grid ghost corners
                         ifine = (ibc-1)*refratio + ii
                         jfine = (jbc-1)*refratio + jj
                         if (is_block_bdry(1) .eq. 1) then
+c                          # get info from fine block corner 1
                            kf = areafine(mx+1-ifine,jfine)
                            qf =   qfine(mx+1-ifine,jfine,mq)
                         elseif (is_block_bdry(3) .eq. 1) then
+c                          # get info from fine block corner 2
                            kf = areafine(ifine,my+1-jfine)
                            qf =   qfine(ifine,my+1-jfine,mq)
                         endif
