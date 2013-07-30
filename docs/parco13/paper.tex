@@ -241,7 +241,15 @@ provided transparently by \pforest.  Mesh modification directives, such as
 adaptive refinement and coarsening, are called from \forestclaw and relayed to
 \pforest.
 
-\alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.}
+\alert{Review 2 requests more info on how this is done.  Sounds like they are more curious about the refinement overhead to other leaves on the tree and the strategy as to how refinement is decided.
+%
+Quote: How is AMR working in detail. For example: Figure 1 shows a
+2:1 refinement, thus refinement of a single patch could affect a whole region
+of the computational domain. + The underlying equations are known to
+Forestclaw: How is is the information shared with p4est (equation dependent
+refinement criteria, refinement and coarsening strategies (interpolation,
+integration).
+}
 
 % Forestclaw would support swapping out p4est or \clawpack
 
