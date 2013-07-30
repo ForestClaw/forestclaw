@@ -212,6 +212,8 @@ void regrid(fclaw2d_domain_t **domain)
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 
+    /* These values are updated below after iterate_adapted. */
+    /* TODO: can we use global min/maxlevels here? */
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
@@ -250,6 +252,8 @@ void regrid(fclaw2d_domain_t **domain)
 
         // Do a level exchange to make sure all data is valid;
         // Coarse and fine grid exchanges will happen during time stepping as needed.
+        minlevel = new_domain->global_minlevel;
+        maxlevel = new_domain->global_maxlevel;
         for (int level = minlevel; level <= maxlevel; level++)
         {
             level_exchange(new_domain,level, FCLAW2D_TIMER_REGRID);
