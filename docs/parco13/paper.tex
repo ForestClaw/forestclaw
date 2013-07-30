@@ -42,6 +42,7 @@
 \newcommand{\plotbox}[1]{#1}
 
 \newcommand{\Fig}[1]{Figure~\ref{fig:#1}}
+\newcommand{\Tab}[1]{Table~\ref{tab:#1}}
 
 \newcommand{\alert}[1]{{\color{red}#1}}
 
@@ -558,9 +559,46 @@ the resolution (from levels 1 and 8).  Then, we examine processor counts from
 16 to 256 using 16 cores per node.  The scaling behavior remains linear for
 the time integration itself, and mostly linear for the local and parallel
 neighbor exchanges which require about 10\% of the time integration run time;
-see Figure~\ref{fig:uniscale}.  Due to space constraints we omit the
+see \Fig{uniscale}.  Due to space constraints we omit the
 corresponding weak scaling results, which are nearly optimal as well.
 
+\begin{table}
+  \begin{center}
+    \begin{tabular}{cccc|rr}
+      \multicolumn{4}{c|}{strategy} & \multicolumn{2}{c}{wall clock time} \\
+      mesh & remesh & partition & time step & $P = 16$ & $P = 256$ \\
+      \hline
+      uniform & none       & by count  & global   & 3961.  & 256.  \\
+      \hline
+          AMR & every step & by count  & global   &  252.  &  54.6 \\
+          AMR & every 4    & by count  & global   &  178.  &  39.7 \\
+      \hline
+          AMR & every step & by count  & subcycle &   99.9 &  17.3 \\
+          AMR & every 4    & by count  & subcycle &   87.2 &  14.0 \\
+      \hline
+          AMR & every step & by weight & subcycle &   95.7 &  18.2 \\
+          AMR & every 4    & by weight & subcycle &   84.4 & 14.2 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\caption{Comparison of different meshing strategies for the advection example
+  with a fixed maximum level 8, run on 16 and 256 cores, respectively.  The
+  wall clock time includes the whole run of the program beginning to end (file
+  I/O disabled).  The adaptive runs converge to a minimum level of 3.}
+\label{tab:swirlwall}
+\end{table}
+Next, we examine how we can reduce the overall wall clock time of a simulation
+by switching from uniform refinement to AMR with the same maximum level,
+effectively coarsening where high resolution is not beneficial.  For an example
+with a sharp front as depicted in \Fig{results2d} we expect considerable
+savings by AMR, which we confirm in \Tab{swirlwall}.  The wall clock times can
+be reduced by up to a factor of 50 by combining AMR with subcycling.  The
+adaptive runs are still very well load balanced overall, which we infer from
+the linear scaling of the time integration alone (not shown) and from the fact
+that the weighted partition does not influence the run times.  There is the
+tradeoff however, at least in the current implementation, that the adaptive
+runs suffer from the loss in scalability associated with the neighbor exchanges
+that we discussed earlier.
 
 
 
@@ -575,20 +613,21 @@ corresponding weak scaling results, which are nearly optimal as well.
 
 
 
-The results in this section are preliminary and will be extended in the final
-version.  We have so far exercised \forestclaw for two 2D manifolds,
-% namely the
-% unit square and a sphere composed of two mapped squares.
-% On both we solve the
-% advection equation with a given velocity field.
-advecting a concentration field with a sharp gradient that we track dynamically
-with adaptive mesh refinement.  We observe that the refinement follows the
-front and allows for an accurate representation of its location over time.
-% \Fig{results2d}.
 
-\pforest is parallelized with MPI and well tested on large supercomputers, both
-in 2D and 3D.  Parallelization of \forestclaw is not completed yet but
-envisioned for the final version of the paper.
+% The results in this section are preliminary and will be extended in the final
+% version.  We have so far exercised \forestclaw for two 2D manifolds,
+% % namely the
+% % unit square and a sphere composed of two mapped squares.
+% % On both we solve the
+% % advection equation with a given velocity field.
+% advecting a concentration field with a sharp gradient that we track dynamically
+% with adaptive mesh refinement.  We observe that the refinement follows the
+% front and allows for an accurate representation of its location over time.
+% % \Fig{results2d}.
+% 
+% \pforest is parallelized with MPI and well tested on large supercomputers, both
+% in 2D and 3D.  Parallelization of \forestclaw is not completed yet but
+% envisioned for the final version of the paper.
 
 \section*{Acknowledgements}
 
