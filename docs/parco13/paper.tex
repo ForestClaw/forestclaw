@@ -600,6 +600,24 @@ tradeoff however, at least in the current implementation, that the adaptive
 runs suffer from the loss in scalability associated with the neighbor exchanges
 that we discussed earlier.
 
+\begin{figure}
+  \begin{center}
+  \begin{minipage}{.4\columnwidth}
+    \begin{tabular}{cc}
+      timing table for sphere & 123, \\
+    \end{tabular}
+  \end{minipage}
+  \hspace{.05\columnwidth}
+  \includegraphics[width=.4\columnwidth]{../figs_misc/sphere_partition5}
+\end{center}
+\caption{Partition of the spherical Example 2 between five MPI processors, indicated
+  by the color scale, at simulated time $T = 1$.  The partition shows the mesh equator,
+  while the refinement is invariant under the number of processors and the partition
+and follows the front, which is not aligned with the equator.}
+\label{fig:spherical}
+\end{figure}
+To demonstrate a multiblock connectivity, we include results for Example 2 in
+\Fig{spherical}.
 
 
 
