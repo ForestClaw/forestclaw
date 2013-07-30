@@ -4,7 +4,7 @@ use strict;
 use Getopt::Std;
 
 my (%opt, $average, $startproc, $found, $filestr);
-my ($procs, $numad, $tad, $tex, $trg);
+my ($procs, $numad, $numex, $numrg, $tad, $tex, $trg);
 my (%proclist, %proclevels, %procad, %procex, %procrg);
 my ($level, $adarr, $exarr, $rgarr, $step);
 
@@ -29,23 +29,27 @@ while (<>) {
 
 	$found = 0;
 	if ($average) {
-if (m:Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+) regrid ([0-9.e+-]+):) {
+if (m:Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange (\d+) ([0-9.e+-]+) regrid (\d+) ([0-9.e+-]+):) {
 		$found = 1;
 		$procs = $1;
 		$numad = $2;
 		$tad = $3;
-		$tex = $4;
-		$trg = $5;
+		$numex = $4;
+		$tex = $5;
+		$numrg = $6;
+		$trg = $7;
 }
 	}
 	else {
-if (m:Max/P (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+) regrid ([0-9.e+-]+):) {
+if (m:Max/P (\d+) advance (\d+) ([0-9.e+-]+) exchange (\d+) ([0-9.e+-]+) regrid (\d+) ([0-9.e+-]+):) {
 		$found = 1;
 		$procs = $1;
 		$numad = $2;
 		$tad = $3;
-		$tex = $4;
-		$trg = $5;
+		$numex = $4;
+		$tex = $5;
+		$numrg = $6;
+		$trg = $7;
 }
 	}
 	if ($found) {
