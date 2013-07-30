@@ -24,6 +24,10 @@ if (mq == 1)
   set(o,'ylim',[qmin+1 qmax+2]);
   set(o,'ticklength',[0 0])
   set(o,'fontsize',16,'fontweight','bold')
+
+  setpatchborderprops(1:10,'linewidth',2);
+  showpatchborders;
+
 else
   cm_index = false;
 
