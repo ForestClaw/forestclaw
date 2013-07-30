@@ -72,16 +72,16 @@
 The University of Texas at Austin, USA}
 
 \begin{abstract}
-We present a new hybrid paradigm for parallel adaptive mesh
-refinement (AMR) that combines the scalability and lightweight architecture of
-tree-based AMR with the computational efficiency of patch-based solvers for
-hyperbolic conservation laws.  The key idea is to interpret each leaf of the AMR
-hierarchy as one uniform compute patch in $\sR^d$ with $m^d$ degrees of freedom,
-where $m$ is customarily between 8 and 32.  Thus, computation on each patch can
-be optimized for speed, while we inherit the flexibility of adaptive meshes.  In
-our work we choose to work with the \pforest AMR library since it allows us to
-compose the mesh from multiple mapped octrees and enables the cubed sphere and
-other nontrivial multiblock geometries.
+We present a new hybrid paradigm for parallel adaptive mesh refinement (AMR)
+that combines the scalability and lightweight architecture of tree-based AMR
+with the computational efficiency of patch-based solvers for hyperbolic
+conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
+as one uniform compute patch in $\sR^d$ with $m^d$ degrees of freedom, where $m$ is
+customarily between 8 and 32.  Thus, computation on each patch can be optimized
+for speed, while we inherit the flexibility of adaptive meshes.  In our work we
+choose to work with the \pforest AMR library since it allows us to compose the mesh
+from multiple mapped octrees and enables the cubed sphere and other
+nontrivial multiblock geometries.
 \end{abstract}
 
 \begin{keyword}
