@@ -1,0 +1,25 @@
+
+Wall clock times for 16 and 256 MPI cores at 16 procs/node
+All mx=my=16, minlevel=1, maxlevel=8, extrapolated to tfinal=1.
+
+uniform (nodes16c)
+here the scale factor is 15.47 out of 16, so that's 96.7 percent
+3961.	256.
+
+nosubcycle regrid 1
+252.	54.6
+
+nosubcycle regrid 4
+178.	39.7
+
+subcycle no weighted partition regrid 1
+99.9	17.3
+
+subcycle no weighted partition regrid 4
+87.2	14.0
+
+subcycle weighted partition regrid 1
+95.7	18.2
+
+subcycle weighted partition regrid 4
+84.4	14.2

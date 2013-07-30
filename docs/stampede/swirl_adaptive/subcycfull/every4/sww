@@ -1,0 +1,30 @@
+#! /bin/bash
+
+#SBATCH -J swrl               # Job name
+#SBATCH -o swrl.%j.out        # Name of stdout output file (%j expands to jobId)
+#SBATCH -e swrl.%j.err        # Name of stderr output file (%j expands to jobId)
+#SBATCH --mail-user=burstedde@ins.uni-bonn.de
+#SBATCH --mail-type=fail
+#SBATCH --mail-type=end
+#SBATCH -A TG-DPP130002
+#SBATCH -p normal             # Queue name
+#SBATCH -t 04:00:00           # Run time (hh:mm:ss)
+#SBATCH -N 1                  # Total number of nodes requested (16 cores/node)
+#SBATCH -n 16                 # Total number of mpi tasks requested
+
+################################ LOOP BEGIN
+for LEVEL in 1 2 3 4 5 6 7 8 ; do
+
+echo "Level $LEVEL"
+BDIR="$WORK/local/forestclaw/swirl"
+BEXE="$BDIR/swirl"
+COMM="$BEXE -F ../swirl_defaults.ini \
+            -W $BDIR/fclaw2d_waveprop.ini \
+            --prefix=$SCRATCH/forestclaw/$SLURM_JOB_NAME.$SLURM_JOB_ID \
+            --maxlevel=$LEVEL --regrid_interval=4"
+
+echo "Starting $COMM"
+ibrun $COMM
+
+done
+################################ LOOP END
