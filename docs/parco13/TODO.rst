@@ -1,6 +1,5 @@
 Stuff To Address
 ================
- - Figure 1 ".. between five MPI processes (the three middle ones are shown from black to white)" - Some annotations in the graphic would be helpful, actually the illustration has four colors.
 
  - ".. as one uniform patch in $mathbb{R}^d$ of dimension $m^d$, where $m$ is ..", The word "dimension" is misleading in this case, because $d$ is already the spatial dimension: "size"?
 
@@ -16,5 +15,3 @@ Stuff To Address
    refinement and grid resolution for the spherical ball? If they are as same as
    the numbers in example 1, please indicate that in the paragraph that starts
    with “In both examples” on page 5.
-
- * Annotations in Fig 1 right
