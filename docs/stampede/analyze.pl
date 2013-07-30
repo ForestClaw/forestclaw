@@ -27,6 +27,7 @@ else {
 
 while (<>) {
 
+	# Try the latest output convention first
 	$found = 0;
 	if ($average) {
 if (m:Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange (\d+) ([0-9.e+-]+) regrid (\d+) ([0-9.e+-]+):) {
@@ -52,6 +53,32 @@ if (m:Max/P (\d+) advance (\d+) ([0-9.e+-]+) exchange (\d+) ([0-9.e+-]+) regrid 
 		$trg = $7;
 }
 	}
+
+	# If the latest convention didn't match, try the older one
+	if (!$found) {
+	if ($average) {
+if (m:Procs (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+) regrid ([0-9.e+-]+):) {
+		$found = 1;
+		$procs = $1;
+		$numad = $2;
+		$tad = $3;
+		$tex = $4;
+		$trg = $5;
+}
+	}
+	else {
+if (m:Max/P (\d+) advance (\d+) ([0-9.e+-]+) exchange ([0-9.e+-]+) regrid ([0-9.e+-]+):) {
+		$found = 1;
+		$procs = $1;
+		$numad = $2;
+		$tad = $3;
+		$tex = $4;
+		$trg = $5;
+}
+	}
+	}
+
+	# Suppose we have identified relevant output
 	if ($found) {
 
 		if (!$proclist{$procs}) {
