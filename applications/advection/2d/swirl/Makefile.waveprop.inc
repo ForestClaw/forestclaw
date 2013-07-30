@@ -11,6 +11,5 @@ waveprop_objs = \
 	$(AMR_WAVEPROP_FORTRAN)/src2.o \
 	$(AMR_WAVEPROP_FORTRAN)/bc2.o \
 	$(AMR_WAVEPROP_FORTRAN)/flux2.o \
-	$(AMR_WAVEPROP_FORTRAN)/qad2.o \
 	$(AMR_WAVEPROP_FORTRAN)/step2.o \
 	$(AMR_WAVEPROP_FORTRAN)/ClawPatch2.o
