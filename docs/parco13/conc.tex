@@ -1,0 +1,13 @@
+
+
+\section{Conclusion}
+
+We have presented the integration of an MPI-based forest-of-octrees adaptive
+meshing code, \pforest, with a numerical solver for hyperbolic
+conservation laws, \clawpack/\manyclaw,
+that implements threaded parallelism for a single compute patch
+on the other.  All topological operations on the mesh are handled by \pforest,
+while all numerical operations are handled by the \clawpack implementation.
+This combination naturally enables a hybrid MPI/threaded parallelization.
+We demonstrate scalability of this approach in various ways, where the MPI-only variant
+scales up to 16,384 codes
