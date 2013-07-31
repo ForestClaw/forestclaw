@@ -631,18 +631,27 @@ objective of minimizing the parallel neighbor exchanges.
 
 \begin{figure}
   \begin{center}
-  \begin{minipage}{.4\columnwidth}
-    \begin{tabular}{cc}
-      timing table for sphere & 123, \\
+    \hspace{.1\columnwidth}
+    \begin{minipage}[c]{.4\columnwidth}
+      \includegraphics[width=.99\columnwidth]{../figs_misc/sphere_partition5}
+    \end{minipage}
+    \hspace{.05\columnwidth}
+    \begin{minipage}[c]{.4\columnwidth}
+    \begin{tabular}{r|r}
+       $P$ & time int./step \\
+      \hline
+       16 & 1.115 \\
+       32 & 0.557 \\
+       64 & 0.297 \\
+      256 & 0.092 \\
     \end{tabular}
   \end{minipage}
-  \hspace{.05\columnwidth}
-  \includegraphics[width=.4\columnwidth]{../figs_misc/sphere_partition5}
 \end{center}
-\caption{Partition of the spherical Example 2 between five MPI processors, indicated
+\caption{Left: Partition of the spherical Example 2 between five MPI processors, indicated
   by the color scale, at simulated time $T = 1$.  The partition shows the mesh equator,
   while the refinement is invariant under the number of processors and the partition
-and follows the front, which is not aligned with the equator.}
+  and follows the front, which is not aligned with the equator.  Right: Strong scaling
+  for a uniform run at level 8.}
 \label{fig:spherical}
 \end{figure}
 To demonstrate a multiblock connectivity, we include results for Example 2 in
