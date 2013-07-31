@@ -33,10 +33,11 @@
 \newcommand{\sR}{\mathbb{R}}
 \newcommand{\dt}{\mathrm{d}t}
 \newcommand{\clawpack}{{\sc Clawpack}\xspace}
-\newcommand{\forestclaw}{Forestclaw\xspace}
+\newcommand{\forestclaw}{ForestClaw\xspace}
 \newcommand{\pforest}{\texttt{p4est}\xspace}
 \newcommand{\manyclaw}{Manyclaw\xspace}
 
+\newcommand{\ignore}[1]{}
 
 % \newcommand{\plotbox}[1]{\fbox{#1}}
 \newcommand{\plotbox}[1]{#1}
@@ -101,7 +102,8 @@ manycore
 
 \section{Introduction}
 
-With the advent of many-core chips, such as GPUs and the MIC architecture, comes the opportunity to sustain unprecedented rates of floating point
+With the advent of many-core chips such as GPUs and the MIC architecture
+ comes the opportunity to sustain unprecedented rates of floating point
 operations at comparably high integration density and low cost.  These
 architectures, however, require careful structuring of the data layout and
 memory access patterns to exhaust their multithreading and vectorization
@@ -148,7 +150,7 @@ higher order methods have also been constructed by widening the stencil, for ins
 To facilitate hardware acceleration for parallel dynamic AMR, we
 build upon the forest-of-octrees paradigm because of its low overhead
 and proven scalability \cite{BursteddeWilcoxGhattas11}.  This approach
-identifies each octree leaf with a mesh element.  The presented work does not
+identifies each octree leaf with a mesh element.  The present work does not
 construct a traditional high-order element but defines each element to be a
 dense computational patch with $m^d$ DOFs.  In fact, this approach
 resembles block-structured AMR \cite{be-ol:1984, be-co:1989,
@@ -224,6 +226,10 @@ under 1k bytes per octree, 8 bytes per MPI rank,
 % CB: thanks, I have added it.
 is insignificant compared to
 the numerical data ($m^d$ floating point values per patch).
+% \comment{It is probably more like M*m^d floating point values - with metric terms, velocity
+% fields, multiple copies of the solution (needed for time stepping, re-taking times steps, etc).
+% but the idea here is the same. What is a good way to say this? }
+
 \item The resulting parallel programming model is a hybrid (often referred
 to as MPI+X).  Only rank-local leaves/patches are stored and computed on.
 \end{enumerate}
@@ -241,9 +247,11 @@ is only known to \pforest.  This patch connectivity information needs
 to be propagated to the numerical code in \forestclaw that implements
 the interaction with neighbor patches via the use of a layer of (typically two)
 ghost cells surrounding each patch.  To this end, we have designed an
-interface that provides read-only access to the sequence of blocks, the list of
-patches for each, and a constant-time lookup of neighbor patches (and their
-relative orientation which is nontrivial between blocks).
+interface that provides \ignore{read-only} access to the sequence of blocks, the list of
+patches per-block, and a constant-time lookup of neighbor patches (and their
+relative and, in general, nontrivial orientation between blocks).
+% \comment{DAC: What do you mean by read-only?  Neighbors get updated by the ghost cell
+% exchange process...}
 % Since a neighbor patch has $m \ge 4$ cells in each direction, the required
 % ghost cells are available by construction.
 Suitably informed by \pforest, \forestclaw stores only the patches local to
@@ -294,9 +302,13 @@ the cell interface.  For non-linear problems and systems, an approximate
 Riemann solver, such as a Roe solver \cite{roesolver}, is typically used.  Since
 much of the physics of an application can be contained in the Riemann solver,
 \forestclaw adopts \clawpack's interface to Riemann solvers effectively allowing
-problems solved with \clawpack to be solvable in \forestclaw.  In order to
+problems solved with \clawpack to be solvable in \forestclaw.  Wave limiters
+are used to supress spurious oscillations resulting from truncation error in a typical
+second order method.
+\comment{DAC: Limiters formally reduce the order of accuracy.}
+\ignore{In order to
 achieve second order accuracy wave limiters are used to suppress spurious
-oscillations at sharp gradients in the flow.
+oscillations at sharp gradients in the flow.}
 
 Data exchanges between neighboring patches are done via layers of
 ghost cells extending the dimensions along the edges of each patch.
@@ -353,7 +365,8 @@ are shown from black to white).}
 \end{figure}
 
 The MPI layer is addressed from within \pforest and not exposed to the
-\forestclaw code.  The order of leaves is maintained in \pforest according to a
+\forestclaw code.  The \ignore{order of leaves} leaf ordering
+is maintained in \pforest according to a
 space filling curve.  Each MPI rank has a local view on its own partition,
 augmented where necessary with information about one layer of ghost leaves
 (see \Fig{cubed3}).
@@ -543,17 +556,19 @@ time in \Fig{results2d}.
   \\[1ex]
   \includegraphics[angle=-90,width=.8\columnwidth]{pdf/uni_exchange_strong-crop}
 \end{center}
-\caption{Strong scaling of MPI parallelism for advection on a uniform mesh.
-  Top: run time of time integration.  Bottom: time spent in local and parallel
-  neighbor exchanges.  The number of patches is $2^{2 \ell}$ at level $\ell$.
-  The flat lines for the smaller runs are caused by having
-  less patches than MPI processes, leaving some of them idle.  For each data point
-  we use the maximum time required across all processes.}
+\caption{Strong scaling of MPI parallelism for advection on a
+  uniformly refined mesh.  Top: run time of time integration.  Bottom:
+  time spent in local and parallel neighbor exchanges.  The number of
+  patches is $2^{2 \ell}$ at level $\ell$.  The flat lines for the
+  smaller runs are caused by having fewer patches than MPI processes,
+  leaving some of the processors idle.  For each data point we use the
+  maximum time required across all processes. \comment{This last
+    sentence is a bit unclear.  What do you mean exactly?}}
 \label{fig:uniscale}
 \end{figure}%
-We begin our analysis of Example 1 with uniform-mesh experiments run on TACC's
-Stampede supercomputer at different levels of resolution.  First of all,
-we use 1 to 16 MPI processes on one 16-core compute node, obtaining a strong
+We begin our analysis of Example 1 with uniformly-refined mesh experiments run on TACC's
+Stampede supercomputer at different levels of resolution.
+We use 1 to 16 MPI processes on one 16-core compute node, obtaining a strong
 scaling efficiency for the time integration between 97\%--103\% depending on
 the resolution (from levels 1 and 8).  Then, we examine processor counts from
 16 to 256 using 16 cores per node.  The scaling behavior remains linear for
@@ -562,10 +577,10 @@ neighbor exchanges which require about 10\% of the time integration run time;
 see \Fig{uniscale}.
 
 We have examined weak scalability as well by using four times as many processes
-for each level inclease, from level 6 at 64 cores to level 10 at 4096.  The
+for each level increase, from level 6 at 64 cores to level 10 at 4096.  The
 exchange times stay consistently below 16\% of the time integration.  The time
 in seconds per time integration step varies between .0578 and .0602,
-which yields a parallel efficiency of 96\%. 
+which yields a parallel efficiency of 96\%.
 
 \begin{table}
   \begin{center}
@@ -593,17 +608,18 @@ which yields a parallel efficiency of 96\%.
 \label{tab:swirlwall}
 \end{table}
 Next, we examine how we can reduce the overall wall clock time of a simulation
-by switching from uniform refinement to AMR with the same maximum level,
+by switching from uniformly refined meshes to adaptive refinement with the same maximum level,
 effectively coarsening where high resolution is not beneficial.  For an example
 with a sharp front as depicted in \Fig{results2d} we expect considerable
 savings by AMR, which we confirm in \Tab{swirlwall}.  The wall clock times can
 be reduced by up to a factor of 50 by combining AMR with subcycling.  The
-adaptive runs are still very well load balanced overall, which we infer from
+adaptive runs are still  load balanced overall, which we infer from
 the linear scaling of the time integration alone (not shown) and from the fact
 that the weighted partition does not influence the run times.  There is the
 tradeoff however, at least in the current implementation, that the adaptive
-runs suffer from the loss in scalability associated with the neighbor exchanges
-that we discussed earlier.
+runs suffer from the loss in scalability associated with the ghost patch exchanges
+described earlier. Currently, ghost patch exchanges are made across all levels, even
+if only two levels are involved in the exchange.
 
 \begin{figure}
   \begin{center}
@@ -647,7 +663,7 @@ To demonstrate a multiblock connectivity, we include results for Example 2 in
 % with adaptive mesh refinement.  We observe that the refinement follows the
 % front and allows for an accurate representation of its location over time.
 % % \Fig{results2d}.
-% 
+%
 % \pforest is parallelized with MPI and well tested on large supercomputers, both
 % in 2D and 3D.  Parallelization of \forestclaw is not completed yet but
 % envisioned for the final version of the paper.
