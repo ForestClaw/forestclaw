@@ -87,7 +87,7 @@ choose to integrate with the \pforest AMR library since it allows us to compose
 the mesh from multiple mapped octrees and enables the cubed sphere and other
 nontrivial multiblock geometries.  We describe aspects of the parallel
 implementation and close with scalings for both MPI-only and OpenMP/MPI hybrid
-runs, where the largest MPI-only run uses 4,096 CPU cores.
+runs, where the largest MPI-only run uses 16,384 CPU cores.
 \end{abstract}
 
 \begin{keyword}
@@ -402,7 +402,7 @@ programming to the MPI interface.
 
 With MPI parallelism, neighbor patches can be either local or assigned to a
 different process (ghost patches).  Since this must make no difference
-numerically, we need to ensure that the values of ghost patches are current
+numerically, we need to ensure that the values of parallel neighbor patches are current
 whenever they are accessed.  To this end, we allocate storage for a layer of
 ghost patches in \forestclaw, which we can pass to a general-purpose \pforest
 routine that communicates local leaf data to all processes that view a
@@ -457,8 +457,8 @@ separately for each level, as it is done for example in Chombo
 \cite{SundarBirosBursteddeEtAl12}.
 
 The threaded parallelism over the degrees of freedom of a patch can be handled
-by \forestclaw alone without the need to involve \pforest.  Additionally,
-many-core implementations, such as \manyclaw \cite{manyclaw}, can be used for
+by \forestclaw alone without the need to involve \pforest.  For instance, a
+many-core implementation, such as \manyclaw \cite{manyclaw}, can be used for
 the integration of the hyperbolic system on a leaf-patch thereby allowing for
 hybrid parallelism.  The design of leaf-patches then can enable efficient
 management of data local to many-core architectures (for example the Xeon Phi
@@ -512,7 +512,7 @@ q_t + ({\bf u}\cdot \nabla) q = 0 ,
 where the velocity field ${\bf u} = (u(\xi,\eta,t), v(\xi,\eta,t)$ is
 a prescribed function of computational coordinates.  The relevant
 numerical parameters that are set in each case include the size of the
-patch on each leaf ($m=8$ or $m=16$), and the minimum and maximum
+patch on each leaf ($m=8$, $16$, or $32$), and the minimum and maximum
 refinement levels, which in turn fix minimum and maximum effective mesh
 resolutions.
 
@@ -525,11 +525,11 @@ if this patch would not meet the criteria for refinement.
 \item{\bf Example 1:} An initial concentration field $q$
 is set to 0 in the left half of a computational square and to 1 in the
 right half.  A time dependent flow field is prescribed that distorts
-the interface between the 0 and 1 concentration values.  The minimum
-and maximum levels of refinement are set to 3 and 6, respectively.
+the interface between the 0 and 1 concentration values.  
+\Fig{results2d} shows the results at an intermediate time step, where
+the minimum and maximum levels of refinement are set to 3 and 6, respectively.
 This results in a minimum resolution of $64 \times 64$ and a maximum
-resolution of $512 \times 512$.  \Fig{results2d} shows the results
-at an intermediate time step.
+resolution of $512 \times 512$.
 
 % \begin{figure}
 % \begin{center}
@@ -545,7 +545,7 @@ multiblock functionality of \forestclaw by considering flow on a
 sphere.  The sphere mapping we use consists of two quadtrees, each
 defined in the computational space $[-1,1] \times [-1,1]$
 \cite{ca-he-le:2008, be-ca-he-le:2009}.  Each quadtree is mapped to cover one
-hemisphere.  The initial conditions is $q = 0$ in one half of
+hemisphere.  The initial condition is $q = 0$ in one half of
 the sphere, and $q = 1$ in the other half, where the halves are not
 necessarily aligned with the equator of the mapping.  The flow field
 ${u}$ simulates rigid body rotation.  We show the results at an intermediate
@@ -564,8 +564,11 @@ time in \Fig{results2d}.
   patches is $2^{2 \ell}$ at level $\ell$.  The flat lines for the
   smaller runs are caused by having fewer patches than MPI processes,
   leaving some of the processors idle.  For each data point we use the
-  maximum time required across all processes. \comment{This last
-    sentence is a bit unclear.  What do you mean exactly?}}
+  time required by the slowest processor to verify that the load is
+  balanced equally.
+%  all processes. \comment{This last
+%    sentence is a bit unclear.  What do you mean exactly?}
+}
 \label{fig:uniscale}
 \end{figure}%
 We begin our analysis of Example 1 with uniformly-refined mesh experiments run on TACC's
@@ -579,10 +582,11 @@ neighbor exchanges which require about 10\% of the time integration run time;
 see \Fig{uniscale}.
 
 We have examined weak scalability as well by using four times as many processes
-for each level increase, from level 6 at 64 cores to level 10 at 4096.  The
-exchange times stay consistently below 16\% of the time integration.  The time
-in seconds per time integration step varies between .0578 and .0602,
-which yields a parallel efficiency of 96\%.
+for each level increase, from level 6 at 64 cores to level 11 at 16,384.  Up to
+4,096 cores, the exchange times stay consistently below 16\% of the time
+integration and the time in seconds per time integration step varies between
+.0578 and .0602, which yields a parallel efficiency of 96\%.  For the
+data point at 16,384 cores, the efficiency is still 82\%.
 
 \begin{table}
   \begin{center}
@@ -611,7 +615,7 @@ which yields a parallel efficiency of 96\%.
 \end{table}
 Next, we examine how we can reduce the overall wall clock time of a simulation
 by switching from uniformly refined meshes to adaptive refinement with the same maximum level,
-effectively coarsening where high resolution is not beneficial.  For an example
+effectively coarsening where high resolution is not needed.  For an example
 with a sharp front as depicted in \Fig{results2d} we expect considerable
 savings by AMR, which we confirm in \Tab{swirlwall}.  The wall clock times can
 be reduced by up to a factor of 50 by combining AMR with subcycling.  The
@@ -619,9 +623,11 @@ adaptive runs are still  load balanced overall, which we infer from
 the linear scaling of the time integration alone (not shown) and from the fact
 that the weighted partition does not influence the run times.  There is the
 tradeoff however, at least in the current implementation, that the adaptive
-runs suffer from the loss in scalability associated with the ghost patch exchanges
-described earlier. Currently, ghost patch exchanges are made across all levels, even
-if only two levels are involved in the exchange.
+runs exhibit reduced scalability associated with the ghost patch exchanges
+described earlier.  Presently, ghost patch exchanges are made across all levels, even
+if only two levels are involved in the exchange.  One enhancement of the code that is
+currently being developed is to rewrite the time stepping loop with the
+objective of minimizing the parallel neighbor exchanges.
 
 \begin{figure}
   \begin{center}
@@ -640,7 +646,8 @@ and follows the front, which is not aligned with the equator.}
 \label{fig:spherical}
 \end{figure}
 To demonstrate a multiblock connectivity, we include results for Example 2 in
-\Fig{spherical}.
+\Fig{spherical}, together with a strong scaling table that shows that the spherical
+example scales as well.
 
 
 
