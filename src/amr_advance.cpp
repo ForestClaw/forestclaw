@@ -66,16 +66,15 @@ static void update_level_solution(fclaw2d_domain_t *domain,
 
 static
 double advance_level(fclaw2d_domain_t *domain,
-                   const int a_level,
-                   const int a_curr_fine_step,
-                   subcycle_manager* a_time_stepper)
+                     const int a_level,
+                     const int a_curr_fine_step,
+                     subcycle_manager* a_time_stepper,
+                     fclaw_bool do_egpd)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
     fclaw_bool time_interp_is_false = fclaw_false;
-
-    /* do an EGPD here, based on whether input flag do_egpd has been set */
 
     double maxcfl = 0;
     if (verbose)
@@ -83,6 +82,15 @@ double advance_level(fclaw2d_domain_t *domain,
         cout << endl;
         cout << "Advancing level " << a_level << " from step " <<
             a_curr_fine_step << " at time " << t_level << endl;
+    }
+
+    if (do_egpd)
+    {
+        /* Do a global exchange.  In the non-subcycled case, this is only true
+           if called directly from advance_level;  otherwise it is false.
+           The efficiency may still not be there in the subcycled case
+        */
+        exchange_ghost_patch_data(domain,time_interp_is_false);
     }
 
     if (!a_time_stepper->can_advance(a_level,a_curr_fine_step))
@@ -118,8 +126,9 @@ double advance_level(fclaw2d_domain_t *domain,
                    be used in setting corners on coarser grids, if needed. */
                 set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
-                /* No EGDP needed here */
-                exchange_with_coarse(domain,a_level,t_level,alpha,
+                /* This can still be improved */
+                fclaw_bool do_egpd = fclaw_true;
+                exchange_with_coarse(domain,a_level,t_level,alpha,do_egpd,
                                      FCLAW2D_TIMER_ADVANCE);
 
                 /* Set physicals BCs on the finer level, using any newly updated
@@ -141,7 +150,9 @@ double advance_level(fclaw2d_domain_t *domain,
                              << a_level-1 << endl;
                     }
                     /* set do_egpd = false */
-                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                    fclaw_bool no_egpd = fclaw_false;
+                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,
+                                           a_time_stepper,no_egpd);
                     if (verbose)
                     {
                         cout << " ----> Returning from recursive call at level "
@@ -168,8 +179,10 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " ----> Making recursive call to advance_level for level "
                              << a_level-1 << endl;
                     }
-                    /* do_egpd = false */
-                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
+                    /* Have to think about this some more, so we'll be on the safe side */
+                    fclaw_bool do_egpd = fclaw_true;
+                    maxcfl = advance_level(domain,a_level-1,last_coarse_step,
+                                           a_time_stepper,do_egpd);
                     if (verbose)
                     {
                         cout << " ----> Returning from recursive call at level "
@@ -205,7 +218,8 @@ double advance_level(fclaw2d_domain_t *domain,
                              << a_level-1 << " using alpha = " << alpha << endl;
                     }
                     /* Make call to EGPD */
-                    exchange_with_coarse(domain,a_level,t_level,alpha,
+                    fclaw_bool do_egpd = fclaw_true;
+                    exchange_with_coarse(domain,a_level,t_level,alpha,do_egpd,
                                          FCLAW2D_TIMER_ADVANCE);
 
                     /* Apply BCs to finer grid.  We want to use current data, not time
@@ -280,6 +294,13 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
+
+    /* Do a parallel ghost patch exchange every time the fine grid is updated.
+       This should improve the non-subcycled case.  Subcycled case though is
+       still doing too many exchanges.
+    */
+    fclaw_bool do_egpd = fclaw_true;
+
     // 'n_fine_steps' is the number of steps we must take on the finest level to equal one
     // step on the coarsest non-empty level, i.e. minlevel.
     int minlevel = a_time_stepper->minlevel();
@@ -288,7 +309,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     double maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
-        double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper);
+        double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper,do_egpd);
         maxcfl = max(cfl_step,maxcfl);
     }
 

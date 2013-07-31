@@ -694,7 +694,8 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 
 void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
-                          double alpha, fclaw2d_timer_names_t running)
+                          double alpha, fclaw_bool do_egpd,
+                          fclaw2d_timer_names_t running)
 {
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
@@ -703,7 +704,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
 
-    // Simple exchange - no time interpolation needed
     fclaw_bool time_interp = alpha > 0; //
     int finer_level = level;
     int coarser_level = level - 1;
@@ -712,16 +712,19 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.time_interp = time_interp;
     e_info.level = level;
 
-    /* copy griddata to griddata_time_sync so that parallel exchange will work */
     if (time_interp)
     {
+        /* Store time interpolated data into m_griddata_time_sync. */
         fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
                                      (void *) &alpha);
     }
 
-    /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
-       we are in the time interpolated case */
-    exchange_ghost_patch_data(domain,time_interp);
+    if (do_egpd)
+    {
+        exchange_ghost_patch_data_levels(domain,time_interp,coarser_level,coarser_level);
+        /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
+           we are in the time interpolated case */
+    }
 
 
     /* Iterate over coarser level and average from finer neighbors to coarse. */
