@@ -365,7 +365,12 @@ fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 {
     int mpiret;
 
-    mpiret = MPI_Init (argc, argv);
+    //mpiret = MPI_Init (argc, argv);
+    //SC_CHECK_MPI (mpiret);
+
+    int provided;
+    mpiret = MPI_Init_thread (argc, argv, MPI_THREAD_FUNNELED, &provided);
+    if (provided != MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
     SC_CHECK_MPI (mpiret);
 
     sc_init (mpicomm, 0, 0, NULL, lp);
