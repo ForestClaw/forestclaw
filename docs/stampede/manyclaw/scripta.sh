@@ -1,9 +1,9 @@
 #! /bin/sh
 
 MINL=1
-MAXL=5
+MAXL=8
 
-NODES="1 2 4"
+NODES="1 2 4 8"
 
 
 for NODE in $NODES ; do
