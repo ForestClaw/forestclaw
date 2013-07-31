@@ -554,9 +554,9 @@ time in \Fig{results2d}.
 
 \begin{figure}
 \begin{center}
-  \includegraphics[angle=-90,width=.7\columnwidth]{pdf/uni_advance_strong-crop}
+  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_advance_strong-crop}
   \\[1ex]
-  \includegraphics[angle=-90,width=.7\columnwidth]{pdf/uni_exchange_strong-crop}
+  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_exchange_strong-crop}
 \end{center}
 \caption{Strong scaling of MPI parallelism for advection on a
   uniformly refined mesh.  Top: run time of time integration.  Bottom:
@@ -585,24 +585,27 @@ see \Fig{uniscale}.
 \begin{center}
 %  \includegraphics[angle=-90,width=.8\columnwidth]{../figs_misc/omp}
 %  \\[1ex]
-  \includegraphics[angle=-90,width=.7\columnwidth]{../figs_misc/advance_strong_omp}
+  \includegraphics[angle=-90,width=.75\columnwidth]{../figs_misc/advance_strong_omp}
 \end{center}
-\caption{Strong scaling of OpenMP parallelism for advection on a
-  uniformly refined mesh:
-  %Top: run time of advection Riemann problem kernel in both an optimized inlined interface and a generic function pointer interface via \manyclaw.  Bottom:
-  MPI + OpenMp hybrid parallelization of the time integration.
+\caption{Strong scaling of MPI/OpenMP parallelism for advection on a
+  uniformly refined mesh with 16 threads per node.
+  %Top: run time of advection Riemann problem kernel in both an optimized
+  %inlined interface and a generic function pointer interface via \manyclaw.
+  %Bottom:
+  %MPI + OpenMp hybrid parallelization of the time integration.
 }
 \label{fig:ompscale}
 \end{figure}%
 
-In \Fig{ompscale}, we scale multi-node parallel calculations.
+In \Fig{ompscale}, we show multi-node calculations using 16 OpenMP
+threads per node executed by the
 %and in future
 %iterations on accelerators 
-We use the \manyclaw set of patch-based PDE solvers.
+\manyclaw set of patch-based PDE solvers.
 %with
 %\forestclaw.  
-\manyclaw provides a generic set of interators for Riemann
-problems and related algorithms.
+%\manyclaw provides a generic set of interators for Riemann
+%problems and related algorithms.
 
 %$In this work we show good scaling results
 %across a single node and coupled to the MPI scaling as well.
@@ -680,13 +683,13 @@ objective of minimizing the parallel neighbor exchanges.
   for a uniform run at level 8.}
 \label{fig:spherical}
 \end{figure}
-To demonstrate a multiblock connectivity, we include results for Example 2 in
-\Fig{spherical}, together with a strong scaling table.
+To showcase a multiblock connectivity, we include results for the spherical Example 2 in
+\Fig{spherical}, together with a strong scaling table from 16 to 256 MPI ranks.
 
 \section{Conclusion}
 
 We have presented a novel hybrid paradigm for AMR that achieves good
-scaling both in the distributed and shared memory aspect of current
+scaling both in the distributed and shared memory aspects of current
 supercomputers.
 %
 % By
@@ -700,7 +703,7 @@ that implements threaded parallelism for a single compute patch.
 %All topological operations on the mesh are handled by \pforest,
 %while all numerical operations are handled by the \clawpack instance.
 This combination naturally enables MPI/threaded hybridization,
-where the MPI version scales to 16,384 CPU cores.
+where our biggest MPI run scales to 16,384 CPU cores.
 
 %
 % We demonstrate scalability of this approach in various ways, where the MPI-only variant
@@ -737,7 +740,8 @@ where the MPI version scales to 16,384 CPU cores.
 \section*{Acknowledgements}
 
 We would like to thank the Texas Advanced Computing Center (TACC) for access to
-the Stampede supercomputer under allocation TG-DPP130002 and TG-ASC130001 granted by the NSF XSEDE Program. 
+the Stampede supercomputer under allocations TG-DPP130002 and TG-ASC130001
+granted by the NSF XSEDE Program.
 The authors acknowledge valuable discussion with Randy LeVeque, Marsha
 Berger, and Hans-Petter Langtangen.  We also acknowledge David
 Ketcheson and the KAUST sponsored HPC$^3$ numerics workshop at which
