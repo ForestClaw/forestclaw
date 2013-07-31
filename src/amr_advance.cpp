@@ -75,6 +75,7 @@ double advance_level(fclaw2d_domain_t *domain,
     double t_level = a_time_stepper->level_time(a_level);
     fclaw_bool time_interp_is_false = fclaw_false;
 
+    /* do an EGPD here, based on whether input flag do_egpd has been set */
 
     double maxcfl = 0;
     if (verbose)
@@ -117,6 +118,7 @@ double advance_level(fclaw2d_domain_t *domain,
                    be used in setting corners on coarser grids, if needed. */
                 set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
+                /* No EGDP needed here */
                 exchange_with_coarse(domain,a_level,t_level,alpha,
                                      FCLAW2D_TIMER_ADVANCE);
 
@@ -138,6 +140,7 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " ----> Making recursive call to advance_level for level "
                              << a_level-1 << endl;
                     }
+                    /* set do_egpd = false */
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
                     if (verbose)
                     {
@@ -165,6 +168,7 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " ----> Making recursive call to advance_level for level "
                              << a_level-1 << endl;
                     }
+                    /* do_egpd = false */
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,a_time_stepper);
                     if (verbose)
                     {
@@ -200,6 +204,7 @@ double advance_level(fclaw2d_domain_t *domain,
                         cout << " --> Doing time interpolatation from coarse grid at level "
                              << a_level-1 << " using alpha = " << alpha << endl;
                     }
+                    /* Make call to EGPD */
                     exchange_with_coarse(domain,a_level,t_level,alpha,
                                          FCLAW2D_TIMER_ADVANCE);
 
