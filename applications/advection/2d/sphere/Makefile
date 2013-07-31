@@ -6,6 +6,7 @@ GEO = sphere
 include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
+FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
