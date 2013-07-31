@@ -481,9 +481,9 @@ coprocessor) and the host.
 
 \begin{figure}
 \begin{center}
-\plotbox{\includegraphics[width=.37\columnwidth]{quadtree}}
+\plotbox{\includegraphics[width=.35\columnwidth]{quadtree}}
 \hspace{.05\columnwidth}
-\plotbox{\includegraphics[width=.37\columnwidth]{sphere_plot167}}
+\plotbox{\includegraphics[width=.35\columnwidth]{sphere_plot167}}
 \end{center}
 \caption{Numerical results for solving the advection equation.  Left:  Unit
 square (single quadtree) with a twisting velocity field.  Right: Spherical ball
@@ -554,9 +554,9 @@ time in \Fig{results2d}.
 
 \begin{figure}
 \begin{center}
-  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_advance_strong-crop}
+  \includegraphics[angle=-90,width=.7\columnwidth]{pdf/uni_advance_strong-crop}
   \\[1ex]
-  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_exchange_strong-crop}
+  \includegraphics[angle=-90,width=.7\columnwidth]{pdf/uni_exchange_strong-crop}
 \end{center}
 \caption{Strong scaling of MPI parallelism for advection on a
   uniformly refined mesh.  Top: run time of time integration.  Bottom:
@@ -658,7 +658,7 @@ objective of minimizing the parallel neighbor exchanges.
 \begin{figure}
   \begin{center}
     \hspace{.1\columnwidth}
-    \begin{minipage}[c]{.4\columnwidth}
+    \begin{minipage}[c]{.35\columnwidth}
       \includegraphics[width=.99\columnwidth]{../figs_misc/sphere_partition5}
     \end{minipage}
     \hspace{.05\columnwidth}
@@ -681,18 +681,40 @@ objective of minimizing the parallel neighbor exchanges.
 \label{fig:spherical}
 \end{figure}
 To demonstrate a multiblock connectivity, we include results for Example 2 in
-\Fig{spherical}, together with a strong scaling table that shows that the spherical
-example scales reasonably well too.
+\Fig{spherical}, together with a strong scaling table.
 
+\section{Conclusion}
 
+We have presented a novel hybrid paradigm for AMR that achieves good
+scaling both in the distributed and shared memory aspect of current
+supercomputers.
+%
+% By
+% abstracting a leaf in the AMR hierarchy as the atomic unit of computation, we
+% are able to use almost arbitrary low level solvers.
+%
+Our implementation integrates an MPI-based forest-of-octrees adaptive
+meshing code, \pforest, with a numerical solver for hyperbolic
+conservation laws, \clawpack/\manyclaw,
+that implements threaded parallelism for a single compute patch.
+%All topological operations on the mesh are handled by \pforest,
+%while all numerical operations are handled by the \clawpack instance.
+This combination naturally enables MPI/threaded hybridization,
+where the MPI version scales to 16,384 CPU cores.
 
-\input{conc}
-
-
-
-
-
-
+%
+% We demonstrate scalability of this approach in various ways, where the MPI-only variant
+% scales weakly up to 16,384 codes, and strong scalability is linear for up to 256 cores
+% in the MPI-only and 128 in the threaded implementation, and our results that higher
+% core counts are easily possible.
+%
+% d to manage the exchanges between them efficiently.  The
+% flexibility and scalability of this approach provides an ideal workspace to
+% explore further algorithms and physics problems requiring new solvers at high
+% resolutions.
+%
+%the versatility of this approach the modular development of
+%scalable codes.
 
 
 
@@ -722,9 +744,11 @@ Ketcheson and the KAUST sponsored HPC$^3$ numerics workshop at which
 the initial phases of this project were first discussed.  The second
 author would like to also acknowledge the Isaac Newton Institute
 (Cambridge, UK), where much of the preliminary development work for
-\forestclaw was done. The leaf/patch paradigm was independently
+\forestclaw was done.
+The fourth author recognizes Simula National Lab for funding.
+The leaf/patch paradigm was independently
 presented by B.\ as part of a talk at the SCI Institute, Salt Lake City, Utah,
-USA in July 2011. The fourth authors recognize Simula National Lab for funding.
+USA in July 2011. 
 
 
 
