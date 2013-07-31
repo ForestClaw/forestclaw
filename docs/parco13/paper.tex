@@ -275,6 +275,55 @@ special-purpose parallel algorithms in \pforest \cite{IsaacBursteddeGhattas12}.
 % rank as is common with parallelization using the MPI framework
 % \cite{Forum94, SnirOttoHuss-LedermanEtAl96}.
 
+\section{Patch-based numerics at the leaf level}
+
+% CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
+% that would mean a whole leaf.
+
+\alert{I have swapped sections 3. and 4.  Please check/smooth the text.}
+
+For hyperbolic problems, we integrate the solution on a single uniform patch,
+containing $m^d$ cells, using the wave propagation algorithm described by R. J.
+LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
+clawpack}.  We assume a single degree of freedom per cell and reconstruct a
+piecewise constant solution to obtain left and right states at cell edges.  At
+each edge, we solve Riemann problems to obtain left and right going waves
+propagating at speeds determined from the solution to the Riemann problem.  For
+scalar advection, the speed of each wave is simply the local advection speed at
+the cell interface.  For non-linear problems and systems, an approximate
+Riemann solver, such as a Roe solver \cite{roesolver}, is typically used.  Since
+much of the physics of an application can be contained in the Riemann solver,
+\forestclaw adopts \clawpack's interface to Riemann solvers effectively allowing
+problems solved with \clawpack to be solvable in \forestclaw.  In order to
+achieve second order accuracy wave limiters are used to suppress spurious
+oscillations at sharp gradients in the flow.
+
+Data exchanges between neighboring patches are done via layers of
+ghost cells extending the dimensions along the edges of each patch.
+The interior edge values of a given patch overlap the ghost cell
+region of a neighboring patch.  For the second order wave propagation
+algorithm, two layers of ghost cells are sufficient.  This implies that
+one layer of ghost patches is sufficient for $m \ge 4$.  Neighboring
+patches at the same level of refinement simply copy their interior
+edge values into a neighbors' ghost cells.  Neighboring fine grid
+patches average their interior edge data to a coarser neighbor's ghost
+cell values.  And neighboring coarse grid patches interpolate data
+from their interior edge cells to their fine grid neighbor's ghost
+cell values.  To avoid loss of conservation and the creation of
+spurious extrema, we use a standard conservative, limited
+interpolation scheme to interpolate values from the coarse grid to
+fine grid coarse cells \cite{amrclaw, chombo}.  When sub-cycling, time accurate
+data between coarse grids is used to fill in ghost cells for fine grids.
+As mentioned in the previous section, this procedure can be extended
+transparently to distributed parallelism by defining an abstract exchange
+routine for ghost patch data.
+
+Mesh refinement and coarsening requires interpolation from coarse grids
+to newly created fine grids, and the averaging of fine grid data to a newly
+created underlying coarse grid.  This operation is rank-local, analogous to the
+general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
+4]{BursteddeGhattasStadlerEtAl08}.
+
 \section{Parallelization}
 
 \begin{figure}
@@ -412,55 +461,6 @@ coprocessor) and the host.
 % horizontal/vertical tree traversal
 
 % \todo{What is BearClaw (tree-based / S.\ Mitran)?}
-
-\section{Patch-based numerics at the leaf level}
-
-% CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
-% that would mean a whole leaf.
-
-\alert{Thought: Should we swap sections 3. and 4.?}
-
-For hyperbolic problems, we integrate the solution on a single uniform patch,
-containing $m^d$ cells, using the wave propagation algorithm described by R. J.
-LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
-clawpack}.  We assume a single degree of freedom per cell and reconstruct a
-piecewise constant solution to obtain left and right states at cell edges.  At
-each edge, we solve Riemann problems to obtain left and right going waves
-propagating at speeds determined from the solution to the Riemann problem.  For
-scalar advection, the speed of each wave is simply the local advection speed at
-the cell interface.  For non-linear problems and systems, an approximate
-Riemann solver, such as a Roe solver \cite{roesolver}, is typically used.  Since
-much of the physics of an application can be contained in the Riemann solver,
-\forestclaw adopts \clawpack's interface to Riemann solvers effectively allowing
-problems solved with \clawpack to be solvable in \forestclaw.  In order to
-achieve second order accuracy wave limiters are used to suppress spurious
-oscillations at sharp gradients in the flow.
-
-Data exchanges between neighboring patches are done via layers of
-ghost cells extending the dimensions along the edges of each patch.
-The interior edge values of a given patch overlap the ghost cell
-region of a neighboring patch.  For the second order wave propagation
-algorithm, two layers of ghost cells are sufficient.  This implies that
-one layer of ghost patches is sufficient for $m \ge 4$.  Neighboring
-patches at the same level of refinement simply copy their interior
-edge values into a neighbors' ghost cells.  Neighboring fine grid
-patches average their interior edge data to a coarser neighbor's ghost
-cell values.  And neighboring coarse grid patches interpolate data
-from their interior edge cells to their fine grid neighbor's ghost
-cell values.  To avoid loss of conservation and the creation of
-spurious extrema, we use a standard conservative, limited
-interpolation scheme to interpolate values from the coarse grid to
-fine grid coarse cells \cite{amrclaw, chombo}.  When sub-cycling, time accurate
-data between coarse grids is used to fill in ghost cells for fine grids.
-As mentioned in the previous section, this procedure can be extended
-transparently to distributed parallelism by defining an abstract exchange
-routine for ghost patch data.
-
-Mesh refinement and coarsening requires interpolation from coarse grids
-to newly created fine grids, and the averaging of fine grid data to a newly
-created underlying coarse grid.  This operation is rank-local, analogous to the
-general dynamic AMR procedures used in \pforest-based FE codes \cite[Fig.\
-4]{BursteddeGhattasStadlerEtAl08}.
 
 \section{Numerical results}
 
