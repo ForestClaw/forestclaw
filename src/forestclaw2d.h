@@ -443,9 +443,12 @@ fclaw2d_domain_exchange_t
  *                              #(received patches) is domain->num_ghost_patches.
  * \param [in] e                Allocated buffers whose e->patch_data[i] pointers
  *                              must have been set properly by forestclaw.
+ * \param [in] exchange_minlevel The minimum quadrant level that is exchanged.
+ * \param [in] exchange_maxlevel The maximum quadrant level that is exchanged.
  */
 void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
-                                    fclaw2d_domain_exchange_t * e);
+                                    fclaw2d_domain_exchange_t * e,
+                                    int exchange_minlevel, int exchange_maxlevel);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.

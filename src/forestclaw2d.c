@@ -802,7 +802,8 @@ fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
-                               fclaw2d_domain_exchange_t * e)
+                               fclaw2d_domain_exchange_t * e,
+                               int exchange_minlevel, int exchange_maxlevel)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
@@ -815,9 +816,21 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
 
     P4EST_ASSERT (e->num_exchange_patches == (int) ghost->mirrors.elem_count);
     P4EST_ASSERT (e->num_ghost_patches == (int) ghost->ghosts.elem_count);
-    p4est_ghost_exchange_custom_data (wrap->p4est, ghost, e->data_size,
-                                      e->patch_data,
-                                      e->ghost_contiguous_memory);
+    if (exchange_minlevel <= domain->global_minlevel &&
+        domain->global_maxlevel <= exchange_maxlevel)
+    {
+        p4est_ghost_exchange_custom (wrap->p4est, ghost, e->data_size,
+                                     e->patch_data,
+                                     e->ghost_contiguous_memory);
+    }
+    else
+    {
+        p4est_ghost_exchange_custom_levels (wrap->p4est, ghost,
+                                            exchange_minlevel,
+                                            exchange_maxlevel,
+                                            e->data_size, e->patch_data,
+                                            e->ghost_contiguous_memory);
+    }
 }
 
 void
