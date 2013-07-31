@@ -15,8 +15,9 @@ for LEVEL in `seq $MINL $MAXL` ; do
 	# This defines the problem size
 	#echo "# level $LEVEL"
 
+	# Not computing the level factor
         grep "Max/P" "mx32_omp_16_level_${LEVEL}_mpi_${NODE}.out" | \
-		cut -d ' ' -f 8,9 | awk "{ printf (\" %g\", \$2 / \$1 / (4**$LEVEL)); }"
+		cut -d ' ' -f 8,9 | awk "{ printf (\" %g\", \$2 / \$1 / (1**$LEVEL)); }"
 done
 	echo
 done
