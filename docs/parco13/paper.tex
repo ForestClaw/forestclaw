@@ -481,9 +481,9 @@ coprocessor) and the host.
 
 \begin{figure}
 \begin{center}
-\plotbox{\includegraphics[width=.4\columnwidth]{quadtree}}
+\plotbox{\includegraphics[width=.37\columnwidth]{quadtree}}
 \hspace{.05\columnwidth}
-\plotbox{\includegraphics[width=.4\columnwidth]{sphere_plot167}}
+\plotbox{\includegraphics[width=.37\columnwidth]{sphere_plot167}}
 \end{center}
 \caption{Numerical results for solving the advection equation.  Left:  Unit
 square (single quadtree) with a twisting velocity field.  Right: Spherical ball
@@ -554,9 +554,9 @@ time in \Fig{results2d}.
 
 \begin{figure}
 \begin{center}
-  \includegraphics[angle=-90,width=.8\columnwidth]{pdf/uni_advance_strong-crop}
+  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_advance_strong-crop}
   \\[1ex]
-  \includegraphics[angle=-90,width=.8\columnwidth]{pdf/uni_exchange_strong-crop}
+  \includegraphics[angle=-90,width=.75\columnwidth]{pdf/uni_exchange_strong-crop}
 \end{center}
 \caption{Strong scaling of MPI parallelism for advection on a
   uniformly refined mesh.  Top: run time of time integration.  Bottom:
@@ -583,17 +583,29 @@ see \Fig{uniscale}.
 
 \begin{figure}
 \begin{center}
-  \includegraphics[angle=-90,width=.8\columnwidth]{../figs_misc/omp.eps}
-  \\[1ex]
-  \includegraphics[angle=-90,width=.8\columnwidth]{../figs)misc/advance_strong_omp.eps}
+%  \includegraphics[angle=-90,width=.8\columnwidth]{../figs_misc/omp}
+%  \\[1ex]
+  \includegraphics[angle=-90,width=.7\columnwidth]{../figs_misc/advance_strong_omp}
 \end{center}
 \caption{Strong scaling of OpenMP parallelism for advection on a
-  uniformly refined mesh.  Top: run time of advection Riemann problem kernel in both an optimized inlined interface and a generic function pointer interface via \manyclaw.  Bottom: MPI + OpenMp scaling results of advance kernel as above.
+  uniformly refined mesh:
+  %Top: run time of advection Riemann problem kernel in both an optimized inlined interface and a generic function pointer interface via \manyclaw.  Bottom:
+  MPI + OpenMp hybrid parallelization of the time integration.
 }
 \label{fig:ompscale}
 \end{figure}%
 
-In \Fig{ompscale}, we scale intranode parallel calculations and in future iterations on accerelrators the \manyclaw set of solvers were compuled with \forestclaw.  \manyclaw provides a generic set of interators for Riemann problems and related algorithms. In this work we show good scaling results across a single node and coupled to the MPI scaling as well.
+In \Fig{ompscale}, we scale multi-node parallel calculations.
+%and in future
+%iterations on accelerators 
+We use the \manyclaw set of patch-based PDE solvers.
+%with
+%\forestclaw.  
+\manyclaw provides a generic set of interators for Riemann
+problems and related algorithms.
+
+%$In this work we show good scaling results
+%across a single node and coupled to the MPI scaling as well.
 
 We have examined weak scalability as well by using four times as many processes
 for each level increase, from level 6 at 64 cores to level 11 at 16,384.  Up to
