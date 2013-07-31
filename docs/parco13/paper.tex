@@ -559,8 +559,13 @@ the resolution (from levels 1 and 8).  Then, we examine processor counts from
 16 to 256 using 16 cores per node.  The scaling behavior remains linear for
 the time integration itself, and mostly linear for the local and parallel
 neighbor exchanges which require about 10\% of the time integration run time;
-see \Fig{uniscale}.  Due to space constraints we omit the
-corresponding weak scaling results, which are nearly optimal as well.
+see \Fig{uniscale}.
+
+We have examined weak scalability as well by using four times as many processes
+for each level inclease, from level 6 at 64 cores to level 10 at 4096.  The
+exchange times stay consistently below 16\% of the time integration.  The time
+in seconds per time integration step varies between .0578 and .0602,
+which yields a parallel efficiency of 96\%. 
 
 \begin{table}
   \begin{center}
