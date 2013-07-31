@@ -83,9 +83,11 @@ conservation laws.  The key idea is to interpret each leaf of the AMR hierarchy
 as one uniform compute patch in $\sR^d$ with $m^d$ degrees of freedom, where $m$ is
 customarily between 8 and 32.  Thus, computation on each patch can be optimized
 for speed, while we inherit the flexibility of adaptive meshes.  In our work we
-choose to work with the \pforest AMR library since it allows us to compose the mesh
-from multiple mapped octrees and enables the cubed sphere and other
-nontrivial multiblock geometries.
+choose to integrate with the \pforest AMR library since it allows us to compose
+the mesh from multiple mapped octrees and enables the cubed sphere and other
+nontrivial multiblock geometries.  We describe aspects of the parallel
+implementation and close with scalings for both MPI-only and OpenMP/MPI hybrid
+runs, where the largest MPI-only run uses 4,096 CPU cores.
 \end{abstract}
 
 \begin{keyword}
@@ -175,11 +177,11 @@ and successfully used in the context of block-structured AMR
 % single DOF.}
 % CB: reworded the criticized statement above.
 
-In this paper we describe our design for the coupling of forest-of-octree AMR
+In this paper we describe our design for the coupling of forest-of-octrees AMR
 with \clawpack at the leaf level.  We comment on challenges that arise in
 enabling multiblock geometries and efficient parallelism and conclude with a range
-of numerical examples that demonstrate the conceptual improvements in relation
-to other approaches.
+of numerical examples that demonstrate the conceptual advantages.
+% improvements in relation to other approaches.
 
 \section{Design principles}
 
@@ -288,8 +290,6 @@ special-purpose parallel algorithms in \pforest \cite{IsaacBursteddeGhattas12}.
 % CB: I'm trying to avoid "mesh" cell here since in \pforest FE simulations
 % that would mean a whole leaf.
 
-\alert{I have swapped sections 3. and 4.  Please check/smooth the text.}
-
 For hyperbolic problems, we integrate the solution on a single uniform patch,
 containing $m^d$ cells, using the wave propagation algorithm described by R. J.
 LeVeque \cite{LeVeque:1997eg} and implemented in \clawpack \cite{le:2002,
@@ -305,7 +305,9 @@ much of the physics of an application can be contained in the Riemann solver,
 problems solved with \clawpack to be solvable in \forestclaw.  Wave limiters
 are used to supress spurious oscillations resulting from truncation error in a typical
 second order method.
-\comment{DAC: Limiters formally reduce the order of accuracy.}
+% at the cost of a localized order reduction.
+% \comment{DAC: Limiters formally reduce the order of accuracy.}
+% wauld be an awkward senctence if order reduction is mentioned
 \ignore{In order to
 achieve second order accuracy wave limiters are used to suppress spurious
 oscillations at sharp gradients in the flow.}
@@ -326,7 +328,7 @@ spurious extrema, we use a standard conservative, limited
 interpolation scheme to interpolate values from the coarse grid to
 fine grid coarse cells \cite{amrclaw, chombo}.  When sub-cycling, time accurate
 data between coarse grids is used to fill in ghost cells for fine grids.
-As mentioned in the previous section, this procedure can be extended
+As we detail in the following section, this procedure can be extended
 transparently to distributed parallelism by defining an abstract exchange
 routine for ghost patch data.
 
@@ -360,7 +362,7 @@ Each quadtree has its own coordinate orientation.  The situation in 3D
 serves as the computational domain for the cubed sphere.  An adhoc refinement
 pattern has been 2:1 balanced in terms of neighbor sizes and partitioned
 between five MPI processes (the three middle ones out of $0 \ldots 4$
-are shown from black to white).}
+are shown with a color scale from black to white).}
 \label{fig:cubed3}
 \end{figure}
 
