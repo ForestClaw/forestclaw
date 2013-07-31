@@ -221,7 +221,8 @@ void regrid(fclaw2d_domain_t **domain)
     {
         // Make sure all ghost cells are valid.
         double alpha = 0;
-        exchange_with_coarse(*domain,level,t,alpha, FCLAW2D_TIMER_REGRID);
+        fclaw_bool do_egpd = fclaw_true;
+        exchange_with_coarse(*domain,level,t,alpha, do_egpd, FCLAW2D_TIMER_REGRID);
     }
 
     // First determine which families should be coarsened.
