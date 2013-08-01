@@ -87,7 +87,7 @@ choose to integrate with the \pforest AMR library since it allows us to compose
 the mesh from multiple mapped octrees and enables the cubed sphere and other
 nontrivial multiblock geometries.  We describe aspects of the parallel
 implementation and close with scalings for both MPI-only and OpenMP/MPI hybrid
-runs, where the largest MPI-only run uses 16,384 CPU cores.
+runs, where the largest MPI run executes on 16,384 CPU cores.
 \end{abstract}
 
 \begin{keyword}
@@ -610,7 +610,8 @@ threads per node executed by the
 %$In this work we show good scaling results
 %across a single node and coupled to the MPI scaling as well.
 
-We have examined weak scalability as well by using four times as many processes
+We have examined weak scalability as well by using four times as many MPI
+processes
 for each level increase, from level 6 at 64 cores to level 11 at 16,384.  Up to
 4,096 cores, the exchange times stay consistently below 16\% of the time
 integration and the time in seconds per time integration step varies between
@@ -661,8 +662,8 @@ objective of minimizing the parallel neighbor exchanges.
 \begin{figure}
   \begin{center}
     \hspace{.1\columnwidth}
-    \begin{minipage}[c]{.35\columnwidth}
-      \includegraphics[width=.99\columnwidth]{../figs_misc/sphere_partition5}
+    \begin{minipage}[c]{.30\columnwidth}
+      \includegraphics[width=\columnwidth]{../figs_misc/sphere_partition5}
     \end{minipage}
     \hspace{.05\columnwidth}
     \begin{minipage}[c]{.4\columnwidth}
@@ -676,9 +677,10 @@ objective of minimizing the parallel neighbor exchanges.
     \end{tabular}
   \end{minipage}
 \end{center}
-\caption{Left: Partition of the spherical Example 2 between five MPI processors, indicated
-  by the color scale, at simulated time $T = 1$.  The partition shows the mesh equator,
-  while the refinement is invariant under the number of processors and the partition
+\caption{Left: Partition of the spherical Example 2 between five
+  MPI processes, indicated by the color scale, at simulated time $T = 1$.
+  % The  partition shows the mesh equator,
+  The refinement is invariant under the parallel partition
   and follows the front, which is not aligned with the equator.  Right: Strong scaling
   for a uniform run at level 8.}
 \label{fig:spherical}
@@ -688,23 +690,38 @@ To showcase a multiblock connectivity, we include results for the spherical Exam
 
 \section{Conclusion}
 
-We have presented a novel hybrid paradigm for AMR that achieves good
-scaling both in the distributed and shared memory aspects of current
-supercomputers.
-%
-% By
-% abstracting a leaf in the AMR hierarchy as the atomic unit of computation, we
-% are able to use almost arbitrary low level solvers.
-%
-Our implementation integrates an MPI-based forest-of-octrees adaptive
-meshing code, \pforest, with a numerical solver for hyperbolic
-conservation laws, \clawpack/\manyclaw,
-that implements threaded parallelism for a single compute patch.
-%All topological operations on the mesh are handled by \pforest,
-%while all numerical operations are handled by the \clawpack instance.
-This combination naturally enables MPI/threaded hybridization,
-where our biggest MPI run scales to 16,384 CPU cores.
 
+We have presented the integration of an MPI-based forest-of-octrees adaptive
+meshing code, \pforest, with a numerical solver for hyperbolic conservation
+laws, \clawpack/\manyclaw, that implements threaded parallelism for a single
+compute patch.
+%All mesh operations are handled by \pforest,
+%while numerics are handled by the \clawpack implementation.
+We abstract an interface to the parallel meshing code in order to derive the
+schedule of neighbor exchanges, averaging/interpolation, and time integration
+on the local patches.
+This approach naturally lends itself to MPI/thread hybridization.
+Apart from its parallel scalability, we favor the presented strategy
+for its modularity, encapsulation, and versality.  Future work
+will continue to optimize the parallel neighbor exchange patterns
+and investigate a generic handling of arbitrary multi-block geometries.
+
+% We have presented a novel hybrid paradigm for AMR that achieves good
+% scaling both in the distributed and shared memory aspects of current
+% supercomputers.
+% %
+% % By
+% % abstracting a leaf in the AMR hierarchy as the atomic unit of computation, we
+% % are able to use almost arbitrary low level solvers.
+% %
+% Our implementation integrates an MPI-based forest-of-octrees adaptive
+% meshing code, \pforest, with a numerical solver for hyperbolic
+% conservation laws, \clawpack/\manyclaw,
+% that implements threaded parallelism for a single compute patch.
+% %All topological operations on the mesh are handled by \pforest,
+% %while all numerical operations are handled by the \clawpack instance.
+% This combination naturally enables MPI/threaded hybridization,
+% where our biggest MPI run scales to 16,384 CPU cores.
 %
 % We demonstrate scalability of this approach in various ways, where the MPI-only variant
 % scales weakly up to 16,384 codes, and strong scalability is linear for up to 256 cores
@@ -715,12 +732,6 @@ where our biggest MPI run scales to 16,384 CPU cores.
 % flexibility and scalability of this approach provides an ideal workspace to
 % explore further algorithms and physics problems requiring new solvers at high
 % resolutions.
-%
-%the versatility of this approach the modular development of
-%scalable codes.
-
-
-
 
 % The results in this section are preliminary and will be extended in the final
 % version.  We have so far exercised \forestclaw for two 2D manifolds,
@@ -741,7 +752,7 @@ where our biggest MPI run scales to 16,384 CPU cores.
 
 We would like to thank the Texas Advanced Computing Center (TACC) for access to
 the Stampede supercomputer under allocations TG-DPP130002 and TG-ASC130001
-granted by the NSF XSEDE Program.
+granted by the NSF XSEDE program.
 The authors acknowledge valuable discussion with Randy LeVeque, Marsha
 Berger, and Hans-Petter Langtangen.  We also acknowledge David
 Ketcheson and the KAUST sponsored HPC$^3$ numerics workshop at which
@@ -749,7 +760,7 @@ the initial phases of this project were first discussed.  The second
 author would like to also acknowledge the Isaac Newton Institute
 (Cambridge, UK), where much of the preliminary development work for
 \forestclaw was done.
-The fourth author recognizes Simula National Lab for funding.
+The fourth author recognizes Simula Research Lab, Norway, for funding.
 The leaf/patch paradigm was independently
 presented by B.\ as part of a talk at the SCI Institute, Salt Lake City, Utah,
 USA in July 2011. 
