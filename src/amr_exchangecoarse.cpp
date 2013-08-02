@@ -717,11 +717,12 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
         /* Store time interpolated data into m_griddata_time_sync. */
         fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
                                      (void *) &alpha);
+        // exchange_ghost_patch_data_levels(domain,time_interp,coarser_level,coarser_level);
+        exchange_ghost_patch_data(domain,time_interp);
     }
 
     if (do_egpd)
     {
-        exchange_ghost_patch_data_levels(domain,time_interp,coarser_level,coarser_level);
         /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
            we are in the time interpolated case */
     }

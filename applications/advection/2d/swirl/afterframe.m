@@ -41,7 +41,11 @@ else
   showpatchborders(1:5);
   % showgridlines(1:4);
   caxis([0 1]);
+  fprintf('%12s %24.16f\n','qmin',qmin);
+  fprintf('%12s %24.16f\n\n','qmax',qmax);
 end;
+
+
 
 view(2);
 

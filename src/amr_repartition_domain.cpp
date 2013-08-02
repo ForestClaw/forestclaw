@@ -81,6 +81,9 @@ unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
             /* access data stored on remote procs.  This might be time interpolated data. */
             double *q = (double*) e->ghost_data[patchno];
 
+            /* Need to check that we should be unpacking time interp data for
+               the current level
+            */
             unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
         }
     }

@@ -69,12 +69,16 @@ double advance_level(fclaw2d_domain_t *domain,
                      const int a_level,
                      const int a_curr_fine_step,
                      subcycle_manager* a_time_stepper,
-                     fclaw_bool do_egpd)
+                     fclaw_bool do_egpd_in)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
     fclaw_bool time_interp_is_false = fclaw_false;
+
+    fclaw_bool no_egpd = fclaw_false;
+    fclaw_bool do_egpd = fclaw_true;
+
 
     double maxcfl = 0;
     if (verbose)
@@ -127,7 +131,7 @@ double advance_level(fclaw2d_domain_t *domain,
                 set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
                 /* This can still be improved */
-                fclaw_bool do_egpd = fclaw_true;
+                fclaw_bool do_egpd = fclaw_false;
                 exchange_with_coarse(domain,a_level,t_level,alpha,do_egpd,
                                      FCLAW2D_TIMER_ADVANCE);
 
@@ -150,7 +154,6 @@ double advance_level(fclaw2d_domain_t *domain,
                              << a_level-1 << endl;
                     }
                     /* set do_egpd = false */
-                    fclaw_bool no_egpd = fclaw_false;
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,
                                            a_time_stepper,no_egpd);
                     if (verbose)
@@ -180,7 +183,7 @@ double advance_level(fclaw2d_domain_t *domain,
                              << a_level-1 << endl;
                     }
                     /* Have to think about this some more, so we'll be on the safe side */
-                    fclaw_bool do_egpd = fclaw_true;
+                    fclaw_bool do_egpd = fclaw_false;
                     maxcfl = advance_level(domain,a_level-1,last_coarse_step,
                                            a_time_stepper,do_egpd);
                     if (verbose)
@@ -267,7 +270,10 @@ double advance_level(fclaw2d_domain_t *domain,
 
     /* Make sure all ghost cells at this level have been updated;  Set physical
        BCs after exchange to get any corner boundary ghost cells */
-    level_exchange(domain,a_level, FCLAW2D_TIMER_ADVANCE);
+    if (!a_time_stepper->nosubcycle())
+    {
+        level_exchange(domain,a_level, FCLAW2D_TIMER_ADVANCE);
+    }
     set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
     a_time_stepper->increment_level_exchange_counter(a_level);

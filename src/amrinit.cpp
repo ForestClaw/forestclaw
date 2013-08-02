@@ -199,7 +199,7 @@ void amrinit (fclaw2d_domain_t **domain)
             rebuild_domain(*domain,new_domain);
 
 
-            // Re-initialize finer grids
+            // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_adapt_init,
                                            (void *) NULL);
