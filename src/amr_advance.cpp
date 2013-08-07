@@ -88,7 +88,7 @@ double advance_level(fclaw2d_domain_t *domain,
             a_curr_fine_step << " at time " << t_level << endl;
     }
 
-    if (do_egpd)
+    if (do_egpd_in)
     {
         /* Do a global exchange.  In the non-subcycled case, this is only true
            if called directly from advance_level;  otherwise it is false.
@@ -273,6 +273,7 @@ double advance_level(fclaw2d_domain_t *domain,
     if (!a_time_stepper->nosubcycle())
     {
         level_exchange(domain,a_level, FCLAW2D_TIMER_ADVANCE);
+        // exchange_ghost_patch_data_levels(domain,time_interp_is_false,a_level,a_level);
     }
     set_phys_bc(domain,a_level,t_level,time_interp_is_false);
 
@@ -285,6 +286,47 @@ double advance_level(fclaw2d_domain_t *domain,
     }
 
     return time_data.maxcfl;  // Maximum from level iteration
+}
+
+void ghost_exchange(domain,coarse_level,fine_level)
+{
+    /* This does the intermediate ghost patch and ghost cell
+       exchange needed by either the subcycled case or the non
+       subcycled case.
+    */
+
+    // const amr_options_t *gparms = get_domain_parms(domain);
+    int minlevel = domain->global_minlevel;
+
+    if (coarse_level > minlevel)
+    {
+        /* Coarse_level-1 is a time interpolated level;  need to
+           do something special for this level
+        */
+        fclaw_bool time_interp = fclaw_false;
+        exchange_ghost_patch_data(domain,time_interp);
+        for(int level = fine_level; level > coarse_level; level--)
+        {
+            level_exchange(domain,level,FCLAW2D_TIMER_ADVANCE);
+            void exchange_with_coarse(domain,level,t_level,alpha
+                                      do_egpd,FCLAW2D_TIMER_ADVANCE);
+        }
+        level_exchange(domain,coarse_level,FCLAW2D_TIMER_ADVANCE);
+    }
+    else
+    {
+        /* Do a full exchange from minlevel to maxlevel. */
+        fclaw_bool time_interp = fclaw_false;
+        exchange_ghost_patch_data(domain,time_interp);
+        for(int level = fine_level; level > coarse_level; level--)
+        {
+            level_exchange(domain,level,FCLAW2D_TIMER_ADVANCE);
+            void exchange_with_coarse(domain,level,t_level,alpha
+                                      do_egpd,FCLAW2D_TIMER_ADVANCE);
+
+        }
+        level_exchange(domain,coarse_level,FCLAW2D_TIMER_ADVANCE);
+    }
 }
 
 
@@ -301,10 +343,8 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
 
-    /* Do a parallel ghost patch exchange every time the fine grid is updated.
-       This should improve the non-subcycled case.  Subcycled case though is
-       still doing too many exchanges.
-    */
+    /* Do a parallel ghost patch exchange at the beginning of a coarse grid
+       time step. All patches are time synchronized at this point */
     fclaw_bool do_egpd = fclaw_true;
 
     // 'n_fine_steps' is the number of steps we must take on the finest level to equal one

@@ -192,7 +192,6 @@ void level_exchange(fclaw2d_domain_t *domain, int level,
     // Start exchanging
     fclaw_bool time_interp = fclaw_false;
     // exchange_ghost_patch_data_levels(domain,time_interp,level,level);
-    exchange_ghost_patch_data_levels(domain,time_interp);
 
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_level_face_exchange, (void *) NULL);
