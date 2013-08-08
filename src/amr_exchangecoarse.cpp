@@ -719,12 +719,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
         /*
         fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
                                      (void *) &alpha);
-<<<<<<< HEAD
-        // exchange_ghost_patch_data_levels(domain,time_interp,coarser_level,coarser_level);
-        exchange_ghost_patch_data(domain,time_interp);
-=======
         */
->>>>>>> eb9da95... Changes to amr_advance that should be in branch new_advance
     }
 
     if (do_egpd)
