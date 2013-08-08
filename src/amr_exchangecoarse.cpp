@@ -667,7 +667,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
 }
 
 
-
+#if 0
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -683,6 +683,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
        the coarser grid */
     cp->setup_for_time_interpolation(alpha);
 }
+#endif
 
 
 
@@ -715,10 +716,15 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     if (time_interp)
     {
         /* Store time interpolated data into m_griddata_time_sync. */
+        /*
         fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
                                      (void *) &alpha);
+<<<<<<< HEAD
         // exchange_ghost_patch_data_levels(domain,time_interp,coarser_level,coarser_level);
         exchange_ghost_patch_data(domain,time_interp);
+=======
+        */
+>>>>>>> eb9da95... Changes to amr_advance that should be in branch new_advance
     }
 
     if (do_egpd)

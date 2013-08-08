@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_mol.H"
 #include "fclaw2d_solvers.H"
 
+
 /* ----------------------------------------------------------
    Manage subcyling process
    ---------------------------------------------------------- */
@@ -40,6 +41,9 @@ static void update_level_solution(fclaw2d_domain_t *domain,
                                   int a_level,
                                   fclaw2d_level_time_data *time_data)
 {
+    /* ToDo : Do we really need to pass in the entire time_data structure?
+       Maybe this can be simplified considerably.
+    */
     double t = time_data->t_level;
     double dt = time_data->dt;
     double cfl;
@@ -61,6 +65,7 @@ static void update_level_solution(fclaw2d_domain_t *domain,
         cfl = fclaw2d_level_mol_step(domain,a_level,time_data,
                                      sf->f_level_ode_solver);
     }
+    /* This is awkward. I should just return the maxcfl. */
     time_data->maxcfl = max(time_data->maxcfl,cfl);
 }
 
@@ -68,19 +73,16 @@ static
 double advance_level(fclaw2d_domain_t *domain,
                      const int a_level,
                      const int a_curr_fine_step,
-                     subcycle_manager* a_time_stepper,
-                     fclaw_bool do_egpd_in)
+                     double maxcfl,
+                     subcycle_manager* a_time_stepper)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
-    fclaw_bool time_interp_is_false = fclaw_false;
 
-    fclaw_bool no_egpd = fclaw_false;
-    fclaw_bool do_egpd = fclaw_true;
+    int this_level = a_level;
+    int coarser_level = a_level - 1;
 
-
-    double maxcfl = 0;
     if (verbose)
     {
         cout << endl;
@@ -88,15 +90,76 @@ double advance_level(fclaw2d_domain_t *domain,
             a_curr_fine_step << " at time " << t_level << endl;
     }
 
-    if (do_egpd_in)
+    /* First assumption : Coming into this routine, all ghost cell information
+       needed for an update of this level has been done.  So we can update
+       immediately.
+
+       Second assumption : No ghost patch exchanges are called from here, and
+       no ghost cell exchanges are done from here.
+    */
+
+    fclaw2d_level_time_data_t time_data;
+
+    time_data.t_level = t_level;
+    time_data.t_initial = a_time_stepper->initial_time();
+    time_data.dt = a_time_stepper->dt(a_level);
+    time_data.fixed_dt = a_time_stepper->nosubcycle();
+
+    if (verbose)
     {
-        /* Do a global exchange.  In the non-subcycled case, this is only true
-           if called directly from advance_level;  otherwise it is false.
-           The efficiency may still not be there in the subcycled case
-        */
-        exchange_ghost_patch_data(domain,time_interp_is_false);
+        cout << "Taking step on level " << a_level << " at time " << t_level << endl;
     }
 
+    time_data.maxcfl = maxcfl;
+
+    /* Set some extra things needed by a multi-stage or implicit scheme. */
+    time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
+    if (!a_time_stepper->is_coarsest(a_level))
+    {
+        time_data.dt_coarse = a_time_stepper->dt(a_level-1);
+    }
+
+    /* ------------------------------------------------------------
+       Advance this level from
+       'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
+       ------------------------------------------------------------ */
+    update_level_solution(domain,this_level,&time_data);
+
+    a_time_stepper->increment_step_counter(this_level);
+    a_time_stepper->increment_time(this_level);
+
+    /* Now advance coarser levels recursively.   If we are in the no-subcycle
+       case, we will a take a time step of dt_fine (i.e. dt_level, where
+       'level' is our current fine grid level).  If we are subcycling,
+       then each time step will be the step size appropriate for that level.
+       In this case, we are anticipating needing to do time interpolation to
+       get ghost cells, and so as soon as we are finished with a coarse step,
+       we will construct the time interpolated data.
+    */
+
+    maxcfl = max(time_data.maxcfl,maxcfl)
+
+    if (!a_time_stepper->is_coarsest(this_level))
+>>>>>>> Cherry-picked from master;  should have been on new_advance
+    {
+        /* Advance coarser level, but only if coarse level and this level are time
+           synchronized.  */
+        int last_coarse_step = a_time_stepper->last_step(coarser_level);
+        if (last_coarse_step == a_curr_step)
+        {
+            maxcfl = advance_level(domain,coarser_level,last_coarse_step,
+                                   a_time_stepper);
+
+            /* Time interpolate this data for a future exchange with finer grid */
+            double  alpha = double(a_curr_fine_step)/refratio;
+            a_time_stepper->increment_step_counter(coarser_level);
+            a_time_stepper->increment_time(coarser_level);
+
+            timeinterp(domain,coarser_level,alpha);
+        }
+    }
+
+#if 0
     if (!a_time_stepper->can_advance(a_level,a_curr_fine_step))
     {
         if (!a_time_stepper->level_exchange_done(a_level))
@@ -236,38 +299,9 @@ double advance_level(fclaw2d_domain_t *domain,
         } /* Time stepper has not exchanged with coarser level */
     } /* can advance */
 
-    fclaw2d_level_time_data_t time_data;
+#endif
 
-    time_data.t_level = t_level;
-    time_data.t_initial = a_time_stepper->initial_time();
-    time_data.dt = a_time_stepper->dt(a_level);
-    time_data.fixed_dt = a_time_stepper->nosubcycle();
-
-    if (verbose)
-    {
-        cout << "Taking step on level " << a_level << " at time " << t_level << endl;
-    }
-
-    /* Need to figure out what to do if our time step doesn't depend on
-       a cfl condition */
-    time_data.maxcfl = maxcfl;
-
-    /* Set some extra things needed by a multi-stage or implicit scheme. */
-    time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
-    if (!a_time_stepper->is_coarsest(a_level))
-    {
-        time_data.dt_coarse = a_time_stepper->dt(a_level-1);
-    }
-
-    /* ------------------------------------------------------------
-       Advance this level from
-       'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
-       ------------------------------------------------------------ */
-    update_level_solution(domain,a_level,&time_data);
-
-    a_time_stepper->increment_step_counter(a_level);
-    a_time_stepper->increment_time(a_level);
-
+#if 0
     /* Make sure all ghost cells at this level have been updated;  Set physical
        BCs after exchange to get any corner boundary ghost cells */
     if (!a_time_stepper->nosubcycle())
@@ -276,8 +310,9 @@ double advance_level(fclaw2d_domain_t *domain,
         // exchange_ghost_patch_data_levels(domain,time_interp_is_false,a_level,a_level);
     }
     set_phys_bc(domain,a_level,t_level,time_interp_is_false);
-
     a_time_stepper->increment_level_exchange_counter(a_level);
+
+#endif
 
     if (verbose)
     {
@@ -355,7 +390,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     double maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
-        double cfl_step = advance_level(domain,maxlevel,nf,a_time_stepper,do_egpd);
+        double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,a_time_stepper);
         maxcfl = max(cfl_step,maxcfl);
     }
 
