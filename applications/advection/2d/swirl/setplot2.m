@@ -41,6 +41,8 @@
 
 % OutputFlag = 'ascii'         % default value.
 
+ForestClaw = 1;     % Plot using ForestClaw preferences.
+
 PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
 			     % 2 = contour
@@ -63,17 +65,6 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
                                  % this level?
 
 %---------------------------------
-
-% Set to either a scalar, for automatic contours or a vector of contour levels.
-ContourValues = [];
-
-%---------------------------------
-
-% for scatter plot (PlotType==4):
-% plot q(i,j) vs. r(i,j) = (x(i,j)-x0)^2 + (y(i,j)-y0)^2
-  x0 = 0;
-  y0 = 0;
-  ScatterStyle = setplotstyle('bx','rx','gx');
 
 global cm_index;
 
