@@ -29,6 +29,7 @@ fclawobjs = \
 	amr_mol.o \
 	amr_single_step.o \
 	amr_neighbors.o \
+	amr_timeinterp.o \
 	amr_physbc.o \
 	amr_utils.o \
 	amr_options.o \
