@@ -78,7 +78,7 @@ void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     if (time_interp)
-        cp->unpack_griddata_time_sync(qdata);
+        cp->unpack_griddata_time_interpolated(qdata);
     else
         cp->unpack_griddata(qdata);
 }
@@ -155,7 +155,7 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_last.define(box, m_meqn);
     m_griddata_save.define(box, m_meqn);
-    m_griddata_time_sync.define(box, m_meqn);
+    m_griddata_time_interpolated.define(box, m_meqn);
 
     m_manifold = gparms->manifold;
     if (m_manifold)
@@ -189,13 +189,18 @@ FArrayBox ClawPatch::newGrid()
     return A;
 }
 
-// This is used by level_step.
+/* Return a pointer to either time interpolated data or regular grid data */
 double* ClawPatch::q_time_sync(fclaw_bool time_interp)
 {
     if (time_interp)
-        return m_griddata_time_sync.dataPtr();
+        return m_griddata_time_interpolated.dataPtr();
     else
         return m_griddata.dataPtr();
+}
+
+double* ClawPatch::q_time_interp()
+{
+    return m_griddata_time_interpolated.dataPtr();
 }
 
 void ClawPatch::save_current_step()
@@ -355,9 +360,9 @@ void ClawPatch::unpack_griddata(double *q)
     m_griddata.copyFromMemory(q);
 }
 
-void ClawPatch::unpack_griddata_time_sync(double *q)
+void ClawPatch::unpack_griddata_time_interpolated(double *q)
 {
-    m_griddata_time_sync.copyFromMemory(q);
+    m_griddata_time_interpolated.copyFromMemory(q);
 }
 
 
@@ -441,24 +446,15 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha)
        exchanges */
     double *qlast = m_griddata_last.dataPtr();
     double *qcurr = m_griddata.dataPtr();
-    double *qsync = m_griddata_time_sync.dataPtr();
-    int size = m_griddata.size();
+    double *qinterp = m_griddata_time_interpolated.dataPtr();
+    int size = m_griddata_time_interpolated.size();
 
     for(int i = 0; i < size; i++)
     {
-        qsync[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
+        qinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
     }
 }
 
-#if 0
-void ClawPatch::reset_after_time_interpolation()
-{
-    /* If there is no time interpolation, we actually
-       want to keep the coarse grid values set in this
-       step. */
-    m_griddata = m_griddata_time_sync;
-}
-#endif
 
 /* ----------------------------------------------------------------
    Multi-level operations
@@ -635,7 +631,6 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
                                             fclaw_bool intersects_block[])
 
 {
-    // double *qcoarse = m_griddata_time_sync.dataPtr();
     double *qcoarse = q_time_sync(a_time_interp);
 
     /* qcorner is the finer level. */

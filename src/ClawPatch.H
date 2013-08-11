@@ -54,11 +54,12 @@ public :
 
     void pack_griddata(double* qdata);
     void unpack_griddata(double* qdata);
-    void unpack_griddata_time_sync(double* qdata);
+    void unpack_griddata_time_interpolated(double* qdata);
 
     void setup_for_time_interpolation(const double& alpha);
     void reset_after_time_interpolation();
     double* q_time_sync(fclaw_bool time_interp);
+    double* q_time_interp();
     FArrayBox newGrid();
 
     // ----------------------------------------------------------------
@@ -284,8 +285,8 @@ protected :
     /* Save last time step in case we need to retake a time step */
     FArrayBox m_griddata_save;
 
-    /* Store time synchronized coarse grid data for time interpolation */
-    FArrayBox m_griddata_time_sync;
+    /* Store time interpolated coarse grid data */
+    FArrayBox m_griddata_time_interpolated;
 
     FArrayBox m_xp;
     FArrayBox m_yp;
