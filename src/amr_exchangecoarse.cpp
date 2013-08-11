@@ -695,38 +695,25 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 
 void exchange_with_coarse(fclaw2d_domain_t *domain,
                           int level, double t_level,
-                          double alpha, fclaw_bool do_egpd,
+                          fclaw_bool time_interp,
                           fclaw2d_timer_names_t running)
 {
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+#if 0
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+#endif
 
-    fclaw_bool time_interp = alpha > 0; //
+    // fclaw_bool time_interp = alpha > 0; //
     int finer_level = level;
     int coarser_level = level - 1;
 
     exchange_info e_info;
     e_info.time_interp = time_interp;
     e_info.level = level;
-
-    if (time_interp)
-    {
-        /* Store time interpolated data into m_griddata_time_sync. */
-        /*
-        fclaw2d_domain_iterate_level(domain, coarser_level,cb_setup_time_interp,
-                                     (void *) &alpha);
-        */
-    }
-
-    if (do_egpd)
-    {
-        /* Do parallel ghost exchange; Pointers to data get reassigned here, in case
-           we are in the time interpolated case */
-    }
 
 
     /* Iterate over coarser level and average from finer neighbors to coarse. */
@@ -787,8 +774,10 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                                  (void *) &e_info);
 
     // Stop timing
+#if 0
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_start (&ddata->timers[running]);
     }
+#endif
 }

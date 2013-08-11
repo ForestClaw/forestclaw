@@ -184,25 +184,31 @@ void level_exchange(fclaw2d_domain_t *domain, int level,
 {
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+#if 0
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+#endif
 
     // Start exchanging
-    fclaw_bool time_interp = fclaw_false;
-    // exchange_ghost_patch_data_levels(domain,time_interp,level,level);
 
+    /* face exchanges */
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_level_face_exchange, (void *) NULL);
 
-    // Do corner exchange only after physical boundary conditions have been set on all patches,
-    // since corners may overlap phyical ghost cell region of neighboring patch.
-    fclaw2d_domain_iterate_level(domain, level, cb_level_corner_exchange, (void *) NULL);
+    /* Do corner exchange only after physical boundary conditions have
+       been set on all patches, since corners may overlap physical ghost
+       cell region of neighboring patch. ??? (where am I doing set_physbc?)
+    */
+    fclaw2d_domain_iterate_level(domain, level, cb_level_corner_exchange,
+                                 (void *) NULL);
 
     // Stop timing
+#if 0
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_start (&ddata->timers[running]);
     }
+#endif
 }
