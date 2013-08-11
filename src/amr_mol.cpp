@@ -177,8 +177,8 @@ void fclaw2d_mol_rhs(const double& t_inner, double *q, double *rhs)
             printf("%d %16.8e %16.8e %16.8e\n",level,t_initial,t_inner,alpha);
 
             // TODO: is there a timer running? Which one?
-            fclaw_bool do_egpd = fclaw_true;
-            exchange_with_coarse(domain, level, t_inner, alpha, do_egpd,FCLAW2D_TIMER_NONE);
+            fclaw_bool time_interp = fclaw_false;
+            exchange_with_coarse(domain, level, t_inner, time_interp, FCLAW2D_TIMER_NONE);
         }
     }
 
