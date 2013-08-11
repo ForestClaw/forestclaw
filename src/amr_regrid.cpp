@@ -207,7 +207,7 @@ void regrid(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    double t = get_domain_time(*domain);
+    // double t = get_domain_time(*domain);
 
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
@@ -221,18 +221,6 @@ void regrid(fclaw2d_domain_t **domain)
     */
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
-
-    /* This exchange is needed so that we have valid data in ghost cells
-       when tagging patches for refinement. */
-    fclaw_bool time_interp_is_false = fclaw_false;
-    double alpha = 0;
-    fclaw_bool do_egpd = fclaw_true;
-    // exchange_ghost_patch_data(*domain,time_interp_is_false);
-    for(int level = maxlevel; level > minlevel; level--)
-    {
-        // Make sure all ghost cells are valid.
-        exchange_with_coarse(*domain,level,t,alpha, do_egpd, FCLAW2D_TIMER_REGRID);
-    }
 
     // First determine which families should be coarsened.
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
@@ -265,15 +253,6 @@ void regrid(fclaw2d_domain_t **domain)
         minlevel = new_domain->global_minlevel;
         maxlevel = new_domain->global_maxlevel;
 
-        // fclaw_bool time_interp_is_false = fclaw_false;
-        exchange_ghost_patch_data(new_domain,time_interp_is_false);
-        for (int level = minlevel; level <= maxlevel; level++)
-        {
-            level_exchange(new_domain,level, FCLAW2D_TIMER_REGRID);
-            set_phys_bc(new_domain,level,t,time_interp_is_false);
-        }
-
-
         // free memory associated with old domain
         amrreset(domain);
         *domain = new_domain;
@@ -282,6 +261,10 @@ void regrid(fclaw2d_domain_t **domain)
         // Repartition for load balancing
         repartition_domain(domain, -1);
     }
+
+    /* Update all ghost patches and ghost cells */
+    update_ghost_all_levels(*domain,FCLAW2D_TIMER_REGRID);
+
 
     // Print global minimum and maximum levels
     if ((*domain)->mpirank == 0) {

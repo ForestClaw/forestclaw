@@ -112,9 +112,22 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain);
  * \param [in] mode             A level for amrinit, -1 for running simulation.
  */
 void repartition_domain(fclaw2d_domain_t** domain, int mode);
-void exchange_ghost_patch_data(fclaw2d_domain_t* domain,fclaw_bool time_interp);
-void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,fclaw_bool time_interp,
+
+// void exchange_ghost_patch_data(fclaw2d_domain_t* domain,fclaw_bool time_interp);
+
+void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
                                       int exchange_minlevel, int exchange_maxlevel);
+
+void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
+                             int exchange_maxlevel);
+
+/* No time interpolation exchange done here */
+void exchange_ghost_patch_data_all(fclaw2d_domain_t* domain);
+
+/* From amr_advance.cpp */
+void update_ghost_cells(fclaw2d_domain_t *domain);
+
+
 void delete_ghost_patches(fclaw2d_domain_t *domain);
 
 
