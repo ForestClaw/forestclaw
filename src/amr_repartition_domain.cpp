@@ -59,10 +59,69 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
     }
 }
 
+/* This is called by rebuild_domain */
+static
+void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
+{
+    size_t data_size =  pack_size(domain);
+    fclaw2d_domain_exchange_t *e;
+
+    /* we just created a grid by amrinit or regrid and we now need to
+       allocate data to store and retrieve local boundary patches and
+       remote ghost patches */
+    e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
+
+    /* Store e so we can retrieve it later */
+    set_domain_exchange_data(domain,e);
+
+    /* Build patches that can be filled later with q data */
+    build_ghost_patches(domain);
+}
+
+/* ------------------------------------------------------------------
+   Partial exchange  - exchange_minlevel is assumed to be a time
+   interpolated level.
+ -------------------------------------------------------------------- */
+/* Exchange_minlevel is a time interpolated level. */
+void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
+                             int exchange_maxlevel)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+
+    int zz = 0;
+    for (int nb = 0; nb < domain->num_blocks; ++nb)
+    {
+        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
+        {
+            if (domain->blocks[nb].patches[np].flags &
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            {
+                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
+                int level = this_patch->level;
+
+                ClawPatch *cp = get_clawpatch(this_patch);
+                double *q;
+                if (exchange_minlevel < level && level <= exchange_maxlevel)
+                {
+                    q = cp->q();
+                }
+                else if (level == exchange_minlevel)
+                {
+                    q = cp->q_time_interp();
+                }
+                else
+                {
+                    q = NULL;
+                }
+                e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
+            }
+        }
+    }
+}
 
 static void
 unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
-                     fclaw_bool time_interp,
                      int exchange_minlevel, int exchange_maxlevel)
 {
     for(int i = 0; i < domain->num_ghost_patches; i++)
@@ -73,73 +132,76 @@ unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
         {
             int blockno = ghost_patch->u.blockno;
 
-            /* not clear how useful this patchno is.  In any case, it isn't
-               used in defining the ClawPatch, so probably doesn't
-               need to be passed in */
             int patchno = i;
 
-            /* access data stored on remote procs.  This might be time interpolated data. */
+            /* access data stored on remote procs. */
             double *q = (double*) e->ghost_data[patchno];
 
-            /* Need to check that we should be unpacking time interp data for
-               the current level
-            */
+            fclaw_bool time_interp = ghost_patch->level == exchange_minlevel;
             unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
         }
     }
 }
 
-
-/* This is called by rebuild_domain */
-static
-    void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
-{
-    size_t data_size =  pack_size(domain);
-    fclaw2d_domain_exchange_t *e;
-
-    /* we just created a grid by amrinit or regrid and we now need to
-       allocate data to store and retrieve local boundary patches and
-       remote ghost patches */
-    e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
-
 #if 0
-    /* Store local boundary data */
-    int zz = 0;
-    for (int nb = 0; nb < domain->num_blocks; ++nb)
-    {
-        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
-        {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-            {
-                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                ClawPatch *cp = get_clawpatch(this_patch);
-                double *q = cp->q();
-                e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
-            }
-        }
-    }
-#endif
-
-    /* Store e so we can retrieve it later */
-    set_domain_exchange_data(domain,e);
-
-    /* Build patches that can be filled later with q data */
-    build_ghost_patches(domain);
-}
-
-
-
 /* This is called anytime we need to update ghost patch data */
 void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
 {
     exchange_ghost_patch_data_levels (domain, time_interp,
                                       domain->global_minlevel, domain->global_maxlevel);
 }
+#endif
+
+
+/* This is called anytime we need to update ghost patch data for certain levels
+   The assumption is that the finest level is a time_interpolated level.  The
+   routine 'unpack_ghost_patches' knows this, and so unpacks ghost patches to the
+   correct places.
+ */
+void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
+                                      int exchange_minlevel, int exchange_maxlevel)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+
+    /* Do exchange to update ghost patch data */
+    fclaw2d_domain_ghost_exchange(domain, e,
+                                  exchange_minlevel, exchange_maxlevel);
+
+    /* Store newly updated e->ghost_patch_data into ghost patches constructed
+       locally */
+    unpack_ghost_patches(domain,e, exchange_minlevel, exchange_maxlevel);
+
+    /* Count calls to this function */
+    ++ddata->count_ghost_exchange;
+}
+
+/* ------------------------------------------------------------------
+   Complete exchange  - no time interpolation assumed.
+ -------------------------------------------------------------------- */
+static void
+unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        int blockno = ghost_patch->u.blockno;
+
+        int patchno = i;
+
+        /* access data stored on remote procs.  */
+        double *q = (double*) e->ghost_data[patchno];
+
+        fclaw_bool time_interp = fclaw_false;
+        unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
+    }
+    ++ddata->count_ghost_exchange;
+}
+
 
 /* This is called anytime we need to update ghost patch data for certain levels */
-void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain, fclaw_bool time_interp,
-                                      int exchange_minlevel, int exchange_maxlevel)
+void exchange_ghost_patch_data_all(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
@@ -156,20 +218,21 @@ void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain, fclaw_bool time_
             {
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 ClawPatch *cp = get_clawpatch(this_patch);
-                double *q = cp->q_time_sync(time_interp);
+                double *q = cp->q();
                 e->patch_data[zz++] = (void*) q;
             }
         }
     }
 
+    int minlevel = domain->global_minlevel;
+    int maxlevel = domain->global_maxlevel;
+
     /* Do exchange to update ghost patch data */
-    fclaw2d_domain_ghost_exchange(domain, e,
-                                  exchange_minlevel, exchange_maxlevel);
+    fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
 
     /* Store newly updated e->ghost_patch_data into ghost patches constructed
        locally */
-    unpack_ghost_patches(domain,e, time_interp,
-                         exchange_minlevel, exchange_maxlevel);
+    unpack_ghost_patches_all(domain,e);
 
     /* Count calls to this function */
     ++ddata->count_ghost_exchange;

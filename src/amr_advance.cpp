@@ -66,12 +66,10 @@ double update_level_solution(fclaw2d_domain_t *domain,
         cfl = fclaw2d_level_mol_step(domain,a_level,time_data,
                                      sf->f_level_ode_solver);
     }
-    /* This is awkward. I should just return the maxcfl. */
+
+    /* This needs to be cleaned up a bit */
     time_data->maxcfl = max(time_data->maxcfl,cfl);
 
-    /* Okay, I am returning maxcfl.  But still need to clean up the time_data
-       stuff.
-    */
     return time_data->maxcfl;
 }
 
@@ -82,7 +80,6 @@ double advance_level(fclaw2d_domain_t *domain,
                      double maxcfl,
                      subcycle_manager* a_time_stepper)
 {
-    // const amr_options_t *gparms = get_domain_parms(domain);
     fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
 
@@ -105,32 +102,21 @@ double advance_level(fclaw2d_domain_t *domain,
           and so coarser grids can all also be updated
     */
 
+    /* The use of time_data here could be cleaned up a bit, but I am leaving
+       everything for now, in case I later decide to do more with the MOL
+       approach.
+    */
     fclaw2d_level_time_data_t time_data;
 
     time_data.t_level = t_level;
     time_data.t_initial = a_time_stepper->initial_time();
     time_data.dt = a_time_stepper->dt(a_level);
     time_data.fixed_dt = a_time_stepper->nosubcycle();
-
-    if (verbose)
-    {
-        // cout << "Taking step on level " << a_level << " at time " << t_level << endl;
-    }
-
     time_data.maxcfl = maxcfl;
 
-#if 0
-    /* Set some extra things needed by a multi-stage or implicit scheme. */
-    time_data.is_coarsest = a_time_stepper->is_coarsest(a_level);
-    if (!a_time_stepper->is_coarsest(a_level))
-    {
-        time_data.dt_coarse = a_time_stepper->dt(a_level-1);
-    }
-#endif
-
     /* ------------------------------------------------------------
-       Advance this level from
-       'a_curr_fine_step' to 'a_curr_fine_step + dt_level'
+       Advance this level from 'a_curr_fine_step' to
+       'a_curr_fine_step + dt_level'
        ------------------------------------------------------------ */
     double cfl_step = update_level_solution(domain,this_level,&time_data);
     maxcfl = max(maxcfl,cfl_step);
@@ -139,7 +125,7 @@ double advance_level(fclaw2d_domain_t *domain,
     a_time_stepper->increment_time(this_level);
 
 
-    /* Now advance coarser levels recursively.   If we are in the no-subcycle
+    /* Advance coarser levels recursively.   If we are in the no-subcycle
        case, we will a take a time step of dt_fine (i.e. dt_level, where
        'level' is our current fine grid level).  If we are subcycling,
        then each time step will be the step size appropriate for that level.
@@ -183,7 +169,7 @@ double advance_level(fclaw2d_domain_t *domain,
             a_time_stepper->level_time(a_level) << endl << endl;
     }
 
-    return time_data.maxcfl;  // Maximum from level iteration
+    return maxcfl;  // Maximum from level iteration
 }
 
 
@@ -308,7 +294,6 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
        Do ghost cell exchange.
        ------------------------------------------------------- */
     double t = get_domain_time(domain); /* needed for phys. bc */
-    // fclaw_bool time_interp = fclaw_false;
     /* Do all level exchanges first */
     for(int level = fine_level; level >= coarse_level; level--)
     {

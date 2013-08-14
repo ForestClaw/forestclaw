@@ -75,12 +75,15 @@ void level_exchange (fclaw2d_domain_t * domain, int a_level,
 // amr_exchangecoarse.cpp
 // Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
 void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
-                           double t_level, double alpha,
-                           fclaw_bool do_egpd,
+                           double t_level, fclaw_bool time_interp,
                            fclaw2d_timer_names_t running);
 
 void timeinterp(fclaw2d_domain_t *domain,
                 int level, double alpha);
+
+void update_ghost_all_levels(fclaw2d_domain_t* domain,
+                             fclaw2d_timer_names_t running);
+
 
 // amr_physbc.cpp
 void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,

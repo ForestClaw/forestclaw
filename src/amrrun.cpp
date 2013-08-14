@@ -271,7 +271,12 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     fclaw_bool cons_check = (fclaw_bool) gparms->check_conservation;
 
     double t0 = 0;
+    /* The user dt_initial is the appropriate value for minlevel
+       (not necessarily level 0)
+    */
     int level_factor = pow_int(2,gparms->minlevel);
+
+    /* Increase dt to value appropriate for level 0 */
     double dt_level0 = initial_dt*level_factor;
     double t_curr = t0;
     set_domain_time(*domain,t_curr);
