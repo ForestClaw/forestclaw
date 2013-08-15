@@ -97,6 +97,7 @@ double no_solver_update(fclaw2d_domain_t *domain,
                         double t,
                         double dt)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = get_clawpatch(this_patch);
 
     // save the current time step for time interpolation.  Otherwise, we get
@@ -108,7 +109,7 @@ double no_solver_update(fclaw2d_domain_t *domain,
     no_solver_patch_initialize(domain,this_patch, this_block_idx,this_patch_idx);
     */
 
-    return 1.0;
+    return gparms->desired_cfl;
 }
 
 
