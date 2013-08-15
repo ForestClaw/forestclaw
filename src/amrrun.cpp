@@ -90,6 +90,10 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     double initial_dt = gparms->initial_dt;
     int regrid_interval = gparms->regrid_interval;
     fclaw_bool cons_check = gparms->check_conservation;
+
+    /* This should be gparms->minlevel, to be consistent with how the
+       user likely choose dt_initial
+    */
     int minlevel = gparms->minlevel;
     int verbosity = gparms->verbosity;
 
@@ -124,7 +128,9 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             // Check to see if solution is still conservative
             if (cons_check)
             {
-                // Get current domain data since it may change during regrid
+                /* Get current domain data since it may change during
+                   regrid.
+                */
                 fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
@@ -133,37 +139,58 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
 
-            // Take a stable level 0 time step (use this as the base level time step even if
-            // we have no grids on level 0) and reduce it.
+            /* Take a stable level 0 time step (use this as the base
+               level time step even if we have no grids on level 0) and
+               reduce it.
+            */
             int reduce_factor;
             if (time_stepper.nosubcycle())
             {
-                // Take one step of a stable time step for the finest non-emtpy level.
+                /* Take one step of a stable time step for the finest
+                   non-emtpy level. */
                 reduce_factor = time_stepper.maxlevel_factor();
             }
             else
             {
-                // Take one step of a stable time step for the coarsest non-empty level.
+                /* Take one step of a stable time step for the coarsest
+                   non-empty level. */
                 reduce_factor = time_stepper.minlevel_factor();
             }
-            double dt_minlevel = dt_level0/reduce_factor;
+            double dt_minlevel_desired = dt_level0/reduce_factor;
 
-            // Use the tolerance to make sure we don't take a tiny time step just to
-            // hit 'tend'.   We will take a slightly larger time step now (dt_cfl + tol)
-            // rather than taking a time step of 'dt_minlevel' now, followed a time step of only
-            // 'tol' in the next step.
-            // Of course if 'tend - t_curr > dt_minlevel', then dt_minlevel doesn't change.
-            double tol = 1e-2*dt_minlevel;
+            /* Use the tolerance to make sure we don't take a tiny time
+               step just to hit 'tend'.   We will take a slightly larger
+               time step now (dt_cfl + tol) rather than taking a time step
+               of 'dt_minlevel' now, followed a time step of only 'tol' in
+               the next step.  Of course if 'tend - t_curr > dt_minlevel',
+               then dt_minlevel doesn't change. */
+            double tol = 1e-2*dt_minlevel_desired;
             fclaw_bool took_small_step = false;
+            fclaw_bool took_big_step = false;
+            double dt_minlevel = dt_minlevel_desired;
             if (!gparms->use_fixed_dt)
             {
-                if (tend - t_curr - dt_minlevel < tol)
+                double small_step = tend-t_curr-dt_minlevel;
+                if (small_step  < tol)
                 {
                     dt_minlevel = tend - t_curr;  // <= 'dt_minlevel + tol'
-                    took_small_step = true;
+                    if (small_step < 0)
+                    {
+                        /* We have (tend-t_curr) < dt_minlevel, and
+                           we have to take a small step to hit tend
+                        */
+                        took_small_step = true;
+                    }
+                    else
+                    {
+                        /* Take a bigger step now to avoid small step
+                           in next time step.
+                        */
+                        took_big_step = true;
+                    }
                 }
             }
-            // This also sets the time step on all finer levels.
+            /* This also sets a scaled time step for all finer levels. */
             time_stepper.set_dt_minlevel(dt_minlevel);
 
             double maxcfl_step = advance_all_levels(*domain, &time_stepper);
@@ -172,24 +199,28 @@ static void outstyle_1(fclaw2d_domain_t **domain)
 
             if ((*domain)->mpirank == 0)
             {
-                printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
-                       time_stepper.minlevel(),n_inner,dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+                printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = \
+%8.3f; Final time = %12.4f\n",
+                       time_stepper.minlevel(),n_inner,dt_minlevel,
+                       maxcfl_step, t_curr+dt_minlevel);
             }
 
             if (maxcfl_step > gparms->max_cfl)
             {
                 if ((*domain)->mpirank == 0)
                 {
-                    printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                    printf("   WARNING : Maximum CFL exceeded; \
+retaking time step\n");
                 }
                 if (!gparms->use_fixed_dt)
                 {
                     restore_time_step(*domain);
 
-                    // Modify dt_level0 from step used.
+                    /* Modify dt_level0 from step used. */
                     dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
 
-                    // Got back to start of loop, without incrementing step counter or time level
+                    /* Got back to start of loop, without incrementing
+                       step counter or time level */
                     continue;
                 }
             }
@@ -198,15 +229,28 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             {
                 if (took_small_step)
                 {
-                    double dt0 =  dt_minlevel*reduce_factor;
                     if ((*domain)->mpirank == 0)
                     {
-                        printf("   WARNING : Took small time step which was %6.1f%% of desired dt.\n",
-                               100.0*dt0/dt_level0);
+                        printf("   WARNING : Took small time step which was \
+%6.1f%% of desired dt.\n",
+                               100.0*dt_minlevel/dt_minlevel_desired);
+
+                    }
+                }
+                if (took_big_step)
+                {
+                    if ((*domain)->mpirank == 0)
+                    {
+                        printf("   WARNING : Took big time step which was \
+%6.1f%% of desired dt.\n",
+                               100.0*dt_minlevel/dt_minlevel_desired);
+
                     }
                 }
 
-                // New time step, which should give a cfl close to the desired cfl.
+
+                /* New time step, which should give a cfl close to the
+                   desired cfl. */
                 double dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
                 if (!took_small_step)
                 {
@@ -214,7 +258,8 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 }
                 else
                 {
-                    // use time step that would have been used had we not taken a small step
+                    /* use time step that would have been used had we
+                       not taken a small step */
                 }
             }
             n_inner++;
@@ -305,17 +350,20 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
 
-        // Take a stable level 0 time step (use level 0 as the base level time step even if
-        // we have no grids on level 0) and reduce it.
+        /* Take a stable level 0 time step (use level 0 as the
+           base level time step even if we have no grids on level 0)
+           and reduce it. */
         int reduce_factor;
         if (time_stepper.nosubcycle())
         {
-            // Take one step of a stable time step for the finest non-emtpy level.
+            /* Take one step of a stable time step for the finest
+               non-emtpy level. */
             reduce_factor = time_stepper.maxlevel_factor();
         }
         else
         {
-            // Take one step of a stable time step for the coarsest non-empty level.
+            /* Take one step of a stable time step for the coarsest
+               non-empty level. */
             reduce_factor = time_stepper.minlevel_factor();
         }
         double dt_minlevel = dt_level0/reduce_factor;
@@ -330,7 +378,8 @@ static void outstyle_3(fclaw2d_domain_t **domain)
 
         if ((*domain)->mpirank == 0)
         {
-            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = %8.3f; Final time = %12.4f\n",
+            printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = \
+%8.3f; Final time = %12.4f\n",
                    time_stepper.minlevel(),n+1,
                    dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
         }
