@@ -66,11 +66,12 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 
 %---------------------------------
 
-global cm_index;
+% Set to either a scalar, for automatic contours or a vector of contour levels.
+ContourValues = [];
+
+%---------------------------------
 
 % Use this for plotting cool proc colors rather than actual data.
-if (mq == 1)
-  cm_index = true;
-else
-  cm_index = false;
-end
+UserColorMapping = mq == 1;  % Partition field.
+
+ShowUnderOverShoots = 1;

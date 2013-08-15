@@ -13,9 +13,6 @@ axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis off;
 
-showpatchborders;
-setpatchborderprops(1:7,'linewidth',2);
-
 if (mq == 1)
   hidegridlines;
 
@@ -35,14 +32,19 @@ if (mq == 1)
   set(o,'ticklength',[0 0])
   set(o,'fontsize',16,'fontweight','bold')
 else
-  yrbcolormap;
   hidepatchborders;
   setpatchborderprops(1:10,'linewidth',2);
-  showpatchborders(1:6);
+  showpatchborders(1:10);
   % showgridlines(1:4);
-  caxis([0 1]);
+  % caxis([0 1]);
   fprintf('%12s %24.16f\n','qmin',qmin);
   fprintf('%12s %24.16f\n\n','qmax',qmax);
+
+  if (ShowUnderOverShoots)
+    underover_colorbar;
+  else
+    yrbcolormap;
+  end;
 end;
 
 
