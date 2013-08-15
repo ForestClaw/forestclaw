@@ -86,7 +86,7 @@ void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
 void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
                              int exchange_maxlevel)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    // fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
 
     int zz = 0;
@@ -182,7 +182,7 @@ void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
 static void
 unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    // fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
@@ -196,7 +196,6 @@ unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
         fclaw_bool time_interp = fclaw_false;
         unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
     }
-    ++ddata->count_ghost_exchange;
 }
 
 
