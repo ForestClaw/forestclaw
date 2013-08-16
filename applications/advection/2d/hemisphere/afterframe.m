@@ -4,13 +4,24 @@ axis image;
 daspect([1 1 1]);
 axis off;
 
-yrbcolormap;
-caxis([0 1]);
-
 showgridlines(1:4)
 setpatchborderprops(1:6,'linewidth',2);
 showpatchborders();
 setviews;
+
+yrbcolormap;
+if (ShowUnderOverShoots == 1)
+  under_label = sprintf('%6.2e',qmin);
+  over_label = sprintf('1 + %6.2e',qmax-1);
+  underover_colorbar(under_label,over_label);
+  fprintf('%12s %15s\n','qmin',under_label);
+  fprintf('%12s %15s\n\n','qmax',over_label);
+else
+  fprintf('%12s %24.16f\n','qmin',qmin);
+  fprintf('%12s %24.16f\n\n','qmax',qmax);
+end;
+
+
 
 NoQuery = 0;
 prt = false;

@@ -69,8 +69,4 @@ ContourValues = [];
 
 %---------------------------------
 
-% for scatter plot (PlotType==4):
-% plot q(i,j) vs. r(i,j) = (x(i,j)-x0)^2 + (y(i,j)-y0)^2
-  x0 = 0;
-  y0 = 0;
-  ScatterStyle = setplotstyle('bx','rx','gx');
+ShowUnderOverShoots = 1;
