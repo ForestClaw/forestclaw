@@ -2,9 +2,9 @@ s = 1e-2;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis off;
-%yrbcolormap;
 
 if (mq == 1)
+  % Plot partitions
   hidegridlines;
 
   npmax = 10;
@@ -24,15 +24,14 @@ if (mq == 1)
   set(o,'fontsize',16,'fontweight','bold')
 else
   colormap(jet);
-  cv = 0.1:0.1:0.9;
-  showpatchborders;
+  cv = linspace(qmin,qmax,21);
+  cv([1 end]) = [];
+  drawcontourlines(cv);
+  setcontourlineprops('linewidth',2);
   setpatchborderprops(1:7,'linewidth',2);
-  showgridlines(1:3);
-  hidegridlines;
+  showpatchborders;
+  colorbar;
 end;
-
-
-
 
 
 view(2);
