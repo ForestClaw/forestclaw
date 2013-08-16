@@ -71,16 +71,9 @@ function setcolors(p,x,y,z,q)
 %
 %      See also PATCH, COLORMAP.
 
-global cm_index;
 
-if (cm_index)
-  qcolors = round(q) + 1;
-  set(p,'CData',qcolors);
+qcolors = round(q) + 1;
+set(p,'CData',qcolors);
 
-  set(p,'CDataMapping','direct');  % Scale into current color map.
-  set(p,'FaceColor','flat');       % Single color per cell
-else
-  set(p,'CData',q);                % Data to use for coloring.
-  set(p,'CDataMapping','scaled');  % Scale into current color map.
-  set(p,'FaceColor','flat');       % Single color per cell
-end;
+set(p,'CDataMapping','direct');  % Scale into current color map.
+set(p,'FaceColor','flat');       % Single color per cell
