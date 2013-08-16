@@ -41,7 +41,9 @@ else
   fprintf('%12s %24.16f\n\n','qmax',qmax);
 
   if (ShowUnderOverShoots)
-    underover_colorbar;
+    under_label = sprintf('%6.2e',qmin);
+    over_label = sprintf('1 + %6.2e',qmax-1);
+    underover_colorbar(under_label,over_label);
   else
     yrbcolormap;
   end;
