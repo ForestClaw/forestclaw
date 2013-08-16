@@ -1,4 +1,3 @@
-global cm_index;
 s = 1e-2;
 axis image;
 daspect([1 1 1]);
@@ -6,7 +5,6 @@ axis off;
 
 
 if (mq == 1)
-  cm_index = true;
   hidegridlines;
 
   npmax = 10;
@@ -29,8 +27,6 @@ if (mq == 1)
   showpatchborders;
 
 else
-  cm_index = false;
-
   yrbcolormap;
   caxis([0 1]);
 
