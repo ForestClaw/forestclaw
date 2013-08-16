@@ -3,7 +3,7 @@
 # Copy this to a local version Make.defs.local
 
 # Location of gfortran library
-FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
+# FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # Extra flags that not every compiler understands
 LOCAL_FFLAGS = -Wno-unused-dummy-argument
@@ -14,8 +14,8 @@ FCLAW_MPI = True
 ifeq ($(FCLAW_MPI),True)
 # make sure p4est is configured with --enable-mpi --enable-mpiio
 P4EST_CXX = mpicxx
-P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local
+# P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local
 else
 P4EST_CXX = c++
-P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build/local
+# P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build/local
 endif
