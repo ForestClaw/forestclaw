@@ -42,8 +42,8 @@ double update_level_solution(fclaw2d_domain_t *domain,
                              int a_level,
                              fclaw2d_level_time_data *time_data)
 {
-    /* ToDo : Do we really need to pass in the entire time_data structure?
-       Maybe this can be simplified considerably.
+    /* ToDo : Do we really need to pass in the entire time_data
+       structure? Maybe this can be simplified considerably.
     */
     double t = time_data->t_level;
     double dt = time_data->dt;
@@ -51,16 +51,16 @@ double update_level_solution(fclaw2d_domain_t *domain,
 
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
-    /* Idea here is that the user may want to apply a single step routine,
-       an MOL routine, or possibly both. */
+    /* Idea here is that the user may want to apply a single
+       step routine, an MOL routine, or possibly both. */
 
     if (sf->use_single_step_update)
     {
         cfl = (sf->f_level_single_step)(domain,a_level,t,dt);
     }
 
-    /* We may actually do both.  Just need to be sure that coarser level has taken a
-       time step though */
+    /* We may actually do both.  Just need to be sure that coarser
+       level has taken a time step though */
     if (sf->use_mol_update)
     {
         cfl = fclaw2d_level_mol_step(domain,a_level,time_data,
@@ -94,17 +94,17 @@ double advance_level(fclaw2d_domain_t *domain,
     }
 
     /* -- Coming into this routine, all ghost cell information
-          needed for an update of this level has been done.  So we can update
-          immediately.
+          needed for an update of this level has been done.  So we can
+          update immediately.
 
-       -- All ghost cell exchanges needed to update coarser levels, whose
-          last updated step is also 'a_curr_fine_step' have been done,
-          and so coarser grids can all also be updated
+       -- All ghost cell exchanges needed to update coarser levels,
+          whose last updated step is also 'a_curr_fine_step' have been
+          done, and so coarser grids can all also be updated
     */
 
-    /* The use of time_data here could be cleaned up a bit, but I am leaving
-       everything for now, in case I later decide to do more with the MOL
-       approach.
+    /* The use of time_data here could be cleaned up a bit, but I am
+       leaving everything for now, in case I later decide to do more
+       with the MOL approach.
     */
     fclaw2d_level_time_data_t time_data;
 
@@ -118,7 +118,8 @@ double advance_level(fclaw2d_domain_t *domain,
        Advance this level from 'a_curr_fine_step' to
        'a_curr_fine_step + dt_level'
        ------------------------------------------------------------ */
-    double cfl_step = update_level_solution(domain,this_level,&time_data);
+    double cfl_step = update_level_solution(domain,this_level,
+                                            &time_data);
     maxcfl = max(maxcfl,cfl_step);
 
     a_time_stepper->increment_step_counter(this_level);
@@ -128,33 +129,40 @@ double advance_level(fclaw2d_domain_t *domain,
     /* Advance coarser levels recursively.   If we are in the no-subcycle
        case, we will a take a time step of dt_fine (i.e. dt_level, where
        'level' is our current fine grid level).  If we are subcycling,
-       then each time step will be the step size appropriate for that level.
-       In this case, we are anticipating needing to do time interpolation to
-       get ghost cells, and so as soon as we are finished with a coarse step,
-       we will construct the time interpolated data.
+       then each time step will be the step size appropriate for that
+       level. In this case, we are anticipating needing to do time
+       interpolation to get ghost cells, and so as soon as we are
+       finished with a coarse step, we will construct the time
+       interpolated data.
     */
 
     if (!a_time_stepper->is_coarsest(this_level))
     {
-        /* Advance coarser level, but only if coarse level and this level are time
-           synchronized.  */
+        /* Advance coarser level, but only if coarse level and this
+           level are time synchronized.  */
         int last_coarse_step = a_time_stepper->last_step(coarser_level);
         if (last_coarse_step == a_curr_fine_step)
         {
-            double cfl_step = advance_level(domain,coarser_level,last_coarse_step,
+            double cfl_step = advance_level(domain,coarser_level,
+                                            last_coarse_step,
                                             maxcfl,a_time_stepper);
             maxcfl = max(maxcfl,cfl_step);
 
             if (!a_time_stepper->nosubcycle())
             {
-                /* Time interpolate this data for a future exchange with finer grid */
-                int coarse_inc = a_time_stepper->step_inc(coarser_level);
-                int new_curr_step = a_time_stepper->last_step(this_level);
-                double alpha = double(new_curr_step % coarse_inc)/coarse_inc;
+                /* Time interpolate this data for a future exchange with
+                   finer grid */
+                int coarse_inc =
+                    a_time_stepper->step_inc(coarser_level);
+                int new_curr_step =
+                    a_time_stepper->last_step(this_level);
+                double alpha =
+                    double(new_curr_step % coarse_inc)/coarse_inc;
                 if (verbose)
                 {
-                    cout << "Time interpolating level " << coarser_level <<
-                        " using alpha = " << alpha << endl;
+                    cout << "Time interpolating level " <<
+                        coarser_level << " using alpha = "
+                         << alpha << endl;
                 }
 
                 timeinterp(domain,coarser_level,alpha);
@@ -259,7 +267,8 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
    ---------------------------------------------------------- */
 static
 void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
-                          int fine_level, subcycle_manager *a_time_stepper,
+                          int fine_level,
+                          subcycle_manager *a_time_stepper,
                           fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
@@ -288,7 +297,8 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     set_boundary_patch_ptrs(domain,time_interp_level, fine_level);
 
     /* Do parallel ghost exchange */
-    exchange_ghost_patch_data_levels(domain,time_interp_level,fine_level);
+    exchange_ghost_patch_data_levels(domain,time_interp_level,
+                                     fine_level);
 
     /* -------------------------------------------------------
        Do ghost cell exchange.
@@ -360,22 +370,23 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     double maxcfl = 0;
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
-        double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,a_time_stepper);
+        double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,
+                                        a_time_stepper);
         maxcfl = max(cfl_step,maxcfl);
         int last_step = a_time_stepper->last_step(maxlevel);
         if (!a_time_stepper->nosubcycle() && last_step < n_fine_steps)
         {
             /* Find time interpolated level and do ghost patch exchange
-             and ghost cell exchange for next update.
-            */
+               and ghost cell exchange for next update. */
             int time_interp_level = maxlevel-1;
-            while (last_step % a_time_stepper->step_inc(time_interp_level) == 0)
+            while (last_step %
+                   a_time_stepper->step_inc(time_interp_level) == 0)
             {
                 time_interp_level--;
             }
-            /* This exchange includes an exchange between level maxlevel-n+1
-               and the time interpolated patch at level maxlevel-n.
-            */
+            /* This exchange includes an exchange between level
+               maxlevel-n+1 and the time interpolated patch at level
+               maxlevel-n. */
             update_ghost_partial(domain,time_interp_level+1,maxlevel,
                                  a_time_stepper,FCLAW2D_TIMER_ADVANCE);
         }
