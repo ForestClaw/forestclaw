@@ -34,15 +34,13 @@ if (mq == 1)
 else
   hidepatchborders;
   setpatchborderprops(1:10,'linewidth',2);
-  showpatchborders(1:10);
-  % showgridlines(1:4);
-  % caxis([0 1]);
+  % showpatchborders(1:10);
+
   fprintf('%12s %24.16f\n','qmin',qmin);
   fprintf('%12s %24.16f\n\n','qmax',qmax);
 
   yrbcolormap;
   if (ShowUnderOverShoots)
-
     under_label = sprintf('%6.2e',qmin);
     over_label = sprintf('1 + %6.2e',qmax-1);
     underover_colorbar(under_label,over_label);
