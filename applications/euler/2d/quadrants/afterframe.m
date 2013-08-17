@@ -28,7 +28,6 @@ else
   cv([1 end]) = [];
   drawcontourlines(cv);
   setcontourlineprops('linewidth',2);
-  setpatchborderprops(1:7,'linewidth',2);
   showpatchborders;
   colorbar;
 end;

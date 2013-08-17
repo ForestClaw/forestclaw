@@ -5,8 +5,6 @@ axis off;
 
 
 if (mq == 1)
-  hidegridlines;
-
   npmax = 10;
   if (Frame == 0)
     cm = multicolormap(npmax);
@@ -29,11 +27,13 @@ if (mq == 1)
 else
   yrbcolormap;
   caxis([0 1]);
-
   showgridlines(1:2);
-  setpatchborderprops(1:6,'linewidth',2);
-  hidepatchborders;
   showpatchborders(1:5);
+  if (ShowOverUnderShoots == 1)
+    under_label = sprintf('%6.2e',qmin);
+    over_label = sprintf('1 + %6.2e',qmax-1);
+    colorbar_underover(under_label,over_label);
+  end
 end
 setviews;
 

@@ -1,5 +1,3 @@
-
-
 s = 1e-2;
 axis([-1-s 1+s -1-s 1+s])
 daspect([1 1 1]);
@@ -8,9 +6,7 @@ axis off;
 if (mq == 1)
   yrbcolormap;
   caxis([0 1]);
-  cm_index = false;  % global variable set in setprob.m
 else
-  cm_index = true;  % Used by setcolors.m
   npmax = 10;
   if (Frame == 0)
     cm = multicolormap(npmax);
