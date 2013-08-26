@@ -39,7 +39,8 @@
 %
 %      See also PLOTCLAW2, SetPlotGrid, setPlotGridEdges.
 
-% OutputFlag = 'ascii'         % default value.
+OutputFlag = 'ascii';         % default value.
+OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 

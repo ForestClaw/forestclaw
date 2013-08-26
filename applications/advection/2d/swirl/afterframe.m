@@ -34,13 +34,16 @@ if (mq == 1)
 else
   yrbcolormap;
   % showpatchborders(1:10);
-
-  fprintf('%12s %24.16f\n','qmin',qmin);
-  fprintf('%12s %24.16f\n\n','qmax',qmax);
+  qlo = 0;
+  qhi = 1;
+  under_label = sprintf('0 - %7.1e',qlo-qmin);
+  over_label = sprintf('1 + %7.1e',qmax-qhi);
+  fprintf('%6s %12s\n','qmin',under_label);
+  fprintf('%6s %12s\n\n','qmax',over_label);
 
   if (ShowUnderOverShoots)
-    under_label = sprintf('%6.2e',qmin);
-    over_label = sprintf('1 + %6.2e',qmax-1);
+    qlo = 0;
+    qhi = 1;
     colorbar_underover(under_label,over_label);
   end;
 end;
@@ -49,15 +52,10 @@ end;
 view(2);
 
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-  filename = 'swirl000.png';
-  str = num2str(Frame);
-  len = length(str);
-  filename(8-len+1:8) = str;
-  pstr = ['print -dpng ',filename];
-  disp(pstr);
-  eval(pstr);
+  filename = framename(Frame,'swirl0000','png');
+  print('-dpng',filename);
 end;
 
 clear afterframe;
