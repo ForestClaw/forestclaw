@@ -53,11 +53,6 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
 void timeinterp(fclaw2d_domain_t *domain,
                 int level,double alpha)
 {
-    // Use separate timer for all exchanges
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-
-    fclaw_bool time_interp = alpha > 0; //
-
     /* Store time interpolated data into m_griddata_time_sync. */
     fclaw2d_domain_iterate_level(domain, level,cb_setup_time_interp,
                                      (void *) &alpha);
