@@ -13,8 +13,8 @@ r = float(sys.argv[3])
 o = r + e
 
 print " "
-print "%40s %6.1f" % ("Over head as percentage of ADVANCE",100.0*o/a)
-print "%40s %6.1f" % ("Over head as percentage of total",100.0*o/(a + o))
+print "%40s %6.1f%%" % ("Over head as percentage of ADVANCE",100.0*o/a)
+print "%40s %6.1f%%" % ("Over head as percentage of total",100.0*o/(a + o))
 print " "
 
 print "Grid advances take %2.1f times as long as exchange and regridding" % (a/o)
