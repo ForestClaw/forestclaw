@@ -698,9 +698,9 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           fclaw_bool time_interp,
                           fclaw2d_timer_names_t running)
 {
+#if 0
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-#if 0
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
     }

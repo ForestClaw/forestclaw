@@ -182,9 +182,9 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 void level_exchange(fclaw2d_domain_t *domain, int level,
                     fclaw2d_timer_names_t running)
 {
+#if 0
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-#if 0
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
     }
