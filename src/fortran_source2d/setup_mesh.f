@@ -84,6 +84,7 @@ c     # than in the rest of the mesh.
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
             sum_area = 0.d0
+
             do ii = 1,rfactor
                do jj = 1,rfactor
                   xef = xe + (ii - 1)*dxf
@@ -104,25 +105,6 @@ c     # than in the rest of the mesh.
             area(i,j) = sum_area
          enddo
       enddo
-
-c      open(10,file='area.out');
-c      do i = 1-mbc,mx+mbc
-c         do j = 1-mbc,my+mbc
-c            write(10,'(2I5,E16.8)') i,j,area(i,j)
-c         enddo
-c         write(10,*) ' '
-c      enddo
-c      close(10)
-c      stop
-c
-c      open(10,file='points.out');
-c      do i = 1,mx+1
-c         do j = 1,my+1
-c            write(10,'(2I5,3E16.8)') i,j,xd(i,j),yd(i,j),zd(i,j)
-c         enddo
-c      enddo
-c      close(10)
-
 
       end
 
