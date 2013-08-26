@@ -293,6 +293,10 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
 
 void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
 {
+    if (new_domain->mpirank == 0)
+    {
+        printf("Rebuilding domain\n");
+    }
     const amr_options_t *gparms = get_domain_parms(old_domain);
     double t = get_domain_time(old_domain);
 
@@ -318,18 +322,46 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
         set_block_data(block,gparms->mthbc);
     }
 
+    if (new_domain->mpirank == 0)
+    {
+        printf("  -- Rebuilding patches ... ");
+    }
     fclaw2d_domain_iterate_patches(new_domain, cb_build_patches,(void *) NULL);
+    if (new_domain->mpirank == 0)
+    {
+        printf("Done\n");
+    }
 
     // Set up the parallel ghost patch data structure.
+    if (new_domain->mpirank == 0)
+    {
+        printf("  -- Setting up parallel ghost exchange ... ");
+    }
     setup_parallel_ghost_exchange(new_domain);
+    if (new_domain->mpirank == 0)
+    {
+        // Done with parallel exchange
+        printf("Done\n");
+    }
+
+    if (new_domain->mpirank == 0)
+    {
+        // done with rebuild
+        printf("Done\n");
+    }
+
 }
 
 void build_initial_domain(fclaw2d_domain_t* domain)
 {
+    if (domain->mpirank == 0)
+    {
+        printf("Building initial domain\n");
+    }
     const amr_options_t *gparms = get_domain_parms(domain);
 
     // init_domain_data(*domain) is not called here, because it is
-    // called in <main>.cpp.  This allows the user to grap gparms,
+    // called in <main>.cpp.  This allows the user to grab gparms,
     // setup_problem(), etc before getting here .
 
     // Allocate memory for new blocks and patches.
@@ -347,10 +379,33 @@ void build_initial_domain(fclaw2d_domain_t* domain)
     }
 
     // Construct new patches
+    if (domain->mpirank == 0)
+    {
+        printf("  -- Rebuilding patches ... ");
+    }
     fclaw2d_domain_iterate_patches(domain, cb_build_patches,(void *) NULL);
+    if (domain->mpirank == 0)
+    {
+        printf("Done\n");
+    }
 
     // Set up the parallel ghost patch data structure.
+    if (domain->mpirank == 0)
+    {
+        printf("  -- Setting up parallel ghost exchange ... ");
+    }
     setup_parallel_ghost_exchange(domain);
+    if (domain->mpirank == 0)
+    {
+        // Done with parallel exchange
+        printf("Done\n");
+    }
+
+    if (domain->mpirank == 0)
+    {
+        // done with rebuild
+        printf("Done\n");
+    }
 }
 
 
