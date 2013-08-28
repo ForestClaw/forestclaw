@@ -17,7 +17,7 @@
 
 @Misc{newton_institute,
   key = 	 "newton",
-  howpublished = 	 "{Website: \url{http://www.newton.ac.uk/programmes/AMM/index.html}}",
+  howpublished = "{Website: \url{http://www.newton.ac.uk/programmes/AMM/index.html}}",
   title = "{Newton Institute Program: Multiscale Numerics for the Atmosphere and Ocean, August 22 - Dec. 21, 2012}"}
 
 @Article{al-be-co-ma:1997,
@@ -302,7 +302,7 @@ incompressible {N}avier-{S}tokes equations in three dimensions",
 }
 
 @Article{be-ca-he-le:2009,
-  author = 	 "M. J. Berger and D. Calhoun, C. Helzel, R. J. LeVeque",
+  author = 	 "M. J. Berger and D. Calhoun and C. Helzel and R. J. LeVeque",
   title = 	 "Logically rectangular finite volume methods with
                   adaptive refinement on the sphere",
   journal = 	 "Phil. Trans. R. Soc. A",
@@ -310,6 +310,23 @@ incompressible {N}avier-{S}tokes equations in three dimensions",
   volume = 	 367,
   number = 	 1,
   pages = 	 "4483--4496"}
+
+
+
+@Article{la-ul-ja:2013,
+  author = "P.H. Lauritzen and P.A. Ullrich and C. Jablonowski and
+            P. A. Bosler and D. Calhoun and A.J. Conley and T. Enomoto and
+            L. Dong and S. Dubey and  O. Guba and A.B. Hansen and E. Kaas and
+            J. Kent and J.-F. Lamarque and M.J. Prather and  D. Reinert and
+            V.V. Shashkin and W.C. Skamarock and B. Sørensen and M.A. Taylor and
+            M.A. Tolstykh",
+  title = "A standard test case suite for two-dimensional linear transport
+          on the sphere: results from a collection of state-of-the-art schemes",
+  journal = 	 "Geoscientific Model Development",
+  year = 	 2013,
+  month = 	 "August",
+  note = 	 "to appear"
+}
 
 
 %% ------------------------------ AMR Codes --------------------------------
@@ -350,8 +367,8 @@ incompressible {N}avier-{S}tokes equations in three dimensions",
 }
 
 @Misc{clawpack,
-  key = "amrclaw",
-  howpublished = "{AMRClaw website: \url{http://www.clawpack.org}}"
+  key = "clawpack",
+  howpublished = "{Clawpack website: \url{http://www.clawpack.org}}"
 }
 
 
@@ -392,14 +409,22 @@ key = "amroc",
 howpublished = "{AMROC website: \url{http://www.cacr.caltech.edu/asc/wiki/bin/view/Amroc/WebHome}}"
 }
 
+@Misc{openfoam,
+  key = "openfoam",
+  howpublished = "{OpenFOAM website: \url{http://openfoam.org}}"
+}
+
+% ---------------------------- applications codes ----------------------------------
 
 @TechReport{ash3d,
-  author = {Mastin, Larry G. and  Randall, Michael J. and Schwaiger, Hans F. and  Denlinger, Roger P.},
-title = {User's Guide and Reference to Ash3d : A Three-Dimensional Model for Eulerian Atmospheric Tephra Transport and Deposition},
+author = "Larry G. Mastin and  Michael J. Randall and Hans F. Schwaiger and Roger P.
+        Denlinger",
+title = "{User's Guide and Reference to Ash3d : A Three-Dimensional Model for Eulerian
+Atmospheric Tephra Transport and Deposition}",
   institution =  "United States Geological Survey",
   year = 	 2013,
   number = 	 "2013-1122",
-  annote = 	 {\url{http://pubs.er.usgs.gov/publication/ofr20131122}}
+  howpublished = {\url{http://pubs.er.usgs.gov/publication/ofr20131122}}
 }
 
 
@@ -475,11 +500,6 @@ volume = {39},
 number = {2}
 }
 
-@Misc{openfoam,
-  key = "openfoam",
-  howpublished = "{OpenFOAM website: \url{http://openfoam.org}}"
-}
-
 @article{ppm,
 author = {Colella, Phillip and Woodward, Paul R.},
 title = {{The Piecewise Parabolic Method (PPM) for Gas-Dynamical Simulations}},
@@ -489,6 +509,15 @@ pages = {174--201},
 year = {1984}
 }
 
+
+
+
+@InProceedings{bu-ca-ma-te:2013,
+  author = 	 "C. Burstedde and D. Calhoun and K. Mandli and A. R. Terrel",
+  title = 	 "{ForestClaw: Hybrid forest-of-octrees AMR for hyperbolic conservation laws}",
+  booktitle = "{Proceedings of ParCo 2013}",
+  year = 	 2013,
+  volume = 	 "to appear"}
 
 %% ------------------------------ END AMR Codes --------------------------------
 
