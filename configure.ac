@@ -4,7 +4,7 @@ dnl
 
 dnl We need a forwarding email for both Donna and Carsten.
 AC_INIT([forestclaw],
-        [m4_esyscmd([sc/config/git-version-gen .tarball-version])],
+        [m4_esyscmd([config/git-version-gen .tarball-version])],
         [burstedde@ins.uni-bonn.de])
 AC_PREREQ(2.61)
 AC_CONFIG_HEADERS([src/pre_config.h])
@@ -70,7 +70,6 @@ AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
 
 AC_DEFINE_UNQUOTED(CC,          ["${CC}"],          [C compiler])
-AC_DEFINE_UNQUOTED(C_VERSION,   ["${C_VERSION}"],   [C compiler version])
 AC_DEFINE_UNQUOTED(CFLAGS,      ["${CFLAGS}"],      [C compiler flags])
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
@@ -86,7 +85,6 @@ echo "o----------------------------------"
 echo "| Results for libsc are"
 echo "o----------------------------------"
 echo "| CC:          $CC"
-echo "| C_VERSION:   $C_VERSION"
 echo "| CFLAGS:      $CFLAGS"
 echo "| CPP:         $CPP"
 echo "| CPPFLAGS:    $CPPFLAGS"
