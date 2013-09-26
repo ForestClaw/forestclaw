@@ -1,0 +1,13 @@
+#! /bin/sh
+
+echo "--- This is the bootstrap script for forestclaw ---"
+echo "It is NOT required to run bootstrap to build from a tar.gz archive"
+echo "Development requires a libtool recent enough to contain LT_INIT" \
+    "(2.2 works)"
+echo "Current directory is $PWD"
+
+aclocal -Wall -I config -I sc/config 
+autoconf -Wall --force
+autoheader -Wall --force
+libtoolize --automake --force --copy
+automake -Wall --add-missing --copy
