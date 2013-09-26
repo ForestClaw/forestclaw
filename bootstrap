@@ -6,8 +6,8 @@ echo "Development requires a libtool recent enough to contain LT_INIT" \
     "(2.2 works)"
 echo "Current directory is $PWD"
 
-aclocal -Wall -I config -I sc/config 
+aclocal -Wall -I config -I sc/config
 autoconf -Wall --force
 autoheader -Wall --force
-libtoolize --automake --force --copy
+libtoolize --install --copy --force
 automake -Wall --add-missing --copy

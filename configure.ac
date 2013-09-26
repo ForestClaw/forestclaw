@@ -8,12 +8,13 @@ AC_INIT([forestclaw],
         [burstedde@ins.uni-bonn.de])
 AC_PREREQ(2.61)
 AC_CONFIG_HEADERS([src/pre_config.h])
-AC_CONFIG_SRCDIR([src/fclaw.h])
-AC_CONFIG_AUX_DIR([config])
+AC_CONFIG_SRCDIR([src/forestclaw2d.h])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([config])
 AC_PREFIX_DEFAULT([$PWD/local])
-AM_INIT_AUTOMAKE([subdir-objects])
 AX_PREFIX_CONFIG_H([src/fclaw_config.h], [FCLAW])
 SC_VERSION([FCLAW])
+AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES
 
 # Checks for MPI C compiler and other programs (no F77 at this point!).
@@ -25,10 +26,8 @@ SC_MPI_CONFIG([FCLAW])
 SC_MPI_ENGAGE([FCLAW])
 # This is needed for compatibility with automake >= 1.12
 m4_ifdef([AM_PROG_AR],[AM_PROG_AR])
-SC_LIBTOOL([FCLAW])
 AM_PROG_CC_C_O
-AC_PROG_RANLIB
-SC_C_VERSION
+LT_INIT
 
 # Checks for libraries.
 echo "o---------------------------------------"
@@ -49,7 +48,7 @@ echo "o---------------------------------------"
 echo "| Checking functions"
 echo "o---------------------------------------"
 
-AC_CHECK_FUNCS([backtrace backtrace_symbols])
+dnl dnl dnl AC_CHECK_FUNCS([backtrace backtrace_symbols])
 
 dnl dnl dnl AC_PROG_F77([gfortran g77 fl32 f77 fort77 xlf f90 xlf90])
 dnl dnl dnl AC_F77_WRAPPERS
