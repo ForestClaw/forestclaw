@@ -8,7 +8,9 @@ DISTCLEANFILES = _configs.sed src/fclaw_config.h
 EXTRA_DIST = bootstrap fclawindent config/fclaw_include.m4 config/git-version-gen
 LDADD =
 bin_PROGRAMS =
+include_HEADERS =
 lib_LTLIBRARIES =
+nodist_include_HEADERS =
 
 LDADD += $(FCLAW_LDADD) $(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src/libsc.a
 SUBDIRS = $(FCLAW_SUBDIRS)
