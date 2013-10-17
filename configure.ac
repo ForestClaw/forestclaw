@@ -13,9 +13,9 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([config])
 AC_PREFIX_DEFAULT([$PWD/local])
 AX_PREFIX_CONFIG_H([src/fclaw_config.h], [FCLAW])
-SC_VERSION([FCLAW])
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES
+SC_VERSION([FCLAW])
 
 # Checks for MPI C compiler and other programs (no F77 at this point!).
 echo "o---------------------------------------"

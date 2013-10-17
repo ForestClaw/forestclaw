@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Not nice for namespace cleanliness, but necessary to include mpi.h */
 #include <sc.h>
+#include <fclaw_config.h>
 
 #ifdef __cplusplus
 extern "C"
