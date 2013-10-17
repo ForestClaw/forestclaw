@@ -5,9 +5,12 @@ AM_CPPFLAGS = -I@top_srcdir@/src \
  -I$(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src \
  -I$(top_srcdir)@FCLAW_TOPLEVEL_MOD@/sc/src
 DISTCLEANFILES = _configs.sed src/fclaw_config.h
-EXTRA_DIST = bootstrap config/fclaw_include.m4 config/git-version-gen
+EXTRA_DIST = bootstrap fclawindent config/fclaw_include.m4 config/git-version-gen
+LDADD =
+bin_PROGRAMS =
 lib_LTLIBRARIES =
 
+LDADD += $(FCLAW_LDADD) $(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src/libsc.a
 SUBDIRS = $(FCLAW_SUBDIRS)
 
 dist-hook:
@@ -20,3 +23,4 @@ dist-hook:
 
 ## using nonrecursive make
 include src/Makefile.am
+include applications/dummy/Makefile.am
