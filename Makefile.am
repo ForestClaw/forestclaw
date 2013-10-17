@@ -6,6 +6,8 @@ DISTCLEANFILES = _configs.sed src/fclaw_config.h
 EXTRA_DIST = bootstrap config/fclaw_include.m4 config/git-version-gen
 lib_LTLIBRARIES =
 
+SUBDIRS = $(FCLAW_SUBDIRS)
+
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 	test "x$(VERSION)" = "x`@top_srcdir@/config/git-version-gen \
