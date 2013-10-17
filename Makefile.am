@@ -12,7 +12,7 @@ include_HEADERS =
 lib_LTLIBRARIES =
 nodist_include_HEADERS =
 
-LDADD += $(FCLAW_LDADD) $(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src/libsc.a
+LDADD += $(FCLAW_LDADD) $(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src/libsc.la
 SUBDIRS = $(FCLAW_SUBDIRS)
 
 dist-hook:
