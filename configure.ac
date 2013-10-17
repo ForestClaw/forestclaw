@@ -17,6 +17,30 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES
 SC_VERSION([FCLAW])
 
+# Check for subpackage sc
+echo "o---------------------------------------"
+echo "| Checking for subpackages"
+echo "o---------------------------------------"
+
+AC_MSG_NOTICE([Current srcdir: $srcdir])
+AC_MSG_CHECKING([whether we are a toplevel package])
+if test -e "$srcdir/sc/src/sc.h" ; then
+AC_MSG_RESULT([yes])
+FCLAW_IS_TOPLEVEL=true
+FCLAW_TOPLEVEL_SRCDIR=$srcdir
+AC_DEFINE([IS_TOPLEVEL], [1], [We are a toplevel package])
+else
+if test -e "$srcdir/../sc/src/sc.h" ; then
+AC_MSG_RESULT([no])
+FCLAW_IS_TOPLEVEL=
+FCLAW_TOPLEVEL_SRCDIR=$srcdir/..
+else
+AC_MSG_ERROR([Could not find package sc])
+fi
+fi
+AM_CONDITIONAL([IS_TOPLEVEL], [test x$FCLAW_IS_TOPLEVEL = xtrue])
+AC_SUBST([FCLAW_TOPLEVEL_SRCDIR])
+
 # Checks for MPI C compiler and other programs (no F77 at this point!).
 echo "o---------------------------------------"
 echo "| Checking MPI and other programs"

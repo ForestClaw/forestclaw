@@ -1,14 +1,10 @@
 ## Toplevel Makefile.am for forestclaw
 
-ACLOCAL_AMFLAGS = -I config -I sc/config
-AM_CPPFLAGS =
-DISTCLEANFILES =
-EXTRA_DIST =
+ACLOCAL_AMFLAGS = -I config -I @FCLAW_TOPLEVEL_SRCDIR@/sc/config
+AM_CPPFLAGS = -I@top_srcdir@/src -I@FCLAW_TOPLEVEL_SRCDIR@/sc/src
+DISTCLEANFILES = _configs.sed src/fclaw_config.h
+EXTRA_DIST = bootstrap config/fclaw_include.m4 config/git-version-gen
 lib_LTLIBRARIES =
-
-DISTCLEANFILES += _configs.sed src/fclaw_config.h
-
-EXTRA_DIST += bootstrap config/fclaw_include.m4 config/git-version-gen
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
