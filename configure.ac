@@ -27,7 +27,7 @@ AC_MSG_CHECKING([whether we are a toplevel package])
 if test -e "$srcdir/sc/src/sc.h" ; then
 AC_MSG_RESULT([yes])
 FCLAW_IS_TOPLEVEL=true
-FCLAW_TOPLEVEL_SRCDIR=$srcdir
+FCLAW_TOPLEVEL_MOD=
 FCLAW_SUBDIRS=sc
 AC_DEFINE([IS_TOPLEVEL], [1], [We are a toplevel package])
 AC_CONFIG_SUBDIRS([sc])
@@ -35,14 +35,16 @@ else
 if test -e "$srcdir/../sc/src/sc.h" ; then
 AC_MSG_RESULT([no])
 FCLAW_IS_TOPLEVEL=
-FCLAW_TOPLEVEL_SRCDIR=$srcdir/..
+FCLAW_TOPLEVEL_MOD=/..
 FCLAW_SUBDIRS=
 else
 AC_MSG_ERROR([Could not find package sc])
 fi
 fi
 AM_CONDITIONAL([IS_TOPLEVEL], [test x$FCLAW_IS_TOPLEVEL = xtrue])
-AC_SUBST([FCLAW_TOPLEVEL_SRCDIR])
+dnl In Makefile.am files we can use
+dnl $(top_srcdir)@FCLAW_TOPLEVEL_MOD@/path and it should work
+AC_SUBST([FCLAW_TOPLEVEL_MOD])
 AC_SUBST([FCLAW_SUBDIRS])
 
 # Checks for MPI C compiler and other programs (no F77 at this point!).

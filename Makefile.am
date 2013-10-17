@@ -1,7 +1,9 @@
 ## Toplevel Makefile.am for forestclaw
 
-ACLOCAL_AMFLAGS = -I config -I @FCLAW_TOPLEVEL_SRCDIR@/sc/config
-AM_CPPFLAGS = -I@top_srcdir@/src -I@FCLAW_TOPLEVEL_SRCDIR@/sc/src
+ACLOCAL_AMFLAGS = -I config -I $(top_srcdir)@FCLAW_TOPLEVEL_MOD@/sc/config
+AM_CPPFLAGS = -I@top_srcdir@/src \
+ -I$(top_builddir)@FCLAW_TOPLEVEL_MOD@/sc/src \
+ -I$(top_srcdir)@FCLAW_TOPLEVEL_MOD@/sc/src
 DISTCLEANFILES = _configs.sed src/fclaw_config.h
 EXTRA_DIST = bootstrap config/fclaw_include.m4 config/git-version-gen
 lib_LTLIBRARIES =
