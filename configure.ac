@@ -1,5 +1,5 @@
 dnl
-dnl This file is part of forestclaw.
+dnl This file is part of ForestClaw.
 dnl
 
 dnl We need a forwarding email for both Donna and Carsten.
