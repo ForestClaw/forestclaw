@@ -496,13 +496,13 @@ cells per \clawpack patch.}
 \label{fig:results2d}
 \end{figure}
 
-We provide two examples that demonstrate the \forestclaw code.
+We provide two examples that exercise the \forestclaw code.
 The numerical results to date have been designed to verify that
 interface layer between \pforest and \forestclaw is sufficiently
 flexible and robust.  Of particular importance was ensuring that all
 ghost cell transfers (including averaging and
 interpolation) are implemented correctly.
-The basic \clawpack algorithm and corresponding code are
+The basic \clawpack algorithms and the corresponding code are
 thoroughly tested and need no further verification in our context.
 
 In both sets of numerical results, we solve a scalar advection
@@ -602,7 +602,7 @@ In \Fig{ompscale}, we show multi-node calculations using 16 OpenMP
 threads per node executed by the
 %and in future
 %iterations on accelerators 
-\manyclaw set of patch-based PDE solvers.
+\manyclaw set of patch-based PDE solvers \cite{manyclaw}.
 %with
 %\forestclaw.  
 %\manyclaw provides a generic set of interators for Riemann
@@ -611,13 +611,32 @@ threads per node executed by the
 %$In this work we show good scaling results
 %across a single node and coupled to the MPI scaling as well.
 
+\begin{table}
+  \begin{center}
+   \begin{tabular}{l|rrrrrr}
+      $P$ (\# total MPI ranks) & 16 & 64 & 256 & 1,024 & 4,096 & 16,384 \\
+      \hline
+      par.\ efficiency (\%) & 100 & 96 & 96 & 103 & 103 & 82 \\
+    \end{tabular}
+  \end{center}
+  \caption{Weak scalability on a uniform mesh from level 6 at 64 cores to level
+    11 at 16,384
+    % using
+    (16 MPI ranks/node).}%
+  \label{tab:weakscale}
+\end{table}%
+%
 We have examined weak scalability as well by using four times as many MPI
-processes
-for each level increase, from level 6 at 64 cores to level 11 at 16,384.  Up to
-4,096 cores, the exchange times stay consistently below 16\% of the time
-integration and the time in seconds per time integration step varies between
-.0578 and .0602, which yields a parallel efficiency of 96\%.  For the
-data point at 16,384 cores, the efficiency is still 82\%.
+processes for each level increase.
+% , from level 6 at 64 cores to level 11 at 16,384.
+Up to 4,096 cores, the exchange times stay consistently below 16\% of the time
+integration,
+% and the time in seconds per time integration step varies between
+% .0578 and .0602,
+and we obtain optimal parallel efficiency.  For
+% the data point at
+16,384 cores, the efficiency reduces to 82\%
+with the current code (see \Tab{weakscale}).
 
 \begin{table}
   \begin{center}
@@ -655,10 +674,15 @@ the linear scaling of the time integration alone (not shown) and from the fact
 that the weighted partition does not influence the run times.  There is the
 tradeoff however, at least in the current implementation, that the adaptive
 runs exhibit reduced scalability associated with the ghost patch exchanges
-described earlier.  Presently, ghost patch exchanges are made across all levels, even
-if only two levels are involved in the exchange.  One enhancement of the code that is
-currently being developed is to rewrite the time stepping loop with the
-objective of minimizing the parallel neighbor exchanges.
+described earlier.
+% One enhancement of the code that is currently being developed is to rewrite
+% the time stepping loop with the objective of minimizing the parallel neighbor
+% exchanges.
+%
+% Presently, ghost patch exchanges are made across all levels, even
+% if only two levels are involved in the exchange.  One enhancement of the code that is
+% currently being developed is to rewrite the time stepping loop with the
+% objective of minimizing the parallel neighbor exchanges.
 
 \begin{figure}
   \begin{center}
