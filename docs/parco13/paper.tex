@@ -372,6 +372,8 @@ is maintained in \pforest according to a
 space filling curve.  Each MPI rank has a local view on its own partition,
 augmented where necessary with information about one layer of ghost leaves
 (see \Fig{cubed3}).
+The structure of \forestclaw is oblivious to the fact that it only has this
+local view, which relieves the developer from programming to the MPI interface.
 
 \forestclaw uses iterators over all rank-local leaves to execute numerical
 tasks one patch at a time, optionally restricted to a given refinement level.
@@ -392,16 +394,15 @@ percentage of cache reuse
 
 When \forestclaw accesses neighbor patches, they can be on the same or a
 different block.  In the latter case, coordinate transformations are carried
-out.  The structure of \forestclaw is oblivious to the fact that it only has a
-local view of the distributed mesh and data which relieves the developer from
-programming to the MPI interface.
+out.
 % Parallel neighbor exchanges are hidden
 % inside \pforest and called by \forestclaw
 % % at well-defined synchronization points
 % as follows.
-
-With MPI parallelism, neighbor patches can be either local or assigned to a
-different process (ghost patches).  Since this must make no difference
+Irrespective of their block,
+% With MPI parallelism,
+neighbor patches can be either local or assigned to a different MPI process (in
+which case we call them ghost patches).  Since this must make no difference
 numerically, we need to ensure that the values of parallel neighbor patches are current
 whenever they are accessed.  To this end, we allocate storage for a layer of
 ghost patches in \forestclaw, which we can pass to a general-purpose \pforest
@@ -431,7 +432,7 @@ $\dt$ is chosen per-patch depending on its size (this is sometimes called
 sub-cycling).  In the tradition of block-structured AMR codes, interaction
 between neighbor patches is done in a hierarchy from coarse to fine levels, and
 then correction factors are propagated back from fine to coarse levels, requiring
-an exchange at each level.  With sub-cycling, this entails a recursion with an
+at most two exchanges per level.  With sub-cycling, this entails a recursion with an
 operation count that is exponential in the difference between the largest and
 the smallest refinement level, with the benefit that $\dt$ matches the CFL
 condition at each level.  While a large number of exchanges per time step can
