@@ -686,19 +686,28 @@ described earlier.
 
 \begin{figure}
   \begin{center}
-    \hspace{.1\columnwidth}
-    \begin{minipage}[c]{.30\columnwidth}
+    %\hspace{.1\columnwidth}
+    \begin{minipage}[c]{.3\columnwidth}
       \includegraphics[width=\columnwidth]{../figs_misc/sphere_partition5}
     \end{minipage}
-    \hspace{.05\columnwidth}
-    \begin{minipage}[c]{.4\columnwidth}
-    \begin{tabular}{r|r}
-       $P$ & time int./step \\
+    \hspace{3ex}
+    \begin{minipage}[c]{.44\columnwidth}
+    \begin{tabular}{rcr}
+      \multicolumn{1}{c}{$P$}
+      & time int./step (s) & eff.\ (\%) \\
       \hline
-       16 & 1.115 \\
-       32 & 0.557 \\
-       64 & 0.297 \\
-      256 & 0.092 \\
+         16 & 3.539  & 100.0 \\
+       % 32 & 1.763  &  99.6 \\
+         64 & 0.889  & 100.5 \\
+      % 128 & 0.445  & 100.6 \\
+        256 & 0.223  & 100.7 \\
+      1,024 & 0.055 & 100.2 \\
+      4,096 & 0.014 &  99.4 \\
+% old results
+%        16 & 1.115 \\
+%        32 & 0.557 \\
+%        64 & 0.297 \\
+%       256 & 0.092 \\
     \end{tabular}
   \end{minipage}
 \end{center}
@@ -711,7 +720,7 @@ described earlier.
 \label{fig:spherical}
 \end{figure}
 To showcase a multiblock connectivity, we include results for the spherical Example 2 in
-\Fig{spherical}, together with a strong scaling table from 16 to 256 MPI ranks.
+\Fig{spherical}, together with a strong scaling table from 16 to 4,096 MPI ranks.
 
 \section{Conclusion}
 
