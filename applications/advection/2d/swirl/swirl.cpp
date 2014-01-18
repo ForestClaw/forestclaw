@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 #include "amr_options.h"
 
 #include "swirl_user.H"
@@ -41,7 +41,7 @@ main (int argc, char **argv)
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   amr_options_t         *gparms;
-  amr_waveprop_parms_t  *waveprop_parms;
+  fclaw2d_clawpack_parms_t  *clawpack_parms;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
@@ -55,7 +55,7 @@ main (int argc, char **argv)
 
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
-  waveprop_parms = amr_waveprop_parms_new(options);
+  clawpack_parms = fclaw2d_clawpack_parms_new(options);
 
   /* Parse any command line arguments.  Argument gparms is no longer needed
      as an input since the array conversion is now done in 'postprocess' */
@@ -64,11 +64,11 @@ main (int argc, char **argv)
 
   /* Any arrays are converted here */
   amr_postprocess_parms(gparms);
-  amr_waveprop_postprocess_parms(waveprop_parms);
+  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
 
   /* Check final state of parameters */
   amr_checkparms(gparms);
-  amr_waveprop_checkparms(waveprop_parms,gparms);
+  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
 
   /* ---------------------------------------------------------------
      Domain geometry
@@ -87,7 +87,7 @@ main (int argc, char **argv)
   init_domain_data(domain);
 
   set_domain_parms(domain,gparms);
-  set_waveprop_parms(domain,waveprop_parms);
+  set_clawpack_parms(domain,clawpack_parms);
 
   /* ---------------------------------------------------------------
      Define the solver and link in other problem/user specific
@@ -113,7 +113,7 @@ main (int argc, char **argv)
 
   sc_options_destroy(options);         /* this could be moved up */
   amr_options_destroy(gparms);
-  amr_waveprop_parms_delete(waveprop_parms);
+  amr_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
 
