@@ -113,7 +113,7 @@ main (int argc, char **argv)
 
   sc_options_destroy(options);         /* this could be moved up */
   amr_options_destroy(gparms);
-  amr_clawpack_parms_delete(clawpack_parms);
+  fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
 
