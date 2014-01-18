@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <amr_single_step.h>
-#include <amr_waveprop.H>
+#include <fclaw2d_clawpack.H>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
@@ -39,7 +39,7 @@ main (int argc, char **argv)
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
-  amr_waveprop_parms_t* waveprop_parms;
+  fclaw2d_clawpack_parms_t* clawpack_parms;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
@@ -52,16 +52,16 @@ main (int argc, char **argv)
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
-  waveprop_parms = amr_waveprop_parms_new(options);
+  clawpack_parms = fclaw2d_clawpack_parms_new(options);
 
   amr_options_parse (options, argc, argv, lp);  // Reads options from a file
 
   amr_postprocess_parms (gparms);
-  amr_waveprop_postprocess_parms(waveprop_parms);
+  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
 
   /* Read in waveprop parms, process and check them */
   amr_checkparms (gparms);
-  amr_waveprop_checkparms(waveprop_parms,gparms);
+  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
 
   /* ---------------------------------------------------------------
      Domain geometry
@@ -82,7 +82,7 @@ main (int argc, char **argv)
 
   /* Store parameters */
   set_domain_parms(domain,gparms);
-  set_waveprop_parms(domain,waveprop_parms);
+  set_clawpack_parms(domain,clawpack_parms);
 
   /* Link solvers to the domain */
   link_problem_setup(domain,slotted_disk_setprob);
@@ -101,7 +101,7 @@ main (int argc, char **argv)
      -------------------------------------------------- */
   amr_options_destroy(gparms);
   sc_options_destroy(options);
-  amr_waveprop_parms_delete(waveprop_parms);
+  fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
 

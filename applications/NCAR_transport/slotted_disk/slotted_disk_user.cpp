@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 #include "slotted_disk_user.H"
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_output = &slotted_disk_parallel_write_output;
 
     /* This is needed to get constructors for user data */
-    amr_waveprop_link_to_clawpatch();
+    fclaw2d_clawpack_link_to_clawpatch();
 }
 
 void slotted_disk_setprob(fclaw2d_domain_t* domain)
@@ -89,14 +89,14 @@ void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
 
     /* -------------------------------------------------------------- */
     // allocate space for the aux array
-    amr_waveprop_define_auxarray(domain,cp);
+    fclaw2d_clawpack_define_auxarray(domain,cp);
 
     /* -------------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     /* -------------------------------------------------------------- */
     // Modified clawpack setaux routine that passes in mapping terms
@@ -142,7 +142,7 @@ void slotted_disk_qinit(fclaw2d_domain_t *domain,
 
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     double *xp = cp->xp();
     double *yp = cp->yp();
@@ -191,7 +191,7 @@ void slotted_disk_b4step2(fclaw2d_domain_t *domain,
     /* -------------------------------------------------------------- */
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
 
     double *xd = cp->xd();
@@ -212,7 +212,7 @@ double slotted_disk_update(fclaw2d_domain_t *domain,
     slotted_disk_b4step2(domain,this_patch,this_block_idx,
                          this_patch_idx,t,dt);
 
-    double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,
+    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);
 
     return maxcfl;
