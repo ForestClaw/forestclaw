@@ -3,7 +3,7 @@
 version := 4.6
 
 FCLAW2D_CLAWPACK = $(FORESTCLAW)/src/solvers/fclaw2d_clawpack${version}
-FCLAW2D_CLAWPACK_FORTRAN = $(FCLAW2d_CLAWPACK)/fortran_source
+FCLAW2D_CLAWPACK_FORTRAN = $(FCLAW2D_CLAWPACK)/fortran_source
 
 clawpack_includes := -I$(FCLAW2D_CLAWPACK) -I$(FCLAW2D_CLAWPACK_FORTRAN)
 
