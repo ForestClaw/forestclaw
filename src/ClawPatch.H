@@ -217,10 +217,10 @@ public :
        Only defined if we are really using the wave prop algorithm.
        The new/delete functions are static because we want to define them
        ---------------------------------------------------------------- */
-    void* waveprop_patch_data();
-    void set_waveprop_patch_data(void* solver_data);
-    static fclaw2d_solver_patch_data_new_t f_waveprop_patch_data_new;
-    static fclaw2d_solver_patch_data_delete_t f_waveprop_patch_data_delete;
+    void* clawpack_patch_data();
+    void set_clawpack_patch_data(void* solver_data);
+    static fclaw2d_solver_patch_data_new_t f_clawpack_patch_data_new;
+    static fclaw2d_solver_patch_data_delete_t f_clawpack_patch_data_delete;
 
     // ----------------------------------------------------------------
     // Wave propagation used for ManyClaw
@@ -307,7 +307,8 @@ protected :
     FArrayBox m_curvature;  // ???
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
-    void *m_waveprop_patch_data;
+    void *m_clawpack_patch_data;
+
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_manyclaw_patch_data;
 

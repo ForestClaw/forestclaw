@@ -14,9 +14,9 @@ static void solver_default(void** solverdata)
    made more general (via some kind of registration?)
    ----------------------------------------------------- */
 fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_waveprop_patch_data_new = &solver_default;
+    ClawPatch::f_clawpack_patch_data_new = &solver_default;
 fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_waveprop_patch_data_delete = &solver_default;
+    ClawPatch::f_clawpack_patch_data_delete = &solver_default;
 
 fclaw2d_solver_patch_data_new_t
     ClawPatch::f_manyclaw_patch_data_new = &solver_default;
@@ -107,7 +107,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
-    ClawPatch::f_waveprop_patch_data_delete(&m_waveprop_patch_data);
+    ClawPatch::f_clawpack_patch_data_delete(&m_clawpack_patch_data);
     ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
     ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
     // All other data arrays get deleted automatically by the FArrayBox
@@ -163,7 +163,7 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms);
     }
 
-    ClawPatch::f_waveprop_patch_data_new(&m_waveprop_patch_data);
+    ClawPatch::f_clawpack_patch_data_new(&m_clawpack_patch_data);
     ClawPatch::f_manyclaw_patch_data_new(&m_manyclaw_patch_data);
     ClawPatch::f_user_patch_data_new(&m_user_patch_data);
 }
@@ -312,14 +312,14 @@ double* ClawPatch::curvature()
    Solver data and functions
    ---------------------------------------------------*/
 // Wave propagation algorithms
-void* ClawPatch::waveprop_patch_data()
+void* ClawPatch::clawpack_patch_data()
 {
-    return m_waveprop_patch_data;
+    return m_clawpack_patch_data;
 }
 
-void ClawPatch::set_waveprop_patch_data(void* solverdata)
+void ClawPatch::set_clawpack_patch_data(void* solverdata)
 {
-    m_waveprop_patch_data = solverdata;
+    m_clawpack_patch_data = solverdata;
 }
 
 // Wave propagation algorithms

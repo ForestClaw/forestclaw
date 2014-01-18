@@ -76,7 +76,7 @@ typedef struct fclaw2d_domain_data
     const amr_options_t *amropts;
 
     /* Some solver parms */
-    void *waveprop_parms;
+    void *clawpack_parms;
     void *manyclaw_parms;
 
     /* Time at start of each subcycled time step */
