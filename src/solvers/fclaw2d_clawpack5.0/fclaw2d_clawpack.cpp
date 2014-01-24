@@ -398,13 +398,11 @@ double fclaw2d_clawpack_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     // Replace this with a call to "step2" at some point...
-    printf("here ...1\n");
     clawpatch2_(maxm, meqn, maux, mbc, clawpack_parms->method,
                 clawpack_parms->mthlim, clawpack_parms->mcapa, mwaves,
                 mx, my, qold,
                 aux, dx, dy, dt, cflgrid, xlower, ylower,
                 level,t, fp, fm, gp, gm);
-    printf("here ...2\n");
     delete [] fp;
     delete [] fm;
     delete [] gp;
