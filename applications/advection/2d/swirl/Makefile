@@ -26,7 +26,7 @@ exampleobjs = \
 
 # Solver routines (several solvers can be added here)
 include Makefile.clawpack.inc
-solverobjs = $(clawpack_objs)
+solverobjs = $(clawpack_mods) $(clawpack_objs)
 solverincludes = $(clawpack_includes)
 
 # Mapping routines
@@ -51,8 +51,15 @@ default: $(TARGET)
 	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
-.f.o:
+%.mod: %.f90
+	$(FC) -Wall $(FFLAGS) ${solverincludes} -c $<  -o $@
+
+%.o: %.f90
+	$(FC) -Wall $(FFLAGS) ${solverincludes} -c $<  -o $@
+
+%.o: %.f
 	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
+
 
 .PHONY: clean realclean default $(TARGET)
 
@@ -61,7 +68,7 @@ $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_LIBS) -o $@
 
 clean:
-	rm -f *.o $(TARGET) $(exampleobjs)
+	rm -f *.o $(TARGET) $(exampleobjs) $(solverobjs)
 
 realclean:
 	rm -f *.o $(TARGET) $(OBJECTS) fort.*
