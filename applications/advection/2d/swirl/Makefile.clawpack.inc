@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-version := 5.0
+version := 4.6
 
 FCLAW2D_CLAWPACK = $(FORESTCLAW)/src/solvers/fclaw2d_clawpack${version}
 FCLAW2D_CLAWPACK_FORTRAN = $(FCLAW2D_CLAWPACK)/fortran_source
@@ -12,6 +12,7 @@ ifeq ($(version),4.6)
 clawpack_mods =
 clawpack_objs = \
 	$(FCLAW2D_CLAWPACK)/fclaw2d_clawpack.o \
+	$(FCLAW2D_CLAWPACK_FORTRAN)/claw2d_utils.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/inlinelimiter.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/src2.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/bc2.o \
@@ -24,6 +25,7 @@ clawpack_mods = \
 
 clawpack_objs = \
 	$(FCLAW2D_CLAWPACK)/fclaw2d_clawpack.o \
+	$(FCLAW2D_CLAWPACK_FORTRAN)/claw2d_utils.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/set_amr_module.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/inlinelimiter.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/src2.o \

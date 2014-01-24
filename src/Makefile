@@ -53,7 +53,6 @@ fclawobjs = \
 	$(FORTRAN_SRC)/mapc2m.o \
 	$(FORTRAN_SRC)/setup_mesh.o \
 	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
-	$(FORTRAN_SRC)/claw2d_utils.o \
 	$(FORTRAN_SRC)/debug.o \
 	$(FORTRAN_SRC)/cellave2.o
 
