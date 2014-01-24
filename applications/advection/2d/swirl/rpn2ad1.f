@@ -27,15 +27,15 @@ c     ------------------------------------------
 
       do i = 2-mbc, mx+mbc
          do m = 1,meqn
-            wave(1,i,m) = ql(m,i) - qr(m,i-1)
+            wave(m,1,i) = ql(m,i) - qr(m,i-1)
          enddo
          s(1,i) = auxl(ixy,i)
 
 c        # The flux difference df = s*wave  all goes in the downwind
 c        direction:
          do m = 1,meqn
-            amdq(m,i) = min(s(1,i), 0.d0) * wave(1,m,i)
-            apdq(m,i) = max(s(1,i), 0.d0) * wave(1,m,i)
+            amdq(m,i) = min(s(1,i), 0.d0) * wave(m,1,i)
+            apdq(m,i) = max(s(1,i), 0.d0) * wave(m,1,i)
          enddo
       enddo
 
