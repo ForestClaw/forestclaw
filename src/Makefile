@@ -69,6 +69,9 @@ libforestclaw.a: $(fclawobjs)
 .f.o:
 	$(FC) -Wall $(FFLAGS) -c $< -o $@
 
+.f90.o:
+	$(FC) -Wall $(FFLAGS) -c $< -o $@
+
 clean:
 	rm -f *.o *.a $(fclawobjs)
 
