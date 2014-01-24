@@ -1,22 +1,22 @@
 c     =====================================================
-      subroutine rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
+      subroutine rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx,
      &                  ql,qr,aux1,aux2,aux3,
-     &                  imp,asdq,bmasdq,bpasdq)
+     &                  asdq,bmasdq,bpasdq)
 c     =====================================================
       implicit none
 c
 c     # Riemann solver in the transverse direction for the advection equation.
 c
 
-      integer ixy,maxm, meqn, mwaves, mbc, mx, imp, m
-      double precision     ql(1-mbc:maxm+mbc, meqn)
-      double precision     qr(1-mbc:maxm+mbc, meqn)
-      double precision   asdq(1-mbc:maxm+mbc, meqn)
-      double precision bmasdq(1-mbc:maxm+mbc, meqn)
-      double precision bpasdq(1-mbc:maxm+mbc, meqn)
-      double precision   aux1(1-mbc:maxm+mbc, 2)
-      double precision   aux2(1-mbc:maxm+mbc, 2)
-      double precision   aux3(1-mbc:maxm+mbc, 2)
+      integer ixy, maux, maxm, meqn, mwaves, mbc, mx, imp, m
+      double precision     ql(meqn,1-mbc:maxm+mbc)
+      double precision     qr(meqn,1-mbc:maxm+mbc)
+      double precision   asdq(meqn,1-mbc:maxm+mbc)
+      double precision bmasdq(meqn,1-mbc:maxm+mbc)
+      double precision bpasdq(meqn,1-mbc:maxm+mbc)
+      double precision   aux1(2,1-mbc:maxm+mbc)
+      double precision   aux2(2,1-mbc:maxm+mbc)
+      double precision   aux3(2,1-mbc:maxm+mbc)
 
       integer kv, i, i1
 
@@ -24,8 +24,8 @@ c
       do i = 2-mbc,mx+mbc
          i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
          do m = 1,meqn
-            bmasdq(i,m) = min(aux2(i1,kv), 0.d0) * asdq(i,m)
-            bpasdq(i,m) = max(aux3(i1,kv), 0.d0) * asdq(i,m)
+            bmasdq(m,i) = min(aux2(kv,i1), 0.d0) * asdq(m,i)
+            bpasdq(m,i) = max(aux3(kv,i1), 0.d0) * asdq(m,i)
          enddo
       enddo
 

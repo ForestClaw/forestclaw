@@ -1,11 +1,11 @@
-      subroutine b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,
+      subroutine b4step2(mbc,mx,my,meqn,q,
      &            xlower,ylower,dx,dy,time,dt,maux,aux)
       implicit none
 
-      integer maxmx, maxmy, mbc, mx, my, meqn, maux
+      integer mbc, mx, my, meqn, maux
       double precision xlower, ylower, dx, dy, time, dt
-      double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
-      double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i, j
       double precision tperiod, pi2, vt, xll,yll, psi
@@ -27,12 +27,12 @@ c           # coordinates of lower left corner of grid cell:
             yll = ylower + (j-1)*dy
 
 c           # difference stream function psi to get normal velocities:
-            aux(i,j,1) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
-            aux(i,j,2) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
+            aux(1,i,j) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
+            aux(2,i,j) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
 c
 c           # multiply by time-factor:
-            aux(i,j,1) = vt * aux(i,j,1)
-            aux(i,j,2) = vt * aux(i,j,2)
+            aux(1,i,j) = vt * aux(1,i,j)
+            aux(2,i,j) = vt * aux(2,i,j)
          enddo
       enddo
 

@@ -214,15 +214,11 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
     int matlab_level = level + 1;
 
     int mpirank = domain->mpirank;
-    swirl_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+    swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                         iframe,num,matlab_level,this_block_idx,mpirank);
 }

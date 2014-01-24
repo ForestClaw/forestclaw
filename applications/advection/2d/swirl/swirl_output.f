@@ -34,17 +34,17 @@
 
       end
 
-      subroutine swirl_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine swirl_write_qfile(meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
      &      mpirank)
 
       implicit none
 
-      integer maxmx, maxmy,meqn,mbc,mx,my, mpirank
+      integer meqn,mbc,mx,my, mpirank
       integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
 
-      double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       character*10 matname1
       integer matunit1
@@ -87,12 +87,12 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
       do j = 1,my
          do i = 1,mx
             do mq = 1,meqn
-               if (abs(q(i,j,mq)) .lt. 1d-99) then
-                  q(i,j,mq) = 0.d0
+               if (abs(q(mq,i,j)) .lt. 1d-99) then
+                  q(mq,i,j) = 0.d0
                endif
             enddo
 
-            write(matunit1,120) mpirank,(q(i,j,mq),mq=1,meqn)
+            write(matunit1,120) mpirank,(q(mq,i,j),mq=1,meqn)
          enddo
          write(matunit1,*) ' '
       enddo

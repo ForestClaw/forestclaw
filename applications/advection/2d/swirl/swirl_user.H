@@ -53,7 +53,7 @@ extern "C"
                             const int& mfields,const int& ngrids,
                             const int& maux);
 
-    void swirl_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+    void swirl_write_qfile_(const int& meqn,
                             const int& mbc, const int& mx,const int& my,
                             const double& xlower,const double& ylower,
                             const double& dx, const double& dy,

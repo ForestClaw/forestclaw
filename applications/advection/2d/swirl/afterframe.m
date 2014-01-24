@@ -1,3 +1,8 @@
+%% afterframe
+
+%%
+% This is the after frame file used by plotclaw2.
+
 global cm_index;
 
 global cm_index;
@@ -33,7 +38,7 @@ if (mq == 1)
   set(o,'fontsize',16,'fontweight','bold')
 else
   yrbcolormap;
-  % showpatchborders(1:10);
+  showpatchborders(1:10);
   qlo = 0;
   qhi = 1;
   under_label = sprintf('0 - %7.1e',qlo-qmin);
@@ -52,7 +57,7 @@ end;
 view(2);
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
   filename = framename(Frame,'swirl0000','png');
   print('-dpng',filename);

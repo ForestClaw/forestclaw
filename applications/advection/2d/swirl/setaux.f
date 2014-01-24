@@ -1,6 +1,5 @@
 c     ============================================
-      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-     &                  maux,aux)
+      subroutine setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
 c     ============================================
 
 c     # set auxiliary arrays
@@ -10,9 +9,9 @@ c     #   aux(i,j,2) is edge velocity at "bottom" boundary of grid point (i,j)
 
       implicit none
 
-      integer maxmx, maxmy,mbc, mx, my, maux
+      integer mbc, mx, my, maux
       double precision xlower, ylower, dx, dy
-      double precision  aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
+      double precision  aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i, j
       double precision xll, yll, psi
@@ -27,8 +26,8 @@ c           # coordinates of lower left corner of grid cell:
             yll = ylower + (j-1)*dy
 
 c           # difference stream function psi to get normal velocities:
-            aux(i,j,1) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
-            aux(i,j,2) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
+            aux(1,i,j) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
+            aux(2,i,j) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
          enddo
       enddo
 
