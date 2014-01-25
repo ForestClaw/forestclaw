@@ -22,7 +22,6 @@ clawpack_objs = \
 else
 clawpack_mods = \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/amr_module.mod
-
 clawpack_objs = \
 	$(FCLAW2D_CLAWPACK)/fclaw2d_clawpack.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/claw2d_utils.o \

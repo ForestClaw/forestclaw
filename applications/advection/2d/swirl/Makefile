@@ -9,8 +9,28 @@ include $(FORESTCLAW)/Make.defs.local
 FC = gfortran
 FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
 
+
+# -----------------------------------------------------------
+# Solver routines (several solvers can be added here)
+include Makefile.clawpack.inc
+
 # -----------------------------------------------------------
 # Define local objects here
+
+ifeq ($(version),4.6)
+exampleobjs = \
+	swirl_user.o \
+	user_4.6/ghost_twopatch.o \
+	user_4.6/tag4refinement.o \
+	user_4.6/psi.o \
+	user_4.6/rpn2ad1.o \
+	user_4.6/rpt2ad1.o \
+	user_4.6/qinit.o \
+	user_4.6/b4step2.o \
+	user_4.6/setaux.o \
+	user_4.6/setprob.o \
+	user_4.6/swirl_output.o
+else
 exampleobjs = \
 	swirl_user.o \
 	ghost_twopatch.o \
@@ -23,9 +43,8 @@ exampleobjs = \
 	setaux.o \
 	setprob.o \
 	swirl_output.o
+endif
 
-# Solver routines (several solvers can be added here)
-include Makefile.clawpack.inc
 solverobjs = $(clawpack_mods) $(clawpack_objs)
 solverincludes = $(clawpack_includes)
 
