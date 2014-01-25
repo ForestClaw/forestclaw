@@ -398,7 +398,7 @@ double fclaw2d_clawpack_step2(fclaw2d_domain_t *domain,
 
     int maxm = max(mx,my);
 
-    double cflgrid;
+    double cflgrid = 0.0;
 
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
     double* work = new double[mwork];
