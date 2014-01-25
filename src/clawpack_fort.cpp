@@ -112,6 +112,8 @@ void FArrayBox::set_dataPtr(int a_size)
             // Don't do anything;  m_data is already the right size
         }
         double qnan, snan;
+        // qnan = quiet nan
+        // snan = signaling nan
         set_qnan(qnan);
         set_snan(snan);
         for(int i = 0; i < a_size; i++)
