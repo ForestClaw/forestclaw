@@ -7,7 +7,18 @@ include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+# FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable -ffpe-trap=invalid
+
+system := $(filter Linux Darwin,$(shell uname))
+arch := $(shell uname -m)
+
+ifeq ($(system),Darwin)
+  FPE_TRAP = fp_exception_glibc_extension.o
+  CPPFLAGS = -DOSX -DTRAPFPE
+else
+  FPE_TRAP =
+endif
 
 
 # -----------------------------------------------------------
@@ -17,33 +28,18 @@ include Makefile.clawpack.inc
 # -----------------------------------------------------------
 # Define local objects here
 
-ifeq ($(version),4.6)
 exampleobjs = \
 	swirl_user.o \
-	user_4.6/ghost_twopatch.o \
-	user_4.6/tag4refinement.o \
-	user_4.6/psi.o \
-	user_4.6/rpn2ad1.o \
-	user_4.6/rpt2ad1.o \
-	user_4.6/qinit.o \
-	user_4.6/b4step2.o \
-	user_4.6/setaux.o \
-	user_4.6/setprob.o \
-	user_4.6/swirl_output.o
-else
-exampleobjs = \
-	swirl_user.o \
-	ghost_twopatch.o \
-	tag4refinement.o \
 	psi.o \
-	rpn2ad1.o \
-	rpt2ad1.o \
-	qinit.o \
-	b4step2.o \
-	setaux.o \
-	setprob.o \
-	swirl_output.o
-endif
+	user_${version}/ghost_twopatch.o \
+	user_${version}/tag4refinement.o \
+	user_${version}/rpn2ad1.o \
+	user_${version}/rpt2ad1.o \
+	user_${version}/qinit.o \
+	user_${version}/b4step2.o \
+	user_${version}/setaux.o \
+	user_${version}/setprob.o \
+	user_${version}/swirl_output.o
 
 solverobjs = $(clawpack_mods) $(clawpack_objs)
 solverincludes = $(clawpack_includes)
@@ -51,7 +47,7 @@ solverincludes = $(clawpack_includes)
 # Mapping routines
 geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
-OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
+OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)  $(FPE_TRAP)
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
@@ -59,24 +55,26 @@ OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
 
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
+.SUFFIXES : .o .c .cpp .f .f90 .mod
+
 # make sure that the first make target is the executable
 default: $(TARGET)
 
 .cpp.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(P4EST_CXX)  $(CPPFLAGS) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .c.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
-%.mod: %.f90
+.f90.mod:
 	$(FC) -Wall $(FFLAGS) ${solverincludes} -c $<  -o $@
 
-%.o: %.f90
+.f90.o:
 	$(FC) -Wall $(FFLAGS) ${solverincludes} -c $<  -o $@
 
-%.o: %.f
+.f.o:
 	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
 
 

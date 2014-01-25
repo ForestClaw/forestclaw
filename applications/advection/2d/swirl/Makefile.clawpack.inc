@@ -1,6 +1,11 @@
 # -*- Makefile -*-
 
-version := 4.6
+# Use
+#     gmake "version=4.6"
+# to specify the version
+# Default : version 5.0
+
+version := 5.0
 
 FCLAW2D_CLAWPACK = $(FORESTCLAW)/src/solvers/fclaw2d_clawpack${version}
 FCLAW2D_CLAWPACK_FORTRAN = $(FCLAW2D_CLAWPACK)/fortran_source
