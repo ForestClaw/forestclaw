@@ -4,18 +4,18 @@ c     =====================================================
       subroutine limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
 c     =====================================================
 c
-c     # Apply a limiter to the waves.  
+c     # Apply a limiter to the waves.
 c
 c     # Version of December, 2002.
-c     # Modified from the original CLAWPACK routine to eliminate calls 
+c     # Modified from the original CLAWPACK routine to eliminate calls
 c     # to philim.  Since philim was called for every wave at each cell
 c     # interface, this was adding substantial overhead in some cases.
 c
 c     # The limiter is computed by comparing the 2-norm of each wave with
 c     # the projection of the wave from the interface to the left or
 c     # right onto the current wave.  For a linear system this would
-c     # correspond to comparing the norms of the two waves.  For a 
-c     # nonlinear problem the eigenvectors are not colinear and so the 
+c     # correspond to comparing the norms of the two waves.  For a
+c     # nonlinear problem the eigenvectors are not colinear and so the
 c     # projection is needed to provide more limiting in the case where the
 c     # neighboring wave has large norm but points in a different direction
 c     # in phase space.
@@ -29,11 +29,16 @@ c     # the left or right.  The norm of the projections onto the wave are then
 c     # given by dotl/wnorm2 and dotr/wnorm2, where wnorm2 is the 2-norm
 c     # of wave.
 c
-      implicit double precision (a-h,o-z)
-      dimension mthlim(mwaves)
-      dimension wave(meqn, mwaves, 1-mbc:maxm+mbc)
-      dimension    s(mwaves, 1-mbc:maxm+mbc)
+      implicit none
+
+      integer maxm, meqn, mwaves, mbc, mx
+
+      integer mthlim(mwaves)
+      double precision wave(1-mbc:maxm+mbc,meqn,mwaves)
+      double precision    s(1-mbc:maxm+mbc,mwaves)
 c
+      integer mw, i, m
+      double precision wnorm2, dotl, dotr, r, c, wlimitr
 c
       do 200 mw=1,mwaves
          if (mthlim(mw) .eq. 0) go to 200
@@ -46,8 +51,8 @@ c
                wnorm2 = wnorm2 + wave(m,mw,i)**2
                dotr = dotr + wave(m,mw,i)*wave(m,mw,i+1)
     5          continue
-            if (i.eq.0) go to 190
-            if (wnorm2.eq.0.d0) go to 190
+            if (i .eq. 0) go to 190
+            if (wnorm2 .eq. 0.d0) go to 190
 c
             if (s(mw,i) .gt. 0.d0) then
                 r = dotl / wnorm2
