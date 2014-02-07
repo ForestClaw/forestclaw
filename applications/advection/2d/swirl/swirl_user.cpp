@@ -63,6 +63,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     /* Set velocity data */
     fclaw2d_clawpack_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
+
     /* Set up diffusion coefficients? Read in velocity data? Material properties? */
 }
 
@@ -98,6 +99,7 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
+
     fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,

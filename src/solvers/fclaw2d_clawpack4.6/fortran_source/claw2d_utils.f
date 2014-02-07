@@ -372,6 +372,7 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
          grady = compute_slopes(sl,sr,mth)
 
 c        # Loop over fine grid ghost cells
+         write(6,*) 'here...1'
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Fill in interpolated values on fine grid cell
@@ -380,17 +381,23 @@ c              # Fill in interpolated values on fine grid cell
 
                value = qc + shiftx*gradx + shifty*grady
                if (icorner_coarse .eq. 0) then
+                  write(6,*)'here...1.1'
                   qfine(mx+ibc,my+jbc,mq) = value
                elseif (icorner_coarse .eq. 1) then
+                  write(6,*)'here...1.2'
                   qfine(1-ibc,my+jbc,mq) = value
                elseif (icorner_coarse .eq. 2) then
+                  write(6,*)'here...1.3; ', ibc, jbc
                   qfine(mx+ibc,1-jbc,mq) = value
                else
+                  write(6,*)'here...1.4'
                   qfine(1-ibc,1-jbc,mq) = value
                endif
             enddo
          enddo
+      write(6,*) 'here...2'
       enddo
+
 
       end
 
@@ -589,7 +596,6 @@ c        # Use AMRClaw slopes
          compute_slopes = min(abs(sl),abs(sr),abs(sc))*
      &         max(0.d0,sign(1.d0,sl*sr))*sign(1.d0,sc)
       endif
-
 
       end
 

@@ -698,6 +698,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           fclaw_bool time_interp,
                           fclaw2d_timer_names_t running)
 {
+
 #if 0
     // Use separate timer for all exchanges
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
@@ -721,7 +722,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average, (void *) &e_info);
-
     /* Iterate over coarser level and average from finer neighbors to coarse. */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
@@ -742,13 +742,11 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_average,
                                  (void *) &e_info);
 
-
     /* Set coarse grid physical boundary conditions - this will help with
        interpolation to finer grids. Time level 't_level' is the time
        at the finer level, i.e. coarse_time + alpha*dt_coarse
     */
     set_phys_bc(domain,coarser_level,t_level,time_interp);
-
     /* Interpolate from coarse grids to finer grids. */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
@@ -760,18 +758,19 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
                                  (void *) &e_info);
-
     /* Interpolate coarse grid to fine grid ghost cells. */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
                                  (void *) &e_info);
+    printf("mpirank = %d\n",domain->mpirank);
 
     /* Interpolate coarse grid to fine grid ghost cells. TODO: correct?? */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
                                  (void *) &e_info);
+    printf("mpirank = %d\n",domain->mpirank);
 
     // Stop timing
 #if 0

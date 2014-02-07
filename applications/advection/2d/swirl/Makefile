@@ -13,9 +13,10 @@ FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable -ffpe-trap=inval
 system := $(filter Linux Darwin,$(shell uname))
 arch := $(shell uname -m)
 
+TrapFPE := TRAPFPE
 ifeq ($(system),Darwin)
   FPE_TRAP = fp_exception_glibc_extension.o
-  CPPFLAGS = -DOSX -DTRAPFPE
+  CPPFLAGS = -DOSX -D${TrapFPE}
 else
   FPE_TRAP =
 endif

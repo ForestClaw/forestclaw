@@ -5,7 +5,7 @@
 # to specify the version
 # Default : version 5.0
 
-version := 5.0
+version := 4.6
 
 FCLAW2D_CLAWPACK = $(FORESTCLAW)/src/solvers/fclaw2d_clawpack${version}
 FCLAW2D_CLAWPACK_FORTRAN = $(FCLAW2D_CLAWPACK)/fortran_source
