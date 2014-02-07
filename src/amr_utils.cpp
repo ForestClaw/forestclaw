@@ -363,6 +363,7 @@ int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
 void
 fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 {
+#ifdef P4EST_MPI
     int mpiret;
 
     //mpiret = MPI_Init (argc, argv);
@@ -370,11 +371,12 @@ fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 
     int provided;
     mpiret = MPI_Init_thread (argc, argv, MPI_THREAD_FUNNELED, &provided);
-    if (provided != MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
+    if (provided != MPI_THREAD_FUNNELED) printf("Received mpi_init_thread level %d\n", provided);
     SC_CHECK_MPI (mpiret);
 
     sc_init (mpicomm, 0, 0, NULL, lp);
     p4est_init (NULL, lp);
+#endif
 }
 
 void
