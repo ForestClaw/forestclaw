@@ -7,7 +7,18 @@ include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
 FC = gfortran
-FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)  -ffpe-trap=invalid
+
+system := $(filter Linux Darwin,$(shell uname))
+arch := $(shell uname -m)
+
+TrapFPE := TRAPFPE
+ifeq ($(system),Darwin)
+  FPE_TRAP = fp_exception_glibc_extension.o
+  CPPFLAGS = -DOSX -D${TrapFPE}
+else
+  FPE_TRAP =
+endif
 
 # -----------------------------------------------------------
 # Define local objects here
@@ -32,7 +43,7 @@ solverincludes = $(waveprop_includes)
 # Mapping routines
 geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
-OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
+OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs) $(FPE_TRAP)
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
@@ -48,7 +59,7 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .c.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
+	$(CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .f.o:
