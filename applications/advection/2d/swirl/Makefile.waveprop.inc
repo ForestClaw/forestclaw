@@ -7,7 +7,7 @@ waveprop_includes := -I$(AMR_WAVEPROP) -I$(AMR_WAVEPROP_FORTRAN)
 
 waveprop_objs = \
 	$(AMR_WAVEPROP)/amr_waveprop.o \
-	$(AMR_WAVEPROP_FORTRAN)/inlinelimiter.o \
+	$(AMR_WAVEPROP_FORTRAN)/limiter.o \
 	$(AMR_WAVEPROP_FORTRAN)/src2.o \
 	$(AMR_WAVEPROP_FORTRAN)/bc2.o \
 	$(AMR_WAVEPROP_FORTRAN)/flux2.o \

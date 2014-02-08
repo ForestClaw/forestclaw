@@ -33,7 +33,8 @@ if (mq == 1)
   set(o,'fontsize',16,'fontweight','bold')
 else
   yrbcolormap;
-  % showpatchborders(1:10);
+  showpatchborders(1:10);
+  caxis([0,1])
   qlo = 0;
   qhi = 1;
   under_label = sprintf('0 - %7.1e',qlo-qmin);
@@ -52,10 +53,11 @@ end;
 view(2);
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
   filename = framename(Frame,'swirl0000','png');
   print('-dpng',filename);
 end;
 
+shg
 clear afterframe;

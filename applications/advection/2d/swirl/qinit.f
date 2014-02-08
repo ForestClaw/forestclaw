@@ -23,7 +23,6 @@ c     #     0.1  otherwise
              xi = xlower + (i-0.5d0)*dx
              do j = 1-mbc,my+mbc
                 yj = ylower + (j-0.5d0)*dy
-
                 s = 0.5d0
                 if (xi .lt. s) then
                    q(i,j,mq) = 0.d0
