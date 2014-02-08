@@ -23,6 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifdef OSX
+#include "fp_exception_glibc_extension.h"
+#endif
+#include <fenv.h>
+#include <signal.h>
+
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
 
@@ -42,6 +48,12 @@ main (int argc, char **argv)
   fclaw2d_domain_t	*domain;
   amr_options_t         *gparms;
   amr_waveprop_parms_t  *waveprop_parms;
+
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  exit(1);
+  feenableexcept(FE_INVALID);
+#endif
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
