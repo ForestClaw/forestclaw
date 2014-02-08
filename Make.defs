@@ -8,6 +8,8 @@
 # Extra flags that not every compiler understands
 LOCAL_FFLAGS = -Wno-unused-dummy-argument
 
+localobjs :=
+
 # Compile with MPI or not.
 FCLAW_MPI = True
 

@@ -23,11 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef OSX
+/* --------------------------------------------------------
+   Needed for trapping floating point errors.
+ ---------------------------------------------------------- */
+#ifdef TRAPFPE_OSX
 #include "fp_exception_glibc_extension.h"
 #endif
+/* Are these all that is needed for non-OSX systems? */
 #include <fenv.h>
 #include <signal.h>
+/* -------------------------------------------------------- */
 
 // This needs to go away.  The p4est namespace should not be used directly.
 #include <p4est.h>
@@ -49,9 +54,8 @@ main (int argc, char **argv)
   amr_options_t         *gparms;
   amr_waveprop_parms_t  *waveprop_parms;
 
-#ifdef TRAPFPE
+#ifdef TRAPFPE_OSX
   printf("Enabling floating point traps\n");
-  exit(1);
   feenableexcept(FE_INVALID);
 #endif
 
