@@ -18,7 +18,7 @@ clawpack_mods =
 clawpack_objs = \
 	$(FCLAW2D_CLAWPACK)/fclaw2d_clawpack.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/claw2d_utils.o \
-	$(FCLAW2D_CLAWPACK_FORTRAN)/inlinelimiter.o \
+	$(FCLAW2D_CLAWPACK_FORTRAN)/limiter.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/src2.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/bc2.o \
 	$(FCLAW2D_CLAWPACK_FORTRAN)/flux2.o \

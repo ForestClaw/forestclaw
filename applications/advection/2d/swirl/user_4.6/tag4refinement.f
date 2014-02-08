@@ -22,16 +22,14 @@ c     # Refine based only on first variable in system.
             if (init_flag .eq. 1) then
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
-c               if (abs(xc - 0.5d0) .lt. dx) then
-               if (xc .lt. 0.5d0) then
+               if (abs(xc - 0.5d0) .lt. dx) then
                   tag_patch = 1
                   return
                endif
             else
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
-c               if (qmax - qmin .gt. 0.25d0) then
-               if (xc .lt. 0.5d0) then
+               if (qmax - qmin .gt. 0.25d0) then
                   tag_patch = 1
                   return
                endif
@@ -59,8 +57,7 @@ c     # coarsening criteria different from the refinement criteria.
 c     # Also, we don't check for an init_flag, since it is unlikely that
 c     # we would coarsen an initial grid.
 
-      tag_patch = 1
-      return
+      tag_patch = 0
       qmin = 100.d0
       qmax = -100.d0
       mq = 1

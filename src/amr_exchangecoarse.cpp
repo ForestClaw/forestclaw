@@ -763,14 +763,12 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
                                  (void *) &e_info);
-    printf("mpirank = %d\n",domain->mpirank);
 
     /* Interpolate coarse grid to fine grid ghost cells. TODO: correct?? */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
                                  (void *) &e_info);
-    printf("mpirank = %d\n",domain->mpirank);
 
     // Stop timing
 #if 0
