@@ -55,7 +55,7 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 default: $(TARGET)
 
 .cpp.o:
-	$(P4EST_CXX) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) $(CPP_FLAGS)\
+	$(P4EST_CXX) $(CPPFLAGS) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .c.o:
