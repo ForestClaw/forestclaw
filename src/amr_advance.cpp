@@ -241,7 +241,6 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     {
         set_phys_bc(domain,level,t,time_interp);
     }
-
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
     if (running != FCLAW2D_TIMER_NONE) {

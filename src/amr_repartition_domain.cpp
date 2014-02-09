@@ -420,10 +420,12 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
     // use data size (in bytes per patch) below.
     size_t data_size = pack_size(*domain);
     void ** patch_data = NULL;
+
     fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
 
     // For all (patch i) { pack its numerical data into patch_data[i] }
     fclaw2d_domain_iterate_patches(*domain, cb_pack_patches,(void *) patch_data);
+
 
     // this call creates a new domain that is valid after partitioning
     // and transfers the data packed above to the new owner processors

@@ -243,7 +243,6 @@ void regrid(fclaw2d_domain_t **domain)
         // allocate memory for user patch data and user domain data in the new
         // domain;  copy data from the old to new the domain.
         rebuild_domain(*domain, new_domain);
-
         // Average to new coarse grids and interpolate to new fine grids
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
                                        (void *) NULL);
@@ -264,7 +263,6 @@ void regrid(fclaw2d_domain_t **domain)
 
     /* Update all ghost patches and ghost cells */
     update_ghost_all_levels(*domain,FCLAW2D_TIMER_REGRID);
-
 
     // Print global minimum and maximum levels
     if ((*domain)->mpirank == 0) {
