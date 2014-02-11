@@ -363,6 +363,7 @@ int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
 void
 fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 {
+#ifdef P4EST_MPI
     int mpiret;
 
     //mpiret = MPI_Init (argc, argv);
@@ -375,6 +376,7 @@ fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 
     sc_init (mpicomm, 0, 0, NULL, lp);
     p4est_init (NULL, lp);
+#endif
 }
 
 void
