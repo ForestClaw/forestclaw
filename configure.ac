@@ -8,7 +8,7 @@ AC_INIT([ForestClaw],
         [burstedde@ins.uni-bonn.de])
 AC_PREREQ(2.61)
 AC_CONFIG_HEADERS([src/pre_config.h])
-AC_CONFIG_SRCDIR([src/fclaw2d_base.h])
+AC_CONFIG_SRCDIR([src/fclaw_base.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([config])
 AC_PREFIX_DEFAULT([$PWD/local])

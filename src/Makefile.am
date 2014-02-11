@@ -4,7 +4,7 @@
 # included non-recursively from toplevel directory
 
 libforestclaw_generated_headers = src/fclaw_config.h
-libforestclaw_installed_headers = src/fclaw2d_base.h
+libforestclaw_installed_headers = src/fclaw_base.h src/fclaw2d_base.h
 libforestclaw_internal_headres =
 libforestclaw_compiled_sources = src/fclaw2d_base.c
 

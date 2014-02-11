@@ -23,10 +23,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BASE_H
-#define FCLAW2D_BASE_H
+/** \file
+ *
+ * Basic include directives and declarations for ForestClaw.
+ * This file helps to integrate with p4est and libsc and provides general
+ * macros.  It should be included regardless of the space dimension that
+ * the code is compiled for.
+ */
 
-#include <fclaw_base.h>
+#ifndef FCLAW_BASE_H
+#define FCLAW_BASE_H
+
+/* include config headers */
+
+#include <fclaw_config.h>
+#include <sc_config.h>
+#if \
+  (defined (FCLAW_ENABLE_MPI) && !defined (SC_ENABLE_MPI)) || \
+  (!defined (FCLAW_ENABLE_MPI) && defined (SC_ENABLE_MPI))
+#error "MPI configured differently in ForestClaw and libsc"
+#endif
+#if \
+  (defined (FCLAW_ENABLE_MPIIO) && !defined (SC_ENABLE_MPIIO)) || \
+  (!defined (FCLAW_ENABLE_MPIIO) && defined (SC_ENABLE_MPIIO))
+#error "MPI I/O configured differently in ForestClaw and libsc"
+#endif
+#include <p4est_base.h>
+#define _fclaw_const _sc_const
+#define _fclaw_restrict _sc_restrict
+
+/* start declarations */
 
 #ifdef __cplusplus
 extern "C"
@@ -36,25 +62,6 @@ extern "C"
 #endif
 #endif
 
-/* Some convenient preprocessor directives */
-
-#define FCLAW2D_SPACEDIM 2
-extern const int fclaw2d_SpaceDim;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int fclaw2d_NumFaces;
-
-#define FCLAW2D_REFINE_FACTOR 2
-extern const int fclaw2d_RefineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int fclaw2d_NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int fclaw2d_NumSiblings;
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
@@ -62,4 +69,4 @@ extern const int fclaw2d_NumSiblings;
 }
 #endif
 
-#endif /* !FCLAW2D_BASE_H */
+#endif /* !FCLAW_BASE_H */
