@@ -26,9 +26,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_BASE_H
 #define FCLAW2D_BASE_H
 
-/* Not nice for namespace cleanliness, but necessary to include mpi.h */
-#include <sc.h>
+/* include config headers */
+
 #include <fclaw_config.h>
+#include <sc_config.h>
+#if \
+  (defined (FCLAW_ENABLE_MPI) && !defined (SC_ENABLE_MPI)) || \
+  (!defined (FCLAW_ENABLE_MPI) && defined (SC_ENABLE_MPI))
+#error "MPI configured differently in ForestClaw and libsc"
+#endif
+#if \
+  (defined (FCLAW_ENABLE_MPIIO) && !defined (SC_ENABLE_MPIIO)) || \
+  (!defined (FCLAW_ENABLE_MPIIO) && defined (SC_ENABLE_MPIIO))
+#error "MPI I/O configured differently in ForestClaw and libsc"
+#endif
+#include <p4est_base.h>
+#define _fclaw_const _sc_const
+#define _fclaw_restrict _sc_restrict
+
+/* start declarations */
 
 #ifdef __cplusplus
 extern "C"
