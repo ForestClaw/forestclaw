@@ -1,5 +1,11 @@
 #! /bin/sh
 
+# Call this without arguments if forestclaw is the toplevel package.
+# Call this with two arguments if forestclaw is itself a subdirectory:
+# ./bootstrap <sc config directory> <p4est config directory>
+
+# RUNNING BOOTSTRAP FOR LIBSC
+
 # override by option argument
 SC_CONFIG="sc/config"
 if test -n "$1" ; then
@@ -17,14 +23,35 @@ if test -x "sc/bootstrap" ; then
   (cd sc && ./bootstrap)
 fi
 
+# RUNNING BOOTSTRAP FOR P4EST
+
+#override by option argument
+P4EST_CONFIG="p4est/config"
+if test -n "$2" ; then
+  P4EST_CONFIG="$2"
+  if test ! -d "$P4EST_CONFIG" ; then
+    echo "Cannot find directory $P4EST_CONFIG"
+    exit
+  fi
+fi
+#convert into an absolute path
+P4EST_CONFIG=`cd "$P4EST_CONFIG" && pwd`
+
+if test -x "p4est/bootstrap" ; then
+  echo "Running bootstrap in subdirectory p4est"
+  (cd p4est && ./bootstrap "$SC_CONFIG")
+fi
+
 echo "--- This is the bootstrap script for forestclaw ---"
-echo "It is NOT required to run bootstrap to build from a tar.gz archive"
-echo "Development requires a libtool recent enough to contain LT_INIT" \
-    "(2.2 works)"
 echo "Current directory is $PWD"
 
-aclocal -Wall -I config -I "$SC_CONFIG"
+LIBTOOLIZE=`which glibtoolize`
+if test ! -x "$LIBTOOLIZE" ; then LIBTOOLIZE=`which libtoolize` ; fi
+if test ! -x "$LIBTOOLIZE" ; then echo "bootstrap requires libtoolize" ; \
+   exit 1 ; fi
+
+aclocal -Wall -I config -I "$SC_CONFIG" -I "$P4EST_CONFIG"
 autoconf -Wall --force
 autoheader -Wall --force
-libtoolize --install --copy
+"$LIBTOOLIZE" --install --copy
 automake -Wall --add-missing --copy
