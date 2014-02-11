@@ -52,7 +52,7 @@ DIST_SUBDIRS = $(SUBDIRS)
 
 # handle toplevel directory
 EXTRA_DIST += \
-  bootstrap fclawindent build-aux/git-version-gen build-aux/git2cl doc bugs
+  bootstrap fclawindent build-aux/git-version-gen build-aux/git2cl
 DISTCLEANFILES += \
         _configs.sed src/fclaw_config.h @FCLAW_DISTCLEAN@
 .PHONY: lint ChangeLog
