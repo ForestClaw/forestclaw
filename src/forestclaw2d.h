@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW2D_H
 #define FORESTCLAW2D_H
 
-#include <sc.h>
+#include <fclaw2d_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -91,7 +91,7 @@ struct fclaw2d_block
 
 struct fclaw2d_domain
 {
-    MPI_Comm mpicomm;           /* MPI communicator */
+    sc_MPI_Comm mpicomm;        /* MPI communicator */
     int mpisize, mpirank;       /* MPI variables */
     int local_num_patches;      /* sum of patches over all blocks on this proc */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
@@ -500,4 +500,4 @@ void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
 }
 #endif
 
-#endif
+#endif /* !FORESTCLAW2D_H */
