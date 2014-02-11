@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_OPTIONS_H
 #define AMR_OPTIONS_H
 
+#include <fclaw_base.h>
 #include <sc_options.h>
-#include "fclaw2d_defs.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -39,11 +39,9 @@ extern "C"
 
 typedef struct amr_options amr_options_t;
 
-
 typedef void *(*fclaw2d_user_parms_new_t) (sc_options_t * opt);
 
 typedef void (*fclaw2d_user_parms_destroy_t) (amr_options_t * gparms);
-
 
 struct amr_options
 {

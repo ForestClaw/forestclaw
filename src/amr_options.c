@@ -23,7 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_options.h"
+#include <amr_options.h>
+#include <fclaw2d_base.h>
 
 /* Proposed naming convention:
  * Parameter names in config file (= long option names) identical to the
@@ -85,7 +86,7 @@ amr_options_convert_arrays (amr_options_t * amropt)
                                    amropt->mwaves);
      */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   NumFaces);
+                                   fclaw2d_NumFaces);
 }
 #endif
 
@@ -158,7 +159,7 @@ amr_options_new (sc_options_t * opt)
 
     /* Array of NumFaces many values */
     amr_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
-                               &amropt->mthbc, NumFaces,
+                               &amropt->mthbc, fclaw2d_NumFaces,
                                "Physical boundary condition type");
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
@@ -238,7 +239,7 @@ amr_postprocess_parms (amr_options_t * amropt)
        check parameters.
        ----------------------------------------------------------------------- */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   NumFaces);
+                                   fclaw2d_NumFaces);
 
 }
 
@@ -301,8 +302,6 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
     amr_options_convert_arrays (amropt);
 #endif
 }
-
-
 
 void
 amr_options_destroy (amr_options_t * amropt)
