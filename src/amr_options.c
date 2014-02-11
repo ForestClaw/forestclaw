@@ -57,7 +57,7 @@ amr_options_convert_int_array (const char *array_string,
     char *endptr;
 
     new_length = SC_MAX (new_length, 0);
-    *int_array = SC_REALLOC (*int_array, int, new_length);
+    *int_array = FCLAW_REALLOC (*int_array, int, new_length);
 
     beginptr = array_string;
     for (i = 0; i < new_length; ++i)
@@ -96,7 +96,7 @@ amr_options_new (sc_options_t * opt)
 {
     amr_options_t *amropt;
 
-    amropt = SC_ALLOC_ZERO (amr_options_t, 1);
+    amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "Number of grid cells per patch in x");
@@ -307,9 +307,9 @@ void
 amr_options_destroy (amr_options_t * amropt)
 {
     /* These are now stored under amropt->waveprop_parms */
-    /* SC_FREE (amropt->->order); */
-    /* SC_FREE (amropt->mthlim); */
-    SC_FREE (amropt->mthbc);
-    SC_FREE (amropt);
+    /* FCLAW_FREE (amropt->->order); */
+    /* FCLAW_FREE (amropt->mthlim); */
+    FCLAW_FREE (amropt->mthbc);
+    FCLAW_FREE (amropt);
 
 }

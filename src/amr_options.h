@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_OPTIONS_H
 
 #include <fclaw_base.h>
-#include <sc_options.h>
 
 #ifdef __cplusplus
 extern "C"

@@ -24,18 +24,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_base.h>
-#include <sc_options.h>
 
 int
 main (int argc, char **argv)
 {
     int dummyvar;
-    sc_options_t *opt;
+    fclaw_app_t sapp, *a = &sapp;
 
-    opt = sc_options_new (argv[0]);
-    sc_options_add_int (opt, '\0', "dummy", &dummyvar, fclaw2d_SpaceDim,
+    fclaw_app_init (a, &argc, &argv, NULL);
+
+    sc_options_add_int (a->opt, '\0', "dummy", &dummyvar, fclaw2d_SpaceDim,
                         "Dummy dimension");
-    sc_options_destroy (opt);
+
+    fclaw_app_reset (a);
 
     return 0;
 }
