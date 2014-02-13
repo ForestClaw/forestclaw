@@ -54,7 +54,7 @@ main (int argc, char **argv)
   amr_options_t         *gparms;
   amr_waveprop_parms_t  *waveprop_parms;
 
-#ifdef TRAPFPE_OSX
+#ifdef TRAPFPE
   printf("Enabling floating point traps\n");
   feenableexcept(FE_INVALID);
 #endif

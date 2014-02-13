@@ -11,8 +11,11 @@ LOCAL_FFLAGS = -Wno-unused-dummy-argument
 # Extra files needed for all examples
 localobjs :=
 
+
 # Extra c++ flags
 CPPFLAGS =
+# e.g. to trap floating point errors :
+# CPPFLAGS = -DTRAPFPE
 
 # Compile with MPI or not.
 FCLAW_MPI = True
