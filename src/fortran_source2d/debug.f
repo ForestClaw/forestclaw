@@ -78,17 +78,33 @@ c     #
       get_level = level_com
       end
 
+      subroutine here(n)
+      implicit none
+      integer n
+      write(6,*) 'here...',n
+      end
 
       subroutine dump_patch(mx,my,mbc,meqn,mq,q)
       implicit none
       integer mx,my,mbc,meqn,mq
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      integer i,j
+      integer i,j, m, m1, m2
 
-      do j = my+mbc,1-mbc,-1
-         write(6,100) j, (q(i,j,mq),i = 1-mbc,mx+mbc)
+      if (mq < 0) then
+         m1 = 1
+         m2 = meqn
+      else
+         m1 = mq
+         m2 = mq
+      endif
+
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
+            write(6,100) i,j, (q(i,j,m),m = m1,m2)
+         enddo
+         write(6,*) ' '
       enddo
       write(6,*) ' '
-  100 format(I5,50E12.4)
+  100 format(2I5,20E24.16)
 
       end

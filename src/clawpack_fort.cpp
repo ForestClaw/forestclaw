@@ -59,6 +59,13 @@ void set_snan(double& f)
     *((long long*)&f) = 0x7ff0000000000001LL;
 }
 
+static
+void set_big_number(double& f)
+{
+    f = 1e99;
+}
+
+
 FArrayBox::FArrayBox()
 {
     m_data = NULL;
@@ -111,9 +118,10 @@ void FArrayBox::set_dataPtr(int a_size)
         {
             // Don't do anything;  m_data is already the right size
         }
-        double qnan, snan;
+        double qnan, snan,big_number;
         set_qnan(qnan);
         set_snan(snan);
+        set_big_number(big_number);
         for(int i = 0; i < a_size; i++)
         {
             m_data[i] = snan;

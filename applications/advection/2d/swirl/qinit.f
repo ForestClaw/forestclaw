@@ -24,7 +24,7 @@ c     #     0.1  otherwise
              do j = 1-mbc,my+mbc
                 yj = ylower + (j-0.5d0)*dy
                 s = 0.5d0
-                if (xi .lt. s) then
+                if (xi+yj .lt. 1.0) then
                    q(i,j,mq) = 0.d0
                 else
                    q(i,j,mq) = 1.d0

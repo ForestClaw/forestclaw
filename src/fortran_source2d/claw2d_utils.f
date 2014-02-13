@@ -138,15 +138,33 @@ c                 # ibc = 2 corresponds to the second layer
       integer ic_add, jc_add, ic, jc, mth
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
+      logical debug_is_on
+      integer get_patch_idx
 
 c     # To be figured out later
       mth = 5
 
 c     # 'iface_coarse is relative to the coarse grid
 
+      if (debug_is_on()) then
+         write(6,*) 'In interpolate_face_ghost (patch ',
+     &         get_patch_idx(),')'
+      endif
+
+c      if (debug_is_on()) then
+c         write(6,*) 'fine patch ', get_patch_idx()
+c         mq = -1
+c         call dump_patch(mx,my,mbc,meqn,mq,qfine)
+c         write(6,*) ' '
+c         write(6,*) 'Coarse patch '
+c         call dump_patch(mx,my,mbc,meqn,mq,qcoarse)
+c         write(6,*)
+c      endif
+c
       do mq = 1,meqn
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
+
             j1 = 1-igrid
             j2 = my/num_neighbors + (1-igrid)
 
@@ -187,6 +205,7 @@ c                       # qfine is at left edge of coarse grid
 c                       # qfine is at right edge of coarse grid
                         qfine(1-ifine,jfine,mq) = value
                      endif
+
                   enddo
                enddo
             enddo
@@ -213,7 +232,6 @@ c           # this ensures that we get 'hanging' corners
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-
                do jbc = 1,mbc
                   do ii = 1,refratio
 c                    # Fill in interpolated values on fine grid cell
@@ -236,6 +254,7 @@ c                       # qfine is at top edge of coarse grid
             enddo
          endif
       enddo
+
       end
 
       subroutine exchange_corner_ghost(mx,my,mbc,meqn,

@@ -22,7 +22,7 @@ c     # Refine based only on first variable in system.
             if (init_flag .eq. 1) then
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
-               if (abs(xc - 0.5d0) .lt. dx) then
+               if (abs(xc + yc-1) .lt. dy) then
                   tag_patch = 1
                   return
                endif
