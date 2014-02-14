@@ -15,6 +15,7 @@ c     # ------------------------------------------------------------------
       double precision x1, y1, d, rp2, xc, yc
       logical multiblock
       integer blockno, get_block
+      logical l1, l2
 
 c     # If 'multiblock == .true.', then this map is applied in a multiblock
 c     # setting where each mesh is assumed to be n [-1,1]x[-1,1], and an
@@ -60,7 +61,11 @@ c     # Set z value
 
 c     # Values that are outside of [-1,1]x[-1,1] (in ghost cell regions)
 c     # to the lower hemisphere
-      if (xor(abs(yc) .gt. 1, abs(xc) .gt. 1)) then
+c     # Juqueen complained about the 'xor', because it is not in the
+c     # Fortran standard.  Use .neqv. instead.
+      l1 = abs(xc) .gt. 1
+      l2 = abs(yc) .gt. 1
+      if (l1 .neqv. l2) then
          zp = -zp
       endif
 

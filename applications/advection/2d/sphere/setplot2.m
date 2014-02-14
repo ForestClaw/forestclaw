@@ -69,6 +69,4 @@ ContourValues = [];
 
 ForestClaw = 1;
 
-UserColorMapping = mq == 1;    % mq = 1 contain mpi ranks
-
-ShowUnderOverShoots = 0;
+ShowOverUnderShoots = false;
