@@ -3,8 +3,6 @@
 include $(FORESTCLAW)/Make.defs.local
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-FC = gfortran
-
 # Not every compiler likes this argument.  May live in Make.defs.local.
 #FFLAGS = -O0 -g -Wno-unused-dummy-argument -Wno-unused-variable
 FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)

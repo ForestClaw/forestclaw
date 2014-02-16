@@ -2,7 +2,10 @@
 
 # Copy this to a local version Make.defs.local
 
-# Location of gfortran library
+# Specify fortran compiler and fortran library
+FC = gfortran
+
+# The user should specify location in Make.defs.local
 # FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 
 # Extra flags that not every compiler understands
