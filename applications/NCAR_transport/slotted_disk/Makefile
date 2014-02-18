@@ -7,7 +7,7 @@ include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
 # FC = gfortran  # Now defined in Make.defs.local
-FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+FFLAGS = $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
 # Define local objects here
