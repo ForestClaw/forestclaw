@@ -6,7 +6,7 @@ GEO = cart
 include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
-FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+FFLAGS = $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
 # Define local objects here
@@ -50,7 +50,7 @@ default: $(TARGET)
 	$(CC) $(P4EST_CFLAGS) $(P4EST_CPPFLAGS) \
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
+	$(FC) $(FFLAGS) -c $< ${solverincludes} -o $@
 
 .PHONY: clean realclean default $(TARGET)
 

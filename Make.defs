@@ -17,10 +17,12 @@ FC = gfortran
 
 # Extra flags that not every compiler understands
 # This may work on gnu systems
-# LOCAL_FFLAGS = -Wno-unused-dummy-argument
+# LOCAL_FFLAGS = -Wall -g -O0 -Wno-unused-dummy-argument -Wno-unused-variable
 #
 # This works on juqueen
 # LOCAL_FFLAGS = -qextname
+# LOCAL_FFLAGS = -O2 -qarch=qp -qtune=qp -qextname
+# LOCAL_FFLAGS = -O3 -qstrict -qarch=qp -qtune=qp -qextname
 
 # Extra files needed for all examples
 localobjs :=

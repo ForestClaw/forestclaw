@@ -6,7 +6,7 @@ GEO = sphere
 include $(FORESTCLAW)/Make.defs.local
 
 # -----------------------------------------------------------
-FFLAGS = -O0 -g -Wno-unused-variable $(LOCAL_FFLAGS)
+FFLAGS = $(LOCAL_FFLAGS)
 
 # -----------------------------------------------------------
 # Define local objects here
@@ -52,7 +52,7 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
+	$(FC) $(FFLAGS) -c $< ${solverincludes} -o $@
 
 .PHONY: clean realclean default $(TARGET)
 
