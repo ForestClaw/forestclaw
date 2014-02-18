@@ -60,7 +60,7 @@
          nstp = nstp / 10
       enddo
 
-      open(matunit1,file=matname1,access='append');
+      open(matunit1,file=matname1,position='append');
 
       write(matunit1,1001) patch_num, level, blockno, mx, my
  1001 format(i5,'                 grid_number',/,
