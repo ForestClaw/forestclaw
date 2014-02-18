@@ -4,16 +4,26 @@
 
 # Specify fortran compiler and fortran library
 FC = gfortran
+#
+# This works for juqueen
+# FC = mpixlf77
 
 # The user should specify location in Make.defs.local
+# This may work on gnu systems
 # FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
+#
+# This works on juqueen
+# FORT_LIB = -L$(XLFLIB_FZJ) -lxlfmath -lxlf90
 
 # Extra flags that not every compiler understands
-LOCAL_FFLAGS = -Wno-unused-dummy-argument
+# This may work on gnu systems
+# LOCAL_FFLAGS = -Wno-unused-dummy-argument
+#
+# This works on juqueen
+# LOCAL_FFLAGS = -qextname
 
 # Extra files needed for all examples
 localobjs :=
-
 
 # Extra c++ flags
 CPPFLAGS =
@@ -25,8 +35,10 @@ FCLAW_MPI = True
 
 ifeq ($(FCLAW_MPI),True)
 # make sure p4est is configured with --enable-mpi --enable-mpiio
-P4EST_CXX = mpicxx
 # P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local
+P4EST_CXX = mpicxx
+# Use this one for juqueen
+# P4EST_CXX = mpixlcxx
 else
 P4EST_CXX = c++
 # P4EST_DIR = /Users/calhoun/projects/ForestClaw/code/p4est-build/local
