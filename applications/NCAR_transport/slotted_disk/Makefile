@@ -60,7 +60,7 @@ default: $(TARGET)
 	-I$(FORESTCLAW)/src -I. ${solverincludes} -c $< -o $@
 
 .f.o:
-	$(FC) -Wall $(FFLAGS) -c $< ${solverincludes} -o $@
+	$(FC) $(FFLAGS) -c $< ${solverincludes} -o $@
 
 .PHONY: clean realclean default $(TARGET)
 
