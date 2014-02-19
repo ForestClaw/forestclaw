@@ -19,9 +19,11 @@ if (mq == 1)
   npmax = 10;
   if (Frame == 0)
     cm = multicolormap(npmax);
+    % cm = load('cm_save');
   end;
   colormap(cm);
   caxis([1 npmax+1]);
+  showpatchborders;
 
   % Fix colorbar
   colorbar;

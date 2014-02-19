@@ -11,7 +11,7 @@ c     # stream function
 
       psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 
-      psi = x - y
+c      psi = x - y
 
       return
       end
