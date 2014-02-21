@@ -44,6 +44,18 @@ P4EST_CHECK_LIBRARIES([FCLAW])
 FCLAW_CHECK_LIBRARIES([FCLAW])
 
 echo "o---------------------------------------"
+echo "| Checking headers"
+echo "o---------------------------------------"
+
+AC_CHECK_HEADERS([fenv.h])
+
+echo "o---------------------------------------"
+echo "| Checking functions"
+echo "o---------------------------------------"
+
+AC_CHECK_FUNCS([feenableexcept])
+
+echo "o---------------------------------------"
 echo "| Checking subpackages"
 echo "o---------------------------------------"
 
