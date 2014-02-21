@@ -4,9 +4,3 @@ c     # This file gets called from driver routines.
       call set_disk()
 
       end
-
-      logical function isflat()
-      implicit none
-
-      isflat = .true.
-      end
