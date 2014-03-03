@@ -11,7 +11,9 @@ libforestclaw_internal_headres =
 libforestclaw_compiled_sources = src/fclaw_base.c src/amr_options.c \
  src/fclaw2d_base.c src/forestclaw2d.c src/fclaw2d_convenience.c \
  src/fclaw2d_map.c src/clawpack_fort.cpp \
- src/mappings/block.f
+ src/mappings/block.f \
+ src/mappings/set_maptype.f
+
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS =

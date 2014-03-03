@@ -144,7 +144,7 @@ c     # ----------------------------
       logical function isflat_cart()
       implicit none
 
-      isflat = .true.
+      isflat_cart = .true.
       end
 
 
@@ -166,7 +166,7 @@ c     # ----------------------------
       logical function isflat_diamond()
       implicit none
 
-      isflat = .true.
+      isflat_diamond = .true.
       end
 
 
@@ -188,7 +188,7 @@ c     # ----------------------------
       logical function isflat_disk()
       implicit none
 
-      isflat = .true.
+      isflat_disk = .true.
       end
 
 
@@ -210,7 +210,7 @@ c     # ----------------------------
       logical function isflat_hemisphere()
       implicit none
 
-      isflat = .false.
+      isflat_hemisphere = .false.
       end
 
 
@@ -232,7 +232,7 @@ c     # ----------------------------
       logical function isflat_sphere()
       implicit none
 
-      isflat = .false.
+      isflat_sphere = .false.
       end
 
 
@@ -254,7 +254,7 @@ c     # ----------------------------
       logical function isflat_rotsq()
       implicit none
 
-      isflat = .true.
+      isflat_rotsq = .true.
       end
 
 
@@ -276,7 +276,7 @@ c     # ----------------------------
       logical function isflat_biquad()
       implicit none
 
-      isflat = .true.
+      isflat_biquad = .true.
       end
 
 
