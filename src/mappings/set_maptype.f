@@ -94,28 +94,28 @@ c     # -------------------------------------------------------------------
       logical function isflat()
       implicit none
 
-      integer maptype, get_map_type
+      integer maptype
       logical isflat_cart, isflat_diamond, isflat_disk
       logical isflat_hemisphere, isflat_sphere, isflat_rotsq
-      logical isflat_biquad
+      logical isflat_biquad, get_map_value
 
-      maptype = get_map_type()
+      maptype = get_map_value()
 
-      if (maptype .eq. 1) then
+      if (get_map_value(1)) then
          isflat = isflat_cart()
-      elseif (maptype .eq. 2) then
+      elseif (get_map_value(2)) then
          write(6,*) 'Diamond mapping is not implemented'
          stop
-      elseif (maptype .eq. 3) then
+      elseif (get_map_value(3)) then
          isflat = isflat_disk()
-      elseif (maptype .eq. 4) then
+      elseif (get_map_value(4)) then
          isflat = isflat_hemisphere()
-      elseif (maptype .eq. 5) then
+      elseif (get_map_value(5)) then
          isflat = isflat_sphere()
-      elseif (maptype .eq. 6) then
+      elseif (get_map_value(6)) then
          write(6,*) 'Rotated Square mapping is not implemented'
          stop
-      elseif (maptype .eq. 7) then
+      elseif (get_map_value(7)) then
          write(6,*) 'Bilinear quad mapping is not implemented'
          stop
       endif
