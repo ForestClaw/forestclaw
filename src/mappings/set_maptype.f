@@ -33,6 +33,13 @@ c     # ----------------------------
       iscart = get_map_value(1)
       end
 
+      logical function isflat_cart()
+      implicit none
+
+      isflat_cart = .true.
+      end
+
+
 c     # ----------------------------
 c     # DIAMOND = 2
 c     # ----------------------------
@@ -47,6 +54,13 @@ c     # ----------------------------
       logical get_map_value
       isdiamond = get_map_value(2)
       end
+
+      logical function isflat_diamond()
+      implicit none
+
+      isflat_diamond = .true.
+      end
+
 
 c     # ----------------------------
 c     # DISK = 3
@@ -63,6 +77,13 @@ c     # ----------------------------
       isdisk = get_map_value(3)
       end
 
+      logical function isflat_disk()
+      implicit none
+
+      isflat_disk = .true.
+      end
+
+
 c     # ----------------------------
 c     # HEMISPHERE = 4
 c     # ----------------------------
@@ -77,6 +98,13 @@ c     # ----------------------------
       logical get_map_value
       ishemisphere = get_map_value(4)
       end
+
+      logical function isflat_hemisphere()
+      implicit none
+
+      isflat_hemisphere = .false.
+      end
+
 
 c     # ----------------------------
 c     # SPHERE = 5
@@ -93,6 +121,13 @@ c     # ----------------------------
       issphere = get_map_value(5)
       end
 
+      logical function isflat_sphere()
+      implicit none
+
+      isflat_sphere = .false.
+      end
+
+
 c     # ----------------------------
 c     # ROTSQ = 6
 c     # ----------------------------
@@ -108,6 +143,13 @@ c     # ----------------------------
       isrotsq = get_map_value(6)
       end
 
+      logical function isflat_rotsq()
+      implicit none
+
+      isflat_rotsq = .true.
+      end
+
+
 c     # ----------------------------
 c     # BIQUAD = 7
 c     # ----------------------------
@@ -121,6 +163,12 @@ c     # ----------------------------
       implicit none
       logical get_map_value
       isbiquad = get_map_value(7)
+      end
+
+      logical function isflat_biquad()
+      implicit none
+
+      isflat_biquad = .true.
       end
 
 

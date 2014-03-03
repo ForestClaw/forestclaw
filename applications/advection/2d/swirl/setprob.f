@@ -11,7 +11,7 @@ c      read(7,*) tperiod
 c      close(7)
       tperiod = 4.d0
 
-      call set_maptype()
+      call set_maptype_sphere()
 
       pi = 4.d0*atan(1.d0)
       pi2 = 2.d0*pi
