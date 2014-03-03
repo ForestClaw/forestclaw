@@ -13,10 +13,10 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map.h \
 	src/clawpack_fort.H
 
-libforestclaw_internal_headres =
+libforestclaw_internal_headers =
 
 # -------------------------------------------------------------------
-# Main source files for ForestClaw are here
+# Main source files for ForestClaw are here - these need to be compiled
 # -------------------------------------------------------------------
 
 libforestclaw_compiled_sources = \
