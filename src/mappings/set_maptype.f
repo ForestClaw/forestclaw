@@ -18,189 +18,10 @@ c     # rotated square = 6
 c     # bilinear quad = 7
 c     # ----------------------
 
-c     # ----------------------------
-c     # CART = 1
-c     # ----------------------------
-      subroutine set_cart()
-      implicit none
-      call set_map_value(1)
-      call set_map_defaults()
-      end
 
-      logical function iscart()
-      implicit none
-      logical get_map_value
-      iscart = get_map_value(1)
-      end
-
-      logical function isflat_cart()
-      implicit none
-
-      isflat_cart = .true.
-      end
-
-
-c     # ----------------------------
-c     # DIAMOND = 2
-c     # ----------------------------
-      subroutine set_diamond()
-      implicit none
-      call set_map_value(2)
-      call set_map_defaults()
-      end
-
-      logical function isdiamond()
-      implicit none
-      logical get_map_value
-      isdiamond = get_map_value(2)
-      end
-
-      logical function isflat_diamond()
-      implicit none
-
-      isflat_diamond = .true.
-      end
-
-
-c     # ----------------------------
-c     # DISK = 3
-c     # ----------------------------
-      subroutine set_disk()
-      implicit none
-      call set_map_value(3)
-      call set_map_defaults()
-      end
-
-      logical function isdisk()
-      implicit none
-      logical get_map_value
-      isdisk = get_map_value(3)
-      end
-
-      logical function isflat_disk()
-      implicit none
-
-      isflat_disk = .true.
-      end
-
-
-c     # ----------------------------
-c     # HEMISPHERE = 4
-c     # ----------------------------
-      subroutine set_hemisphere()
-      implicit none
-      call set_map_value(4)
-      call set_map_defaults()
-      end
-
-      logical function ishemisphere()
-      implicit none
-      logical get_map_value
-      ishemisphere = get_map_value(4)
-      end
-
-      logical function isflat_hemisphere()
-      implicit none
-
-      isflat_hemisphere = .false.
-      end
-
-
-c     # ----------------------------
-c     # SPHERE = 5
-c     # ----------------------------
-      subroutine set_sphere()
-      implicit none
-      call set_map_value(5)
-      call set_map_defaults()
-      end
-
-      logical function issphere()
-      implicit none
-      logical get_map_value
-      issphere = get_map_value(5)
-      end
-
-      logical function isflat_sphere()
-      implicit none
-
-      isflat_sphere = .false.
-      end
-
-
-c     # ----------------------------
-c     # ROTSQ = 6
-c     # ----------------------------
-      subroutine set_rotsq()
-      implicit none
-      call set_map_value(6)
-      call set_map_defaults()
-      end
-
-      logical function isrotsq()
-      implicit none
-      logical get_map_value
-      isrotsq = get_map_value(6)
-      end
-
-      logical function isflat_rotsq()
-      implicit none
-
-      isflat_rotsq = .true.
-      end
-
-
-c     # ----------------------------
-c     # BIQUAD = 7
-c     # ----------------------------
-      subroutine set_biquad()
-      implicit none
-      call set_map_value(7)
-      call set_map_defaults()
-      end
-
-      logical function isbiquad()
-      implicit none
-      logical get_map_value
-      isbiquad = get_map_value(7)
-      end
-
-      logical function isflat_biquad()
-      implicit none
-
-      isflat_biquad = .true.
-      end
-
-
-c     # ------------------------------------
-c     # Cartesian BC
-c     # ------------------------------------
-c
-c     # If we have cartesian BCs then we can skip
-c     # the tridiagonal solve for boundary conditions.
-      subroutine set_cart_bc(cart_bc)
-      implicit none
-
-      logical cart_bc, cart_bc_com
-      common /comcartbc/ cart_bc_com
-
-      cart_bc_com = cart_bc
-      end
-
-      logical function has_cart_bc()
-      implicit none
-
-      logical cart_bc_com
-      common /comcartbc/ cart_bc_com
-
-      has_cart_bc = cart_bc_com
-
-      end
-
-
-c     # ------------------------------------------
-c     # Mapping routines
-c     # ------------------------------------------
+c     # -------------------------------------------------------------------
+c     # Common mapping routines
+c     # -------------------------------------------------------------------
       subroutine set_all_maps_false()
       implicit none
 
@@ -267,5 +88,219 @@ c     # ------------------------------------------
       endif
 
       get_map_value = ismap_com(imap)
+
+      end
+
+      logical function isflat()
+      implicit none
+
+      integer maptype, get_map_type
+      logical isflat_cart, isflat_diamond, isflat_disk
+      logical isflat_hemisphere, isflat_sphere, isflat_rotsq
+      logical isflat_biquad
+
+      maptype = get_map_type()
+
+      if (maptype .eq. 1) then
+         isflat = isflat_cart()
+      elseif (maptype .eq. 2) then
+         write(6,*) 'Diamond mapping is not implemented'
+         stop
+      elseif (maptype .eq. 3) then
+         isflat = isflat_disk()
+      elseif (maptype .eq. 4) then
+         isflat = isflat_hemisphere()
+      elseif (maptype .eq. 5) then
+         isflat = isflat_sphere()
+      elseif (maptype .eq. 6) then
+         write(6,*) 'Rotated Square mapping is not implemented'
+         stop
+      elseif (maptype .eq. 7) then
+         write(6,*) 'Bilinear quad mapping is not implemented'
+         stop
+      endif
+
+      end
+
+c     # ----------------------------------------------------------------
+c     # Specific mapping routines
+c     # ----------------------------------------------------------------
+
+c     # ----------------------------
+c     # CART = 1
+c     # ----------------------------
+      subroutine set_maptype_cart()
+      implicit none
+      call set_map_value(1)
+      call set_map_defaults()
+      end
+
+      logical function iscart()
+      implicit none
+      logical get_map_value
+      iscart = get_map_value(1)
+      end
+
+      logical function isflat_cart()
+      implicit none
+
+      isflat_cart = .true.
+      end
+
+
+c     # ----------------------------
+c     # DIAMOND = 2
+c     # ----------------------------
+      subroutine set_maptype_diamond()
+      implicit none
+      call set_map_value(2)
+      call set_map_defaults()
+      end
+
+      logical function isdiamond()
+      implicit none
+      logical get_map_value
+      isdiamond = get_map_value(2)
+      end
+
+      logical function isflat_diamond()
+      implicit none
+
+      isflat_diamond = .true.
+      end
+
+
+c     # ----------------------------
+c     # DISK = 3
+c     # ----------------------------
+      subroutine set_maptype_disk()
+      implicit none
+      call set_map_value(3)
+      call set_map_defaults()
+      end
+
+      logical function isdisk()
+      implicit none
+      logical get_map_value
+      isdisk = get_map_value(3)
+      end
+
+      logical function isflat_disk()
+      implicit none
+
+      isflat_disk = .true.
+      end
+
+
+c     # ----------------------------
+c     # HEMISPHERE = 4
+c     # ----------------------------
+      subroutine set_maptype_hemisphere()
+      implicit none
+      call set_map_value(4)
+      call set_map_defaults()
+      end
+
+      logical function ishemisphere()
+      implicit none
+      logical get_map_value
+      ishemisphere = get_map_value(4)
+      end
+
+      logical function isflat_hemisphere()
+      implicit none
+
+      isflat_hemisphere = .false.
+      end
+
+
+c     # ----------------------------
+c     # SPHERE = 5
+c     # ----------------------------
+      subroutine set_maptype_sphere()
+      implicit none
+      call set_map_value(5)
+      call set_map_defaults()
+      end
+
+      logical function issphere()
+      implicit none
+      logical get_map_value
+      issphere = get_map_value(5)
+      end
+
+      logical function isflat_sphere()
+      implicit none
+
+      isflat_sphere = .false.
+      end
+
+
+c     # ----------------------------
+c     # ROTSQ = 6
+c     # ----------------------------
+      subroutine set_maptype_rotsq()
+      implicit none
+      call set_map_value(6)
+      call set_map_defaults()
+      end
+
+      logical function isrotsq()
+      implicit none
+      logical get_map_value
+      isrotsq = get_map_value(6)
+      end
+
+      logical function isflat_rotsq()
+      implicit none
+
+      isflat_rotsq = .true.
+      end
+
+
+c     # ----------------------------
+c     # BIQUAD = 7
+c     # ----------------------------
+      subroutine set_maptype_biquad()
+      implicit none
+      call set_map_value(7)
+      call set_map_defaults()
+      end
+
+      logical function isbiquad()
+      implicit none
+      logical get_map_value
+      isbiquad = get_map_value(7)
+      end
+
+      logical function isflat_biquad()
+      implicit none
+
+      isflat_biquad = .true.
+      end
+
+
+c     # ------------------------------------
+c     # Cartesian BC
+c     # ------------------------------------
+c
+c     # If we have cartesian BCs then we can skip
+c     # the tridiagonal solve for boundary conditions.
+      subroutine set_cart_bc(cart_bc)
+      implicit none
+
+      logical cart_bc, cart_bc_com
+      common /comcartbc/ cart_bc_com
+
+      cart_bc_com = cart_bc
+      end
+
+      logical function has_cart_bc()
+      implicit none
+
+      logical cart_bc_com
+      common /comcartbc/ cart_bc_com
+
+      has_cart_bc = cart_bc_com
 
       end
