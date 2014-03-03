@@ -28,10 +28,8 @@ include Makefile.waveprop.inc
 solverobjs = $(waveprop_objs)
 solverincludes = $(waveprop_includes)
 
-# Mapping routines
-# geoobjs = $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
 
-OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs) $(localobjs)
+OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(localobjs)
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
