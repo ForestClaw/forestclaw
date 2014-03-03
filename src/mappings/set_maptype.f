@@ -99,8 +99,6 @@ c     # -------------------------------------------------------------------
       logical isflat_hemisphere, isflat_sphere, isflat_rotsq
       logical isflat_biquad, get_map_value
 
-      maptype = get_map_value()
-
       if (get_map_value(1)) then
          isflat = isflat_cart()
       elseif (get_map_value(2)) then
