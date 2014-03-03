@@ -21,9 +21,7 @@ include Makefile.waveprop.inc
 solverobjs =
 solverincludes = $(waveprop_includes)
 
-geoobjs =
-
-OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
+OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs)
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
