@@ -29,10 +29,7 @@ include Makefile.waveprop.inc
 solverobjs = $(waveprop_objs)
 solverincludes = $(waveprop_includes)
 
-# Mapping routines
-geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
-
-OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs) $(geoobjs)
+OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs)
 
 # -----------------------------------------------------------
 # The rest of this is more or less default.
