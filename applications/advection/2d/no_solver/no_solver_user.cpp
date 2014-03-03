@@ -56,7 +56,7 @@ void no_solver_linker(fclaw2d_domain_t* domain)
 
 void no_solver_setprob(fclaw2d_domain_t* domain)
 {
-    set_maptype_();
+    set_maptype_cart_();
 }
 
 

@@ -48,10 +48,7 @@ default: $(TARGET)
 
 .PHONY: clean realclean default $(TARGET)
 
-GeoFiles := \
-      $(FORESTCLAW)/src/mappings/cart/set_maptype_cart.o
-
-OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs) $(GeoFiles)
+OBJECTS = $(TARGET).o $(exampleobjs) $(amrclawobjs)
 
 $(TARGET): $(OBJECTS) $(FORESTCLAW)/src/libforestclaw.a
 	$(P4EST_CXX) $(P4EST_CFLAGS) $^ $(P4EST_LDFLAGS) $(FORT_LIB) \
