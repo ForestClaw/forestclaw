@@ -15,6 +15,9 @@
 
       pi = 4.d0*atan(1.d0)
 
+      call set_maptype_sphere()
+      call set_map_defaults()
+
 c     # TODO : Need a better way to read in data parameters in
 c     # Fortran for parallel cases
 
