@@ -26,6 +26,7 @@ libforestclaw_compiled_sources = \
 	src/forestclaw2d.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_map.c \
+	src/fclaw2d_vtk.c \
 	src/clawpack_fort.cpp \
 	src/mappings/block.f \
 	src/mappings/set_maptype.f \
@@ -62,7 +63,8 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/claw2d_utils_mapped.f \
 	src/fortran_source2d/claw2d_utils.f \
 	src/fortran_source2d/debug.f \
-	src/fortran_source2d/cellave2.f
+	src/fortran_source2d/cellave2.f \
+	src/fortran_source2d/fdisc.f
 
 
 # this variable is used for headers that are not publicly installed
