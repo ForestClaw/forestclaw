@@ -2,7 +2,7 @@
 
 include src/solvers/amr_waveprop/Makefile.am
 
-bin_PROGRAMS += applications/advection/2d/swirl
+bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
 applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl.cpp \
