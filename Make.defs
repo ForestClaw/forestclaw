@@ -9,7 +9,7 @@ FC = gfortran
 # FC = mpixlf77
 
 # The user should specify location in Make.defs.local
-# This may work on gnu systems
+# This may work on gnu systems.  
 # FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 #
 # This works on juqueen
