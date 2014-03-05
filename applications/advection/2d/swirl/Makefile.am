@@ -1,6 +1,14 @@
 ## Makefile.am in applications/advection/2d/swirl
 
-include src/solvers/amr_waveprop/Makefile.am
+# A single hash comment like this one WILL show up in the Makefile.
+## A double hash comment like this one will NOT be copied to the Makefile.
+
+## We should probably include .am files only from the toplevel Makefile.am,
+## and not recursively as is done here.
+## include src/solvers/amr_waveprop/Makefile.am
+
+## We need to find a solution about how to compile the waveprop files without
+## creating a name conflict with other solvers.
 
 bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
