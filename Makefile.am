@@ -60,7 +60,8 @@ DISTCLEANFILES += \
 # non-recursive build
 include src/Makefile.am
 include applications/dummy/Makefile.am
-# include applications/advection/2d/swirl/Makefile.am
+include src/solvers/amr_waveprop/Makefile.am
+include applications/advection/2d/swirl/Makefile.am
 
 # revision control and ChangeLog
 ChangeLog:
