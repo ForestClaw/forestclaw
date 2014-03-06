@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-include_HEADERS += -I$(AMR_WAVEPROP) -I$(AMR_WAVEPROP_FORTRAN)
+include_HEADERS += -Isrc/solvers/amr_waveprop -Isrc/solvers/amr_waveprop/fortran_source
 
 solver_SOURCES += \
 	src/solvers/amr_waveprop/amr_waveprop.cpp \
