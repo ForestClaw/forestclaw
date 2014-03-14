@@ -8,7 +8,9 @@
 ## been mentioned in bin_PROGRAMS for example.  Any variable used with +=
 ## must also first be initialized with = (usually to empty).
 
-waveprop_compiled_sources = \
+libwaveprop_internal_headers = claw.i
+
+libwaveprop_compiled_sources = \
 	src/solvers/amr_waveprop/amr_waveprop.cpp \
 	src/solvers/amr_waveprop/fortran_source/limiter.f \
 	src/solvers/amr_waveprop/fortran_source/src2.f \
@@ -17,11 +19,18 @@ waveprop_compiled_sources = \
 	src/solvers/amr_waveprop/fortran_source/step2.f \
 	src/solvers/amr_waveprop/fortran_source/ClawPatch2.f
 
-include_HEADERS += src/solvers/amr_waveprop/amr_waveprop.H src/solvers/amr_waveprop/fortran_source/claw.i
+src_solvers_amr_waveprop_libwaveprop_la_CPPFLAGS = \
+	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/amr_waveprop
 
 lib_LTLIBRARIES += src/solvers/amr_waveprop/libwaveprop.la
-src_solvers_amr_waveprop_libwaveprop_la_SOURCES = \
- $(libwaveprop_internal_headers) \
- $(waveprop_compiled_sources)
 
-# src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+src_libwaveprop_la_SOURCES = \
+ $(libwaveprop_internal_headers) \
+ $(libwaveprop_compiled_sources)
+
+LDADD += @top_builddir@/src/libwaveprop.la @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
+
+nodist_include_HEADERS += $(libwaveprop_generated_headers)
+include_HEADERS += $(libwaveprop_installed_headers)
+
+AM_CPPFLAGS += -I@top_srcdir@/src @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
