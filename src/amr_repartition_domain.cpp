@@ -436,11 +436,11 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
 
     if (have_new_partition)
     {
-        // Use separate timer for all exchanges
-        fclaw2d_domain_data_t *ddata = get_domain_data(domain_partitioned);
+
+        fclaw2d_domain_data_t *ddata = get_domain_data (domain_partitioned);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
         rebuild_domain(*domain, domain_partitioned);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
+        fclaw2d_timer_stop(&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
 
         // update patch array to point to the numerical data that was received
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);

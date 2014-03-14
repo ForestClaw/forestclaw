@@ -85,6 +85,7 @@ void amrreset(fclaw2d_domain_t **domain)
         FCLAW2D_STATS_SET (stats, ddata, CHECK);
         FCLAW2D_STATS_SET (stats, ddata, ADVANCE);
         FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
+        FCLAW2D_STATS_SET (stats, ddata, BUILDPATCHES);
         FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
         FCLAW2D_STATS_SET (stats, ddata, BUILDPATCHES);
         sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
