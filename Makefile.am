@@ -16,7 +16,7 @@ AM_CPPFLAGS =
 CLEANFILES =
 DISTCLEANFILES =
 EXTRA_DIST =
-LDADD =
+LDADD = -L/usr/lib -lgfortran
 LINT_CSOURCES =
 TESTS =
 bin_PROGRAMS =
@@ -57,11 +57,14 @@ DISTCLEANFILES += \
         _configs.sed src/fclaw_config.h @FCLAW_DISTCLEAN@
 .PHONY: lint ChangeLog
 
+# ------------------------------------------------------------------
 # non-recursive build
 include src/Makefile.am
 include applications/dummy/Makefile.am
+
 include src/solvers/amr_waveprop/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
+# ------------------------------------------------------------------
 
 # revision control and ChangeLog
 ChangeLog:

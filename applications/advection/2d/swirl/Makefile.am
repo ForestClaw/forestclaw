@@ -13,8 +13,8 @@
 bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
 applications_advection_2d_swirl_swirl_SOURCES = \
-	applications/advection/2d/swirl.cpp \
 	applications/advection/2d/swirl/swirl_user.cpp \
+	applications/advection/2d/swirl/swirl.cpp \
 	applications/advection/2d/swirl/ghost_twopatch.f \
 	applications/advection/2d/swirl/tag4refinement.f \
 	applications/advection/2d/swirl/psi.f \
@@ -26,3 +26,7 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/setprob.f \
 	applications/advection/2d/swirl/swirl_output.f
 
+applications_advection_2d_swirl_swirl_CPPFLAGS = \
+	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/amr_waveprop
+
+applications_advection_2d_swirl_swirl_LDADD = @top_builddir@/local/lib/libwaveprop.la $(LDADD)
