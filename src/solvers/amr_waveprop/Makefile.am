@@ -1,8 +1,10 @@
 # -*- Makefile -*-
 
+## TODO: are these comments still current?
+##
 ## This variable should list the .h and .H files from the source tree that
 ## should be installed in the "include" directory.
-
+##
 ## The first part of the variable, "solver," must refer to a library or a
 ## program that is to be built.  That is, a target file that itself has
 ## been mentioned in bin_PROGRAMS for example.  Any variable used with +=
