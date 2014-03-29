@@ -78,6 +78,7 @@ AC_DEFINE_UNQUOTED(CXX,         ["${CXX}"],         [C++ compiler])
 AC_DEFINE_UNQUOTED(CXXFLAGS,    ["${CXXFLAGS}"],    [C++ compiler flags])
 AC_DEFINE_UNQUOTED(LDFLAGS,     ["${LDFLAGS}"],     [Linker flags])
 AC_DEFINE_UNQUOTED(LIBS,        ["${LIBS}"],        [Libraries])
+AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
 
 echo "o----------------------------------"
 echo "| Results for ForestClaw are"
@@ -92,6 +93,7 @@ echo "| CXX:         $CXX"
 echo "| CXXFLAGS:    $CXXFLAGS"
 echo "| LDFLAGS:     $LDFLAGS"
 echo "| LIBS:        $LIBS"
+echo "| FLIBS:       $FLIBS"
 echo "o----------------------------------"
 
 # Create output files.
