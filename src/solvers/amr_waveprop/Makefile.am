@@ -28,7 +28,7 @@ src_solvers_amr_waveprop_libwaveprop_la_SOURCES = \
  $(libwaveprop_internal_headers) \
  $(libwaveprop_compiled_sources)
 
-LDADD += @top_builddir@/src/solvers/amr_waveprop/libwaveprop.la @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
+# LDADD += @top_builddir@/src/solvers/amr_waveprop/libwaveprop.la @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 
 nodist_include_HEADERS += $(libwaveprop_generated_headers)
 include_HEADERS += $(libwaveprop_installed_headers)
