@@ -69,7 +69,7 @@ libforestclaw_compiled_sources = \
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS =
- 
+
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
  $(libforestclaw_internal_headers) \
