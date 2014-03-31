@@ -75,6 +75,7 @@ extern "C"
 
 void hemisphere_link_solvers(fclaw2d_domain_t *domain);
 
+void hemisphere_problem_setup(fclaw2d_domain_t *domain);
 
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,

@@ -51,6 +51,14 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
     amr_waveprop_link_to_clawpatch();
 }
 
+void hemisphere_problem_setup(fclaw2d_domain_t* domain)
+{
+    /* Setup any fortran common blocks for general problem
+       and any other general problem specific things that only needs
+       to be done once. */
+    amr_waveprop_setprob(domain);
+}
+
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,

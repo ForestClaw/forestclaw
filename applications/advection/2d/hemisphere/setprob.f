@@ -3,6 +3,8 @@
 
       double precision kappa,tfinal
       double precision rot_angle(2), scale
+      logical isflat
+      integer get_map_value
 
       double precision pi
       common /compi/ pi
@@ -26,6 +28,8 @@ c     # conditions set.
 c     # -------------------------------------------------
 c     # Mapping routines
 c     # -------------------------------------------------
+
+      call set_maptype_hemisphere()
 
 c     # Set mapping scaling
       scale = 1
