@@ -22,5 +22,4 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 applications_advection_2d_swirl_swirl_CPPFLAGS = \
 	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/amr_waveprop
 
-applications_advection_2d_swirl_swirl_LDADD = \
-	@top_builddir@/src/solvers/amr_waveprop/libwaveprop.la $(LDADD)
+applications_advection_2d_swirl_swirl_LDADD = @top_builddir@/src/solvers/amr_waveprop/libwaveprop.la $(LDADD)

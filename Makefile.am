@@ -16,8 +16,7 @@ AM_CPPFLAGS =
 CLEANFILES =
 DISTCLEANFILES =
 EXTRA_DIST =
-#LDADD = -L/usr/lib -lgfortran
-LDADD =
+LDADD = $(FLIBS)
 LINT_CSOURCES =
 TESTS =
 bin_PROGRAMS =
@@ -60,11 +59,14 @@ DISTCLEANFILES += \
 
 # ------------------------------------------------------------------
 # non-recursive build
-include src/Makefile.am
-include applications/dummy/Makefile.am
+# include src/Makefile.am
+# include applications/dummy/Makefile.am
+#
+# include src/solvers/amr_waveprop/Makefile.am
+# include applications/advection/2d/swirl/Makefile.am
+# include applications/advection/2d/hemisphere/Makefile.am
 
-include src/solvers/amr_waveprop/Makefile.am
-include applications/advection/2d/swirl/Makefile.am
+include Makefile.apps
 # ------------------------------------------------------------------
 
 # revision control and ChangeLog
