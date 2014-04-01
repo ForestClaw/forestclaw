@@ -57,6 +57,7 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
    'mapping context' idea */
 void set_maptype_cart_();
 void set_maptype_sphere_();
+void set_maptype_hemisphere_();
 void set_maptype_disk_();
 void set_map_defaults_();
 
