@@ -56,7 +56,8 @@ void hemisphere_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    amr_waveprop_setprob(domain);
+    set_maptype_hemisphere_();
+    setprob_();
 }
 
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,

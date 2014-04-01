@@ -1,7 +1,5 @@
 ## Makefile.am in applications/advection/2d/hemisphere
 
-hemisphere_dir = applications/advection/2d/hemisphere
-
 bin_PROGRAMS += applications/advection/2d/hemisphere/hemisphere
 
 

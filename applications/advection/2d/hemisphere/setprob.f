@@ -29,8 +29,6 @@ c     # -------------------------------------------------
 c     # Mapping routines
 c     # -------------------------------------------------
 
-      call set_maptype_hemisphere()
-
 c     # Set mapping scaling
       scale = 1
       rot_angle(1) = 0
