@@ -78,10 +78,13 @@ c     #
       get_level = level_com
       end
 
-      subroutine here(n)
+      subroutine debug_here(n,str)
       implicit none
       integer n
-      write(6,*) 'here...',n
+      character(100) str
+
+      write(6,100) str,n
+  100 format('Here  (',A100,'): ',I2)
       end
 
       subroutine dump_patch(mx,my,mbc,meqn,mq,q)

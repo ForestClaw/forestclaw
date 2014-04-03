@@ -263,7 +263,7 @@ void reset_debug_info_();
 int get_block_idx_();
 int get_patch_idx_();
 int get_level_();
-void here_(const int& n);
+void debug_here_(const int& n, const char str[]);
 
 void dump_patch_(const int& mx, const int& my, const int& m_mbc, const int& meqn,
                  const int& mq, double q[]);

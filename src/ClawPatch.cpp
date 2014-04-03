@@ -549,10 +549,11 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
     }
     else
     {
-        here_(1);
+        // const char str[100] = "ClawPatch.cpp:interpolate_face_ghost";
+        // debug_here_(1,str);
         interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
                                 a_p4est_refineFactor,a_refratio,igrid);
-        here_(2);
+        // debug_here_(2,str);
     }
 
 #if 0
