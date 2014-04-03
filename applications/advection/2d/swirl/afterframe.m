@@ -2,12 +2,6 @@ global cm_index;
 
 global cm_index;
 
-if (mq == 1)
-  cm_index = true;
-else
-  cm_index = false;
-end
-
 s = 1e-2;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
@@ -19,7 +13,6 @@ if (mq == 1)
   npmax = 10;
   if (Frame == 0)
     cm = multicolormap(npmax);
-    % cm = load('cm_save');
   end;
   colormap(cm);
   caxis([1 npmax+1]);
@@ -48,8 +41,8 @@ else
     qlo = 0;
     qhi = 1;
     colorbar_underover(under_label,over_label);
-  end;
-end;
+  end
+end
 
 
 view(2);
@@ -59,7 +52,7 @@ prt = false;
 if (prt)
   filename = framename(Frame,'swirl0000','png');
   print('-dpng',filename);
-end;
+end
 
 shg
 clear afterframe;
