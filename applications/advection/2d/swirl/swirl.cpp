@@ -59,6 +59,14 @@ main (int argc, char **argv)
   feenableexcept(FE_INVALID);
 #endif
 
+  int ii = 0;
+  while (ii == 0)
+  {
+      ii = 0;
+      /* Do something */
+  }
+
+
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
