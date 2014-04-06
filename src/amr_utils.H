@@ -81,6 +81,11 @@ fclaw2d_block_data_t *get_block_data (fclaw2d_block_t * block);
 fclaw2d_patch_data_t *get_patch_data (fclaw2d_patch_t * patch);
 
 /* -----------------------------------------------------------------
+  Debug routines
+   ---------------------------------------------------------------- */
+void fclaw2d_mpi_debug();
+
+/* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
 void set_block_data (fclaw2d_block_t * block, const int mthbc[]);
