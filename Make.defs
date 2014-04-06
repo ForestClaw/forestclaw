@@ -10,7 +10,7 @@ FC = gfortran
 # FC = mpixlf77
 
 # The user should specify location in Make.defs.local
-# This may work on gnu systems.  
+# This may work on gnu systems.
 # FORT_LIB = -L/usr/local/gfortran/lib -lgfortran
 #
 # This works on juqueen
@@ -34,6 +34,7 @@ localobjs :=
 CPPFLAGS =
 # e.g. to trap floating point errors :
 # CPPFLAGS = -DTRAPFPE
+# CPPFLAGS = -DMPI_DEBUG
 
 # Compile with MPI or not.
 FCLAW_MPI = True
