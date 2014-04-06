@@ -437,7 +437,7 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
     if (have_new_partition)
     {
 
-        fclaw2d_domain_data_t *ddata = get_domain_data (domain_partitioned);
+        fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
         rebuild_domain(*domain, domain_partitioned);
         fclaw2d_timer_stop(&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
