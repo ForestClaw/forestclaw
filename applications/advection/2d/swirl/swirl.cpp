@@ -65,6 +65,10 @@ main (int argc, char **argv)
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG
+  fclaw2d_mpi_debug();
+#endif
+
+#if 0
   /* Find out process rank */
   int my_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
