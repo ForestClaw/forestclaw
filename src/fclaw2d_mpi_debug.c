@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>    //  To get process ids
 
 
-
 void fclaw2d_mpi_debug()
 {
   /* Find out process rank */
@@ -60,8 +59,8 @@ void fclaw2d_mpi_debug()
   }
 
   int ii = 0;
-  while (ii == 0)
+  while (ii == 0)  /* (gdb) set ii=1 */
   {
-      /* set break point here */
+    /* Code will stop here;  set ii=1 to continue in gdb */
   }
 }
