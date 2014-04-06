@@ -218,6 +218,8 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
 
     exchange_ghost_patch_data_all(domain);
 
+    fclaw2d_domain_barrier(domain);
+
     /* Each level should exchange with other patches at that level */
     int minlevel = domain->global_minlevel;
     int maxlevel = domain->global_maxlevel;
@@ -229,6 +231,9 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     {
         level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
     }
+
+    // Don't go beyond here until all procs have exchanged at every level. 
+    fclaw2d_domain_barrier(domain);
 
     /* Each level should exchange with coarser patches */
     for(int level = maxlevel; level > minlevel; level--)
