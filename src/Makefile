@@ -14,6 +14,7 @@ fclawobjs = \
 	amrinit.o \
 	amrrun.o \
 	amrreset.o \
+	fclaw2d_mpi_debug.o \
 	subcycle_manager.o \
 	amr_advance.o \
 	amr_regrid.o \
