@@ -80,6 +80,7 @@ main (int argc, char **argv)
       printf("\n");
       printf("Getting setup for parallel debugging\n");
       printf("------------------------------------\n");
+      MPI_Barrier(MPI_COMM_WORLD);
   }
   for(int i = 0; i < num; i++)
   {
