@@ -4,6 +4,7 @@
 
 # Specify fortran compiler and fortran library
 FC = gfortran
+
 #
 # This works for juqueen
 # FC = mpixlf77
@@ -17,7 +18,9 @@ FC = gfortran
 
 # Extra flags that not every compiler understands
 # This may work on gnu systems
-# LOCAL_FFLAGS = -Wall -g -O0 -Wno-unused-dummy-argument -Wno-unused-variable
+
+LOCAL_FFLAGS = -Wall -g -O0 -Wno-unused-dummy-argument -Wno-unused-variable
+
 #
 # This works on juqueen
 # LOCAL_FFLAGS = -qextname

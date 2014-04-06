@@ -3,7 +3,7 @@
 include $(FORESTCLAW)/Make.defs.local
 include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
-FFLAGS = $(LOCAL_FFLAGS)
+FFLAGS = $(LOCAL_FFLAGS) 
 
 FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
 FORTRAN_INC = $(FORTRAN_SRC)
