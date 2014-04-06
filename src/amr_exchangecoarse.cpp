@@ -331,10 +331,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             }
             else if (ref_flag == -1 && is_fine)
             {
-                /* Corner is at a coarser level.  If the corner patch is a parallel
-                   ghost patch, then we should average onto it as well (even if it
-                   is technically read only)  Otherwise, it won't have good data for
-                   doing interpolation to this fine grid later */
+	        /* Corner is at a coarser level.  Use this corner patch to do the interpolation */
                 if (fclaw2d_patch_is_ghost(neighbor_patch))
                 {
                     /* Corner is a parallel ghost patch.  Do the same as above, but
@@ -824,7 +821,10 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     printf("Second pass (corner interpolate) (mpirank = %d)\n",domain->mpirank);
     fclaw2d_domain_barrier(domain);
 
-    /* Second pass : Interpolate coarse grid to fine grid ghost cells.*/
+    /* Second pass : Iterate over fine grids on this processor that have 
+       off processor coarse grid neighbors.  The first pass doesn't catch 
+       these coarse grids, and the fine grids don't get ghost cell data set.  
+    */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
