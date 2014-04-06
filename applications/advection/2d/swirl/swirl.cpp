@@ -80,8 +80,8 @@ main (int argc, char **argv)
       printf("\n");
       printf("Getting setup for parallel debugging\n");
       printf("------------------------------------\n");
-      MPI_Barrier(MPI_COMM_WORLD);
   }
+  MPI_Barrier(MPI_COMM_WORLD);
   for(int i = 0; i < num; i++)
   {
       if (my_rank == i)
@@ -89,8 +89,8 @@ main (int argc, char **argv)
           printf("Proc %d with process %d is waiting to be attached\n",my_rank,getpid());
           fflush(stdout);
       }
+      MPI_Barrier(MPI_COMM_WORLD);
   }
-  MPI_Barrier(MPI_COMM_WORLD);
 
   int ii = 0;
   while (ii == 0)
