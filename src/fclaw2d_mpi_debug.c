@@ -27,9 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mpi.h>
 #include <unistd.h>    //  To get process ids
 
+
+
 void fclaw2d_mpi_debug()
 {
-    /* Find out process rank */
+  /* Find out process rank */
   int my_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   
@@ -46,7 +48,8 @@ void fclaw2d_mpi_debug()
       printf("------------------------------------\n");
   }
   MPI_Barrier(MPI_COMM_WORLD);
-  for(int i = 0; i < num; i++)
+  int i;
+  for(i = 0; i < num; i++)
   {
       if (my_rank == i)
       {
