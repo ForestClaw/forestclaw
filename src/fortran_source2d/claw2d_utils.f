@@ -21,12 +21,14 @@ c     # 'qneighbor'
          do j = 1,my
             do ibc = 1,mbc
                do mq = 1,meqn
-c                 # Exchange at high side of 'this' grid in
+c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0)
                   if (iface .eq. 0) then
                      qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
+                     qneighbor(mx+ibc,j,mq) = qthis(ibc,j,mq)
                   elseif (iface .eq. 1) then
                      qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
+                     qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
                   endif
                enddo
             enddo
@@ -39,8 +41,10 @@ c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
                   if (iface .eq. 2) then
                      qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
+                     qneighbor(i,my+jbc,mq) = qthis(i,jbc,mq)
                   elseif (iface .eq. 3) then
                      qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
+                     qneighbor(i,1-jbc,mq) = qthis(i,my+1-jbc,mq)
                   endif
                enddo
             enddo
@@ -138,29 +142,9 @@ c                 # ibc = 2 corresponds to the second layer
       integer ic_add, jc_add, ic, jc, mth
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
-      logical debug_is_on
-      integer get_patch_idx
 
-c     # To be figured out later
       mth = 5
 
-c     # 'iface_coarse is relative to the coarse grid
-
-      if (debug_is_on()) then
-         write(6,*) 'In interpolate_face_ghost (patch ',
-     &         get_patch_idx(),')'
-      endif
-
-c      if (debug_is_on()) then
-c         write(6,*) 'fine patch ', get_patch_idx()
-c         mq = -1
-c         call dump_patch(mx,my,mbc,meqn,mq,qfine)
-c         write(6,*) ' '
-c         write(6,*) 'Coarse patch '
-c         call dump_patch(mx,my,mbc,meqn,mq,qcoarse)
-c         write(6,*)
-c      endif
-c
       do mq = 1,meqn
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
@@ -357,6 +341,11 @@ c              # Average fine grid corners onto coarse grid ghost corners
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady, shiftx, shifty
       double precision compute_slopes, value
+
+      integer get_patch_idx, pidx
+      logical debug_is_on
+
+      pidx = get_patch_idx()
 
       mth = 5
 
