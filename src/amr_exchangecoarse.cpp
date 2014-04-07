@@ -742,7 +742,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        Corner average
        ----------------------------------------------------------- */
 
-    // printf("Corner average (mpirank = %d)\n",domain->mpirank);
     /* First pass : Iterate over coarse grids in space filling curve */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
@@ -757,70 +756,38 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_average,
                                  (void *) &e_info);
 
-    fclaw2d_domain_barrier(domain);
-
     /* -----------------------------------------------------------
        Physical BC : Set coarse grid physical boundary conditions -
        this will help with interpolation to finer grids. Time level
        't_level' is the time at the finer level, i.e.
        coarse_time + alpha*dt_coarse
        ----------------------------------------------------------- */
-    // printf("Physical BC (mpirank = %d)\n",domain->mpirank);
-
     set_phys_bc(domain,coarser_level,t_level,time_interp);
-
-    fclaw2d_domain_barrier(domain);
 
     /* -----------------------------------------------------------
        Face interpolate
        ----------------------------------------------------------- */
-    // fclaw2d_domain_barrier(domain);
-    // printf("Face interpolate - first pass (mpirank = %d)\n",domain->mpirank);
-    // fclaw2d_domain_barrier(domain);
-
     /* First pass : Iterate over coarse grids in space filling curve */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain,coarser_level,cb_face_interpolate,
                                  (void *) &e_info);
 
-    // fclaw2d_domain_barrier(domain);
-    // printf("Second pass (face interpolate) (mpirank = %d)\n",domain->mpirank);
-    // fclaw2d_domain_barrier(domain);
-
     /* Second pass : Average over finer grids in sf curve */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
 
-    fclaw2d_domain_serialization_enter(domain);
-    // set_debug_on_();
     fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
                                  (void *) &e_info);
-    // set_debug_off_();
-
-    fclaw2d_domain_serialization_leave(domain);
-
-    // fclaw2d_domain_barrier(domain);
-    // printf("Done with face interpolate (mpirank = %d)\n",domain->mpirank);
-    // fclaw2d_domain_barrier(domain);
-
 
     /* -----------------------------------------------------------
        Corner interpolate
        ----------------------------------------------------------- */
-    /* First pass : Iterate over coarse grids in space filling curve */
-    // fclaw2d_domain_barrier(domain);
-    // printf("Corner interpolate (mpirank = %d)\n",domain->mpirank);
-    // fclaw2d_domain_barrier(domain);
 
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
                                  (void *) &e_info);
-
-    // fclaw2d_domain_barrier(domain);
-    // printf("Second pass (corner interpolate) (mpirank = %d)\n",domain->mpirank);
-    // fclaw2d_domain_barrier(domain);
 
     /* Second pass : Iterate over fine grids on this processor that have
        off processor coarse grid neighbors.  The first pass doesn't catch
@@ -831,8 +798,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
                                  (void *) &e_info);
 
-    fclaw2d_domain_barrier(domain);
-    // printf("Done (mpirank = %d)\n",domain->mpirank);
 
     // Stop timing
 #if 0
