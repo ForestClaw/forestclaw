@@ -339,6 +339,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                     ClawPatch *corner_cp = this_cp;
                     ClawPatch *coarse_cp = get_clawpatch(neighbor_patch);
 
+                    set_debug_info_(this_block_idx, this_patch_idx,this_patch->level);
+
                     if (this_block_idx == corner_block_idx)
                     {
                         int icorner_coarse = 3-icorner;
@@ -598,7 +600,6 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                     ClawPatch *fine_cp = this_cp;
                     /* Figure out which grid we got */
                     int igrid;
-                    set_debug_info_(this_block_idx, this_patch_idx,this_patch->level);
                     if (idir == 0)
                     {
                         /* this is a awkward;  is there a better way to do this? */

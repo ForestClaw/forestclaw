@@ -216,16 +216,25 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
         cout << "Exchanging ghost patches across all levels " << endl;
     }
 
-    exchange_ghost_patch_data_all(domain);
-
-    fclaw2d_domain_barrier(domain);
-
     /* Each level should exchange with other patches at that level */
     int minlevel = domain->global_minlevel;
     int maxlevel = domain->global_maxlevel;
 
     fclaw_bool time_interp = fclaw_false;
     double t = get_domain_time(domain);
+
+    for(int level = maxlevel; level >= minlevel; level--)
+    {
+        level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
+    }
+
+    // Don't go beyond here until all procs have exchanged at every level. 
+    fclaw2d_domain_barrier(domain);
+
+
+    exchange_ghost_patch_data_all(domain);
+
+    fclaw2d_domain_barrier(domain);
 
     for(int level = maxlevel; level >= minlevel; level--)
     {
@@ -246,6 +255,9 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     {
         set_phys_bc(domain,level,t,time_interp);
     }
+
+    fclaw2d_domain_barrier(domain);
+
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
     if (running != FCLAW2D_TIMER_NONE) {
@@ -314,6 +326,7 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
         level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
     }
 
+    fclaw2d_domain_barrier(domain);
 
     /* Then do exchanges with coarser level */
     fclaw_bool time_interp_vec[fine_level-coarse_level+1];
@@ -333,11 +346,15 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     }
 
 
+    fclaw2d_domain_barrier(domain);
+
     fclaw_bool time_interp = fclaw_false;
     for (int level = fine_level; level >= coarse_level; level--)
     {
         set_phys_bc(domain,level,t,time_interp);
     }
+
+    fclaw2d_domain_barrier(domain);
 
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
