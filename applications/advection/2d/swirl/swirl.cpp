@@ -72,43 +72,6 @@ main (int argc, char **argv)
   fclaw2d_mpi_debug();
 #endif
 
-#if 0
-  /* Find out process rank */
-  int my_rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  /* Find out number of processes */
-  int num;
-  MPI_Comm_size(MPI_COMM_WORLD, &num);
-
-  // Don't do anything until we are done with this part
-  MPI_Barrier(MPI_COMM_WORLD);
-  if (my_rank == 0)
-  {
-      printf("\n");
-      printf("Getting setup for parallel debugging\n");
-      printf("------------------------------------\n");
-  }
-  MPI_Barrier(MPI_COMM_WORLD);
-  for(int i = 0; i < num; i++)
-  {
-      if (my_rank == i)
-      {
-          printf("Proc %d with process %d is waiting to be attached\n",my_rank,getpid());
-          fflush(stdout);
-      }
-      MPI_Barrier(MPI_COMM_WORLD);
-  }
-
-  int ii = 0;
-  while (ii == 0)
-  {
-      /* set break point here */
-  }
-#endif
-
-
-
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and
      do parameter checking.
