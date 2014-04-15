@@ -14,7 +14,7 @@ SUBROUTINE step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 !     Converted to f90 2012-1-04 (KTM)
 !
 
-  USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves
+  USE amr_module, ONLY: mwaves, mcapa
 
     implicit none
 
@@ -54,7 +54,7 @@ SUBROUTINE step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
     real(kind=8) :: bpadq(meqn,1-mbc:maxm + mbc)
 
     ! Looping scalar storage
-    integer :: i,j,thread_num
+    integer :: i,j
     real(kind=8) :: dtdx,dtdy,cfl1d
 
     ! Common block storage

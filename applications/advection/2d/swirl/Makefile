@@ -4,6 +4,7 @@ TARGET = swirl
 GEO = cart
 
 include $(FORESTCLAW)/Make.defs.local
+include Makefile.clawpack.inc
 
 # -----------------------------------------------------------
 FFLAGS = $(LOCAL_FFLAGS)
