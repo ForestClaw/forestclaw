@@ -1,5 +1,5 @@
 c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+       subroutine qinit(meqn,mbc,mx,my,xlower,ylower,
      &                   dx,dy,q,maux,aux)
 c     =====================================================
 
@@ -10,10 +10,10 @@ c     #     0.1  otherwise
 
        implicit none
 
-       integer maxmx, maxmy, meqn, mbc, mx, my, maux
+       integer meqn, mbc, mx, my, maux
        double precision xlower, ylower, dx, dy
-       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
+       double precision q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
+       double precision aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 
        integer i, j, mq
        double precision xi, yj, s
@@ -23,12 +23,12 @@ c     #     0.1  otherwise
              xi = xlower + (i-0.5d0)*dx
              do j = 1-mbc,my+mbc
                 yj = ylower + (j-0.5d0)*dy
+
                 s = 0.5d0
-c                if (xi+yj .lt. 1.0) then
-                if (xi .lt. 0.5d0) then
-                   q(i,j,mq) = 0.d0
+                if (xi .lt. s) then
+                   q(mq,i,j) = 0.d0
                 else
-                   q(i,j,mq) = 1.d0
+                   q(mq,i,j) = 1.d0
                 endif
              enddo
           enddo

@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 #include "swirl_user.H"
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
@@ -43,7 +43,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &swirl_parallel_write_header;
     of->f_patch_write_output = &swirl_parallel_write_output;
 
-    amr_waveprop_link_to_clawpatch();
+    fclaw2d_clawpack_link_to_clawpatch();
 }
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
@@ -51,7 +51,7 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    amr_waveprop_setprob(domain);
+    fclaw2d_clawpack_setprob(domain);
 }
 
 
@@ -61,7 +61,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_patch_idx)
 {
     /* Set velocity data */
-    amr_waveprop_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_clawpack_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+
 
     /* Set up diffusion coefficients? Read in velocity data? Material properties? */
 }
@@ -73,7 +74,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    amr_waveprop_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -86,7 +87,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
 
@@ -98,9 +99,10 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-    amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
-    double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,
+    fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+
+    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);
     return maxcfl;
 }
@@ -214,15 +216,11 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
     int matlab_level = level + 1;
 
     int mpirank = domain->mpirank;
-    swirl_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+    swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                         iframe,num,matlab_level,this_block_idx,mpirank);
 }

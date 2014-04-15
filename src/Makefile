@@ -5,7 +5,7 @@ include $(P4EST_DIR)/etc/Makefile.p4est.mk
 
 FFLAGS = $(LOCAL_FFLAGS) 
 
-FORTRAN_SRC = $(FORESTCLAW)/src/fortran_source2d
+FORTRAN_SRC = fortran_source2d
 FORTRAN_INC = $(FORTRAN_SRC)
 
 fclawobjs = \
@@ -50,7 +50,6 @@ fclawobjs = \
 	$(FORTRAN_SRC)/mapc2m.o \
 	$(FORTRAN_SRC)/setup_mesh.o \
 	$(FORTRAN_SRC)/claw2d_utils_mapped.o \
-	$(FORTRAN_SRC)/claw2d_utils.o \
 	$(FORTRAN_SRC)/debug.o \
 	$(FORTRAN_SRC)/cellave2.o
 
@@ -65,6 +64,9 @@ libforestclaw.a: $(fclawobjs)
 
 .f.o:
 	$(FC) $(FFLAGS) -c $< -o $@
+
+.f90.o:
+	$(FC) -Wall $(FFLAGS) -c $< -o $@
 
 clean:
 	rm -f *.o *.a $(fclawobjs)

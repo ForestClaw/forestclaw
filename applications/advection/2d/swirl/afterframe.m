@@ -1,3 +1,8 @@
+%% afterframe
+
+%%
+% This is the after frame file used by plotclaw2.
+
 global cm_index;
 
 global cm_index;

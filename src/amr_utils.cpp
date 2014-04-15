@@ -224,7 +224,7 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
 
     /* Copy data members */
     ddata_new->amropts = ddata_old->amropts;
-    ddata_new->waveprop_parms = ddata_old->waveprop_parms;
+    ddata_new->clawpack_parms = ddata_old->clawpack_parms;
     ddata_new->manyclaw_parms = ddata_old->manyclaw_parms;
 
     ddata_new->curr_time = ddata_old->curr_time;
@@ -371,7 +371,7 @@ fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
 
     int provided;
     mpiret = MPI_Init_thread (argc, argv, MPI_THREAD_FUNNELED, &provided);
-    if (provided != MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
+    if (provided != MPI_THREAD_FUNNELED) printf("Received mpi_init_thread level %d\n", provided);
     SC_CHECK_MPI (mpiret);
 
     sc_init (mpicomm, 0, 0, NULL, lp);

@@ -33,9 +33,9 @@ exampleobjs = \
 	${BENCH}/ghost_twopatch.o
 
 # Solver routines (several solvers can be added here)
-include Makefile.waveprop.inc
-solverobjs = $(waveprop_objs)
-solverincludes = $(waveprop_includes)
+include Makefile.clawpack.inc
+solverobjs = $(clawpack_objs)
+solverincludes = $(clawpack_includes)
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(solverobjs)
 

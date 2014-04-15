@@ -717,7 +717,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain, coarser_level,
                                  cb_face_average, (void *) &e_info);
-
     /* Second pass : Iterate over fine grids in space-filling curve,
        looking for parallel ghost patches or time interpolated data.
     */
@@ -769,11 +768,9 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
 
     fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
                                  (void *) &e_info);
-
     /* -----------------------------------------------------------
        Corner interpolate
        ----------------------------------------------------------- */
-
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
