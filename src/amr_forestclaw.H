@@ -69,8 +69,7 @@ void patch_output_default (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 // -------------------------------------------
 // amr_levelexchange.cpp
 // Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.
-void level_exchange (fclaw2d_domain_t * domain, int a_level,
-                     fclaw2d_timer_names_t running);
+void level_exchange (fclaw2d_domain_t * domain, int a_level);
 
 // amr_exchangecoarse.cpp
 // Pass in the enum value for a running timer or FCLAW2D_TIMER_NONE.

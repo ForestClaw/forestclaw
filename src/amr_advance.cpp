@@ -225,14 +225,14 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
 
     for(int level = maxlevel; level >= minlevel; level--)
     {
-        level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
+        level_exchange(domain,level);
     }
 
     exchange_ghost_patch_data_all(domain);
 
     for(int level = maxlevel; level >= minlevel; level--)
     {
-        level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
+        level_exchange(domain,level);
     }
 
     /* Each level should exchange with coarser patches */
@@ -311,7 +311,7 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     /* Do all level exchanges first */
     for(int level = fine_level; level >= coarse_level; level--)
     {
-        level_exchange(domain,level,FCLAW2D_TIMER_EXCHANGE);
+        level_exchange(domain,level);
     }
 
     /* Then do exchanges with coarser level */
