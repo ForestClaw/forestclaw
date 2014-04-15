@@ -56,10 +56,6 @@ main (int argc, char **argv)
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
 #ifdef TRAPFPE
-  feenableexcept(FE_INVALID);
-#endif
-
-#ifdef TRAPFPE
   printf("Enabling floating point traps\n");
   feenableexcept(FE_INVALID);
 #endif
