@@ -4,13 +4,12 @@ daspect([1 1 1]);
 axis off;
 
 if (mq == 1)
-  yrbcolormap;
-  caxis([0 1]);
-else
+  hidegridlines;
+
   npmax = 10;
   if (Frame == 0)
     cm = multicolormap(npmax);
-  end
+  end;
   colormap(cm);
   caxis([1 npmax+1]);
 
@@ -22,24 +21,21 @@ else
   set(o,'ylim',[qmin+1 qmax+2]);
   set(o,'ticklength',[0 0])
   set(o,'fontsize',16,'fontweight','bold')
-end
+else
+  yrbcolormap;
+  showpatchborders(1:10);
+  caxis([0,1])
+end;
 
-setpatchborderprops(1:7,'linewidth',2);
-showpatchborders;
 
 view(2);
 
 NoQuery = 0;
 prt = false;
 if (prt)
-  filename = 'swirl000.png';
-  str = num2str(Frame);
-  len = length(str);
-  filename(8-len+1:8) = str;
-  pstr = ['print -dpng ',filename];
-  disp(pstr);
-  eval(pstr);
+  filename = framename(Frame,'swirl0000','png');
+  print('-dpng',filename);
 end;
 
+shg
 clear afterframe;
-clear setcolors;

@@ -14,7 +14,7 @@
       tag_patch = 0
 
 c     # Refine based only on first variable in system.
-      mq = 1
+      mq = 2
       do i = 1,mx
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
