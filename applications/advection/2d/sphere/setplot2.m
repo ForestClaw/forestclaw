@@ -47,7 +47,7 @@ PlotType = 1;                % type of plot to produce:
 			     % 3 = Schlieren
 			     % 4 = scatter plot of q vs. r
 
-mq = 2;                      % which component of q to plot
+mq = 1;                      % which component of q to plot
 UserVariable = 0;            % set to 1 to specify a user-defined variable
 UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
@@ -67,6 +67,6 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 % Set to either a scalar, for automatic contours or a vector of contour levels.
 ContourValues = [];
 
-ForestClaw = 1;
+%---------------------------------
 
-ShowOverUnderShoots = false;
+ShowUnderOverShoots = 0;
