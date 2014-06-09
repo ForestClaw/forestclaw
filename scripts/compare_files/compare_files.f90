@@ -32,8 +32,8 @@ PROGRAM compare_files
   character(100) :: dir3_fname3
 
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: max_grids
-  DOUBLE PRECISION :: global_max
-  INTEGER :: grid_max, field_max
+  DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: global_max
+  INTEGER, DIMENSION(:), ALLOCATABLE :: grid_max
 
   !! CHARACTER :: c
   INTEGER :: nstp, ipos, idigit, l1, l2
@@ -77,7 +77,7 @@ PROGRAM compare_files
   ENDDO
 
   dir1_fname1 = TRIM(dir1)//'/'//trim(fname1)
-  dir2_fname1 = TRIM(dir2)//'/'//trim(fname1)
+   dir2_fname1 = TRIM(dir2)//'/'//trim(fname1)
 
   dir1_fname2 = TRIM(dir1)//'/'//trim(fname2)
   dir2_fname2 = TRIM(dir2)//'/'//trim(fname2)
@@ -131,8 +131,8 @@ PROGRAM compare_files
   CALL write_tfile(iframe,t,mfields,ngrids,dir3)
   CALL new_qfile(iframe,dir3)
 
+  ALLOCATE(grid_max(mfields),global_max(mfields))
   grid_max = 0
-  field_max = 0
   global_max = 0
 
   OPEN(10,file=dir1_fname1)
@@ -189,7 +189,6 @@ PROGRAM compare_files
      xlow = xlow1
      ylow = ylow1
 
-
      ALLOCATE(q1(mx,my,mfields))
      ALLOCATE(q2(mx,my,mfields))
      ALLOCATE(qc(mx,my,mfields))
@@ -203,10 +202,9 @@ PROGRAM compare_files
            READ(20,*) (q2(i,j,m),m = 1,mfields)
            DO m = 1,mfields
               qc(i,j,m) = ABS(q1(i,j,m)-q2(i,j,m))
-              IF (qc(i,j,m) .GT. global_max) THEN
-                 global_max = qc(i,j,m)  !! Largest difference on all grids
-                 grid_max = ngrid        !! max occurs on this grid
-                 field_max = m           !! max occurs in this field
+              IF (qc(i,j,m) .GT. global_max(m)) THEN
+                 global_max(m) = qc(i,j,m)  !! Largest difference on all grids
+                 grid_max(m) = ngrid        !! max occurs on this grid
               ENDIF
               max_grids(ngrid,m) = MAX(max_grids(ngrid,m),qc(i,j,m))
            ENDDO
@@ -222,18 +220,25 @@ PROGRAM compare_files
   CLOSE(10)
   CLOSE(20)
 
+  WRITE(6,*) ' '
+  DO m = 1,mfields
+     WRITE(6,150) global_max(m), m, grid_max(m)
+  ENDDO
+
+  WRITE(6,*) ' '
   OPEN(30,file=dir3_fname3)
-  WRITE(30,130) global_max, 'Global maximum'
-  WRITE(30,130) global_max, 'Global maximum'
-  WRITE(30,140) grid_max, 'Global maximum occurs on this grid'
-  WRITE(30,140) field_max, 'Global maximum occurs in this field'
+  DO m = 1,mfields
+     WRITE(30,150) global_max(m), m, grid_max(m)
+  ENDDO
   WRITE(30,*) ' '
+
   DO n = 0,ngrids-1
-     WRITE(30,'(I5,10E16.4)') n, (max_grids(ngrid,m),m=1,mfields)
+     WRITE(30,'(I5,10E16.4)') n, (max_grids(n,m),m=1,mfields)
   ENDDO
   CLOSE(30)
 130 FORMAT(E30.16,'     ',A)
 140 FORMAT(I30,   '     ',A)
+150 FORMAT(E30.16, '     occurs in field',I5,' on grid ',I5)
 
 END PROGRAM compare_files
 
@@ -308,7 +313,7 @@ SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
 
   INTEGER :: mfields,mbc,mx,my
   INTEGER :: iframe,patch_num, level, blockno
-  DOUBLE PRECISION :: xlower, ylower,dx,dy
+  DOUBLE PRECISION :: xlower, ylower, dx, dy
 
   DOUBLE PRECISION q(mx,my,mfields)
 
@@ -362,7 +367,7 @@ SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
               q(i,j,mq) = 0.d0
            ENDIF
         END DO
-        WRITE(fid_com,120) INT(q(i,j,1)), (q(i,j,mq),mq=1,mfields-1)
+        WRITE(fid_com,120) INT(q(i,j,1)), (q(i,j,mq),mq=2,mfields)
      ENDDO
      WRITE(fid_com,*) ' '
   ENDDO
