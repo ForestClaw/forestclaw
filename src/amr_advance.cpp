@@ -184,7 +184,7 @@ double advance_level(fclaw2d_domain_t *domain,
 /* ------------------------------------------------------------
    This does a complete exchange over all levels.
 
-   -- Parallel ghost patches are exchange at all levels
+   -- Parallel ghost patches are exchanged at all levels
    -- Every level exchanges ghost cells with other patches
       at that level
    -- Every finer level exchanges with a coarser level
