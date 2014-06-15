@@ -37,7 +37,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int iside,
                         int *neighbor_block_idx,
                         fclaw2d_patch_t* neighbor_patches[],
-                        int **ref_flag_ptr)
+                        int **ref_flag_ptr,
+                        int **fine_grid_pos_ptr)
 {
     int rproc[p4est_refineFactor];
     int rblockno;
@@ -91,17 +92,20 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
         {
             **ref_flag_ptr = 0;
+            *fine_grid_pos_ptr = NULL;
             num_neighbors = 1;
         }
         else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
         {
             **ref_flag_ptr = -1;
+            **fine_grid_pos_ptr = rproc[1];    // Special storage for fine grid info
             num_neighbors = 1;
         }
         else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
         {
             /* Patch has two neighbors */
             **ref_flag_ptr = 1; /* patches are at one level finer */
+            *fine_grid_pos_ptr = NULL;
             num_neighbors = p4est_refineFactor;
         }
         else

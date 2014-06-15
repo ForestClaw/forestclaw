@@ -47,6 +47,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int neighbor_block_idx;
         int ref_flag;   // = -1, 0, 1
         int *ref_flag_ptr = &ref_flag;
+        int fine_grid_pos;
+        int *fine_grid_pos_ptr = &fine_grid_pos;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
 
         get_face_neighbors(domain,
@@ -55,7 +57,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            iface,
                            &neighbor_block_idx,
                            ghost_patches,
-                           &ref_flag_ptr);
+                           &ref_flag_ptr,
+                           &fine_grid_pos_ptr);
 
         if (ref_flag_ptr == NULL)
         {

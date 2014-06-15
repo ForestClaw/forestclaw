@@ -435,6 +435,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int neighbor_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
+            int fine_grid_pos;
+            int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
 
             get_face_neighbors(domain,
@@ -443,11 +445,12 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patches,
-                               &ref_flag_ptr);
+                               &ref_flag_ptr,
+                               &fine_grid_pos_ptr);
 
             if (ref_flag_ptr == NULL)
             {
-                // no face neighor
+                // no face neighbor
             }
             else if (ref_flag == 1 && is_coarse)  // neighbors are at finer level
             {
@@ -469,43 +472,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
                     ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
                     ClawPatch *fine_cp = this_cp;
                     /* Figure out which grid we got */
-                    int igrid;
-                    if (idir == 0)
-                    {
-                        /* this is a awkward;  is there a better way to do this? */
-                        double tol = 1e-12;
-                        double ylow_fine = fine_cp->ylower();
-                        double yhi_fine = fine_cp->yupper();
-                        double ylow_coarse = coarse_cp->ylower();
-                        double yhi_coarse = coarse_cp->yupper();
-                        if (fabs(ylow_fine - ylow_coarse) < tol)
-                            igrid = 0;
-                        else if (fabs(yhi_fine - yhi_coarse) < tol)
-                            igrid = 1;
-                        else
-                        {
-                            printf("amr_exchange_coarse; cannot find igrid\n");
-                            exit(1);
-                        }
-                    }
-                    else
-                    {
-                        /* this is a awkward;  is there a better way to do this? */
-                        double tol = 1e-12;
-                        double xlow_fine = fine_cp->xlower();
-                        double xhi_fine = fine_cp->xupper();
-                        double xlow_coarse = coarse_cp->xlower();
-                        double xhi_coarse = coarse_cp->xupper();
-                        if (fabs(xlow_fine - xlow_coarse) < tol)
-                            igrid = 0;
-                        else if (fabs(xhi_fine - xhi_coarse) < tol)
-                            igrid = 1;
-                        else
-                        {
-                            printf("amr_exchange_coarse; cannot find igrid\n");
-                            exit(1);
-                        }
-                    }
+                    int igrid = fine_grid_pos;
+
                     /* Swap out coarse and fine */
                     fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                     int iface_coarse;
@@ -565,6 +533,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int neighbor_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
+            int fine_grid_pos;
+            int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
 
             get_face_neighbors(domain,
@@ -573,7 +543,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                iface,
                                &neighbor_block_idx,
                                neighbor_patches,
-                               &ref_flag_ptr);
+                               &ref_flag_ptr,
+                               &fine_grid_pos_ptr);
 
             fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)
@@ -599,43 +570,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                     ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
                     ClawPatch *fine_cp = this_cp;
                     /* Figure out which grid we got */
-                    int igrid;
-                    if (idir == 0)
-                    {
-                        /* this is a awkward;  is there a better way to do this? */
-                        double tol = 1e-12;
-                        double ylow_fine = fine_cp->ylower();
-                        double yhi_fine = fine_cp->yupper();
-                        double ylow_coarse = coarse_cp->ylower();
-                        double yhi_coarse = coarse_cp->yupper();
-                        if (fabs(ylow_fine - ylow_coarse) < tol)
-                            igrid = 0;
-                        else if (fabs(yhi_fine - yhi_coarse) < tol)
-                            igrid = 1;
-                        else
-                        {
-                            printf("amr_exchange_coarse; cannot find igrid\n");
-                            exit(1);
-                        }
-                    }
-                    else
-                    {
-                        /* this is a awkward;  is there a better way to do this? */
-                        double tol = 1e-12;
-                        double xlow_fine = fine_cp->xlower();
-                        double xhi_fine = fine_cp->xupper();
-                        double xlow_coarse = coarse_cp->xlower();
-                        double xhi_coarse = coarse_cp->xupper();
-                        if (fabs(xlow_fine - xlow_coarse) < tol)
-                            igrid = 0;
-                        else if (fabs(xhi_fine - xhi_coarse) < tol)
-                            igrid = 1;
-                        else
-                        {
-                            printf("amr_exchange_coarse; cannot find igrid\n");
-                            exit(1);
-                        }
-                    }
+                    int igrid = fine_grid_pos;
+
                     /* Swap out coarse and fine */
                     int iface_coarse;
                     if (!block_boundary)
