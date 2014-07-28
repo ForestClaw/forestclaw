@@ -14,7 +14,6 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 return;
 
-blockno = getblocknumber();
 
 maptype = 'sphere';
 
@@ -71,9 +70,6 @@ case {'hemisphere','sphere'}
   zp(ijlower) = -zp(ijlower);          % negate z in lower hemisphere
 end;
 
-if (blockno == 1)
-  zp = -zp;
-end;
 
 return;
 

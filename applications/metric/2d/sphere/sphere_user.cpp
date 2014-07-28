@@ -41,8 +41,8 @@ void sphere_link_patch(fclaw2d_domain_t *domain)
 
 void sphere_setprob(fclaw2d_domain_t* domain)
 {
+    set_maptype_sphere_();
     setprob_();
-    // set_maptype_();
 }
 
 
