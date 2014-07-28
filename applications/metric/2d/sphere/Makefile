@@ -23,7 +23,7 @@ solverobjs =
 solverincludes =
 
 # Mapping routines
-geoobjs = $(FORESTCLAW)/src/mappings/sphere/set_maptype_sphere.o
+geoobjs = $(FORESTCLAW)/src/mappings/set_maptype.o
 
 OBJECTS = $(TARGET).o $(exampleobjs) $(geoobjs)
 
