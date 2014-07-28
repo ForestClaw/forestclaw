@@ -461,7 +461,8 @@ fclaw2d_domain_exchange_t
  */
 void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e,
-                                    int exchange_minlevel, int exchange_maxlevel);
+                                    int exchange_minlevel,
+                                    int exchange_maxlevel);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.

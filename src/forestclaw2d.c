@@ -620,12 +620,15 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
 
     /* We are not yet ready for true multiblock connectivities */
-    if (qid < 0) {
+    if (qid < 0)
+    {
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
     }
-    else {
+    else
+    {
         FCLAW_ASSERT (0 <= qid);
-        if (qid < mesh->local_num_quadrants) {
+        if (qid < mesh->local_num_quadrants)
+        {
             /* local quadrant may be in a different tree */
             *rproc = domain->mpirank;
             *rblockno = (int) mesh->quad_to_tree[qid];
@@ -635,7 +638,8 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             qid -= rtree->quadrants_offset;     /* relative to tree */
             q = p4est_quadrant_array_index (&rtree->quadrants, qid);
         }
-        else {
+        else
+        {
             qid -= mesh->local_num_quadrants;   /* relative to ghosts */
             FCLAW_ASSERT (qid < mesh->ghost_num_quadrants);
             *rproc = mesh->ghost_to_proc[qid];
@@ -644,18 +648,19 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             *rblockno = (int) q->p.piggy3.which_tree;
         }
         *rpatchno = (int) qid;
-        switch (q->level - block->patches[patchno].level) {
-            case -1:
-                *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
-                break;
-            case 0:
-                *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
-                break;
-            case 1:
-                *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
-                break;
-            default:
-                SC_ABORT_NOT_REACHED ();
+        switch (q->level - block->patches[patchno].level)
+        {
+        case -1:
+            *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
+            break;
+        case 0:
+            *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
+            break;
+        case 1:
+            *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
         }
         FCLAW_ASSERT (*rproc == domain->mpirank || (*rpatchno >= 0 &&
                       *rpatchno < mesh->ghost_num_quadrants));
@@ -669,7 +674,8 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     dret = fclaw2d_patch_corner_neighbors_old (domain, blockno, patchno,
                                                cornerno, &drproc, &drblockno,
                                                &drpatchno, &dneighbor_size);
-    if (dret) {
+    if (dret)
+    {
         FCLAW_ASSERT (drproc == *rproc);
         FCLAW_ASSERT (drblockno == *rblockno);
         FCLAW_ASSERT (drpatchno == *rpatchno);
