@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.h"
+#include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
@@ -35,7 +35,8 @@ fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
     int mpiret;
     double gd;
 
-    mpiret = MPI_Allreduce (&d, &gd, 1, MPI_DOUBLE, MPI_MAX, domain->mpicomm);
+    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_MAX, 
+                               domain->mpicomm);
     SC_CHECK_MPI (mpiret);
 
     return gd;
@@ -47,7 +48,8 @@ fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d)
     int mpiret;
     double gd;
 
-    mpiret = MPI_Allreduce (&d, &gd, 1, MPI_DOUBLE, MPI_SUM, domain->mpicomm);
+    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_SUM,
+                               domain->mpicomm);
     SC_CHECK_MPI (mpiret);
 
     return gd;
@@ -58,7 +60,7 @@ fclaw2d_domain_barrier (fclaw2d_domain_t * domain)
 {
     int mpiret;
 
-    mpiret = MPI_Barrier (domain->mpicomm);
+    mpiret = sc_MPI_Barrier (domain->mpicomm);
     SC_CHECK_MPI (mpiret);
 }
 
@@ -96,7 +98,7 @@ void
 fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                              int icorner, int faces[2])
 {
-    P4EST_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
+    FCLAW_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
     faces[0] = p4est_corner_faces[icorner][0];
     faces[1] = p4est_corner_faces[icorner][1];
 }
@@ -106,7 +108,7 @@ fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 {
     const int childid = fclaw2d_patch_childid (patch);
 
-    P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
 
     return (patch->level == 0 ||
             cornerno == childid ||
@@ -118,7 +120,7 @@ fclaw2d_patch_childid (const fclaw2d_patch_t * patch)
 {
     const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
 
-    P4EST_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
+    FCLAW_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
 
     return childid;
 }
@@ -167,7 +169,7 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
 
-    P4EST_ASSERT (0 <= level && level <= domain->possible_maxlevel);
+    FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
     for (i = 0; i < domain->num_blocks; ++i)
     {
         block = domain->blocks + i;
@@ -175,8 +177,8 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
              patch != NULL; patch = patch->u.next)
         {
             j = (int) (patch - block->patches);
-            P4EST_ASSERT (0 <= j && j < block->num_patches);
-            P4EST_ASSERT (patch->level == level);
+            FCLAW_ASSERT (0 <= j && j < block->num_patches);
+            FCLAW_ASSERT (patch->level == level);
             pcb (domain, patch, i, j, user);
         }
     }
@@ -217,12 +219,12 @@ fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
             patch = block->patches + j;
             if (fclaw2d_patch_is_first_sibling (patch))
             {
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
                 int k;
                 for (k = 0; k < P4EST_CHILDREN; ++k)
                 {
-                    P4EST_ASSERT (j + k < block->num_patches);
-                    P4EST_ASSERT (fclaw2d_patch_childid (patch + k) == k);
+                    FCLAW_ASSERT (j + k < block->num_patches);
+                    FCLAW_ASSERT (fclaw2d_patch_childid (patch + k) == k);
                 }
 #endif
                 pcb (domain, patch, i, j, user);
@@ -246,32 +248,32 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq;
     p4est_tree_t *tree;
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_block_t *block;
 #endif
 
-    P4EST_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (domain->pp_owned);
     anyboundary = 0;
 
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
-    P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     block = domain->blocks + blockno;
 #endif
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
     totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
-    P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
+    FCLAW_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
     for (faceno = 0; faceno < P4EST_FACES; ++faceno)
     {
         qtq = mesh->quad_to_quad[P4EST_FACES * totalleaf + faceno];
         qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
         if (qtq == totalleaf && qtf == faceno)
         {
-            P4EST_ASSERT (block->is_boundary[faceno]);
+            FCLAW_ASSERT (block->is_boundary[faceno]);
             anyboundary = 1;
             boundaries[faceno] = 1;
         }
@@ -294,31 +296,31 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     p4est_quadrant_t *gq;
     fclaw2d_block_t *block;
 
-    P4EST_ASSERT (domain->pp_owned);
-    P4EST_ASSERT (0 <= qtq);
-    P4EST_ASSERT (qtq <
+    FCLAW_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (0 <= qtq);
+    FCLAW_ASSERT (qtq <
                   mesh->local_num_quadrants + mesh->ghost_num_quadrants);
     if (qtq < mesh->local_num_quadrants)
     {
         /* processor-local neighbor */
         *proc = domain->mpirank;
         *blockno = (int) mesh->quad_to_tree[qtq];
-        P4EST_ASSERT ((int) wrap->p4est->first_local_tree <= *blockno);
-        P4EST_ASSERT (*blockno <= (int) wrap->p4est->last_local_tree);
+        FCLAW_ASSERT ((int) wrap->p4est->first_local_tree <= *blockno);
+        FCLAW_ASSERT (*blockno <= (int) wrap->p4est->last_local_tree);
         block = domain->blocks + *blockno;
         qtq -= block->num_patches_before;
-        P4EST_ASSERT (0 <= qtq && qtq < block->num_patches);
+        FCLAW_ASSERT (0 <= qtq && qtq < block->num_patches);
         *patchno = (int) qtq;   /* patch number within the block as usual */
     }
     else
     {
         /* off-processor ghost neighbor */
         qtq -= mesh->local_num_quadrants;
-        P4EST_ASSERT (qtq >= 0 && qtq < mesh->ghost_num_quadrants);
+        FCLAW_ASSERT (qtq >= 0 && qtq < mesh->ghost_num_quadrants);
         *proc = mesh->ghost_to_proc[qtq];
         gq = p4est_quadrant_array_index (&ghost->ghosts, qtq);
-        P4EST_ASSERT (0 <= gq->p.piggy3.which_tree);
-        P4EST_ASSERT (gq->p.piggy3.which_tree < wrap->conn->num_trees);
+        FCLAW_ASSERT (0 <= gq->p.piggy3.which_tree);
+        FCLAW_ASSERT (gq->p.piggy3.which_tree < wrap->conn->num_trees);
         *blockno = (int) gq->p.piggy3.which_tree;
         *patchno = (int) qtq;
     }
@@ -340,35 +342,35 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t totalleaf;
     p4est_locidx_t qtq, *qth;
     p4est_tree_t *tree;
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_block_t *block;
 #endif
 
-    P4EST_ASSERT (domain->num_ghost_patches ==
+    FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
 
-    P4EST_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (domain->pp_owned);
 
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
-    P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     block = domain->blocks + blockno;
 #endif
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
     totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
-    P4EST_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
-    P4EST_ASSERT (0 <= faceno && faceno < P4EST_FACES);
+    FCLAW_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
+    FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
 
     qtq = mesh->quad_to_quad[P4EST_FACES * totalleaf + faceno];
     qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
     if (qtq == totalleaf && qtf == faceno)
     {
         /* physical domain boundary encoded by same patch face */
-        P4EST_ASSERT (block->is_boundary[faceno]);
+        FCLAW_ASSERT (block->is_boundary[faceno]);
         rproc[0] = domain->mpirank;
         *rblockno = blockno;
         rpatchno[0] = patchno;
@@ -389,11 +391,11 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             fclaw2d_patch_encode_neighbor (domain, mesh, qth[k],
                                            rproc + k, hblockno + k,
                                            rpatchno + k);
-            P4EST_ASSERT (k == 0 || hblockno[k - 1] == hblockno[k]);
+            FCLAW_ASSERT (k == 0 || hblockno[k - 1] == hblockno[k]);
         }
         *rblockno = hblockno[0];
         *rfaceno = qtf + num_orientations;
-        P4EST_ASSERT (*rfaceno >= 0);
+        FCLAW_ASSERT (*rfaceno >= 0);
         return FCLAW2D_PATCH_HALFSIZE;
     }
     else
@@ -410,7 +412,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
         {
             /* same-size neighbor */
             *rfaceno = (int) qtf;
-            P4EST_ASSERT (0 <= *rfaceno && *rfaceno < num_orientations);
+            FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < num_orientations);
             return FCLAW2D_PATCH_SAMESIZE;
         }
         else
@@ -419,7 +421,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
             *rfaceno = (int) qtf % num_orientations;
             /* the number of our patch within the bigger neighbor subfaces */
             rproc[1] = (int) qtf / num_orientations - 1;
-            P4EST_ASSERT (0 <= rproc[1] && rproc[1] < P4EST_HALF);
+            FCLAW_ASSERT (0 <= rproc[1] && rproc[1] < P4EST_HALF);
             return FCLAW2D_PATCH_DOUBLESIZE;
         }
     }
@@ -431,7 +433,7 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
     p4est_expand_face_transform (faceno, rfaceno, ftransform);
 }
 
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
 
 static int
 fclaw2d_patch_corner_neighbors_old (fclaw2d_domain_t * domain,
@@ -442,7 +444,7 @@ fclaw2d_patch_corner_neighbors_old (fclaw2d_domain_t * domain,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
 #endif
     const p4est_topidx_t nt = (p4est_topidx_t) blockno;
@@ -455,17 +457,17 @@ fclaw2d_patch_corner_neighbors_old (fclaw2d_domain_t * domain,
     fclaw2d_block_t *block;
     fclaw2d_patch_relation_t prel;
 
-    P4EST_ASSERT (domain->num_ghost_patches ==
+    FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
 
-    P4EST_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (domain->pp_owned);
 
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
-    P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
     block = domain->blocks + blockno;
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
     q = p4est_quadrant_array_index (&tree->quadrants, patchno);
@@ -505,16 +507,16 @@ fclaw2d_patch_corner_neighbors_old (fclaw2d_domain_t * domain,
 
     if (prel != FCLAW2D_PATCH_BOUNDARY)
     {
-        P4EST_ASSERT (rparr->elem_count == 1);
-        P4EST_ASSERT (qarr->elem_count == 1);
+        FCLAW_ASSERT (rparr->elem_count == 1);
+        FCLAW_ASSERT (qarr->elem_count == 1);
         *rproc = *(int *) sc_array_index (rparr, 0);
         rq = p4est_quadrant_array_index (qarr, 0);
         *rblockno = (p4est_topidx_t) rq->p.piggy3.which_tree;
         *rpatchno = (p4est_topidx_t) rq->p.piggy3.local_num;
-        P4EST_ASSERT (*rproc == domain->mpirank ||
+        FCLAW_ASSERT (*rproc == domain->mpirank ||
                       (*rpatchno >= 0
                        && *rpatchno < mesh->ghost_num_quadrants));
-        P4EST_ASSERT (*rproc != domain->mpirank
+        FCLAW_ASSERT (*rproc != domain->mpirank
                       || (*rblockno >= 0 && *rblockno < domain->num_blocks
                           && *rpatchno >= 0 && *rpatchno <
                           domain->blocks[*rblockno].num_patches));
@@ -539,7 +541,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     int dret, drproc, drblockno, drpatchno;
     fclaw2d_patch_relation_t dneighbor_size;
 #endif
@@ -548,18 +550,18 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
 
-    P4EST_ASSERT (domain->num_ghost_patches ==
+    FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
 
-    P4EST_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (domain->pp_owned);
 
-    P4EST_ASSERT (0 <= blockno && blockno < domain->num_blocks);
-    P4EST_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
-    P4EST_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
 
     block = domain->blocks + blockno;
-    P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
-    P4EST_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
 
     local_num = block->num_patches_before + patchno;
     qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
@@ -569,22 +571,22 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
     }
     else {
-        P4EST_ASSERT (0 <= qid);
+        FCLAW_ASSERT (0 <= qid);
         if (qid < mesh->local_num_quadrants) {
             /* local quadrant may be in a different tree */
             *rproc = domain->mpirank;
             *rblockno = (int) mesh->quad_to_tree[qid];
             rtree = p4est_tree_array_index (p4est->trees,
                                             (p4est_topidx_t) *rblockno);
-            P4EST_ASSERT (rtree->quadrants_offset <= qid);
+            FCLAW_ASSERT (rtree->quadrants_offset <= qid);
             qid -= rtree->quadrants_offset;     /* relative to tree */
             q = p4est_quadrant_array_index (&rtree->quadrants, qid);
         }
         else {
             qid -= mesh->local_num_quadrants;   /* relative to ghosts */
-            P4EST_ASSERT (qid < mesh->ghost_num_quadrants);
+            FCLAW_ASSERT (qid < mesh->ghost_num_quadrants);
             *rproc = mesh->ghost_to_proc[qid];
-            P4EST_ASSERT (*rproc != domain->mpirank);
+            FCLAW_ASSERT (*rproc != domain->mpirank);
             q = p4est_quadrant_array_index (&ghost->ghosts, qid);
             *rblockno = (int) q->p.piggy3.which_tree;
         }
@@ -602,25 +604,25 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             default:
                 SC_ABORT_NOT_REACHED ();
         }
-        P4EST_ASSERT (*rproc == domain->mpirank || (*rpatchno >= 0 &&
+        FCLAW_ASSERT (*rproc == domain->mpirank || (*rpatchno >= 0 &&
                       *rpatchno < mesh->ghost_num_quadrants));
-        P4EST_ASSERT (*rproc != domain->mpirank ||
+        FCLAW_ASSERT (*rproc != domain->mpirank ||
                       (*rblockno >= 0 && *rblockno < domain->num_blocks &&
                        *rpatchno >= 0 && *rpatchno <
                        domain->blocks[*rblockno].num_patches));
     }
 
-#ifdef P4EST_DEBUG
+#ifdef FCLAW_ENABLE_DEBUG
     dret = fclaw2d_patch_corner_neighbors_old (domain, blockno, patchno,
                                                cornerno, &drproc, &drblockno,
                                                &drpatchno, &dneighbor_size);
     if (dret) {
-        P4EST_ASSERT (drproc == *rproc);
-        P4EST_ASSERT (drblockno == *rblockno);
-        P4EST_ASSERT (drpatchno == *rpatchno);
-        P4EST_ASSERT (dneighbor_size == *neighbor_size);
+        FCLAW_ASSERT (drproc == *rproc);
+        FCLAW_ASSERT (drblockno == *rblockno);
+        FCLAW_ASSERT (drpatchno == *rpatchno);
+        FCLAW_ASSERT (dneighbor_size == *neighbor_size);
     }
-    P4EST_ASSERT (dret == (*neighbor_size != FCLAW2D_PATCH_BOUNDARY));
+    FCLAW_ASSERT (dret == (*neighbor_size != FCLAW2D_PATCH_BOUNDARY));
 #endif
 
     return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
@@ -659,20 +661,20 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
     fclaw2d_patch_t *old_patch, *new_patch;
     fclaw2d_patch_relation_t newsize;
 
-    P4EST_ASSERT (!old_domain->pp_owned);
-    P4EST_ASSERT (new_domain->pp_owned);
-    P4EST_ASSERT (old_domain->pp == new_domain->pp);
-    P4EST_ASSERT (old_domain->num_blocks == new_domain->num_blocks);
+    FCLAW_ASSERT (!old_domain->pp_owned);
+    FCLAW_ASSERT (new_domain->pp_owned);
+    FCLAW_ASSERT (old_domain->pp == new_domain->pp);
+    FCLAW_ASSERT (old_domain->num_blocks == new_domain->num_blocks);
     for (i = 0; i < old_domain->num_blocks; i++)
     {
         old_block = old_domain->blocks + i;
         new_block = new_domain->blocks + i;
         for (oj = nj = 0; oj < old_block->num_patches;)
         {
-            P4EST_ASSERT (nj < new_block->num_patches);
+            FCLAW_ASSERT (nj < new_block->num_patches);
             old_patch = old_block->patches + oj;
             new_patch = new_block->patches + nj;
-            P4EST_ASSERT (abs (old_patch->level - new_patch->level) <= 1);
+            FCLAW_ASSERT (abs (old_patch->level - new_patch->level) <= 1);
             if (old_patch->level < new_patch->level)
             {
                 /* refinement */
@@ -699,8 +701,8 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
             oj += oskip;
             nj += nskip;
         }
-        P4EST_ASSERT (oj == old_block->num_patches);
-        P4EST_ASSERT (nj == new_block->num_patches);
+        FCLAW_ASSERT (oj == old_block->num_patches);
+        FCLAW_ASSERT (nj == new_block->num_patches);
     }
 }
 
@@ -724,7 +726,7 @@ fclaw2d_domain_assign_for_partition (fclaw2d_domain_t * domain,
 
         for (patchno = 0; patchno < block->num_patches; ++zz, ++patchno)
         {
-            P4EST_ASSERT (zz ==
+            FCLAW_ASSERT (zz ==
                           (size_t) (block->num_patches_before + patchno));
 
             q = p4est_quadrant_array_index (&tree->quadrants,
@@ -732,7 +734,7 @@ fclaw2d_domain_assign_for_partition (fclaw2d_domain_t * domain,
             patch_data[zz] = q->p.user_data;
         }
     }
-    P4EST_ASSERT (zz == (size_t) domain->local_num_patches);
+    FCLAW_ASSERT (zz == (size_t) domain->local_num_patches);
 }
 
 void
@@ -742,12 +744,12 @@ fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
-    P4EST_ASSERT (*patch_data == NULL);
+    FCLAW_ASSERT (*patch_data == NULL);
 
     p4est_reset_data (wrap->p4est, data_size, NULL,
                       wrap->p4est->user_pointer);
 
-    *patch_data = P4EST_ALLOC (void *, domain->local_num_patches);
+    *patch_data = FCLAW_ALLOC (void *, domain->local_num_patches);
     fclaw2d_domain_assign_for_partition (domain, *patch_data);
 }
 
@@ -756,7 +758,7 @@ fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
                                          void ***patch_data)
 {
     *patch_data =
-        P4EST_REALLOC (*patch_data, void *, domain->local_num_patches);
+        FCLAW_REALLOC (*patch_data, void *, domain->local_num_patches);
     fclaw2d_domain_assign_for_partition (domain, *patch_data);
 }
 
@@ -766,7 +768,7 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
-    P4EST_FREE (*patch_data);
+    FCLAW_FREE (*patch_data);
     *patch_data = NULL;
 
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
@@ -780,14 +782,14 @@ fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
     char *m;
     fclaw2d_domain_exchange_t *e;
 
-    e = P4EST_ALLOC (fclaw2d_domain_exchange_t, 1);
+    e = FCLAW_ALLOC (fclaw2d_domain_exchange_t, 1);
     e->data_size = data_size;
     e->num_exchange_patches = domain->num_exchange_patches;
     e->num_ghost_patches = domain->num_ghost_patches;
 
-    e->patch_data = P4EST_ALLOC (void *, domain->num_exchange_patches);
-    e->ghost_data = P4EST_ALLOC (void *, domain->num_ghost_patches);
-    e->ghost_contiguous_memory = m = P4EST_ALLOC (char,
+    e->patch_data = FCLAW_ALLOC (void *, domain->num_exchange_patches);
+    e->ghost_data = FCLAW_ALLOC (void *, domain->num_ghost_patches);
+    e->ghost_contiguous_memory = m = FCLAW_ALLOC (char,
                                                   (size_t)
                                                   domain->num_ghost_patches *
                                                   data_size);
@@ -814,8 +816,8 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                    e->num_ghost_patches, (int) ghost->ghosts.elem_count);
 #endif
 
-    P4EST_ASSERT (e->num_exchange_patches == (int) ghost->mirrors.elem_count);
-    P4EST_ASSERT (e->num_ghost_patches == (int) ghost->ghosts.elem_count);
+    FCLAW_ASSERT (e->num_exchange_patches == (int) ghost->mirrors.elem_count);
+    FCLAW_ASSERT (e->num_ghost_patches == (int) ghost->ghosts.elem_count);
     if (exchange_minlevel <= domain->global_minlevel &&
         domain->global_maxlevel <= exchange_maxlevel)
     {
@@ -837,10 +839,10 @@ void
 fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e)
 {
-    P4EST_FREE (e->ghost_contiguous_memory);
-    P4EST_FREE (e->ghost_data);
-    P4EST_FREE (e->patch_data);
-    P4EST_FREE (e);
+    FCLAW_FREE (e->ghost_contiguous_memory);
+    FCLAW_FREE (e->ghost_data);
+    FCLAW_FREE (e->patch_data);
+    FCLAW_FREE (e);
 }
 
 void
@@ -848,15 +850,15 @@ fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
 {
     int mpiret;
     int i;
-    MPI_Status status;
+    sc_MPI_Status status;
 
     if (domain->mpirank > 0)
     {
-        mpiret = MPI_Recv (&i, 1, MPI_INT, domain->mpirank - 1,
+        mpiret = sc_MPI_Recv (&i, 1, sc_MPI_INT, domain->mpirank - 1,
                            FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm,
                            &status);
         SC_CHECK_MPI (mpiret);
-        P4EST_ASSERT (i == 0);
+        FCLAW_ASSERT (i == 0);
     }
 }
 
@@ -868,8 +870,8 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
 
     if (domain->mpirank + 1 < domain->mpisize)
     {
-        mpiret = MPI_Send (&i, 1, MPI_INT, domain->mpirank + 1,
-                           FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm);
+        mpiret = sc_MPI_Send (&i, 1, sc_MPI_INT, domain->mpirank + 1,
+                              FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm);
         SC_CHECK_MPI (mpiret);
     }
 }

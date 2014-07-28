@@ -58,6 +58,7 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 void set_maptype_cart_();
 void set_maptype_sphere_();
 void set_maptype_disk_();
+void set_map_defaults_();
 
 int isflat_();
 int iscart_();

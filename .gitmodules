@@ -1,0 +1,6 @@
+[submodule "sc"]
+	path = sc
+	url = git@github.com:cburstedde/libsc.git
+[submodule "p4est"]
+	path = p4est
+	url = git@github.com:cburstedde/p4est.git

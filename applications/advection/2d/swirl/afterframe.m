@@ -1,12 +1,3 @@
-%% afterframe
-
-%%
-% This is the after frame file used by plotclaw2.
-
-global cm_index;
-
-global cm_index;
-
 s = 1e-2;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);

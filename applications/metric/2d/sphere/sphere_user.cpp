@@ -42,7 +42,7 @@ void sphere_link_patch(fclaw2d_domain_t *domain)
 void sphere_setprob(fclaw2d_domain_t* domain)
 {
     setprob_();
-    set_maptype_();
+    // set_maptype_();
 }
 
 
@@ -75,7 +75,7 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     // Pointers needed to pass to Fortran
     double* curvature = cp->curvature();
 
-    int tag_patch;  // == 0 or 1
+    int tag_patch = 0;  // == 0 or 1
     tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,curvature,initflag,
                     blockno, tag_patch);
     return tag_patch == 1;
@@ -106,7 +106,7 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    int tag_patch;  // == 0 or 1
+    int tag_patch = 1;  // == 0 or 1
     tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
     return tag_patch == 0;
 }

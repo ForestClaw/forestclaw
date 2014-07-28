@@ -1,0 +1,25 @@
+## Makefile.am in applications/advection/2d/hemisphere
+
+hemisphere_dir = applications/advection/2d/hemisphere
+
+bin_PROGRAMS += applications/advection/2d/hemisphere/hemisphere
+
+
+applications_advection_2d_hemisphere_hemisphere_SOURCES = \
+	applications/advection/2d/hemisphere/hemisphere_user.cpp \
+	applications/advection/2d/hemisphere/hemisphere.cpp \
+	applications/advection/2d/hemisphere/ghost_twopatch.f \
+	applications/advection/2d/hemisphere/tag4refinement.f \
+	applications/advection/2d/hemisphere/mapc2m.f \
+	applications/advection/2d/hemisphere/velocity_wind.f \
+	applications/advection/2d/hemisphere/rpn2noncons.f \
+	applications/advection/2d/hemisphere/rpt2noncons.f \
+	applications/advection/2d/hemisphere/qinit_manifold.f \
+	applications/advection/2d/hemisphere/b4step2_manifold.f \
+	applications/advection/2d/hemisphere/setaux_manifold.f \
+	applications/advection/2d/hemisphere/setprob.f
+
+applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
+	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/amr_waveprop
+
+applications_advection_2d_hemisphere_hemisphere_LDADD = @top_builddir@/src/solvers/amr_waveprop/libwaveprop.la $(LDADD)

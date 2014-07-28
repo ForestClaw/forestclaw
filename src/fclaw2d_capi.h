@@ -118,7 +118,7 @@ int pow_int(int a, int n);
 
 /* These two are defined in amr_utils.cpp */
 void fclaw_mpi_init (int * argc, char *** argv,
-                     MPI_Comm mpicomm, int log_priority);
+                     sc_MPI_Comm mpicomm, int log_priority);
 void fclaw_mpi_finalize (void);
 
 void amrinit(fclaw2d_domain_t **domain);

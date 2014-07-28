@@ -89,7 +89,7 @@ main (int argc, char **argv)
    --------------------------------------------- */
 
   /* Link waveprop solvers to domain */
-  link_problem_setup(domain,amr_waveprop_setprob);
+  link_problem_setup(domain,hemisphere_problem_setup);
 
   hemisphere_link_solvers(domain);
   link_regrid_functions(domain,hemisphere_patch_tag4refinement,

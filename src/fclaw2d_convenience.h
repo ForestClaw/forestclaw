@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CONVENIENCE_H
 #define FCLAW2D_CONVENIENCE_H
 
-#include "forestclaw2d.h"
+#include <forestclaw2d.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,15 +36,15 @@ extern "C"
 #endif
 #endif
 
-fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (MPI_Comm mpicomm,
+fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_torus (MPI_Comm mpicomm,
+fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_twosphere (MPI_Comm mpicomm,
+fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (MPI_Comm mpicomm,
+fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_disk (MPI_Comm mpicomm,
+fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                                            int initial_level);
 
 void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
@@ -101,4 +101,4 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
 }
 #endif
 
-#endif
+#endif /* !FCLAW2D_CONVENIENCE_H */
