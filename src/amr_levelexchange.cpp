@@ -50,6 +50,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
+        int ftransform[9];
+
 
         get_face_neighbors(domain,
                            this_block_idx,
@@ -58,7 +60,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            &neighbor_block_idx,
                            ghost_patches,
                            &ref_flag_ptr,
-                           &fine_grid_pos_ptr);
+                           &fine_grid_pos_ptr,
+                           ftransform);
 
         if (ref_flag_ptr == NULL)
         {
@@ -69,6 +72,12 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             /* We have a neighbor patch at the same level */
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
+
+            int based = 1;
+            set_transform_(this_patch,ftransform,&mx,&my,&based);
+
+
+
             if (this_block_idx == neighbor_block_idx)
             {
                 // Exchange between 'this_patch' and 'neighbor patch(es)' at face 'iface'

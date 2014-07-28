@@ -3,8 +3,8 @@ c    # Internal boundary conditions
 c    # ------------------------------------------------------------------
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,qneighbor,
-     &      iface)
+      subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,
+     &      qneighbor,iface)
       implicit none
 
       integer mx,my,mbc,meqn,iface
@@ -12,6 +12,7 @@ c     # Exchange edge ghost data with neighboring grid at same level.
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,ibc,jbc,mq, idir
+      integer ifunc,jfunc,i1,j1, i2,j2
 
       idir = iface/2
 
@@ -24,12 +25,32 @@ c     # 'qneighbor'
 c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0)
                   if (iface .eq. 0) then
-                     qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
-                     qneighbor(mx+ibc,j,mq) = qthis(ibc,j,mq)
+                     i1 = 1-ibc
+                     j1 = j
                   elseif (iface .eq. 1) then
-                     qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
-                     qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
+                     i1 = mx+mbc
+                     j1 = j
                   endif
+                  call idxfunc(i1,j1,iface,this_block,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+c                  if (iface .eq. 0) then
+c                     i2 = ifunc(1-ibc,j,iface,this_block)
+c                     j2 = jfunc(1-ibc,j,iface,this_block)
+c                     qthis(1-ibc,j,mq) = qneighbor(i2,j2,mq)
+c
+cc                    # Original code
+cc                     qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
+cc                     qneighbor(mx+ibc,j,mq) = qthis(ibc,j,mq)
+c                  elseif (iface .eq. 1) then
+c    1                i2 = ifunc(mx+ibc,j,iface,this_block)
+c    1                j2 = jfunc(mx+ibc,j,iface,this_block)
+c                     qthis(mx+ibc,j,mq) = qneighbor(i2,j2,mq)
+c
+cc                    # Original code
+cc                     qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
+cc                     qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
+c                  endif
                enddo
             enddo
          enddo
@@ -40,12 +61,32 @@ c                 # x-direction (idir == 0)
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
                   if (iface .eq. 2) then
-                     qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
-                     qneighbor(i,my+jbc,mq) = qthis(i,jbc,mq)
+                     i1 = i
+                     j1 = 1-jbc
                   elseif (iface .eq. 3) then
-                     qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
-                     qneighbor(i,1-jbc,mq) = qthis(i,my+1-jbc,mq)
+                     i1 = i
+                     j1 = my+jbc
                   endif
+                  call idxfunc(i1,j1,iface,this_block,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+c                  if (iface .eq. 2) then
+c                     i2 = ifunc(i,1-jbc,iface,this_block)
+c                     j2 = jfunc(i,1-jbc,iface,this_block)
+c                     qthis(i,1-jbc,mq) = qneighbor(i2,j2,mq)
+c
+cc                    # Original code
+cc                     qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
+cc                     qneighbor(i,my+jbc,mq) = qthis(i,jbc,mq)
+c                  elseif (iface .eq. 3) then
+c                     i2 = ifunc(i,my+jbc,iface,this_block)
+c                     j2 = jfunc(i,my+jbc,iface,this_block)
+c                     qthis(i,1-jbc,mq) = qneighbor(i2,j2,mq)
+c
+cc                    # Original code
+cc                     qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
+cc                     qneighbor(i,1-jbc,mq) = qthis(i,my+1-jbc,mq)
+c                  endif
                enddo
             enddo
          enddo
@@ -54,7 +95,7 @@ c                 # y-direction (idir == 1)
 
 
 c     # average ghost cells from 'igrid' neighbor 'qfine' (igrid = 0,1)
-c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
+c     # to 'qcoarse' at face 'iface_coarse'  in direction 'idir' of 'qcoarse'
       subroutine average_face_ghost(mx,my,mbc,meqn,qcoarse,
      &      qfine,idir,iface_coarse,num_neighbors,refratio,igrid)
       implicit none
@@ -68,6 +109,7 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
       integer mq,r2
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
+      integer i1,j1,i2,j3,ifunc,jfunc
 
 c     # 'iface' is relative to the coarse grid
 
@@ -81,46 +123,76 @@ c     # Average fine grid onto coarse grid
                do ibc = 1,mbc
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
 c                 # ibc = 2 corresponds to the second layer
+
+c                 # Original code
+c                 sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (ibc-1)*refratio + ii
+c                        jfine = (j-1)*refratio + jj
+c                        if (iface_coarse .eq. 0) then
+c                           sum = sum + qfine(mx-ifine+1,jfine,mq)
+c                        elseif (iface_coarse .eq. 1) then
+c                           sum = sum + qfine(ifine,jfine,mq)
+c                        endif
+c                     enddo
+c                  enddo
+
+                  if (iface_coarse .eq. 0) then
+                     i1 = 1-ibc
+                     i2 = j+jc_add
+                  elseif (iface_coarse .eq. 1) then
+                     i1 = mx+ibc
+                     i2 = j+jc_add
+                  endif
+                  call idxfunc(i1,j1,iface_coarse,this_block,i2,j2)
                   sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (ibc-1)*refratio + ii
-                        jfine = (j-1)*refratio + jj
-                        if (iface_coarse .eq. 0) then
-                           sum = sum + qfine(mx-ifine+1,jfine,mq)
-                        elseif (iface_coarse .eq. 1) then
-                           sum = sum + qfine(ifine,jfine,mq)
-                        endif
+                  do ii = 0,1
+                     do jj = 0,1
+                        sum = sum + qfine(i2+ii,j2+jj,mq)
                      enddo
                   enddo
-                  if (iface_coarse .eq. 0) then
-                     qcoarse(1-ibc,j+jc_add,mq) = sum/r2
-                  else
-                     qcoarse(mx+ibc,j+jc_add,mq) = sum/r2
-                  endif
+                  qcoarse(i1,j1,mq) = sum/r2
                enddo
             enddo
          else
             ic_add = igrid*mx/num_neighbors
             do i = 1,mx/num_neighbors
                do jbc = 1,mbc
+
+                  if (iface_coarse .eq. 2) then
+                     i1 = i+ic_add
+                     i2 = 1-jbc
+                  elseif (iface_coarse .eq. 3) then
+                     i1 = i+ic_add
+                     i2 = mx+jbc
+                  endif
+                  call idxfunc(i1,j1,iface_coarse,this_block,i2,j2)
                   sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (i-1)*refratio + ii
-                        jfine = (jbc-1)*refratio + jj
-                        if (iface_coarse .eq. 2) then
-                           sum = sum + qfine(ifine,my-jfine+1,mq)
-                        else
-                           sum = sum + qfine(ifine,jfine,mq)
-                        endif
+                  do ii = 0,1
+                     do jj = 0,1
+                        sum = sum + qfine(i2+ii,j2+jj,mq)
                      enddo
                   enddo
-                  if (iface_coarse .eq. 2) then
-                     qcoarse(i+ic_add,1-jbc,mq) = sum/r2
-                  else
-                     qcoarse(i+ic_add,my+jbc,mq) = sum/r2
-                  endif
+                  qcoarse(i1,j1,mq) = sum/r2
+
+c                  sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (i-1)*refratio + ii
+c                        jfine = (jbc-1)*refratio + jj
+c                        if (iface_coarse .eq. 2) then
+c                           sum = sum + qfine(ifine,my-jfine+1,mq)
+c                        else
+c                           sum = sum + qfine(ifine,jfine,mq)
+c                        endif
+c                     enddo
+c                  enddo
+c                  if (iface_coarse .eq. 2) then
+c                     qcoarse(i+ic_add,1-jbc,mq) = sum/r2
+c                  else
+c                     qcoarse(i+ic_add,my+jbc,mq) = sum/r2
+c                  endif
                enddo
             enddo
          endif
@@ -137,8 +209,8 @@ c                 # ibc = 2 corresponds to the second layer
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2
-      integer i, i1, i2, ibc, ii, ifine
-      integer j, j1, j2, jbc, jj, jfine
+      integer i, ic1, ic2, ibc, ii, ifine, i1, i2
+      integer j, jc1, jc2, jbc, jj, jfine, j1, j2
       integer ic_add, jc_add, ic, jc, mth
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
@@ -149,8 +221,8 @@ c                 # ibc = 2 corresponds to the second layer
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
 
-            j1 = 1-igrid
-            j2 = my/num_neighbors + (1-igrid)
+            jc1 = 1-igrid
+            jc2 = my/num_neighbors + (1-igrid)
 
             jc_add = igrid*my/num_neighbors
             if (iface_coarse .eq. 0) then
@@ -158,7 +230,7 @@ c           # this ensures that we get 'hanging' corners
             elseif (iface_coarse .eq. 1) then
                ic = mx
             endif
-            do j = j1, j2
+            do j = jc1, jc2
                jc = j + jc_add
                qc = qcoarse(ic,jc,mq)
 c              # Compute limited slopes in both x and y. Note we are not
@@ -172,26 +244,40 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-               do ibc = 1,mbc
-                  do jj = 1,refratio
-c                    # Fill in interpolated values on fine grid cell
-                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
-                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-
+               call idxfunc(i1,j2,iface_coarse,this_block,i2,j2)
+               do ii = 0,refratio-1
+                  do jj = 0,refratio-1
+                     shiftx = (ii - refratio/2.d0 + 0.5)/refratio
+                     shifty = (jj - refratio/2.d0 + 0.5)/refratio
                      value = qc + shiftx*gradx + shifty*grady
-
-                     ifine = ibc
-                     jfine = (j-1)*refratio + jj
-                     if (iface_coarse .eq. 0) then
-c                       # qfine is at left edge of coarse grid
-                        qfine(mx+ifine,jfine,mq) = value
-                     elseif (iface_coarse .eq. 1) then
-c                       # qfine is at right edge of coarse grid
-                        qfine(1-ifine,jfine,mq) = value
-                     endif
-
+                     qfine(i2+ii,j2+ii,mq) = value
                   enddo
                enddo
+
+
+c               do ibc = 1,mbc
+c                  do jj = 1,refratio
+cc                    # Fill in interpolated values on fine grid cell
+c                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+c                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+c
+c                     value = qc + shiftx*gradx + shifty*grady
+c                     i1 = ic
+c                     j1 = jc
+c                     qfine(i2,j2,mq) = value
+c
+cc                     ifine = ibc
+cc                     jfine = (j-1)*refratio + jj
+cc                     if (iface_coarse .eq. 0) then
+ccc                       # qfine is at left edge of coarse grid
+cc                        qfine(mx+ifine,jfine,mq) = value
+cc                     elseif (iface_coarse .eq. 1) then
+ccc                       # qfine is at right edge of coarse grid
+cc                        qfine(1-ifine,jfine,mq) = value
+cc                     endif
+c
+c                  enddo
+c               enddo
             enddo
          else
             ic_add = igrid*mx/num_neighbors
