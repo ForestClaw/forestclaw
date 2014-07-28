@@ -99,7 +99,10 @@ void get_face_neighbors (fclaw2d_domain_t * domain,
                          int *neighbor_block_idx,
                          fclaw2d_patch_t * ghost_patches[],
                          int **ref_flag_ptr,
-                         int **fine_grid_pos_ptr);
+                         int **fine_grid_pos_ptr,
+                         int ftransform[]);
+
+void set_transform_(fclaw2d_patch_t* this_patch,int ftransform[],
 
 void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int this_block_idx,
