@@ -137,7 +137,7 @@ void delete_patch_data(fclaw2d_patch_t *patch)
 double
 fclaw2d_timer_wtime (void)
 {
-    return MPI_Wtime ();
+    return sc_MPI_Wtime ();
 }
 
 void
@@ -361,17 +361,17 @@ int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
 /* Functions with C prototypes to use forestclaw from C code */
 
 void
-fclaw_mpi_init (int * argc, char *** argv, MPI_Comm mpicomm, int lp)
+fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
 {
 #ifdef P4EST_MPI
     int mpiret;
 
-    //mpiret = MPI_Init (argc, argv);
+    //mpiret = sc_MPI_Init (argc, argv);
     //SC_CHECK_MPI (mpiret);
 
     int provided;
-    mpiret = MPI_Init_thread (argc, argv, MPI_THREAD_FUNNELED, &provided);
-    if (provided != MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
+    mpiret = sc_MPI_Init_thread (argc, argv, sc_MPI_THREAD_FUNNELED, &provided);
+    if (provided != sc_MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
     SC_CHECK_MPI (mpiret);
 
     sc_init (mpicomm, 0, 0, NULL, lp);
@@ -386,6 +386,6 @@ fclaw_mpi_finalize (void)
 
     sc_finalize ();
 
-    mpiret = MPI_Finalize ();
+    mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
 }

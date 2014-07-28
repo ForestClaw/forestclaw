@@ -1,5 +1,55 @@
-#! /bin/sh
+#! /bin/bash
 
-for FILE in "$@"; do
-        indent -i4 -bli0 -nut "$FILE"
+# Copyright (C) 2014 Carsten Burstedde and Tobin Isaac
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+# This is the GNU style for indent 2.2.9 (according to man page)
+#
+#"$INDENT" \
+#    -nbad -bap -nbc -bbo -bl -bli2 -bls -ncdb -nce -cp1 -cs -di2 \
+#    -ndj -nfc1 -nfca -hnl -i2 -ip5 -lp -pcs -nprs -psl -saf -sai \
+#    -saw -nsc -nsob
+#    "$@"
+
+# This is our modification
+#
+# blank line after procedure body
+# braces indent 0 (or do you want -bl2 here and -bl below?)
+# braces to right of control statements (or do you want -bl here?)
+# no tabs; fill with spaces only
+# put the return type of a function on a separate line
+# swallow optional blank lines
+# indent by 4 spaces
+# INDENT_OPTIONS="-bap -bli0 -br -nut -psl -sob -i4"
+INDENT_OPTIONS="-bap -bli0 -nut -sob -i4"
+
+INDENT=`which gnuindent 2> /dev/null`
+if test -z "$INDENT" ; then
+	INDENT=`which indent`
+fi
+
+for arg in "$@" ; do
+  if [ "x$arg" == "x-o" ]; then
+    WANTSOUT=1
+  fi
 done
+if [ -z "$WANTSOUT" ]; then
+  for NAME in "$@" ; do
+    $INDENT $INDENT_OPTIONS "$NAME"
+  done
+else
+  $INDENT $INDENT_OPTIONS $@
+fi

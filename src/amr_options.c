@@ -23,7 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_options.h"
+#include <amr_options.h>
+#include <fclaw2d_base.h>
 
 /* Proposed naming convention:
  * Parameter names in config file (= long option names) identical to the
@@ -56,7 +57,7 @@ amr_options_convert_int_array (const char *array_string,
     char *endptr;
 
     new_length = SC_MAX (new_length, 0);
-    *int_array = SC_REALLOC (*int_array, int, new_length);
+    *int_array = FCLAW_REALLOC (*int_array, int, new_length);
 
     beginptr = array_string;
     for (i = 0; i < new_length; ++i)
@@ -85,7 +86,7 @@ amr_options_convert_arrays (amr_options_t * amropt)
                                    amropt->mwaves);
      */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   NumFaces);
+                                   fclaw2d_NumFaces);
 }
 #endif
 
@@ -95,7 +96,7 @@ amr_options_new (sc_options_t * opt)
 {
     amr_options_t *amropt;
 
-    amropt = SC_ALLOC_ZERO (amr_options_t, 1);
+    amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "Number of grid cells per patch in x");
@@ -158,7 +159,7 @@ amr_options_new (sc_options_t * opt)
 
     /* Array of NumFaces many values */
     amr_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
-                               &amropt->mthbc, NumFaces,
+                               &amropt->mthbc, fclaw2d_NumFaces,
                                "Physical boundary condition type");
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
@@ -238,7 +239,7 @@ amr_postprocess_parms (amr_options_t * amropt)
        check parameters.
        ----------------------------------------------------------------------- */
     amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   NumFaces);
+                                   fclaw2d_NumFaces);
 
 }
 
@@ -302,15 +303,13 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
 #endif
 }
 
-
-
 void
 amr_options_destroy (amr_options_t * amropt)
 {
     /* These are now stored under amropt->waveprop_parms */
-    /* SC_FREE (amropt->->order); */
-    /* SC_FREE (amropt->mthlim); */
-    SC_FREE (amropt->mthbc);
-    SC_FREE (amropt);
+    /* FCLAW_FREE (amropt->->order); */
+    /* FCLAW_FREE (amropt->mthlim); */
+    FCLAW_FREE (amropt->mthbc);
+    FCLAW_FREE (amropt);
 
 }

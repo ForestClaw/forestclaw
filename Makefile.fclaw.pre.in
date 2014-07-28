@@ -1,0 +1,29 @@
+
+# This file is part of ForestClaw
+# Use `include /path/to/Makefile.fclaw.mk' in your Makefile
+# to use ForestClaw in your project without autotools
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+fclaw_sysconfdir = @sysconfdir@
+
+@FCLAW_SC_MK_INCLUDE@
+@FCLAW_P4EST_MK_INCLUDE@
+
+# These are just for convenience
+FCLAW_F77 = @F77@
+FCLAW_CC = @CC@
+FCLAW_CXX = @CXX@
+FCLAW_CFLAGS = @CFLAGS@
+
+# These pull in ForestClaw but none of its dependencies
+FCLAW_PKG_CPPFLAGS = -I@includedir@
+FCLAW_PKG_LDFLAGS = -L@libdir@
+FCLAW_PKG_LIBS = -lforestclaw
+
+# These pull in everything needed by ForestClaw except for sub-libraries
+FCLAW_CPPFLAGS = @CPPFLAGS@ \
+  $(SC_PKG_CPPFLAGS) $(P4EST_PKG_CPPFLAGS) $(FCLAW_PKG_CPPFLAGS)
+FCLAW_LDFLAGS = @LDFLAGS@ \
+  $(SC_PKG_LDFLAGS) $(P4EST_PKG_LDFLAGS) $(FCLAW_PKG_LDFLAGS)
+FCLAW_LIBS = $(FCLAW_PKG_LIBS) $(P4EST_PKG_LIBS) $(SC_PKG_LIBS) @LIBS@

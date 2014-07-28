@@ -98,22 +98,24 @@ c     # -------------------------------------------------------------------
       logical isflat_cart, isflat_diamond, isflat_disk
       logical isflat_hemisphere, isflat_sphere, isflat_rotsq
       logical isflat_biquad, get_map_value
+      logical iscart, isdiamond, isdisk, ishemisphere
+      logical issphere, isrotsq, isbiquad
 
-      if (get_map_value(1)) then
+      if (iscart()) then
          isflat = isflat_cart()
-      elseif (get_map_value(2)) then
+      elseif (isdiamond()) then
          write(6,*) 'Diamond mapping is not implemented'
          stop
-      elseif (get_map_value(3)) then
+      elseif (isdisk()) then
          isflat = isflat_disk()
-      elseif (get_map_value(4)) then
+      elseif (ishemisphere()) then
          isflat = isflat_hemisphere()
-      elseif (get_map_value(5)) then
+      elseif (issphere()) then
          isflat = isflat_sphere()
-      elseif (get_map_value(6)) then
+      elseif (isrotsq()) then
          write(6,*) 'Rotated Square mapping is not implemented'
          stop
-      elseif (get_map_value(7)) then
+      elseif (isbiquad()) then
          write(6,*) 'Bilinear quad mapping is not implemented'
          stop
       endif
