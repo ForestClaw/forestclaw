@@ -18,6 +18,6 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/setprob.f
 
 applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
-	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/amr_waveprop
+	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/fclaw2d_clawpack4.6
 
-applications_advection_2d_hemisphere_hemisphere_LDADD = @top_builddir@/src/solvers/amr_waveprop/libwaveprop.la $(LDADD)
+applications_advection_2d_hemisphere_hemisphere_LDADD = @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la $(LDADD)
