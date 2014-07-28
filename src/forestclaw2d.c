@@ -433,6 +433,59 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
     p4est_expand_face_transform (faceno, rfaceno, ftransform);
 }
 
+void
+fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
+                              const int ftransform[],
+                              int mx, int my, int based, int *i, int *j)
+{
+    const int *my_axis = &ftransform[0];
+    const int *target_axis = &ftransform[3];
+    const int *edge_reverse = &ftransform[6];
+    double my_xyz[2], target_xyz[2];
+    double Rmx;
+
+    P4EST_ASSERT (patch->level < P4EST_MAXLEVEL);
+    P4EST_ASSERT (patch->xlower >= 0. && patch->xlower <= 1.);
+    P4EST_ASSERT (patch->ylower >= 0. && patch->ylower <= 1.);
+
+    P4EST_ASSERT (mx >= 1 && mx == my);
+    P4EST_ASSERT (based == 0 || based == 1);
+
+    /* work with doubles -- exact for integers up to 52 bits of precision */
+    Rmx = (double) mx;
+
+    /* the reference cube is stretched to mx times my units */
+    my_xyz[0] = patch->xlower * Rmx + *i - .5 * based;
+    my_xyz[1] = patch->ylower * Rmx + *j - .5 * based;
+
+    /* transform transversal direction */
+    target_xyz[target_axis[0]] =
+        !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+
+    /* transform normal direction */
+    switch (edge_reverse[2])
+    {
+    case 0:
+        target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
+        break;
+    case 1:
+        target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
+        break;
+    case 2:
+        target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
+        break;
+    case 3:
+        target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    /* transform back to integer coordinates */
+    *i = (int) (target_xyz[0] - patch->xlower * Rmx + .5 * based);
+    *j = (int) (target_xyz[1] - patch->ylower * Rmx + .5 * based);
+}
+
 #ifdef FCLAW_ENABLE_DEBUG
 
 static int

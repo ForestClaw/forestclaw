@@ -291,6 +291,19 @@ fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
 void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
                                         int ftransform[]);
 
+/** Transform a patch coordinate into a face neighbor's coordinate system.
+ * \param [in] patch        The patch that the input coordinates are relative to.
+ * \param [in] ftransform   Array computed by fclaw2d_patch_face_transformation.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ */
+void fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
+                                   const int ftransform[],
+                                   int mx, int my, int based, int *i, int *j);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e. no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
