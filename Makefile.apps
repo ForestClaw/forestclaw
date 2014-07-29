@@ -1,11 +1,6 @@
 # -*- Makefile -*-
 
 # ----------------------------------
-# Main ForestClaw source code
-# ----------------------------------
-include src/Makefile.am
-
-# ----------------------------------
 # Solver libraries
 # ----------------------------------
 include src/solvers/fclaw2d_clawpack4.6/Makefile.am
