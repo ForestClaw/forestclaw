@@ -90,7 +90,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             if (sizeof(cptr) != sizeof(&transform_data))
             {
                 printf("amr_level_exchange : assumed size of ptr is incorrect; \
-                        sizeof(ptr) = %u but sizeof(&transform_data) = %u\n",
+                        sizeof(cptr) = %u but sizeof(&transform_data) = %u\n",
                        sizeof(cptr), sizeof(&transform_data));
                 exit(0);
             }
