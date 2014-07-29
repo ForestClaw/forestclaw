@@ -73,11 +73,6 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
 
-            int based = 1;
-            set_transform_(this_patch,ftransform,&mx,&my,&based);
-
-
-
             if (this_block_idx == neighbor_block_idx)
             {
                 // Exchange between 'this_patch' and 'neighbor patch(es)' at face 'iface'

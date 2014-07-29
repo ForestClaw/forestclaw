@@ -4,15 +4,16 @@ c    # ------------------------------------------------------------------
 
 c     # Exchange edge ghost data with neighboring grid at same level.
       subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,
-     &      qneighbor,iface)
+     &      qneighbor,iface,transform_cptr)
       implicit none
 
-      integer mx,my,mbc,meqn,iface
+      integer mx,my,mbc,meqn,iface, ftransform(9)
+      integer*8 transform_cptr
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,ibc,jbc,mq, idir
-      integer ifunc,jfunc,i1,j1, i2,j2
+      integer i1,j1, i2(0),j2(0)
 
       idir = iface/2
 
@@ -31,8 +32,8 @@ c                 # x-direction (idir == 0)
                      i1 = mx+mbc
                      j1 = j
                   endif
-                  call idxfunc(i1,j1,iface,this_block,i2,j2)
-                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 0) then
 c                     i2 = ifunc(1-ibc,j,iface,this_block)
@@ -67,8 +68,8 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call idxfunc(i1,j1,iface,this_block,i2,j2)
-                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 2) then
 c                     i2 = ifunc(i,1-jbc,iface,this_block)
@@ -97,19 +98,21 @@ c                  endif
 c     # average ghost cells from 'igrid' neighbor 'qfine' (igrid = 0,1)
 c     # to 'qcoarse' at face 'iface_coarse'  in direction 'idir' of 'qcoarse'
       subroutine average_face_ghost(mx,my,mbc,meqn,qcoarse,
-     &      qfine,idir,iface_coarse,num_neighbors,refratio,igrid)
+     &      qfine,idir,iface_coarse,num_neighbors,refratio,igrid,
+     &      transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
+      integer*8 transform_cptr
       integer num_neighbors
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision sum
 
-      integer mq,r2
+      integer mq,r2, m
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
-      integer i1,j1,i2,j3,ifunc,jfunc
+      integer i1,j1,i2(0:refratio*refratio),j2(0:refratio*refratio)
 
 c     # 'iface' is relative to the coarse grid
 
@@ -145,12 +148,10 @@ c                  enddo
                      i1 = mx+ibc
                      i2 = j+jc_add
                   endif
-                  call idxfunc(i1,j1,iface_coarse,this_block,i2,j2)
+                  call idxfunc(transform_cptr,i1,i2,i2,j2)
                   sum = 0
-                  do ii = 0,1
-                     do jj = 0,1
-                        sum = sum + qfine(i2+ii,j2+jj,mq)
-                     enddo
+                  do m = 0,r2-1
+                     sum = sum + qfine(i2(m),j2(m),mq)
                   enddo
                   qcoarse(i1,j1,mq) = sum/r2
                enddo
@@ -167,12 +168,10 @@ c                  enddo
                      i1 = i+ic_add
                      i2 = mx+jbc
                   endif
-                  call idxfunc(i1,j1,iface_coarse,this_block,i2,j2)
+                  call idxfunc(transform_cptr,i1,j1,i2,j2)
                   sum = 0
-                  do ii = 0,1
-                     do jj = 0,1
-                        sum = sum + qfine(i2+ii,j2+jj,mq)
-                     enddo
+                  do m = 0,3
+                     sum = sum + qfine(i2(m),j2(m),mq)
                   enddo
                   qcoarse(i1,j1,mq) = sum/r2
 
@@ -201,21 +200,24 @@ c                  endif
       end
 
       subroutine interpolate_face_ghost(mx,my,mbc,meqn,qcoarse,qfine,
-     &      idir,iface_coarse,num_neighbors,refratio,igrid)
+     &      idir,iface_coarse,num_neighbors,refratio,igrid,
+     &      transform_cptr)
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer num_neighbors
+      integer*8 transform_cptr
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer mq,r2
-      integer i, ic1, ic2, ibc, ii, ifine, i1, i2
-      integer j, jc1, jc2, jbc, jj, jfine, j1, j2
+      integer mq,r2, m
+      integer i, ic1, ic2, ibc, ii, ifine, i1, i2(0:refratio*refratio-1)
+      integer j, jc1, jc2, jbc, jj, jfine, j1, j2(0:refratio*refratio-1)
       integer ic_add, jc_add, ic, jc, mth
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
 
       mth = 5
+      r2 = refratio*refratio
 
       do mq = 1,meqn
          if (idir .eq. 0) then
@@ -244,14 +246,12 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-               call idxfunc(i1,j2,iface_coarse,this_block,i2,j2)
-               do ii = 0,refratio-1
-                  do jj = 0,refratio-1
-                     shiftx = (ii - refratio/2.d0 + 0.5)/refratio
-                     shifty = (jj - refratio/2.d0 + 0.5)/refratio
-                     value = qc + shiftx*gradx + shifty*grady
-                     qfine(i2+ii,j2+ii,mq) = value
-                  enddo
+               call idxfunc(transform_cptr,ic,jc,i2,j2)
+               do m = 0,r2-1
+                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+                  value = qc + shiftx*gradx + shifty*grady
+                  qfine(i2(m),j2(m),mq) = value
                enddo
 
 
@@ -302,25 +302,35 @@ c           # this ensures that we get 'hanging' corners
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-               do jbc = 1,mbc
-                  do ii = 1,refratio
-c                    # Fill in interpolated values on fine grid cell
-                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
-
-                     value = (qc + shiftx*gradx + shifty*grady)
-
-                     ifine = (i-1)*refratio + ii
-                     jfine = jbc
-                     if (iface_coarse .eq. 2) then
-c                       # qfine is at bottom edge of coarse grid
-                        qfine(ifine,my+jfine,mq) = value
-                     else if (iface_coarse .eq. 3) then
-c                       # qfine is at top edge of coarse grid
-                        qfine(ifine,1-jfine,mq) = value
-                     endif
-                  enddo
+               call idxfunc(transform_cptr,ic,jc,i2,j2)
+               do m = 0,r2-1
+                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+                  value = qc + shiftx*gradx + shifty*grady
+                  qfine(i2(m),j2(m),mq) = value
                enddo
+
+
+c               do jbc = 1,mbc
+c                  do ii = 1,refratio
+cc                    # Fill in interpolated values on fine grid cell
+c                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+c                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+c
+c                     value = (qc + shiftx*gradx + shifty*grady)
+c
+c                     ifine = (i-1)*refratio + ii
+c                     jfine = jbc
+c                     if (iface_coarse .eq. 2) then
+cc                       # qfine is at bottom edge of coarse grid
+c                        qfine(ifine,my+jfine,mq) = value
+c                     else if (iface_coarse .eq. 3) then
+cc                       # qfine is at top edge of coarse grid
+c                        qfine(ifine,1-jfine,mq) = value
+c                     endif
+c                  enddo
+c               enddo
+
             enddo
          endif
       enddo
