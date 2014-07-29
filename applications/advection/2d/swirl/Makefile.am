@@ -20,6 +20,9 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/user_4.6/swirl_output.f
 
 applications_advection_2d_swirl_swirl_CPPFLAGS = \
-	$(AM_CPPFLAGS) -I@top_srcdir@/src/solvers/fclaw2d_clawpack4.6
+	$(FCLAW_CPPFLAGS) \
+	$(AM_CPPFLAGS)
 
-applications_advection_2d_swirl_swirl_LDADD = @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack46.la $(LDADD)
+applications_advection_2d_swirl_swirl_LDADD = \
+	@top_builddir@/src/solvers/fclaw2d_clawpack46/libclawpack46.la \
+	$(LDADD)
