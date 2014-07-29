@@ -32,7 +32,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+mbc
                      j1 = j
                   endif
-                  call transform_func(transform_cptr,i1,j1,i2,j2)
+                  call transform_func(i1,j1,i2,j2,transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 0) then
@@ -68,7 +68,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call transform_func(transform_cptr,i1,j1,i2,j2)
+                  call transform_func(i1,j1,i2,j2,transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 2) then
@@ -150,7 +150,7 @@ c                 # Original code
                   enddo
 
 c                 # New code
-c                 call idxfunc(transform_cptr,i1,i2,i2,j2)
+c                 call idxfunc(i1,i2,i2,j2,transform_cptr)
 c                 sum = 0
 c                 do m = 0,r2-1
 c                     sum = sum + qfine(i2(m),j2(m),mq)
@@ -187,7 +187,7 @@ c                 # Original code
                   enddo
 
 c                 # New code
-c                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+c                  call idxfunc(i1,j1,i2,j2,transform_cptr)
 c                  sum = 0
 c                  do m = 0,r2
 c                     sum = sum + qfine(i2(m),j2(m),mq)
@@ -255,7 +255,7 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                grady = compute_slopes(sl,sr,mth)
 
 c              # New code
-c              call idxfunc(transform_cptr,ic,jc,i2,j2)
+c              call idxfunc(ic,jc,i2,j2,transform_cptr)
 c              do m = 0,r2-1
 c                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
 c                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -313,7 +313,7 @@ c           # this ensures that we get 'hanging' corners
                grady = compute_slopes(sl,sr,mth)
 
 c              # New code
-c               call idxfunc(transform_cptr,ic,jc,i2,j2)
+c               call idxfunc(ic,jc,i2,j2,transform_cptr)
 c               do m = 0,r2-1
 c                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
 c                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio

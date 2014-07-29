@@ -110,9 +110,9 @@ typedef struct fclaw2d_transform_data
     int mx, my, iface, based;
 } fclaw2d_transform_data_t;
 
-void transform_func_(fclaw2d_transform_data_t* tdata,
-                     const int &i1, const int &j1,
-                     int i2[], int j2[]);
+void transform_func_(const int &i1, const int &j1,
+                     int i2[], int j2[],
+                     fclaw2d_transform_data_t* tdata);
 
 
 
