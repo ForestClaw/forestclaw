@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 #include "amr_forestclaw.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 #include "hemisphere_user.H"
 
 #ifdef __cplusplus
@@ -45,10 +45,10 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &hemisphere_patch_setup;
     sf->f_patch_initialize         = &hemisphere_qinit;
-    sf->f_patch_physical_bc        = &amr_waveprop_bc2;
+    sf->f_patch_physical_bc        = &fclaw2d_clawpack_bc2;
     sf->f_patch_single_step_update = &hemisphere_update;
 
-    amr_waveprop_link_to_clawpatch();
+    fclaw2d_clawpack_link_to_clawpatch();
 }
 
 void hemisphere_problem_setup(fclaw2d_domain_t* domain)
@@ -85,14 +85,14 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // allocate space for the aux array
-    amr_waveprop_define_auxarray(domain,cp);
+    fclaw2d_clawpack_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     int maxmx = mx;
     int maxmy = my;
@@ -141,7 +141,7 @@ void hemisphere_qinit(fclaw2d_domain_t *domain,
 
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -189,7 +189,7 @@ void hemisphere_b4step2(fclaw2d_domain_t *domain,
 
     double *aux;
     int maux;
-    amr_waveprop_get_auxarray(domain,cp,&aux,&maux);
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     // Other input arguments
     int maxmx = mx;
@@ -214,7 +214,7 @@ double hemisphere_update(fclaw2d_domain_t *domain,
 {
     hemisphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
-    double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     return maxcfl;
 }

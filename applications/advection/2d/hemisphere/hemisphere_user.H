@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HEMISPHERE_USER_H
 
 #include "amr_forestclaw.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 
 extern "C"
 {
