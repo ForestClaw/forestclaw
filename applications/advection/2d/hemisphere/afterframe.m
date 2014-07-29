@@ -30,6 +30,8 @@ if (prt)
   eval(pstr);
 end;
 
+shg;
+
 clear afterframe;
 clear mapc2m;
 clear mapc2m_pillow;

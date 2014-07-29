@@ -1,6 +1,9 @@
 ## Makefile.am in applications/advection/2d/hemisphere
 
+
+
 bin_PROGRAMS += applications/advection/2d/hemisphere/hemisphere
+
 
 
 applications_advection_2d_hemisphere_hemisphere_SOURCES = \
@@ -19,6 +22,8 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 
 applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
 	$(FCLAW_CPPFLAGS) $(AM_CPPFLAGS)
+
+applications_advection_2d_hemisphere_hemisphere_FFLAGS = $(FCLAW_FFLAGS)
 
 applications_advection_2d_hemisphere_hemisphere_LDADD = \
 	@top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la \
