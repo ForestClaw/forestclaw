@@ -14,4 +14,4 @@ include applications/advection/2d/no_solver/Makefile.am
 
 include applications/advection/2d/swirl/Makefile.am
 include applications/advection/2d/hemisphere/Makefile.am
-# include applications/metric/2d/sphere/Makefile.am
+include applications/metric/2d/sphere/Makefile.am
