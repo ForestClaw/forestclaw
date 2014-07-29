@@ -222,5 +222,6 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
 
     int mpirank = domain->mpirank;
     swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                        iframe,num,matlab_level,this_block_idx,mpirank);
+                       iframe,num,matlab_level,this_block_idx,
+                       mpirank);
 }

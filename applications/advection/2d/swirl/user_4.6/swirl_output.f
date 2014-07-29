@@ -1,7 +1,7 @@
       subroutine swirl_write_tfile(iframe,time,mfields,ngrids,maux)
       implicit none
 
-      integer iframe,mfields,ngrids,maux
+      integer iframe,mfields,ngrids,maux, mpirank
 
       character*10 matname1
       character*10 matname2
@@ -62,10 +62,11 @@
 
       open(matunit1,file=matname1,access='append');
 
-      write(matunit1,1001) patch_num, level, blockno, mx, my
+      write(matunit1,1001) patch_num, level, blockno, mpirank, mx, my
  1001 format(i5,'                 grid_number',/,
      &       i5,'                 AMR_level',/,
      &       i5,'                 block_number',/,
+     &       i5,'                 mpi_rank',/,
      &       i5,'                 mx',/,
      &       i5,'                 my')
 
