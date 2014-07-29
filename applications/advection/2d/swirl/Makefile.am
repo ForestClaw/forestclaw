@@ -24,5 +24,5 @@ applications_advection_2d_swirl_swirl_CPPFLAGS = \
 	$(AM_CPPFLAGS)
 
 applications_advection_2d_swirl_swirl_LDADD = \
-	@top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack46.la \
+	@top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la \
 	$(LDADD)
