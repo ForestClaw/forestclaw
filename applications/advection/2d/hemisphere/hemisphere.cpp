@@ -102,8 +102,8 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
-  amr_options_destroy(gparms);
   sc_options_destroy (options);
+  amr_options_destroy(gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
