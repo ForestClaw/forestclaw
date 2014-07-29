@@ -434,7 +434,8 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 }
 
 void
-fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
+fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
+                              fclaw2d_patch_t * opatch,
                               const int ftransform[],
                               int mx, int my, int based, int *i, int *j)
 {
@@ -444,9 +445,12 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
     double my_xyz[2], target_xyz[2];
     double Rmx;
 
-    P4EST_ASSERT (patch->level < P4EST_MAXLEVEL);
-    P4EST_ASSERT (patch->xlower >= 0. && patch->xlower <= 1.);
-    P4EST_ASSERT (patch->ylower >= 0. && patch->ylower <= 1.);
+    P4EST_ASSERT (ipatch->level == opatch->level);
+    P4EST_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
+    P4EST_ASSERT (ipatch->xlower >= 0. && ipatch->xlower <= 1.);
+    P4EST_ASSERT (ipatch->ylower >= 0. && ipatch->ylower <= 1.);
+    P4EST_ASSERT (opatch->xlower >= 0. && opatch->xlower <= 1.);
+    P4EST_ASSERT (opatch->ylower >= 0. && opatch->ylower <= 1.);
 
     P4EST_ASSERT (mx >= 1 && mx == my);
     P4EST_ASSERT (based == 0 || based == 1);
@@ -455,8 +459,8 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
     Rmx = (double) mx;
 
     /* the reference cube is stretched to mx times my units */
-    my_xyz[0] = patch->xlower * Rmx + *i - .5 * based;
-    my_xyz[1] = patch->ylower * Rmx + *j - .5 * based;
+    my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
+    my_xyz[1] = ipatch->ylower * Rmx + *j - .5 * based;
 
     /* transform transversal direction */
     target_xyz[target_axis[0]] =
@@ -482,8 +486,8 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
     }
 
     /* transform back to integer coordinates */
-    *i = (int) (target_xyz[0] - patch->xlower * Rmx + .5 * based);
-    *j = (int) (target_xyz[1] - patch->ylower * Rmx + .5 * based);
+    *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
+    *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG

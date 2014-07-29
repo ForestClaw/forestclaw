@@ -292,15 +292,21 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
                                         int ftransform[]);
 
 /** Transform a patch coordinate into a face neighbor's coordinate system.
- * \param [in] patch        The patch that the input coordinates are relative to.
+ * We have an input patch in one block and on output patch across a face.
+ * This function assumes that the two patches are of the SAME size.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] ftransform   Array computed by fclaw2d_patch_face_transformation.
+ *                          It must have room for NINE (9) integers.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
+ *                          This function assumes \a mx == \a my.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw2d_patch_transform_face (fclaw2d_patch_t * patch,
+void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
+                                   fclaw2d_patch_t * opatch,
                                    const int ftransform[],
                                    int mx, int my, int based, int *i, int *j);
 
