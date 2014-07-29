@@ -39,6 +39,16 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
     // const int p4est_refineFactor = get_p4est_refineFactor(domain);
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
+    // Transform data needed at multi-block boundaries
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    // The rest gets filled in below.
+
+
     // int numfaces = get_faces_per_patch(domain);
 
     for (int iface = 0; iface < NumFaces; iface++)
@@ -50,9 +60,10 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
-        int ftransform[9];
+        // int ftransform[9];
 
 
+        transform_data.iface = iface;
         get_face_neighbors(domain,
                            this_block_idx,
                            this_patch_idx,
@@ -61,7 +72,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            ghost_patches,
                            &ref_flag_ptr,
                            &fine_grid_pos_ptr,
-                           ftransform);
+                           transform_data.transform);
 
         if (ref_flag_ptr == NULL)
         {
@@ -73,6 +84,19 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
 
+            /* This is now done for all boundaries */
+            transform_data.neighbor_patch = ghost_patches[0];
+            fclaw_cptr cptr;
+            if (sizeof(cptr) != sizeof(&transform_data))
+            {
+                printf("amr_level_exchange : assumed size of ptr is incorrect; \
+                        sizeof(ptr) = %u but sizeof(&transform_data) = %u\n",
+                       sizeof(cptr), sizeof(&transform_data));
+                exit(0);
+            }
+            this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
+
+            /*
             if (this_block_idx == neighbor_block_idx)
             {
                 // Exchange between 'this_patch' and 'neighbor patch(es)' at face 'iface'
@@ -83,6 +107,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                 // Initiate exchange from block 0
                 this_cp->mb_exchange_face_ghost(iface,neighbor_cp);
             }
+            */
         } /* Check return from neighbor */
     } /* loop over all faces */
 }

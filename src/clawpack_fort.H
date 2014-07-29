@@ -92,7 +92,8 @@ void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
    Internal boundary conditions
    ---------------------------------------------------------------------------------- */
 void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                          double qthis[],double qneighbor[], const int& a_idir);
+                          double qthis[],double qneighbor[], const int& a_idir,
+                          fclaw_cptr transform_cptr);
 
 void average_face_ghost_(const int& mx, const int& my, const int& mbc,
                          const int& meqn, double qfine[],double qcoarse[],

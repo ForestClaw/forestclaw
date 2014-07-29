@@ -102,7 +102,19 @@ void get_face_neighbors (fclaw2d_domain_t * domain,
                          int **fine_grid_pos_ptr,
                          int ftransform[]);
 
-void set_transform_(fclaw2d_patch_t* this_patch,int ftransform[],
+typedef struct fclaw2d_transform_data
+{
+    fclaw2d_patch_t* this_patch;
+    fclaw2d_patch_t* neighbor_patch;
+    int transform[9];
+    int mx, my, iface, based;
+} fclaw2d_transform_data_t;
+
+void transform_func_(fclaw2d_transform_data_t* tdata,
+                     const int &i1, const int &j1,
+                     int i2[], int j2[]);
+
+
 
 void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int this_block_idx,

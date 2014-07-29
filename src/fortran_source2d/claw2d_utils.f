@@ -13,7 +13,7 @@ c     # Exchange edge ghost data with neighboring grid at same level.
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,ibc,jbc,mq, idir
-      integer i1,j1, i2(0),j2(0)
+      integer i1,j1, i2(0:0),j2(0:0)
 
       idir = iface/2
 
@@ -32,7 +32,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+mbc
                      j1 = j
                   endif
-                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+                  call transform_func(transform_cptr,i1,j1,i2,j2)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 0) then
@@ -68,7 +68,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+                  call transform_func(transform_cptr,i1,j1,i2,j2)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
 c                  if (iface .eq. 2) then
@@ -127,20 +127,6 @@ c     # Average fine grid onto coarse grid
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
 c                 # ibc = 2 corresponds to the second layer
 
-c                 # Original code
-c                 sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (ibc-1)*refratio + ii
-c                        jfine = (j-1)*refratio + jj
-c                        if (iface_coarse .eq. 0) then
-c                           sum = sum + qfine(mx-ifine+1,jfine,mq)
-c                        elseif (iface_coarse .eq. 1) then
-c                           sum = sum + qfine(ifine,jfine,mq)
-c                        endif
-c                     enddo
-c                  enddo
-
                   if (iface_coarse .eq. 0) then
                      i1 = 1-ibc
                      i2 = j+jc_add
@@ -148,11 +134,28 @@ c                  enddo
                      i1 = mx+ibc
                      i2 = j+jc_add
                   endif
-                  call idxfunc(transform_cptr,i1,i2,i2,j2)
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine(i2(m),j2(m),mq)
+
+c                 # Original code
+                 sum = 0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (ibc-1)*refratio + ii
+                        jfine = (j-1)*refratio + jj
+                        if (iface_coarse .eq. 0) then
+                           sum = sum + qfine(mx-ifine+1,jfine,mq)
+                        elseif (iface_coarse .eq. 1) then
+                           sum = sum + qfine(ifine,jfine,mq)
+                        endif
+                     enddo
                   enddo
+
+c                 # New code
+c                 call idxfunc(transform_cptr,i1,i2,i2,j2)
+c                 sum = 0
+c                 do m = 0,r2-1
+c                     sum = sum + qfine(i2(m),j2(m),mq)
+c                 enddo
+
                   qcoarse(i1,j1,mq) = sum/r2
                enddo
             enddo
@@ -166,27 +169,32 @@ c                  enddo
                      i2 = 1-jbc
                   elseif (iface_coarse .eq. 3) then
                      i1 = i+ic_add
-                     i2 = mx+jbc
+                     i2 = my+jbc
                   endif
-                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+
+c                 # Original code
                   sum = 0
-                  do m = 0,3
-                     sum = sum + qfine(i2(m),j2(m),mq)
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (i-1)*refratio + ii
+                        jfine = (jbc-1)*refratio + jj
+                        if (iface_coarse .eq. 2) then
+                           sum = sum + qfine(ifine,my-jfine+1,mq)
+                        else
+                           sum = sum + qfine(ifine,jfine,mq)
+                        endif
+                     enddo
                   enddo
+
+c                 # New code
+c                  call idxfunc(transform_cptr,i1,j1,i2,j2)
+c                  sum = 0
+c                  do m = 0,r2
+c                     sum = sum + qfine(i2(m),j2(m),mq)
+c                  enddo
+c
                   qcoarse(i1,j1,mq) = sum/r2
 
-c                  sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (i-1)*refratio + ii
-c                        jfine = (jbc-1)*refratio + jj
-c                        if (iface_coarse .eq. 2) then
-c                           sum = sum + qfine(ifine,my-jfine+1,mq)
-c                        else
-c                           sum = sum + qfine(ifine,jfine,mq)
-c                        endif
-c                     enddo
-c                  enddo
 c                  if (iface_coarse .eq. 2) then
 c                     qcoarse(i+ic_add,1-jbc,mq) = sum/r2
 c                  else
@@ -246,51 +254,53 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-               call idxfunc(transform_cptr,ic,jc,i2,j2)
-               do m = 0,r2-1
-                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                  value = qc + shiftx*gradx + shifty*grady
-                  qfine(i2(m),j2(m),mq) = value
-               enddo
-
-
-c               do ibc = 1,mbc
-c                  do jj = 1,refratio
-cc                    # Fill in interpolated values on fine grid cell
-c                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
-c                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-c
-c                     value = qc + shiftx*gradx + shifty*grady
-c                     i1 = ic
-c                     j1 = jc
-c                     qfine(i2,j2,mq) = value
-c
-cc                     ifine = ibc
-cc                     jfine = (j-1)*refratio + jj
-cc                     if (iface_coarse .eq. 0) then
-ccc                       # qfine is at left edge of coarse grid
-cc                        qfine(mx+ifine,jfine,mq) = value
-cc                     elseif (iface_coarse .eq. 1) then
-ccc                       # qfine is at right edge of coarse grid
-cc                        qfine(1-ifine,jfine,mq) = value
-cc                     endif
-c
-c                  enddo
+c              # New code
+c              call idxfunc(transform_cptr,ic,jc,i2,j2)
+c              do m = 0,r2-1
+c                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+c                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+c                  value = qc + shiftx*gradx + shifty*grady
+c                  qfine(i2(m),j2(m),mq) = value
 c               enddo
+
+
+c              # Original code
+               do ibc = 1,mbc
+                  do jj = 1,refratio
+c                    # Fill in interpolated values on fine grid cell
+                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+
+                     value = qc + shiftx*gradx + shifty*grady
+                     i1 = ic
+                     j1 = jc
+                     qfine(i2,j2,mq) = value
+
+                     ifine = ibc
+                     jfine = (j-1)*refratio + jj
+                     if (iface_coarse .eq. 0) then
+c                       # qfine is at left edge of coarse grid
+                        qfine(mx+ifine,jfine,mq) = value
+                     elseif (iface_coarse .eq. 1) then
+c                       # qfine is at right edge of coarse grid
+                        qfine(1-ifine,jfine,mq) = value
+                     endif
+
+                  enddo
+               enddo
             enddo
          else
             ic_add = igrid*mx/num_neighbors
 c           # this ensures that we get 'hanging' corners
-            i1 = 1-igrid
-            i2 = mx/num_neighbors + (1-igrid)
+            ic1 = 1-igrid
+            ic2 = mx/num_neighbors + (1-igrid)
 
             if (iface_coarse .eq. 2) then
                jc = 1
             elseif (iface_coarse .eq. 3) then
                jc = my
             endif
-            do i = i1, i2
+            do i = ic1, ic2
                ic = i + ic_add
                qc = qcoarse(ic,jc,mq)
 
@@ -302,34 +312,35 @@ c           # this ensures that we get 'hanging' corners
                sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
-               call idxfunc(transform_cptr,ic,jc,i2,j2)
-               do m = 0,r2-1
-                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                  value = qc + shiftx*gradx + shifty*grady
-                  qfine(i2(m),j2(m),mq) = value
-               enddo
-
-
-c               do jbc = 1,mbc
-c                  do ii = 1,refratio
-cc                    # Fill in interpolated values on fine grid cell
-c                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-c                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
-c
-c                     value = (qc + shiftx*gradx + shifty*grady)
-c
-c                     ifine = (i-1)*refratio + ii
-c                     jfine = jbc
-c                     if (iface_coarse .eq. 2) then
-cc                       # qfine is at bottom edge of coarse grid
-c                        qfine(ifine,my+jfine,mq) = value
-c                     else if (iface_coarse .eq. 3) then
-cc                       # qfine is at top edge of coarse grid
-c                        qfine(ifine,1-jfine,mq) = value
-c                     endif
-c                  enddo
+c              # New code
+c               call idxfunc(transform_cptr,ic,jc,i2,j2)
+c               do m = 0,r2-1
+c                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+c                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+c                  value = qc + shiftx*gradx + shifty*grady
+c                  qfine(i2(m),j2(m),mq) = value
 c               enddo
+
+
+               do jbc = 1,mbc
+                  do ii = 1,refratio
+c                    # Fill in interpolated values on fine grid cell
+                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+
+                     value = (qc + shiftx*gradx + shifty*grady)
+
+                     ifine = (i-1)*refratio + ii
+                     jfine = jbc
+                     if (iface_coarse .eq. 2) then
+c                       # qfine is at bottom edge of coarse grid
+                        qfine(ifine,my+jfine,mq) = value
+                     else if (iface_coarse .eq. 3) then
+c                       # qfine is at top edge of coarse grid
+                        qfine(ifine,1-jfine,mq) = value
+                     endif
+                  enddo
+               enddo
 
             enddo
          endif

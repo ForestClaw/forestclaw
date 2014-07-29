@@ -370,11 +370,14 @@ void ClawPatch::unpack_griddata_time_interpolated(double *q)
    Single level exchanges
    ---------------------------------------------------------------- */
 
-void ClawPatch::exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
+void ClawPatch::exchange_face_ghost(const int& a_iface,
+                                    ClawPatch *neighbor_cp,
+                                    fclaw_cptr transform_data)
 {
     double *qthis = m_griddata.dataPtr();
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
-    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface);
+    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
+                         transform_data);
 }
 
 void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)

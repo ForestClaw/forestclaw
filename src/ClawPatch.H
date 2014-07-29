@@ -65,7 +65,9 @@ public :
     // ----------------------------------------------------------------
     // Internal boundary conditions
     // ----------------------------------------------------------------
-    void exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
+    void exchange_face_ghost(const int& a_iface,
+                             ClawPatch *a_neighbor_cp,
+                             fclaw_cptr transform_data);
 
     void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 

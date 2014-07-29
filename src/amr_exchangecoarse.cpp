@@ -438,6 +438,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
+            int ftransform[9];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -446,7 +447,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                &neighbor_block_idx,
                                neighbor_patches,
                                &ref_flag_ptr,
-                               &fine_grid_pos_ptr);
+                               &fine_grid_pos_ptr,
+                               ftransform);
 
             if (ref_flag_ptr == NULL)
             {
@@ -536,6 +538,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
+            int ftransform[9];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -544,7 +547,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                &neighbor_block_idx,
                                neighbor_patches,
                                &ref_flag_ptr,
-                               &fine_grid_pos_ptr);
+                               &fine_grid_pos_ptr,
+                               ftransform);
 
             fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)

@@ -31,6 +31,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // and to determine if we are at physical boundaries or not.
 // ------------------------------------------------------------------------------
 
+/* This will be called from fortran */
+/* This transforms cell centered data */
+void transform_func_(fclaw2d_transform_data_t* tdata,
+                     const int &i1, const int &j1,
+                     int i2[],int j2[])
+{
+    /*
+    void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
+                                       fclaw2d_patch_t * opatch,
+                                       const int ftransform[],
+                                       int mx, int my, int based, int *i, int *j);
+    */
+
+    i2[0] = i1;
+    j2[0] = j1;
+    fclaw2d_patch_transform_face(tdata->this_patch,
+                                      tdata->neighbor_patch,
+                                      tdata->transform,
+                                      tdata->mx, tdata->my,
+                                      tdata->based,
+                                      i2, j2);
+}
+
+
+
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
