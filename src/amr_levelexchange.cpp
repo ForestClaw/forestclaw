@@ -46,7 +46,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
     transform_data.my = gparms->my;
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
-    // The rest gets filled in below.
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
 
 
     // int numfaces = get_faces_per_patch(domain);
@@ -60,7 +60,6 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
-        // int ftransform[9];
 
 
         transform_data.iface = iface;
@@ -86,7 +85,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
 
             /* This is now done for all boundaries */
             transform_data.neighbor_patch = ghost_patches[0];
-            fclaw_cptr cptr;
+            fclaw_cptr cptr;  // unsigned long int
             if (sizeof(cptr) != sizeof(&transform_data))
             {
                 printf("amr_level_exchange : assumed size of ptr is incorrect; \
