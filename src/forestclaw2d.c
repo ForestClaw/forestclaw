@@ -445,15 +445,15 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     double my_xyz[2], target_xyz[2];
     double Rmx;
 
-    P4EST_ASSERT (ipatch->level == opatch->level);
-    P4EST_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
-    P4EST_ASSERT (ipatch->xlower >= 0. && ipatch->xlower <= 1.);
-    P4EST_ASSERT (ipatch->ylower >= 0. && ipatch->ylower <= 1.);
-    P4EST_ASSERT (opatch->xlower >= 0. && opatch->xlower <= 1.);
-    P4EST_ASSERT (opatch->ylower >= 0. && opatch->ylower <= 1.);
+    FCLAW_ASSERT (ipatch->level == opatch->level);
+    FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower <= 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower <= 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower <= 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower <= 1.);
 
-    P4EST_ASSERT (mx >= 1 && mx == my);
-    P4EST_ASSERT (based == 0 || based == 1);
+    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (based == 0 || based == 1);
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx;
