@@ -15,8 +15,10 @@ libclawpack4_6_installed_headers = \
 	src/solvers/fclaw2d_clawpack4.6/fclaw2d_clawpack.H
 
 ## TODO: there could be a name conflict with multiple claw.i files present
+##       but that's ok for internal headers (and ONLY for these)
 libclawpack4_6_internal_headers = src/solvers/fclaw2d_clawpack4.6/fortran_source/claw.i
 
+## TODO: remove dependencies of this library on any sources under applications
 libclawpack4_6_compiled_sources = \
 	src/solvers/fclaw2d_clawpack4.6/fclaw2d_clawpack.cpp \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/limiter.f \
@@ -36,10 +38,10 @@ src_solvers_fclaw2d_clawpack4_6_libclawpack4_6_la_SOURCES = \
   $(libclawpack4_6_internal_headers) \
   $(libclawpack4_6_compiled_sources)
 
-src_solvers_fclaw2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+src_solvers_fclaw2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = \
+  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
-LDADD += @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la
+## LDADD += @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la
+## AM_CPPFLAGS += -I@top_srcdir@/src/solvers/fclaw2d_clawpack4.6
 
-include_HEADERS += $(libclawpack4.6_installed_headers)
-
-AM_CPPFLAGS += -I@top_srcdir@/src/solvers/fclaw2d_clawpack4.6
+include_HEADERS += $(libclawpack4_6_installed_headers)
