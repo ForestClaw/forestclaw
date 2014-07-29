@@ -13,6 +13,7 @@ endif
 
 # initialize empty variables
 AM_CPPFLAGS =
+AM_FFLAGS =
 CLEANFILES =
 DISTCLEANFILES =
 EXTRA_DIST =

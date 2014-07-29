@@ -12,7 +12,7 @@ applications_advection_2d_no_solver_no_solver_SOURCES = \
 	applications/advection/2d/no_solver/user_4.6/tag4refinement.f \
 	applications/advection/2d/no_solver/user_4.6/initialize.f
 
-applications_advection_2d_no_solver_no_solver_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+# applications_advection_2d_no_solver_no_solver_CPPFLAGS = \
+#       $(AM_CPPFLAGS)
 
 applications_advection_2d_no_solver_no_solver_LDADD = $(LDADD) $(FLIBS)

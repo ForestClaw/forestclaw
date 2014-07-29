@@ -11,9 +11,11 @@ libforestclaw_installed_headers = \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map.h \
-	src/clawpack_fort.H
+	src/clawpack_fort.H \
+	src/fortran_source2d/metric_terms.i
 
-libforestclaw_internal_headers =
+libforestclaw_internal_headers = \
+	src/fortran_source2d/debug.i
 
 # -------------------------------------------------------------------
 # Main source files for ForestClaw are here - these need to be compiled
@@ -66,11 +68,9 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f
 
-
 # this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS =
-
-FCLAW_FFLAGS = -I@top_srcdir@/src/fortran_source2d
+FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d
+FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
@@ -83,4 +83,5 @@ EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 nodist_include_HEADERS += $(libforestclaw_generated_headers)
 include_HEADERS += $(libforestclaw_installed_headers)
 
-AM_CPPFLAGS += -I@top_srcdir@/src @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
+AM_CPPFLAGS += $(FCLAW_CPPFLAGS) @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
+AM_FFLAGS += $(FCLAW_FFLAGS)
