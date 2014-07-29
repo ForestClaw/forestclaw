@@ -38,13 +38,14 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int *neighbor_block_idx,
                         fclaw2d_patch_t* neighbor_patches[],
                         int **ref_flag_ptr,
-                        int **fine_grid_pos_ptr)
+                        int **fine_grid_pos_ptr,
+                        int ftransform[])
 {
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
     int rfaceno;
-    int ftransform[9];
+    // int ftransform[9];
     int num_neighbors;
 
     for(int ir = 0; ir < p4est_refineFactor; ir++)
