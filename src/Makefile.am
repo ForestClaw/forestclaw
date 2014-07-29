@@ -70,6 +70,8 @@ libforestclaw_compiled_sources = \
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS =
 
+FCLAW_FFLAGS = -I@top_srcdir@/src/fortran_source2d
+
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
  $(libforestclaw_internal_headers) \
