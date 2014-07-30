@@ -439,55 +439,81 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
                               const int ftransform[],
                               int mx, int my, int based, int *i, int *j)
 {
-    const int *my_axis = &ftransform[0];
-    const int *target_axis = &ftransform[3];
-    const int *edge_reverse = &ftransform[6];
-    double my_xyz[2], target_xyz[2];
-    double Rmx;
+    int        powl;
+    double     Rmx;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower <= 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower <= 1.);
-    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower <= 1.);
-    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower <= 1.);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
     FCLAW_ASSERT (based == 0 || based == 1);
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx;
+    powl = (double) (1 << ipatch->level);
 
-    /* the reference cube is stretched to mx times my units */
-    my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
-    my_xyz[1] = ipatch->ylower * Rmx + *j - .5 * based;
-
-    /* transform transversal direction */
-    target_xyz[target_axis[0]] =
-        !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
-
-    /* transform normal direction */
-    switch (edge_reverse[2])
+    if (ftransform[8] == 4)
     {
-    case 0:
-        target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
-        break;
-    case 1:
-        target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
-        break;
-    case 2:
-        target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
-        break;
-    case 3:
-        target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
-        break;
-    default:
-        SC_ABORT_NOT_REACHED ();
+        /* The two patches are in the same block.  ftransform is undefined.  */
+        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx * powl);
+        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx * powl);
+    }
+    else
+    {
+        const int *my_axis = &ftransform[0];
+        const int *target_axis = &ftransform[3];
+        const int *edge_reverse = &ftransform[6];
+        double     my_xyz[2], target_xyz[2];
+
+#if 0
+        printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
+                ipatch->xlower, ipatch->ylower, ipatch->level,
+                ftransform[0], ftransform[2], ftransform[3], ftransform[5],
+                ftransform[6], ftransform[8],
+                mx, *i, *j, based);
+#endif
+
+        /* the reference cube is stretched to mx times my units */
+        my_xyz[0] = ipatch->xlower * Rmx + (*i - .5 * based) * powl;
+        my_xyz[1] = ipatch->ylower * Rmx + (*j - .5 * based) * powl;
+
+        /* transform transversal direction */
+        target_xyz[target_axis[0]] =
+            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+
+        /* transform normal direction */
+        switch (edge_reverse[2])
+        {
+        case 0:
+            target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
+            break;
+        case 1:
+            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
+            break;
+        case 2:
+            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
+            break;
+        case 3:
+            target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
+
+        /* transform back to integer coordinates */
+        *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
+        *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
     }
 
-    /* transform back to integer coordinates */
-    *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
-    *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
+#if 0
+    printf ("Test O: IP %g %g IJ %d %d\n",
+            opatch->xlower, opatch->ylower,
+            *i, *j);
+#endif
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
