@@ -88,9 +88,10 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw_cptr cptr;  // unsigned long int
             if (sizeof(cptr) != sizeof(&transform_data))
             {
-                printf("amr_level_exchange : assumed size of ptr is incorrect; \
-                        sizeof(cptr) = %u but sizeof(&transform_data) = %u\n",
-                       sizeof(cptr), sizeof(&transform_data));
+                printf ("amr_level_exchange : assumed size of ptr is incorrect; "
+                        "sizeof(cptr) = %llu but sizeof(&transform_data) = %llu\n",
+                        (unsigned long long) sizeof(cptr),
+                        (unsigned long long) sizeof(&transform_data));
                 exit(0);
             }
             this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
