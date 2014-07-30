@@ -129,10 +129,10 @@ c                 # ibc = 2 corresponds to the second layer
 
                   if (iface_coarse .eq. 0) then
                      i1 = 1-ibc
-                     i2 = j+jc_add
+                     j1 = j+jc_add
                   elseif (iface_coarse .eq. 1) then
                      i1 = mx+ibc
-                     i2 = j+jc_add
+    1                j1 = j+jc_add
                   endif
 
 c                 # Original code
@@ -166,10 +166,10 @@ c                 enddo
 
                   if (iface_coarse .eq. 2) then
                      i1 = i+ic_add
-                     i2 = 1-jbc
+                     j1 = 1-jbc
                   elseif (iface_coarse .eq. 3) then
                      i1 = i+ic_add
-                     i2 = my+jbc
+                     j1 = my+jbc
                   endif
 
 c                 # Original code
@@ -272,9 +272,6 @@ c                    # Fill in interpolated values on fine grid cell
                      shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
 
                      value = qc + shiftx*gradx + shifty*grady
-c                     i1 = ic
-c                     j1 = jc
-c                     qfine(i2,j2,mq) = value
 
                      ifine = ibc
                      jfine = (j-1)*refratio + jj
