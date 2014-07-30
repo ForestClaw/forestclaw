@@ -81,7 +81,8 @@ void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& meqn, double qfine[],double qcoarse[],
                             const double areacoarse[], const double areafine[],
                             const int& idir, const int& iside, const int& num_neighbors,
-                            const int& refratio, const int& igrid);
+                            const int& refratio, const int& igrid,
+                            fclaw_cptr transform_cptr);
 
 void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                 double qcoarse[], double qfine[], double areacoarse[], double areafine[],
@@ -96,14 +97,21 @@ void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const in
                           fclaw_cptr transform_cptr);
 
 void average_face_ghost_(const int& mx, const int& my, const int& mbc,
-                         const int& meqn, double qfine[],double qcoarse[],
-                         const int& idir, const int& iside, const int& num_neighbors,
+                         const int& meqn,
+                         double qcoarse[],double qfine[],
+                         double areacoarse[], double areafine[],
+                         const int& idir, const int& iside,
+                         const int& num_neighbors,
                          const int& refratio, const int& igrid,
-                         fclaw_cptr transform_cptr);
+                         const int& manifold, fclaw_cptr transform_cptr);
 
-void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                             double qthis[],double qcoarse[], const int& idir, const int& iside,
-                             const int& num_neighbors,const int& refratio, const int& igrid);
+void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
+                             const int& meqn,
+                             double qthis[],double qcoarse[],
+                             const int& idir, const int& iside,
+                             const int& num_neighbors,
+                             const int& refratio, const int& igrid,
+                             fclaw_cptr transform_data);
 
 
 void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,

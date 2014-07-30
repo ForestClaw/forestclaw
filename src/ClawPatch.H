@@ -94,7 +94,8 @@ public :
                                 ClawPatch *a_neighbor_cp,
                                 fclaw_bool a_time_interp,
                                 fclaw_bool a_block_boundary,
-                                const int& igrid);
+                                const int& igrid,
+                                fclaw_cptr transform_data);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);

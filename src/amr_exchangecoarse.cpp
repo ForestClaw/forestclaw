@@ -546,8 +546,18 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
     fclaw_bool is_coarse = e_info->is_coarse;
     fclaw_bool is_fine = e_info->is_fine;
 
+    // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
+
+    // Transform data needed at multi-block boundaries
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
+
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
 
@@ -568,8 +578,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int *iface_neighbor_ptr = &iface_neighbor;
 
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
-            int ftransform[9];
 
+            transform_data.iface = iface;
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
@@ -579,7 +589,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                &ref_flag_ptr,
                                &fine_grid_pos_ptr,
                                &iface_neighbor_ptr,
-                               ftransform);
+                               transform_data.transform);
 
             fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
             if (ref_flag_ptr == NULL)
@@ -592,9 +602,12 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
                     ClawPatch *fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
+                    transform_data.neighbor_patch = neighbor_patches[igrid];
+                    transform_data.fine_grid_pos = igrid;
                     this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                     refratio,fine_neighbor_cp,time_interp,
-                                                    block_boundary,igrid);
+                                                    block_boundary,igrid,
+                                                    (fclaw_cptr) &transform_data);
                 }
             }
             else if (ref_flag == -1 && is_fine)
@@ -633,9 +646,12 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                        completely understand, (er don't understand at all...) Valgrind doesn't
                        find any errors, and results do not have any NANs.  Strange
                     */
-                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
-                                                      fine_cp,time_interp,block_boundary,
-                                                      igrid);
+                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,
+                                                      p4est_refineFactor,refratio,
+                                                      fine_cp,time_interp,
+                                                      block_boundary,
+                                                      igrid,
+                                                      (fclaw_cptr) &transform_data);
                 }
             }
         } // loop sides (iside = 0,1,2,3)

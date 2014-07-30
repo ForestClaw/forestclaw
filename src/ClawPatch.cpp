@@ -478,31 +478,18 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     double *qcoarse = q_time_sync(a_time_interp);
 
     double *qfine = neighbor_cp->m_griddata.dataPtr();
-    if (m_manifold)
-    {
-        double *areacoarse = m_area.dataPtr();
-        double *areafine = neighbor_cp->m_area.dataPtr();
-        if (a_block_boundary)
-        {
-            mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                   areacoarse, areafine,
-                                   a_idir,a_iface_coarse,
-                                   a_p4est_refineFactor,a_refratio,igrid);
-        }
-        else
-        {
-            average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                       areacoarse, areafine,
-                                       a_idir,a_iface_coarse,
-                                       a_p4est_refineFactor,a_refratio,igrid);
-        }
-    }
-    else
-    {
-        average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
-                            a_p4est_refineFactor,a_refratio,igrid,transform_cptr);
-    }
 
+    /* These will be empty for non-manifolds cases */
+    double *areacoarse = m_area.dataPtr();
+    double *areafine = neighbor_cp->m_area.dataPtr();
+
+    int manifold = m_manifold ? 1 : 0;
+    average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,
+                        qcoarse,qfine,
+                        areacoarse, areafine,
+                        a_idir,a_iface_coarse,
+                        a_p4est_refineFactor,a_refratio,igrid,
+                        manifold, transform_cptr);
 
 #if 0
     for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
@@ -543,12 +530,19 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        ClawPatch *neighbor_cp,
                                        fclaw_bool a_time_interp,
                                        fclaw_bool a_block_boundary,
-                                       const int& igrid)
+                                       const int& igrid,
+                                       fclaw_cptr transform_data)
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
     double *qfine = neighbor_cp->m_griddata.dataPtr();
 
+
+    interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                            a_p4est_refineFactor,a_refratio,igrid,
+                            transform_data);
+
+#if 0
     if (a_block_boundary)
     {
         mb_interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
@@ -562,6 +556,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                 a_p4est_refineFactor,a_refratio,igrid);
         // debug_here_(2,str);
     }
+#endif
 
 #if 0
     for(int ir = 0; ir < a_p4est_refineFactor; ir++)
