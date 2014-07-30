@@ -189,11 +189,13 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
 c     # Assume this is mapped.
       subroutine mb_average_face_ghost(mx,my,mbc,meqn,qcoarse,
      &      qfine,areacoarse, areafine,
-     &      idir,iface_coarse,p4est_refineFactor,refratio,igrid)
+     &      idir,iface_coarse,p4est_refineFactor,refratio,igrid,
+     &      transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer p4est_refineFactor
+      integer*8 transform_cptr
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -201,9 +203,22 @@ c     # Assume this is mapped.
 
       double precision sum, kf, kc, qf
 
-      integer mq
+      integer mq, r2
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
+
+c     # This should be refratio*refratio.
+      integer i1,j1, m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
+
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_face_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
 
 c     # 'iface' is relative to the coarse grid
 
@@ -215,56 +230,100 @@ c     # Average fine grid onto coarse grid
                do ibc = 1,mbc
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
 c                 # ibc = 2 corresponds to the second layer
-                  sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (ibc-1)*refratio + ii
-                        jfine = (j-1)*refratio + jj
-                        if (iface_coarse .eq. 0) then
-                           qf = qfine(ifine,jfine,mq)
-                           kf = areafine(ifine,jfine)
-                        else
-                           qf = qfine(mx+1-ifine,jfine,mq)
-                           kf = areafine(mx+1-ifine,jfine)
-                        endif
-                        sum = sum + qf*kf
-                     enddo
-                  enddo
+
                   if (iface_coarse .eq. 0) then
-                     kc = areacoarse(1-ibc,j+jc_add)
-                     qcoarse(1-ibc,j+jc_add,mq) = sum/kc
-                  else
-                     kc = areacoarse(mx+ibc,j+jc_add)
-                     qcoarse(mx+ibc,j+jc_add,mq) = sum/kc
+                     i1 = 1-ibc
+                     j1 = j+jc_add
+                  elseif (iface_coarse .eq. 1) then
+                     i1 = mx+ibc
+    1                j1 = j+jc_add
                   endif
+c                 # New code
+                  call transform_func_halfsize(i1,j1,i2,j2,
+     &                  transform_cptr)
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     kf = areafine(i2(m),j2(m))
+                     sum = sum + qf*kf
+                  enddo
+                  kc = areacoarse(i1,j1)
+                  qcoarse(i1,j1,mq) = sum/kc
+
+
+c                 # Original code
+c                  sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (ibc-1)*refratio + ii
+c                        jfine = (j-1)*refratio + jj
+c                        if (iface_coarse .eq. 0) then
+c                           qf = qfine(ifine,jfine,mq)
+c                           kf = areafine(ifine,jfine)
+c                        else
+c                           qf = qfine(mx+1-ifine,jfine,mq)
+c                           kf = areafine(mx+1-ifine,jfine)
+c                        endif
+c                        sum = sum + qf*kf
+c                     enddo
+c                  enddo
+c                  if (iface_coarse .eq. 0) then
+c                     kc = areacoarse(1-ibc,j+jc_add)
+c                     qcoarse(1-ibc,j+jc_add,mq) = sum/kc
+c                  else
+c                     kc = areacoarse(mx+ibc,j+jc_add)
+c                     qcoarse(mx+ibc,j+jc_add,mq) = sum/kc
+c                  endif
                enddo
             enddo
          else
             ic_add = igrid*mx/p4est_refineFactor
             do i = 1,mx/p4est_refineFactor
                do jbc = 1,mbc
-                  sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (i-1)*refratio + ii
-                        jfine = (jbc-1)*refratio + jj
-                        if (iface_coarse .eq. 2) then
-                           qf = qfine(ifine,jfine,mq)
-                           kf = areafine(ifine,jfine)
-                        else
-                           qf = qfine(ifine,my+1-jfine,mq)
-                           kf = areafine(ifine,my+1-jfine)
-                        endif
-                        sum = sum + kf*qf
-                     enddo
-                  enddo
+
                   if (iface_coarse .eq. 2) then
-                     kc = areacoarse(i+ic_add,1-jbc)
-                     qcoarse(i+ic_add,1-jbc,mq) = sum/kc
-                  else
-                     kc = areacoarse(i+ic_add,my+jbc)
-                     qcoarse(i+ic_add,my+jbc,mq) = sum/kc
+                     i1 = i+ic_add
+                     j1 = 1-jbc
+                  elseif (iface_coarse .eq. 3) then
+                     i1 = i+ic_add
+                     j1 = my+jbc
                   endif
+c                 # New code
+                  call transform_func_halfsize(i1,j1,i2,j2,
+     &                  transform_cptr)
+
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     kf = areafine(i2(m),j2(m))
+                     sum = sum + qf*kf
+                  enddo
+                  kc = areacoarse(i1,j1)
+                  qcoarse(i1,j1,mq) = sum/kc
+
+c                 # Original code
+c                  sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (i-1)*refratio + ii
+c                        jfine = (jbc-1)*refratio + jj
+c                        if (iface_coarse .eq. 2) then
+c                           qf = qfine(ifine,jfine,mq)
+c                           kf = areafine(ifine,jfine)
+c                        else
+c                           qf = qfine(ifine,my+1-jfine,mq)
+c                           kf = areafine(ifine,my+1-jfine)
+c                        endif
+c                        sum = sum + kf*qf
+c                     enddo
+c                  enddo
+c                  if (iface_coarse .eq. 2) then
+c                     kc = areacoarse(i+ic_add,1-jbc)
+c                     qcoarse(i+ic_add,1-jbc,mq) = sum/kc
+c                  else
+c                     kc = areacoarse(i+ic_add,my+jbc)
+c                     qcoarse(i+ic_add,my+jbc,mq) = sum/kc
+c                  endif
                enddo
             enddo
          endif
