@@ -25,7 +25,6 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/limiter.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/qinit.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/b4step2.f \
-	src/solvers/fclaw2d_clawpack4.6/fortran_source/claw2d_utils.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/setaux.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/src2.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/bc2.f \
