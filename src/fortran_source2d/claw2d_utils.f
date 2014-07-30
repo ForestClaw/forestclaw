@@ -81,27 +81,38 @@ c                  endif
 
 c     # average ghost cells from 'igrid' neighbor 'qfine' (igrid = 0,1)
 c     # to 'qcoarse' at face 'iface_coarse'  in direction 'idir' of 'qcoarse'
-      subroutine average_face_ghost(mx,my,mbc,meqn,qcoarse,
-     &      qfine,idir,iface_coarse,num_neighbors,refratio,igrid,
-     &      transform_cptr)
+      subroutine average_face_ghost(mx,my,mbc,meqn,
+     &      qcoarse,qfine,areacoarse, areafine,
+     &      idir,iface_coarse,num_neighbors,refratio,igrid,
+     &      manifold, transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
+      integer manifold
       integer*8 transform_cptr
       integer num_neighbors
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision sum
+
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      double precision sum, qf, kf
+      logical is_manifold
 
       integer mq,r2, m
-      integer i, ic_add, ibc, ii, ifine
-      integer j, jc_add, jbc, jj, jfine
-      integer i1,j1
+      integer i, ic_add, ibc
+      integer j, jc_add, jbc
 
 c     # This should be refratio*refratio.
+      integer i1,j1
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
+      double precision kc
+
+      is_manifold = manifold .eq. 1
 
 c     # 'iface' is relative to the coarse grid
 
@@ -129,28 +140,25 @@ c                 # ibc = 2 corresponds to the second layer
     1                j1 = j+jc_add
                   endif
 
-cc                 # Original code
-c                 sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (ibc-1)*refratio + ii
-c                        jfine = (j-1)*refratio + jj
-c                        if (iface_coarse .eq. 0) then
-c                           sum = sum + qfine(mx-ifine+1,jfine,mq)
-c                        elseif (iface_coarse .eq. 1) then
-c                           sum = sum + qfine(ifine,jfine,mq)
-c                        endif
-c                     enddo
-c                  enddo
-
 c                 # New code
                   call transform_func_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine(i2(m),j2(m),mq)
-                  enddo
-                  qcoarse(i1,j1,mq) = sum/r2
+                  if (is_manifold) then
+                     sum = 0
+                     do m = 0,r2-1
+                        qf = qfine(i2(m),j2(m),mq)
+                        kf = areafine(i2(m),j2(m))
+                        sum = sum + qf*kf
+                     enddo
+                     kc = areacoarse(i1,j1)
+                     qcoarse(i1,j1,mq) = sum/kc
+                  else
+                     sum = 0
+                     do m = 0,r2-1
+                        sum = sum + qfine(i2(m),j2(m),mq)
+                     enddo
+                     qcoarse(i1,j1,mq) = sum/r2
+                  endif
                enddo
             enddo
          else
@@ -166,34 +174,31 @@ c                 # New code
                      j1 = my+jbc
                   endif
 
-cc                 # Original code
-c                  sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (i-1)*refratio + ii
-c                        jfine = (jbc-1)*refratio + jj
-c                        if (iface_coarse .eq. 2) then
-c                           sum = sum + qfine(ifine,my-jfine+1,mq)
-c                        else
-c                           sum = sum + qfine(ifine,jfine,mq)
-c                        endif
-c                     enddo
-c                  enddo
-
-c                 # New code
                   call transform_func_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine(i2(m),j2(m),mq)
-                  enddo
-                  qcoarse(i1,j1,mq) = sum/r2
+                  if (is_manifold) then
+                     sum = 0
+                     do m = 0,r2-1
+                        qf = qfine(i2(m),j2(m),mq)
+                        kf = areafine(i2(m),j2(m))
+                        sum = sum + qf*kf
+                     enddo
+                     kc = areacoarse(i1,j1)
+                     qcoarse(i1,j1,mq) = sum/kc
+                  else
+                     sum = 0
+                     do m = 0,r2-1
+                        sum = sum + qfine(i2(m),j2(m),mq)
+                     enddo
+                     qcoarse(i1,j1,mq) = sum/r2
+                  endif
                enddo
             enddo
          endif
       enddo
 
       end
+
 
       subroutine interpolate_face_ghost(mx,my,mbc,meqn,qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
