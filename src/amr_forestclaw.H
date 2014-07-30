@@ -91,18 +91,8 @@ void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,
 // -------------------------------------------
 // Routines needed to communicate with p4est
 // -------------------------------------------
-// amr_neighbors.cpp
-void get_face_neighbors (fclaw2d_domain_t * domain,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         int iside,
-                         int *neighbor_block_idx,
-                         fclaw2d_patch_t * ghost_patches[],
-                         int **ref_flag_ptr,
-                         int **fine_grid_pos_ptr,
-                         int **iface_neighbor,
-                         int ftransform[]);
 
+/* Data structure for transformation data at non-aligned boundaries */
 typedef struct fclaw2d_transform_data
 {
     fclaw2d_patch_t* this_patch;
@@ -115,14 +105,26 @@ typedef struct fclaw2d_transform_data
     int fine_grid_pos;   // Fine grid position (0 or 1)
 } fclaw2d_transform_data_t;
 
+
+// amr_neighbors.cpp
+void get_face_neighbors (fclaw2d_domain_t * domain,
+                         int this_block_idx,
+                         int this_patch_idx,
+                         int iside,
+                         int *neighbor_block_idx,
+                         fclaw2d_patch_t * ghost_patches[],
+                         int **ref_flag_ptr,
+                         int **fine_grid_pos_ptr,
+                         int **iface_neighbor,
+                         int ftransform[]);
+
 void transform_func_samesize_(const int &i1, const int &j1,
-                     int i2[], int j2[],
-                     fclaw2d_transform_data_t* tdata);
+                              int *i2, int *j2,
+                              fclaw2d_transform_data_t* tdata);
 
 void transform_func_halfsize_(const int &i1, const int &j1,
-                     int i2[], int j2[],
-                     fclaw2d_transform_data_t* tdata);
-
+                              int i2[], int j2[],
+                              fclaw2d_transform_data_t* tdata);
 
 void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int this_block_idx,

@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This will be called from fortran */
 void transform_func_samesize_(const int &i1, const int &j1,
-                     int i2[],int j2[],
-                     fclaw2d_transform_data_t* tdata)
+                              int *i2,int *j2,
+                              fclaw2d_transform_data_t* tdata)
 
 {
     /*
@@ -46,8 +46,8 @@ void transform_func_samesize_(const int &i1, const int &j1,
                                        int mx, int my, int based, int *i, int *j);
     */
 
-    i2[0] = i1;
-    j2[0] = j1;
+    *i2 = i1;
+    *j2 = j1;
     fclaw2d_patch_transform_face(tdata->this_patch,
                                       tdata->neighbor_patch,
                                       tdata->transform,
@@ -92,7 +92,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t* neighbor_patches[],
                         int **ref_flag_ptr,
                         int **fine_grid_pos_ptr,
-                        int **iface_neighbor,
+                        int **iface_neighbor_ptr,
                         int ftransform[])
 {
     int rproc[p4est_refineFactor];
@@ -186,8 +186,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             }
             neighbor_patches[ir] = neighbor;
         }
-        **iface_neighbor = iside;
-        fclaw2d_patch_face_swap(*iface_neighbor,&rfaceno);
+        **iface_neighbor_ptr = iside;
+        fclaw2d_patch_face_swap(*iface_neighbor_ptr,&rfaceno);
 
     }
 }

@@ -13,7 +13,7 @@ c     # Exchange edge ghost data with neighboring grid at same level.
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,ibc,jbc,mq, idir
-      integer i1,j1, i2(0:0),j2(0:0)
+      integer i1,j1, i2, j2
 
       idir = iface/2
 
@@ -34,7 +34,7 @@ c                 # x-direction (idir == 0)
                   endif
                   call transform_func_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
-                  qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
 cc                 # Original code
 c                  if (iface .eq. 0) then
@@ -62,7 +62,7 @@ c                 # y-direction (idir == 1)
                   endif
                   call transform_func_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
-                  qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
 cc                 # Original code
 c                  if (iface .eq. 2) then
