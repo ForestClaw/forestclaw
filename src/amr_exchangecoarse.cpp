@@ -444,8 +444,12 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
+
+            /* Get the face neighbor relative to the neighbor's coordinate
+               orientation */
             int iface_neighbor;
             int *iface_neighbor_ptr = &iface_neighbor;
+
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
 
             transform_data.iface = iface;
@@ -557,8 +561,12 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
+
+            /* Get the face neighbor relative to the neighbor's coordinate
+               orientation */
             int iface_neighbor;
             int *iface_neighbor_ptr = &iface_neighbor;
+
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
             int ftransform[9];
 

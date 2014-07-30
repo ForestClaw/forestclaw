@@ -59,8 +59,12 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int *ref_flag_ptr = &ref_flag;
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
+
+        /* Get the face neighbor relative to the neighbor's coordinate
+           orientation (this isn't used here) */
         int iface_neighbor;
         int *iface_neighbor_ptr = &iface_neighbor;
+
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
 
 
@@ -102,6 +106,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                 this_cp->mb_exchange_face_ghost(iface,neighbor_cp);
             }
             */
+
         } /* Check return from neighbor */
     } /* loop over all faces */
 }

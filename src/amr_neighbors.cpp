@@ -129,9 +129,11 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
     if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
     {
-        // Edge is a physical boundary
-        // Set the pointer to NULL rather than come up with some bogus value for ref_flag.
+        /* Edge is a physical boundary
+           Set the pointer to NULL rather than come up with some bogus value
+           for ref_flag and iface_neighbor */
         *ref_flag_ptr = NULL;
+        *iface_neighbor_ptr = NULL;
     }
     else
     {
@@ -184,9 +186,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             }
             neighbor_patches[ir] = neighbor;
         }
-        /*
-          void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
-        */
         **iface_neighbor = iside;
         fclaw2d_patch_face_swap(*iface_neighbor,&rfaceno);
 
