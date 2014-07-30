@@ -454,9 +454,9 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     /* work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx * (double) (1 << ipatch->level);
 
-    if (ftransform[8] == 4)
+    if (ftransform[8] & 4)
     {
-        /* The two patches are in the same block.  ftransform is undefined.  */
+        /* The two patches are in the same block.  ftransform is not used */
         *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
         *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
     }

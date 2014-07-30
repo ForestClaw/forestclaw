@@ -108,19 +108,13 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     }
     else
     {
-        // This is demonstration code to infer the patch transformation.
-        // We can do this at a later point when we really need to transform
-        // a patch into it's face neighbor's coordinate system.
-        // This is nontrivial only across a block boundary
-        if (this_block_idx != rblockno)
+        // Get encoding of transforming a neighbor coordinate across a face
+        fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+        if (this_block_idx == rblockno)
         {
-            fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+            // If we are within one patch this is a special case
+            ftransform[8] |= 4;
         }
-        else
-        {
-            ftransform[8] = 4;
-        }
-
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
         {

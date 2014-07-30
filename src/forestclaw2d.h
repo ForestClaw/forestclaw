@@ -297,10 +297,10 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  * Else we have an input patch in one block and on output patch across a face.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
- * \param [in] ftransform   It must have room for NINE (9) integers.
- *                          If \a ipatch and \a opatch are in the same block, set
- *                          \a ftransform[8] == 4.  Else its contents must be as
+ * \param [in] ftransform   It must have room for NINE (9) integers and be
  *                          computed by \a fclaw2d_patch_face_transformation.
+ *                          If \a ipatch and \a opatch are in the same block,
+ *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
