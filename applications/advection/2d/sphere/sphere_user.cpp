@@ -294,7 +294,7 @@ void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngri
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     /* Increase the number of fields by 1 so we can printout the mpi rank */
-    int mfields = gparms->meqn + 1;
+    int mfields = gparms->meqn;
     int maux = 0;
     sphere_write_tfile_(iframe,time,mfields,ngrids,maux);
 

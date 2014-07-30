@@ -18,6 +18,9 @@ c     # at face 'iface'.
 
       integer i,j,ibc,jbc,mq
 
+      write(6,*) 'In ghost_twopatch.f'
+      stop
+
       do mq = 1,meqn
          if (iface .eq. 0) then
             do j = 1,my

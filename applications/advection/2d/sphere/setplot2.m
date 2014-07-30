@@ -39,7 +39,8 @@
 %
 %      See also PLOTCLAW2, SetPlotGrid, setPlotGridEdges.
 
-% OutputFlag = 'ascii'         % default value.
+OutputFlag = 'forestclaw';         % default value.
+ForestClaw = 1;
 
 PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
@@ -54,6 +55,7 @@ MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
 Manifold = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;
+MaskFlag = 0;
 ReadBlockNumber = 1;
 PlotData =  ones(1,MaxLevels);   % Data on refinement level k is plotted only if
 			     % k'th component is nonzero
