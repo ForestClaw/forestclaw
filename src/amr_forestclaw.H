@@ -107,13 +107,20 @@ typedef struct fclaw2d_transform_data
     fclaw2d_patch_t* this_patch;
     fclaw2d_patch_t* neighbor_patch;
     int transform[9];
-    int mx, my, iface, based;
+    int mx;
+    int my;
+    int iface;   // Relative to the coarse grid
+    int based;   // 0 for cell-centered; 1 for nodes
+    int fine_grid_pos;   // Fine grid position (0 or 1)
 } fclaw2d_transform_data_t;
 
-void transform_func_(const int &i1, const int &j1,
+void transform_func_samesize_(const int &i1, const int &j1,
                      int i2[], int j2[],
                      fclaw2d_transform_data_t* tdata);
 
+void transform_func_halfsize_(const int &i1, const int &j1,
+                     int i2[], int j2[],
+                     fclaw2d_transform_data_t* tdata);
 
 
 void get_corner_neighbor (fclaw2d_domain_t * domain,

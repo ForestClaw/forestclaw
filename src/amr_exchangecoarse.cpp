@@ -446,6 +446,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
 
+            transform_data.iface = iface;
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
@@ -467,7 +468,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
                     transform_data.neighbor_patch = neighbor_patches[igrid];
-                    // will need to set transform_data.igrid == ???
+                    transform_data.fine_grid_pos = igrid;
                     ClawPatch* fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
                     this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                                 fine_neighbor_cp,time_interp,block_boundary,

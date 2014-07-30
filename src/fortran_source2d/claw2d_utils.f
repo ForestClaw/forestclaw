@@ -32,23 +32,15 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call transform_func(i1,j1,i2,j2,transform_cptr)
+                  call transform_func_samesize(i1,j1,i2,j2,
+     &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
+cc                 # Original code
 c                  if (iface .eq. 0) then
-c                     i2 = ifunc(1-ibc,j,iface,this_block)
-c                     j2 = jfunc(1-ibc,j,iface,this_block)
-c                     qthis(1-ibc,j,mq) = qneighbor(i2,j2,mq)
-c
-cc                    # Original code
 cc                     qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
 cc                     qneighbor(mx+ibc,j,mq) = qthis(ibc,j,mq)
 c                  elseif (iface .eq. 1) then
-c    1                i2 = ifunc(mx+ibc,j,iface,this_block)
-c    1                j2 = jfunc(mx+ibc,j,iface,this_block)
-c                     qthis(mx+ibc,j,mq) = qneighbor(i2,j2,mq)
-c
-cc                    # Original code
 cc                     qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
 cc                     qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
 c                  endif
@@ -68,23 +60,15 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call transform_func(i1,j1,i2,j2,transform_cptr)
+                  call transform_func_samesize(i1,j1,i2,j2,
+     &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2(0),j2(0),mq)
 
+cc                 # Original code
 c                  if (iface .eq. 2) then
-c                     i2 = ifunc(i,1-jbc,iface,this_block)
-c                     j2 = jfunc(i,1-jbc,iface,this_block)
-c                     qthis(i,1-jbc,mq) = qneighbor(i2,j2,mq)
-c
-cc                    # Original code
 cc                     qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
 cc                     qneighbor(i,my+jbc,mq) = qthis(i,jbc,mq)
 c                  elseif (iface .eq. 3) then
-c                     i2 = ifunc(i,my+jbc,iface,this_block)
-c                     j2 = jfunc(i,my+jbc,iface,this_block)
-c                     qthis(i,1-jbc,mq) = qneighbor(i2,j2,mq)
-c
-cc                    # Original code
 cc                     qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
 cc                     qneighbor(i,1-jbc,mq) = qthis(i,my+1-jbc,mq)
 c                  endif
@@ -135,27 +119,27 @@ c                 # ibc = 2 corresponds to the second layer
     1                j1 = j+jc_add
                   endif
 
-c                 # Original code
-                 sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (ibc-1)*refratio + ii
-                        jfine = (j-1)*refratio + jj
-                        if (iface_coarse .eq. 0) then
-                           sum = sum + qfine(mx-ifine+1,jfine,mq)
-                        elseif (iface_coarse .eq. 1) then
-                           sum = sum + qfine(ifine,jfine,mq)
-                        endif
-                     enddo
-                  enddo
+cc                 # Original code
+c                 sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (ibc-1)*refratio + ii
+c                        jfine = (j-1)*refratio + jj
+c                        if (iface_coarse .eq. 0) then
+c                           sum = sum + qfine(mx-ifine+1,jfine,mq)
+c                        elseif (iface_coarse .eq. 1) then
+c                           sum = sum + qfine(ifine,jfine,mq)
+c                        endif
+c                     enddo
+c                  enddo
 
 c                 # New code
-c                 call idxfunc(i1,i2,i2,j2,transform_cptr)
-c                 sum = 0
-c                 do m = 0,r2-1
-c                     sum = sum + qfine(i2(m),j2(m),mq)
-c                 enddo
-
+                  call transform_func_halfsize(i1,j1,i2,j2,
+     &                  transform_cptr)
+                  sum = 0
+                  do m = 0,r2-1
+                     sum = sum + qfine(i2(m),j2(m),mq)
+                  enddo
                   qcoarse(i1,j1,mq) = sum/r2
                enddo
             enddo
@@ -172,34 +156,28 @@ c                 enddo
                      j1 = my+jbc
                   endif
 
-c                 # Original code
-                  sum = 0
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        ifine = (i-1)*refratio + ii
-                        jfine = (jbc-1)*refratio + jj
-                        if (iface_coarse .eq. 2) then
-                           sum = sum + qfine(ifine,my-jfine+1,mq)
-                        else
-                           sum = sum + qfine(ifine,jfine,mq)
-                        endif
-                     enddo
-                  enddo
+cc                 # Original code
+c                  sum = 0
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        ifine = (i-1)*refratio + ii
+c                        jfine = (jbc-1)*refratio + jj
+c                        if (iface_coarse .eq. 2) then
+c                           sum = sum + qfine(ifine,my-jfine+1,mq)
+c                        else
+c                           sum = sum + qfine(ifine,jfine,mq)
+c                        endif
+c                     enddo
+c                  enddo
 
 c                 # New code
-c                  call idxfunc(i1,j1,i2,j2,transform_cptr)
-c                  sum = 0
-c                  do m = 0,r2
-c                     sum = sum + qfine(i2(m),j2(m),mq)
-c                  enddo
-c
+                  call transform_func_halfsize(i1,j1,i2,j2,
+     &                  transform_cptr)
+                  sum = 0
+                  do m = 0,r2
+                     sum = sum + qfine(i2(m),j2(m),mq)
+                  enddo
                   qcoarse(i1,j1,mq) = sum/r2
-
-c                  if (iface_coarse .eq. 2) then
-c                     qcoarse(i+ic_add,1-jbc,mq) = sum/r2
-c                  else
-c                     qcoarse(i+ic_add,my+jbc,mq) = sum/r2
-c                  endif
                enddo
             enddo
          endif
