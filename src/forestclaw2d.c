@@ -428,6 +428,21 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
+{
+  const int        iface = *faceno;
+  const int        orientation = *rfaceno / P4EST_FACES;
+
+  P4EST_ASSERT (orientation < P4EST_HALF);
+  P4EST_ASSERT (*faceno < P4EST_FACES);
+
+  *faceno = *rfaceno % P4EST_FACES;
+  *rfaceno = iface + P4EST_FACES * orientation;
+
+  P4EST_ASSERT (*faceno < P4EST_FACES);
+}
+
+void
 fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 {
     p4est_expand_face_transform (faceno, rfaceno, ftransform);
