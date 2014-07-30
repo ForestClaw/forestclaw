@@ -96,11 +96,20 @@ c     # to 'qcoarse' at face 'iface_coarse'  in direction 'idir' of 'qcoarse'
       integer mq,r2, m
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
-      integer i1,j1,i2(0:refratio*refratio),j2(0:refratio*refratio)
+      integer i1,j1
+
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
 
 c     # 'iface' is relative to the coarse grid
 
       r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_face_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
 
 c     # Average fine grid onto coarse grid
       do mq = 1,meqn
