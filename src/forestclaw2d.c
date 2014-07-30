@@ -466,6 +466,14 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (mx >= 1 && mx == my);
     FCLAW_ASSERT (based == 0 || based == 1);
 
+#if 0
+    printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
+            ipatch->xlower, ipatch->ylower, ipatch->level,
+            ftransform[0], ftransform[2], ftransform[3], ftransform[5],
+            ftransform[6], ftransform[8],
+            mx, *i, *j, based);
+#endif
+
     /* work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx * (double) (1 << ipatch->level);
 
@@ -481,14 +489,6 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
         double     my_xyz[2], target_xyz[2];
-
-#if 0
-        printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
-                ipatch->xlower, ipatch->ylower, ipatch->level,
-                ftransform[0], ftransform[2], ftransform[3], ftransform[5],
-                ftransform[6], ftransform[8],
-                mx, *i, *j, based);
-#endif
 
         /* the reference cube is stretched to mx times my units */
         my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
@@ -517,15 +517,14 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
             SC_ABORT_NOT_REACHED ();
         }
 
-        /* transform back to integer coordinates */
+        /* transform back to integer coordinates: this is exact */
         *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
         *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
     }
 
 #if 0
     printf ("Test O: IP %g %g IJ %d %d\n",
-            opatch->xlower, opatch->ylower,
-            *i, *j);
+            opatch->xlower, opatch->ylower, *i, *j);
 #endif
 }
 
