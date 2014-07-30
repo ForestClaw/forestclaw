@@ -29,7 +29,7 @@ c                 # x-direction (idir == 0)
                      i1 = 1-ibc
                      j1 = j
                   elseif (iface .eq. 1) then
-                     i1 = mx+mbc
+                     i1 = mx+ibc
                      j1 = j
                   endif
                   call transform_func(i1,j1,i2,j2,transform_cptr)
@@ -272,9 +272,9 @@ c                    # Fill in interpolated values on fine grid cell
                      shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
 
                      value = qc + shiftx*gradx + shifty*grady
-                     i1 = ic
-                     j1 = jc
-                     qfine(i2,j2,mq) = value
+c                     i1 = ic
+c                     j1 = jc
+c                     qfine(i2,j2,mq) = value
 
                      ifine = ibc
                      jfine = (j-1)*refratio + jj
