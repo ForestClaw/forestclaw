@@ -98,7 +98,8 @@ void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const in
 void average_face_ghost_(const int& mx, const int& my, const int& mbc,
                          const int& meqn, double qfine[],double qcoarse[],
                          const int& idir, const int& iside, const int& num_neighbors,
-                         const int& refratio, const int& igrid);
+                         const int& refratio, const int& igrid,
+                         fclaw_cptr transform_cptr);
 
 void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
                              double qthis[],double qcoarse[], const int& idir, const int& iside,

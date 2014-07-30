@@ -384,6 +384,9 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
 {
     double *qthis = m_griddata.dataPtr();
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
+
+    printf("In mb_exchange_face_ghost\n");
+    exit(0);
     mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
@@ -469,7 +472,8 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    ClawPatch *neighbor_cp,
                                    fclaw_bool a_time_interp,
                                    fclaw_bool a_block_boundary,
-                                   const int& igrid)
+                                   const int& igrid,
+                                   fclaw_cptr transform_cptr)
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
@@ -496,7 +500,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     else
     {
         average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
-                            a_p4est_refineFactor,a_refratio,igrid);
+                            a_p4est_refineFactor,a_refratio,igrid,transform_cptr);
     }
 
 

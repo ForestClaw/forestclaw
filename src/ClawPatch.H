@@ -83,7 +83,8 @@ public :
                             ClawPatch *neighbor_cp,
                             fclaw_bool a_time_interp,
                             fclaw_bool a_block_boundary,
-                            const int& igrid);
+                            const int& igrid,
+                            fclaw_cptr transform_data);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,

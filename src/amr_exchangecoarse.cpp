@@ -425,8 +425,15 @@ void cb_face_average(fclaw2d_domain_t *domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
 
-    ClawPatch *this_cp = get_clawpatch(this_patch);
+    // Transform data needed at multi-block boundaries
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
 
+    ClawPatch *this_cp = get_clawpatch(this_patch);
     for (int idir = 0; idir < 2; idir++)
     {
         // Loop over low side and high side
@@ -438,7 +445,6 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
-            int ftransform[9];
 
             get_face_neighbors(domain,
                                this_block_idx,
@@ -448,7 +454,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                neighbor_patches,
                                &ref_flag_ptr,
                                &fine_grid_pos_ptr,
-                               ftransform);
+                               transform_data.transform);
 
             if (ref_flag_ptr == NULL)
             {
@@ -460,10 +466,12 @@ void cb_face_average(fclaw2d_domain_t *domain,
                 fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
+                    transform_data.neighbor_patch = neighbor_patches[igrid];
+                    // will need to set transform_data.igrid == ???
                     ClawPatch* fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
                     this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                                 fine_neighbor_cp,time_interp,block_boundary,
-                                                igrid);
+                                                igrid,(fclaw_cptr) &transform_data);
                 }
             }
             else if (ref_flag == -1 && is_fine)
@@ -496,9 +504,12 @@ void cb_face_average(fclaw2d_domain_t *domain,
                         iface_coarse = iface;
                     }
 
+                    transform_data.this_patch = neighbor_patches[0];
+                    transform_data.neighbor_patch = this_patch;
+                    // transform_data.igrid = ...???
                     coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
                                                 fine_cp,time_interp,block_boundary,
-                                                igrid);
+                                                  igrid, (fclaw_cptr) &transform_data);
 
                 }
 
