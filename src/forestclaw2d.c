@@ -439,7 +439,6 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
                               const int ftransform[],
                               int mx, int my, int based, int *i, int *j)
 {
-    int        powl;
     double     Rmx;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
@@ -453,14 +452,13 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (based == 0 || based == 1);
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx;
-    powl = (double) (1 << ipatch->level);
+    Rmx = (double) mx * (double) (1 << ipatch->level);
 
     if (ftransform[8] == 4)
     {
         /* The two patches are in the same block.  ftransform is undefined.  */
-        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx * powl);
-        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx * powl);
+        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
+        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
     }
     else
     {
@@ -478,8 +476,8 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 #endif
 
         /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmx + (*i - .5 * based) * powl;
-        my_xyz[1] = ipatch->ylower * Rmx + (*j - .5 * based) * powl;
+        my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
+        my_xyz[1] = ipatch->ylower * Rmx + *j - .5 * based;
 
         /* transform transversal direction */
         target_xyz[target_axis[0]] =
