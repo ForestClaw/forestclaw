@@ -59,6 +59,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         int *ref_flag_ptr = &ref_flag;
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
+        int iface_neighbor;
+        int *iface_neighbor_ptr = &iface_neighbor;
         fclaw2d_patch_t* ghost_patches[p4est_refineFactor];
 
 
@@ -71,6 +73,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
                            ghost_patches,
                            &ref_flag_ptr,
                            &fine_grid_pos_ptr,
+                           &iface_neighbor_ptr,
                            transform_data.transform);
 
         if (ref_flag_ptr == NULL)

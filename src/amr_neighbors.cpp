@@ -92,13 +92,13 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t* neighbor_patches[],
                         int **ref_flag_ptr,
                         int **fine_grid_pos_ptr,
+                        int **iface_neighbor,
                         int ftransform[])
 {
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
     int rfaceno;
-    // int ftransform[9];
     int num_neighbors;
 
     for(int ir = 0; ir < p4est_refineFactor; ir++)
@@ -184,6 +184,12 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             }
             neighbor_patches[ir] = neighbor;
         }
+        /*
+          void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
+        */
+        **iface_neighbor = iside;
+        fclaw2d_patch_face_swap(*iface_neighbor,&rfaceno);
+
     }
 }
 

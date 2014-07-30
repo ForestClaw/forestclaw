@@ -444,6 +444,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
+            int iface_neighbor;
+            int *iface_neighbor_ptr = &iface_neighbor;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
 
             transform_data.iface = iface;
@@ -455,6 +457,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                                neighbor_patches,
                                &ref_flag_ptr,
                                &fine_grid_pos_ptr,
+                               &iface_neighbor_ptr,
                                transform_data.transform);
 
             if (ref_flag_ptr == NULL)
@@ -486,7 +489,10 @@ void cb_face_average(fclaw2d_domain_t *domain,
                     int igrid = fine_grid_pos;
 
                     /* Swap out coarse and fine */
+                    int iface_coarse = iface_neighbor;
+
                     fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
+#if 0
                     int iface_coarse;
                     if (!block_boundary)
                     {
@@ -504,12 +510,14 @@ void cb_face_average(fclaw2d_domain_t *domain,
                         /* This only works for the sphere grid */
                         iface_coarse = iface;
                     }
+#endif
+
 
                     transform_data.this_patch = neighbor_patches[0];
                     transform_data.neighbor_patch = this_patch;
-                    // transform_data.igrid = ...???
+                    transform_data.fine_grid_pos = igrid;
                     coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
-                                                fine_cp,time_interp,block_boundary,
+                                                  fine_cp,time_interp,block_boundary,
                                                   igrid, (fclaw_cptr) &transform_data);
 
                 }
@@ -549,6 +557,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag; // = -1, 0, 1
             int fine_grid_pos;
             int *fine_grid_pos_ptr = &fine_grid_pos;
+            int iface_neighbor;
+            int *iface_neighbor_ptr = &iface_neighbor;
             fclaw2d_patch_t *neighbor_patches[p4est_refineFactor];
             int ftransform[9];
 
@@ -560,6 +570,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                neighbor_patches,
                                &ref_flag_ptr,
                                &fine_grid_pos_ptr,
+                               &iface_neighbor_ptr,
                                ftransform);
 
             fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
@@ -589,6 +600,8 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                     int igrid = fine_grid_pos;
 
                     /* Swap out coarse and fine */
+                    int iface_coarse = iface_neighbor;
+#if 0
                     int iface_coarse;
                     if (!block_boundary)
                     {
@@ -606,6 +619,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                         /* This only works for the sphere grid */
                         iface_coarse = iface;
                     }
+#endif
 
                     /* This call can generate a floating point exception, for reasons I don't
                        completely understand, (er don't understand at all...) Valgrind doesn't

@@ -100,6 +100,7 @@ void get_face_neighbors (fclaw2d_domain_t * domain,
                          fclaw2d_patch_t * ghost_patches[],
                          int **ref_flag_ptr,
                          int **fine_grid_pos_ptr,
+                         int **iface_neighbor,
                          int ftransform[]);
 
 typedef struct fclaw2d_transform_data
