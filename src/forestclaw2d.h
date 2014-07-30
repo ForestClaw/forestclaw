@@ -313,6 +313,35 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
                                    const int ftransform[],
                                    int mx, int my, int based, int *i, int *j);
 
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the neighbor patch is smaller (HALF size).
+ * The neighbor patch may be in the same block, encoded by ftransform[8] == 4.
+ * Else we have an input patch in one block and on output patch across a face.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] ftransform   It must have room for NINE (9) integers and be
+ *                          computed by \a fclaw2d_patch_face_transformation.
+ *                          If \a ipatch and \a opatch are in the same block,
+ *                          we require \a ftransform[8] |= 4.
+ * \param [in] position     0 or 1 depending on the position of small neighbor.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ *                          This function assumes \a mx == \a my.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        FOUR (4) integer coordinates along x-axis in
+ *                          \a based .. \a mx.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] j        FOUR (4) integer coordinates along y-axis in
+ *                          \a based .. \a mx.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ */
+void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
+                                    fclaw2d_patch_t * opatch,
+                                    const int ftransform[], int position,
+                                    int mx, int my, int based, int i[], int j[]);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e. no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
