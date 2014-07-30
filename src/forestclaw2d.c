@@ -555,9 +555,17 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 
     if (ftransform[8] & 4)
     {
+#if 0
+        printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
+                ipatch->xlower, ipatch->ylower, ipatch->level,
+                ftransform[0], ftransform[2], ftransform[3], ftransform[5],
+                ftransform[6], ftransform[8],
+                mx, *i, *j, based);
+#endif
+
         /* The two patches are in the same block.  ftransform is undefined */
         di = (ipatch->xlower - opatch->xlower) * Rmxo + 2. * (*i - based);
-        dj = (ipatch->xlower - opatch->xlower) * Rmxo + 2. * (*j - based);
+        dj = (ipatch->ylower - opatch->ylower) * Rmxo + 2. * (*j - based);
 
         /* In the same block, the order of child cells is canonical */
         for (kt = 0; kt < 2; ++kt) {
@@ -566,6 +574,12 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
             j[2 * kt + kn] = (int) dj + kt + based;
           }
         }
+
+#if 0
+        printf ("Test O: OP %g %g %d IJ %d %d\n",
+                opatch->xlower, opatch->ylower, opatch->level,
+                i[0], j[0]);
+#endif
     }
     else
     {
