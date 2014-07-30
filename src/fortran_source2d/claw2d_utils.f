@@ -98,6 +98,7 @@ c     # to 'qcoarse' at face 'iface_coarse'  in direction 'idir' of 'qcoarse'
       integer j, jc_add, jbc, jj, jfine
       integer i1,j1
 
+c     # This should be refratio*refratio.
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
@@ -183,7 +184,7 @@ c                 # New code
                   call transform_func_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
                   sum = 0
-                  do m = 0,r2
+                  do m = 0,r2-1
                      sum = sum + qfine(i2(m),j2(m),mq)
                   enddo
                   qcoarse(i1,j1,mq) = sum/r2
