@@ -1,0 +1,141 @@
+{
+   bootstrap (in /usr/lib/dyld)
+   Memcheck:Leak
+   ...
+   fun:_ZN13dyldbootstrap5startEPK12macho_headeriPPKclS2_Pm
+}
+
+{
+   objc_init
+   Memcheck:Leak
+   ...
+   fun:_objc_init
+}
+
+{
+   map_images (in /usr/lib/libobjc.A.dylib)
+   Memcheck:Leak
+   ...
+   fun:map_images
+}
+
+{
+   libSystem_initializer
+   Memcheck:Leak
+   ...
+   fun:libSystem_initializer
+}
+{
+   _libxpc_initializer
+   Memcheck:Leak
+   ...
+   fun:_libxpc_initializer
+}
+{
+   libSystem_initializer
+   Memcheck:Leak
+   ...
+   fun:libSystem_initializer
+}
+
+{
+   fprintf__snprintf_chk
+   Memcheck:Leak
+   ...
+   fun:__snprintf_chk
+}
+
+{
+   fprintf
+   Memcheck:Leak
+   ...
+   fun:fprintf
+}
+
+# {
+#    fputc (in /usr/lib/system/libsystem_c.dylib)
+#    Memcheck:Leak
+#    ...
+#    fun:fputc
+# }
+
+{
+   snprintf
+   Memcheck:Leak
+   ...
+   fun:snprintf
+}
+
+{
+   basename (/usr/lib/system/libsystem_c.dylib)
+   Memcheck:Leak
+   ...
+   fun:basename
+}
+
+{
+   write_float (Value8)
+   Memcheck:Value8
+   ...
+   fun:write_float
+}
+
+{
+   write_float (Cond)
+   Memcheck:Cond
+   ...
+   fun:write_float
+}
+
+
+# Known fortran memory bug?
+# See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=55469
+
+{
+   _gfortrani_get_mem (known bug in gfortran?)
+   Memcheck:Leak
+   fun:malloc
+   fun:_gfortrani_get_mem
+}
+
+{
+   HYD_uii_mpx_get_parameters (MPICH error?)
+   Memcheck:Leak
+   ...
+   fun:HYD_uii_mpx_get_parameters
+}
+
+{
+   si_module_with_name
+   Memcheck:Leak
+   ...
+   fun:si_module_with_name
+}
+
+{
+   HYDU_sock_is_local
+   Memcheck:Leak
+   ...
+   fun:HYDU_sock_is_local
+}
+
+{
+   HYD_pmci_launch_procs
+   Memcheck:Leak
+   ...
+   fun:HYD_pmci_launch_procs
+}
+
+{
+   dispatch_once_f
+   Memcheck:Leak
+   ...
+   fun:dispatch_once_f
+}
+
+{
+   HYD_pmci_wait_for_completion
+   Memcheck:Leak
+   ...
+   fun:HYD_pmci_wait_for_completion
+}
