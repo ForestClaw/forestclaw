@@ -72,3 +72,4 @@ ContourValues = [];
 %---------------------------------
 
 ShowUnderOverShoots = 0;
+UseColorMapping = 'ParallelPartions';
