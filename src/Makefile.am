@@ -12,6 +12,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map.h \
 	src/clawpack_fort.H \
+	src/fclaw2d_transform.h \
 	src/fortran_source2d/metric_terms.i
 
 libforestclaw_internal_headers = \
@@ -48,6 +49,7 @@ libforestclaw_compiled_sources = \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
+	src/fclaw2d_transform.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
 	src/amr_neighbors.cpp \
