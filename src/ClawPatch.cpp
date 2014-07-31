@@ -580,16 +580,24 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
 }
 
 //
-void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                     ClawPatch *cp_corner, fclaw_bool a_time_interp)
+void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
+                                     const int& a_refratio,
+                                     ClawPatch *cp_corner,
+                                     fclaw_bool a_time_interp,
+                                     fclaw_cptr transform_cptr)
 {
 
     double *qcoarse = q_time_sync(a_time_interp);
-
     double *qfine = cp_corner->m_griddata.dataPtr();
+    double *areacoarse = this->m_area.dataPtr();
+    double *areafine = cp_corner->m_area.dataPtr();
 
+    int manifold = m_manifold ? 1 : 0;
     average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio,
-                          qcoarse, qfine, a_coarse_corner);
+                          qcoarse, qfine,
+                          areacoarse, areafine,
+                          manifold,
+                          a_coarse_corner,transform_cptr);
 }
 
 

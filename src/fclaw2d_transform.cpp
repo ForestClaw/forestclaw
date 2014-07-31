@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This will be called from fortran */
 void transform_face_samesize_(const int &i1, const int &j1,
-                                  int *i2,int *j2,
-                                  fclaw2d_transform_data_t* tdata)
+                              int *i2,int *j2,
+                              fclaw2d_transform_data_t* tdata)
 
 {
     *i2 = i1;
@@ -98,33 +98,46 @@ void transform_face_halfsize_(const int &i1, const int &j1,
 
 /* This obviously is just temporary */
 void transform_corner_halfsize_(const int &i1, const int &j1,
-                                    int *i2,int *j2,
-                                    fclaw2d_transform_data_t* tdata)
+                                int *i2,int *j2,
+                                fclaw2d_transform_data_t* tdata)
 
 {
-    *i2 = i1;
-    *j2 = j1;
+    int ibc = i1;
+    int jbc = j1;
+    int refratio = 2;
 
-    /* Nothing multiblock here ... */
+    /* Nothing multiblock here - this will all get replaced, but I was able
+     to drop it in without much thought.*/
     int icorner = tdata->icorner;
-    if (icorner == 0)
+    int m = 0;
+    for(int jj = 0; jj < refratio; jj++)
     {
-        *i2 = i1 + tdata->mx;
-        *j2 = j1 + tdata->my;
-    }
-    else if (icorner == 1)
-    {
-        *i2 = i1 - tdata->mx;
-        *j2 = j1 + tdata->my;
-    }
-    else if (icorner == 2)
-    {
-        *i2 = i1 + tdata->mx;
-        *j2 = j1 - tdata->my;
-    }
-    else if (icorner == 3)
-    {
-        *i2 = i1 - tdata->mx;
-        *j2 = j1 - tdata->my;
+        for(int ii = 0; ii < refratio; ii++)
+        {
+            int ifine = ibc*refratio + ii;
+            int jfine = jbc*refratio + jj;
+
+            /* These transformations don't depend on i1,j1 ... */
+            if (icorner == 0)
+            {
+                *i2++ = tdata->mx + 1 - ifine;
+                *j2++ = tdata->my + 1 - jfine;
+            }
+            else if (icorner == 1)
+            {
+                *i2++ = ifine;
+                *j2++ = tdata->my + 1 - jfine;
+            }
+            else if (icorner == 2)
+            {
+                *i2++ = tdata->mx + 1 - ifine;
+                *j2++ = jfine;
+            }
+            else if (icorner == 3)
+            {
+                *i2++ = ifine;
+                *j2++ = jfine;
+            }
+        }
     }
 }

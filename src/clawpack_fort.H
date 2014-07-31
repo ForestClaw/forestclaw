@@ -111,16 +111,19 @@ void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
                              const int& idir, const int& iside,
                              const int& num_neighbors,
                              const int& refratio, const int& igrid,
-                             fclaw_cptr transform_data);
+                             fclaw_cptr transform_cptr);
 
 
 void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& meqn, double this_q[],double neighbor_q[],
-                            const int& a_corner,fclaw_cptr transform_data);
+                            const int& a_corner,fclaw_cptr transform_cptr);
 
 void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                           const int& meqn, const int& a_refratio, double this_q[],
-                           double neighbor_q[],const int& a_corner);
+                           const int& meqn, const int& a_refratio,
+                           double qcoarse[], double qfine[],
+                           double areacoarse[], double areafine[],
+                           const int& manifold,
+                           const int& a_corner, fclaw_cptr transform_cptr);
 
 void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                const int& meqn, const int& a_refratio, double this_q[],

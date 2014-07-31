@@ -349,51 +349,110 @@ c               endif
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine average_corner_ghost(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,icorner_coarse)
+     &      refratio,qcoarse,qfine,areacoarse,areafine,
+     &      manifold,icorner_coarse,transform_cptr)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,icorner_coarse
+      integer mx,my,mbc,meqn,refratio,icorner_coarse, manifold
+      integer*8 transform_cptr
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
       double precision sum
 
-      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+      integer i,j,ibc,jbc,ii,jj,mq,r2
       integer ifine, jfine
+      logical is_manifold
+      double precision qf,kf, kc
 
-      integer get_block_idx, get_patch_idx
-      logical debug_is_on
+c     # This should be refratio*refratio.
+      integer i1,j1,m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
 
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
+      is_manifold = manifold .eq. 1
 
       r2 = refratio*refratio
       do mq = 1,meqn
+c        # Loop over four corner cells on coarse grid
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Average fine grid corners onto coarse grid ghost corners
-               sum = 0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (ibc-1)*refratio + ii
-                     jfine = (jbc-1)*refratio + jj
-                     if (icorner_coarse .eq. 0) then
-                        sum = sum + qfine(mx+1-ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 1) then
-                        sum = sum + qfine(ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 2) then
-                        sum = sum + qfine(mx+1-ifine,jfine,mq)
-                     elseif (icorner_coarse .eq. 3) then
-                        sum = sum + qfine(ifine,jfine,mq)
-                     endif
-                  enddo
-               enddo
                if (icorner_coarse .eq. 0) then
-                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+    1             i1 = 1-ibc
+                  j1 = 1-jbc
                elseif (icorner_coarse .eq. 1) then
-                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+                  i1 = mx+ibc
+                  j1 = 1-jbc
                elseif (icorner_coarse .eq. 2) then
-                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+                  i1 = 1-ibc
+                  j1 = my+jbc
                elseif (icorner_coarse .eq. 3) then
-                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+                  i1 = mx+ibc
+                  j1 = my+jbc
                endif
+
+c              # Again, a fake routine until the real one is
+c              # available (be sure to pass in (i1,j1)
+               call transform_corner_halfsize(ibc,jbc,i2,j2,
+     &               transform_cptr)
+               if (is_manifold) then
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     kf = areafine(i2(m),j2(m))
+                     sum = sum + kf*qf
+                  enddo
+                  kc = areacoarse(i1,j1)
+                  qcoarse(i1,j1,mq) = sum/kc
+               else
+                  sum = 0
+                  do m = 0,r2-1
+                     sum = sum + qfine(i2(m),j2(m),mq)
+                  enddo
+                  qcoarse(i1,j1,mq) = sum/r2
+               endif
+
+
+c               sum = 0
+c               do ii = 1,refratio
+c                  do jj = 1,refratio
+c                     ifine = (ibc-1)*refratio + ii
+c                     jfine = (jbc-1)*refratio + jj
+c                     if (icorner_coarse .eq. 0) then
+c                        sum = sum + qfine(mx+1-ifine,my+1-jfine,mq)
+c                     elseif (icorner_coarse .eq. 1) then
+c                        sum = sum + qfine(ifine,my+1-jfine,mq)
+c                     elseif (icorner_coarse .eq. 2) then
+c                        sum = sum + qfine(mx+1-ifine,jfine,mq)
+c                     elseif (icorner_coarse .eq. 3) then
+c                        sum = sum + qfine(ifine,jfine,mq)
+c                     endif
+c                  enddo
+c               enddo
+c               qcoarse(i1,j1,mq) = sum/r2
+
+c               if (icorner_coarse .eq. 0) then
+c                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 1) then
+c                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 2) then
+c                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 3) then
+c                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+c               endif
             enddo
          enddo
       enddo

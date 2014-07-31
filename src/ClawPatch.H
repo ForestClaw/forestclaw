@@ -103,7 +103,8 @@ public :
 
     void average_corner_ghost(const int& a_corner, const int& a_refratio,
                               ClawPatch *cp_fine,
-                              fclaw_bool a_time_interp);
+                              fclaw_bool a_time_interp,
+                              fclaw_cptr transform_cptr);
 
     void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
                                  ClawPatch *cp_fine,
