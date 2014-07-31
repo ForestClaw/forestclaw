@@ -66,8 +66,8 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  /* For cubed_sphere */
-  domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
+  /* This is a five-block square in [-3,3]^2. */
+  domain = fclaw2d_domain_new_disk (mpicomm, gparms->minlevel);
 
   if (gparms->verbosity > 0)
   {
