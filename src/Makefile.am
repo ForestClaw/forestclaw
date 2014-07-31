@@ -62,7 +62,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/mapc2p.f \
 	src/fortran_source2d/mapc2m.f \
 	src/fortran_source2d/setup_mesh.f \
-	src/fortran_source2d/claw2d_utils_mapped.f \
 	src/fortran_source2d/claw2d_utils.f \
 	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \

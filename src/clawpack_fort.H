@@ -194,15 +194,20 @@ void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
                                 const int& refratio, const int& igrid);
 
 void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,
-                              const int& meqn, double qcoarse[],double qfine[],
+                              const int& meqn,
+                              double qcoarse[],double qfine[],
+                              double areacoarse[],double areafine[],
                               const int& p4est_refineFactor,
-                              const int& refratio, const int& igrid);
+                              const int& refratio, const int& igrid,
+                              const int& manifold);
 
+#if 0
 void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
                                const int& meqn, double qcoarse[], double qfine[],
                                const double areacoarse[], const double areafine[],
                                const int& p4est_refineFactor,
                                const int& refratio, const int& igrid);
+#endif
 
 /* ----------------------------------------------------------------------------------
    Mapped grids

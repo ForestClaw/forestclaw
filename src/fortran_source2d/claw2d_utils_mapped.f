@@ -14,6 +14,10 @@
       integer mq
       double precision sum, r2, qf, kf, kc
 
+      write(6,*) 'average_to_coarse_mapped (claw2d_utils_mapped) : ',
+     &      'This should not get called'
+      stop
+
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
       jg = (igrid-ig)/refratio
@@ -64,6 +68,11 @@ c     # to 'qcoarse' at face 'iside'  in direction 'idir' of 'qcoarse'
       integer mq,r2
       integer i, ic_add, ibc, ii, ifine
       integer j, jc_add, jbc, jj, jfine
+
+      write(6,*) 'average_to_coarse_mapped (claw2d_utils_mapped) : ',
+     &      'This should not get called'
+      stop
+
 
 c     # 'iface' is relative to the coarse grid
 
@@ -149,6 +158,11 @@ c                 # ibc = 2 corresponds to the second layer
 
       integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
       double precision kf, kc, r2, sum, cons_diff, qf, qc
+
+      write(6,*) 'average_to_coarse_mapped (claw2d_utils_mapped) : ',
+     &      'This should not get called'
+      stop
+
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)

@@ -686,7 +686,10 @@ void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
     double *qcoarse = m_griddata.dataPtr();
     double *qfine = a_fine->q();
 
-    // Use linear interpolation with limiters.
+    printf("Interpolate_fine_patch (Clawpatch.cpp) : Do not use this!\n");
+    exit(0);
+
+    // Use linear interpolation with limiters, even in mapped case.
     interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
                                a_p4est_refineFactor,
                                a_refratio,a_igrid);
@@ -706,9 +709,26 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
                                          const int& a_p4est_refineFactor)
 {
     double *qcoarse = m_griddata.dataPtr();
+
+    printf("coarsen_from_fine_family (Clawpatch.cpp) : Do not use this!\n");
+    exit(0);
+
     for(int igrid = 0; igrid < a_num_siblings; igrid++)
     {
         double *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
+
+        /* These will be empty for non-manifolds cases */
+        double *areacoarse = m_area.dataPtr();
+        double *areafine = a_cp_siblings[igrid]->m_area.dataPtr();
+
+        int manifold = m_manifold ? 1 : 0;
+        average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,
+                                 qcoarse,qfine,
+                                 areacoarse, areafine,
+                                 a_p4est_refineFactor,a_refratio,igrid,
+                                 manifold);
+
+#if 0
         if (m_manifold)
         {
             double *areacoarse = m_area.dataPtr();
@@ -723,6 +743,7 @@ void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
             average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
                                      a_p4est_refineFactor,a_refratio,igrid);
         }
+#endif
     }
 }
 

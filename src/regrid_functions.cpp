@@ -119,14 +119,25 @@ void patch_average2coarse(fclaw2d_domain_t *domain,
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
     int refratio = gparms->refratio;
+    int manifold = gparms->manifold ? 1 : 0;
 
     ClawPatch *cp_coarse = get_clawpatch(coarse_patch);
     double *qcoarse = cp_coarse->q();
+
 
     for(int igrid = 0; igrid < NumSiblings; igrid++)
     {
         ClawPatch *cp_fine = get_clawpatch(&fine_siblings[igrid]);
         double *qfine = cp_fine->q();
+        double *areacoarse = cp_coarse->area();
+        double *areafine = cp_fine->area();
+
+        average_to_coarse_patch_(mx,my,mbc,meqn,qcoarse,qfine,
+                                 areacoarse, areafine,
+                                 p4est_refineFactor,
+                                 refratio, igrid,manifold);
+
+#if 0
         if (gparms->manifold)
         {
             double *areacoarse = cp_coarse->area();
@@ -141,6 +152,7 @@ void patch_average2coarse(fclaw2d_domain_t *domain,
             average_to_coarse_patch_(mx,my,mbc,meqn,qcoarse,qfine,
                                      p4est_refineFactor,refratio,igrid);
         }
+#endif
     }
 }
 

@@ -36,14 +36,6 @@ c                 # x-direction (idir == 0)
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
-cc                 # Original code
-c                  if (iface .eq. 0) then
-cc                     qthis(1-ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
-cc                     qneighbor(mx+ibc,j,mq) = qthis(ibc,j,mq)
-c                  elseif (iface .eq. 1) then
-cc                     qthis(mx+ibc,j,mq) = qneighbor(ibc,j,mq)
-cc                     qneighbor(1-ibc,j,mq) = qthis(mx+1-ibc,j,mq)
-c                  endif
                enddo
             enddo
          enddo
@@ -64,14 +56,6 @@ c                 # y-direction (idir == 1)
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
-cc                 # Original code
-c                  if (iface .eq. 2) then
-cc                     qthis(i,1-jbc,mq) = qneighbor(i,my+1-jbc,mq)
-cc                     qneighbor(i,my+jbc,mq) = qthis(i,jbc,mq)
-c                  elseif (iface .eq. 3) then
-cc                     qthis(i,my+jbc,mq) = qneighbor(i,jbc,mq)
-cc                     qneighbor(i,1-jbc,mq) = qthis(i,my+1-jbc,mq)
-c                  endif
                enddo
             enddo
          enddo
@@ -268,29 +252,6 @@ c              # This works for smooth grid mappings as well.
                   value = qc + shiftx*gradx + shifty*grady
                   qfine(i2(m),j2(m),mq) = value
                enddo
-
-
-cc              # Original code
-c               do ibc = 1,mbc
-c                  do jj = 1,refratio
-cc                    # Fill in interpolated values on fine grid cell
-c                     shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
-c                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-c
-c                     value = qc + shiftx*gradx + shifty*grady
-c
-c                     ifine = ibc
-c                     jfine = (j-1)*refratio + jj
-c                     if (iface_coarse .eq. 0) then
-cc                       # qfine is at left edge of coarse grid
-c                        qfine(mx+ifine,jfine,mq) = value
-c                     elseif (iface_coarse .eq. 1) then
-cc                       # qfine is at right edge of coarse grid
-c                        qfine(1-ifine,jfine,mq) = value
-c                     endif
-c
-c                  enddo
-c               enddo
             enddo
          else
             ic_add = igrid*mx/num_neighbors
@@ -325,28 +286,6 @@ c              # New code
                   value = qc + shiftx*gradx + shifty*grady
                   qfine(i2(m),j2(m),mq) = value
                enddo
-
-
-c               do jbc = 1,mbc
-c                  do ii = 1,refratio
-cc                    # Fill in interpolated values on fine grid cell
-c                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-c                     shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
-c
-c                     value = (qc + shiftx*gradx + shifty*grady)
-c
-c                     ifine = (i-1)*refratio + ii
-c                     jfine = jbc
-c                     if (iface_coarse .eq. 2) then
-cc                       # qfine is at bottom edge of coarse grid
-c                        qfine(ifine,my+jfine,mq) = value
-c                     else if (iface_coarse .eq. 3) then
-cc                       # qfine is at top edge of coarse grid
-c                        qfine(ifine,1-jfine,mq) = value
-c                     endif
-c                  enddo
-c               enddo
-
             enddo
          endif
       enddo
@@ -385,8 +324,6 @@ c              # Exchange initiated only at high side (1,3) corners
          enddo
       enddo
       end
-
-
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine average_corner_ghost(mx,my,mbc,meqn,
@@ -713,17 +650,46 @@ c        # Use AMRClaw slopes
 
       end
 
-      subroutine average_to_coarse_patch(mx,my,mbc,meqn,qcoarse,qfine,
-     &      p4est_refineFactor, refratio, igrid)
+      subroutine average_to_coarse_patch(mx,my,mbc,meqn,
+     &      qcoarse,qfine,
+     &      areacoarse, areafine,
+     &      p4est_refineFactor,
+     &      refratio, igrid,manifold)
       implicit none
 
       integer mx,my,mbc,meqn,p4est_refineFactor, refratio, igrid
+      integer manifold
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+
       integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
       integer mq
-      double precision sum, r2
+      double precision sum
+      logical is_manifold
+
+c     # This should be refratio*refratio.
+      integer i1,j1, r2, m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
+      double precision kc, kf, qf
+
+      is_manifold = manifold .eq. 1
+
+c     # 'iface' is relative to the coarse grid
+
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_face_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
@@ -737,15 +703,33 @@ c     # Get rectangle in coarse grid for fine grid.
       do mq = 1,meqn
          do j = 1,my/p4est_refineFactor
             do i = 1,mx/p4est_refineFactor
-               sum = 0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (i-1)*refratio + ii
-                     jfine = (j-1)*refratio + jj
-                     sum = sum + qfine(ifine,jfine,mq)
+               i1 = i+ic_add
+               j1 = j+jc_add
+               m = 0
+               do jj = 1,refratio
+                  do ii = 1,refratio
+                     i2(m) = (i-1)*refratio + ii
+                     j2(m) = (j-1)*refratio + jj
+                     m = m + 1
                   enddo
                enddo
-               qcoarse(i+ic_add,j + jc_add,mq) = sum/r2
+               if (is_manifold) then
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     kf = areafine(i2(m),j2(m))
+                     sum = sum + kf*qf
+                  enddo
+                  kc = areacoarse(i1,j1)
+                  qcoarse(i1,j1,mq) = sum/kc
+               else
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     sum = sum + qf
+                  enddo
+                  qcoarse(i1,j1,mq) = sum/r2
+               endif
             enddo
          enddo
       enddo
@@ -769,4 +753,73 @@ c    # -------------------------------------------------------------------------
             sum = sum + q(i,j,1)*dx*dy
          enddo
       enddo
+      end
+
+
+      subroutine fixcapaq2(mx,my,mbc,meqn,qcoarse,qfine,
+     &      areacoarse,areafine, p4est_refineFactor,
+     &      refratio,igrid)
+      implicit none
+
+      integer mx,my,mbc,meqn, refratio, igrid
+      integer p4est_refineFactor
+
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
+      double precision kf, kc, r2, sum, cons_diff, qf, qc
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(igrid,refratio)
+      jg = (igrid-ig)/refratio
+
+c     # Get rectangle in coarse grid for fine grid.
+      ic_add = ig*mx/p4est_refineFactor
+      jc_add = jg*my/p4est_refineFactor
+
+c     # ------------------------------------------------------
+c     # This routine ensures that the interpolated solution
+c     # has the same mass as the coarse grid solution
+c     # -------------------------------------------------------
+
+
+      r2 = refratio*refratio
+      do m = 1,meqn
+         do i = 1,mx/p4est_refineFactor
+            do j = 1,my/p4est_refineFactor
+               sum = 0.d0
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     ifine = (i-1)*refratio + ii
+                     jfine = (j-1)*refratio + jj
+                     kf = areafine(ifine,jfine)
+                     qf = qfine(ifine,jfine,m)
+                     sum = sum + kf*qf
+                  enddo
+               enddo
+
+               kc = areacoarse(i+ic_add,j+jc_add)
+               qc = qcoarse(i+ic_add, j+jc_add,m)
+               cons_diff = (qc*kc - sum)/r2
+
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     ifine  = (i-1)*refratio + ii
+                     jfine  = (j-1)*refratio + jj
+                     kf = areafine(ifine,jfine)
+                     if (kf .eq. 0) then
+                        write(6,*) 'fixcapaq : kf = 0'
+                        stop
+                     endif
+                     qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
+     &                     cons_diff/kf
+                  enddo
+               enddo
+            enddo  !! end of meqn
+         enddo
+      enddo
+
       end
