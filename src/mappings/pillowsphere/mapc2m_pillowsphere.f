@@ -7,7 +7,7 @@ c     # either the upper hemisphere (blockno == 0) or the lower hemisphere
 c     # (blockno == 1).
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_sphere(xc1,yc1,xp,yp,zp)
+      subroutine mapc2m_pillowsphere(xc1,yc1,xp,yp,zp)
       implicit none
 
       double precision xc1,yc1, xp, yp, zp
