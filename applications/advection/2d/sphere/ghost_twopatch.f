@@ -309,7 +309,7 @@ c                 # New code
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
 
-      write(6,'(A,A)') 'mb_interpolate_face_ghost (ghost_twopatch.f) : ',
+      write(6,'(A,A)') 'mb_interpolate_face_ghost (ghost_twopatch.f): ',
      &      'This has been replaced by a routine in claw2d_utils.f'
       stop
 
