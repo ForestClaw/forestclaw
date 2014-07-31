@@ -32,6 +32,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_vtk.c \
 	src/clawpack_fort.cpp \
 	src/mappings/block.f \
+	src/mappings/context.f \
 	src/mappings/set_maptype.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/cart/mapc2m_cart.f \

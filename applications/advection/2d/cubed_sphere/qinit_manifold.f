@@ -4,6 +4,7 @@
       implicit none
 
       integer maxmx, maxmy, meqn, mbc, mx, my, maux,this_block_idx
+      integer blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
@@ -19,9 +20,9 @@
          do i = 1-mbc,mx+mbc
             xlow = xlower + (i-1)*dx
             ylow = ylower + (j-1)*dy
-            x = xp(i,j)
-            y = yp(i,j)
-            z = zp(i,j)
+c            x = xp(i,j)
+c            y = yp(i,j)
+c            z = zp(i,j)
 
             call cellave2(xlow,ylow,dx,dy,w)
             q(i,j,1) = w

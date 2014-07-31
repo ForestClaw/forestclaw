@@ -12,10 +12,7 @@
       elseif (isdisk()) then
          call mapc2m_disk(xc1,yc1,xp,yp,zp)
       elseif (issphere()) then
-c         write(6,*) 'mapc2m (mapc2m.f) : this should be replaced with',
-c     &         ' a cubed sphere mapping'
-c         stop
-         call mapc2m_sphere(xc1,yc1,xp,yp,zp)
+         call mapc2m_cubed_sphere(xc,yc,xp,yp,zp)
       endif
 
       call scale_map(xp,yp,zp)

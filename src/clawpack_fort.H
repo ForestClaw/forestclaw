@@ -69,6 +69,7 @@ int issphere_();
 /* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);
+void set_context_(fclaw_cptr a_context);
 
 void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
                                 const int& meqn, double qfine[],double qcoarse[],

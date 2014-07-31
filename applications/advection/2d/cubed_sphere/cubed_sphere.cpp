@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
@@ -74,6 +75,10 @@ main (int argc, char **argv)
       fclaw2d_domain_list_levels(domain, lp);
       fclaw2d_domain_list_neighbors(domain, lp);
   }
+
+  double R = 1.0;
+  fclaw2d_map_context_t *csphere_context = fclaw2d_map_new_csphere(R);
+  set_context_((fclaw_cptr) csphere_context);
 
   /* ---------------------------------------------------------------
      Set domain data.
