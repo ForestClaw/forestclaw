@@ -118,11 +118,11 @@ void get_face_neighbors (fclaw2d_domain_t * domain,
                          int **iface_neighbor,
                          int ftransform[]);
 
-void transform_func_samesize_(const int &i1, const int &j1,
+void transform_face_samesize_(const int &i1, const int &j1,
                               int *i2, int *j2,
                               fclaw2d_transform_data_t* tdata);
 
-void transform_func_halfsize_(const int &i1, const int &j1,
+void transform_face_halfsize_(const int &i1, const int &j1,
                               int i2[], int j2[],
                               fclaw2d_transform_data_t* tdata);
 
