@@ -4,6 +4,12 @@ c     # All boundaries in the two-patch case are assumed to
 c     # oriented identically.
 c     # ----------------------------------------------------------------------
 
+c     # Routines that are still used :
+c     # mb_exchange_corner_ghost
+c     # mb_average_corner_ghost
+c     # mb_average_block_corner_ghost
+c     # mb_interpolate_corner_ghost  (at block boundaries)
+
 
 c     # Exchange edge ghost data with neighboring grid at same level.
 c     # In the multiblock case, 'this' grid always initiates the exchange
@@ -18,7 +24,8 @@ c     # at face 'iface'.
 
       integer i,j,ibc,jbc,mq
 
-      write(6,*) 'In ghost_twopatch.f'
+      write(6,'(A,A)') 'mb_exchange_face_ghost (ghost_two_patch.f) : ',
+     &      'This has been replaced by a routine in claw2d_utils.f'
       stop
 
       do mq = 1,meqn
@@ -213,6 +220,10 @@ c     # This should be refratio*refratio.
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
+      write(6,'(A,A)') 'mb_average_face_ghost (ghost_two_patch.f) : ',
+     &      'This has been replaced by a routine in claw2d_utils.f'
+      stop
+
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
          write(6,*) 'average_face_ghost (claw2d_utils.f) ',
@@ -249,31 +260,6 @@ c                 # New code
                   enddo
                   kc = areacoarse(i1,j1)
                   qcoarse(i1,j1,mq) = sum/kc
-
-
-c                 # Original code
-c                  sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (ibc-1)*refratio + ii
-c                        jfine = (j-1)*refratio + jj
-c                        if (iface_coarse .eq. 0) then
-c                           qf = qfine(ifine,jfine,mq)
-c                           kf = areafine(ifine,jfine)
-c                        else
-c                           qf = qfine(mx+1-ifine,jfine,mq)
-c                           kf = areafine(mx+1-ifine,jfine)
-c                        endif
-c                        sum = sum + qf*kf
-c                     enddo
-c                  enddo
-c                  if (iface_coarse .eq. 0) then
-c                     kc = areacoarse(1-ibc,j+jc_add)
-c                     qcoarse(1-ibc,j+jc_add,mq) = sum/kc
-c                  else
-c                     kc = areacoarse(mx+ibc,j+jc_add)
-c                     qcoarse(mx+ibc,j+jc_add,mq) = sum/kc
-c                  endif
                enddo
             enddo
          else
@@ -301,29 +287,6 @@ c                 # New code
                   kc = areacoarse(i1,j1)
                   qcoarse(i1,j1,mq) = sum/kc
 
-c                 # Original code
-c                  sum = 0
-c                  do ii = 1,refratio
-c                     do jj = 1,refratio
-c                        ifine = (i-1)*refratio + ii
-c                        jfine = (jbc-1)*refratio + jj
-c                        if (iface_coarse .eq. 2) then
-c                           qf = qfine(ifine,jfine,mq)
-c                           kf = areafine(ifine,jfine)
-c                        else
-c                           qf = qfine(ifine,my+1-jfine,mq)
-c                           kf = areafine(ifine,my+1-jfine)
-c                        endif
-c                        sum = sum + kf*qf
-c                     enddo
-c                  enddo
-c                  if (iface_coarse .eq. 2) then
-c                     kc = areacoarse(i+ic_add,1-jbc)
-c                     qcoarse(i+ic_add,1-jbc,mq) = sum/kc
-c                  else
-c                     kc = areacoarse(i+ic_add,my+jbc)
-c                     qcoarse(i+ic_add,my+jbc,mq) = sum/kc
-c                  endif
                enddo
             enddo
          endif
@@ -345,6 +308,10 @@ c                  endif
       integer ic_add, jc_add, ic, jc, mth
       double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
       double precision compute_slopes
+
+      write(6,'(A,A)') 'mb_interpolate_face_ghost (ghost_twopatch.f) : ',
+     &      'This has been replaced by a routine in claw2d_utils.f'
+      stop
 
 c     # To be figured out later
       mth = 5
