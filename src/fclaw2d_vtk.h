@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTK_H
 #define FCLAW2D_VTK_H
 
-#include "forestclaw2d.h"
+#include <forestclaw2d.h>
 
 #ifdef __cplusplus
 extern "C"

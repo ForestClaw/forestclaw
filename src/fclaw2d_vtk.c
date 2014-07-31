@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_vtk.h"
+#include <fclaw2d_vtk.h>
 #include <p4est_base.h>
 
 typedef struct fclaw2d_vtk_state
@@ -48,7 +48,7 @@ typedef struct fclaw2d_vtk_state
     fclaw2d_vtk_patch_data_t coordinate_cb;
     fclaw2d_vtk_patch_data_t value_cb;
     FILE *file;
-#ifdef P4EST_MPIIO
+#ifdef P4EST_ENABLE_MPIIO
     MPI_File mpifile;
     MPI_Offset mpibegin;
 #endif
@@ -145,7 +145,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     retval = retval || fprintf (file, " <AppendedData "
                                 "encoding=\"raw\">\n  _") < 0;
 
-#ifdef P4EST_MPIIO
+#ifdef P4EST_ENABLE_MPIIO
     /* unconditionally close the file when in MPI I/O mode */
     retval = fclose (file) || retval;
     s->file = NULL;
@@ -157,7 +157,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 static void
 write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 {
-#ifndef P4EST_MPIIO
+#ifndef P4EST_ENABLE_MPIIO
     int retval;
 
     retval = fwrite (s->buf, psize_field, 1, s->file);
@@ -330,19 +330,19 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
                          fclaw2d_patch_callback_t cb)
 {
     int32_t bcount;
-#ifndef P4EST_MPIIO
+#ifndef P4EST_ENABLE_MPIIO
     int retval;
 #else
     int mpiret;
     MPI_Offset mpipos;
-#ifdef P4EST_DEBUG
+#ifdef P4EST_ENABLE_DEBUG
     MPI_Offset mpinew;
 #endif
     MPI_Status mpistatus;
 #endif
 
     s->buf = P4EST_ALLOC (char, psize_field);
-#ifdef P4EST_MPIIO
+#ifdef P4EST_ENABLE_MPIIO
     mpipos = s->mpibegin + offset_field;
     if (domain->mpirank > 0)
     {
@@ -361,7 +361,7 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
                        (long long) offset_field, (long long) psize_field,
                        bcount, bcount, bcount);
 #endif
-#ifndef P4EST_MPIIO
+#ifndef P4EST_ENABLE_MPIIO
         retval = fwrite (&bcount, s->ndsize, 1, s->file);
         SC_CHECK_ABORT (retval == 1, "VTK file write failed");
 #else
@@ -372,8 +372,8 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
     fclaw2d_domain_iterate_patches (domain, cb, s);
     P4EST_FREE (s->buf);
 
-#ifdef P4EST_MPIIO
-#ifdef P4EST_DEBUG
+#ifdef P4EST_ENABLE_MPIIO
+#ifdef P4EST_ENABLE_DEBUG
     mpiret = MPI_File_get_position (s->mpifile, &mpinew);
     SC_CHECK_MPI (mpiret);
     P4EST_ASSERT (mpinew - mpipos ==
@@ -390,7 +390,7 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
 static void
 fclaw2d_vtk_write_data (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
-#ifdef P4EST_MPIIO
+#ifdef P4EST_ENABLE_MPIIO
     int mpiret;
     MPI_Offset mpipos;
 
@@ -424,7 +424,7 @@ fclaw2d_vtk_write_data (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     fclaw2d_vtk_write_field (domain, s, s->offset_meqn, s->psize_meqn,
                              write_meqn_cb);
 
-#ifdef P4EST_MPIIO
+#ifdef P4EST_ENABLE_MPIIO
     /* collectively close the file */
     mpiret = MPI_File_close (&s->mpifile);
     SC_CHECK_MPI (mpiret);
@@ -437,7 +437,7 @@ fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     int retval;
     FILE *file;
 
-#ifndef P4EST_MPIIO
+#ifndef P4EST_ENABLE_MPIIO
     file = s->file;
 #else
     /* unconditionally open the file */
@@ -525,8 +525,8 @@ fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
     {
         retval = fclaw2d_vtk_write_header (domain, s);
     }
-    mpiret = MPI_Allreduce (&retval, &gretval, 1, MPI_INT, MPI_MIN,
-                            domain->mpicomm);
+    mpiret = sc_MPI_Allreduce (&retval, &gretval, 1, sc_MPI_INT, sc_MPI_MIN,
+                               domain->mpicomm);
     SC_CHECK_MPI (mpiret);
     if (gretval < 0)
     {
@@ -542,8 +542,8 @@ fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
     {
         retval = fclaw2d_vtk_write_footer (domain, s);
     }
-    mpiret = MPI_Allreduce (&retval, &gretval, 1, MPI_INT, MPI_MIN,
-                            domain->mpicomm);
+    mpiret = sc_MPI_Allreduce (&retval, &gretval, 1, sc_MPI_INT, sc_MPI_MIN,
+                               domain->mpicomm);
     SC_CHECK_MPI (mpiret);
     if (gretval < 0)
     {
