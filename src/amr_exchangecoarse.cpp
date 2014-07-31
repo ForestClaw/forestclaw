@@ -130,6 +130,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
+            int ftransform[9];
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -138,7 +139,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                ftransform);
 
             /* -------------------------------------
                Possible returns from ref_flag :
@@ -300,6 +302,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
+            int ftransform[9];
 
             get_corner_neighbor(domain,
                                 this_block_idx,
@@ -308,7 +311,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                ftransform);
 
             if (ref_flag_ptr == NULL)
             {

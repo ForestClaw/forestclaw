@@ -146,7 +146,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_block_idx,
                          fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
-                         fclaw_bool is_block_corner)
+                         fclaw_bool is_block_corner,
+                         int ftransform[])
 {
     int rproc_corner;
     int corner_patch_idx;
@@ -225,6 +226,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                            icorner, &rproc_corner, corner_block_idx,
                                            &corner_patch_idx, &neighbor_type);
+
+        // get transform type?
+
     }
     if (!has_corner_neighbor)
     {

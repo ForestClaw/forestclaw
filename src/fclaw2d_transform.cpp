@@ -23,24 +23,60 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include "fclaw2d_transform.h"
 
 
 /* This will be called from fortran */
 void transform_face_samesize_(const int &i1, const int &j1,
-                              int *i2,int *j2,
-                              fclaw2d_transform_data_t* tdata)
+                                  int *i2,int *j2,
+                                  fclaw2d_transform_data_t* tdata)
 
 {
     *i2 = i1;
     *j2 = j1;
     fclaw2d_patch_transform_face(tdata->this_patch,
-                                      tdata->neighbor_patch,
-                                      tdata->transform,
-                                      tdata->mx, tdata->my,
-                                      tdata->based,
-                                      i2, j2);
+                                 tdata->neighbor_patch,
+                                 tdata->transform,
+                                 tdata->mx, tdata->my,
+                                 tdata->based,
+                                 i2, j2);
 }
+
+/* This obviously is just temporary, but I just transferred what I had
+   already written in fortran to this routine, so that I could drop in
+   multiblock routines when they are ready */
+void transform_corner_samesize_(const int &i1, const int &j1,
+                                int *i2,int *j2,
+                                fclaw2d_transform_data_t* tdata)
+
+{
+    *i2 = i1;
+    *j2 = j1;
+
+    /* Nothing multiblock here ... */
+    int icorner = tdata->icorner;
+    if (icorner == 0)
+    {
+        *i2 = i1 + tdata->mx;
+        *j2 = j1 + tdata->my;
+    }
+    else if (icorner == 1)
+    {
+        *i2 = i1 - tdata->mx;
+        *j2 = j1 + tdata->my;
+    }
+    else if (icorner == 2)
+    {
+        *i2 = i1 + tdata->mx;
+        *j2 = j1 - tdata->my;
+    }
+    else if (icorner == 3)
+    {
+        *i2 = i1 - tdata->mx;
+        *j2 = j1 - tdata->my;
+    }
+}
+
 
 /* Halfsize neighbor */
 void transform_face_halfsize_(const int &i1, const int &j1,
@@ -57,4 +93,38 @@ void transform_face_halfsize_(const int &i1, const int &j1,
                                   tdata->mx, tdata->my,
                                   tdata->based,
                                   i2, j2);
+}
+
+
+/* This obviously is just temporary */
+void transform_corner_halfsize_(const int &i1, const int &j1,
+                                    int *i2,int *j2,
+                                    fclaw2d_transform_data_t* tdata)
+
+{
+    *i2 = i1;
+    *j2 = j1;
+
+    /* Nothing multiblock here ... */
+    int icorner = tdata->icorner;
+    if (icorner == 0)
+    {
+        *i2 = i1 + tdata->mx;
+        *j2 = j1 + tdata->my;
+    }
+    else if (icorner == 1)
+    {
+        *i2 = i1 - tdata->mx;
+        *j2 = j1 + tdata->my;
+    }
+    else if (icorner == 2)
+    {
+        *i2 = i1 + tdata->mx;
+        *j2 = j1 - tdata->my;
+    }
+    else if (icorner == 3)
+    {
+        *i2 = i1 - tdata->mx;
+        *j2 = j1 - tdata->my;
+    }
 }

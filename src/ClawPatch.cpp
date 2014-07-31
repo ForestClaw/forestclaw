@@ -390,12 +390,14 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
     mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
-void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
+void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
+                                      fclaw_cptr transform_data)
 {
     double *qthis = m_griddata.dataPtr();
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
-    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
+    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
+                           transform_data);
 
 }
 

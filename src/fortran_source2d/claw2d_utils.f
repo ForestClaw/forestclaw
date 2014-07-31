@@ -293,33 +293,55 @@ c              # New code
       end
 
       subroutine exchange_corner_ghost(mx,my,mbc,meqn,
-     &      qthis, qneighbor, icorner_this)
+     &      qthis, qneighbor, this_icorner,transform_cptr)
       implicit none
 
-      integer mx, my, mbc, meqn, icorner_this
+      integer mx, my, mbc, meqn, this_icorner
+      integer*8 transform_cptr
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq, ibc, jbc
+      integer i1, j1, i2, j2
 
 c     # Do exchanges for all corners
       do mq = 1,meqn
          do ibc = 1,mbc
             do jbc = 1,mbc
-c              # Exchange initiated only at high side (1,3) corners
-               if (icorner_this .eq. 0) then
-                  qthis(1-ibc,1-jbc,mq) =
-     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
-               else if (icorner_this .eq. 1) then
-                  qthis(mx+ibc,1-jbc,mq) =
-     &                  qneighbor(ibc,my+1-jbc,mq)
-               elseif (icorner_this .eq. 2) then
-                  qthis(1-ibc,my+jbc,mq) =
-     &                  qneighbor(mx+1-ibc,jbc,mq)
-               elseif (icorner_this .eq. 3) then
-                  qthis(mx+ibc,my+jbc,mq) =
-     &                  qneighbor(ibc,jbc,mq)
+               if (this_icorner .eq. 0) then
+                  i1 = 1-ibc
+                  j1 = 1-jbc
+               elseif (this_icorner .eq. 1) then
+                  i1 = mx+ibc
+                  j1 = 1-jbc
+               elseif (this_icorner .eq. 2) then
+                  i1 = 1 -ibc
+                  j1 = my+jbc
+               else
+                  i1 = mx+ibc
+                  j1 = my+jbc
                endif
+
+c              # this routine is not yet complete, but the complete one
+c              # can now be dropped in.
+               call transform_corner_samesize(i1,j1,i2,j2,
+     &               transform_cptr)
+               qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+cc              # Exchange initiated only at high side (1,3) corners
+c               if (icorner_this .eq. 0) then
+c                  qthis(1-ibc,1-jbc,mq) =
+c     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
+c               else if (icorner_this .eq. 1) then
+c                  qthis(mx+ibc,1-jbc,mq) =
+c     &                  qneighbor(ibc,my+1-jbc,mq)
+c               elseif (icorner_this .eq. 2) then
+c                  qthis(1-ibc,my+jbc,mq) =
+c     &                  qneighbor(mx+1-ibc,jbc,mq)
+c               elseif (icorner_this .eq. 3) then
+c                  qthis(mx+ibc,my+jbc,mq) =
+c     &                  qneighbor(ibc,jbc,mq)
+c               endif
             enddo
          enddo
       enddo
