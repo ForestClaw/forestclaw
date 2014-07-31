@@ -32,7 +32,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call transform_func_samesize(i1,j1,i2,j2,
+                  call transform_face_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -52,7 +52,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call transform_func_samesize(i1,j1,i2,j2,
+                  call transform_face_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -125,7 +125,7 @@ c                 # ibc = 2 corresponds to the second layer
                   endif
 
 c                 # New code
-                  call transform_func_halfsize(i1,j1,i2,j2,
+                  call transform_face_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -158,7 +158,7 @@ c                 # New code
                      j1 = my+jbc
                   endif
 
-                  call transform_func_halfsize(i1,j1,i2,j2,
+                  call transform_face_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -245,7 +245,7 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
 c              # This works for smooth grid mappings as well.
                i1 = ic
                j1 = jc
-               call transform_func_halfsize(i1,j1,i2,j2,transform_cptr)
+               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -279,7 +279,7 @@ c           # this ensures that we get 'hanging' corners
 c              # New code
                i1 = ic
                j1 = jc
-               call transform_func_halfsize(i1,j1,i2,j2,transform_cptr)
+               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio

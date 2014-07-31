@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ------------------------------------------------------------------------------
 
 /* This will be called from fortran */
-void transform_func_samesize_(const int &i1, const int &j1,
-                              int *i2,int *j2,
-                              fclaw2d_transform_data_t* tdata)
+void transform_face_samesize_(const int &i1, const int &j1,
+                         int *i2,int *j2,
+                         fclaw2d_transform_data_t* tdata)
 
 {
     /*
@@ -57,9 +57,9 @@ void transform_func_samesize_(const int &i1, const int &j1,
 }
 
 /* Halfsize neighbor */
-void transform_func_halfsize_(const int &i1, const int &j1,
-                              int i2[],int j2[],
-                              fclaw2d_transform_data_t* tdata)
+void transform_face_halfsize_(const int &i1, const int &j1,
+                         int i2[],int j2[],
+                         fclaw2d_transform_data_t* tdata)
 
 {
     /*
