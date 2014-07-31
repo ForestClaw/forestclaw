@@ -109,7 +109,6 @@ void transform_corner_halfsize_(const int &i1, const int &j1,
     /* Nothing multiblock here - this will all get replaced, but I was able
      to drop it in without much thought.*/
     int icorner = tdata->icorner;
-    int m = 0;
     for(int jj = 0; jj < refratio; jj++)
     {
         for(int ii = 0; ii < refratio; ii++)
@@ -137,6 +136,45 @@ void transform_corner_halfsize_(const int &i1, const int &j1,
             {
                 *i2++ = ifine;
                 *j2++ = jfine;
+            }
+        }
+    }
+}
+
+/* This obviously is bogus - but I have here it so I can get the
+   rest of the code working */
+void transform_corner_halfsize2_(const int &i1, const int &j1,
+                                int *i2,int *j2,
+                                fclaw2d_transform_data_t* tdata)
+
+{
+    int mbc = 2;
+
+    int icorner = tdata->icorner;
+    for(int jbc = 1; jbc <= mbc; jbc++)
+    {
+        for(int ibc = 1; ibc <= mbc; ibc++)
+        {
+            /* These transformations don't depend on i1,j1 ... */
+            if (icorner == 0)
+            {
+                *i2++ = tdata->mx + ibc;
+                *j2++ = tdata->my + jbc;
+            }
+            else if (icorner == 1)
+            {
+                *i2++ = 1-ibc;
+                *j2++ = tdata->my+jbc;
+            }
+            else if (icorner == 2)
+            {
+                *i2++ = tdata->mx + ibc;
+                *j2++ = 1-jbc;
+            }
+            else if (icorner == 3)
+            {
+                *i2++ = 1-ibc;
+                *j2++ = 1-jbc;
             }
         }
     }

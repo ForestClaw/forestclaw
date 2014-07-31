@@ -127,7 +127,8 @@ void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
 
 void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                const int& meqn, const int& a_refratio, double this_q[],
-                               double neighbor_q[], const int& a_corner);
+                               double neighbor_q[], const int& a_corner,
+                               fclaw_cptr transform_cptr);
 
 void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
                              double qthis[], double qneighbor[], const int& iface,

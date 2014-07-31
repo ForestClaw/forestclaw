@@ -460,11 +460,13 @@ c               endif
 
       end
 
-      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,refratio,
-     &      qcoarse,qfine,icorner_coarse)
+      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,
+     &      refratio,
+     &      qcoarse,qfine,icorner_coarse,transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
+      integer*8 transform_cptr
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -472,10 +474,19 @@ c               endif
       double precision qc, sl, sr, gradx, grady, shiftx, shifty
       double precision compute_slopes, value
 
-      integer get_patch_idx, pidx
-      logical debug_is_on
+c     # This should be refratio*refratio.
+      integer i1,j1,m, r2
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
 
-      pidx = get_patch_idx()
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
 
       mth = 5
 
@@ -509,25 +520,38 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
          sr = (qcoarse(ic,jc+1,mq) - qc)
          grady = compute_slopes(sl,sr,mth)
 
-c        # Loop over fine grid ghost cells
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-c              # Fill in interpolated values on fine grid cell
-               shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
-               shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
-
-               value = qc + shiftx*gradx + shifty*grady
-               if (icorner_coarse .eq. 0) then
-                  qfine(mx+ibc,my+jbc,mq) = value
-               elseif (icorner_coarse .eq. 1) then
-                  qfine(1-ibc,my+jbc,mq) = value
-               elseif (icorner_coarse .eq. 2) then
-                  qfine(mx+ibc,1-jbc,mq) = value
-               else
-                  qfine(1-ibc,1-jbc,mq) = value
-               endif
-            enddo
+c        # This works for smooth grid mappings as well.
+         i1 = ic
+         j1 = jc
+         call transform_corner_halfsize2(i1,j1,i2,j2,transform_cptr)
+         do m = 0,r2-1
+            shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+            shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+            value = qc + shiftx*gradx + shifty*grady
+            qfine(i2(m),j2(m),mq) = value
          enddo
+
+cc        # Loop over fine grid ghost cells
+c         do ibc = 1,mbc
+c            do jbc = 1,mbc
+c
+cc              # Fill in interpolated values on fine grid cell
+c               shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+c               shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+c
+c               value = qc + shiftx*gradx + shifty*grady
+
+c               if (icorner_coarse .eq. 0) then
+c                  qfine(mx+ibc,my+jbc,mq) = value
+c               elseif (icorner_coarse .eq. 1) then
+c                  qfine(1-ibc,my+jbc,mq) = value
+c               elseif (icorner_coarse .eq. 2) then
+c                  qfine(mx+ibc,1-jbc,mq) = value
+c               else
+c                  qfine(1-ibc,1-jbc,mq) = value
+c               endif
+c            enddo
+c        enddo
       enddo
 
       end

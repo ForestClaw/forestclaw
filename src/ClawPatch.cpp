@@ -670,8 +670,11 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
     }
 }
 
-void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                         ClawPatch *cp_corner, fclaw_bool a_time_interp)
+void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
+                                         const int& a_refratio,
+                                         ClawPatch *cp_corner,
+                                         fclaw_bool a_time_interp,
+                                         fclaw_cptr transform_cptr)
 
 {
     double *qcoarse = q_time_sync(a_time_interp);
@@ -680,7 +683,8 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                              a_refratio, qcoarse, qfine, a_coarse_corner);
+                              a_refratio, qcoarse, qfine,
+                              a_coarse_corner,transform_cptr);
 }
 
 
