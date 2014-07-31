@@ -59,6 +59,7 @@ void set_maptype_cart_();
 void set_maptype_sphere_();
 void set_maptype_hemisphere_();
 void set_maptype_disk_();
+void set_maptype_cubedsphere_();
 void set_map_defaults_();
 
 int isflat_();
@@ -66,6 +67,7 @@ int iscart_();
 int isdisk_();
 int ishemisphere_();
 int issphere_();
+int iscubedsphere_();
 /* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);

@@ -20,10 +20,6 @@
          do i = 1-mbc,mx+mbc
             xlow = xlower + (i-1)*dx
             ylow = ylower + (j-1)*dy
-c            x = xp(i,j)
-c            y = yp(i,j)
-c            z = zp(i,j)
-
             call cellave2(xlow,ylow,dx,dy,w)
             q(i,j,1) = w
          enddo

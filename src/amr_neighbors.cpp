@@ -159,6 +159,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     /* This will be made more general once we figure out what we do with
        block corners */
     fclaw_bool is_sphere_grid = issphere_();
+    fclaw_bool is_cubedsphere_grid = iscubedsphere_();
     if (is_sphere_grid && is_block_corner)
     {
         has_corner_neighbor = fclaw_true;  // By definition
@@ -192,6 +193,53 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             exit(1);
         }
 
+        if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
+            neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+        {
+            // This patch shares face 'iface' with a single patch.
+            igrid = 0;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            // On bottom corners, we want to take the first patch in the list;
+            // On top corners, we take the last patch in the list.
+            igrid = (icorner/2)*(p4est_refineFactor - 1);
+        }
+        else
+        {
+            printf("Something went wrong;  this should not be a boundary\n");
+            exit(1);
+        }
+
+        corner_patch_idx = rpatchno[igrid];
+        rproc_corner = rproc[igrid];
+    }
+    else if (is_cubedsphere_grid && is_block_corner)
+    {
+        has_corner_neighbor = fclaw_true;  // By definition
+        int rpatchno[p4est_refineFactor];
+        int rproc[p4est_refineFactor];
+        int rfaceno;
+        int igrid;
+        // int ftransform[9];
+
+        /* Use only faces 0 or 1 to get block data. */
+        int iface = icorner % 2;
+        neighbor_type =
+            fclaw2d_patch_face_neighbors(domain,
+                                         this_block_idx,
+                                         this_patch_idx,
+                                         iface,
+                                         rproc,
+                                         corner_block_idx,
+                                         rpatchno,
+                                         &rfaceno);
+
+        if (this_block_idx == *corner_block_idx)
+        {
+            printf("Something went wrong;  these blocks should be different\n");
+            exit(1);
+        }
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
             neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
         {

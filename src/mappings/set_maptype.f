@@ -16,6 +16,7 @@ c     # hemisphere = 4
 c     # sphere = 5
 c     # rotated square = 6
 c     # bilinear quad = 7
+c     # cubed_sphere = 8
 c     # ----------------------
 
 
@@ -33,7 +34,7 @@ c     # -------------------------------------------------------------------
       common /comsurf1/ n_maps_com
       common /comsurf2/ ismap_com
 
-      n_maps_com = 7
+      n_maps_com = 8
       if (n_maps_com .gt. max_maps) then
          write(6,*) 'set_all_maps_false (setup_mesh.f) : ',
      &         'Increase size of max_maps to ', n_maps_com
@@ -98,8 +99,10 @@ c     # -------------------------------------------------------------------
       logical isflat_cart, isflat_diamond, isflat_disk
       logical isflat_hemisphere, isflat_sphere, isflat_rotsq
       logical isflat_biquad, get_map_value
+      logical isflat_cubedsphere
       logical iscart, isdiamond, isdisk, ishemisphere
       logical issphere, isrotsq, isbiquad
+      logical iscubedsphere
 
       if (iscart()) then
          isflat = isflat_cart()
@@ -118,6 +121,8 @@ c     # -------------------------------------------------------------------
       elseif (isbiquad()) then
          write(6,*) 'Bilinear quad mapping is not implemented'
          stop
+      elseif (iscubedsphere()) then
+         isflat = isflat_cubedsphere()
       endif
 
       end
@@ -277,6 +282,27 @@ c     # ----------------------------
       implicit none
 
       isflat_biquad = .true.
+      end
+
+c     # ----------------------------
+c     # CUBED_SPHERE = 8
+c     # ----------------------------
+      subroutine set_maptype_cubedsphere()
+      implicit none
+      call set_map_value(8)
+      call set_map_defaults()
+      end
+
+      logical function iscubedsphere()
+      implicit none
+      logical get_map_value
+      iscubedsphere = get_map_value(8)
+      end
+
+      logical function isflat_cubedsphere()
+      implicit none
+
+      isflat_cubedsphere = .false.
       end
 
 

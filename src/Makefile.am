@@ -37,6 +37,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/scale_rot_map.f \
 	src/mappings/cart/mapc2m_cart.f \
 	src/mappings/disk/mapc2m_disk.f \
+	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/sphere/mapc2m_sphere.f \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \

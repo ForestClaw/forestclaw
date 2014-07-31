@@ -16,10 +16,7 @@ c      read(7,*) kappa
 c      read(7,*) Tfinal
 c      close(7)
 
-      call set_maptype_sphere()
-
-c     # No scaling or rotation - will be set below.
-      call set_map_defaults()
+      call set_maptype_cubedsphere()
 
 c     # These are the values that work well with the hemisphere.  Other
 c     # values don't work so well, since we don't have any inflow
@@ -35,7 +32,9 @@ c     # -------------------------------------------------
 
 c     # Set mapping scaling
       scale = 1
+      rot_angle(1) = 1.34
+      rot_angle(2) = 2.1
       rot_angle(1) = 0
-      rot_angle(2) = 0
+      rot_angle(2) = 1.8
       call setup_mappedgrid(rot_angle,scale)
       end
