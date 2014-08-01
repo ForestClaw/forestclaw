@@ -35,6 +35,8 @@ int
 main (int argc, char **argv)
 {
   int			lp;
+  int                   example;
+  double                cubed_R1, cubed_R2;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
@@ -49,6 +51,12 @@ main (int argc, char **argv)
      Read in parameters and options
      --------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "2 for disk, 3 for sphere");
+  sc_options_add_double (options, 0, "cubed_R1", &cubed_R1, -1.,
+                         "outer radius of cubed disk and cubed sphere");
+  sc_options_add_double (options, 0, "cubed_R2", &cubed_R2, -1.,
+                         "circumcircle radius of inner cube of cubed disk");
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
