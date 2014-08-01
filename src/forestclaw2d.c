@@ -162,6 +162,39 @@ fclaw2d_free (void *ptr)
 }
 
 void
+fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
+                              const char * name, void * attribute)
+{
+    sc_keyvalue_t *a = domain->attributes;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (!sc_keyvalue_exists (a, name));
+    sc_keyvalue_set_pointer (a, name, attribute);
+}
+
+void *
+fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
+                                 const char * name, void * default_attr)
+{
+    sc_keyvalue_t *a = domain->attributes;
+
+    FCLAW_ASSERT (a != NULL);
+    return sc_keyvalue_get_pointer (a, name, default_attr);
+}
+
+void
+fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char * name)
+{
+    sc_keyvalue_t *a = domain->attributes;
+    sc_keyvalue_entry_type_t et;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (sc_keyvalue_exists (a, name));
+    et = sc_keyvalue_unset (a, name);
+    FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
+}
+
+void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)
 {

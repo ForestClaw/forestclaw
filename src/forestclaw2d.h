@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORESTCLAW2D_H
 
 #include <fclaw2d_base.h>
+#include <sc_keyvalue.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -93,6 +94,8 @@ struct fclaw2d_domain
 {
     sc_MPI_Comm mpicomm;        /* MPI communicator */
     int mpisize, mpirank;       /* MPI variables */
+    int possible_maxlevel;      /* theoretical maximum that can be reached */
+
     int local_num_patches;      /* sum of patches over all blocks on this proc */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
                                            store any patches at all, we set
@@ -100,7 +103,7 @@ struct fclaw2d_domain
     int64_t global_num_patches; /* sum of local_num_patches over all procs */
     int64_t global_num_patches_before;  /* Number of patches on lower procs */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
-    int possible_maxlevel;      /* theoretical maximum that can be reached */
+
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int num_exchange_patches;   /* # my patches relevant to other procs.
@@ -109,10 +112,41 @@ struct fclaw2d_domain
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     int num_ghost_patches;      /* # off-proc patches relevant to this proc */
     fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
+
     void *pp;                   /* opaque backend data */
     int pp_owned;               /* The pp member is owned by this domain */
+    sc_keyvalue_t *attributes;  /* Reserved to store domain attributes */
+
     void *user;
 };
+
+/***************************** DOMAIN ATTRIBUTES **************************/
+
+/** Add a named attribute to the domain.
+ * \param [in] domain   This domain will get a new attribute.
+ * \param [in] name     This name must not yet be used for another attribute.
+ * \param [in] attribute        Arbitrary data stored under \a name.
+ */
+void fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
+                                   const char * name, void * attribute);
+
+/** Access a named attribute of the domain.
+ * \param [in] domain   The domain may or may not have the queried attribute.
+ * \param [in] name     The attribute by this \a name is retrieved.
+ * \param [in] default_attr     Returned if the attribute does not exist.
+ * \return              The data that was previously stored under \a name,
+ *                      or \a default_attr if the attribute does not exist.
+ */
+void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
+                                       const char * name, void * default_attr);
+
+/** Remove a named attribute from the domain.
+ * It is NOT necessary to call this function before domain destruction.
+ * \param [in] domain   The domain must have the attribute \a name.
+ * \param [in] name     An attribute of this name must exist.
+ */
+void fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain,
+                                      const char * name);
 
 /*************************** TOPOLOGICAL PROPERTIES ***********************/
 
