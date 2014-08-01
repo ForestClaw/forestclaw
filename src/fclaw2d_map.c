@@ -53,6 +53,17 @@ fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
+void
+fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
+{
+  if (cont->destroy == NULL) {
+    FCLAW_FREE (cont);
+  }
+  else {
+    cont->destroy (cont);
+  }
+}
+
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
 
 static int
@@ -113,13 +124,6 @@ fclaw2d_map_new_torus (double R1, double R2)
     cont->user_double[1] = R2;
 
     return cont;
-}
-
-void
-fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont)
-{
-    FCLAW_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (torus));
-    FCLAW_FREE (cont);
 }
 
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
@@ -216,13 +220,6 @@ fclaw2d_map_new_csphere (double R)
     cont->user_double[0] = R;
 
     return cont;
-}
-
-void
-fclaw2d_map_destroy_csphere (fclaw2d_map_context_t * cont)
-{
-    FCLAW_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (csphere));
-    FCLAW_FREE (cont);
 }
 
 /* Spherical disk in xy plane.  Matches p4est_connectivity_new_disk (). */
@@ -330,13 +327,6 @@ fclaw2d_map_new_disk (double R1, double R2)
     return cont;
 }
 
-void
-fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont)
-{
-    FCLAW_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (disk));
-    FCLAW_FREE (cont);
-}
-
 /* Use an existing Fortran mapc2m routine.
  * The answers to the queries are expected in user_int[0] through [4].
  * The pointer to the Fortran mapping function is stored in user_data.
@@ -347,8 +337,7 @@ fclaw2d_map_query_fortran (fclaw2d_map_context_t * cont, int query_identifier)
 {
     FCLAW_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
 
-    return 0 <= query_identifier
-        && query_identifier <
+    return 0 <= query_identifier && query_identifier <
         FCLAW2D_MAP_QUERY_LAST ? cont->user_int[query_identifier] : 0;
 }
 
@@ -379,11 +368,4 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
     cont->user_data = (void *) mapc2m;
 
     return cont;
-}
-
-void
-fclaw2d_map_destroy_fortran (fclaw2d_map_context_t * cont)
-{
-    FCLAW_ASSERT (cont->magic == FCLAW2D_MAP_MAGIC (fortran));
-    FCLAW_FREE (cont);
 }

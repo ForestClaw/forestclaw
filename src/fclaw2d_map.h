@@ -90,6 +90,10 @@ typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
                                    double xc, double yc,
                                    double *xp, double *yp, double *zp);
 
+/** Destructor for a fclaw2d_map_context.
+ */
+typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
+
 /** Mapping context that is interpreted by its query and c2m members.
  * The callbacks are free to define the meaning of the user_* fields.
  */
@@ -98,10 +102,19 @@ struct fclaw2d_map_context
     unsigned magic;
     fclaw2d_map_query_t query;
     fclaw2d_map_c2m_t mapc2m;
-    void *user_data;
+    fclaw2d_map_destroy_t destroy;
     int user_int[16];
     double user_double[16];
+    void *user_data;
 };
+
+/** Deallocate a mapping context.
+ * If the \a destroy member is not NULL, it is called on the context.
+ * Otherwise, this function calls FCLAW_FREE (cont).
+ * \param [in] cont     Mapping context where the \a destroy member is NULL
+ *                      or a valid function that is then called.
+ */
+void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
 
 /** Query function for the mapping that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
@@ -128,28 +141,22 @@ void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
  * \param [in] R1       Large radius of the torus.
  * \param [in] R2       Small radius of the torus.
  * \return              Mapping context.
- *                      Must be destroyed by fclaw2d_map_destroy_torus.
  */
 fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
-void fclaw2d_map_destroy_torus (fclaw2d_map_context_t * cont);
 
 /** Create a cubed sphere mapping from six trees.
  * \param [in] R        Radius of the cubed sphere surface.
  * \return              Mapping context.
- *                      Must be destroyed by fclaw2d_map_destroy_csphere.
  */
 fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
-void fclaw2d_map_destroy_csphere (fclaw2d_map_context_t * cont);
 
 /** Create a planar spherical disk mapping from five trees.
  * It is composed of a center square and one deformed patches on either side.
  * \param [in] R1       Outer radius of the disk.
  * \param [in] R2       Radius at any corner of the inside square.
  * \return              Mapping context.
- *                      Must be destroyed by fclaw2d_map_destroy_disk.
  */
 fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
-void fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont);
 
 /** Create a mapping context for any number of blocks using a Fortran mapc2m.
  * \param [in] mapc2m   Address of the Fortran mapping function.
@@ -158,14 +165,12 @@ void fclaw2d_map_destroy_disk (fclaw2d_map_context_t * cont);
  *                      Be sure to assign them by the symbolic constants
  *                      defined above since these may change in the future.
  * \return              Mapping context.
- *                      Must be destroyed by fclaw2d_map_destroy_fortran.
  */
 fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
                                                 mapc2m,
                                                 const int
                                                 query_results
                                                 [FCLAW2D_MAP_QUERY_LAST]);
-void fclaw2d_map_destroy_fortran (fclaw2d_map_context_t * cont);
 
 #ifdef __cplusplus
 #if 0
