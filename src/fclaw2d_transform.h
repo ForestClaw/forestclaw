@@ -53,24 +53,31 @@ typedef struct fclaw2d_transform_data
 }
 fclaw2d_transform_data_t;
 
-/* Underscore is needed since these routines will be called from Fortran */
-void transform_face_samesize_ (const int &i1, const int &j1,
+#define FCLAW2D_TRANSFORM_FACE \
+  FCLAW_F77_FUNC_(fclaw2d_transform_face,FCLAW2D_TRANSFORM_FACE)
+void FCLAW2D_TRANSFORM_FACE (const int &i1, const int &j1,
+                             int *i2, int *j2,
+                             fclaw2d_transform_data_t * tdata);
+
+#define FCLAW2D_TRANSFORM_FACE_HALF \
+  FCLAW_F77_FUNC_(fclaw2d_transform_face_half,FCLAW2D_TRANSFORM_FACE_HALF)
+void FCLAW2D_TRANSFORM_FACE_HALF (const int &i1, const int &j1,
+                                  int i2[], int j2[],
+                                  fclaw2d_transform_data_t * tdata);
+
+#define FCLAW2D_TRANSFORM_CORNER \
+  FCLAW_F77_FUNC_(fclaw2d_transform_corner,FCLAW2D_TRANSFORM_CORNER)
+void FCLAW2D_TRANSFORM_CORNER (const int &i1, const int &j1,
                                int *i2, int *j2,
                                fclaw2d_transform_data_t * tdata);
 
-void transform_face_halfsize_ (const int &i1, const int &j1,
-                               int i2[], int j2[],
-                               fclaw2d_transform_data_t * tdata);
+#define FCLAW2D_TRANSFORM_CORNER_HALF \
+  FCLAW_F77_FUNC_(fclaw2d_transform_corner_half,FCLAW2D_TRANSFORM_CORNER_HALF)
+void FCLAW2D_TRANSFORM_CORNER_HALF (const int &i1, const int &j1,
+                                    int i2[], int j2[],
+                                    fclaw2d_transform_data_t * tdata);
 
-/* Underscore is needed since these routines will be called from Fortran */
-void transform_corner_samesize_ (const int &i1, const int &j1,
-                                 int *i2, int *j2,
-                                 fclaw2d_transform_data_t * tdata);
-
-void transform_corner_halfsize_ (const int &i1, const int &j1,
-                                 int i2[], int j2[],
-                                 fclaw2d_transform_data_t * tdata);
-
+/* TODO: remove this function */
 void transform_corner_halfsize2_ (const int &i1, const int &j1,
                                   int i2[], int j2[],
                                   fclaw2d_transform_data_t * tdata);

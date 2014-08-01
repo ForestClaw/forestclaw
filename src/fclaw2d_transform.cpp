@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Same size neighbor across a face */
 void
-transform_face_samesize_ (const int &i1, const int &j1,
-                          int *i2, int *j2, fclaw2d_transform_data_t * tdata)
+FCLAW2D_TRANSFORM_FACE (const int &i1, const int &j1,
+                        int *i2, int *j2, fclaw2d_transform_data_t * tdata)
 {
     *i2 = i1;
     *j2 = j1;
@@ -40,9 +40,9 @@ transform_face_samesize_ (const int &i1, const int &j1,
 
 /* This works except for a block-block corner */
 void
-transform_corner_samesize_ (const int &i1, const int &j1,
-                            int *i2, int *j2,
-                            fclaw2d_transform_data_t * tdata)
+FCLAW2D_TRANSFORM_CORNER (const int &i1, const int &j1,
+                          int *i2, int *j2,
+                          fclaw2d_transform_data_t * tdata)
 {
     *i2 = i1;
     *j2 = j1;
@@ -68,9 +68,9 @@ transform_corner_samesize_ (const int &i1, const int &j1,
 
 /* Half size neighbor across a face */
 void
-transform_face_halfsize_ (const int &i1, const int &j1,
-                          int i2[], int j2[],
-                          fclaw2d_transform_data_t * tdata)
+FCLAW2D_TRANSFORM_FACE_HALF (const int &i1, const int &j1,
+                             int i2[], int j2[],
+                             fclaw2d_transform_data_t * tdata)
 {
     i2[0] = i1;
     j2[0] = j1;
@@ -82,9 +82,9 @@ transform_face_halfsize_ (const int &i1, const int &j1,
 
 /* This works except for a block-block corner */
 void
-transform_corner_halfsize_ (const int &i1, const int &j1,
-                            int *i2, int *j2,
-                            fclaw2d_transform_data_t * tdata)
+FCLAW2D_TRANSFORM_CORNER_HALF (const int &i1, const int &j1,
+                               int *i2, int *j2,
+                               fclaw2d_transform_data_t * tdata)
 {
     i2[0] = i1;
     j2[0] = j1;
@@ -110,7 +110,7 @@ transform_corner_halfsize_ (const int &i1, const int &j1,
 
 /* This obviously is bogus - but I have here it so I can get the
    rest of the code working.
-   TODO: remove this */
+   TODO: remove this function */
 void
 transform_corner_halfsize2_ (const int &i1, const int &j1,
                              int *i2, int *j2,
