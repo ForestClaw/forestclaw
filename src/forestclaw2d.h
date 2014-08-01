@@ -123,12 +123,13 @@ struct fclaw2d_domain
 /***************************** DOMAIN ATTRIBUTES **************************/
 
 /** Add a named attribute to the domain.
+ * Attribute names starting with 'fclaw' are reserved.
  * \param [in] domain   This domain will get a new attribute.
  * \param [in] name     This name must not yet be used for another attribute.
  * \param [in] attribute        Arbitrary data stored under \a name.
  */
 void fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
-                                   const char * name, void * attribute);
+                                   const char *name, void *attribute);
 
 /** Access a named attribute of the domain.
  * \param [in] domain   The domain may or may not have the queried attribute.
@@ -138,7 +139,7 @@ void fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
  *                      or \a default_attr if the attribute does not exist.
  */
 void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
-                                       const char * name, void * default_attr);
+                                       const char *name, void *default_attr);
 
 /** Remove a named attribute from the domain.
  * It is NOT necessary to call this function before domain destruction.
@@ -146,7 +147,7 @@ void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
  * \param [in] name     An attribute of this name must exist.
  */
 void fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain,
-                                      const char * name);
+                                      const char *name);
 
 /*************************** TOPOLOGICAL PROPERTIES ***********************/
 
@@ -385,10 +386,11 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
                                     fclaw2d_patch_t * opatch,
                                     const int ftransform[], int position,
-                                    int mx, int my, int based, int i[], int j[]);
+                                    int mx, int my, int based, int i[],
+                                    int j[]);
 
 /** Determine neighbor patch(es) and orientation across a given corner.
- * The current version only supports one neighbor, i.e. no true multi-block.
+ * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
@@ -400,7 +402,8 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts_patches[.
  * \param [out] neighbor_size   The relative patch size of the neighbor.
- * \return			True if at least one corner neighbor exists.
+ * \return                      True if at least one corner neighbor exists
+ *                              that is not already a face neighbor.
  */
 int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                     int blockno, int patchno, int cornerno,

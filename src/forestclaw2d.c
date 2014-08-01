@@ -35,7 +35,7 @@ fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
     int mpiret;
     double gd;
 
-    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_MAX, 
+    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_MAX,
                                domain->mpicomm);
     SC_CHECK_MPI (mpiret);
 
@@ -163,7 +163,7 @@ fclaw2d_free (void *ptr)
 
 void
 fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
-                              const char * name, void * attribute)
+                              const char *name, void *attribute)
 {
     sc_keyvalue_t *a = domain->attributes;
 
@@ -174,7 +174,7 @@ fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
 
 void *
 fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
-                                 const char * name, void * default_attr)
+                                 const char *name, void *default_attr)
 {
     sc_keyvalue_t *a = domain->attributes;
 
@@ -183,7 +183,7 @@ fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char * name)
+fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
 {
     sc_keyvalue_t *a = domain->attributes;
     sc_keyvalue_entry_type_t et;
@@ -463,16 +463,16 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
 void
 fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
 {
-  const int        iface = *faceno;
-  const int        orientation = *rfaceno / P4EST_FACES;
+    const int iface = *faceno;
+    const int orientation = *rfaceno / P4EST_FACES;
 
-  P4EST_ASSERT (orientation < P4EST_HALF);
-  P4EST_ASSERT (*faceno < P4EST_FACES);
+    P4EST_ASSERT (orientation < P4EST_HALF);
+    P4EST_ASSERT (*faceno < P4EST_FACES);
 
-  *faceno = *rfaceno % P4EST_FACES;
-  *rfaceno = iface + P4EST_FACES * orientation;
+    *faceno = *rfaceno % P4EST_FACES;
+    *rfaceno = iface + P4EST_FACES * orientation;
 
-  P4EST_ASSERT (*faceno < P4EST_FACES);
+    P4EST_ASSERT (*faceno < P4EST_FACES);
 }
 
 void
@@ -487,7 +487,7 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
                               const int ftransform[],
                               int mx, int my, int based, int *i, int *j)
 {
-    double     Rmx;
+    double Rmx;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
@@ -503,12 +503,11 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level,
             ftransform[0], ftransform[2], ftransform[3], ftransform[5],
-            ftransform[6], ftransform[8],
-            mx, *i, *j, based);
+            ftransform[6], ftransform[8], mx, *i, *j, based);
 #endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << ipatch->level);
+    Rmx = (double) mx *(double) (1 << ipatch->level);
 
     if (ftransform[8] & 4)
     {
@@ -521,7 +520,7 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
-        double     my_xyz[2], target_xyz[2];
+        double my_xyz[2], target_xyz[2];
 
         /* the reference cube is stretched to mx times my units */
         my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
@@ -567,9 +566,9 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
                                const int ftransform[], int position,
                                int mx, int my, int based, int i[], int j[])
 {
-    int        kt, kn;
-    int        di, dj;
-    double     Rmx;
+    int kt, kn;
+    int di, dj;
+    double Rmx;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
@@ -585,27 +584,28 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level,
             ftransform[0], ftransform[2], ftransform[3], ftransform[5],
-            ftransform[6], ftransform[8],
-            mx, *i, *j, based);
+            ftransform[6], ftransform[8], mx, *i, *j, based);
 #endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << opatch->level);
+    Rmx = (double) mx *(double) (1 << opatch->level);
 
     if (ftransform[8] & 4)
     {
         /* The two patches are in the same block.  ftransform is undefined */
         di = based + (int)
-          ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
+            ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
         dj = based + (int)
-          ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
+            ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
 
         /* In the same block, the order of child cells is canonical */
-        for (kt = 0; kt < 2; ++kt) {
-          for (kn = 0; kn < 2; ++kn) {
-            i[2 * kt + kn] = di + kn;
-            j[2 * kt + kn] = dj + kt;
-          }
+        for (kt = 0; kt < 2; ++kt)
+        {
+            for (kn = 0; kn < 2; ++kn)
+            {
+                i[2 * kt + kn] = di + kn;
+                j[2 * kt + kn] = dj + kt;
+            }
         }
     }
     else
@@ -613,10 +613,10 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
-        int        bt, bn;
-        int        nx, ny;
-        int        sx, sy;
-        double     my_xyz[2], target_xyz[2];
+        int bt, bn;
+        int nx, ny;
+        int sx, sy;
+        double my_xyz[2], target_xyz[2];
 
         /* the reference cube is stretched to mx times my units */
         my_xyz[0] = ipatch->xlower * Rmx + 2. * (*i + .5 - based);
@@ -650,36 +650,43 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         dj = (int) (target_xyz[1] - opatch->ylower * Rmx) + based - 1;
 
         /* Run through the child cells in order of the small patch */
-        for (sy = 0; sy < 2; ++sy) {
-            for (sx = 0; sx < 2; ++sx) {
+        for (sy = 0; sy < 2; ++sy)
+        {
+            for (sx = 0; sx < 2; ++sx)
+            {
 
-              /* Compute small patch coordinate in (transverse, normal) order */
-              if (target_axis[0]) {
-                kt = sy;
-                kn = sx;
-              }
-              else {
-                kt = sx;
-                kn = sy;
-              }
+                /* Compute small patch coordinate in (transverse, normal) order */
+                if (target_axis[0])
+                {
+                    kt = sy;
+                    kn = sx;
+                }
+                else
+                {
+                    kt = sx;
+                    kn = sy;
+                }
 
-              /* Transform into big patch (transverse, normal) coordinate */
-              bt = !edge_reverse[0] ? kt : !kt;
-              bn = (edge_reverse[2] == 1 || edge_reverse[2] == 2) ? kn : !kn;
+                /* Transform into big patch (transverse, normal) coordinate */
+                bt = !edge_reverse[0] ? kt : !kt;
+                bn = (edge_reverse[2] == 1
+                      || edge_reverse[2] == 2) ? kn : !kn;
 
-              /* Compute coordinate relative to the big patch */
-              if (my_axis[0]) {
-                nx = bn;
-                ny = bt;
-              }
-              else {
-                nx = bt;
-                ny = bn;
-              }
+                /* Compute coordinate relative to the big patch */
+                if (my_axis[0])
+                {
+                    nx = bn;
+                    ny = bt;
+                }
+                else
+                {
+                    nx = bt;
+                    ny = bn;
+                }
 
-              /* assign value in proper place */
-              i[2 * ny + nx] = di + sx;
-              j[2 * ny + nx] = dj + sy;
+                /* assign value in proper place */
+                i[2 * ny + nx] = di + sx;
+                j[2 * ny + nx] = dj + sy;
             }
         }
     }
@@ -827,6 +834,8 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     /* We are not yet ready for true multiblock connectivities */
     if (qid < 0)
     {
+        /* The value -1 is expected for a corner on the physical boundary */
+        /* It is -2 for a number of true corner neighbors greater than one */
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
     }
     else
@@ -838,7 +847,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             *rproc = domain->mpirank;
             *rblockno = (int) mesh->quad_to_tree[qid];
             rtree = p4est_tree_array_index (p4est->trees,
-                                            (p4est_topidx_t) *rblockno);
+                                            (p4est_topidx_t) * rblockno);
             FCLAW_ASSERT (rtree->quadrants_offset <= qid);
             qid -= rtree->quadrants_offset;     /* relative to tree */
             q = p4est_quadrant_array_index (&rtree->quadrants, qid);
@@ -867,12 +876,17 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         default:
             SC_ABORT_NOT_REACHED ();
         }
-        FCLAW_ASSERT (*rproc == domain->mpirank || (*rpatchno >= 0 &&
-                      *rpatchno < mesh->ghost_num_quadrants));
-        FCLAW_ASSERT (*rproc != domain->mpirank ||
-                      (*rblockno >= 0 && *rblockno < domain->num_blocks &&
-                       *rpatchno >= 0 && *rpatchno <
-                       domain->blocks[*rblockno].num_patches));
+
+/* *INDENT-OFF* */
+        FCLAW_ASSERT (*rproc == domain->mpirank
+                      || (*rpatchno >= 0
+                          && *rpatchno < mesh->ghost_num_quadrants));
+        FCLAW_ASSERT (*rproc != domain->mpirank
+                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                          && *rpatchno >= 0
+                          && *rpatchno <
+                             domain->blocks[*rblockno].num_patches));
+/* *INDENT-ON* */
     }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -1119,8 +1133,8 @@ fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
     if (domain->mpirank > 0)
     {
         mpiret = sc_MPI_Recv (&i, 1, sc_MPI_INT, domain->mpirank - 1,
-                           FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm,
-                           &status);
+                              FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm,
+                              &status);
         SC_CHECK_MPI (mpiret);
         FCLAW_ASSERT (i == 0);
     }
