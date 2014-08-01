@@ -110,6 +110,10 @@ main (int argc, char **argv)
       fclaw2d_domain_list_neighbors(domain, lp);
   }
 
+  double R = 1.0;
+  fclaw2d_map_context_t *csphere_context = fclaw2d_map_new_csphere(R);
+  set_context_((fclaw_cptr) csphere_context);
+
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */

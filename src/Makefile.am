@@ -12,6 +12,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map.h \
 	src/clawpack_fort.H \
+	src/fclaw2d_transform.h \
 	src/fortran_source2d/metric_terms.i
 
 libforestclaw_internal_headers = \
@@ -31,11 +32,13 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_vtk.c \
 	src/clawpack_fort.cpp \
 	src/mappings/block.f \
+	src/mappings/context.f \
 	src/mappings/set_maptype.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/cart/mapc2m_cart.f \
 	src/mappings/disk/mapc2m_disk.f \
-	src/mappings/sphere/mapc2m_sphere.f \
+	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
+	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \
 	src/amrrun.cpp \
@@ -48,6 +51,7 @@ libforestclaw_compiled_sources = \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
+	src/fclaw2d_transform.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
 	src/amr_neighbors.cpp \
@@ -58,11 +62,15 @@ libforestclaw_compiled_sources = \
 	src/output_functions.cpp \
 	src/fclaw2d_solvers.cpp \
 	src/fortran_source2d/philim.f \
-	src/fortran_source2d/claw_out2.f \
+	src/fortran_source2d/average_fv1.f \
+	src/fortran_source2d/interpolate_fv1.f \
+	src/fortran_source2d/exchange_fv1.f \
+	src/fortran_source2d/diagnostics.f \
+	src/fortran_source2d/phys_corner.f \
 	src/fortran_source2d/mapc2p.f \
 	src/fortran_source2d/mapc2m.f \
 	src/fortran_source2d/setup_mesh.f \
-	src/fortran_source2d/claw2d_utils.f \
+	src/fortran_source2d/claw_out2.f \
 	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f

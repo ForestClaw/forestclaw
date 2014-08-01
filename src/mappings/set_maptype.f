@@ -13,9 +13,10 @@ c     # cart = 1
 c     # diamond = 2
 c     # disk = 3
 c     # hemisphere = 4
-c     # sphere = 5
+c     # pillow sphere = 5
 c     # rotated square = 6
 c     # bilinear quad = 7
+c     # cubed_sphere = 8
 c     # ----------------------
 
 
@@ -33,7 +34,7 @@ c     # -------------------------------------------------------------------
       common /comsurf1/ n_maps_com
       common /comsurf2/ ismap_com
 
-      n_maps_com = 7
+      n_maps_com = 8
       if (n_maps_com .gt. max_maps) then
          write(6,*) 'set_all_maps_false (setup_mesh.f) : ',
      &         'Increase size of max_maps to ', n_maps_com
@@ -96,10 +97,12 @@ c     # -------------------------------------------------------------------
 
       integer maptype
       logical isflat_cart, isflat_diamond, isflat_disk
-      logical isflat_hemisphere, isflat_sphere, isflat_rotsq
+      logical isflat_hemisphere, isflat_pillowsphere, isflat_rotsq
       logical isflat_biquad, get_map_value
+      logical isflat_cubedsphere
       logical iscart, isdiamond, isdisk, ishemisphere
-      logical issphere, isrotsq, isbiquad
+      logical ispillowsphere, isrotsq, isbiquad
+      logical iscubedsphere
 
       if (iscart()) then
          isflat = isflat_cart()
@@ -110,15 +113,26 @@ c     # -------------------------------------------------------------------
          isflat = isflat_disk()
       elseif (ishemisphere()) then
          isflat = isflat_hemisphere()
-      elseif (issphere()) then
-         isflat = isflat_sphere()
+      elseif (ispillowsphere()) then
+         isflat = isflat_pillowsphere()
       elseif (isrotsq()) then
          write(6,*) 'Rotated Square mapping is not implemented'
          stop
       elseif (isbiquad()) then
          write(6,*) 'Bilinear quad mapping is not implemented'
          stop
+      elseif (iscubedsphere()) then
+         isflat = isflat_cubedsphere()
       endif
+
+      end
+
+      logical function issphere()
+      implicit none
+
+      logical ispillowsphere, iscubedsphere
+
+      issphere = ispillowsphere() .or. iscubedsphere()
 
       end
 
@@ -215,24 +229,24 @@ c     # ----------------------------
 
 
 c     # ----------------------------
-c     # SPHERE = 5
+c     # PILLOW SPHERE = 5
 c     # ----------------------------
-      subroutine set_maptype_sphere()
+      subroutine set_maptype_pillowsphere()
       implicit none
       call set_map_value(5)
       call set_map_defaults()
       end
 
-      logical function issphere()
+      logical function ispillowsphere()
       implicit none
       logical get_map_value
-      issphere = get_map_value(5)
+      ispillowsphere = get_map_value(5)
       end
 
-      logical function isflat_sphere()
+      logical function isflat_pillowsphere()
       implicit none
 
-      isflat_sphere = .false.
+      isflat_pillowsphere = .false.
       end
 
 
@@ -277,6 +291,27 @@ c     # ----------------------------
       implicit none
 
       isflat_biquad = .true.
+      end
+
+c     # ----------------------------
+c     # CUBED_SPHERE = 8
+c     # ----------------------------
+      subroutine set_maptype_cubedsphere()
+      implicit none
+      call set_map_value(8)
+      call set_map_defaults()
+      end
+
+      logical function iscubedsphere()
+      implicit none
+      logical get_map_value
+      iscubedsphere = get_map_value(8)
+      end
+
+      logical function isflat_cubedsphere()
+      implicit none
+
+      isflat_cubedsphere = .false.
       end
 
 

@@ -131,6 +131,15 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     // Number of patch corners, not the number of corners in the domain!
     // const int numcorners = get_corners_per_patch(domain);
 
+    // Transform data needed at multi-block boundaries
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
+
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
@@ -173,6 +182,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *ghost_patch;
 
+            transform_data.icorner = icorner;
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
@@ -180,7 +190,8 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                transform_data.transform);
 
             if (ref_flag_ptr == NULL)
             {
@@ -191,9 +202,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             {
                 fclaw2d_patch_t* corner_patch = ghost_patch;
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                transform_data.neighbor_patch = corner_patch;
                 if (this_block_idx == corner_block_idx)
                 {
-                    this_cp->exchange_corner_ghost(icorner,corner_cp);
+                    this_cp->exchange_corner_ghost(icorner,corner_cp,
+                                                   (fclaw_cptr) &transform_data);
                 }
                 else
                 {

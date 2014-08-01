@@ -56,9 +56,10 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 /* This is here for now;  may be taken out once I figure out Carsten's
    'mapping context' idea */
 void set_maptype_cart_();
-void set_maptype_sphere_();
+void set_maptype_pillowsphere_();
 void set_maptype_hemisphere_();
 void set_maptype_disk_();
+void set_maptype_cubedsphere_();
 void set_map_defaults_();
 
 int isflat_();
@@ -66,9 +67,12 @@ int iscart_();
 int isdisk_();
 int ishemisphere_();
 int issphere_();
+int ispillowsphere_();
+int iscubedsphere_();
 /* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);
+void set_context_(fclaw_cptr a_context);
 
 void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
                                 const int& meqn, double qfine[],double qcoarse[],
@@ -111,20 +115,24 @@ void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
                              const int& idir, const int& iside,
                              const int& num_neighbors,
                              const int& refratio, const int& igrid,
-                             fclaw_cptr transform_data);
+                             fclaw_cptr transform_cptr);
 
 
 void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& meqn, double this_q[],double neighbor_q[],
-                            const int& a_corner);
+                            const int& a_corner,fclaw_cptr transform_cptr);
 
 void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                           const int& meqn, const int& a_refratio, double this_q[],
-                           double neighbor_q[],const int& a_corner);
+                           const int& meqn, const int& a_refratio,
+                           double qcoarse[], double qfine[],
+                           double areacoarse[], double areafine[],
+                           const int& manifold,
+                           const int& a_corner, fclaw_cptr transform_cptr);
 
 void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                const int& meqn, const int& a_refratio, double this_q[],
-                               double neighbor_q[], const int& a_corner);
+                               double neighbor_q[], const int& a_corner,
+                               fclaw_cptr transform_cptr);
 
 void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
                              double qthis[], double qneighbor[], const int& iface,

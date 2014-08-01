@@ -88,6 +88,14 @@ void cb_corner_average(fclaw2d_domain_t *domain,
     // Number of patch corners, not the number of corners in the domain!
     // const int numcorners = get_corners_per_patch(domain);
 
+    // Transform data needed at multi-block boundaries
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
+
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // Get faces that intersect 'icorner'
@@ -131,6 +139,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
 
+            transform_data.icorner = icorner;
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
@@ -138,7 +147,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                transform_data.transform);
 
             /* -------------------------------------
                Possible returns from ref_flag :
@@ -157,10 +167,13 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 /* Corner neighbor at a finer level, and so we need to average
                    that corner onto the coarser corner ghost cells */
                 ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
+                transform_data.neighbor_patch = neighbor_patch;
 
                 if (this_block_idx == corner_block_idx)
                 {
-                    this_cp->average_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                    this_cp->average_corner_ghost(icorner,refratio,corner_cp,
+                                                  time_interp,
+                                                  (fclaw_cptr) &transform_data);
                 }
                 else
                 {
@@ -185,7 +198,9 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                     {
                         int icorner_coarse = 3-icorner;
                         coarse_cp->average_corner_ghost(icorner_coarse,
-                                                      refratio,corner_cp,time_interp);
+                                                        refratio,corner_cp,
+                                                        time_interp,
+                                                        (fclaw_cptr) &transform_data);
                     }
                     else
                     {
@@ -226,8 +241,11 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                             }
                         }
                         coarse_cp->mb_average_corner_ghost(icorner_coarse,
-                                                           refratio,corner_cp,time_interp,
-                                                           is_block_corner,intersects_block);
+                                                           refratio,
+                                                           corner_cp,
+                                                           time_interp,
+                                                           is_block_corner,
+                                                           intersects_block);
                     }
                 }
             }
@@ -259,6 +277,15 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
     // Number of patch corners, not the number of corners in the domain!
     // const int numcorners = get_corners_per_patch(domain);
+
+    // Transform data needed at multi-block boundaries
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
+
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
@@ -301,6 +328,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             int *ref_flag_ptr = &ref_flag;
             fclaw2d_patch_t *neighbor_patch;
 
+            transform_data.icorner = icorner;
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
@@ -308,7 +336,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner);
+                                is_block_corner,
+                                transform_data.transform);
 
             if (ref_flag_ptr == NULL)
             {
@@ -318,9 +347,12 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
             {
                 ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
 
+                transform_data.neighbor_patch = neighbor_patch;
                 if (this_block_idx == corner_block_idx)
                 {
-                    this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,time_interp);
+                    this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
+                                                      time_interp,
+                                                      (fclaw_cptr) &transform_data);
                 }
                 else
                 {
@@ -344,8 +376,13 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                     if (this_block_idx == corner_block_idx)
                     {
                         int icorner_coarse = 3-icorner;
+                        transform_data.icorner = icorner_coarse;
+                        transform_data.this_patch = neighbor_patch;
+                        transform_data.neighbor_patch = this_patch;
                         coarse_cp->interpolate_corner_ghost(icorner_coarse,
-                                                            refratio,corner_cp,time_interp);
+                                                            refratio,corner_cp,
+                                                            time_interp,
+                                                            (fclaw_cptr) &transform_data);
                     }
                     else
                     {

@@ -32,7 +32,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call transform_func_samesize(i1,j1,i2,j2,
+                  call transform_face_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -52,7 +52,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call transform_func_samesize(i1,j1,i2,j2,
+                  call transform_face_samesize(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -125,7 +125,7 @@ c                 # ibc = 2 corresponds to the second layer
                   endif
 
 c                 # New code
-                  call transform_func_halfsize(i1,j1,i2,j2,
+                  call transform_face_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -158,7 +158,7 @@ c                 # New code
                      j1 = my+jbc
                   endif
 
-                  call transform_func_halfsize(i1,j1,i2,j2,
+                  call transform_face_halfsize(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -245,7 +245,7 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
 c              # This works for smooth grid mappings as well.
                i1 = ic
                j1 = jc
-               call transform_func_halfsize(i1,j1,i2,j2,transform_cptr)
+               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -279,7 +279,7 @@ c           # this ensures that we get 'hanging' corners
 c              # New code
                i1 = ic
                j1 = jc
-               call transform_func_halfsize(i1,j1,i2,j2,transform_cptr)
+               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -293,33 +293,55 @@ c              # New code
       end
 
       subroutine exchange_corner_ghost(mx,my,mbc,meqn,
-     &      qthis, qneighbor, icorner_this)
+     &      qthis, qneighbor, this_icorner,transform_cptr)
       implicit none
 
-      integer mx, my, mbc, meqn, icorner_this
+      integer mx, my, mbc, meqn, this_icorner
+      integer*8 transform_cptr
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq, ibc, jbc
+      integer i1, j1, i2, j2
 
 c     # Do exchanges for all corners
       do mq = 1,meqn
          do ibc = 1,mbc
             do jbc = 1,mbc
-c              # Exchange initiated only at high side (1,3) corners
-               if (icorner_this .eq. 0) then
-                  qthis(1-ibc,1-jbc,mq) =
-     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
-               else if (icorner_this .eq. 1) then
-                  qthis(mx+ibc,1-jbc,mq) =
-     &                  qneighbor(ibc,my+1-jbc,mq)
-               elseif (icorner_this .eq. 2) then
-                  qthis(1-ibc,my+jbc,mq) =
-     &                  qneighbor(mx+1-ibc,jbc,mq)
-               elseif (icorner_this .eq. 3) then
-                  qthis(mx+ibc,my+jbc,mq) =
-     &                  qneighbor(ibc,jbc,mq)
+               if (this_icorner .eq. 0) then
+                  i1 = 1-ibc
+                  j1 = 1-jbc
+               elseif (this_icorner .eq. 1) then
+                  i1 = mx+ibc
+                  j1 = 1-jbc
+               elseif (this_icorner .eq. 2) then
+                  i1 = 1 -ibc
+                  j1 = my+jbc
+               else
+                  i1 = mx+ibc
+                  j1 = my+jbc
                endif
+
+c              # this routine is not yet complete, but the complete one
+c              # can now be dropped in.
+               call transform_corner_samesize(i1,j1,i2,j2,
+     &               transform_cptr)
+               qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+cc              # Exchange initiated only at high side (1,3) corners
+c               if (icorner_this .eq. 0) then
+c                  qthis(1-ibc,1-jbc,mq) =
+c     &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
+c               else if (icorner_this .eq. 1) then
+c                  qthis(mx+ibc,1-jbc,mq) =
+c     &                  qneighbor(ibc,my+1-jbc,mq)
+c               elseif (icorner_this .eq. 2) then
+c                  qthis(1-ibc,my+jbc,mq) =
+c     &                  qneighbor(mx+1-ibc,jbc,mq)
+c               elseif (icorner_this .eq. 3) then
+c                  qthis(mx+ibc,my+jbc,mq) =
+c     &                  qneighbor(ibc,jbc,mq)
+c               endif
             enddo
          enddo
       enddo
@@ -327,51 +349,110 @@ c              # Exchange initiated only at high side (1,3) corners
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine average_corner_ghost(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,icorner_coarse)
+     &      refratio,qcoarse,qfine,areacoarse,areafine,
+     &      manifold,icorner_coarse,transform_cptr)
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,icorner_coarse
+      integer mx,my,mbc,meqn,refratio,icorner_coarse, manifold
+      integer*8 transform_cptr
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
       double precision sum
 
-      integer i,j,ibc,jbc,i1,j1,ii,jj,mq,r2
+      integer i,j,ibc,jbc,ii,jj,mq,r2
       integer ifine, jfine
+      logical is_manifold
+      double precision qf,kf, kc
 
-      integer get_block_idx, get_patch_idx
-      logical debug_is_on
+c     # This should be refratio*refratio.
+      integer i1,j1,m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
 
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
+      is_manifold = manifold .eq. 1
 
       r2 = refratio*refratio
       do mq = 1,meqn
+c        # Loop over four corner cells on coarse grid
          do ibc = 1,mbc
             do jbc = 1,mbc
 c              # Average fine grid corners onto coarse grid ghost corners
-               sum = 0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (ibc-1)*refratio + ii
-                     jfine = (jbc-1)*refratio + jj
-                     if (icorner_coarse .eq. 0) then
-                        sum = sum + qfine(mx+1-ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 1) then
-                        sum = sum + qfine(ifine,my+1-jfine,mq)
-                     elseif (icorner_coarse .eq. 2) then
-                        sum = sum + qfine(mx+1-ifine,jfine,mq)
-                     elseif (icorner_coarse .eq. 3) then
-                        sum = sum + qfine(ifine,jfine,mq)
-                     endif
-                  enddo
-               enddo
                if (icorner_coarse .eq. 0) then
-                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+    1             i1 = 1-ibc
+                  j1 = 1-jbc
                elseif (icorner_coarse .eq. 1) then
-                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+                  i1 = mx+ibc
+                  j1 = 1-jbc
                elseif (icorner_coarse .eq. 2) then
-                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+                  i1 = 1-ibc
+                  j1 = my+jbc
                elseif (icorner_coarse .eq. 3) then
-                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+                  i1 = mx+ibc
+                  j1 = my+jbc
                endif
+
+c              # Again, a fake routine until the real one is
+c              # available (be sure to pass in (i1,j1)
+               call transform_corner_halfsize(ibc,jbc,i2,j2,
+     &               transform_cptr)
+               if (is_manifold) then
+                  sum = 0
+                  do m = 0,r2-1
+                     qf = qfine(i2(m),j2(m),mq)
+                     kf = areafine(i2(m),j2(m))
+                     sum = sum + kf*qf
+                  enddo
+                  kc = areacoarse(i1,j1)
+                  qcoarse(i1,j1,mq) = sum/kc
+               else
+                  sum = 0
+                  do m = 0,r2-1
+                     sum = sum + qfine(i2(m),j2(m),mq)
+                  enddo
+                  qcoarse(i1,j1,mq) = sum/r2
+               endif
+
+
+c               sum = 0
+c               do ii = 1,refratio
+c                  do jj = 1,refratio
+c                     ifine = (ibc-1)*refratio + ii
+c                     jfine = (jbc-1)*refratio + jj
+c                     if (icorner_coarse .eq. 0) then
+c                        sum = sum + qfine(mx+1-ifine,my+1-jfine,mq)
+c                     elseif (icorner_coarse .eq. 1) then
+c                        sum = sum + qfine(ifine,my+1-jfine,mq)
+c                     elseif (icorner_coarse .eq. 2) then
+c                        sum = sum + qfine(mx+1-ifine,jfine,mq)
+c                     elseif (icorner_coarse .eq. 3) then
+c                        sum = sum + qfine(ifine,jfine,mq)
+c                     endif
+c                  enddo
+c               enddo
+c               qcoarse(i1,j1,mq) = sum/r2
+
+c               if (icorner_coarse .eq. 0) then
+c                  qcoarse(1-ibc,1-jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 1) then
+c                  qcoarse(mx+ibc,1-jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 2) then
+c                  qcoarse(1-ibc,my+jbc,mq) = sum/r2
+c               elseif (icorner_coarse .eq. 3) then
+c                  qcoarse(mx+ibc,my+jbc,mq) = sum/r2
+c               endif
             enddo
          enddo
       enddo
@@ -379,11 +460,13 @@ c              # Average fine grid corners onto coarse grid ghost corners
 
       end
 
-      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,refratio,
-     &      qcoarse,qfine,icorner_coarse)
+      subroutine interpolate_corner_ghost(mx,my,mbc,meqn,
+     &      refratio,
+     &      qcoarse,qfine,icorner_coarse,transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
+      integer*8 transform_cptr
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -391,10 +474,19 @@ c              # Average fine grid corners onto coarse grid ghost corners
       double precision qc, sl, sr, gradx, grady, shiftx, shifty
       double precision compute_slopes, value
 
-      integer get_patch_idx, pidx
-      logical debug_is_on
+c     # This should be refratio*refratio.
+      integer i1,j1,m, r2
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
 
-      pidx = get_patch_idx()
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
 
       mth = 5
 
@@ -428,25 +520,38 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
          sr = (qcoarse(ic,jc+1,mq) - qc)
          grady = compute_slopes(sl,sr,mth)
 
-c        # Loop over fine grid ghost cells
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-c              # Fill in interpolated values on fine grid cell
-               shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
-               shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
-
-               value = qc + shiftx*gradx + shifty*grady
-               if (icorner_coarse .eq. 0) then
-                  qfine(mx+ibc,my+jbc,mq) = value
-               elseif (icorner_coarse .eq. 1) then
-                  qfine(1-ibc,my+jbc,mq) = value
-               elseif (icorner_coarse .eq. 2) then
-                  qfine(mx+ibc,1-jbc,mq) = value
-               else
-                  qfine(1-ibc,1-jbc,mq) = value
-               endif
-            enddo
+c        # This works for smooth grid mappings as well.
+         i1 = ic
+         j1 = jc
+         call transform_corner_halfsize2(i1,j1,i2,j2,transform_cptr)
+         do m = 0,r2-1
+            shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+            shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+            value = qc + shiftx*gradx + shifty*grady
+            qfine(i2(m),j2(m),mq) = value
          enddo
+
+cc        # Loop over fine grid ghost cells
+c         do ibc = 1,mbc
+c            do jbc = 1,mbc
+c
+cc              # Fill in interpolated values on fine grid cell
+c               shiftx = (ibc - refratio/2.d0 - 0.5d0)/refratio
+c               shifty = (jbc - refratio/2.d0 - 0.5d0)/refratio
+c
+c               value = qc + shiftx*gradx + shifty*grady
+
+c               if (icorner_coarse .eq. 0) then
+c                  qfine(mx+ibc,my+jbc,mq) = value
+c               elseif (icorner_coarse .eq. 1) then
+c                  qfine(1-ibc,my+jbc,mq) = value
+c               elseif (icorner_coarse .eq. 2) then
+c                  qfine(mx+ibc,1-jbc,mq) = value
+c               else
+c                  qfine(1-ibc,1-jbc,mq) = value
+c               endif
+c            enddo
+c        enddo
       enddo
 
       end

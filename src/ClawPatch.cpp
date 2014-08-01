@@ -390,12 +390,14 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
     mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
-void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner)
+void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
+                                      fclaw_cptr transform_data)
 {
     double *qthis = m_griddata.dataPtr();
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
-    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner);
+    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
+                           transform_data);
 
 }
 
@@ -490,37 +492,6 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                         a_idir,a_iface_coarse,
                         a_p4est_refineFactor,a_refratio,igrid,
                         manifold, transform_cptr);
-
-#if 0
-    for(int igrid = 0; igrid < a_p4est_refineFactor; igrid++)
-    {
-        double *qfine = neighbor_cp[igrid]->m_griddata.dataPtr();
-        if (m_manifold)
-        {
-            double *areacoarse = m_area.dataPtr();
-            double *areafine = neighbor_cp[igrid]->m_area.dataPtr();
-            if (a_block_boundary)
-            {
-                mb_average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                       areacoarse, areafine,
-                                       a_idir,a_iface_coarse,
-                                       a_p4est_refineFactor,a_refratio,igrid);
-            }
-            else
-            {
-                average_face_ghost_mapped_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                           areacoarse, areafine,
-                                           a_idir,a_iface_coarse,
-                                           a_p4est_refineFactor,a_refratio,igrid);
-            }
-        }
-        else
-        {
-            average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iface_coarse,
-                                a_p4est_refineFactor,a_refratio,igrid);
-        }
-    }
-#endif
 }
 
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
@@ -534,60 +505,32 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        fclaw_cptr transform_data)
 {
     double *qcoarse = q_time_sync(a_time_interp);
-
     double *qfine = neighbor_cp->m_griddata.dataPtr();
-
 
     interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
                             a_p4est_refineFactor,a_refratio,igrid,
                             transform_data);
-
-#if 0
-    if (a_block_boundary)
-    {
-        mb_interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                                   a_p4est_refineFactor,a_refratio,igrid);
-    }
-    else
-    {
-        // const char str[100] = "ClawPatch.cpp:interpolate_face_ghost";
-        // debug_here_(1,str);
-        interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                                a_p4est_refineFactor,a_refratio,igrid);
-        // debug_here_(2,str);
-    }
-#endif
-
-#if 0
-    for(int ir = 0; ir < a_p4est_refineFactor; ir++)
-    {
-        double *qfine = neighbor_cp[ir]->m_griddata.dataPtr();
-        int igrid = ir; // indicates which grid we are averaging from.
-        if (a_block_boundary)
-        {
-            mb_interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                                       a_p4est_refineFactor,a_refratio,igrid);
-        }
-        else
-        {
-            interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                                    a_p4est_refineFactor,a_refratio,igrid);
-        }
-    }
-#endif
 }
 
 //
-void ClawPatch::average_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                     ClawPatch *cp_corner, fclaw_bool a_time_interp)
+void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
+                                     const int& a_refratio,
+                                     ClawPatch *cp_corner,
+                                     fclaw_bool a_time_interp,
+                                     fclaw_cptr transform_cptr)
 {
 
     double *qcoarse = q_time_sync(a_time_interp);
-
     double *qfine = cp_corner->m_griddata.dataPtr();
+    double *areacoarse = this->m_area.dataPtr();
+    double *areafine = cp_corner->m_area.dataPtr();
 
+    int manifold = m_manifold ? 1 : 0;
     average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio,
-                          qcoarse, qfine, a_coarse_corner);
+                          qcoarse, qfine,
+                          areacoarse, areafine,
+                          manifold,
+                          a_coarse_corner,transform_cptr);
 }
 
 
@@ -660,8 +603,11 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
     }
 }
 
-void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& a_refratio,
-                                         ClawPatch *cp_corner, fclaw_bool a_time_interp)
+void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
+                                         const int& a_refratio,
+                                         ClawPatch *cp_corner,
+                                         fclaw_bool a_time_interp,
+                                         fclaw_cptr transform_cptr)
 
 {
     double *qcoarse = q_time_sync(a_time_interp);
@@ -670,7 +616,8 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
     double *qfine = cp_corner->m_griddata.dataPtr();
 
     interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                              a_refratio, qcoarse, qfine, a_coarse_corner);
+                              a_refratio, qcoarse, qfine,
+                              a_coarse_corner,transform_cptr);
 }
 
 
@@ -678,105 +625,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner, const int& 
 // Tagging, refining and coarsening
 // ----------------------------------------------------------------
 
-void ClawPatch::interpolate_to_fine_patch(ClawPatch* a_fine,
-                                          const int& a_igrid,
-                                          const int& a_p4est_refineFactor,
-                                          const int& a_refratio)
-{
-    double *qcoarse = m_griddata.dataPtr();
-    double *qfine = a_fine->q();
 
-    printf("Interpolate_fine_patch (Clawpatch.cpp) : Do not use this!\n");
-    exit(0);
-
-    // Use linear interpolation with limiters, even in mapped case.
-    interpolate_to_fine_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                               a_p4est_refineFactor,
-                               a_refratio,a_igrid);
-    if (m_manifold)
-    {
-        double *areacoarse = m_area.dataPtr();
-        double *areafine = a_fine->m_area.dataPtr();
-
-        fixcapaq2_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine, areacoarse, areafine,
-                   a_p4est_refineFactor, a_refratio, a_igrid);
-    }
-}
-
-void ClawPatch::coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
-                                         const int& a_refratio,
-                                         const int& a_num_siblings,
-                                         const int& a_p4est_refineFactor)
-{
-    double *qcoarse = m_griddata.dataPtr();
-
-    printf("coarsen_from_fine_family (Clawpatch.cpp) : Do not use this!\n");
-    exit(0);
-
-    for(int igrid = 0; igrid < a_num_siblings; igrid++)
-    {
-        double *qfine = a_cp_siblings[igrid]->m_griddata.dataPtr();
-
-        /* These will be empty for non-manifolds cases */
-        double *areacoarse = m_area.dataPtr();
-        double *areafine = a_cp_siblings[igrid]->m_area.dataPtr();
-
-        int manifold = m_manifold ? 1 : 0;
-        average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,
-                                 qcoarse,qfine,
-                                 areacoarse, areafine,
-                                 a_p4est_refineFactor,a_refratio,igrid,
-                                 manifold);
-
-#if 0
-        if (m_manifold)
-        {
-            double *areacoarse = m_area.dataPtr();
-            double *areafine = a_cp_siblings[igrid]->m_area.dataPtr();
-            average_to_coarse_mapped_(m_mx, m_my, m_mbc, m_meqn, qcoarse, qfine,
-                                      areacoarse, areafine,
-                                      a_p4est_refineFactor,
-                                      a_refratio, igrid);
-        }
-        else
-        {
-            average_to_coarse_patch_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,
-                                     a_p4est_refineFactor,a_refratio,igrid);
-        }
-#endif
-    }
-}
-
-/*
-fclaw_bool ClawPatch::tag_for_refinement(fclaw_bool a_init_flag)
-{
-    set_block_(&m_blockno);
-
-    double *q = m_griddata.dataPtr();
-    int tag_patch;  // == 0 or 1
-    int iflag = a_init_flag ? 1 : 0;
-    tag4refinement_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,
-                        m_dx, m_dy,q,iflag,tag_patch);
-    return tag_patch == 1;
-}
-*/
-
-/*
-fclaw_bool ClawPatch::tag_for_coarsening(ClawPatch *a_cp_siblings[],
-                                   const int& a_refratio,
-                                   const int& a_num_siblings,
-                                   const int& a_p4est_refineFactor)
-{
-
-    this->coarsen_from_fine_family(a_cp_siblings,a_refratio,a_num_siblings,
-                                   a_p4est_refineFactor);
-    int tag_patch;
-    double *qcoarse = m_griddata.dataPtr();
-    tag4coarsening_(m_mx,m_my,m_mbc,m_meqn,m_xlower,m_ylower,m_dx,m_dy,
-                              qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-*/
 
 
 /* ----------------------------------------------------------------

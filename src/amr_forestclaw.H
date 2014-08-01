@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_regrid.H"
 #include "amr_utils.H"
 #include "ClawPatch.H"
+#include "fclaw2d_transform.h"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
 
@@ -92,20 +93,6 @@ void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,
 // Routines needed to communicate with p4est
 // -------------------------------------------
 
-/* Data structure for transformation data at non-aligned boundaries */
-typedef struct fclaw2d_transform_data
-{
-    fclaw2d_patch_t* this_patch;
-    fclaw2d_patch_t* neighbor_patch;
-    int transform[9];
-    int mx;
-    int my;
-    int iface;   // Relative to the coarse grid
-    int based;   // 0 for cell-centered; 1 for nodes
-    int fine_grid_pos;   // Fine grid position (0 or 1)
-} fclaw2d_transform_data_t;
-
-
 // amr_neighbors.cpp
 void get_face_neighbors (fclaw2d_domain_t * domain,
                          int this_block_idx,
@@ -118,21 +105,15 @@ void get_face_neighbors (fclaw2d_domain_t * domain,
                          int **iface_neighbor,
                          int ftransform[]);
 
-void transform_func_samesize_(const int &i1, const int &j1,
-                              int *i2, int *j2,
-                              fclaw2d_transform_data_t* tdata);
-
-void transform_func_halfsize_(const int &i1, const int &j1,
-                              int i2[], int j2[],
-                              fclaw2d_transform_data_t* tdata);
-
 void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int this_block_idx,
                           int this_patch_idx,
                           int icorner,
                           int *corner_block_idx,
                           fclaw2d_patch_t ** ghost_patch,
-                          int **ref_flag_ptr, fclaw_bool is_block_corner);
+                          int **ref_flag_ptr,
+                          fclaw_bool is_block_corner,
+                          int ftransform[]);
 
 void get_block_boundary (fclaw2d_domain_t * domain,
                          int this_block_idx,

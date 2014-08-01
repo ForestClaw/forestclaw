@@ -98,10 +98,13 @@ public :
                                 fclaw_cptr transform_data);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
-    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor);
+    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor,
+                               fclaw_cptr transform_data);
+
     void average_corner_ghost(const int& a_corner, const int& a_refratio,
                               ClawPatch *cp_fine,
-                              fclaw_bool a_time_interp);
+                              fclaw_bool a_time_interp,
+                              fclaw_cptr transform_cptr);
 
     void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
                                  ClawPatch *cp_fine,
@@ -110,7 +113,8 @@ public :
 
     void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                   ClawPatch *cp_fine,
-                                  fclaw_bool a_time_interp);
+                                  fclaw_bool a_time_interp,
+                                  fclaw_cptr transform_cptr);
 
     void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                      ClawPatch *cp_fine,

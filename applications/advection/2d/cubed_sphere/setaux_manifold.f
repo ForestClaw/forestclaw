@@ -97,8 +97,8 @@ c           # x-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dy,vn,t)
-            if (blockno == 1) then
-               vn = -vn
+            if (xd2(3) .le. 0) then
+c               vn = -vn
             endif
             aux(i,j,2) = vn
          enddo
@@ -116,8 +116,8 @@ c           # y-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dx,vn,t)
-            if (blockno == 1) then
-               vn = -vn
+            if (xd2(3) .lt. 0) then
+c               vn = -vn
             endif
 
             aux(i,j,3) = -vn
