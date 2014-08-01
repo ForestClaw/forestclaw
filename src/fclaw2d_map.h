@@ -107,14 +107,6 @@ struct fclaw2d_map_context
     void *user_data;
 };
 
-/** Deallocate a mapping context.
- * If the \a destroy member is not NULL, it is called on the context.
- * Otherwise, this function calls FCLAW_FREE (cont).
- * \param [in] cont     Mapping context where the \a destroy member is NULL
- *                      or a valid function that is then called.
- */
-void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
-
 /** Query function for the mapping that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] query_identifier Is passed to the map_query_t function.
@@ -136,6 +128,14 @@ void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
                        const double *xc, const double *yc,
                        double *xp, double *yp, double *zp);
 
+/** Deallocate a mapping context.
+ * If the \a destroy member is not NULL, it is called on the context.
+ * Otherwise, this function calls FCLAW_FREE (cont).
+ * \param [in] cont     Mapping context where the \a destroy member is either
+ *                      NULL or a valid function that is then called.
+ */
+void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
+
 /** Create a torus mapping for one block with [0, 1]^2 (for now).
  * \param [in] R1       Large radius of the torus.
  * \param [in] R2       Small radius of the torus.
@@ -150,7 +150,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
 fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
 
 /** Create a planar spherical disk mapping from five trees.
- * It is composed of a center square and one deformed patches on either side.
+ * It is composed of a center square and one deformed patch on either side.
  * \param [in] R1       Outer radius of the disk.
  * \param [in] R2       Radius at any corner of the inside square.
  * \return              Mapping context.

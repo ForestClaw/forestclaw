@@ -45,6 +45,7 @@ fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
+/* This function is expected to be called from C or C++. */
 void
 fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
 {
