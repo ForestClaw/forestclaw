@@ -99,7 +99,6 @@ typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
  */
 struct fclaw2d_map_context
 {
-    unsigned magic;
     fclaw2d_map_query_t query;
     fclaw2d_map_c2m_t mapc2m;
     fclaw2d_map_destroy_t destroy;
