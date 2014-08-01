@@ -30,18 +30,20 @@ void set_block_ (const int *a_blockno);
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_QUERY (fclaw2d_map_context_t * cont,
+FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
                    const int *query_identifier, int *iresult)
 {
+    fclaw2d_map_context_t *cont = *pcont;
     *iresult = cont->query (cont, *query_identifier);
 }
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_C2M (fclaw2d_map_context_t * cont, int *blockno,
+FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc,
                  double *xp, double *yp, double *zp)
 {
+    fclaw2d_map_context_t *cont = *pcont;
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 

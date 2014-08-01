@@ -114,7 +114,7 @@ struct fclaw2d_map_context
  * \param [in] query_identifier Is passed to the map_query_t function.
  * \param [out] iresult         On return contains result of query.
  */
-void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t * cont,
+void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
                         const int *query_identifier, int *iresult);
 
 #define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
@@ -128,7 +128,7 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t * cont,
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
  */
-void FCLAW2D_MAP_C2M (fclaw2d_map_context_t * cont, int *blockno,
+void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc,
                       double *xp, double *yp, double *zp);
 
