@@ -16,6 +16,12 @@
       integer i,j
       double precision dxf,dyf, xc,yc,xd1, yd1,zd1
 
+      integer blockno, get_block
+      integer*8 map_context, get_context
+
+      map_context = get_context()
+      blockno = get_block()
+
 c     # We need both cell centered and node locations to
 c     # compute the normals at cell edges.
       dxf = dx/2.d0
@@ -28,7 +34,17 @@ c     # compute the normals at cell edges.
             xc = xlower + (i-1)*dxf
             yc = ylower + (j-1)*dyf
 
+
+cvoid fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
+c                       const double *xc, const double *yc,
+c                       double *xp, double *yp, double *zp);
+
+c           # Doesn't yet work
+c            call fclaw2d_map_c2m(map_context,blockno,xc,yc,xd1,yd1,zd1)
+
+c
             call mapc2m(xc,yc ,xd1,yd1,zd1)
+
 
             if (abs(mod(i,2)) .eq. 1) then
 c              # Physical location of cell vertices
