@@ -27,11 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Same size neighbor across a face */
 void
-FCLAW2D_TRANSFORM_FACE (const int &i1, const int &j1,
+FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
                         int *i2, int *j2, fclaw2d_transform_data_t * tdata)
 {
-    *i2 = i1;
-    *j2 = j1;
+    *i2 = *i1;
+    *j2 = *j1;
     fclaw2d_patch_transform_face (tdata->this_patch,
                                   tdata->neighbor_patch,
                                   tdata->transform,
@@ -40,12 +40,12 @@ FCLAW2D_TRANSFORM_FACE (const int &i1, const int &j1,
 
 /* This works except for a block-block corner */
 void
-FCLAW2D_TRANSFORM_CORNER (const int &i1, const int &j1,
+FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                           int *i2, int *j2,
                           fclaw2d_transform_data_t * tdata)
 {
-    *i2 = i1;
-    *j2 = j1;
+    *i2 = *i1;
+    *j2 = *j1;
     if (tdata->iface >= 0)
     {
         /* block-face but no block-corner */
@@ -68,12 +68,12 @@ FCLAW2D_TRANSFORM_CORNER (const int &i1, const int &j1,
 
 /* Half size neighbor across a face */
 void
-FCLAW2D_TRANSFORM_FACE_HALF (const int &i1, const int &j1,
+FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                              int i2[], int j2[],
                              fclaw2d_transform_data_t * tdata)
 {
-    i2[0] = i1;
-    j2[0] = j1;
+    i2[0] = *i1;
+    j2[0] = *j1;
     fclaw2d_patch_transform_face2 (tdata->this_patch,
                                    tdata->neighbor_patch,
                                    tdata->transform, tdata->mx, tdata->my,
@@ -82,12 +82,12 @@ FCLAW2D_TRANSFORM_FACE_HALF (const int &i1, const int &j1,
 
 /* This works except for a block-block corner */
 void
-FCLAW2D_TRANSFORM_CORNER_HALF (const int &i1, const int &j1,
+FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                int *i2, int *j2,
                                fclaw2d_transform_data_t * tdata)
 {
-    i2[0] = i1;
-    j2[0] = j1;
+    i2[0] = *i1;
+    j2[0] = *j1;
     if (tdata->iface >= 0)
     {
         /* block-face but no block-corner */
@@ -112,16 +112,18 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int &i1, const int &j1,
    rest of the code working.
    TODO: remove this function */
 void
-transform_corner_halfsize2_ (const int &i1, const int &j1,
+transform_corner_halfsize2_ (const int *i1, const int *j1,
                              int *i2, int *j2,
                              fclaw2d_transform_data_t * tdata)
 {
     int mbc = 2;
-
     int icorner = tdata->icorner;
-    for (int jbc = 1; jbc <= mbc; jbc++)
+
+    int ibc, jbc;
+
+    for (jbc = 1; jbc <= mbc; jbc++)
     {
-        for (int ibc = 1; ibc <= mbc; ibc++)
+        for (ibc = 1; ibc <= mbc; ibc++)
         {
             /* These transformations don't depend on i1,j1 ... */
             if (icorner == 0)

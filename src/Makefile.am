@@ -30,6 +30,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
+	src/fclaw2d_transform.c \
 	src/clawpack_fort.cpp \
 	src/mappings/block.f \
 	src/mappings/context.f \
@@ -51,7 +52,6 @@ libforestclaw_compiled_sources = \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
-	src/fclaw2d_transform.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
 	src/amr_neighbors.cpp \
