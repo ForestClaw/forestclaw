@@ -563,7 +563,7 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 void
 fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
                                fclaw2d_patch_t * opatch,
-                               const int ftransform[], int position,
+                               const int ftransform[],
                                int mx, int my, int based, int i[], int j[])
 {
     int kt, kn;

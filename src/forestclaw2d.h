@@ -369,7 +369,6 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  *                          computed by \a fclaw2d_patch_face_transformation.
  *                          If \a ipatch and \a opatch are in the same block,
  *                          we require \a ftransform[8] |= 4.
- * \param [in] position     0 or 1 depending on the position of small neighbor.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
@@ -385,7 +384,7 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  */
 void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
                                     fclaw2d_patch_t * opatch,
-                                    const int ftransform[], int position,
+                                    const int ftransform[],
                                     int mx, int my, int based, int i[],
                                     int j[]);
 

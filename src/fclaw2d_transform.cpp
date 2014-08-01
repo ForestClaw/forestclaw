@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_transform.h>
 
-/* This will be called from fortran */
+/* Same size neighbor across a face */
 void
 transform_face_samesize_ (const int &i1, const int &j1,
                           int *i2, int *j2, fclaw2d_transform_data_t * tdata)
@@ -38,7 +38,7 @@ transform_face_samesize_ (const int &i1, const int &j1,
                                   tdata->mx, tdata->my, tdata->based, i2, j2);
 }
 
-/* So far this only works for a single block */
+/* This works except for a block-block corner */
 void
 transform_corner_samesize_ (const int &i1, const int &j1,
                             int *i2, int *j2,
@@ -46,14 +46,27 @@ transform_corner_samesize_ (const int &i1, const int &j1,
 {
     *i2 = i1;
     *j2 = j1;
-    fclaw2d_patch_transform_corner (tdata->this_patch,
-                                    tdata->neighbor_patch,
-                                    tdata->icorner,
-                                    tdata->mx, tdata->my, tdata->based, i2,
-                                    j2);
+    if (tdata->iface >= 0)
+    {
+        /* block-face but no block-corner */
+        FCLAW_ASSERT (tdata->iface < 4);
+        fclaw2d_patch_transform_face (tdata->this_patch,
+                                      tdata->neighbor_patch, tdata->transform,
+                                      tdata->mx, tdata->my,
+                                      tdata->based, i2, j2);
+    }
+    else
+    {
+        /* corner within a block */
+        FCLAW_ASSERT (tdata->iface == -1);
+        fclaw2d_patch_transform_corner (tdata->this_patch,
+                                        tdata->neighbor_patch, tdata->icorner,
+                                        tdata->mx, tdata->my,
+                                        tdata->based, i2, j2);
+    }
 }
 
-/* Halfsize neighbor */
+/* Half size neighbor across a face */
 void
 transform_face_halfsize_ (const int &i1, const int &j1,
                           int i2[], int j2[],
@@ -63,13 +76,11 @@ transform_face_halfsize_ (const int &i1, const int &j1,
     j2[0] = j1;
     fclaw2d_patch_transform_face2 (tdata->this_patch,
                                    tdata->neighbor_patch,
-                                   tdata->transform,
-                                   tdata->fine_grid_pos,
-                                   tdata->mx, tdata->my,
+                                   tdata->transform, tdata->mx, tdata->my,
                                    tdata->based, i2, j2);
 }
 
-/* So far this only works for a single block */
+/* This works except for a block-block corner */
 void
 transform_corner_halfsize_ (const int &i1, const int &j1,
                             int *i2, int *j2,
@@ -77,15 +88,29 @@ transform_corner_halfsize_ (const int &i1, const int &j1,
 {
     i2[0] = i1;
     j2[0] = j1;
-    fclaw2d_patch_transform_corner2 (tdata->this_patch,
-                                     tdata->neighbor_patch,
-                                     tdata->icorner,
-                                     tdata->mx, tdata->my, tdata->based, i2,
-                                     j2);
+    if (tdata->iface >= 0)
+    {
+        /* block-face but no block-corner */
+        FCLAW_ASSERT (tdata->iface < 4);
+        fclaw2d_patch_transform_face2 (tdata->this_patch,
+                                       tdata->neighbor_patch,
+                                       tdata->transform, tdata->mx, tdata->my,
+                                       tdata->based, i2, j2);
+    }
+    else
+    {
+        /* corner within a block */
+        FCLAW_ASSERT (tdata->iface == -1);
+        fclaw2d_patch_transform_corner2 (tdata->this_patch,
+                                         tdata->neighbor_patch,
+                                         tdata->icorner, tdata->mx, tdata->my,
+                                         tdata->based, i2, j2);
+    }
 }
 
 /* This obviously is bogus - but I have here it so I can get the
-   rest of the code working */
+   rest of the code working.
+   TODO: remove this */
 void
 transform_corner_halfsize2_ (const int &i1, const int &j1,
                              int *i2, int *j2,
