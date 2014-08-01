@@ -13,7 +13,7 @@ c     # cart = 1
 c     # diamond = 2
 c     # disk = 3
 c     # hemisphere = 4
-c     # sphere = 5
+c     # pillow sphere = 5
 c     # rotated square = 6
 c     # bilinear quad = 7
 c     # cubed_sphere = 8
@@ -97,11 +97,11 @@ c     # -------------------------------------------------------------------
 
       integer maptype
       logical isflat_cart, isflat_diamond, isflat_disk
-      logical isflat_hemisphere, isflat_sphere, isflat_rotsq
+      logical isflat_hemisphere, isflat_pillowsphere, isflat_rotsq
       logical isflat_biquad, get_map_value
       logical isflat_cubedsphere
       logical iscart, isdiamond, isdisk, ishemisphere
-      logical issphere, isrotsq, isbiquad
+      logical ispillowsphere, isrotsq, isbiquad
       logical iscubedsphere
 
       if (iscart()) then
@@ -113,8 +113,8 @@ c     # -------------------------------------------------------------------
          isflat = isflat_disk()
       elseif (ishemisphere()) then
          isflat = isflat_hemisphere()
-      elseif (issphere()) then
-         isflat = isflat_sphere()
+      elseif (ispillowsphere()) then
+         isflat = isflat_pillowsphere()
       elseif (isrotsq()) then
          write(6,*) 'Rotated Square mapping is not implemented'
          stop
@@ -124,6 +124,15 @@ c     # -------------------------------------------------------------------
       elseif (iscubedsphere()) then
          isflat = isflat_cubedsphere()
       endif
+
+      end
+
+      logical function issphere()
+      implicit none
+
+      logical ispillowsphere, iscubedsphere
+
+      issphere = ispillowsphere() .or. iscubedsphere()
 
       end
 
@@ -220,24 +229,24 @@ c     # ----------------------------
 
 
 c     # ----------------------------
-c     # SPHERE = 5
+c     # PILLOW SPHERE = 5
 c     # ----------------------------
-      subroutine set_maptype_sphere()
+      subroutine set_maptype_pillowsphere()
       implicit none
       call set_map_value(5)
       call set_map_defaults()
       end
 
-      logical function issphere()
+      logical function ispillowsphere()
       implicit none
       logical get_map_value
-      issphere = get_map_value(5)
+      ispillowsphere = get_map_value(5)
       end
 
-      logical function isflat_sphere()
+      logical function isflat_pillowsphere()
       implicit none
 
-      isflat_sphere = .false.
+      isflat_pillowsphere = .false.
       end
 
 

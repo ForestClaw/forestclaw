@@ -56,7 +56,7 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 /* This is here for now;  may be taken out once I figure out Carsten's
    'mapping context' idea */
 void set_maptype_cart_();
-void set_maptype_sphere_();
+void set_maptype_pillowsphere_();
 void set_maptype_hemisphere_();
 void set_maptype_disk_();
 void set_maptype_cubedsphere_();
@@ -67,6 +67,7 @@ int iscart_();
 int isdisk_();
 int ishemisphere_();
 int issphere_();
+int ispillowsphere_();
 int iscubedsphere_();
 /* ------------------------------------------------------------------------ */
 

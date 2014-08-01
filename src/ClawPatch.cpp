@@ -505,9 +505,7 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        fclaw_cptr transform_data)
 {
     double *qcoarse = q_time_sync(a_time_interp);
-
     double *qfine = neighbor_cp->m_griddata.dataPtr();
-
 
     interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
                             a_p4est_refineFactor,a_refratio,igrid,

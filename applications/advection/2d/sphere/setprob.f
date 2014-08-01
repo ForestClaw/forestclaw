@@ -16,10 +16,7 @@ c      read(7,*) kappa
 c      read(7,*) Tfinal
 c      close(7)
 
-      call set_maptype_sphere()
-
-c     # No scaling or rotation - will be set below.
-      call set_map_defaults()
+      call set_maptype_pillowsphere()
 
 c     # These are the values that work well with the hemisphere.  Other
 c     # values don't work so well, since we don't have any inflow

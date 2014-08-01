@@ -89,7 +89,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         if (this_block_idx == rblockno)
         {
             // If we are within one patch this is a special case
-            ftransform[8] |= 4;
+            ftransform[8] = 4;
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -158,9 +158,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     /* This will be made more general once we figure out what we do with
        block corners */
-    fclaw_bool is_sphere_grid = issphere_();
+    fclaw_bool is_pillowsphere_grid = ispillowsphere_();
     fclaw_bool is_cubedsphere_grid = iscubedsphere_();
-    if (is_sphere_grid && is_block_corner)
+    if (is_pillowsphere_grid && is_block_corner)
     {
         has_corner_neighbor = fclaw_true;  // By definition
         int rpatchno[p4est_refineFactor];
