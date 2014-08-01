@@ -423,9 +423,9 @@ int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
 void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
-                                    fclaw2d_patch_t * opatch,
-                                    int icorner,
-                                    int mx, int my, int based, int *i, int *j);
+                                     fclaw2d_patch_t * opatch,
+                                     int icorner, int mx, int my,
+                                     int based, int *i, int *j);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).

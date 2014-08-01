@@ -107,13 +107,17 @@ struct fclaw2d_map_context
     void *user_data;
 };
 
+#define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
+
 /** Query function for the mapping that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] query_identifier Is passed to the map_query_t function.
  * \param [out] iresult         On return contains result of query.
  */
-void fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
-                         const int *query_identifier, int *iresult);
+void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t * cont,
+                        const int *query_identifier, int *iresult);
+
+#define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
 
 /** Mapping function that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
@@ -124,9 +128,9 @@ void fclaw2d_map_query_ (fclaw2d_map_context_t * cont,
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
  */
-void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
-                       const double *xc, const double *yc,
-                       double *xp, double *yp, double *zp);
+void FCLAW2D_MAP_C2M (fclaw2d_map_context_t * cont, int *blockno,
+                      const double *xc, const double *yc,
+                      double *xp, double *yp, double *zp);
 
 /** Deallocate a mapping context.
  * If the \a destroy member is not NULL, it is called on the context.
