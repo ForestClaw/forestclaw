@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
@@ -39,7 +41,9 @@ main (int argc, char **argv)
   double                cubed_R1, cubed_R2;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
-  fclaw2d_domain_t	*domain;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
+  fclaw2d_domain_t	*domain = NULL;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
 
@@ -74,8 +78,31 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  /* This is a five-block square in [-3,3]^2. */
-  domain = fclaw2d_domain_new_disk (mpicomm, gparms->minlevel);
+
+  switch (example) {
+    case 2:
+      if (!(0. < cubed_R2 && cubed_R2 < cubed_R1)) {
+        sc_abort_collective
+          ("Parameters 0 < cubed_R2 < cubed_R1 required for cubed disk");
+      }
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_disk (cubed_R1, cubed_R2);
+      break;
+    case 3:
+      if (!(0. < cubed_R1)) {
+        sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
+      }
+      conn = p4est_connectivity_new_cubed ();
+      cont = fclaw2d_map_new_csphere (cubed_R1);
+      break;
+    default:
+      sc_abort_collective ("Parameter example must be either 2 or 3");
+  }
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ---------------------------------------------------------------
+     Print some diagnostics.  TODO: Should this really be in main()?
+     --------------------------------------------------------------- */
 
   if (gparms->verbosity > 0)
   {
@@ -107,6 +134,7 @@ main (int argc, char **argv)
   /* --------------------------------------------------
      Clean up.
      -------------------------------------------------- */
+  fclaw2d_map_destroy (cont);
   amr_options_destroy(gparms);
   sc_options_destroy(options);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
