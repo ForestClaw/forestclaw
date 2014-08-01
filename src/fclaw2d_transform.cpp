@@ -23,32 +23,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_transform.h"
-
+#include <fclaw2d_transform.h>
 
 /* This will be called from fortran */
-void transform_face_samesize_(const int &i1, const int &j1,
-                              int *i2,int *j2,
-                              fclaw2d_transform_data_t* tdata)
-
+void
+transform_face_samesize_ (const int &i1, const int &j1,
+                          int *i2, int *j2, fclaw2d_transform_data_t * tdata)
 {
     *i2 = i1;
     *j2 = j1;
-    fclaw2d_patch_transform_face(tdata->this_patch,
-                                 tdata->neighbor_patch,
-                                 tdata->transform,
-                                 tdata->mx, tdata->my,
-                                 tdata->based,
-                                 i2, j2);
+    fclaw2d_patch_transform_face (tdata->this_patch,
+                                  tdata->neighbor_patch,
+                                  tdata->transform,
+                                  tdata->mx, tdata->my, tdata->based, i2, j2);
 }
 
 /* This obviously is just temporary, but I just transferred what I had
    already written in fortran to this routine, so that I could drop in
    multiblock routines when they are ready */
-void transform_corner_samesize_(const int &i1, const int &j1,
-                                int *i2,int *j2,
-                                fclaw2d_transform_data_t* tdata)
-
+void
+transform_corner_samesize_ (const int &i1, const int &j1,
+                            int *i2, int *j2,
+                            fclaw2d_transform_data_t * tdata)
 {
     *i2 = i1;
     *j2 = j1;
@@ -77,44 +73,41 @@ void transform_corner_samesize_(const int &i1, const int &j1,
     }
 }
 
-
 /* Halfsize neighbor */
-void transform_face_halfsize_(const int &i1, const int &j1,
-                         int i2[],int j2[],
-                         fclaw2d_transform_data_t* tdata)
-
+void
+transform_face_halfsize_ (const int &i1, const int &j1,
+                          int i2[], int j2[],
+                          fclaw2d_transform_data_t * tdata)
 {
     i2[0] = i1;
     j2[0] = j1;
-    fclaw2d_patch_transform_face2(tdata->this_patch,
-                                  tdata->neighbor_patch,
-                                  tdata->transform,
-                                  tdata->fine_grid_pos,
-                                  tdata->mx, tdata->my,
-                                  tdata->based,
-                                  i2, j2);
+    fclaw2d_patch_transform_face2 (tdata->this_patch,
+                                   tdata->neighbor_patch,
+                                   tdata->transform,
+                                   tdata->fine_grid_pos,
+                                   tdata->mx, tdata->my,
+                                   tdata->based, i2, j2);
 }
 
-
 /* This obviously is just temporary */
-void transform_corner_halfsize_(const int &i1, const int &j1,
-                                int *i2,int *j2,
-                                fclaw2d_transform_data_t* tdata)
-
+void
+transform_corner_halfsize_ (const int &i1, const int &j1,
+                            int *i2, int *j2,
+                            fclaw2d_transform_data_t * tdata)
 {
     int ibc = i1;
     int jbc = j1;
     int refratio = 2;
 
     /* Nothing multiblock here - this will all get replaced, but I was able
-     to drop it in without much thought.*/
+       to drop it in without much thought. */
     int icorner = tdata->icorner;
-    for(int jj = 0; jj < refratio; jj++)
+    for (int jj = 0; jj < refratio; jj++)
     {
-        for(int ii = 0; ii < refratio; ii++)
+        for (int ii = 0; ii < refratio; ii++)
         {
-            int ifine = ibc*refratio + ii;
-            int jfine = jbc*refratio + jj;
+            int ifine = ibc * refratio + ii;
+            int jfine = jbc * refratio + jj;
 
             /* These transformations don't depend on i1,j1 ... */
             if (icorner == 0)
@@ -143,17 +136,17 @@ void transform_corner_halfsize_(const int &i1, const int &j1,
 
 /* This obviously is bogus - but I have here it so I can get the
    rest of the code working */
-void transform_corner_halfsize2_(const int &i1, const int &j1,
-                                int *i2,int *j2,
-                                fclaw2d_transform_data_t* tdata)
-
+void
+transform_corner_halfsize2_ (const int &i1, const int &j1,
+                             int *i2, int *j2,
+                             fclaw2d_transform_data_t * tdata)
 {
     int mbc = 2;
 
     int icorner = tdata->icorner;
-    for(int jbc = 1; jbc <= mbc; jbc++)
+    for (int jbc = 1; jbc <= mbc; jbc++)
     {
-        for(int ibc = 1; ibc <= mbc; ibc++)
+        for (int ibc = 1; ibc <= mbc; ibc++)
         {
             /* These transformations don't depend on i1,j1 ... */
             if (icorner == 0)
@@ -163,18 +156,18 @@ void transform_corner_halfsize2_(const int &i1, const int &j1,
             }
             else if (icorner == 1)
             {
-                *i2++ = 1-ibc;
-                *j2++ = tdata->my+jbc;
+                *i2++ = 1 - ibc;
+                *j2++ = tdata->my + jbc;
             }
             else if (icorner == 2)
             {
                 *i2++ = tdata->mx + ibc;
-                *j2++ = 1-jbc;
+                *j2++ = 1 - jbc;
             }
             else if (icorner == 3)
             {
-                *i2++ = 1-ibc;
-                *j2++ = 1-jbc;
+                *i2++ = 1 - ibc;
+                *j2++ = 1 - jbc;
             }
         }
     }
