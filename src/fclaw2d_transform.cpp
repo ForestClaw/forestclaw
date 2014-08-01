@@ -38,9 +38,7 @@ transform_face_samesize_ (const int &i1, const int &j1,
                                   tdata->mx, tdata->my, tdata->based, i2, j2);
 }
 
-/* This obviously is just temporary, but I just transferred what I had
-   already written in fortran to this routine, so that I could drop in
-   multiblock routines when they are ready */
+/* So far this only works for a single block */
 void
 transform_corner_samesize_ (const int &i1, const int &j1,
                             int *i2, int *j2,
@@ -48,29 +46,11 @@ transform_corner_samesize_ (const int &i1, const int &j1,
 {
     *i2 = i1;
     *j2 = j1;
-
-    /* Nothing multiblock here ... */
-    int icorner = tdata->icorner;
-    if (icorner == 0)
-    {
-        *i2 = i1 + tdata->mx;
-        *j2 = j1 + tdata->my;
-    }
-    else if (icorner == 1)
-    {
-        *i2 = i1 - tdata->mx;
-        *j2 = j1 + tdata->my;
-    }
-    else if (icorner == 2)
-    {
-        *i2 = i1 + tdata->mx;
-        *j2 = j1 - tdata->my;
-    }
-    else if (icorner == 3)
-    {
-        *i2 = i1 - tdata->mx;
-        *j2 = j1 - tdata->my;
-    }
+    fclaw2d_patch_transform_corner (tdata->this_patch,
+                                    tdata->neighbor_patch,
+                                    tdata->icorner,
+                                    tdata->mx, tdata->my, tdata->based, i2,
+                                    j2);
 }
 
 /* Halfsize neighbor */
@@ -89,49 +69,19 @@ transform_face_halfsize_ (const int &i1, const int &j1,
                                    tdata->based, i2, j2);
 }
 
-/* This obviously is just temporary */
+/* So far this only works for a single block */
 void
 transform_corner_halfsize_ (const int &i1, const int &j1,
                             int *i2, int *j2,
                             fclaw2d_transform_data_t * tdata)
 {
-    int ibc = i1;
-    int jbc = j1;
-    int refratio = 2;
-
-    /* Nothing multiblock here - this will all get replaced, but I was able
-       to drop it in without much thought. */
-    int icorner = tdata->icorner;
-    for (int jj = 0; jj < refratio; jj++)
-    {
-        for (int ii = 0; ii < refratio; ii++)
-        {
-            int ifine = ibc * refratio + ii;
-            int jfine = jbc * refratio + jj;
-
-            /* These transformations don't depend on i1,j1 ... */
-            if (icorner == 0)
-            {
-                *i2++ = tdata->mx + 1 - ifine;
-                *j2++ = tdata->my + 1 - jfine;
-            }
-            else if (icorner == 1)
-            {
-                *i2++ = ifine;
-                *j2++ = tdata->my + 1 - jfine;
-            }
-            else if (icorner == 2)
-            {
-                *i2++ = tdata->mx + 1 - ifine;
-                *j2++ = jfine;
-            }
-            else if (icorner == 3)
-            {
-                *i2++ = ifine;
-                *j2++ = jfine;
-            }
-        }
-    }
+    i2[0] = i1;
+    j2[0] = j1;
+    fclaw2d_patch_transform_corner2 (tdata->this_patch,
+                                     tdata->neighbor_patch,
+                                     tdata->icorner,
+                                     tdata->mx, tdata->my, tdata->based, i2,
+                                     j2);
 }
 
 /* This obviously is bogus - but I have here it so I can get the

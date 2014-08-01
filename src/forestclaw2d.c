@@ -907,6 +907,180 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
+                                fclaw2d_patch_t * opatch,
+                                int icorner,
+                                int mx, int my, int based, int *i, int *j)
+{
+    double Rmx;
+
+    FCLAW_ASSERT (ipatch->level == opatch->level);
+    FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+
+    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (based == 0 || based == 1);
+
+#if 0
+    printf ("Test I: IP %g %g %d IC %d MX %d IJ %d %d BS %d\n",
+            ipatch->xlower, ipatch->ylower, ipatch->level, icorner,
+            mx, *i, *j, based);
+#endif
+
+    /* work with doubles -- exact for integers up to 52 bits of precision */
+    Rmx = (double) mx *(double) (1 << ipatch->level);
+
+    if (1)
+    {
+        /* The two patches are in the same block */
+        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
+        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
+    }
+}
+
+void
+fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
+                                 fclaw2d_patch_t * opatch,
+                                 int icorner,
+                                 int mx, int my, int based, int i[], int j[])
+{
+    int kt, kn;
+    int di, dj;
+    double Rmx;
+
+    FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
+    FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+
+    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (based == 0 || based == 1);
+
+#if 0
+    printf ("Test I: IP %g %g %d IC %d MX %d IJ %d %d BS %d\n",
+            ipatch->xlower, ipatch->ylower, ipatch->level, icorner,
+            mx, *i, *j, based);
+#endif
+
+    /* work with doubles -- exact for integers up to 52 bits of precision */
+    Rmx = (double) mx *(double) (1 << opatch->level);
+
+    if (1)
+    {
+        /* The two patches are in the same block */
+        di = based + (int)
+            ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
+        dj = based + (int)
+            ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
+
+        /* In the same block, the order of child cells is canonical */
+        for (kt = 0; kt < 2; ++kt)
+        {
+            for (kn = 0; kn < 2; ++kn)
+            {
+                i[2 * kt + kn] = di + kn;
+                j[2 * kt + kn] = dj + kt;
+            }
+        }
+    }
+#if 0
+    else
+    {
+        const int *my_axis = &ftransform[0];
+        const int *target_axis = &ftransform[3];
+        const int *edge_reverse = &ftransform[6];
+        int bt, bn;
+        int nx, ny;
+        int sx, sy;
+        double my_xyz[2], target_xyz[2];
+
+        /* the reference cube is stretched to mx times my units */
+        my_xyz[0] = ipatch->xlower * Rmx + 2. * (*i + .5 - based);
+        my_xyz[1] = ipatch->ylower * Rmx + 2. * (*j + .5 - based);
+
+        /* transform transversal direction */
+        target_xyz[target_axis[0]] =
+            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+
+        /* transform normal direction */
+        switch (edge_reverse[2])
+        {
+        case 0:
+            target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
+            break;
+        case 1:
+            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
+            break;
+        case 2:
+            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
+            break;
+        case 3:
+            target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
+
+        /* move back into integer coordinates: this is exact */
+        di = (int) (target_xyz[0] - opatch->xlower * Rmx) + based - 1;
+        dj = (int) (target_xyz[1] - opatch->ylower * Rmx) + based - 1;
+
+        /* Run through the child cells in order of the small patch */
+        for (sy = 0; sy < 2; ++sy)
+        {
+            for (sx = 0; sx < 2; ++sx)
+            {
+
+                /* Compute small patch coordinate in (transverse, normal) order */
+                if (target_axis[0])
+                {
+                    kt = sy;
+                    kn = sx;
+                }
+                else
+                {
+                    kt = sx;
+                    kn = sy;
+                }
+
+                /* Transform into big patch (transverse, normal) coordinate */
+                bt = !edge_reverse[0] ? kt : !kt;
+                bn = (edge_reverse[2] == 1
+                      || edge_reverse[2] == 2) ? kn : !kn;
+
+                /* Compute coordinate relative to the big patch */
+                if (my_axis[0])
+                {
+                    nx = bn;
+                    ny = bt;
+                }
+                else
+                {
+                    nx = bt;
+                    ny = bn;
+                }
+
+                /* assign value in proper place */
+                i[2 * ny + nx] = di + sx;
+                j[2 * ny + nx] = dj + sy;
+            }
+        }
+    }
+#endif
+
+#if 0
+    printf ("Test O: OP %g %g %d I %d %d %d %d J %d %d %d %d\n",
+            opatch->xlower, opatch->ylower, opatch->level,
+            i[0], i[1], i[2], i[3], j[0], j[1], j[2], j[3]);
+#endif
+}
+
+void
 fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
                            int patchno)
 {
