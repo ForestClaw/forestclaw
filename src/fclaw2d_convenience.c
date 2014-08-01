@@ -273,6 +273,22 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
                                NULL);
 }
 
+fclaw2d_domain_t *
+fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
+                             p4est_connectivity_t * conn,
+                             fclaw2d_map_context_t * cont)
+{
+    p4est_wrap_t       *wrap;
+    fclaw2d_domain_t   *domain;
+
+    fclaw2d_check_initial_level (mpicomm, initial_level);
+    wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
+    domain = fclaw2d_domain_new (wrap, NULL);
+    fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
+
+    return domain;
+}
+
 void
 fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 {
