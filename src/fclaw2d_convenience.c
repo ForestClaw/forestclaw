@@ -32,7 +32,7 @@ const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 /** Domain constructor takes ownership of wrap.
  */
 static fclaw2d_domain_t *
-fclaw2d_domain_new (p4est_wrap_t * wrap)
+fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 {
     int mpiret;
     int i, j;
@@ -66,6 +66,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap)
     domain->mpirank = wrap->p4est->mpirank;
     domain->pp = (void *) wrap;
     domain->pp_owned = 1;
+    domain->attributes = attributes != NULL ? attributes : sc_keyvalue_new ();
     nm = 0;
     domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
     if (domain->num_exchange_patches > 0) {
@@ -234,7 +235,8 @@ fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm,
-                                                          initial_level));
+                                                          initial_level),
+                               NULL);
 }
 
 fclaw2d_domain_t *
@@ -242,7 +244,8 @@ fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return
-        fclaw2d_domain_new (p4est_wrap_new_periodic (mpicomm, initial_level));
+        fclaw2d_domain_new (p4est_wrap_new_periodic (mpicomm, initial_level),
+                            NULL);
 }
 
 fclaw2d_domain_t *
@@ -250,21 +253,24 @@ fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return
-        fclaw2d_domain_new (p4est_wrap_new_pillow (mpicomm, initial_level));
+        fclaw2d_domain_new (p4est_wrap_new_pillow (mpicomm, initial_level),
+                            NULL);
 }
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new (p4est_wrap_new_cubed (mpicomm, initial_level));
+    return fclaw2d_domain_new (p4est_wrap_new_cubed (mpicomm, initial_level),
+                               NULL);
 }
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new (p4est_wrap_new_disk (mpicomm, initial_level));
+    return fclaw2d_domain_new (p4est_wrap_new_disk (mpicomm, initial_level),
+                               NULL);
 }
 
 void
@@ -287,6 +293,7 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     {
         p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
         p4est_wrap_destroy (wrap);
+        sc_keyvalue_destroy (domain->attributes);
     }
     FCLAW_FREE (domain);
 }
@@ -300,7 +307,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     if (p4est_wrap_adapt (wrap))
     {
         domain->pp_owned = 0;
-        return fclaw2d_domain_new (wrap);
+        return fclaw2d_domain_new (wrap, domain->attributes);
     }
     else
     {
@@ -317,7 +324,7 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     if (p4est_wrap_partition (wrap, weight_exponent))
     {
         domain->pp_owned = 0;
-        return fclaw2d_domain_new (wrap);
+        return fclaw2d_domain_new (wrap, domain->attributes);
     }
     else
     {
