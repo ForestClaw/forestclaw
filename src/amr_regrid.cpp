@@ -205,22 +205,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
 void regrid(fclaw2d_domain_t **domain)
 {
-
+#if 0
     const amr_options_t *gparms = get_domain_parms(*domain);
     // double t = get_domain_time(*domain);
+#endif
 
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
-
-    /* These values are updated below after iterate_adapted. */
-    /* TODO: can we use global min/maxlevels here? */
-    /* DAC : I am not sure - The coarse/fine exchanges will
-       probably break if passed levels on which there are no
-       patches.  This could of course be fixed, but it doesn't
-       seem necessary at this point.
-    */
-    int minlevel = gparms->minlevel;
-    int maxlevel = gparms->maxlevel;
 
     // First determine which families should be coarsened.
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
@@ -246,11 +237,20 @@ void regrid(fclaw2d_domain_t **domain)
         // Average to new coarse grids and interpolate to new fine grids
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
                                        (void *) NULL);
-
+    
+        /* TODO: can we use global min/maxlevels here? */
+        /* DAC : I am not sure - The coarse/fine exchanges will
+           probably break if passed levels on which there are no
+           patches.  This could of course be fixed, but it doesn't
+           seem necessary at this point.
+        */
         // Do a level exchange to make sure all data is valid;
         // Coarse and fine grid exchanges will happen during time stepping as needed.
+#if 0
+        /* currently unused */
         minlevel = new_domain->global_minlevel;
         maxlevel = new_domain->global_maxlevel;
+#endif
 
         // free memory associated with old domain
         amrreset(domain);
@@ -259,15 +259,15 @@ void regrid(fclaw2d_domain_t **domain)
 
         // Repartition for load balancing
         repartition_domain(domain, -1);
-    }
 
-    /* Update all ghost patches and ghost cells */
-    update_ghost_all_levels(*domain,FCLAW2D_TIMER_REGRID);
-
-    // Print global minimum and maximum levels
-    if ((*domain)->mpirank == 0) {
-        printf ("Global minlevel %d maxlevel %d\n",
-                (*domain)->global_minlevel, (*domain)->global_maxlevel);
+        /* Update all ghost patches and ghost cells */
+        update_ghost_all_levels (*domain,FCLAW2D_TIMER_REGRID);
+    
+        // Print global minimum and maximum levels
+        if ((*domain)->mpirank == 0) {
+            printf ("Global minlevel %d maxlevel %d\n",
+                    (*domain)->global_minlevel, (*domain)->global_maxlevel);
+        }
     }
 
     // Stop timer
