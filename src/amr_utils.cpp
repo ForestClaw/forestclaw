@@ -194,6 +194,15 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
     return (fclaw2d_patch_data_t *) patch->user;
 }
 
+fclaw2d_map_context_t* get_map_context(fclaw2d_domain_t* domain)
+{
+    fclaw2d_map_context_t* cont;
+  cont = (fclaw2d_map_context_t*)
+         fclaw2d_domain_attribute_access (domain, "fclaw_map_context", NULL);
+  FCLAW_ASSERT (cont != NULL);
+  return cont;
+}
+
 
 // -----------------------------------------------------------------
 // Set user data with user defined variables, etc.

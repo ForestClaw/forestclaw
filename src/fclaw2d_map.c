@@ -149,8 +149,11 @@ fclaw2d_map_c2m_csphere_help (double R, double xi, double eta,
     const double tan_xi = tan (.5 * M_PI * (xi - .5));
     const double tan_eta = tan (.5 * M_PI * (eta - .5));
 
+    /*
+      This won't be true for ghost cell values.
     FCLAW_ASSERT (0. <= xi && xi <= 1.);
     FCLAW_ASSERT (0. <= eta && eta <= 1.);
+    */
 
     *z = R / sqrt (SC_SQR (tan_xi) + SC_SQR (tan_eta) + 1.);
     *x = *z * tan_xi;
@@ -239,7 +242,7 @@ fclaw2d_map_c2m_disk_help (double R2sqrbyR1, double R1byR2,
 {
     const double R = R2sqrbyR1 * pow (R1byR2, 1. + eta);
     const double tan_xi = tan (.5 * M_PI * (xi - .5));
-    const double xi_prime = (1. - eta) * 2. * (xi - .5) + eta * tan_xi; 
+    const double xi_prime = (1. - eta) * 2. * (xi - .5) + eta * tan_xi;
 
     *y = R / sqrt (1. + eta * SC_SQR (tan_xi) + (1. - eta));
     *x = *y * xi_prime;
@@ -252,7 +255,7 @@ fclaw2d_map_c2m_disk (fclaw2d_map_context_t * cont, int blockno,
 {
     FCLAW_ASSERT (0. <= xc && xc <= 1.);
     FCLAW_ASSERT (0. <= yc && yc <= 1.);
-    
+
     *zp = 0.;
     if (blockno == 2) {
         /* center square */

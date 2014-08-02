@@ -40,10 +40,13 @@ c                       const double *xc, const double *yc,
 c                       double *xp, double *yp, double *zp);
 
 c           # Doesn't yet work
-c            call fclaw2d_map_c2m(map_context,blockno,xc,yc,xd1,yd1,zd1)
+c            call fclaw2d_mapc2m(map_context, blockno,xc,yc,xd1,yd1,zd1)
+
+            call fclaw2d_mapc2m(map_context,
+     &            blockno,xc,yc,xd1,yd1,zd1)
 
 c
-            call mapc2m(xc,yc ,xd1,yd1,zd1)
+c            call mapc2m(xc,yc ,xd1,yd1,zd1)
 
 
             if (abs(mod(i,2)) .eq. 1) then

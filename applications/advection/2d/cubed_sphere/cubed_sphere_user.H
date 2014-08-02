@@ -85,6 +85,8 @@ extern "C"
 
 void cubed_sphere_link_solvers(fclaw2d_domain_t *domain);
 
+void cubed_sphere_problem_setup(fclaw2d_domain_t* domain);
+
 
 void cubed_sphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,

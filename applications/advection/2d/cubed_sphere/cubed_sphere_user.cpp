@@ -57,6 +57,14 @@ void cubed_sphere_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_clawpack_link_to_clawpatch();
 }
 
+void cubed_sphere_problem_setup(fclaw2d_domain_t* domain)
+{
+    // This calls setprob_, which might be null.  This is used
+    // mostly for setting up things related to Fortran.
+
+    fclaw2d_clawpack_setprob(domain);
+}
+
 void cubed_sphere_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,

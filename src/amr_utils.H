@@ -79,6 +79,7 @@ void fclaw2d_timer_stop (fclaw2d_timer_t * timer);
 fclaw2d_domain_data_t *get_domain_data (fclaw2d_domain_t * domain);
 fclaw2d_block_data_t *get_block_data (fclaw2d_block_t * block);
 fclaw2d_patch_data_t *get_patch_data (fclaw2d_patch_t * patch);
+fclaw2d_map_context_t *get_map_context(fclaw2d_domain_t * domain);
 
 /* -----------------------------------------------------------------
   Debug routines

@@ -275,6 +275,16 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                            icorner, &rproc_corner, corner_block_idx,
                                            &corner_patch_idx, &neighbor_type);
 
+        /*
+        // Get encoding of transforming a neighbor coordinate across a face
+        fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+        if (this_block_idx == rblockno)
+        {
+            // If we are within one patch this is a special case
+            ftransform[8] = 4;
+        }
+        */
+
         // get transform type?
 
     }

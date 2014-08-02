@@ -48,6 +48,9 @@ c     # include call.i   !! included in AMRClaw
       double precision work(mwork)
       logical debug
 
+      logical iscubedsphere
+      integer ibc,jbc
+
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
 
@@ -113,10 +116,31 @@ c
       do 50 j = 0,my+1
 c
 c        # copy data along a slice into 1d arrays:
-         do 20 m=1,meqn
-           do 20 i = 1-mbc, mx+mbc
+         do m=1,meqn
+           do i = 1-mbc, mx+mbc
                q1d(i,m) = qold(i,j,m)
-   20          continue
+            enddo
+         enddo
+
+         if (j .eq. 0) then
+            if (iscubedsphere()) then
+               do m = 1,meqn
+                  do ibc = 1,mbc
+                     q1d(1-ibc,m) = qold(ibc,0,m)
+                     q1d(mx+ibc,m) = qold(mx-ibc+1,0,m)
+                  enddo
+               enddo
+            endif
+         else if (j .eq. my+1) then
+            if (iscubedsphere()) then
+               do m = 1,meqn
+                  do ibc = 1,mbc
+                     q1d(1-ibc,m) = qold(ibc,my+1,m)
+                     q1d(mx+ibc,m) = qold(mx-ibc+1,my+1,m)
+                  enddo
+               enddo
+            endif
+         endif
 c
          if (mcapa.gt.0)  then
            do 21 i = 1-mbc, mx+mbc
@@ -169,10 +193,32 @@ c
       do 100 i = 0, mx+1
 c
 c        # copy data along a slice into 1d arrays:
-         do 70 m=1,meqn
-           do 70 j = 1-mbc, my+mbc
+         do m=1,meqn
+           do j = 1-mbc, my+mbc
                q1d(j,m) = qold(i,j,m)
-   70          continue
+            enddo
+         enddo
+
+         if (i .eq. 0) then
+            if (iscubedsphere()) then
+               do m = 1,meqn
+                  do jbc = 1,mbc
+                     q1d(1-jbc,m) = qold(0,jbc,m)
+                     q1d(my+jbc,m) = qold(0,my-jbc+1,m)
+                  enddo
+               enddo
+            endif
+         else if (i .eq. mx+1) then
+            if (iscubedsphere()) then
+               do m = 1,meqn
+                  do jbc = 1,mbc
+                     q1d(1-jbc,m) = qold(mx+1,jbc,m)
+                     q1d(my+jbc,m) = qold(mx+1,my-jbc+1,m)
+                  enddo
+               enddo
+            endif
+         endif
+
 c
          if (mcapa.gt.0)  then
            do 71 j = 1-mbc, my+mbc

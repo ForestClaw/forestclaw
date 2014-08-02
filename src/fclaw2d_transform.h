@@ -45,6 +45,9 @@ typedef struct fclaw2d_transform_data
     int mx;
     int my;
     /* This seems to be okay - we should never need both a corner and a face */
+    // -1 for interior corners or block corners; otherwise it is an
+    //  block face (but not a block corner).  IN this case, set to face number. In
+    // this case, ftransform[] is well defined.
     int iface;
     int icorner;
     /* 1 for cell-centered (1 .. mx); 0 for node-based (0 .. mx) */

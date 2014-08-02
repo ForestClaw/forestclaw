@@ -3,7 +3,7 @@
 
       double precision xd, yd, zd, t
       double precision l, th, lp, Tfinal, kappa, pi
-      logical issphere, isdisk, iscubedsphere
+      logical issphere, isdisk
 
       common /compi/ pi
 
@@ -14,7 +14,7 @@
       lp = l - 2*pi*t/Tfinal
 
 c     # Set kappa to zero to get solid body rotation
-      if (issphere() .or.  iscubedsphere()) then
+      if (issphere()) then
          psi = kappa*sin(lp)**2*cos(th)**2*cos(pi*t/Tfinal) -
      &         2*pi*sin(th)/Tfinal
       else if (isdisk()) then

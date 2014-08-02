@@ -144,6 +144,12 @@ void amrinit (fclaw2d_domain_t **domain)
     // Set problem dependent parameters for Riemann solvers, etc.
     (ddata->f_problem_setup)(*domain);
 
+    /* Set mapping context for Fortran.  The context will now be
+     available via get_context(), as a integer*8.  This corresonds
+    to a (fclaw2d_map_context_t**) for calling C/C++ routines.*/
+    fclaw2d_map_context_t* cont = get_map_context(*domain);
+    set_context_((fclaw_cptr*) &cont);
+
     double t = 0;
 
     set_domain_time(*domain,t);

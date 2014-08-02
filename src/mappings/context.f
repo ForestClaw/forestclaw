@@ -2,7 +2,7 @@
       implicit none
 
       integer*8 context, context_com
-      common /comblock/ context_com
+      common /comcontext/ context_com
 
       context_com = context
       end
@@ -11,7 +11,7 @@
       implicit none
 
       integer*8 context_com
-      common /comblock/ context_com
+      common /comcontext/ context_com
 
       get_context = context_com
       return

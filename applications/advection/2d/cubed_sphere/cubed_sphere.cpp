@@ -110,10 +110,6 @@ main (int argc, char **argv)
       fclaw2d_domain_list_neighbors(domain, lp);
   }
 
-  double R = 1.0;
-  fclaw2d_map_context_t *csphere_context = fclaw2d_map_new_csphere(R);
-  set_context_((fclaw_cptr) csphere_context);
-
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
@@ -124,7 +120,7 @@ main (int argc, char **argv)
   set_clawpack_parms(domain,clawpack_parms);
 
   /* Link solvers to the domain */
-  link_problem_setup(domain,fclaw2d_clawpack_setprob);
+  link_problem_setup(domain,cubed_sphere_problem_setup);
 
   cubed_sphere_link_solvers(domain);
 
