@@ -57,14 +57,14 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 #define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
 #define FCLAW2D_MAP_QUERY_IS_PLANAR       5     /* (x,y) -> (?,?,0) */
 #define FCLAW2D_MAP_QUERY_IS_ALIGNED      6     /* (x,y) -> (f(x),g(y),0) */
+#define FCLAW2D_MAP_QUERY_IS_FLAT         7     /* Zero curvature */
 
 #if 0
 /* How would flat be defined exactly? */
-#define FCLAW2D_MAP_QUERY_IS_FLAT         ?     /* Zero curvature */
 /* Has phyical boundaries: should not be relevant to mappings */
 #endif
 
-#define FCLAW2D_MAP_QUERY_LAST            7     /* #"official" queries. */
+#define FCLAW2D_MAP_QUERY_LAST            8     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
