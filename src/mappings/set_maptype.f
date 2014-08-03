@@ -36,7 +36,7 @@ c     # -------------------------------------------------------------------
 
       n_maps_com = 8
       if (n_maps_com .gt. max_maps) then
-         write(6,*) 'set_all_maps_false (setup_mesh.f) : ',
+         write(6,*) 'set_all_maps_false (setup_maptype.f) : ',
      &         'Increase size of max_maps to ', n_maps_com
          stop
       endif

@@ -35,19 +35,10 @@ c     # compute the normals at cell edges.
             yc = ylower + (j-1)*dyf
 
 
-cvoid fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
-c                       const double *xc, const double *yc,
-c                       double *xp, double *yp, double *zp);
-
-c           # Doesn't yet work
-c            call fclaw2d_mapc2m(map_context, blockno,xc,yc,xd1,yd1,zd1)
-
-            call fclaw2d_mapc2m(map_context,
-     &            blockno,xc,yc,xd1,yd1,zd1)
-
-c
 c            call mapc2m(xc,yc ,xd1,yd1,zd1)
 
+            call fclaw2d_map_c2m(map_context,
+     &            blockno,xc,yc,xd1,yd1,zd1)
 
             if (abs(mod(i,2)) .eq. 1) then
 c              # Physical location of cell vertices
@@ -84,6 +75,12 @@ c              # Physical locations of cell centers
       double precision xef, yef, xe,ye
       integer k, m
 
+      integer blockno, get_block
+      integer*8 map_context, get_context
+
+      map_context = get_context()
+      blockno = get_block()
+
       rfactor = 1
       do ir = level,maxlevel-1
          rfactor = rfactor*refratio
@@ -112,7 +109,9 @@ c     # than in the rest of the mesh.
                      do jcell = 0,1
                         xcorner = xef + icell*dxf
                         ycorner = yef + jcell*dyf
-                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
+                        call fclaw2d_map_c2m(map_context,
+     &                        blockno,xcorner,ycorner,xp1,yp1,zp1)
+c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
                         quad(icell,jcell,1) = xp1
                         quad(icell,jcell,2) = yp1
                         quad(icell,jcell,3) = zp1

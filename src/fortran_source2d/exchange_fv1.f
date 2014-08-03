@@ -36,7 +36,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call transform_face_samesize(i1,j1,i2,j2,
+                  call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -56,7 +56,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call transform_face_samesize(i1,j1,i2,j2,
+                  call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_cptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
@@ -99,7 +99,7 @@ c     # Do exchanges for all corners
 
 c              # this routine is not yet complete, but the complete one
 c              # can now be dropped in.
-               call transform_corner_samesize(i1,j1,i2,j2,
+               call fclaw2d_transform_corner(i1,j1,i2,j2,
      &               transform_cptr)
                qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
             enddo

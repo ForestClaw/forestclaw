@@ -81,6 +81,8 @@ c           # Hemisphere
       integer i,j
       double precision vn
 
+      logical ispillowsphere
+
       integer blockno, get_block
       blockno = get_block()
 
@@ -97,8 +99,10 @@ c           # x-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dy,vn,t)
-            if (xd2(3) .le. 0) then
-c               vn = -vn
+            if (ispillowsphere()) then
+               if (blockno == 1) then
+                  vn = -vn
+               endif
             endif
             aux(i,j,2) = vn
          enddo
@@ -116,8 +120,10 @@ c           # y-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dx,vn,t)
-            if (xd2(3) .lt. 0) then
-c               vn = -vn
+            if (ispillowsphere()) then
+               if (blockno == 1) then
+                  vn = -vn
+               endif
             endif
 
             aux(i,j,3) = -vn

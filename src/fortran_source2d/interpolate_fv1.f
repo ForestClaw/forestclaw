@@ -83,7 +83,8 @@ c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
 c              # This works for smooth grid mappings as well.
                i1 = ic
                j1 = jc
-               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+     &               transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -118,7 +119,8 @@ c              # Compute interpolant for each of four
 c              # fine grid cells.
                i1 = ic
                j1 = jc
-               call transform_face_halfsize(i1,j1,i2,j2,transform_cptr)
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+     &               transform_cptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -194,7 +196,8 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
 c        # This works for smooth grid mappings as well.
          i1 = ic
          j1 = jc
-         call transform_corner_halfsize2(i1,j1,i2,j2,transform_cptr)
+         call fclaw2d_transform_corner_half(i1,j1,i2,j2,
+     &         transform_cptr)
          do m = 0,r2-1
             shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
             shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio

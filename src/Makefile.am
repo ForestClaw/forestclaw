@@ -31,7 +31,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
-	src/clawpack_fort.cpp \
 	src/mappings/block.f \
 	src/mappings/context.f \
 	src/mappings/set_maptype.f \
@@ -40,6 +39,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/disk/mapc2m_disk.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
+	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \
 	src/amrrun.cpp \

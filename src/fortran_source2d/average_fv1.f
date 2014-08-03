@@ -68,7 +68,7 @@ c                 # ibc = 2 corresponds to the second layer
                   endif
 
 c                 # New code
-                  call transform_face_halfsize(i1,j1,i2,j2,
+                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -101,7 +101,7 @@ c                 # New code
                      j1 = my+jbc
                   endif
 
-                  call transform_face_halfsize(i1,j1,i2,j2,
+                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &                  transform_cptr)
                   if (is_manifold) then
                      sum = 0
@@ -185,7 +185,7 @@ c              # Average fine grid corners onto coarse grid ghost corners
 
 c              # Again, a fake routine until the real one is
 c              # available (be sure to pass in (i1,j1)
-               call transform_corner_halfsize(ibc,jbc,i2,j2,
+               call fclaw2d_transform_corner_half(i1,j1,i2,j2,
      &               transform_cptr)
                if (is_manifold) then
                   sum = 0

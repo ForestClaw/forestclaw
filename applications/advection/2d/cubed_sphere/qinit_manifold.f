@@ -33,8 +33,17 @@
       implicit none
 
       double precision xc,yc, xp, yp, zp
+      integer*8 map_context, get_context
+      integer blockno, get_block
 
-      call mapc2m(xc,yc,xp,yp,zp)
+      map_context = get_context()
+      blockno = get_block()
+
+c      call mapc2m(xc,yc,xp,yp,zp)
+
+      call fclaw2d_map_c2m(map_context,
+     &      blockno,xc,yc,xp,yp,zp)
+
 
       fdisc = xp
       end

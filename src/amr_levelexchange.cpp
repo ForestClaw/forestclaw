@@ -90,22 +90,23 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
 
-            /* This is now done for all boundaries */
+#if 1
             transform_data.neighbor_patch = ghost_patches[0];
             this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
+#endif
 
-            /*
+#if 0
+            /* This is now done for all boundaries */
             if (this_block_idx == neighbor_block_idx)
             {
-                // Exchange between 'this_patch' and 'neighbor patch(es)' at face 'iface'
-                this_cp->exchange_face_ghost(iface,neighbor_cp);
+                transform_data.neighbor_patch = ghost_patches[0];
+                this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
             }
             else
             {
-                // Initiate exchange from block 0
                 this_cp->mb_exchange_face_ghost(iface,neighbor_cp);
             }
-            */
+#endif
 
         } /* Check return from neighbor */
     } /* loop over all faces */

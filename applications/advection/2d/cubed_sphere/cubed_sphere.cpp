@@ -79,21 +79,41 @@ main (int argc, char **argv)
      Domain geometry
      --------------------------------------------------------------- */
 
+  // Queries for sphere grids.
+  int query_results[FCLAW2D_MAP_QUERY_LAST];
+  query_results[0] = 1;
+  query_results[1] = 0;
+  query_results[2] = 0;
+  query_results[3] = 1;
+  query_results[4] = 0;
+  query_results[5] = 0;
+  query_results[6] = 0;
+
   switch (example) {
-    case 2:
+  case 1:
+      set_maptype_pillowsphere_();
+      conn = p4est_connectivity_new_pillow();
+      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
+      break;
+  case 2:
       if (!(0. < cubed_R2 && cubed_R2 < cubed_R1)) {
-        sc_abort_collective
+          sc_abort_collective
           ("Parameters 0 < cubed_R2 < cubed_R1 required for cubed disk");
       }
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_disk (cubed_R1, cubed_R2);
       break;
-    case 3:
+  case 3:
       if (!(0. < cubed_R1)) {
         sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
       }
       conn = p4est_connectivity_new_cubed ();
       cont = fclaw2d_map_new_csphere (cubed_R1);
+      break;
+  case 4:
+      set_maptype_cubedsphere_();
+      conn = p4est_connectivity_new_cubed();
+      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
       break;
     default:
       sc_abort_collective ("Parameter example must be either 2 or 3");

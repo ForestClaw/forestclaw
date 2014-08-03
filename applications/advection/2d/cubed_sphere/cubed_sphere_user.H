@@ -26,10 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CUBED_SPHERE_USER_H
 #define CUBED_SPHERE_USER_H
 
-#include "amr_forestclaw.H"
+#include <amr_forestclaw.H>
 
 extern "C"
 {
+    void mapc2m_cubedsphere_(const double *xc, const double *yc,
+                             double *xp, double *yp, double *zp);
+
+    void mapc2m_(const double *xc, const double *yc,
+                 double *xp, double *yp, double *zp);
+
     void cubed_sphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, const double& xlower,
                                 const double& ylower, const double& dx, const double& dy,

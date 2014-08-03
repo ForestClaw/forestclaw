@@ -24,37 +24,37 @@ c     # at face 'iface'.
 
       integer i,j,ibc,jbc,mq
 
-      write(6,'(A,A)') 'mb_exchange_face_ghost (ghost_two_patch.f) : ',
-     &      'This has been replaced by a routine in claw2d_utils.f'
-      stop
+c      write(6,'(A,A)') 'mb_exchange_face_ghost (ghost_two_patch.f) : ',
+c     &      'This has been replaced by a routine in exchange_fv1.f'
+c      stop
 
       do mq = 1,meqn
          if (iface .eq. 0) then
             do j = 1,my
                do ibc = 1,mbc
                   qthis(1-ibc,j,mq) = qneighbor(ibc,j,mq)
-c                  qneighbor(1-ibc,j,mq) = qthis(ibc,j,mq)
+                  qneighbor(1-ibc,j,mq) = qthis(ibc,j,mq)
                enddo
             enddo
          elseif (iface .eq. 1) then
             do j = 1,my
                do ibc = 1,mbc
                   qthis(mx+ibc,j,mq) = qneighbor(mx+1-ibc,j,mq)
-c                  qneighbor(mx+ibc,j,mq) = qthis(mx+1-ibc,j,mq)
+                  qneighbor(mx+ibc,j,mq) = qthis(mx+1-ibc,j,mq)
                enddo
             enddo
          elseif (iface .eq. 2) then
             do i = 1,mx
                do jbc = 1,mbc
                   qthis(i,1-jbc,mq) = qneighbor(i,jbc,mq)
-c                   qneighbor(i,1-jbc,mq) = qthis(i,jbc,mq)
+                   qneighbor(i,1-jbc,mq) = qthis(i,jbc,mq)
                enddo
             enddo
          elseif (iface .eq. 3) then
             do i = 1,mx
                do jbc = 1,mbc
                   qthis(i,my+jbc,mq) = qneighbor(i,my+1-jbc,mq)
-c                  qneighbor(i,my+jbc,mq) = qthis(i,my+1-jbc,mq)
+                  qneighbor(i,my+jbc,mq) = qthis(i,my+1-jbc,mq)
                enddo
             enddo
          endif
@@ -81,13 +81,13 @@ c     # Exchange ghost cells at interior of a block boundary.
                   if (is_block_bdry(0) .eq. 1) then
                      qthis(1-ibc,1-jbc,mq) =
      &                     qneighbor(ibc,my+1-jbc,mq)
-c                     qneighbor(1-ibc,my+jbc,mq) =
-c     &                     qthis(ibc,jbc,mq)
+                     qneighbor(1-ibc,my+jbc,mq) =
+     &                     qthis(ibc,jbc,mq)
                   else if (is_block_bdry(2) .eq. 1) then
                      qthis(1-ibc,1-jbc,mq) =
      &                     qneighbor(mx+1-ibc,jbc,mq)
-c                     qneighbor(mx+ibc,1-jbc,mq) =
-c     &                     qthis(ibc,jbc,mq)
+                     qneighbor(mx+ibc,1-jbc,mq) =
+     &                     qthis(ibc,jbc,mq)
                   endif
                enddo
             enddo
@@ -97,13 +97,13 @@ c     &                     qthis(ibc,jbc,mq)
                   if (is_block_bdry(1) .eq. 1) then
                      qthis(mx+ibc,1-jbc,mq) =
      &                     qneighbor(mx+1-ibc,my+1-jbc,mq)
-c                     qneighbor(mx+ibc,my+jbc,mq) =
-c     &                     qthis(mx+1-ibc,jbc,mq)
+                     qneighbor(mx+ibc,my+jbc,mq) =
+     &                     qthis(mx+1-ibc,jbc,mq)
                   elseif (is_block_bdry(2) .eq. 1) then
                      qthis(mx+ibc,1-jbc,mq) =
      &                     qneighbor(ibc,jbc,mq)
-c                     qneighbor(1-ibc,1-jbc,mq) =
-c     &                     qthis(mx+1-ibc,jbc,mq)
+                     qneighbor(1-ibc,1-jbc,mq) =
+     &                     qthis(mx+1-ibc,jbc,mq)
                   endif
                enddo
             enddo
@@ -113,13 +113,13 @@ c     &                     qthis(mx+1-ibc,jbc,mq)
                   if (is_block_bdry(0) .eq. 1) then
                      qthis(1-ibc,my+jbc,mq) =
      &                     qneighbor(ibc,jbc,mq)
-c                     qneighbor(1-ibc,1-jbc,mq) =
-c     &                     qthis(ibc,my+1-jbc,mq)
+                     qneighbor(1-ibc,1-jbc,mq) =
+     &                     qthis(ibc,my+1-jbc,mq)
                   elseif (is_block_bdry(3) .eq. 1) then
                      qthis(1-ibc,my+jbc,mq) =
      &                     qneighbor(mx+1-ibc,my+1-jbc,mq)
-c                     qneighbor(mx+ibc,my+jbc,mq) =
-c     &                     qthis(ibc,my+1-jbc,mq)
+                     qneighbor(mx+ibc,my+jbc,mq) =
+     &                     qthis(ibc,my+1-jbc,mq)
                   endif
                enddo
             enddo
@@ -129,13 +129,13 @@ c     &                     qthis(ibc,my+1-jbc,mq)
                   if (is_block_bdry(1) .eq. 1) then
                      qthis(mx+ibc,my+jbc,mq) =
      &                     qneighbor(mx+1-ibc,jbc,mq)
-c                     qneighbor(mx+ibc,1-jbc,mq) =
-c     &                     qthis(mx+1-ibc,my+1-jbc,mq)
+                     qneighbor(mx+ibc,1-jbc,mq) =
+     &                     qthis(mx+1-ibc,my+1-jbc,mq)
                   elseif (is_block_bdry(3) .eq. 1) then
                      qthis(mx+ibc,my+jbc,mq) =
      &                     qneighbor(ibc,my+1-jbc,mq)
-c                     qneighbor(1-ibc,my+jbc,mq) =
-c     &                     qthis(mx+1-ibc,my+1-jbc,mq)
+                     qneighbor(1-ibc,my+jbc,mq) =
+     &                     qthis(mx+1-ibc,my+1-jbc,mq)
                   endif
                enddo
             enddo
@@ -160,21 +160,21 @@ c     # Exchange ghost cells at block corner
             do ibc = 1,mbc
                do jbc = 1,mbc
                   qthis(1-ibc,1-jbc,mq) = qneighbor(ibc,jbc,mq)
-c                  qneighbor(1-ibc,1-jbc,mq) = qthis(ibc,jbc,mq)
+                  qneighbor(1-ibc,1-jbc,mq) = qthis(ibc,jbc,mq)
                enddo
             enddo
          elseif (icorner .eq. 1) then
             do ibc = 1,mbc
                do jbc = 1,mbc
                   qthis(mx+ibc,1-jbc,mq) = qneighbor(mx+1-ibc,jbc,mq)
-c                  qneighbor(mx+ibc,1-jbc,mq) = qthis(mx+1-ibc,jbc,mq)
+                  qneighbor(mx+ibc,1-jbc,mq) = qthis(mx+1-ibc,jbc,mq)
                enddo
             enddo
          elseif (icorner .eq. 2) then
             do ibc = 1,mbc
                do jbc = 1,mbc
                   qthis(1-ibc,my+jbc,mq) = qneighbor(ibc,my+1-jbc,mq)
-c                  qneighbor(1-ibc,my+jbc,mq) = qthis(ibc,my+1-jbc,mq)
+                  qneighbor(1-ibc,my+jbc,mq) = qthis(ibc,my+1-jbc,mq)
                enddo
             enddo
          elseif (icorner .eq. 3) then
@@ -182,8 +182,8 @@ c                  qneighbor(1-ibc,my+jbc,mq) = qthis(ibc,my+1-jbc,mq)
                do jbc = 1,mbc
                   qthis(mx+ibc,my+jbc,mq) =
      &                  qneighbor(mx+1-ibc,my+1-jbc,mq)
-c                  qneighbor(mx+ibc,my+jbc,mq) =
-c     &                  qthis(mx+1-ibc,my+1-jbc,mq)
+                  qneighbor(mx+ibc,my+jbc,mq) =
+     &                  qthis(mx+1-ibc,my+1-jbc,mq)
                enddo
             enddo
          endif

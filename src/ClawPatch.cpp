@@ -385,8 +385,8 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
     double *qthis = m_griddata.dataPtr();
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
 
-    printf("In mb_exchange_face_ghost\n");
-    exit(0);
+    // printf("In mb_exchange_face_ghost\n");
+    // exit(0);
     mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
 }
 
