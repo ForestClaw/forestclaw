@@ -118,6 +118,7 @@ main (int argc, char **argv)
     default:
       sc_abort_collective ("Parameter example must be either 2 or 3");
   }
+
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
   /* ---------------------------------------------------------------

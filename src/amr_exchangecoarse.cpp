@@ -95,22 +95,23 @@ void cb_corner_average(fclaw2d_domain_t *domain,
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
+    transform_data.iface = -1;
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
         // p4est has tons of lookup table like this, can be exposed similarly
-        int faces[SpaceDim];
-        fclaw2d_domain_corner_faces(domain, icorner, faces);
+        int corner_faces[SpaceDim];
+        fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
         // Both faces are at a physical boundary
         fclaw_bool is_phys_corner =
-                intersects_bc[faces[0]] && intersects_bc[faces[1]];
+                intersects_bc[corner_faces[0]] && intersects_bc[corner_faces[1]];
 
         // Corner lies in interior of physical boundary edge.
         fclaw_bool corner_on_phys_face = !is_phys_corner &&
-                (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
+                (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
 
         // This corner may still be on a block boundary.
         fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
@@ -132,7 +133,21 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         {
             // Both faces are at a block boundary
             fclaw_bool is_block_corner =
-                intersects_block[faces[0]] && intersects_block[faces[1]];
+                intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
+
+            if (!is_block_corner)
+            {
+                if (intersects_block[corner_faces[0]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[0];
+                }
+                else if (intersects_block[corner_faces[1]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[1];
+                }
+            }
 
             int corner_block_idx;
             int ref_flag;
@@ -144,6 +159,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
+                                transform_data.iface,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
@@ -292,16 +308,16 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         // Get faces that intersect 'icorner'
         // There must be a clever way to do this...
         // p4est has tons of lookup table like this, can be exposed similarly
-        int faces[SpaceDim];
-        fclaw2d_domain_corner_faces(domain, icorner, faces);
+        int corner_faces[SpaceDim];
+        fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
         // Both faces are at a physical boundary
         fclaw_bool is_phys_corner =
-                intersects_bc[faces[0]] && intersects_bc[faces[1]];
+                intersects_bc[corner_faces[0]] && intersects_bc[corner_faces[1]];
 
         // Corner lies in interior of physical boundary edge.
         fclaw_bool corner_on_phys_face = !is_phys_corner &&
-                (intersects_bc[faces[0]] || intersects_bc[faces[1]]);
+                (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
 
         fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
@@ -321,7 +337,22 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
             // Both faces are at a block boundary
             fclaw_bool is_block_corner =
-                intersects_block[faces[0]] && intersects_block[faces[1]];
+                intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
+
+
+            if (!is_block_corner)
+            {
+                if (intersects_block[corner_faces[0]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[0];
+                }
+                else if (intersects_block[corner_faces[1]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[1];
+                }
+            }
 
             int corner_block_idx;
             int ref_flag;
@@ -333,6 +364,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
+                                transform_data.iface,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,

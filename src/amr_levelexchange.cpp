@@ -140,6 +140,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
+    transform_data.iface = -1;  // Assume that corner is not at a block edge.
 
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
@@ -156,8 +157,9 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         fclaw_bool corner_on_phys_face = !is_phys_corner &&
                 (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
 
-        // Either a corner at a block boundary (but not a physical boundary),
-        // or internal to a block
+        /* Either a corner at a block boundary (but not a physical boundary),
+           or internal to a block.  L-shaped domains are excluded for now
+           (i.e. no reentrant corners). */
         fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
@@ -171,11 +173,25 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             // Again, smart sweeping on in the bc2 routine should take care of these
             // corner cells.
         }
-        else if (interior_corner)
+        else if (interior_corner)  /* Interior to the domain, not necessarily to a block */
         {
             // Both faces are at a block boundary
             fclaw_bool is_block_corner =
                 intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
+
+            if (!is_block_corner)
+            {
+                if (intersects_block[corner_faces[0]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[0];
+                }
+                else if (intersects_block[corner_faces[1]])
+                {
+                    // Corner is on a block face.
+                    transform_data.iface = corner_faces[1];
+                }
+            }
 
             // We know corner 'icorner' has an adjacent patch.
             int corner_block_idx;
@@ -188,6 +204,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
+                                transform_data.iface,
                                 &corner_block_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
@@ -196,8 +213,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
             if (ref_flag_ptr == NULL)
             {
-                // We should never get here, since we only call 'get_corner_neighbors' in a
-                // situation in which we are sure we have neighbors.
+                /* This can happen if we are at a hanging corner */
             }
             else if (ref_flag == 0)
             {
