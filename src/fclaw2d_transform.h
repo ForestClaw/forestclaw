@@ -81,11 +81,6 @@ void FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                     int i2[], int j2[],
                                     fclaw2d_transform_data_t** ptdata);
 
-/* TODO: remove this function */
-void transform_corner_halfsize2_ (const int *i1, const int *j1,
-                                  int i2[], int j2[],
-                                  fclaw2d_transform_data_t** ptdata);
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
