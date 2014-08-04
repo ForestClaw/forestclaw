@@ -8,11 +8,11 @@ c     # ----------------------------------------------------------
 
 c     # Exchange edge ghost data with neighboring grid at same level.
       subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,
-     &      qneighbor,iface,transform_cptr)
+     &      qneighbor,iface,transform_ptr)
       implicit none
 
       integer mx,my,mbc,meqn,iface, ftransform(9)
-      integer*8 transform_cptr
+      integer*8 transform_ptr
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -37,7 +37,7 @@ c                 # x-direction (idir == 0)
                      j1 = j
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_cptr)
+     &                  transform_ptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
                enddo
@@ -57,7 +57,7 @@ c                 # y-direction (idir == 1)
                      j1 = my+jbc
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_cptr)
+     &                  transform_ptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
                enddo
@@ -68,11 +68,11 @@ c                 # y-direction (idir == 1)
 
 
       subroutine exchange_corner_ghost(mx,my,mbc,meqn,
-     &      qthis, qneighbor, this_icorner,transform_cptr)
+     &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
       integer mx, my, mbc, meqn, this_icorner
-      integer*8 transform_cptr
+      integer*8 transform_ptr
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -100,7 +100,7 @@ c     # Do exchanges for all corners
 c              # this routine is not yet complete, but the complete one
 c              # can now be dropped in.
                call fclaw2d_transform_corner(i1,j1,i2,j2,
-     &               transform_cptr)
+     &               transform_ptr)
                qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
             enddo
          enddo

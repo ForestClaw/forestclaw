@@ -189,7 +189,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,
                                                   time_interp,
-                                                  (fclaw_cptr) &transform_data);
+                                                  &transform_data);
                 }
                 else
                 {
@@ -216,7 +216,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                         coarse_cp->average_corner_ghost(icorner_coarse,
                                                         refratio,corner_cp,
                                                         time_interp,
-                                                        (fclaw_cptr) &transform_data);
+                                                        &transform_data);
                     }
                     else
                     {
@@ -384,7 +384,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 {
                     this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
                                                       time_interp,
-                                                      (fclaw_cptr) &transform_data);
+                                                      &transform_data);
                 }
                 else
                 {
@@ -414,7 +414,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                         coarse_cp->interpolate_corner_ghost(icorner_coarse,
                                                             refratio,corner_cp,
                                                             time_interp,
-                                                            (fclaw_cptr) &transform_data);
+                                                            &transform_data);
                     }
                     else
                     {
@@ -548,7 +548,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                     ClawPatch* fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
                     this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
                                                 fine_neighbor_cp,time_interp,block_boundary,
-                                                igrid,(fclaw_cptr) &transform_data);
+                                                igrid,&transform_data);
                 }
             }
             else if (ref_flag == -1 && is_fine)
@@ -591,7 +591,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                     transform_data.fine_grid_pos = igrid;
                     coarse_cp->average_face_ghost(idir,iface_coarse,p4est_refineFactor,refratio,
                                                   fine_cp,time_interp,block_boundary,
-                                                  igrid, (fclaw_cptr) &transform_data);
+                                                  igrid, &transform_data);
 
                 }
 
@@ -676,7 +676,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                     this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                     refratio,fine_neighbor_cp,time_interp,
                                                     block_boundary,igrid,
-                                                    (fclaw_cptr) &transform_data);
+                                                    &transform_data);
                 }
             }
             else if (ref_flag == -1 && is_fine)
@@ -720,7 +720,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                                                       fine_cp,time_interp,
                                                       block_boundary,
                                                       igrid,
-                                                      (fclaw_cptr) &transform_data);
+                                                      &transform_data);
                 }
             }
         } // loop sides (iside = 0,1,2,3)

@@ -24,11 +24,11 @@ c     # ----------------------------------------------------------
       subroutine interpolate_face_ghost(mx,my,mbc,meqn,
      &      qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
-     &      transform_cptr)
+     &      transform_ptr)
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer num_neighbors
-      integer*8 transform_cptr
+      integer*8 transform_ptr
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -84,7 +84,7 @@ c              # This works for smooth grid mappings as well.
                i1 = ic
                j1 = jc
                call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &               transform_cptr)
+     &               transform_ptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -120,7 +120,7 @@ c              # fine grid cells.
                i1 = ic
                j1 = jc
                call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &               transform_cptr)
+     &               transform_ptr)
                do m = 0,r2-1
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
@@ -135,11 +135,11 @@ c              # fine grid cells.
 
       subroutine interpolate_corner_ghost(mx,my,mbc,meqn,
      &      refratio,
-     &      qcoarse,qfine,icorner_coarse,transform_cptr)
+     &      qcoarse,qfine,icorner_coarse,transform_ptr)
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
-      integer*8 transform_cptr
+      integer*8 transform_ptr
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -197,7 +197,7 @@ c        # This works for smooth grid mappings as well.
          i1 = ic
          j1 = jc
          call fclaw2d_transform_corner_half(i1,j1,i2,j2,
-     &         transform_cptr)
+     &         transform_ptr)
          do m = 0,r2-1
             shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
             shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio

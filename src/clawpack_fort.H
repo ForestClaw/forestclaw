@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_convenience.h"
 #include "forestclaw2d.h"
 #include "amr_options.h"
+#include "fclaw2d_transform.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -92,7 +93,7 @@ void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                             const double areacoarse[], const double areafine[],
                             const int& idir, const int& iside, const int& num_neighbors,
                             const int& refratio, const int& igrid,
-                            fclaw_cptr transform_cptr);
+                            fclaw2d_transform_data_t** transform_cptr);
 
 void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                 double qcoarse[], double qfine[], double areacoarse[], double areafine[],
@@ -104,7 +105,7 @@ void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
    ---------------------------------------------------------------------------------- */
 void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
                           double qthis[],double qneighbor[], const int& a_idir,
-                          fclaw_cptr transform_cptr);
+                          fclaw2d_transform_data_t** transform_cptr);
 
 void average_face_ghost_(const int& mx, const int& my, const int& mbc,
                          const int& meqn,
@@ -113,7 +114,7 @@ void average_face_ghost_(const int& mx, const int& my, const int& mbc,
                          const int& idir, const int& iside,
                          const int& num_neighbors,
                          const int& refratio, const int& igrid,
-                         const int& manifold, fclaw_cptr transform_cptr);
+                         const int& manifold, fclaw2d_transform_data_t** transform_cptr);
 
 void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
                              const int& meqn,
@@ -121,24 +122,24 @@ void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
                              const int& idir, const int& iside,
                              const int& num_neighbors,
                              const int& refratio, const int& igrid,
-                             fclaw_cptr transform_cptr);
+                             fclaw2d_transform_data_t** transform_cptr);
 
 
 void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& meqn, double this_q[],double neighbor_q[],
-                            const int& a_corner,fclaw_cptr transform_cptr);
+                            const int& a_corner,fclaw2d_transform_data_t** transform_cptr);
 
 void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
                            const int& meqn, const int& a_refratio,
                            double qcoarse[], double qfine[],
                            double areacoarse[], double areafine[],
                            const int& manifold,
-                           const int& a_corner, fclaw_cptr transform_cptr);
+                           const int& a_corner, fclaw2d_transform_data_t** transform_cptr);
 
 void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                const int& meqn, const int& a_refratio, double this_q[],
                                double neighbor_q[], const int& a_corner,
-                               fclaw_cptr transform_cptr);
+                               fclaw2d_transform_data_t** transform_cptr);
 
 void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
                              double qthis[], double qneighbor[], const int& iface,

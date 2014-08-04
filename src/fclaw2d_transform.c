@@ -28,8 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Same size neighbor across a face */
 void
 FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
-                        int *i2, int *j2, fclaw2d_transform_data_t * tdata)
+                        int *i2, int *j2, fclaw2d_transform_data_t** ptdata)
 {
+    fclaw2d_transform_data_t *tdata = *ptdata;
     *i2 = *i1;
     *j2 = *j1;
     fclaw2d_patch_transform_face (tdata->this_patch,
@@ -42,8 +43,9 @@ FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                           int *i2, int *j2,
-                          fclaw2d_transform_data_t * tdata)
+                          fclaw2d_transform_data_t** ptdata)
 {
+    fclaw2d_transform_data_t *tdata = *ptdata;
     *i2 = *i1;
     *j2 = *j1;
     if (tdata->iface >= 0)
@@ -70,8 +72,9 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                              int i2[], int j2[],
-                             fclaw2d_transform_data_t * tdata)
+                             fclaw2d_transform_data_t** ptdata)
 {
+    fclaw2d_transform_data_t *tdata = *ptdata;
     i2[0] = *i1;
     j2[0] = *j1;
     fclaw2d_patch_transform_face2 (tdata->this_patch,
@@ -84,8 +87,9 @@ FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                int *i2, int *j2,
-                               fclaw2d_transform_data_t * tdata)
+                               fclaw2d_transform_data_t** ptdata)
 {
+    fclaw2d_transform_data_t *tdata = *ptdata;
     i2[0] = *i1;
     j2[0] = *j1;
     if (tdata->iface >= 0)
@@ -114,8 +118,15 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
 void
 transform_corner_halfsize2_ (const int *i1, const int *j1,
                              int *i2, int *j2,
-                             fclaw2d_transform_data_t * tdata)
+                             fclaw2d_transform_data_t** ptdata)
 {
+
+
+    fclaw2d_transform_data_t *tdata = *ptdata;
+
+    printf("halfsize2 : we should not be calling this function\n");
+    exit(0);
+
     int mbc = 2;
     int icorner = tdata->icorner;
 

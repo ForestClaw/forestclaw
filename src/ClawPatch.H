@@ -67,7 +67,7 @@ public :
     // ----------------------------------------------------------------
     void exchange_face_ghost(const int& a_iface,
                              ClawPatch *a_neighbor_cp,
-                             fclaw_cptr transform_data);
+                             fclaw2d_transform_data_t* transform_data);
 
     void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
 
@@ -84,7 +84,7 @@ public :
                             fclaw_bool a_time_interp,
                             fclaw_bool a_block_boundary,
                             const int& igrid,
-                            fclaw_cptr transform_data);
+                            fclaw2d_transform_data_t* transform_data);
 
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
@@ -95,16 +95,16 @@ public :
                                 fclaw_bool a_time_interp,
                                 fclaw_bool a_block_boundary,
                                 const int& igrid,
-                                fclaw_cptr transform_data);
+                                fclaw2d_transform_data_t* transform_data);
 
     // Exchange corner ghost cells with interior neighbor (interior to the domain)
     void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor,
-                               fclaw_cptr transform_data);
+                               fclaw2d_transform_data_t* transform_data);
 
     void average_corner_ghost(const int& a_corner, const int& a_refratio,
                               ClawPatch *cp_fine,
                               fclaw_bool a_time_interp,
-                              fclaw_cptr transform_cptr);
+                              fclaw2d_transform_data_t* transform_cptr);
 
     void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
                                  ClawPatch *cp_fine,
@@ -114,7 +114,7 @@ public :
     void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                   ClawPatch *cp_fine,
                                   fclaw_bool a_time_interp,
-                                  fclaw_cptr transform_cptr);
+                                  fclaw2d_transform_data_t* transform_cptr);
 
     void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                      ClawPatch *cp_fine,

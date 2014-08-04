@@ -372,12 +372,12 @@ void ClawPatch::unpack_griddata_time_interpolated(double *q)
 
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
-                                    fclaw_cptr transform_data)
+                                    fclaw2d_transform_data_t* transform_data)
 {
     double *qthis = m_griddata.dataPtr();
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
-                         transform_data);
+                         &transform_data);
 }
 
 void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
@@ -391,13 +391,13 @@ void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_c
 }
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
-                                      fclaw_cptr transform_data)
+                                      fclaw2d_transform_data_t* transform_data)
 {
     double *qthis = m_griddata.dataPtr();
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
-                           transform_data);
+                           &transform_data);
 
 }
 
@@ -475,7 +475,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    fclaw_bool a_time_interp,
                                    fclaw_bool a_block_boundary,
                                    const int& igrid,
-                                   fclaw_cptr transform_cptr)
+                                   fclaw2d_transform_data_t* transform_data)
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
@@ -491,7 +491,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                         areacoarse, areafine,
                         a_idir,a_iface_coarse,
                         a_p4est_refineFactor,a_refratio,igrid,
-                        manifold, transform_cptr);
+                        manifold, &transform_data);
 }
 
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
@@ -502,14 +502,14 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        fclaw_bool a_time_interp,
                                        fclaw_bool a_block_boundary,
                                        const int& igrid,
-                                       fclaw_cptr transform_data)
+                                       fclaw2d_transform_data_t* transform_data)
 {
     double *qcoarse = q_time_sync(a_time_interp);
     double *qfine = neighbor_cp->m_griddata.dataPtr();
 
     interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
                             a_p4est_refineFactor,a_refratio,igrid,
-                            transform_data);
+                            &transform_data);
 }
 
 //
@@ -517,7 +517,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
                                      const int& a_refratio,
                                      ClawPatch *cp_corner,
                                      fclaw_bool a_time_interp,
-                                     fclaw_cptr transform_cptr)
+                                     fclaw2d_transform_data_t* transform_data)
 {
 
     double *qcoarse = q_time_sync(a_time_interp);
@@ -530,7 +530,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
                           qcoarse, qfine,
                           areacoarse, areafine,
                           manifold,
-                          a_coarse_corner,transform_cptr);
+                          a_coarse_corner,&transform_data);
 }
 
 
@@ -607,7 +607,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
                                          const int& a_refratio,
                                          ClawPatch *cp_corner,
                                          fclaw_bool a_time_interp,
-                                         fclaw_cptr transform_cptr)
+                                         fclaw2d_transform_data_t* transform_data)
 
 {
     double *qcoarse = q_time_sync(a_time_interp);
@@ -617,7 +617,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
 
     interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
                               a_refratio, qcoarse, qfine,
-                              a_coarse_corner,transform_cptr);
+                              a_coarse_corner,&transform_data);
 }
 
 

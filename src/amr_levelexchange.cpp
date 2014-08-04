@@ -92,7 +92,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
 
 #if 1
             transform_data.neighbor_patch = ghost_patches[0];
-            this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
+            this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
 #endif
 
 #if 0
@@ -100,7 +100,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             if (this_block_idx == neighbor_block_idx)
             {
                 transform_data.neighbor_patch = ghost_patches[0];
-                this_cp->exchange_face_ghost(iface,neighbor_cp,(fclaw_cptr) &transform_data);
+                this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
             }
             else
             {
@@ -223,7 +223,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                 if (this_block_idx == corner_block_idx)
                 {
                     this_cp->exchange_corner_ghost(icorner,corner_cp,
-                                                   (fclaw_cptr) &transform_data);
+                                                   &transform_data);
                 }
                 else
                 {

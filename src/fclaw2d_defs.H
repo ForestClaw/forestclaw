@@ -57,8 +57,6 @@ static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 #define fclaw_true true
 #define fclaw_false false
 
-#define fclaw_cptr unsigned long int
-
 #define fclaw_nan NAN
 
 #endif
