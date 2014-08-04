@@ -72,7 +72,7 @@ int iscubedsphere_();
 /* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);
-void set_context_(fclaw_cptr* a_context);
+void set_context_(fclaw2d_map_context_t** a_context);
 
 
 void fclaw2d_mapc2m_(fclaw2d_map_context_t** cont, int *blockno,

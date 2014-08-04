@@ -17,9 +17,9 @@
       double precision dxf,dyf, xc,yc,xd1, yd1,zd1
 
       integer blockno, get_block
-      integer*8 map_context, get_context
+      integer*8 map_context_ptr, get_context
 
-      map_context = get_context()
+      map_context_ptr = get_context()
       blockno = get_block()
 
 c     # We need both cell centered and node locations to
@@ -37,7 +37,7 @@ c     # compute the normals at cell edges.
 
 c            call mapc2m(xc,yc ,xd1,yd1,zd1)
 
-            call fclaw2d_map_c2m(map_context,
+            call fclaw2d_map_c2m(map_context_ptr,
      &            blockno,xc,yc,xd1,yd1,zd1)
 
             if (abs(mod(i,2)) .eq. 1) then
@@ -76,9 +76,9 @@ c              # Physical locations of cell centers
       integer k, m
 
       integer blockno, get_block
-      integer*8 map_context, get_context
+      integer*8 map_context_ptr, get_context
 
-      map_context = get_context()
+      map_context_ptr = get_context()
       blockno = get_block()
 
       rfactor = 1
@@ -109,7 +109,7 @@ c     # than in the rest of the mesh.
                      do jcell = 0,1
                         xcorner = xef + icell*dxf
                         ycorner = yef + jcell*dyf
-                        call fclaw2d_map_c2m(map_context,
+                        call fclaw2d_map_c2m(map_context_ptr,
      &                        blockno,xcorner,ycorner,xp1,yp1,zp1)
 c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
                         quad(icell,jcell,1) = xp1

@@ -148,7 +148,7 @@ void amrinit (fclaw2d_domain_t **domain)
      available via get_context(), as a integer*8.  This corresonds
     to a (fclaw2d_map_context_t**) for calling C/C++ routines.*/
     fclaw2d_map_context_t* cont = get_map_context(*domain);
-    set_context_((fclaw_cptr*) &cont);
+    set_context_(&cont);
 
     double t = 0;
 
