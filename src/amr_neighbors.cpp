@@ -141,22 +141,27 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
 /* -----------------------------------------------
    Three corner cases to consider :
-   1) Corner is at a block corner. In this case,
-      the number of blocks meeting at a corner
-      is variable (2-pillow grid; 3-cubed sphere;
-      4-brick; 5-???).  For now, this "is_block_corner"
-      is handled as special cases.
-   2) Corner is at a block boundary, but not at a block
-      corner.  Four patches meet at this corner, two of
-      which will be on the remote block.  This corner
-      has a face on 'this_patch' at iface, and at
-      'rface' on the remote block.
-   3) Corner is internal to a single block.  This is the
-      easiest case to handle.
+   (1) Corner is at a block corner. In this case,
+       the number of blocks meeting at a corner
+       is variable (2-pillow grid; 3-cubed sphere;
+       4-brick; 5-???).  For now, this "is_block_corner"
+       is handled as special cases.
+   (2) Corner is at a block boundary, but not at a block
+       corner.  Four patches meet at this corner, two of
+       which will be on the remote block.  This corner
+       has a face on 'this_patch' at iface, and at
+       'rface' on the remote block.
+   (3) Corner is internal to a single block.  This is the
+       easiest case to handle.
+   (4) Corner is a hanging node.  Don't need to do anything.
 
    In cases 2 and 3, a 'transform' between corner-adjacent
    patches is well defined.  In case 1, only when four
    patches meet is the transform well defined.
+
+   Situations in which we might not have a corner
+   adjacent neighbor include : cubed sphere case or
+   hanging node case.
    ----------------------------------------------- */
 
 
@@ -173,24 +178,20 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 {
     int rproc_corner;
     int corner_patch_idx;
-
-    /* Code is now back in state it was before I added stuff */
     fclaw2d_patch_relation_t neighbor_type;
     fclaw_bool has_corner_neighbor = fclaw_false;
 
     if (is_block_corner)
     {
-        /* Case (1) from above */
-
+        /* Case (1) : 2, 3, or more  blocks meeting at a block corner */
         if (ispillowsphere_())
         {
-            /* Case (1) (2 blocks meeting at a corner */
-            has_corner_neighbor = fclaw_true;  // By definition
+            /* 2 patches meet at a corner.  This is handled as a special
+               case */
+            has_corner_neighbor = fclaw_true;
             int rpatchno[p4est_refineFactor];
             int rproc[p4est_refineFactor];
             int rfaceno;
-            int igrid;
-            // int ftransform[9];
 
             /* Use only faces 0 or 1 to get block data. */
             int iface = icorner % 2;
@@ -204,82 +205,17 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                              rpatchno,
                                              &rfaceno);
 
-            if (this_block_idx == *corner_block_idx)
-            {
-                printf("Something went wrong;  these blocks should be different\n");
-                exit(1);
-            }
-            else if (rfaceno != iface)
-            {
-                printf("Something went wrong; faces should have same number \
-                    (for sphere grid)\n");
-                exit(1);
-            }
-
-            if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
-                neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
-            {
-                // This patch shares face 'iface' with a single patch.
-                igrid = 0;
-            }
-            else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
-            {
-                // On bottom corners, we want to take the first patch in the list;
-                // On top corners, we take the last patch in the list.
-                igrid = (icorner/2)*(p4est_refineFactor - 1);
-            }
-            else
-            {
-                printf("Something went wrong;  this should not be a boundary\n");
-                exit(1);
-            }
-
-            corner_patch_idx = rpatchno[igrid];
-            rproc_corner = rproc[igrid];
-        }
-        else if (iscubedsphere_())
-        {
-            /* Case (1) (3 blocks meeting at a corner */
-            has_corner_neighbor = fclaw_false;  // By definition
-            int rpatchno[p4est_refineFactor];
-            int rproc[p4est_refineFactor];
-            int rfaceno;
             int igrid;
-            // int ftransform[9];
-
-            /* Use only faces 0 or 1 to get block data. */
-            int iface = icorner % 2;
-            neighbor_type =
-                fclaw2d_patch_face_neighbors(domain,
-                                             this_block_idx,
-                                             this_patch_idx,
-                                             iface,
-                                             rproc,
-                                             corner_block_idx,
-                                             rpatchno,
-                                             &rfaceno);
-
-            if (this_block_idx == *corner_block_idx)
+            if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
             {
-                printf("Something went wrong;  these blocks should be different\n");
-                exit(1);
-            }
-            if (neighbor_type == FCLAW2D_PATCH_SAMESIZE ||
-                neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
-            {
-                // This patch shares face 'iface' with a single patch.
-                igrid = 0;
-            }
-            else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
-            {
-                // On bottom corners, we want to take the first patch in the list;
-                // On top corners, we take the last patch in the list.
+                /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
+                   where R = refinement factor */
                 igrid = (icorner/2)*(p4est_refineFactor - 1);
             }
             else
             {
-                printf("Something went wrong;  this should not be a boundary\n");
-                exit(1);
+                /* Same size or double size grids. */
+                igrid = 0;
             }
 
             corner_patch_idx = rpatchno[igrid];
@@ -287,20 +223,42 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         }
         else
         {
-            /* Case (1) (4, 5 blocks meeting at a corner */
+            int rblockno;
+            has_corner_neighbor =
+                fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
+                                               icorner, &rproc_corner, &rblockno,
+                                               &corner_patch_idx, &neighbor_type);
+            if (!has_corner_neighbor)
+            {
+                /* Case (1) : 3 patches meet at a corner, e.g. the
+                   cubed sphere.   Nothing to do here */
+            }
+            else
+            {
+                /* Case (1) : 4 or more patches meet at a corner */
+                printf("get_corner_neighbors (amr_neighbors.f) : " \
+                       "Four or more patches meet at a block corner; " \
+                       "(not implemented yet).\n");
+                exit(0);
+            }
         }
     }
     else
     {
-        /* Cases (2) and (3) */
-
+        /* Cases (2) and (3) : We are either at a block edge or at an
+           internal corner.  Unless we are a hanging node, we return
+           a "transform" vector here. */
         int rblockno;
         has_corner_neighbor =
             fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                            icorner, &rproc_corner, &rblockno,
                                            &corner_patch_idx, &neighbor_type);
 
-        if (has_corner_neighbor)
+        if (!has_corner_neighbor)
+        {
+            /* 'icorner' is a hanging node.  See see below. */
+        }
+        else
         {
             *corner_block_idx = rblockno;
             if (this_block_idx != rblockno)
@@ -323,7 +281,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                              &rpatchno,
                                              &rfaceno);
 
-                // Get encoding of transforming a neighbor coordinate across a face
+                /* Get encoding of transforming a neighbor coordinate across a face */
                 fclaw2d_patch_face_transformation (iface, rfaceno, ftransform);
             }
             else
@@ -331,10 +289,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                 /* Case (3) : Both patches are in the same block */
                 ftransform[8] = 4;
             }
-        }
-        else
-        {
-            /* 'icorner' is a hanging node.  See see below. */
         }
     }
 
