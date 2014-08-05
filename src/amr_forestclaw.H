@@ -124,6 +124,15 @@ void get_phys_boundary (fclaw2d_domain_t * domain,
                         int this_block_idx,
                         int this_patch_idx, fclaw_bool * intersects_bc);
 
+void get_corner_type(fclaw2d_domain_t* domain,
+                     int icorner,
+                     fclaw_bool intersects_bdry[],
+                     fclaw_bool intersects_block[],
+                     fclaw_bool* interior_corner,
+                     fclaw_bool* is_block_corner,
+                     int* block_iface);
+
+
 // ----------------------------
 // Routines used by diagnostics
 // ----------------------------

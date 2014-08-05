@@ -121,9 +121,9 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 {
 
     // const int numfaces = get_faces_per_patch(domain);
-    fclaw_bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bdry[NumFaces];
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bc);
+                      intersects_bdry);
 
     fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
@@ -145,6 +145,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
+#if 0
         // p4est has tons of lookup table like this, can be exposed similarly
         int corner_faces[SpaceDim];
         fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
@@ -161,8 +162,21 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
            or internal to a block.  L-shaped domains are excluded for now
            (i.e. no reentrant corners). */
         fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
+#endif
+
+        int block_iface;   /* in case corner is on a block face */
+        fclaw_bool is_block_corner, interior_corner;
+        get_corner_type(domain,icorner,
+                        intersects_bdry,
+                        intersects_block,
+                        &interior_corner,
+                        &is_block_corner,
+                        &block_iface);
+
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
+
+#if 0
         if (is_phys_corner)
         {
             // We don't have to worry about this now.  It is
@@ -173,12 +187,14 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             // Again, smart sweeping on in the bc2 routine should take care of these
             // corner cells.
         }
-        else if (interior_corner)  /* Interior to the domain, not necessarily to a block */
+#endif
+
+        if (interior_corner)  /* Interior to the domain, not necessarily to a block */
         {
+#if 0
             // Both faces are at a block boundary
             fclaw_bool is_block_corner =
                 intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
-
             if (!is_block_corner)
             {
                 if (intersects_block[corner_faces[0]])
@@ -191,6 +207,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                     // Corner is on a block face.
                     transform_data.iface = corner_faces[1];
                 }
+            }
+#endif
+            if (block_iface >= 0)
+            {
+                transform_data.iface = block_iface;
             }
 
             // We know corner 'icorner' has an adjacent patch.
