@@ -47,6 +47,18 @@ extern "C"
 #endif
 #endif
 
+
+typedef struct exchange_info
+{
+    fclaw_bool time_interp;
+    fclaw_bool is_coarse;
+    fclaw_bool is_fine;
+    int level;
+    fclaw_bool copy;
+    fclaw_bool average;
+    fclaw_bool interpolate;
+} fclaw2d_exchange_info_t;
+
 // ----------------------------------------
 // Routines needed to time step and produce
 // output
@@ -110,10 +122,10 @@ void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int this_patch_idx,
                           int icorner,
                           int iface,
+                          fclaw_bool is_block_corner,
                           int *corner_block_idx,
                           fclaw2d_patch_t ** ghost_patch,
                           int **ref_flag_ptr,
-                          fclaw_bool is_block_corner,
                           int ftransform[]);
 
 void get_block_boundary (fclaw2d_domain_t * domain,
@@ -124,14 +136,21 @@ void get_phys_boundary (fclaw2d_domain_t * domain,
                         int this_block_idx,
                         int this_patch_idx, fclaw_bool * intersects_bc);
 
-void get_corner_type(fclaw2d_domain_t* domain,
-                     int icorner,
-                     fclaw_bool intersects_bdry[],
-                     fclaw_bool intersects_block[],
-                     fclaw_bool* interior_corner,
-                     fclaw_bool* is_block_corner,
-                     int* block_iface);
+void
+get_corner_type(fclaw2d_domain_t* domain,
+                int icorner,
+                fclaw_bool intersects_bdry[],
+                fclaw_bool intersects_block[],
+                fclaw_bool *interior_corner,
+                fclaw_bool *is_block_corner,
+                int *block_iface);
 
+
+void cb_corner_fill(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    void *user);
 
 // ----------------------------
 // Routines used by diagnostics

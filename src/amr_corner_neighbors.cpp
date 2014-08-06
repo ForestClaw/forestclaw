@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
-
 void
 get_corner_type(fclaw2d_domain_t* domain,
                 int icorner,
@@ -68,6 +67,180 @@ get_corner_type(fclaw2d_domain_t* domain,
         {
             // Corner is on a block face.
             *block_iface = corner_faces[1];
+        }
+    }
+}
+
+void cb_corner_fill(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    void *user)
+{
+
+    printf("Not calling this routine\n");
+    exit(0);
+
+
+    fclaw2d_exchange_info_t &filltype = *((fclaw2d_exchange_info_t*) user);
+    fclaw_bool time_interp = filltype.time_interp;
+    fclaw_bool is_coarse = filltype.is_coarse;
+    fclaw_bool is_fine = filltype.is_fine;
+
+    fclaw_bool intersects_bdry[NumFaces];
+    fclaw_bool intersects_block[NumFaces];
+    int block_iface;   /* in case corner is on a block face */
+    fclaw_bool is_block_corner;
+    fclaw_bool is_interior_corner;
+
+    get_phys_boundary(domain,this_block_idx,this_patch_idx,
+                      intersects_bdry);
+    get_block_boundary(domain,this_block_idx,this_patch_idx,
+                       intersects_block);
+
+    /* Transform data needed at multi-block boundaries */
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
+
+    int refratio = gparms->refratio;
+
+    ClawPatch *this_cp = get_clawpatch(this_patch);
+    for (int icorner = 0; icorner < NumCorners; icorner++)
+    {
+        get_corner_type(domain,icorner,
+                        intersects_bdry,
+                        intersects_block,
+                        &is_interior_corner,
+                        &is_block_corner,
+                        &block_iface);
+
+
+        if (is_interior_corner)  /* Interior to the domain, not necessarily to a block */
+        {
+            transform_data.iface = block_iface; /* = -1 if corner is not on block face */
+
+            int corner_block_idx;
+            int relative_refinement_level;
+            int *ref_flag_ptr = &relative_refinement_level;
+            fclaw2d_patch_t *ghost_patch;
+
+            transform_data.icorner = icorner;
+            get_corner_neighbor(domain,
+                                this_block_idx,
+                                this_patch_idx,
+                                icorner,
+                                transform_data.iface,
+                                is_block_corner,
+                                &corner_block_idx,
+                                &ghost_patch,
+                                &ref_flag_ptr,
+                                transform_data.transform);
+
+            if (ref_flag_ptr == NULL)
+            {
+                /* no corner neighbor; relative_refinement_level is not set
+                   This can happen in the cubed sphere case, or if icorner is
+                   a hanging node */
+                return;
+            }
+
+            if (filltype.copy)
+            {
+                if (relative_refinement_level == 0)
+                {
+                    ClawPatch *this_cp = get_clawpatch(this_patch);
+                    fclaw2d_patch_t* corner_patch = ghost_patch;
+                    ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                    transform_data.neighbor_patch = corner_patch;
+                    if (!is_block_corner)
+                    {
+                        this_cp->exchange_corner_ghost(icorner,corner_cp,
+                                                       &transform_data);
+                    }
+                    else
+                    {
+                        if (ispillowsphere_())
+                        {
+                            this_cp->mb_exchange_corner_ghost(icorner,intersects_block,
+                                                              corner_cp,is_block_corner);
+                        }
+                        else
+                        {
+                            /* Handle 4 and 5 corner block cases here */
+                        }
+                    }
+                }
+            }
+            else if (filltype.average)
+            {
+                if (relative_refinement_level == 1 && is_coarse)
+                {
+                    /* Corner neighbor at a finer level, and so we need to average
+                       that corner onto the coarser corner ghost cells */
+                    ClawPatch *corner_cp = get_clawpatch(ghost_patch);
+                    transform_data.neighbor_patch = ghost_patch;
+
+                    if (!is_block_corner)
+                    {
+                        this_cp->average_corner_ghost(icorner,refratio,corner_cp,
+                                                      time_interp, &transform_data);
+                    }
+                    else
+                    {
+                        if (ispillowsphere_())
+                        {
+                            this_cp->mb_average_corner_ghost(icorner,refratio,
+                                                             corner_cp,time_interp,
+                                                             is_block_corner,
+                                                             intersects_block);
+                        }
+                        else
+                        {
+                            /* Handle 4 and 5 corner block cases here */
+                        }
+                    }
+                }
+                else if (relative_refinement_level == -1 && is_fine)
+                {
+                    /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
+                }
+            }
+            else if (filltype.interpolate)
+            {
+                if (relative_refinement_level == 1 && is_coarse)
+                {
+                    ClawPatch *corner_cp = get_clawpatch(ghost_patch);
+                    transform_data.neighbor_patch = ghost_patch;
+                    if (!is_block_corner)
+                    {
+                        this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
+                                                          time_interp,&transform_data);
+                    }
+                    else
+                    {
+                        if (ispillowsphere_())
+                        {
+                            this_cp->mb_interpolate_corner_ghost(icorner,refratio,
+                                                                 corner_cp,time_interp,
+                                                                 is_block_corner,
+                                                                 intersects_block);
+                        }
+                        else
+                        {
+                            /* Handle 4,5 patch corners */
+                        }
+                    }
+                }
+                else if (relative_refinement_level == -1 && is_fine)
+                {
+                    /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
+                }
+            }
         }
     }
 }

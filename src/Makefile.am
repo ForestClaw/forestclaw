@@ -39,6 +39,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/disk/mapc2m_disk.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
+	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \

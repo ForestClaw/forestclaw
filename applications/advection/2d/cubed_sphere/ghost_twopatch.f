@@ -24,9 +24,9 @@ c     # at face 'iface'.
 
       integer i,j,ibc,jbc,mq
 
-c      write(6,'(A,A)') 'mb_exchange_face_ghost (ghost_two_patch.f) : ',
-c     &      'This has been replaced by a routine in exchange_fv1.f'
-c      stop
+      write(6,'(A,A)') 'mb_exchange_face_ghost (ghost_two_patch.f) : ',
+     &      'This has been replaced by a routine in exchange_fv1.f'
+      stop
 
       do mq = 1,meqn
          if (iface .eq. 0) then
@@ -73,6 +73,10 @@ c     # Exchange ghost cells at interior of a block boundary.
       integer is_block_bdry(0:3)
 
       integer mq, ibc, jbc, m
+
+      write(6,'(A,A)') 'mb_exchange_corner_ghost (ghost_twopatch.f) : ',
+     &      'This has been replaced by a routine in exchange_fv1.f'
+      stop
 
       do mq = 1,meqn
          if (icorner .eq. 0) then
@@ -430,6 +434,11 @@ c     Average fine grid to coarse grid or copy neighboring coarse grid
       integer ifine, jfine
       double precision kf, qf, kc
 
+      write(6,'(A,A)') 'mb_average_corner_ghost (ghost_two_patch.f) : ',
+     &      'This has been replaced by a routine in average_fv1.f'
+      stop
+
+
       do mq = 1,meqn
          if (icorner .eq. 0) then
             do ibc = 1,mbc
@@ -641,6 +650,12 @@ c     # Exchange ghost cells at block corner
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady, shiftx, shifty
       double precision compute_slopes, value
+
+
+      write(6,'(A,A)') 'mb_interpolate_corner_ghost ',
+     &      ' (ghost_two_patch.f) : ',
+     &      'This has been replaced by a routine in interpolate_fv1.f'
+      stop
 
       mth = 5
 

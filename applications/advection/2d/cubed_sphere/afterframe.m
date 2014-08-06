@@ -47,7 +47,12 @@ if (prt)
   disp(pstr);
   eval(pstr);
 end;
-
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
 shg;
 
 clear afterframe;

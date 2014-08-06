@@ -407,6 +407,11 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_inter
     double *qthis = m_griddata.dataPtr();
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
+
+    mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
+                                    a_corner, m_blockno);
+
+    return;
     if (a_is_block_corner)
     {
         // We know we are at a block corner, which is handled differently than a corner that is
@@ -549,6 +554,12 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
     double *areafine = cp_corner->m_area.dataPtr();
     double *qfine = cp_corner->m_griddata.dataPtr();
 
+    mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
+                                   a_refratio,qcoarse,qfine,
+                                   areacoarse,areafine,
+                                   a_coarse_corner,m_blockno);
+    return;
+
     if (is_block_corner)
     {
         mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
@@ -582,6 +593,11 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
 
     /* qcorner is the finer level. */
     double *qfine = cp_corner->m_griddata.dataPtr();
+
+    mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
+                                       a_refratio, qcoarse, qfine,
+                                       a_coarse_corner, m_blockno);
+    return;
 
     if (is_block_corner)
     {

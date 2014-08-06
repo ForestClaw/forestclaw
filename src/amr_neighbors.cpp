@@ -170,10 +170,10 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_patch_idx,
                          int icorner,
                          int iface,
+                         fclaw_bool is_block_corner,
                          int *corner_block_idx,
                          fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
-                         fclaw_bool is_block_corner,
                          int ftransform[])
 {
     /* See what p4est thinks we have for corners, and consider four cases */
@@ -196,14 +196,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
-        /* 'icorner' is a hanging node and has no corner
-           adjacent neighbor */
+        /* 'icorner' is a hanging node */
         *ref_flag_ptr = NULL;
         *ghost_patch = NULL;
         return;
     }
     else if (has_corner_neighbor && !is_block_corner)
     {
+        /* 'icorner' is an interior corner or a a block edge */
         /* Need to return a valid transform in 'ftransform' */
         if (this_block_idx == *corner_block_idx)
         {

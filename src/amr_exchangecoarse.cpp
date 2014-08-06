@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    ******************************************************************************
 */
 
+#if 0
 struct exchange_info
 {
     fclaw_bool time_interp;
@@ -59,7 +60,7 @@ struct exchange_info
     fclaw_bool is_fine;
     int level;
 };
-
+#endif
 
 static
 void cb_corner_average(fclaw2d_domain_t *domain,
@@ -160,10 +161,10 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                                 this_patch_idx,
                                 icorner,
                                 transform_data.iface,
+                                is_block_corner,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner,
                                 transform_data.transform);
 
             /* -------------------------------------
@@ -365,10 +366,10 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                                 this_patch_idx,
                                 icorner,
                                 transform_data.iface,
+                                is_block_corner,
                                 &corner_block_idx,
                                 &neighbor_patch,
                                 &ref_flag_ptr,
-                                is_block_corner,
                                 transform_data.transform);
 
             if (ref_flag_ptr == NULL)
@@ -762,7 +763,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     int finer_level = level;
     int coarser_level = level - 1;
 
-    exchange_info e_info;
+    fclaw2d_exchange_info_t e_info;
     e_info.time_interp = time_interp;
     e_info.level = level;
 
@@ -793,6 +794,9 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     /* First pass : Iterate over coarse grids in space filling curve */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
+    e_info.average = fclaw_true;
+    e_info.copy = fclaw_false;
+    e_info.interpolate = fclaw_false;
 
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_average,
                                  (void *) &e_info);
@@ -832,6 +836,10 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        ----------------------------------------------------------- */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
+    e_info.average = fclaw_false;
+    e_info.copy = fclaw_false;
+    e_info.interpolate = fclaw_true;
+
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
                                  (void *) &e_info);
 
