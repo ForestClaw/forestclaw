@@ -154,8 +154,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
              corner. (not implemented yet).
     Case 2 : Corner is a hanging node and has no valid
              adjacent corner.
-    Case 3 : Corner is either interior to a patch, or on a
-             patch edge.  In each sub-case, the transform is
+    Case 3 : Corner is either interior to a block, or on a
+             block edge.  In each sub-case, the transform is
              well-defined.
     Case 4 : Either 3 patches meet at a corner, in which
              case we don't have a valid corner, or we are

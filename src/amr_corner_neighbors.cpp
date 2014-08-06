@@ -162,7 +162,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         }
                         else
                         {
-                            /* Handle 4 and 5 corner block cases here */
+                            /* Handle 4 and 5 corner block cases here;  nothing to do for
+                               cubed sphere case. */
                         }
                     }
                 }
@@ -225,7 +226,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         }
                         else
                         {
-                            /* Handle 4,5 patch corners */
+                            /* Handle 4,5 patch corners; nothing to be done for cubed sphere */
                         }
                     }
                 }
