@@ -5,7 +5,6 @@ bin_PROGRAMS += applications/advection/2d/cubed_sphere/cubed_sphere
 applications_advection_2d_cubed_sphere_cubed_sphere_SOURCES = \
 	applications/advection/2d/cubed_sphere/cubed_sphere_user.cpp \
 	applications/advection/2d/cubed_sphere/cubed_sphere.cpp \
-	applications/advection/2d/cubed_sphere/ghost_twopatch.f \
 	applications/advection/2d/cubed_sphere/tag4refinement.f \
 	applications/advection/2d/cubed_sphere/mapc2m.f \
 	applications/advection/2d/cubed_sphere/velocity_wind.f \

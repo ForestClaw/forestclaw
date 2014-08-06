@@ -380,15 +380,6 @@ void ClawPatch::exchange_face_ghost(const int& a_iface,
                          &transform_data);
 }
 
-void ClawPatch::mb_exchange_face_ghost(const int& a_iface, ClawPatch *neighbor_cp)
-{
-    double *qthis = m_griddata.dataPtr();
-    double *qneighbor = neighbor_cp->m_griddata.dataPtr();
-
-    // printf("In mb_exchange_face_ghost\n");
-    // exit(0);
-    mb_exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,m_blockno);
-}
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                                       fclaw2d_transform_data_t* transform_data)
@@ -411,25 +402,6 @@ void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_inter
     mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
                                     a_corner, m_blockno);
 
-    return;
-    if (a_is_block_corner)
-    {
-        // We know we are at a block corner, which is handled differently than a corner that is
-        // only at an edge, but not at a corner.
-        mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
-                                        a_corner, m_blockno);
-    }
-    else
-    {
-        int bdry[NumFaces];
-        for(int m = 0; m < NumFaces; m++)
-        {
-            bdry[m] = a_intersects_block[m] ? 1 : 0;
-        }
-        mb_exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
-                                  a_corner, bdry, m_blockno);
-
-    }
 }
 
 
@@ -558,27 +530,6 @@ void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
                                    a_refratio,qcoarse,qfine,
                                    areacoarse,areafine,
                                    a_coarse_corner,m_blockno);
-    return;
-
-    if (is_block_corner)
-    {
-        mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
-                                       a_refratio,qcoarse,qfine,
-                                       areacoarse,areafine,
-                                       a_coarse_corner,m_blockno);
-    }
-    else
-    {
-        int block_bdry[4];
-        for (int m = 0; m < 4; m++)
-        {
-            block_bdry[m] = intersects_block[m] ? 1 : 0;
-        }
-        mb_average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                                 a_refratio, qcoarse, qfine,
-                                 areacoarse, areafine,
-                                 a_coarse_corner, block_bdry);
-    }
 }
 
 
@@ -597,26 +548,6 @@ void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
     mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
                                        a_refratio, qcoarse, qfine,
                                        a_coarse_corner, m_blockno);
-    return;
-
-    if (is_block_corner)
-    {
-        // This doesn't do anything right now.
-        mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                                           a_refratio, qcoarse, qfine,
-                                           a_coarse_corner, m_blockno);
-    }
-    else
-    {
-        int bdry[4];
-        for(int m = 0; m < 4; m++)
-        {
-            bdry[m] = intersects_block[m] ? 1 : 0;
-        }
-        mb_interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                                     a_refratio, qcoarse, qfine,
-                                     a_coarse_corner, bdry);
-    }
 }
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
