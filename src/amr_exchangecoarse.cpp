@@ -69,7 +69,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    exchange_info *e_info = (exchange_info*) user;
+    fclaw2d_exchange_info_t *e_info = (fclaw2d_exchange_info_t *) user;
     fclaw_bool time_interp = e_info->time_interp;
     fclaw_bool is_coarse = e_info->is_coarse;
     fclaw_bool is_fine = e_info->is_fine;
@@ -77,17 +77,14 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
-    fclaw_bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bdry[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bc);
+                      intersects_bdry);
 
     fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
-
-    // Number of patch corners, not the number of corners in the domain!
-    // const int numcorners = get_corners_per_patch(domain);
 
     // Transform data needed at multi-block boundaries
     fclaw2d_transform_data_t transform_data;
@@ -100,56 +97,19 @@ void cb_corner_average(fclaw2d_domain_t *domain,
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
-        // Get faces that intersect 'icorner'
-        // There must be a clever way to do this...
-        // p4est has tons of lookup table like this, can be exposed similarly
-        int corner_faces[SpaceDim];
-        fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
+        fclaw_bool interior_corner, is_block_corner;
+        get_corner_type(domain,icorner,
+                        intersects_bdry,
+                        intersects_block,
+                        &interior_corner,
+                        &is_block_corner,
+                        &transform_data.iface);
 
-        // Both faces are at a physical boundary
-        fclaw_bool is_phys_corner =
-                intersects_bc[corner_faces[0]] && intersects_bc[corner_faces[1]];
-
-        // Corner lies in interior of physical boundary edge.
-        fclaw_bool corner_on_phys_face = !is_phys_corner &&
-                (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
-
-        // This corner may still be on a block boundary.
-        fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
-        if (is_phys_corner)
-        {
-            // We don't have to worry about this now.  It is
-            // now taken care of by applying physical boundary conditions,
-            // first in x, then in y.
-        }
-        else if (corner_on_phys_face)
-        {
-            // Taken care of by applying boundary conditions _after_ doing
-            // face exchanges or coarse/fine interpolation at a face that
-            // intersects (perpendicularly) the physical boundary.
-        }
-        else if (interior_corner)
-        {
-            // Both faces are at a block boundary
-            fclaw_bool is_block_corner =
-                intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
 
-            if (!is_block_corner)
-            {
-                if (intersects_block[corner_faces[0]])
-                {
-                    // Corner is on a block face.
-                    transform_data.iface = corner_faces[0];
-                }
-                else if (intersects_block[corner_faces[1]])
-                {
-                    // Corner is on a block face.
-                    transform_data.iface = corner_faces[1];
-                }
-            }
-
+        if (interior_corner)
+        {
             int corner_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
@@ -186,7 +146,7 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
                 transform_data.neighbor_patch = neighbor_patch;
 
-                if (this_block_idx == corner_block_idx)
+                if (!is_block_corner)
                 {
                     this_cp->average_corner_ghost(icorner,refratio,corner_cp,
                                                   time_interp,
@@ -194,8 +154,11 @@ void cb_corner_average(fclaw2d_domain_t *domain,
                 }
                 else
                 {
-                    this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
-                                                     is_block_corner,intersects_block);
+                    if (ispillowsphere_())
+                    {
+                        this_cp->mb_average_corner_ghost(icorner,refratio,corner_cp,time_interp,
+                                                         is_block_corner,intersects_block);
+                    }
                 }
             }
             else if (ref_flag == -1 && is_fine)
@@ -277,23 +240,20 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            int this_patch_idx,
                            void *user)
 {
-    exchange_info *e_info = (exchange_info*) user;
+    fclaw2d_exchange_info_t *e_info = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = e_info->time_interp;
     fclaw_bool is_fine = e_info->is_fine;
 
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
-    fclaw_bool intersects_bc[NumFaces];
+    fclaw_bool intersects_bdry[NumFaces];
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bc);
+                      intersects_bdry);
 
     fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
-
-    // Number of patch corners, not the number of corners in the domain!
-    // const int numcorners = get_corners_per_patch(domain);
 
     // Transform data needed at multi-block boundaries
     fclaw2d_transform_data_t transform_data;
@@ -306,55 +266,18 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
 
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
-        // Get faces that intersect 'icorner'
-        // There must be a clever way to do this...
-        // p4est has tons of lookup table like this, can be exposed similarly
-        int corner_faces[SpaceDim];
-        fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
+        fclaw_bool interior_corner, is_block_corner;
+        get_corner_type(domain,icorner,
+                        intersects_bdry,
+                        intersects_block,
+                        &interior_corner,
+                        &is_block_corner,
+                        &transform_data.iface);
 
-        // Both faces are at a physical boundary
-        fclaw_bool is_phys_corner =
-                intersects_bc[corner_faces[0]] && intersects_bc[corner_faces[1]];
-
-        // Corner lies in interior of physical boundary edge.
-        fclaw_bool corner_on_phys_face = !is_phys_corner &&
-                (intersects_bc[corner_faces[0]] || intersects_bc[corner_faces[1]]);
-
-        fclaw_bool interior_corner = !corner_on_phys_face && !is_phys_corner;
 
         ClawPatch *this_cp = get_clawpatch(this_patch);
-        if (is_phys_corner)
+        if (interior_corner)
         {
-            // We don't have to worry about this now.  It is
-            // now taken care of by smart sweeping in the bc2 routine.
-        }
-        else if (corner_on_phys_face)
-        {
-            // Again, smart sweeping on in the bc2 routine should take care of these
-            // corner cells.
-        }
-        else if (interior_corner)
-        {
-
-            // Both faces are at a block boundary
-            fclaw_bool is_block_corner =
-                intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
-
-
-            if (!is_block_corner)
-            {
-                if (intersects_block[corner_faces[0]])
-                {
-                    // Corner is on a block face.
-                    transform_data.iface = corner_faces[0];
-                }
-                else if (intersects_block[corner_faces[1]])
-                {
-                    // Corner is on a block face.
-                    transform_data.iface = corner_faces[1];
-                }
-            }
-
             int corner_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
@@ -381,7 +304,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 ClawPatch *corner_cp = get_clawpatch(neighbor_patch);
 
                 transform_data.neighbor_patch = neighbor_patch;
-                if (this_block_idx == corner_block_idx)
+                if (!is_block_corner)
                 {
                     this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
                                                       time_interp,
@@ -389,9 +312,12 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
                 }
                 else
                 {
-                    this_cp->mb_interpolate_corner_ghost(icorner,refratio,
-                                                         corner_cp,time_interp,
-                                                         is_block_corner, intersects_block);
+                    if (ispillowsphere_())
+                    {
+                        this_cp->mb_interpolate_corner_ghost(icorner,refratio,
+                                                             corner_cp,time_interp,
+                                                             is_block_corner, intersects_block);
+                    }
                 }
             }
             else if (ref_flag == -1 && is_fine)

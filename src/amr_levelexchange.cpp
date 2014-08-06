@@ -121,7 +121,6 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 {
     fclaw_bool intersects_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
-    int block_iface;   /* in case corner is on a block face */
     fclaw_bool is_block_corner;
     fclaw_bool is_interior_corner;
 
@@ -147,13 +146,11 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                         intersects_block,
                         &is_interior_corner,
                         &is_block_corner,
-                        &block_iface);
+                        &transform_data.iface);
 
 
         if (is_interior_corner)  /* Interior to the domain, not necessarily to a block */
         {
-            transform_data.iface = block_iface; /* = -1 if corner is not on block face */
-
             int corner_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
@@ -172,10 +169,9 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 transform_data.transform);
             if (ref_flag_ptr == NULL)
             {
-                return;
+                /* Nothing happens here */
             }
-
-            if (ref_flag == 0)
+            else if (ref_flag == 0)
             {
                 ClawPatch *this_cp = get_clawpatch(this_patch);
                 fclaw2d_patch_t* corner_patch = ghost_patch;
