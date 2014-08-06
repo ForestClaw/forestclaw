@@ -126,6 +126,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bdry);
+
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -221,7 +222,7 @@ void level_exchange(fclaw2d_domain_t *domain, int level)
     filltype.is_fine = f;
     filltype.time_interp = f;
 
-    fclaw2d_domain_iterate_level(domain, level, cb_level_corner_exchange,
+    fclaw2d_domain_iterate_level(domain, level, cb_corner_fill,
                                  (void *) &filltype);
 
 }

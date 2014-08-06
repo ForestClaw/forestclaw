@@ -724,14 +724,14 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.copy = fclaw_false;
     e_info.interpolate = fclaw_false;
 
-    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_average,
+    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_fill,
                                  (void *) &e_info);
 
 
     /* Second pass : Average over finer grids in sf curve */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
-    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_average,
+    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_fill,
                                  (void *) &e_info);
 
     /* -----------------------------------------------------------
@@ -766,7 +766,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.copy = fclaw_false;
     e_info.interpolate = fclaw_true;
 
-    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_interpolate,
+    fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_fill,
                                  (void *) &e_info);
 
     /* Second pass : Iterate over fine grids on this processor that have
@@ -775,7 +775,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     */
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
-    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_interpolate,
+    fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_fill,
                                  (void *) &e_info);
 
 }

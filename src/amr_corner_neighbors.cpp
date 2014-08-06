@@ -77,24 +77,19 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-
-    printf("Not calling this routine\n");
-    exit(0);
-
-
-    fclaw2d_exchange_info_t &filltype = *((fclaw2d_exchange_info_t*) user);
-    fclaw_bool time_interp = filltype.time_interp;
-    fclaw_bool is_coarse = filltype.is_coarse;
-    fclaw_bool is_fine = filltype.is_fine;
+    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
+    fclaw_bool time_interp = filltype->time_interp;
+    fclaw_bool is_coarse = filltype->is_coarse;
+    fclaw_bool is_fine = filltype->is_fine;
 
     fclaw_bool intersects_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
-    int block_iface;   /* in case corner is on a block face */
     fclaw_bool is_block_corner;
     fclaw_bool is_interior_corner;
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bdry);
+
     get_block_boundary(domain,this_block_idx,this_patch_idx,
                        intersects_block);
 
@@ -109,7 +104,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
     int refratio = gparms->refratio;
 
-    ClawPatch *this_cp = get_clawpatch(this_patch);
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         get_corner_type(domain,icorner,
@@ -117,13 +111,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         intersects_block,
                         &is_interior_corner,
                         &is_block_corner,
-                        &block_iface);
-
+                        &transform_data.iface);
 
         if (is_interior_corner)  /* Interior to the domain, not necessarily to a block */
         {
-            transform_data.iface = block_iface; /* = -1 if corner is not on block face */
-
             int corner_block_idx;
             int relative_refinement_level;
             int *ref_flag_ptr = &relative_refinement_level;
@@ -146,10 +137,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 /* no corner neighbor; relative_refinement_level is not set
                    This can happen in the cubed sphere case, or if icorner is
                    a hanging node */
-                return;
+                continue;
             }
 
-            if (filltype.copy)
+            if (filltype->copy)
             {
                 if (relative_refinement_level == 0)
                 {
@@ -176,12 +167,13 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }
-            else if (filltype.average)
+            else if (filltype->average)
             {
                 if (relative_refinement_level == 1 && is_coarse)
                 {
                     /* Corner neighbor at a finer level, and so we need to average
                        that corner onto the coarser corner ghost cells */
+                    ClawPatch *this_cp = get_clawpatch(this_patch);
                     ClawPatch *corner_cp = get_clawpatch(ghost_patch);
                     transform_data.neighbor_patch = ghost_patch;
 
@@ -210,10 +202,11 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
                 }
             }
-            else if (filltype.interpolate)
+            else if (filltype->interpolate)
             {
                 if (relative_refinement_level == 1 && is_coarse)
                 {
+                    ClawPatch *this_cp = get_clawpatch(this_patch);
                     ClawPatch *corner_cp = get_clawpatch(ghost_patch);
                     transform_data.neighbor_patch = ghost_patch;
                     if (!is_block_corner)
