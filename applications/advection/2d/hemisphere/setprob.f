@@ -12,9 +12,6 @@
 
       pi = 4.d0*atan(1.d0)
 
-      call set_maptype_hemisphere()
-
-
 c     # read in data to see whether we should run with fixed rotation or not.
       open(7,file='setprob.data')
       read(7,*) kappa
