@@ -89,12 +89,9 @@ main (int argc, char **argv)
   query_results[5] = 0;
   query_results[6] = 0;
 
-  switch (example) {
-  case 1:
-      set_maptype_pillowsphere_();
-      conn = p4est_connectivity_new_pillow();
-      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
-      break;
+
+  /*
+    // Save disk for another example.
   case 2:
       if (!(0. < cubed_R2 && cubed_R2 < cubed_R1)) {
           sc_abort_collective
@@ -103,20 +100,28 @@ main (int argc, char **argv)
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_disk (cubed_R1, cubed_R2);
       break;
-  case 3:
+  */
+
+  switch (example) {
+  case 1:
+      set_maptype_pillowsphere_();
+      conn = p4est_connectivity_new_pillow();
+      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
+      break;
+  case 2:
       if (!(0. < cubed_R1)) {
         sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
       }
       conn = p4est_connectivity_new_cubed ();
       cont = fclaw2d_map_new_csphere (cubed_R1);
       break;
-  case 4:
+  case 3:
       set_maptype_cubedsphere_();
       conn = p4est_connectivity_new_cubed();
       cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
       break;
     default:
-      sc_abort_collective ("Parameter example must be either 2 or 3");
+      sc_abort_collective ("Parameter example must be 1, 3 or 4");
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
