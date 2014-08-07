@@ -30,8 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+#include <fclaw2d_map_query.h>
 
 #include "cubed_sphere_user.H"
+
 
 int
 main (int argc, char **argv)
@@ -56,7 +58,10 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "2 for disk, 3 for sphere");
+                      "1 for pillow grid, "\
+                      "2 for cubed sphere (C version), " \
+                      "3 for cubed sphere  (fortran version)");
+
   sc_options_add_double (options, 0, "cubed_R1", &cubed_R1, -1.,
                          "outer radius of cubed disk and cubed sphere");
   sc_options_add_double (options, 0, "cubed_R2", &cubed_R2, -1.,
@@ -79,36 +84,31 @@ main (int argc, char **argv)
      Domain geometry
      --------------------------------------------------------------- */
 
-  // Queries for sphere grids.
+  // Queries for pillow grid
   int query_results[FCLAW2D_MAP_QUERY_LAST];
-  query_results[0] = 1;
-  query_results[1] = 0;
-  query_results[2] = 0;
-  query_results[3] = 1;
-  query_results[4] = 0;
-  query_results[5] = 0;
-  query_results[6] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_USED] = 1;
+  query_results[FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_AFFINE] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_NONLINEAR] = 1;
+  query_results[FCLAW2D_MAP_QUERY_IS_GRAPH] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_PLANAR] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_ALIGNED] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_FLAT] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
+  query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
+  query_results[FCLAW2D_MAP_QUERY_IS_CART] = 0;   // IS_CUBEDSPHERE
 
-
-  /*
-    // Save disk for another example.
-  case 2:
-      if (!(0. < cubed_R2 && cubed_R2 < cubed_R1)) {
-          sc_abort_collective
-          ("Parameters 0 < cubed_R2 < cubed_R1 required for cubed disk");
-      }
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_disk (cubed_R1, cubed_R2);
-      break;
-  */
 
   switch (example) {
   case 1:
-      set_maptype_pillowsphere_();
+      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 1;    // IS_PILLOWDISK
+      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 0;    // IS_PILLOWSPHERE
       conn = p4est_connectivity_new_pillow();
       cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
       break;
   case 2:
+      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
+      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
       if (!(0. < cubed_R1)) {
         sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
       }
@@ -116,7 +116,8 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_csphere (cubed_R1);
       break;
   case 3:
-      set_maptype_cubedsphere_();
+      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
+      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
       conn = p4est_connectivity_new_cubed();
       cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
       break;
