@@ -56,20 +56,32 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
 /* ------------------------------------------------------------------------ */
 /* This is here for now;  may be taken out once I figure out Carsten's
    'mapping context' idea */
+/*
 void set_maptype_cart_();
 void set_maptype_pillowsphere_();
 void set_maptype_hemisphere_();
 void set_maptype_disk_();
 void set_maptype_cubedsphere_();
 void set_map_defaults_();
+*/
 
-int isflat_();
-int iscart_();
-int isdisk_();
-int ishemisphere_();
-int issphere_();
-int ispillowsphere_();
-int iscubedsphere_();
+
+#define ISPILLOWSPHERE FCLAW_F77_FUNC_(ispillowsphere,ISPILLOWSPHERE)
+int ISPILLOWSPHERE();
+
+#define IS_CUBEDSPHERE FCLAW_F77_FUNC_(iscubedsphere,ISCUBEDSPHERE)
+int ISCUBEDSPHERE();
+
+#define ISPILLOWDISK FCLAW_F77_FUNC_(ispillowdisk,ISPILLOWDISK)
+int ISPILLOWDISK();
+
+#define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
+int ISFLAT();
+
+#define ISSPHERE FCLAW_F77_FUNC_(issphere,ISSPHERE)
+int ISSPHERE();
+
+
 /* ------------------------------------------------------------------------ */
 
 void set_block_(const int * a_blockno);
