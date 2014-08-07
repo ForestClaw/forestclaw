@@ -43,28 +43,28 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
                                            double *zp);
 
 /* These integers are meant to be passed in query_identifier of map_query_t.
- * One of these four types is generally chosen.
- * 1 maps into R^2, 2 and 3 map into R^2 or R^3.
  */
-#define FCLAW2D_MAP_QUERY_IS_USED         0     /* is the map used at all? */
-#define FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT  1     /* x_i -> a_i x_i + b_i */
-#define FCLAW2D_MAP_QUERY_IS_AFFINE       2     /* x -> A x + b */
-#define FCLAW2D_MAP_QUERY_IS_NONLINEAR    3     /* x -> F(x) */
+#define FCLAW2D_MAP_QUERY_IS_USED           0     /* is the map used at all? */
+#define FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT    1     /* x_i -> a_i x_i + b_i */
+#define FCLAW2D_MAP_QUERY_IS_AFFINE         2     /* x -> A x + b */
+#define FCLAW2D_MAP_QUERY_IS_NONLINEAR      3     /* x -> F(x) */
 
 /* Query additional properties of mappings.
  * These properties can be used to implement shortcuts in the numerical code.
  */
-#define FCLAW2D_MAP_QUERY_IS_GRAPH        4     /* (x,y) -> (x,y,f(x,y)) */
-#define FCLAW2D_MAP_QUERY_IS_PLANAR       5     /* (x,y) -> (?,?,0) */
-#define FCLAW2D_MAP_QUERY_IS_ALIGNED      6     /* (x,y) -> (f(x),g(y),0) */
-#define FCLAW2D_MAP_QUERY_IS_FLAT         7     /* Zero curvature */
+#define FCLAW2D_MAP_QUERY_IS_CART           4     /* Cartesian grid */
+#define FCLAW2D_MAP_QUERY_IS_GRAPH          5     /* (x,y) -> (x,y,f(x,y)) */
+#define FCLAW2D_MAP_QUERY_IS_PLANAR         6     /* (x,y) -> (?,?,0) */
+#define FCLAW2D_MAP_QUERY_IS_ALIGNED        7     /* (x,y) -> (f(x),g(y),0) */
+#define FCLAW2D_MAP_QUERY_IS_FLAT           8     /* Zero curvature */
+#define FCLAW2D_MAP_QUERY_IS_PILLOWDISK     9     /* Pillow disk */
+#define FCLAW2D_MAP_QUERY_IS_SQUAREDDISK   10     /* Pillow disk */
+#define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  11     /* Pillow sphere */
+#define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   12     /* Cubed sphere */
+#define FCLAW2D_MAP_QUERY_LAST             13     /* # of "official" queries. */
 
-#if 0
-/* How would flat be defined exactly? */
-/* Has phyical boundaries: should not be relevant to mappings */
-#endif
+#define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
 
-#define FCLAW2D_MAP_QUERY_LAST            8     /* #"official" queries. */
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 
@@ -107,15 +107,17 @@ struct fclaw2d_map_context
     void *user_data;
 };
 
-#define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
 
 /** Query function for the mapping that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] query_identifier Is passed to the map_query_t function.
  * \param [out] iresult         On return contains result of query.
  */
+
+
 void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
                         const int *query_identifier, int *iresult);
+
 
 #define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
 
