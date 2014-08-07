@@ -12,8 +12,8 @@ c     # ------------------------------------------------------------------
       double precision x1,y1,xp,yp,zp
       double precision xc,yc
 
-      xc = x1
-      yc = y1
+      xc = 2*x1 - 1
+      yc = 2*y1 - 1
 
 c     # Get circle of radius sqrt(2.d0)
       call mapc2p_circle(xc,yc,xp,yp)
