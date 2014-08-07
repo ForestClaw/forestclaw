@@ -62,6 +62,7 @@ struct exchange_info
 };
 #endif
 
+#if 0
 static
 void cb_corner_average(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -232,7 +233,9 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         }
     }
 }
+#endif
 
+#if 0
 static
 void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -391,6 +394,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         }
     }
 }
+#endif
 
 // -----------------------------------------------------------------
 // Multi-level ghost cell operations

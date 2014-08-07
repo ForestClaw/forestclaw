@@ -112,6 +112,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
     } /* loop over all faces */
 }
 
+#if 0
 static
 void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
@@ -195,6 +196,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
         }
     }
 }
+#endif
 
 
 /* -------------------------------------------------------------------

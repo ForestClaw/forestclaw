@@ -367,7 +367,7 @@ void ClawPatch::unpack_griddata_time_interpolated(double *q)
 
 
 /* ----------------------------------------------------------------
-   Single level exchanges
+   Exchange/average/interpolate
    ---------------------------------------------------------------- */
 
 void ClawPatch::exchange_face_ghost(const int& a_iface,
@@ -391,55 +391,6 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                            &transform_data);
 
 }
-
-void ClawPatch::mb_exchange_corner_ghost(const int& a_corner, fclaw_bool a_intersects_block[],
-                                         ClawPatch *cp_corner, const fclaw_bool& a_is_block_corner)
-{
-    double *qthis = m_griddata.dataPtr();
-    double *qcorner = cp_corner->m_griddata.dataPtr();
-
-
-    mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
-                                    a_corner, m_blockno);
-
-}
-
-
-
-void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                                      const double& t, const double& dt)
-{
-    double *q = m_griddata.dataPtr();
-
-    /* This routine doesn't do anything ... */
-    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
-}
-
-void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side,
-                                                ClawPatch* cp)
-{
-    double *this_q = m_griddata.dataPtr();
-    double *neighbor_q = cp->m_griddata.dataPtr();
-
-    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q,
-                                a_corner, a_side);
-}
-
-void ClawPatch::setup_for_time_interpolation(const double& alpha)
-{
-    /* Store time interpolated data that will be use in coarse grid
-       exchanges */
-    double *qlast = m_griddata_last.dataPtr();
-    double *qcurr = m_griddata.dataPtr();
-    double *qinterp = m_griddata_time_interpolated.dataPtr();
-    int size = m_griddata_time_interpolated.size();
-
-    for(int i = 0; i < size; i++)
-    {
-        qinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
-    }
-}
-
 
 /* ----------------------------------------------------------------
    Multi-level operations
@@ -511,44 +462,6 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
 }
 
 
-// internal corners only a block boundaries.
-void ClawPatch::mb_average_corner_ghost(const int& a_coarse_corner,
-                                        const int& a_refratio,
-                                        ClawPatch *cp_corner, fclaw_bool a_time_interp,
-                                        fclaw_bool is_block_corner,
-                                        fclaw_bool intersects_block[])
-{
-    // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    double *qcoarse = q_time_sync(a_time_interp);
-
-
-    double *areacoarse = this->m_area.dataPtr();
-    double *areafine = cp_corner->m_area.dataPtr();
-    double *qfine = cp_corner->m_griddata.dataPtr();
-
-    mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
-                                   a_refratio,qcoarse,qfine,
-                                   areacoarse,areafine,
-                                   a_coarse_corner,m_blockno);
-}
-
-
-void ClawPatch::mb_interpolate_corner_ghost(const int& a_coarse_corner,
-                                            const int& a_refratio,
-                                            ClawPatch *cp_corner,
-                                            fclaw_bool a_time_interp, fclaw_bool is_block_corner,
-                                            fclaw_bool intersects_block[])
-
-{
-    double *qcoarse = q_time_sync(a_time_interp);
-
-    /* qcorner is the finer level. */
-    double *qfine = cp_corner->m_griddata.dataPtr();
-
-    mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                                       a_refratio, qcoarse, qfine,
-                                       a_coarse_corner, m_blockno);
-}
 
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
                                          const int& a_refratio,
@@ -568,11 +481,101 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
 }
 
 
-// ----------------------------------------------------------------
-// Tagging, refining and coarsening
-// ----------------------------------------------------------------
+/* ----------------------------------------------------------------
+   Special case : Pillow grid ghost exchanges/average/interpolate
+   ---------------------------------------------------------------- */
+
+void ClawPatch::mb_exchange_block_corner_ghost(const int& a_corner,
+                                               ClawPatch *cp_corner)
+{
+    double *qthis = m_griddata.dataPtr();
+    double *qcorner = cp_corner->m_griddata.dataPtr();
 
 
+    mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
+                                    a_corner, m_blockno);
+
+}
+
+// internal corners only a block boundaries.
+void ClawPatch::mb_average_block_corner_ghost(const int& a_coarse_corner,
+                                              const int& a_refratio,
+                                              ClawPatch *cp_corner,
+                                              fclaw_bool a_time_interp)
+{
+    // 'this' is the finer grid; 'cp_corner' is the coarser grid.
+    double *qcoarse = q_time_sync(a_time_interp);
+
+
+    double *areacoarse = this->m_area.dataPtr();
+    double *areafine = cp_corner->m_area.dataPtr();
+    double *qfine = cp_corner->m_griddata.dataPtr();
+
+    mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
+                                   a_refratio,qcoarse,qfine,
+                                   areacoarse,areafine,
+                                   a_coarse_corner,m_blockno);
+}
+
+
+void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
+                                                  const int& a_refratio,
+                                                  ClawPatch *cp_corner,
+                                                  fclaw_bool a_time_interp)
+
+{
+    double *qcoarse = q_time_sync(a_time_interp);
+
+    /* qcorner is the finer level. */
+    double *qfine = cp_corner->m_griddata.dataPtr();
+
+    mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
+                                       a_refratio, qcoarse, qfine,
+                                       a_coarse_corner, m_blockno);
+}
+
+
+
+/* ----------------------------------------------------------------
+   Phyisical boundary conditions
+   ---------------------------------------------------------------- */
+
+void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
+                                      const double& t, const double& dt)
+{
+    double *q = m_griddata.dataPtr();
+
+    /* This routine doesn't do anything ... */
+    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
+}
+
+void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side,
+                                                ClawPatch* cp)
+{
+    double *this_q = m_griddata.dataPtr();
+    double *neighbor_q = cp->m_griddata.dataPtr();
+
+    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q,
+                                a_corner, a_side);
+}
+
+/* ----------------------------------------------------------------
+   Time interpolation
+   ---------------------------------------------------------------- */
+void ClawPatch::setup_for_time_interpolation(const double& alpha)
+{
+    /* Store time interpolated data that will be use in coarse grid
+       exchanges */
+    double *qlast = m_griddata_last.dataPtr();
+    double *qcurr = m_griddata.dataPtr();
+    double *qinterp = m_griddata_time_interpolated.dataPtr();
+    int size = m_griddata_time_interpolated.size();
+
+    for(int i = 0; i < size; i++)
+    {
+        qinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
+    }
+}
 
 
 /* ----------------------------------------------------------------

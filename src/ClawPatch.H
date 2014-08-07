@@ -62,18 +62,12 @@ public :
     double* q_time_interp();
     FArrayBox newGrid();
 
-    // ----------------------------------------------------------------
-    // Internal boundary conditions
-    // ----------------------------------------------------------------
+    /* ----------------------------------------------------------------
+       Internal boundary conditions
+       ---------------------------------------------------------------- */
     void exchange_face_ghost(const int& a_iface,
                              ClawPatch *a_neighbor_cp,
                              fclaw2d_transform_data_t* transform_data);
-
-    void mb_exchange_face_ghost(const int& a_iface,ClawPatch *a_neighbor_cp);
-
-    void mb_exchange_corner_ghost(const int& a_icorner, fclaw_bool a_intersects_block[],
-                                  ClawPatch *a_neighbor_cp,
-                                  const fclaw_bool& a_is_block_corner);
 
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
@@ -106,20 +100,24 @@ public :
                               fclaw_bool a_time_interp,
                               fclaw2d_transform_data_t* transform_cptr);
 
-    void mb_average_corner_ghost(const int& a_corner, const int& a_refratio,
-                                 ClawPatch *cp_fine,
-                                 fclaw_bool a_time_interp, fclaw_bool is_corner_block,
-                                 fclaw_bool intersects_block[]);
-
     void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                   ClawPatch *cp_fine,
                                   fclaw_bool a_time_interp,
                                   fclaw2d_transform_data_t* transform_cptr);
 
-    void mb_interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
-                                     ClawPatch *cp_fine,
-                                     fclaw_bool a_time_interp, fclaw_bool is_block_corner,
-                                     fclaw_bool intersects_block[]);
+    /* ----------------------------------------------------------------
+       Pillow grid ghost exchanges
+       ---------------------------------------------------------------- */
+    void mb_exchange_block_corner_ghost(const int& a_icorner,
+                                        ClawPatch *a_neighbor_cp);
+
+    void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
+                                       ClawPatch *cp_fine,
+                                       fclaw_bool a_time_interp);
+
+    void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
+                                           ClawPatch *cp_fine,
+                                           fclaw_bool a_time_interp);
 
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
