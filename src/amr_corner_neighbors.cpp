@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
+#include "fclaw2d_map_query.h"
 
 void
 get_corner_type(fclaw2d_domain_t* domain,
