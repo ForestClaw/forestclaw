@@ -14,7 +14,8 @@ libforestclaw_installed_headers = \
 	src/clawpack_fort.H \
 	src/fclaw2d_transform.h \
 	src/fortran_source2d/metric_terms.i \
-	src/mappings/fclaw2d_map_query.h
+	src/fclaw2d_map_query.h \
+	src/fclaw2d_map_query_defs.h
 
 libforestclaw_internal_headers = \
 	src/fortran_source2d/debug.i
@@ -32,12 +33,12 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
+	src/fclaw2d_map_query.c \
 	src/mappings/block.f \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/cart/mapc2m_cart.f \
 	src/mappings/disk/mapc2m_disk.f \
-	src/mappings/fclaw2d_map_query.c \
 	src/mappings/map_query.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
@@ -80,7 +81,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fdisc.f
 
 # this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/mappings
+FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d
 FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la
