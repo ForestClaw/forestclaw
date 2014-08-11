@@ -50,21 +50,8 @@ void set_common_levels_(const int& maxlevel,const int& a_level,
                         const int& refratio);
 
 /* ----------------------------------------------------------------------------------
-   Initialization routines
+   Mapping routines
    ---------------------------------------------------------------------------------- */
-
-/* ------------------------------------------------------------------------ */
-/* This is here for now;  may be taken out once I figure out Carsten's
-   'mapping context' idea */
-/*
-void set_maptype_cart_();
-void set_maptype_pillowsphere_();
-void set_maptype_hemisphere_();
-void set_maptype_disk_();
-void set_maptype_cubedsphere_();
-void set_map_defaults_();
-*/
-
 
 #define ISPILLOWSPHERE FCLAW_F77_FUNC_(ispillowsphere,ISPILLOWSPHERE)
 int ISPILLOWSPHERE();
@@ -81,16 +68,18 @@ int ISFLAT();
 #define ISSPHERE FCLAW_F77_FUNC_(issphere,ISSPHERE)
 int ISSPHERE();
 
+#define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
+void SET_BLOCK(const int * a_blockno);
 
-/* ------------------------------------------------------------------------ */
-
-void set_block_(const int * a_blockno);
-void set_context_(fclaw2d_map_context_t** a_context);
+#define SET_CONTEXT FCLAW_F77_FUNC (set_context,SET_CONTEXT)
+void SET_CONTEXT (fclaw2d_map_context_t** a_context);
 
 
 void fclaw2d_mapc2m_(fclaw2d_map_context_t** cont, int *blockno,
                      const double *xc, const double *yc,
                      double *xp, double *yp, double *zp);
+
+/* ------------------------------------------------------------------------ */
 
 
 void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
