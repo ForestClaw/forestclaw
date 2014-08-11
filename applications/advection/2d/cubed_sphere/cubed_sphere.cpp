@@ -102,7 +102,7 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_csphere (cubed_R1);
       break;
   case 3:
-      conn = p4est_connectivity_new_cubed();x
+      conn = p4est_connectivity_new_cubed();
       cont = fclaw2d_map_new_cubedsphere();
       break;
     default:
