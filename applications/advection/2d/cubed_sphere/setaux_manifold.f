@@ -100,7 +100,7 @@ c           # x-faces
 
             call get_vel_psi(xd1,xd2,dy,vn,t)
             if (ispillowsphere()) then
-               if (blockno == 1) then
+               if (blockno .eq. 1) then
                   vn = -vn
                endif
             endif
@@ -121,7 +121,7 @@ c           # y-faces
 
             call get_vel_psi(xd1,xd2,dx,vn,t)
             if (ispillowsphere()) then
-               if (blockno == 1) then
+               if (blockno .eq. 1) then
                   vn = -vn
                endif
             endif
