@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_MAP_H
 
 #include <fclaw_base.h>
+#include <fclaw2d_map_query_defs.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,27 +42,6 @@ extern "C"
 typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
                                            double *xp, double *yp,
                                            double *zp);
-
-/* These integers are meant to be passed in query_identifier of map_query_t.
- */
-#define FCLAW2D_MAP_QUERY_IS_USED           0     /* is the map used at all? */
-#define FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT    1     /* x_i -> a_i x_i + b_i */
-#define FCLAW2D_MAP_QUERY_IS_AFFINE         2     /* x -> A x + b */
-#define FCLAW2D_MAP_QUERY_IS_NONLINEAR      3     /* x -> F(x) */
-
-/* Query additional properties of mappings.
- * These properties can be used to implement shortcuts in the numerical code.
- */
-#define FCLAW2D_MAP_QUERY_IS_CART           4     /* Cartesian grid */
-#define FCLAW2D_MAP_QUERY_IS_GRAPH          5     /* (x,y) -> (x,y,f(x,y)) */
-#define FCLAW2D_MAP_QUERY_IS_PLANAR         6     /* (x,y) -> (?,?,0) */
-#define FCLAW2D_MAP_QUERY_IS_ALIGNED        7     /* (x,y) -> (f(x),g(y),0) */
-#define FCLAW2D_MAP_QUERY_IS_FLAT           8     /* Zero curvature */
-#define FCLAW2D_MAP_QUERY_IS_PILLOWDISK     9     /* Pillow disk */
-#define FCLAW2D_MAP_QUERY_IS_SQUAREDDISK   10     /* Pillow disk */
-#define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  11     /* Pillow sphere */
-#define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   12     /* Cubed sphere */
-#define FCLAW2D_MAP_QUERY_LAST             13     /* # of "official" queries. */
 
 #define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
 

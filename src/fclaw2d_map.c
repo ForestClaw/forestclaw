@@ -81,6 +81,13 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_ALIGNED:
         return 0;
+    default:
+        printf("\n");
+        printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not " \
+               "identified;  Maybe the query is not up to date?\nSee "  \
+               "fclaw2d_map_query.h.\n");
+        printf("Requested query id : %d\n",query_identifier);
+        SC_ABORT_NOT_REACHED ();
     }
     return 0;
 }
@@ -138,9 +145,31 @@ fclaw2d_map_query_csphere (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_ALIGNED:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_FLAT:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_DISK:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_SPHERE:
+        return 1;
+    case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
+        return 1;
+    default:
+        printf("\n");
+        printf("fclaw2d_map_query_csphere (fclaw2d_map.c) : Query id not "\
+               "identified;  Maybe the query is not up to date?\nSee "  \
+               "fclaw2d_map_query.h.\n");
+        printf("Requested query id : %d\n",query_identifier);
+        SC_ABORT_NOT_REACHED ();
     }
     return 0;
 }
+
 
 static inline void
 fclaw2d_map_c2m_csphere_help (double R, double xi, double eta,
@@ -232,6 +261,13 @@ fclaw2d_map_query_disk (fclaw2d_map_context_t * cont, int query_identifier)
         return 1;
     case FCLAW2D_MAP_QUERY_IS_ALIGNED:
         return 0;
+    default:
+        printf("\n");
+        printf("fclaw2d_map_query_disk (fclaw2d_map.c) : Query id not " \
+               "identified;  Maybe the query is not up to date?\nSee "  \
+               "fclaw2d_map_query.h.\n");
+        printf("Requested query id : %d\n",query_identifier);
+        SC_ABORT_NOT_REACHED ();
     }
     return 0;
 }
