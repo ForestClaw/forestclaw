@@ -34,6 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cubed_sphere_user.H"
 
+extern "C" {
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere ();
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere ();
+}
+
 
 int
 main (int argc, char **argv)
@@ -84,31 +89,12 @@ main (int argc, char **argv)
      Domain geometry
      --------------------------------------------------------------- */
 
-  // Queries for pillow grid
-  int query_results[FCLAW2D_MAP_QUERY_LAST];
-  query_results[FCLAW2D_MAP_QUERY_IS_USED] = 1;
-  query_results[FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_AFFINE] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_NONLINEAR] = 1;
-  query_results[FCLAW2D_MAP_QUERY_IS_GRAPH] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_PLANAR] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_ALIGNED] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_FLAT] = 0;
-  query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
-  query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
-  query_results[FCLAW2D_MAP_QUERY_IS_CART] = 0;   // IS_CUBEDSPHERE
-
-
   switch (example) {
   case 1:
-      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 1;    // IS_PILLOWDISK
-      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 0;    // IS_PILLOWSPHERE
       conn = p4est_connectivity_new_pillow();
-      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
+      cont = fclaw2d_map_new_pillowsphere();
       break;
   case 2:
-      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
-      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
       if (!(0. < cubed_R1)) {
         sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
       }
@@ -116,16 +102,40 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_csphere (cubed_R1);
       break;
   case 3:
-      query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;    // IS_PILLOWDISK
-      query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 1;    // IS_PILLOWSPHERE
-      conn = p4est_connectivity_new_cubed();
-      cont = fclaw2d_map_new_fortran(mapc2m_,query_results);
+      conn = p4est_connectivity_new_cubed();x
+      cont = fclaw2d_map_new_cubedsphere();
       break;
     default:
-      sc_abort_collective ("Parameter example must be 1, 3 or 4");
+      sc_abort_collective ("Parameter example must be 1, 2 or 3");
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     Set mapping context for Fortran.  The context will now be
+     available via get_context(), as a integer*8.  This argument
+     will show up as a (fclaw2d_map_context_t**) in C/C++.
+     From Fortran, use
+
+     c      # From fortran :
+            integer*8 cont
+            integer blockno
+
+     c      # .......
+
+            cont = get_context()
+            blockno = get_block()
+
+     c      # Call the mapping function
+            call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+
+     c      # .......
+
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure.
+     ---------------------------------------------------------- */
+    set_context_(&cont);
 
   /* ---------------------------------------------------------------
      Print some diagnostics.  TODO: Should this really be in main()?
