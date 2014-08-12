@@ -30,9 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern "C"
 {
-    void mapc2m_cubedsphere_(const double *xc, const double *yc,
-                             double *xp, double *yp, double *zp);
-
     void mapc2m_(const double *xc, const double *yc,
                  double *xp, double *yp, double *zp);
 
