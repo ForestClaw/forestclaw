@@ -96,35 +96,83 @@ c     # Rotates map so as to not bias the solution.
       r1(2,1) = -r1(1,2)
       r1(2,2) = r1(1,1)
 
-      if (isflat()) then
-c        # rotate in one direction only
-         do i = 1,3
-            do j = 1,3
-               rrot(i,j) = r1(i,j)
+c     # rotate in second direction (for full 3d map)
+      do i = 1,3
+         do j = 1,3
+            r2(i,j) = 0
+         enddo
+         r2(i,i) = 1
+      enddo
+      phi = rot_angle(2)
+      r2(1,1) = cos(phi)
+      r2(1,2) = -sin(phi)
+      r2(2,1) = -r2(1,2)
+      r2(2,2) = r2(1,1)
+      do i = 1,3
+         do j = 1,3
+            rrot(i,j) = 0
+            do k = 1,3
+               rrot(i,j) = rrot(i,j) + r2(i,k)*r1(k,j)
             enddo
          enddo
-      else
-c        # rotate in second direction
+      enddo
+
+c     call set_rotation(rrot)
+
+      do j = 1,3
          do i = 1,3
-            do j = 1,3
-               r2(i,j) = 0
-            enddo
-            r2(i,i) = 1
+            rrot_com(i,j) = rrot(i,j)
          enddo
-         phi = rot_angle(2)
-         r2(1,1) = cos(phi)
-         r2(1,3) = -sin(phi)
-         r2(3,1) = -r2(1,3)
-         r2(3,3) = r2(1,1)
-         do i = 1,3
-            do j = 1,3
-               rrot(i,j) = 0
-               do k = 1,3
-                  rrot(i,j) = rrot(i,j) + r2(i,k)*r1(k,j)
-               enddo
-            enddo
+      enddo
+
+c      Writing a file like this is problematic in parallel.
+c      Only one rank should write this file.
+c
+c      open(10,file='rrot.dat')
+c      do i = 1,3
+c         write(10,100) (rrot(i,j),j=1,3)
+c      enddo
+c      close(10)
+c  100 format(3F24.16)
+
+      end
+
+
+      subroutine set_rotation_flat(rot_angle)
+      implicit none
+
+      double precision rot_angle(2), scale
+
+      double precision rrot(3,3), r1(3,3), r2(3,3)
+
+      double precision th, phi
+      integer i,j,k
+
+      logical isflat
+
+      double precision rrot_com(3,3)
+      common /comrot/ rrot_com
+
+c     # Rotates map so as to not bias the solution.
+      do i = 1,3
+         do j = 1,3
+            r1(i,j) = 0
          enddo
-      endif
+         r1(i,i) = 1
+      enddo
+
+      th = rot_angle(1)
+      r1(1,1) = cos(th)
+      r1(1,2) = -sin(th)
+      r1(2,1) = -r1(1,2)
+      r1(2,2) = r1(1,1)
+
+c     # rotate in one direction only
+      do i = 1,3
+         do j = 1,3
+            rrot(i,j) = r1(i,j)
+         enddo
+      enddo
 
 c      call set_rotation(rrot)
 
@@ -145,6 +193,7 @@ c      close(10)
 c  100 format(3F24.16)
 
       end
+
 
       subroutine get_rotation(rrot)
       implicit none

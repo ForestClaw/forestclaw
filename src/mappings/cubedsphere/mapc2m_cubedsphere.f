@@ -34,7 +34,7 @@
 
       common /compi/ pi
 
-      R = 1
+      R = 1.d0
       tan_xi = tan(0.5d0*pi*(xc-0.5d0))
       tan_eta = tan(0.5*pi*(yc-0.5d0))
       zp = R/sqrt(tan_xi**2 + tan_eta**2 + 1)

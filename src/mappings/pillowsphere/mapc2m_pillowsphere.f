@@ -1,5 +1,5 @@
 c     # ------------------------------------------------------------------
-c     # MAPC2M_SPHERE
+c     # MAPC2M_PILLOWSPHERE
 c     # ------------------------------------------------------------------
 c     #
 c     # Maps a logically rectangular Cartesian grid in [-1,1]x[-1,1] to
@@ -17,27 +17,10 @@ c     # ------------------------------------------------------------------
       integer blockno, get_block
       logical l1, l2
 
-c     # If 'multiblock == .true.', then this map is applied in a multiblock
-c     # setting where each mesh is assumed to be n [-1,1]x[-1,1], and an
-c     # independent function is used to return the current block number
-c     # If used in the non-multiblock case, it is assumed that all data comes
-c     # from the domain [-3,1]x[-1,1].
-      data multiblock /.true./
+      xc = 2*xc1 - 1
+      yc = 2*yc1 - 1
 
-      xc = xc1
-      yc = yc1
-
-c     # Translate and flip [-3,-1]x[-1,1] into [1,-1]x[-1,1]
-      if (.not. multiblock) then
-         if (xc .lt. -1) then
-            blockno = 1
-            xc = -(xc+2)
-         else
-            blockno = 0
-         endif
-      else
-         blockno = get_block()
-      endif
+      blockno = get_block()
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)
@@ -45,7 +28,6 @@ c     # Map xc and yc from ghost cells to interior
 
       d = max(yc - 1,0.d0) + max(-1 - yc,0.d0)
       y1 = ((1-d)/(1+d))*yc
-
 
 c     # Get circle of radius sqrt(2.d0).  Cluster radial
 c     # direction towards boundary
@@ -68,7 +50,6 @@ c     # Fortran standard.  Use .neqv. instead.
       if (l1 .neqv. l2) then
          zp = -zp
       endif
-
 
 c     # This maps everything to the unit sphere
       xp = xp/sqrt(2.d0)
