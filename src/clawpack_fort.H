@@ -49,35 +49,6 @@ extern "C"
 void set_common_levels_(const int& maxlevel,const int& a_level,
                         const int& refratio);
 
-/* ----------------------------------------------------------------------------------
-   Mapping routines
-   ---------------------------------------------------------------------------------- */
-
-#define ISPILLOWSPHERE FCLAW_F77_FUNC_(ispillowsphere,ISPILLOWSPHERE)
-int ISPILLOWSPHERE();
-
-#define IS_CUBEDSPHERE FCLAW_F77_FUNC_(iscubedsphere,ISCUBEDSPHERE)
-int ISCUBEDSPHERE();
-
-#define ISPILLOWDISK FCLAW_F77_FUNC_(ispillowdisk,ISPILLOWDISK)
-int ISPILLOWDISK();
-
-#define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
-int ISFLAT();
-
-#define ISSPHERE FCLAW_F77_FUNC_(issphere,ISSPHERE)
-int ISSPHERE();
-
-#define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
-void SET_BLOCK(const int * a_blockno);
-
-#define SET_CONTEXT FCLAW_F77_FUNC (set_context,SET_CONTEXT)
-void SET_CONTEXT (fclaw2d_map_context_t** a_context);
-
-
-void fclaw2d_mapc2m_(fclaw2d_map_context_t** cont, int *blockno,
-                     const double *xc, const double *yc,
-                     double *xp, double *yp, double *zp);
 
 /* ------------------------------------------------------------------------ */
 

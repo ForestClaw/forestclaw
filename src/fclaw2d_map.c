@@ -25,9 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_map.h>
 
-/* This prototype is declared in src/clawpack_fort.H.  Clean up later. */
-void set_block_ (const int *a_blockno);
-
 /* This function can be called from Fortran inside of ClawPatch. */
 void
 FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,

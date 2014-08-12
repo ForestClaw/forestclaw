@@ -37,6 +37,9 @@ extern "C"
 #endif
 #endif
 
+
+
+
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
 typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
@@ -122,6 +125,12 @@ void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
  */
 void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
 
+
+/* ----------------------------------------------------------------------------------
+   New maps (torus, cubedsphere, disk) and a utility function for calling maps
+   defined in fortran.
+   ---------------------------------------------------------------------------------- */
+
 /** Create a torus mapping for one block with [0, 1]^2 (for now).
  * \param [in] R1       Large radius of the torus.
  * \param [in] R2       Small radius of the torus.
@@ -143,6 +152,25 @@ fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
  */
 fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
 
+
+/** Create a rotated, scaled cubed sphere. Uses same cubed sphere map as above.
+ * It is composed of a center square and one deformed patch on either side.
+ * \param [in] rotate   (theta,phi) rotation angles
+ * \param [in] scale    Scale the unit cube (e.g. set the radius)
+ * \return              Mapping context.
+ */
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (double rotate[], double scale);
+
+
+/** Create a rotated, scaled pillow sphere.
+ * It is composed of a center square and one deformed patch on either side.
+ * \param [in] rotate   (theta,phi) rotation angles
+ * \param [in] scale    Scale the unit cube (e.g. set the radius)
+ * \return              Mapping context.
+ */
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (double rotate[], double scale);
+
+
 /** Create a mapping context for any number of blocks using a Fortran mapc2m.
  * \param [in] mapc2m   Address of the Fortran mapping function.
  *                      It expects the block number in a Clawpatch COMMON.
@@ -156,6 +184,49 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
                                                 const int
                                                 query_results
                                                 [FCLAW2D_MAP_QUERY_LAST]);
+
+/* ----------------------------------------------------------------------------------
+   Mapping routines (from clawpack_fort.H)
+   ---------------------------------------------------------------------------------- */
+
+#define ISPILLOWSPHERE FCLAW_F77_FUNC_(ispillowsphere,ISPILLOWSPHERE)
+int ISPILLOWSPHERE();
+
+#define IS_CUBEDSPHERE FCLAW_F77_FUNC_(iscubedsphere,ISCUBEDSPHERE)
+int ISCUBEDSPHERE();
+
+#define ISPILLOWDISK FCLAW_F77_FUNC_(ispillowdisk,ISPILLOWDISK)
+int ISPILLOWDISK();
+
+#define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
+int ISFLAT();
+
+#define ISSPHERE FCLAW_F77_FUNC_(issphere,ISSPHERE)
+int ISSPHERE();
+
+#define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
+void SET_BLOCK(const int * a_blockno);
+
+#define SET_CONTEXT FCLAW_F77_FUNC (set_context,SET_CONTEXT)
+void SET_CONTEXT (fclaw2d_map_context_t** a_context);
+
+#define SETUP_MAPPEDGRID FCLAW_F77_FUNC (setup_mappedgrid,SETUP_MAPPEDGRID)
+void SETUP_MAPPEDGRID(double rot_angle[], double* scale);
+
+#define SCALE_MAP FCLAW_F77_FUNC (scale_map,SCALE_MAP)
+void SCALE_MAP (double *xp, double *yp, double *zp);
+
+#define ROTATE_MAP FCLAW_F77_FUNC (rotate_map,ROTATE_MAP)
+void ROTATE_MAP (double *xp, double *yp, double *zp);
+
+#define MAPC2M_CUBEDSPHERE FCLAW_F77_FUNC (mapc2m_cubedsphere,MAPC2M_CUBEDSPHERE)
+void MAPC2M_CUBEDSPHERE (double *xc, double *yc, double *xp, double *yp, double *zp);
+
+#define MAPC2M_PILLOWSPHERE FCLAW_F77_FUNC (mapc2m_pillowsphere,MAPC2M_PILLOWSPHERE)
+void MAPC2M_PILLOWSPHERE (double *xc, double *yc, double *xp, double *yp, double *zp);
+/* ---------------------------------------------------------------------------------- */
+
+
 
 #ifdef __cplusplus
 #if 0
