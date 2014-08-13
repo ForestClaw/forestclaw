@@ -34,18 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cubed_sphere_user.H"
 
-extern "C" {
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere ();
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere ();
-}
-
-
 int
 main (int argc, char **argv)
 {
   int			lp;
   int                   example;
-  double                cubed_R1, cubed_R2;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
@@ -53,6 +46,10 @@ main (int argc, char **argv)
   fclaw2d_domain_t	*domain = NULL;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
+
+  double scale, theta, phi;
+  double rotate[2];
+
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
@@ -64,13 +61,15 @@ main (int argc, char **argv)
   options = sc_options_new (argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
                       "1 for pillow grid, "\
-                      "2 for cubed sphere (C version), " \
-                      "3 for cubed sphere  (fortran version)");
+                      "2 for cubed sphere ");
 
-  sc_options_add_double (options, 0, "cubed_R1", &cubed_R1, -1.,
-                         "outer radius of cubed disk and cubed sphere");
-  sc_options_add_double (options, 0, "cubed_R2", &cubed_R2, -1.,
-                         "circumcircle radius of inner cube of cubed disk");
+  sc_options_add_double (options, 0, "scale", &scale, 1.0,
+                         "Scale unit sphere (e.g. set radius [1])");
+  sc_options_add_double (options, 0, "theta", &theta, 0,
+                         "Rotation angle theta (degrees) about z axis [0]");
+
+  sc_options_add_double (options, 0, "phi", &phi, 0,
+                         "Rotation angle phi (degrees) about x axis [0]");
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
@@ -89,24 +88,21 @@ main (int argc, char **argv)
      Domain geometry
      --------------------------------------------------------------- */
 
+  double pi = 3.141592653589793;
+  rotate[0] = pi*theta/180.0;
+  rotate[1] = pi*phi/180.0;
+
   switch (example) {
   case 1:
       conn = p4est_connectivity_new_pillow();
-      cont = fclaw2d_map_new_pillowsphere();
+      cont = fclaw2d_map_new_pillowsphere(rotate,scale);
       break;
   case 2:
-      if (!(0. < cubed_R1)) {
-        sc_abort_collective ("Parameter 0 < cubed_R1 required for cubed sphere");
-      }
-      conn = p4est_connectivity_new_cubed ();
-      cont = fclaw2d_map_new_csphere (cubed_R1);
-      break;
-  case 3:
       conn = p4est_connectivity_new_cubed();
-      cont = fclaw2d_map_new_cubedsphere();
+      cont = fclaw2d_map_new_cubedsphere(rotate,scale);
       break;
     default:
-      sc_abort_collective ("Parameter example must be 1, 2 or 3");
+      sc_abort_collective ("Parameter example must be 1 (pillow sphere) or 2 (cubed sphere)");
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
@@ -135,7 +131,7 @@ main (int argc, char **argv)
      passing the context to a C/C++ routine.  Do not expect to be
      able to access fields of the cont structure.
      ---------------------------------------------------------- */
-    set_context_(&cont);
+    SET_CONTEXT(&cont);
 
   /* ---------------------------------------------------------------
      Print some diagnostics.  TODO: Should this really be in main()?
