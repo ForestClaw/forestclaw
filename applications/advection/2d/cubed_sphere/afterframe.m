@@ -1,3 +1,4 @@
+setviews;
 s = 1e-2;
 daspect([1 1 1]);
 axis off;
@@ -54,6 +55,7 @@ zoom(1.1);
 zoom(1.1);
 zoom(1.1);
 shg;
+
 
 clear afterframe;
 clear mapc2m;
