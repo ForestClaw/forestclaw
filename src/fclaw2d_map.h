@@ -238,7 +238,7 @@ void SCALE_MAP (double *xp, double *yp, double *zp);
 void ROTATE_MAP (double *xp, double *yp, double *zp);
 
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
-void MAPC2M_PILLOWDISK (*xc, double *yc, double *xp, double *yp, double *zp);
+void MAPC2M_PILLOWDISK (double *xc, double *yc, double *xp, double *yp, double *zp);
 
 #define MAPC2M_CUBEDSPHERE FCLAW_F77_FUNC (mapc2m_cubedsphere,MAPC2M_CUBEDSPHERE)
 void MAPC2M_CUBEDSPHERE (double *xc, double *yc, double *xp, double *yp, double *zp);
