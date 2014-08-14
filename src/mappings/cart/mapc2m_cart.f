@@ -4,7 +4,7 @@
       double precision xc,yc,xp,yp,zp
 
       xp = xc
-      yp = xc + yc
+      yp = yc
       zp = 0
 
 
