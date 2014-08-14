@@ -8,7 +8,6 @@ applications_advection_2d_cubed_sphere_cubed_sphere_SOURCES = \
 	applications/advection/2d/cubed_sphere/fclaw2d_map_cubedsphere.c \
 	applications/advection/2d/cubed_sphere/fclaw2d_map_pillowsphere.c \
 	applications/advection/2d/cubed_sphere/tag4refinement.f \
-	applications/advection/2d/cubed_sphere/mapc2m.f \
 	applications/advection/2d/cubed_sphere/velocity_wind.f \
 	applications/advection/2d/cubed_sphere/rpn2noncons.f \
 	applications/advection/2d/cubed_sphere/rpt2noncons.f \
