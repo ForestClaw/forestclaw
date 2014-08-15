@@ -92,7 +92,7 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
         return 1;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_generic (fclaw2d_map_query_defs.h) : ",\
+        printf("fclaw2d_map_query_generic (fclaw2d_map_query_defs.h) : " \
                "Query id not identified;  Maybe the query is not up to "\
                "date?\nSee fclaw2d_map_query_defs.h.\n");
         printf("Requested query id : %d\n",query_identifier);
