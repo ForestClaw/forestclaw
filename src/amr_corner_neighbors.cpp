@@ -113,12 +113,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
+    int rcornerno;
     fclaw2d_patch_relation_t neighbor_type;
 
     fclaw_bool has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                        icorner, &rproc_corner, corner_block_idx,
-                                       &corner_patch_idx, &neighbor_type);
+                                       &corner_patch_idx, &rcornerno,
+                                       &neighbor_type);
 
     if (has_corner_neighbor && is_block_corner)
     {

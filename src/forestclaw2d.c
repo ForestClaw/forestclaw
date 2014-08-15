@@ -698,10 +698,17 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 #endif
 }
 
+static inline p4est_locidx_t
+fclaw2d_array_index_locidx (sc_array_t * array, p4est_locidx_t li)
+{
+    return *(p4est_locidx_t *) sc_array_index_int (array, (int) li);
+}
+
 int
 fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                 int blockno, int patchno, int cornerno,
                                 int *rproc, int *rblockno, int *rpatchno,
+                                int *rcorner,
                                 fclaw2d_patch_relation_t * neighbor_size)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
@@ -709,6 +716,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid;
+    p4est_locidx_t cornerid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
@@ -733,12 +741,36 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     if (qid < 0)
     {
         /* The value -1 is expected for a corner on the physical boundary */
-        /* It is -2 for a number of true corner neighbors greater than one */
+        /* It is -2 for one or more true corner neighbors */
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
     }
     else
     {
         FCLAW_ASSERT (0 <= qid);
+        if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
+        {
+            /* this is a corner neighbor across an inter-tree face */
+            /* TODO: currently p4est does not expose true corner neighbors */
+            cornerid =
+                qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
+            FCLAW_ASSERT (cornerid < mesh->local_num_corners);
+            cstart =
+                fclaw2d_array_index_locidx (mesh->corner_offset, cornerid);
+            cend =
+                fclaw2d_array_index_locidx (mesh->corner_offset,
+                                            cornerid + 1);
+            FCLAW_ASSERT (cstart + 1 == cend);  /* TODO: ok on faces */
+            qid = fclaw2d_array_index_locidx (mesh->corner_quad, cstart);
+            *rcorner = (int)
+                *(int8_t *) sc_array_index_int (mesh->corner_corner,
+                                                (int) cstart);
+            FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+        }
+        else
+        {
+            /* for intra-tree corners we take the corner is opposite */
+            *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
+        }
         if (qid < mesh->local_num_quadrants)
         {
             /* local quadrant may be in a different tree */

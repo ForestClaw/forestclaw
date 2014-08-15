@@ -339,7 +339,7 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
- * The neighbor patch may be in the same block, encoded by ftransform[8] == 4.
+ * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
@@ -361,7 +361,7 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
- * The neighbor patch may be in the same block, encoded by ftransform[8] == 4.
+ * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
@@ -400,6 +400,7 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
  * \param [out] rpatchno        Neighbor patch number relative to the block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts_patches[.
+ * \param [out] rcorner         Number of the corner from the other neigbor.
  * \param [out] neighbor_size   The relative patch size of the neighbor.
  * \return                      True if at least one corner neighbor exists
  *                              that is not already a face neighbor.
@@ -407,6 +408,7 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                     int blockno, int patchno, int cornerno,
                                     int *rproc, int *rblockno, int *rpatchno,
+                                    int *rcorner,
                                     fclaw2d_patch_relation_t * neighbor_size);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
