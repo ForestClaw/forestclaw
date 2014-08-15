@@ -823,6 +823,16 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno)
+{
+  int swap;
+
+  swap = *cornerno;
+  *cornerno = *rcornerno;
+  *rcornerno = swap;
+}
+
+void
 fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                 fclaw2d_patch_t * opatch,
                                 int icorner,

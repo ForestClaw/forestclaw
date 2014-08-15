@@ -411,6 +411,17 @@ int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                     int *rcorner,
                                     fclaw2d_patch_relation_t * neighbor_size);
 
+/** Change perspective across a corner neighbor situation.
+ * \param [in,out] cornerno     On input, valid corner number for a patch.
+ *                              On output, corner number seen from
+ *                              the corner neighbor patch.
+ * \param [in,out] rcornerno    On input, valid corner number as returned
+ *                              by fclaw2d_patch_face_neighbors.
+ *                              On output, corner number seen from
+ *                              the corner neighbor patch.
+ */
+void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
+
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
  * This function assumes that the two patches are in the SAME block.
