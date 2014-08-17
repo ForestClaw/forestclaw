@@ -11,7 +11,7 @@
       if (iscart()) then
          call mapc2m_cart(xc1,yc1,xp,yp,zp)
       elseif (isdisk()) then
-         call mapc2m_disk(xc1,yc1,xp,yp,zp)
+         call mapc2m_pillowdisk(xc1,yc1,xp,yp,zp)
       elseif (ispillowsphere()) then
          call mapc2m_pillowsphere(xc1,yc1,xp,yp,zp)
       elseif (iscubedsphere()) then
