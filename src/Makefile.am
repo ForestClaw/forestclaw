@@ -39,6 +39,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/scale_rot_map.f \
 	src/mappings/cart/mapc2m_cart.f \
 	src/mappings/pillowdisk/mapc2m_pillowdisk.f \
+	src/mappings/squareddisk/mapc2m_squareddisk.f \
 	src/mappings/map_query.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
