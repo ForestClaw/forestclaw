@@ -48,8 +48,8 @@ c     # include call.i   !! included in AMRClaw
       double precision work(mwork)
       logical debug
 
-      logical iscubedsphere, issquareddisk
       integer ibc,jbc
+      integer block_corner_count(0:3)
 
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
@@ -67,7 +67,8 @@ c     # passed in...
       dycom = dy
       dtcom = dt
 
-c
+
+      call get_corners(block_corner_count)
 c
 c     # partition work array into pieces needed for local storage in
 c     # flux2 routine.  Find starting index of each piece:
@@ -123,23 +124,31 @@ c        # copy data along a slice into 1d arrays:
          enddo
 
          if (j .eq. 0) then
-            if (iscubedsphere() .or. issquareddisk()) then
-               do m = 1,meqn
+            do m = 1,meqn
+               if (block_corner_count(0) .eq. 3) then
                   do ibc = 1,mbc
                      q1d(1-ibc,m) = qold(ibc,0,m)
+                  enddo
+               endif
+               if (block_corner_count(1) .eq. 3) then
+                  do ibc = 1,mbc
                      q1d(mx+ibc,m) = qold(mx-ibc+1,0,m)
                   enddo
-               enddo
-            endif
+               endif
+            enddo
          else if (j .eq. my+1) then
-            if (iscubedsphere() .or. issquareddisk()) then
-               do m = 1,meqn
+            do m = 1,meqn
+               if (block_corner_count(2) .eq. 3) then
                   do ibc = 1,mbc
                      q1d(1-ibc,m) = qold(ibc,my+1,m)
+                  enddo
+               endif
+               if (block_corner_count(3) .eq. 3) then
+                  do ibc = 1,mbc
                      q1d(mx+ibc,m) = qold(mx-ibc+1,my+1,m)
                   enddo
-               enddo
-            endif
+               endif
+            enddo
          endif
 c
          if (mcapa.gt.0)  then
@@ -200,23 +209,31 @@ c        # copy data along a slice into 1d arrays:
          enddo
 
          if (i .eq. 0) then
-            if (iscubedsphere() .or. issquareddisk()) then
-               do m = 1,meqn
+            do m = 1,meqn
+               if (block_corner_count(0) .eq. 3) then
                   do jbc = 1,mbc
                      q1d(1-jbc,m) = qold(0,jbc,m)
+                  enddo
+               endif
+               if (block_corner_count(2) .eq. 3) then
+                  do jbc = 1,mbc
                      q1d(my+jbc,m) = qold(0,my-jbc+1,m)
                   enddo
-               enddo
-            endif
+               endif
+            enddo
          else if (i .eq. mx+1) then
-            if (iscubedsphere() .or. issquareddisk()) then
-               do m = 1,meqn
+            do m = 1,meqn
+               if (block_corner_count(1) .eq. 3) then
                   do jbc = 1,mbc
                      q1d(1-jbc,m) = qold(mx+1,jbc,m)
+                  enddo
+               endif
+               if (block_corner_count(3) .eq. 3) then
+                  do jbc= 1,mbc
                      q1d(my+jbc,m) = qold(mx+1,my-jbc+1,m)
                   enddo
-               enddo
-            endif
+               endif
+            enddo
          endif
 
 c

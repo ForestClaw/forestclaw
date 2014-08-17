@@ -214,6 +214,7 @@ public :
 
     double* q();
 
+    int* block_corner_count();
 
     /* ---------------------------------------------------------------
        This isn't very object oriented, and I will think about a better

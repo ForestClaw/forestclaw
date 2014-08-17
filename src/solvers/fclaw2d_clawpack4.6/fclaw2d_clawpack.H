@@ -88,6 +88,10 @@ extern "C"
 #endif
 #endif
 
+#define SET_CORNERS FCLAW_F77_FUNC(set_corners, SET_CORNERS)
+void SET_CORNERS(int block_corners_count[]);
+
+
 typedef struct fclaw2d_clawpack_parms fclaw2d_clawpack_parms_t;
 typedef struct fclaw2d_clawpack_patch_data fclaw2d_clawpack_patch_data_t;
 

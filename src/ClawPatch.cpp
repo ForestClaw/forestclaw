@@ -307,6 +307,10 @@ double* ClawPatch::curvature()
     return m_curvature.dataPtr();
 }
 
+int* ClawPatch::block_corner_count()
+{
+    return &m_block_corner_count[0];
+}
 
 /* ----------------------------------------------------
    Solver data and functions

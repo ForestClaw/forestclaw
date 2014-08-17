@@ -70,8 +70,7 @@ void fclaw2d_clawpack_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
     ll[0] = 1-mbc;
     ll[1] = 1-mbc;
     ur[0] = mx + mbc;
-    ur[1] = my + mbc;
-    Box box(ll,ur);
+    ur[1] = my + mbc;    Box box(ll,ur);
 
     // get solver specific data stored on this patch
     fclaw2d_clawpack_patch_data_t *clawpack_patch_data = get_clawpack_patch_data(cp);
@@ -88,7 +87,6 @@ void fclaw2d_clawpack_get_auxarray(fclaw2d_domain_t* domain,
     fclaw2d_clawpack_patch_data_t *clawpack_patch_data = get_clawpack_patch_data(cp);
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
-
 
 void fclaw2d_clawpack_setprob(fclaw2d_domain_t* domain)
 {
@@ -364,12 +362,12 @@ double fclaw2d_clawpack_step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-    const amr_options_t* gparms              = get_domain_parms(domain);
-    ClawPatch *cp                            = get_clawpatch(this_patch);
-    // fclaw2d_clawpack_patch_data_t *clawpack_patch_data = get_clawpack_patch_data(cp);
+    const amr_options_t* gparms                 = get_domain_parms(domain);
+    ClawPatch *cp                               = get_clawpatch(this_patch);
     fclaw2d_clawpack_parms_t * clawpack_parms   = get_clawpack_parms(domain);
 
-    set_block_(&this_block_idx);
+    /* SET_BLOCK(&this_block_idx);  */
+    SET_CORNERS(cp->block_corner_count());
 
     int level = this_patch->level;
 
