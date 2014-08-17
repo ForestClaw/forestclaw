@@ -24,6 +24,19 @@
 
       end
 
+      logical function issquareddisk()
+      implicit none
+
+      integer id, fclaw2d_map_is_squareddisk
+      integer*8 cont, get_context
+
+      cont = get_context()
+
+      id = fclaw2d_map_is_squareddisk(cont)
+      issquareddisk = id .ne. 0
+
+      end
+
 
       logical function isflat()
       implicit none

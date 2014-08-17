@@ -48,7 +48,7 @@ c     # include call.i   !! included in AMRClaw
       double precision work(mwork)
       logical debug
 
-      logical iscubedsphere
+      logical iscubedsphere, issquareddisk
       integer ibc,jbc
 
       double precision dtcom, dxcom, dycom, tcom
@@ -123,7 +123,7 @@ c        # copy data along a slice into 1d arrays:
          enddo
 
          if (j .eq. 0) then
-            if (iscubedsphere()) then
+            if (iscubedsphere() .or. issquareddisk()) then
                do m = 1,meqn
                   do ibc = 1,mbc
                      q1d(1-ibc,m) = qold(ibc,0,m)
@@ -132,7 +132,7 @@ c        # copy data along a slice into 1d arrays:
                enddo
             endif
          else if (j .eq. my+1) then
-            if (iscubedsphere()) then
+            if (iscubedsphere() .or. issquareddisk()) then
                do m = 1,meqn
                   do ibc = 1,mbc
                      q1d(1-ibc,m) = qold(ibc,my+1,m)
@@ -200,7 +200,7 @@ c        # copy data along a slice into 1d arrays:
          enddo
 
          if (i .eq. 0) then
-            if (iscubedsphere()) then
+            if (iscubedsphere() .or. issquareddisk()) then
                do m = 1,meqn
                   do jbc = 1,mbc
                      q1d(1-jbc,m) = qold(0,jbc,m)
@@ -209,7 +209,7 @@ c        # copy data along a slice into 1d arrays:
                enddo
             endif
          else if (i .eq. mx+1) then
-            if (iscubedsphere()) then
+            if (iscubedsphere() .or. issquareddisk()) then
                do m = 1,meqn
                   do jbc = 1,mbc
                      q1d(1-jbc,m) = qold(mx+1,jbc,m)
