@@ -16,29 +16,39 @@ c     #     0.1  otherwise
        double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
        integer i, j, mq
-       double precision xi, yj, s, r
+       double precision xlow, ylow, w
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
-             xi = xlower + (i-0.5d0)*dx
              do j = 1-mbc,my+mbc
-                yj = ylower + (j-0.5d0)*dy
-
-                s = 0.5d0
-                r = sqrt((xi-0.5d0)**2 + (yj-1.d0)**2)
-c                if (xi .lt. s) then
-c                   q(i,j,mq) = 0.d0
-c                else
-c                   q(i,j,mq) = 1.d0
-c                endif
-                if (r .le. 0.25d0) then
-                   q(i,j,mq) = 1.d0
-                else
-                   q(i,j,mq) = 0.d0
-                endif
+                xlow = xlower + (i-1)*dx
+                ylow = ylower + (j-1)*dy
+                call cellave2(xlow,ylow,dx,dy,w)
+                q(i,j,mq) = w
              enddo
           enddo
        enddo
 
-       return
        end
+
+      double precision function  fdisc(xc,yc)
+      implicit none
+
+      double precision xc,yc, xp, yp, zp
+      integer*8 cont, get_context
+
+      integer blockno, get_block
+      double precision r
+
+      cont = get_context()
+      blockno = get_block()
+
+c      call mapc2m(xc,yc,xp,yp,zp)
+
+      call fclaw2d_map_c2m(cont,
+     &      blockno,xc,yc,xp,yp,zp)
+
+      r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
+
+      fdisc = r-0.25d0
+      end

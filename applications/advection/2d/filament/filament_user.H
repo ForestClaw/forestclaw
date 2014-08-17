@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef FILAMENT_USER_H
+#define FILAMENT_USER_H
 
 #include "amr_forestclaw.H"
 #include "fclaw2d_clawpack.H"
@@ -39,21 +39,30 @@ extern "C"
 
 extern "C"
 {
-    void swirl_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn, const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double q[], const int& init_flag, int& tag_patch);
+    void filament_tag4refinement_(const int& mx,const int& my,const int& mbc,
+                                  const int& meqn, const double& xlower,
+                                  const double& ylower, const double& dx, const double& dy,
+                                  double q[], const int& init_flag, int &blockno,
+                                  int& tag_patch);
 
-    void swirl_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+    void filament_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                const int& meqn,const double& xlower,
                                const double& ylower, const double& dx, const double& dy,
                                double qcoarsened[], int& tag_patch);
 
-    void swirl_write_tfile_(const int& iframe,const double& time,
+    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
+                          const int& mx, const int& my,
+                          const double& xlower, const double& ylower,
+                          const double& dx, const double& dy,
+                          const int& maux, double aux[],
+                          double xp[], double yp[], double zp[],
+                          double xd[], double yd[], double zd[],double area[]);
+
+    void filament_write_tfile_(const int& iframe,const double& time,
                             const int& mfields,const int& ngrids,
                             const int& maux);
 
-    void swirl_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+    void filament_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
                             const int& mbc, const int& mx,const int& my,
                             const double& xlower,const double& ylower,
                             const double& dx, const double& dy,
@@ -64,22 +73,27 @@ extern "C"
 
 }
 
+fclaw2d_map_context_t * fclaw2d_map_new_squareddisk (double rotate[], double scale,
+                                                     double R1, double R2);
+fclaw2d_map_context_t * fclaw2d_map_new_pillowdisk (double rotate[], double scale);
+fclaw2d_map_context_t* fclaw2d_map_new_cart(double scale);
 
-void swirl_link_solvers(fclaw2d_domain_t *domain);
 
-void swirl_problem_setup(fclaw2d_domain_t* domain);
+void filament_link_solvers(fclaw2d_domain_t *domain);
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
+void filament_problem_setup(fclaw2d_domain_t* domain);
+
+void filament_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+void filament_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
+void filament_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -88,28 +102,28 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp);
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+double filament_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
                                       double t,
                                       double dt);
 
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
+fclaw_bool filament_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         int this_block_idx, int this_patch_idx,
+                                         int initflag);
 
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
+fclaw_bool filament_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         int blockno,
+                                         int patchno);
 
-void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void filament_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                  int iframe,int num,int level);
 
-void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+void filament_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
 #ifdef __cplusplus
 #if 0

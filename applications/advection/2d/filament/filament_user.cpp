@@ -23,30 +23,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
-#include "swirl_user.H"
+#include <amr_includes.H>
+#include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
+#include "filament_user.H"
 
-void swirl_link_solvers(fclaw2d_domain_t *domain)
+void filament_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
 
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
 
-    sf->f_patch_setup              = &swirl_patch_setup;
-    sf->f_patch_initialize         = &swirl_patch_initialize;
-    sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
-    sf->f_patch_single_step_update = &swirl_patch_single_step_update;
+    sf->f_patch_setup              = &filament_patch_setup;
+    sf->f_patch_initialize         = &filament_patch_initialize;
+    sf->f_patch_physical_bc        = &filament_patch_physical_bc;
+    sf->f_patch_single_step_update = &filament_patch_single_step_update;
 
     fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &swirl_parallel_write_header;
-    of->f_patch_write_output = &swirl_parallel_write_output;
+    of->f_patch_write_header = &filament_parallel_write_header;
+    of->f_patch_write_output = &filament_parallel_write_output;
 
     fclaw2d_clawpack_link_to_clawpatch();
 }
 
-void swirl_problem_setup(fclaw2d_domain_t* domain)
+void filament_problem_setup(fclaw2d_domain_t* domain)
 {
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
@@ -55,29 +56,72 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
 }
 
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
+void filament_patch_setup(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx)
 {
-    /* Set velocity data */
-    fclaw2d_clawpack_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
 
-    /* Set up diffusion coefficients? Read in velocity data? Material properties? */
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ----------------------------------------------------------- */
+    // allocate space for the aux array
+    fclaw2d_clawpack_define_auxarray(domain,cp);
+
+    /* ----------------------------------------------------------- */
+    // Pointers needed to pass to class setaux call, and other setaux
+    // specific arguments
+    double *aux;
+    int maux;
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ----------------------------------------------------------- */
+    /* Modified clawpack setaux routine that passes in mapping terms */
+    double *xp = cp->xp();
+    double *yp = cp->yp();
+    double *zp = cp->zp();
+    double *xd = cp->xd();
+    double *yd = cp->yd();
+    double *zd = cp->zd();
+    double *area = cp->area();
+
+    setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
+                     maux,aux,xp,yp,zp,xd,yd,zd,area);
 }
 
 
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+
+
+void filament_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
 {
+    SET_BLOCK(&this_block_idx);
     fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
+void filament_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -91,7 +135,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
 }
 
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+double filament_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
@@ -109,7 +153,7 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool filament_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
                                       int initflag)
@@ -135,11 +179,12 @@ fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     int tag_patch = 0;
-    swirl_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
+    filament_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
+                             this_block_idx, tag_patch);
     return tag_patch == 1;
 }
 
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool filament_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno)
@@ -165,11 +210,11 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     double* qcoarse = cp->q();
 
     int tag_patch = 1;  // == 0 or 1
-    swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
+    filament_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
 }
 
-void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+void filament_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
@@ -177,9 +222,9 @@ void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn + 1;
+    int mfields = gparms->meqn;
     int maux = 0;
-    swirl_write_tfile_(iframe,time,mfields,ngrids,maux);
+    filament_write_tfile_(iframe,time,mfields,ngrids,maux);
 
     // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
     // 0010, 0114), and closes the file.
@@ -187,7 +232,7 @@ void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
 }
 
 
-void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void filament_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level)
 {
@@ -223,6 +268,6 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
     int matlab_level = level + 1;
 
     int mpirank = domain->mpirank;
-    swirl_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+    filament_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                         iframe,num,matlab_level,this_block_idx,mpirank);
 }

@@ -1,8 +1,9 @@
-      subroutine swirl_tag4refinement(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,q,init_flag, tag_patch)
+      subroutine filament_tag4refinement(mx,my,mbc,meqn,
+     &      xlower,ylower,dx,dy,q,init_flag, blockno, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
+      integer blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -13,6 +14,14 @@
       qmin = 100.d0
       qmax = -100.d0
       tag_patch = 0
+
+      if (blockno .eq. 4) then
+         tag_patch = 1
+      else
+         tag_patch = 0
+      endif
+      return
+
 
 c     # Refine based only on first variable in system.
       mq = 1
@@ -40,7 +49,7 @@ c     # Refine based only on first variable in system.
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine swirl_tag4coarsening(mx,my,mbc,meqn,
+      subroutine filament_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, qcoarsened, tag_patch)
       implicit none
 
@@ -57,7 +66,8 @@ c     # coarsening criteria different from the refinement criteria.
 c     # Also, we don't check for an init_flag, since it is unlikely that
 c     # we would coarsen an initial grid.
 
-      tag_patch = 0
+      tag_patch = 1
+      return
       qmin = 100.d0
       qmax = -100.d0
       mq = 1

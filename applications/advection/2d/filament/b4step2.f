@@ -12,6 +12,7 @@
 
       common /comvt/ tperiod,pi2
 c
+
       if (tperiod .eq. 0.d0) then
 c        # special case --- indication that velocities specified in
 c        # setaux should be used for all time.
