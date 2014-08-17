@@ -23,19 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* --------------------------------------------------------
-   Needed for trapping floating point errors.
- ---------------------------------------------------------- */
-#ifdef TRAPFPE_OSX
-#include "fp_exception_glibc_extension.h"
-#endif
-/* Are these all that is needed for non-OSX systems? */
-#include <fenv.h>
-#include <signal.h>
-#include <unistd.h>    //  To get process ids
-/* -------------------------------------------------------- */
-
-
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
