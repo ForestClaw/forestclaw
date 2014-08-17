@@ -73,8 +73,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/exchange_fv1.f \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/phys_corner.f \
-	src/fortran_source2d/mapc2p.f \
-	src/fortran_source2d/mapc2m.f \
 	src/fortran_source2d/setup_mesh.f \
 	src/fortran_source2d/claw_out2.f \
 	src/fortran_source2d/debug.f \
