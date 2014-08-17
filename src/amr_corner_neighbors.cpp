@@ -108,6 +108,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int *corner_block_idx,
                          fclaw2d_patch_t** ghost_patch,
                          int **ref_flag_ptr,
+                         int *block_corner_count,
                          int ftransform[])
 {
     /* See what p4est thinks we have for corners, and consider four cases */
@@ -122,12 +123,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        &corner_patch_idx, &rcornerno,
                                        &neighbor_type);
 
+    *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)
     {
         /* 4 or more patches meet at a block corner */
         printf("get_corner_neighbors (amr_neighbors.f) : "             \
                "Four or more patches meet at a block corner; "         \
                "(not implemented yet).\n");
+        /* Set block_corner_count to number of patches that meet */
         exit(0);
     }
     else if (!has_corner_neighbor && !is_block_corner)
@@ -173,6 +176,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     {
         if (!ispillowsphere_())
         {
+            *block_corner_count = 3;
             /* Exactly 3 patches meet at a corner, e.g. the cubed sphere.
                In this case, 'this_patch' has no corner-adjacent only
                neighbors, and so there is nothing to do. */
@@ -182,6 +186,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         }
         else
         {
+            *block_corner_count = 2;
             /* 2 patches meet at a corner, .e.g. pillow sphere.
                This is handled as a special case */
             has_corner_neighbor = fclaw_true;
@@ -264,6 +269,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw_bool intersects_block[NumFaces];
     fclaw_bool is_block_corner;
     fclaw_bool is_interior_corner;
+    int block_corner_count;
 
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bdry);
@@ -282,8 +288,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
     int refratio = gparms->refratio;
 
+    ClawPatch *this_cp = get_clawpatch(this_patch);
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
+        block_corner_count = 0;
         get_corner_type(domain,icorner,
                         intersects_bdry,
                         intersects_block,
@@ -308,8 +316,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
+                                &block_corner_count,
                                 transform_data.transform);
 
+            this_cp->set_block_corner_count(icorner,block_corner_count);
             if (ref_flag_ptr == NULL)
             {
                 /* no corner neighbor; relative_refinement_level is not set
@@ -322,7 +332,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             {
                 if (relative_refinement_level == 0)
                 {
-                    ClawPatch *this_cp = get_clawpatch(this_patch);
                     fclaw2d_patch_t* corner_patch = ghost_patch;
                     ClawPatch *corner_cp = get_clawpatch(corner_patch);
                     transform_data.neighbor_patch = corner_patch;
@@ -351,7 +360,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 {
                     /* Corner neighbor at a finer level, and so we need to average
                        that corner onto the coarser corner ghost cells */
-                    ClawPatch *this_cp = get_clawpatch(this_patch);
                     ClawPatch *corner_cp = get_clawpatch(ghost_patch);
                     transform_data.neighbor_patch = ghost_patch;
 
@@ -382,7 +390,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             {
                 if (relative_refinement_level == 1 && is_coarse)
                 {
-                    ClawPatch *this_cp = get_clawpatch(this_patch);
                     ClawPatch *corner_cp = get_clawpatch(ghost_patch);
                     transform_data.neighbor_patch = ghost_patch;
                     if (!is_block_corner)

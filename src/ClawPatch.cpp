@@ -582,6 +582,11 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha)
    Mapped grids
    ---------------------------------------------------------------- */
 
+void ClawPatch::set_block_corner_count(const int icorner, const int block_corner_count)
+{
+    m_block_corner_count[icorner] = block_corner_count;
+}
+
 void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
 {
     // Set fortran common block

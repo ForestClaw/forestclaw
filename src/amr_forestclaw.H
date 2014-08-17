@@ -126,6 +126,7 @@ void get_corner_neighbor (fclaw2d_domain_t * domain,
                           int *corner_block_idx,
                           fclaw2d_patch_t ** ghost_patch,
                           int **ref_flag_ptr,
+                          int* block_corner_count,
                           int ftransform[]);
 
 void get_block_boundary (fclaw2d_domain_t * domain,

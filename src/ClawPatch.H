@@ -166,6 +166,8 @@ public :
 
     void setup_manifold(const int& a_level, const amr_options_t *gparms);
 
+    void set_block_corner_count(const int icorner, const int block_corner_count);
+
     // ----------------------------------------------------------------
     // Output and diagnostics
     // ----------------------------------------------------------------
@@ -279,7 +281,6 @@ protected :
     int m_mbc;
 
     fclaw_bool m_manifold;
-    // fclaw_bool m_mapped;
     int m_blockno; /* This determines which mapping to use for this patch */
 
     /* Current time step */
@@ -311,6 +312,8 @@ protected :
     FArrayBox m_edge_lengths;
 
     FArrayBox m_curvature;  // ???
+
+    int m_block_corner_count[4];
 
     /* Data associated with the wave propagation algorithm (ClawPack) */
     void *m_clawpack_patch_data;

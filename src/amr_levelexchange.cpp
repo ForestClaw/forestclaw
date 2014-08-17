@@ -156,6 +156,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
             int corner_block_idx;
             int ref_flag;
             int *ref_flag_ptr = &ref_flag;
+            int block_corner_count;
             fclaw2d_patch_t *ghost_patch;
 
             transform_data.icorner = icorner;
@@ -168,6 +169,7 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                                 &corner_block_idx,
                                 &ghost_patch,
                                 &ref_flag_ptr,
+                                &block_corner_count,
                                 transform_data.transform);
             if (ref_flag_ptr == NULL)
             {
