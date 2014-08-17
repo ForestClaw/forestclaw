@@ -152,25 +152,6 @@ fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
  */
 fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
 
-/** Create a rotated, scaled pillow disk;
- * It is composed of a center square and one deformed patch on either side.
- * \param [in] rotate   (theta,phi) rotation angles
- * \param [in] scale    Scale the unit cube (e.g. set the radius)
- * \return              Mapping context.
- */
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowdisk (double rotate[], double scale);
-
-/** Create a rotated, scaled squared disk;
- * It is composed of a center square and one deformed patch on either side.
- * \param [in] rotate   (theta,phi) rotation angles
- * \param [in] scale    Scale the unit cube (e.g. set the radius)
- * \return              Mapping context.
- */
-fclaw2d_map_context_t * fclaw2d_map_new_squareddisk (double rotate[], double scale);
-
-
-
 /** Create a rotated, scaled cubed sphere. Uses same cubed sphere map as above.
  * It is composed of a center square and one deformed patch on either side.
  * \param [in] rotate   (theta,phi) rotation angles
@@ -216,6 +197,9 @@ int ISCUBEDSPHERE();
 #define ISPILLOWDISK FCLAW_F77_FUNC_(ispillowdisk,ISPILLOWDISK)
 int ISPILLOWDISK();
 
+#define ISSQUAREDDISK FCLAW_F77_FUNC_(issquareddisk,ISSQUAREDDISK)
+int ISSQUAREDDISK();
+
 #define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
 int ISFLAT();
 
@@ -236,6 +220,10 @@ void SCALE_MAP (double *xp, double *yp, double *zp);
 
 #define ROTATE_MAP FCLAW_F77_FUNC (rotate_map,ROTATE_MAP)
 void ROTATE_MAP (double *xp, double *yp, double *zp);
+
+#define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
+void MAPC2M_SQUAREDDISK (double *xc, double *yc, double *xp, double *yp, double *zp,
+                         double user_double[]);
 
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
 void MAPC2M_PILLOWDISK (double *xc, double *yc, double *xp, double *yp, double *zp);
