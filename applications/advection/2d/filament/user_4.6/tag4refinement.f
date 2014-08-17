@@ -15,14 +15,6 @@
       qmax = -100.d0
       tag_patch = 0
 
-      if (blockno .eq. 4) then
-         tag_patch = 1
-      else
-         tag_patch = 0
-      endif
-      return
-
-
 c     # Refine based only on first variable in system.
       mq = 1
       do i = 1,mx
@@ -66,8 +58,7 @@ c     # coarsening criteria different from the refinement criteria.
 c     # Also, we don't check for an init_flag, since it is unlikely that
 c     # we would coarsen an initial grid.
 
-      tag_patch = 1
-      return
+      tag_patch = 0
       qmin = 100.d0
       qmax = -100.d0
       mq = 1
