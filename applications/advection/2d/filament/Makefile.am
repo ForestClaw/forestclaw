@@ -17,7 +17,6 @@ applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/user_4.6/rpn2noncons.f \
 	applications/advection/2d/filament/user_4.6/rpt2noncons.f \
 	applications/advection/2d/filament/user_4.6/qinit.f \
-	applications/advection/2d/filament/fp_exception_glibc_extension.c \
 	applications/advection/2d/filament/user_4.6/setaux_manifold.f \
 	applications/advection/2d/filament/user_4.6/filament_output.f
 
@@ -25,7 +24,7 @@ applications_advection_2d_filament_filament_SOURCES = \
 applications_advection_2d_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-# applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE -D TRAPFPE_OSX
+applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE -D TRAPFPE_OSX
 
 
 applications_advection_2d_filament_filament_LDADD = \
