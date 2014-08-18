@@ -262,8 +262,12 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 {
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;
-    fclaw_bool is_coarse = filltype->is_coarse;
-    fclaw_bool is_fine = filltype->is_fine;
+    fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
+    fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
+
+    fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
+    fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
+    fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
     fclaw_bool intersects_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
@@ -328,7 +332,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 continue;
             }
 
-            if (filltype->copy)
+            if (copy_from_neighbor)
             {
                 if (relative_refinement_level == 0)
                 {
@@ -354,7 +358,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }
-            else if (filltype->average)
+            else if (average_from_neighbor)
             {
                 if (relative_refinement_level == 1 && is_coarse)
                 {
@@ -386,7 +390,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
                 }
             }
-            else if (filltype->interpolate)
+            else if (interpolate_to_neighbor)
             {
                 if (relative_refinement_level == 1 && is_coarse)
                 {

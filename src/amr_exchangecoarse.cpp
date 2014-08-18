@@ -52,15 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    ******************************************************************************
 */
 
-#if 0
-struct exchange_info
-{
-    fclaw_bool time_interp;
-    fclaw_bool is_coarse;
-    fclaw_bool is_fine;
-    int level;
-};
-#endif
 
 #if 0
 static
@@ -412,7 +403,7 @@ void cb_face_average(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    exchange_info *e_info = (exchange_info*) user;
+    fclaw2d_exchange_info_t *e_info = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = e_info->time_interp;
 
     /* is_coarse == true : We are iterating over the coarser level -
@@ -545,7 +536,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    exchange_info *e_info = (exchange_info*) user;
+    fclaw2d_exchange_info_t *e_info = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = e_info->time_interp;
     fclaw_bool is_coarse = e_info->is_coarse;
     fclaw_bool is_fine = e_info->is_fine;
@@ -726,19 +717,22 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        ----------------------------------------------------------- */
 
     /* First pass : Iterate over coarse grids in space filling curve */
+#if 0
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
-    e_info.average = fclaw_true;
-    e_info.copy = fclaw_false;
-    e_info.interpolate = fclaw_false;
-
+#endif
+    e_info.grid_type = FCLAW2D_IS_COARSE;
+    e_info.exchange_type = FCLAW2D_AVERAGE;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_fill,
                                  (void *) &e_info);
 
 
     /* Second pass : Average over finer grids in sf curve */
+#if 0
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
+#endif
+    e_info.grid_type = FCLAW2D_IS_FINE;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_fill,
                                  (void *) &e_info);
 
@@ -756,6 +750,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     /* First pass : Iterate over coarse grids in space filling curve */
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
+    // e_info.grid_type = FCLAW2D_IS_COARSE;
     fclaw2d_domain_iterate_level(domain,coarser_level,cb_face_interpolate,
                                  (void *) &e_info);
 
@@ -763,17 +758,22 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
 
+    // e_info.grid_type = FCLAW2D_IS_FINE;
     fclaw2d_domain_iterate_level(domain,finer_level,cb_face_interpolate,
                                  (void *) &e_info);
     /* -----------------------------------------------------------
        Corner interpolate
        ----------------------------------------------------------- */
+#if 0
     e_info.is_coarse = fclaw_true;
     e_info.is_fine = fclaw_false;
     e_info.average = fclaw_false;
     e_info.copy = fclaw_false;
     e_info.interpolate = fclaw_true;
+#endif
 
+    e_info.grid_type = FCLAW2D_IS_COARSE;
+    e_info.exchange_type = FCLAW2D_INTERPOLATE;
     fclaw2d_domain_iterate_level(domain,coarser_level, cb_corner_fill,
                                  (void *) &e_info);
 
@@ -781,8 +781,11 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        off processor coarse grid neighbors.  The first pass doesn't catch
        these coarse grids, and the fine grids don't get ghost cell data set.
     */
+#if 0
     e_info.is_coarse = fclaw_false;
     e_info.is_fine = fclaw_true;
+#endif
+    e_info.grid_type = FCLAW2D_IS_FINE;
     fclaw2d_domain_iterate_level(domain,finer_level, cb_corner_fill,
                                  (void *) &e_info);
 

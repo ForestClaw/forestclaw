@@ -206,8 +206,6 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
    ------------------------------------------------------------------- */
 void level_exchange(fclaw2d_domain_t *domain, int level)
 {
-    // Start exchanging
-
     /* face exchanges */
     fclaw2d_domain_iterate_level(domain, level,
                                  cb_level_face_exchange, (void *) NULL);
@@ -217,14 +215,9 @@ void level_exchange(fclaw2d_domain_t *domain, int level)
        cell region of neighboring patch. ??? (where am I doing set_physbc?)
     */
     fclaw2d_exchange_info_t filltype;
-    fclaw_bool t = fclaw_true;
-    fclaw_bool f = fclaw_false;
-    filltype.copy = t;
-    filltype.interpolate = f;
-    filltype.average = f;
-    filltype.is_coarse = t;
-    filltype.is_fine = f;
-    filltype.time_interp = f;
+    filltype.exchange_type = FCLAW2D_COPY;
+    filltype.grid_type = FCLAW2D_IS_COARSE;
+    filltype.time_interp = fclaw_false;
 
     fclaw2d_domain_iterate_level(domain, level, cb_corner_fill,
                                  (void *) &filltype);

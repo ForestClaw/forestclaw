@@ -366,7 +366,6 @@ double fclaw2d_clawpack_step2(fclaw2d_domain_t *domain,
     ClawPatch *cp                               = get_clawpatch(this_patch);
     fclaw2d_clawpack_parms_t * clawpack_parms   = get_clawpack_parms(domain);
 
-    /* SET_BLOCK(&this_block_idx);  */
     SET_CORNERS(cp->block_corner_count());
 
     int level = this_patch->level;

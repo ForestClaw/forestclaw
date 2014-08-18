@@ -48,15 +48,28 @@ extern "C"
 #endif
 
 
-typedef struct exchange_info
+typedef enum fclaw2d_exchange_type
+{
+    FCLAW2D_COPY = 1,
+    FCLAW2D_AVERAGE,
+    FCLAW2D_INTERPOLATE,
+} fclaw2d_exchange_type_t;
+
+typedef enum fclaw2d_grid_type
+{
+    FCLAW2D_IS_COARSE = 1,
+    FCLAW2D_IS_FINE,
+} fclaw2d_grid_type_t;
+
+typedef struct fclaw2d_exchange_info
 {
     fclaw_bool time_interp;
+    int level;
     fclaw_bool is_coarse;
     fclaw_bool is_fine;
-    int level;
-    fclaw_bool copy;
-    fclaw_bool average;
-    fclaw_bool interpolate;
+
+    fclaw2d_exchange_type_t exchange_type;
+    fclaw2d_grid_type_t grid_type;
 } fclaw2d_exchange_info_t;
 
 // ----------------------------------------
