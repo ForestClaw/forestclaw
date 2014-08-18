@@ -58,6 +58,7 @@ libforestclaw_compiled_sources = \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
 	src/amr_corner_neighbors.cpp \
+	src/fclaw2d_face_neighbors.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
 	src/amr_neighbors.cpp \

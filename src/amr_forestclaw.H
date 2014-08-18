@@ -166,6 +166,13 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user);
 
+void cb_face_fill(fclaw2d_domain_t *domain,
+                  fclaw2d_patch_t *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx,
+                  void *user);
+
+
 // ----------------------------
 // Routines used by diagnostics
 // ----------------------------

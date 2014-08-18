@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* -----------------------------------------------------------------
    Exchange corner and face information at same level
    ----------------------------------------------------------------- */
-
+#if 0
 static
 void cb_level_face_exchange(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
@@ -111,6 +111,7 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         } /* Check return from neighbor */
     } /* loop over all faces */
 }
+#endif
 
 #if 0
 static
@@ -206,19 +207,16 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
    ------------------------------------------------------------------- */
 void level_exchange(fclaw2d_domain_t *domain, int level)
 {
-    /* face exchanges */
-    fclaw2d_domain_iterate_level(domain, level,
-                                 cb_level_face_exchange, (void *) NULL);
-
-    /* Do corner exchange only after physical boundary conditions have
-       been set on all patches, since corners may overlap physical ghost
-       cell region of neighboring patch. ??? (where am I doing set_physbc?)
-    */
     fclaw2d_exchange_info_t filltype;
     filltype.exchange_type = FCLAW2D_COPY;
     filltype.grid_type = FCLAW2D_IS_COARSE;
     filltype.time_interp = fclaw_false;
 
+    /* face exchanges */
+    fclaw2d_domain_iterate_level(domain, level, cb_face_fill,
+                                 (void *) &filltype);
+
+    /* corner exchanges */
     fclaw2d_domain_iterate_level(domain, level, cb_corner_fill,
                                  (void *) &filltype);
 
