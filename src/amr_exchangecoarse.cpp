@@ -226,9 +226,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
         }
     }
 }
-#endif
 
-#if 0
+
 static
 void cb_corner_interpolate(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -389,9 +388,7 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
         }
     }
 }
-#endif
 
-#if 0
 // -----------------------------------------------------------------
 // Multi-level ghost cell operations
 //   -- average fine grid ghost cells to coarse grid
@@ -526,10 +523,8 @@ void cb_face_average(fclaw2d_domain_t *domain,
         } /* loop over directions (idir = 0,1) */
     }
 }
-#endif
 
 
-#if 0
 // Iterator over patches looking for finer neighbors
 static
 void cb_face_interpolate(fclaw2d_domain_t *domain,
@@ -654,10 +649,7 @@ void cb_face_interpolate(fclaw2d_domain_t *domain,
         } // loop sides (iside = 0,1,2,3)
     } // loop over directions (idir = 0,1,2)
 }
-#endif
 
-
-#if 0
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -673,6 +665,8 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
        the coarser grid */
     cp->setup_for_time_interpolation(alpha);
 }
+
+/* Closes off #if 0 from beginning */
 #endif
 
 

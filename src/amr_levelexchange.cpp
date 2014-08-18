@@ -90,10 +90,8 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
             fclaw2d_patch_t *neighbor_patch = ghost_patches[0];
             ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
 
-#if 1
             transform_data.neighbor_patch = ghost_patches[0];
             this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
-#endif
 
 #if 0
             /* This is now done for all boundaries */
@@ -111,9 +109,6 @@ void cb_level_face_exchange(fclaw2d_domain_t *domain,
         } /* Check return from neighbor */
     } /* loop over all faces */
 }
-#endif
-
-#if 0
 static
 void cb_level_corner_exchange(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
@@ -200,7 +195,6 @@ void cb_level_corner_exchange(fclaw2d_domain_t *domain,
     }
 }
 #endif
-
 
 /* -------------------------------------------------------------------
    Main routine in this file
