@@ -26,14 +26,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_includes.H"
 #include "fclaw2d_map_query.h"
 
-void
-get_corner_type(fclaw2d_domain_t* domain,
-                int icorner,
-                fclaw_bool intersects_bdry[],
-                fclaw_bool intersects_block[],
-                fclaw_bool *interior_corner,
-                fclaw_bool *is_block_corner,
-                int *block_iface)
+static
+void get_block_boundary(fclaw2d_domain_t *domain,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        fclaw_bool *intersects_block);
+
+static
+void get_corner_type(fclaw2d_domain_t* domain,
+                     int icorner,
+                     fclaw_bool intersects_bdry[],
+                     fclaw_bool intersects_block[],
+                     fclaw_bool *interior_corner,
+                     fclaw_bool *is_block_corner,
+                     int *block_iface)
 {
     // p4est has tons of lookup table like this, can be exposed similarly
     int corner_faces[SpaceDim];
@@ -98,7 +104,7 @@ get_corner_type(fclaw2d_domain_t* domain,
              as a special case.
    ----------------------------------------------- */
 
-
+static
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
@@ -107,6 +113,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          fclaw_bool is_block_corner,
                          int *corner_block_idx,
                          fclaw2d_patch_t** corner_patch,
+                         int *rcornerno,
                          int **ref_flag_ptr,
                          int *block_corner_count,
                          int ftransform[])
@@ -114,13 +121,12 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
-    int rcornerno;
     fclaw2d_patch_relation_t neighbor_type;
 
     fclaw_bool has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                        icorner, &rproc_corner, corner_block_idx,
-                                       &corner_patch_idx, &rcornerno,
+                                       &corner_patch_idx, rcornerno,
                                        &neighbor_type);
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
@@ -226,7 +232,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     /* ---------------------------------------------------------------------
        We have a valid neighbor and possibly a transform. We just now need
-       to get a pointer to the ghost patch (which may be a parallel patch)
+       to get a pointer to the neighbor patch (which may be a parallel patch)
        and the relative level (-1,0,1).
        --------------------------------------------------------------------- */
 
@@ -253,6 +259,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         **ref_flag_ptr = -1;
     }
 }
+
+
 
 void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
@@ -309,6 +317,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             int relative_refinement_level;
             int *ref_flag_ptr = &relative_refinement_level;
             fclaw2d_patch_t *corner_patch;
+            int rcornerno;
 
             transform_data.icorner = icorner;
             get_corner_neighbor(domain,
@@ -319,11 +328,13 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 is_block_corner,
                                 &corner_block_idx,
                                 &corner_patch,
+                                &rcornerno,
                                 &ref_flag_ptr,
                                 &block_corner_count,
                                 transform_data.transform);
 
             this_cp->set_block_corner_count(icorner,block_corner_count);
+
             if (ref_flag_ptr == NULL)
             {
                 /* no corner neighbor; relative_refinement_level is not set
@@ -332,158 +343,154 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 continue;
             }
 
-            if (copy_from_neighbor && relative_refinement_level == 0)
+            if (!fclaw2d_patch_is_ghost(corner_patch))
             {
-                // fclaw2d_patch_t* corner_patch = neighbor_patch;
-                ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                transform_data.neighbor_patch = corner_patch;
-                if (!is_block_corner)
+                /* Neighbor is on the same processor */
+                if (copy_from_neighbor)
                 {
-                    this_cp->exchange_corner_ghost(icorner,corner_cp,
-                                                   &transform_data);
-                }
-                else
-                {
-                    if (ispillowsphere_())
+                    if (relative_refinement_level == 0)
                     {
-                        this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
-                    }
-                    else
-                    {
-                        /* Handle 4 and 5 corner block cases here;  nothing to do for
-                           cubed sphere case. */
-                    }
-                }
-            }
-            else if (average_from_neighbor)
-            {
-                if (relative_refinement_level == 1 && is_coarse)
-                {
-                    /* Corner neighbor at a finer level, and so we need to average
-                       that corner onto the coarser corner ghost cells */
-                    ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                    transform_data.neighbor_patch = corner_patch;
-
-                    if (!is_block_corner)
-                    {
-                        this_cp->average_corner_ghost(icorner,refratio,corner_cp,
-                                                      time_interp, &transform_data);
-                    }
-                    else
-                    {
-                        if (ispillowsphere_())
+                        // fclaw2d_patch_t* corner_patch = neighbor_patch;
+                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                        transform_data.neighbor_patch = corner_patch;
+                        if (!is_block_corner)
                         {
-                            this_cp->mb_average_block_corner_ghost(icorner,refratio,
-                                                                   corner_cp,time_interp);
+                            this_cp->exchange_corner_ghost(icorner,corner_cp,
+                                                           &transform_data);
                         }
                         else
                         {
-                            /* Handle 4 and 5 corner block cases here */
-                        }
-                    }
-                }
-                else if (relative_refinement_level == -1 && is_fine)
-                {
-#if 0
-                    /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
-
-                    /* Corner is at at coarser level.  If the corner patch is a parallel
-                       ghost patch, then we should average onto it as well (even if it
-                       is technically read only)  Otherwise, it won't have good data for
-                       doing interpolation to this fine grid later */
-                    if (fclaw2d_patch_is_ghost (corner_patch))
-                    {
-                        /* Corner is a parallel ghost patch.  Do the same as above, but
-                           but from the perspective of the ghost (coarser) patch.*/
-                        ClawPatch *corner_cp = this_cp;
-                        ClawPatch *coarse_cp = get_clawpatch(corner_patch);
-
-                        if (this_block_idx == corner_block_idx)
-                        {
-                            int icorner_coarse = 3-icorner;
-                            coarse_cp->average_corner_ghost(icorner_coarse,
-                                                            refratio,corner_cp,
-                                                            time_interp,
-                                                            &transform_data);
-                        }
-                        else
-                        {
-                            int icorner_coarse;
-                            if (is_block_corner)
+                            if (ispillowsphere_())
                             {
-                                icorner_coarse = icorner;
+                                this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
                             }
                             else
                             {
-                                if (icorner == 0)
-                                {
-                                    if (intersects_block[0])
-                                        icorner_coarse = 2;
-                                    else if (intersects_block[2])
-                                        icorner_coarse = 1;
-                                }
-                                else if (icorner == 1)
-                                {
-                                    if (intersects_block[1])
-                                        icorner_coarse = 3;
-                                    else if (intersects_block[2])
-                                        icorner_coarse = 0;
-                                }
-                                else if (icorner == 2)
-                                {
-                                    if (intersects_block[0])
-                                        icorner_coarse = 0;
-                                    else if (intersects_block[3])
-                                        icorner_coarse = 3;
-                                }
-                                else if (icorner == 3)
-                                {
-                                    if (intersects_block[1])
-                                        icorner_coarse = 1;
-                                    else if (intersects_block[3])
-                                    icorner_coarse = 2;
-                                }
+                                /* Handle 4 and 5 corner block cases here;  nothing to do for
+                                   cubed sphere case. */
                             }
-                            coarse_cp->mb_average_corner_ghost(icorner_coarse,
-                                                               refratio,
-                                                               corner_cp,
-                                                               time_interp,
-                                                               is_block_corner,
-                                                               intersects_block);
                         }
-                    }  // Go to here
-#endif
-                }
-            }
-            else if (interpolate_to_neighbor)
-            {
-                if (relative_refinement_level == 1 && is_coarse)
-                {
-                    ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                    transform_data.neighbor_patch = corner_patch;
-                    if (!is_block_corner)
-                    {
-                        this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
-                                                          time_interp,&transform_data);
                     }
-                    else
+                }
+                else if (average_from_neighbor)
+                {
+                    if (relative_refinement_level == 1 && is_coarse)
                     {
-                        if (ispillowsphere_())
+                        /* Corner neighbor at a finer level, and so we need to average
+                           that corner onto the coarser corner ghost cells */
+                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                        transform_data.neighbor_patch = corner_patch;
+
+                        if (!is_block_corner)
                         {
-                            this_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
-                                                                       corner_cp,time_interp);
+                            this_cp->average_corner_ghost(icorner,refratio,corner_cp,
+                                                          time_interp, &transform_data);
                         }
                         else
                         {
-                            /* Handle 4,5 patch corners; nothing to be done for cubed sphere */
+                            if (ispillowsphere_())
+                            {
+                                this_cp->mb_average_block_corner_ghost(icorner,refratio,
+                                                                       corner_cp,time_interp);
+                            }
+                            else
+                            {
+                                /* Handle 4 and 5 corner block cases here */
+                            }
                         }
                     }
                 }
-                else if (relative_refinement_level == -1 && is_fine)
+                else if (interpolate_to_neighbor)
                 {
-                    /* Neighbor is a parallel patch;  swap 'this' and 'neighbor' */
+                    if (relative_refinement_level == 1 && is_coarse)
+                    {
+                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                        transform_data.neighbor_patch = corner_patch;
+                        if (!is_block_corner)
+                        {
+                            this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
+                                                              time_interp,&transform_data);
+                        }
+                        else
+                        {
+                            if (ispillowsphere_())
+                            {
+                                this_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
+                                                                           corner_cp,time_interp);
+                            }
+                            else
+                            {
+                                /* Handle 4,5 patch corners; nothing to be done for cubed sphere */
+                            }
+                        }
+                    }
                 }
-            }
+            }  /* End of non-parallel patch case */
+            else
+            {
+                /* Neighbor is a parallel patch */
+                if (average_from_neighbor)
+                {
+                    /* Neighbor is a parallel patch */
+                    if (relative_refinement_level == -1 && is_fine)
+                    {
+                        /* We want to average 'this' onto the coarser parallel ghost patch */
+                        /* Assume that "rcornerno" correctly encodes the transformation at
+                           block boundaries */
+                    }
+                }
+                else if (interpolate_to_neighbor)
+                {
+                    if (relative_refinement_level == -1 && is_fine)
+                    {
+                        /* Figure out something here .... */
+                    }
+                }
+            }  /* End of parallel case */
+        }  /* End of 'interior_corner' */
+    }  /* End of icorner loop */
+}
+
+static
+void get_block_boundary(fclaw2d_domain_t *domain,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        fclaw_bool *intersects_block)
+{
+    int rproc[p4est_refineFactor];
+    int rblockno;
+    int rpatchno[p4est_refineFactor];
+    int rfaceno;
+
+    for (int iside = 0; iside < NumFaces; iside++)
+    {
+        fclaw2d_patch_relation_t neighbor_type =
+            fclaw2d_patch_face_neighbors(domain,
+                                         this_block_idx,
+                                         this_patch_idx,
+                                         iside,
+                                         rproc,
+                                         &rblockno,
+                                         rpatchno,
+                                         &rfaceno);
+        /* --------------------------
+           neighbor_type is one of :
+           FCLAW2D_PATCH_BOUNDARY,
+           FCLAW2D_PATCH_HALFSIZE,
+           FCLAW2D_PATCH_SAMESIZE,
+           FCLAW2D_PATCH_DOUBLESIZE
+           --------------------------*/
+
+        if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
+        {
+            /* 'iside' is a physical boundary (and so it must also be a
+               block boundary */
+            intersects_block[iside] = fclaw_true;
+        }
+        else
+        {
+            // We have a neighbor patch on block 'rblockno'.
+            intersects_block[iside] = this_block_idx != rblockno;
         }
     }
 }
