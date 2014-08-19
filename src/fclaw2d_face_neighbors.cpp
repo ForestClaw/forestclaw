@@ -25,6 +25,115 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
+static
+void get_face_neighbors(fclaw2d_domain_t *domain,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        int iside,
+                        int *neighbor_block_idx,
+                        fclaw2d_patch_t* neighbor_patches[],
+                        int **ref_flag_ptr,
+                        int **fine_grid_pos_ptr,
+                        int **iface_neighbor_ptr,
+                        int ftransform[])
+{
+    int rproc[p4est_refineFactor];
+    int rblockno;
+    int rpatchno[p4est_refineFactor];
+    int rfaceno;
+    int num_neighbors;
+
+    for(int ir = 0; ir < p4est_refineFactor; ir++)
+    {
+        neighbor_patches[ir] = NULL;
+    }
+
+    fclaw2d_patch_relation_t neighbor_type =
+        fclaw2d_patch_face_neighbors(domain,
+                                     this_block_idx,
+                                     this_patch_idx,
+                                     iside,
+                                     rproc,
+                                     &rblockno,
+                                     rpatchno,
+                                     &rfaceno);
+
+    /* ------------------------------
+      neighbor_type is one of :
+      FCLAW2D_PATCH_BOUNDARY,
+      FCLAW2D_PATCH_HALFSIZE,
+      FCLAW2D_PATCH_SAMESIZE,
+      FCLAW2D_PATCH_DOUBLESIZE
+      ------------------------------- */
+
+    *neighbor_block_idx = rblockno;
+
+    if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
+    {
+        /* Edge is a physical boundary
+           Set the pointer to NULL rather than come up with some bogus value
+           for ref_flag and iface_neighbor */
+        *ref_flag_ptr = NULL;
+        *iface_neighbor_ptr = NULL;
+    }
+    else
+    {
+        // Get encoding of transforming a neighbor coordinate across a face
+        fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
+        if (this_block_idx == rblockno)
+        {
+            // If we are within one patch this is a special case
+            ftransform[8] = 4;
+        }
+
+        if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+        {
+            **ref_flag_ptr = 0;
+            *fine_grid_pos_ptr = NULL;
+            num_neighbors = 1;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+        {
+            **ref_flag_ptr = -1;
+            **fine_grid_pos_ptr = rproc[1];    // Special storage for fine grid info
+            num_neighbors = 1;
+        }
+        else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            /* Patch has two neighbors */
+            **ref_flag_ptr = 1; /* patches are at one level finer */
+            *fine_grid_pos_ptr = NULL;
+            num_neighbors = p4est_refineFactor;
+        }
+        else
+        {
+            printf ("Illegal fclaw2d_patch_face_neighbors return value\n");
+            exit (1);
+        }
+
+        for(int ir = 0; ir < num_neighbors; ir++)
+        {
+            fclaw2d_patch_t *neighbor;
+            if (rproc[ir] == domain->mpirank)
+            {
+                /* neighbor patch is local */
+                fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
+                neighbor = &neighbor_block->patches[rpatchno[ir]];
+            }
+            else
+            {
+                /* neighbor patch is on a remote processor */
+                neighbor = &domain->ghost_patches[rpatchno[ir]];
+            }
+            neighbor_patches[ir] = neighbor;
+        }
+        **iface_neighbor_ptr = iside;
+        fclaw2d_patch_face_swap(*iface_neighbor_ptr,&rfaceno);
+
+    }
+}
+
+
 void cb_face_fill(fclaw2d_domain_t *domain,
                   fclaw2d_patch_t *this_patch,
                   int this_block_idx,
@@ -91,101 +200,76 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             continue;
         }
 
-        if (copy_from_neighbor)
+        /* Parallel distribution keeps siblings on same processor */
+        fclaw_bool remote_neighbor;
+        remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
+        if (is_coarse)
         {
-            if (relative_refinement_level == 0)
+            if (relative_refinement_level == 1)
             {
-                /* We have a neighbor patch at the same level */
+                for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
+                {
+                    ClawPatch *fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
+                    transform_data.neighbor_patch = neighbor_patches[igrid];
+                    transform_data.fine_grid_pos = igrid;
+                    if (interpolate_to_neighbor && !remote_neighbor)
+                    {
+                        /* interpolate to igrid */
+                        this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
+                                                        refratio,fine_neighbor_cp,
+                                                        time_interp,
+                                                        block_boundary,igrid,
+                                                        &transform_data);
+                    }
+                    else if (average_from_neighbor)
+                    {
+                        /* average */
+                        this_cp->average_face_ghost(idir,iface,p4est_refineFactor,
+                                                    refratio,fine_neighbor_cp,
+                                                    time_interp,
+                                                    block_boundary,igrid,
+                                                    &transform_data);
+                    }
+                }
+            }
+            else if (relative_refinement_level == 0 && copy_from_neighbor)
+            {
+                /* Copy */
                 fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                 ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
-
                 transform_data.neighbor_patch = neighbor_patches[0];
                 this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
             }
         }
-        else if (average_from_neighbor)
+        else if (is_fine && remote_neighbor)
         {
-            /* neighbors are at a finer level */
-            if (relative_refinement_level == 1 && is_coarse)
+            if (relative_refinement_level == -1)
             {
-                /* Fill in ghost cells on 'this_patch' by averaging data from finer neighbors */
+                /* We need to average to the parallel patches so that the
+                   interpolatation to corners (if needed) will work */
+                ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
+                ClawPatch *fine_cp = this_cp;
+                /* Figure out which grid we got */
+                int igrid = fine_grid_pos;
+
+                /* Swap out coarse and fine */
+                int iface_coarse = iface_neighbor;
+
                 fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
-                for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
+                transform_data.this_patch = neighbor_patches[0];
+                transform_data.neighbor_patch = this_patch;
+                transform_data.fine_grid_pos = igrid;
+                if (average_from_neighbor)
                 {
-                    transform_data.neighbor_patch = neighbor_patches[igrid];
-                    transform_data.fine_grid_pos = igrid;
-                    ClawPatch* fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
-                    this_cp->average_face_ghost(idir,iface,p4est_refineFactor,refratio,
-                                                fine_neighbor_cp,time_interp,block_boundary,
-                                                igrid,&transform_data);
-                }
-            }
-            else if (relative_refinement_level == -1 && is_fine)
-            {
-                /* This happens only when running parallel */
-                /* Found a fine grid with a parallel ghost patch as a neighbor */
-                if (fclaw2d_patch_is_ghost (neighbor_patches[0]))
-                {
-                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
-                    ClawPatch *fine_cp = this_cp;
-                    /* Figure out which grid we got */
-                    int igrid = fine_grid_pos;
-
-                    /* Swap out coarse and fine */
-                    int iface_coarse = iface_neighbor;
-
-                    fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
-                    transform_data.this_patch = neighbor_patches[0];
-                    transform_data.neighbor_patch = this_patch;
-                    transform_data.fine_grid_pos = igrid;
                     coarse_cp->average_face_ghost(idir,iface_coarse,
                                                   p4est_refineFactor,refratio,
                                                   fine_cp,time_interp,block_boundary,
                                                   igrid, &transform_data);
                 }
             }
-        }
-        else if (interpolate_to_neighbor)
-        {
-            if (relative_refinement_level == 1 && is_coarse)  // neighbors are at finer level
+            else if (relative_refinement_level == 0)
             {
-                /* Fill in ghost cells on 'neighbor_patch' by interpolation */
-                for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
-                {
-                    ClawPatch *fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
-                    transform_data.neighbor_patch = neighbor_patches[igrid];
-                    transform_data.fine_grid_pos = igrid;
-                    this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
-                                                    refratio,fine_neighbor_cp,
-                                                    time_interp,
-                                                    block_boundary,igrid,
-                                                    &transform_data);
-                }
-            }
-            else if (relative_refinement_level == -1 && is_fine)
-            {
-                /* Found a fine grid with a parallel coarse grid neighbor? */
-                if (fclaw2d_patch_is_ghost (neighbor_patches[0]))
-                {
-                    ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
-                    ClawPatch *fine_cp = this_cp;
-                    /* Figure out which grid we got */
-                    int igrid = fine_grid_pos;
-
-                    /* Swap out coarse and fine */
-                    int iface_coarse = iface_neighbor;
-
-                    /* This call can generate a floating point exception, for reasons I don't
-                       completely understand, (er don't understand at all...) Valgrind doesn't
-                       find any errors, and results do not have any NANs.  Strange
-                    */
-                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,
-                                                      p4est_refineFactor,refratio,
-                                                      fine_cp,time_interp,
-                                                      block_boundary,
-                                                      igrid,
-                                                      &transform_data);
-                }
+                /* Copy to parallel patch */
             }
         }
     }
