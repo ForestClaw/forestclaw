@@ -65,6 +65,7 @@ typedef struct fclaw2d_exchange_info
 {
     fclaw_bool time_interp;
     int level;
+    fclaw_bool ignore_parallel_patches;   /* before we have done a parallel exchange */
     fclaw2d_exchange_type_t exchange_type;
     fclaw2d_grid_type_t grid_type;
 } fclaw2d_exchange_info_t;

@@ -79,12 +79,12 @@ void get_corner_type(fclaw2d_domain_t* domain,
 }
 
 
-/* -----------------------------------------------
+/* --------------------------------------------------------
    Four cases to consider.   The 'has_corner_neighbor'
    value is returned from p4est.
 
    Case No. | has_corner_neighbor  |  is_block_corner
-   ----------------------------------------------------
+   --------------------------------------------------------
       1     |       T              |        T
       2     |       F              |        F
       3     |       T              |        F
@@ -102,7 +102,7 @@ void get_corner_type(fclaw2d_domain_t* domain,
              on a pillow grid, in which case we have a valid
              corner, but one which we nonetheless treat
              as a special case.
-   ----------------------------------------------- */
+   ------------------------------------------------------ */
 
 static
 void get_corner_neighbor(fclaw2d_domain_t *domain,
@@ -347,7 +347,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             if (is_coarse)
             {
                 /* Looking for finer grids which 'this_patch' can average from, or
-                   interpolate to (if patch is not remote) */
+                   interpolate to (if patch is not remote).  We include in this
+                   grid at the same level, from which we copy values.  */
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
                 if (!is_block_corner)
@@ -405,7 +406,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }  /* Ende of non-parallel patch case */
-            else if (remote_neighbor && is_fine)
+            else if (remote_neighbor && is_fine && !ignore_parallel_patches)
             {
                 /* Neighbor is a parallel patch and we need to switch 'this_patch' with
                    the 'ghost_patch'.  */
