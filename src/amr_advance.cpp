@@ -199,6 +199,7 @@ double advance_level(fclaw2d_domain_t *domain,
   the logic here is considerably simpler than for the partial
   update used in intermediate steps in the subcycled case.
   ------------------------------------------------------------- */
+#if 0
 void update_ghost_all_levels(fclaw2d_domain_t* domain,
                              fclaw2d_timer_names_t running)
 {
@@ -252,7 +253,7 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
         fclaw2d_timer_start (&ddata->timers[running]);
     }
 }
-
+#endif
 
 
 /* ----------------------------------------------------------
