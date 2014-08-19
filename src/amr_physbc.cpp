@@ -50,6 +50,22 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                               t_info->time_interp);
 }
 
+/* This is needed by other routines, so we don't set it to static. */
+void get_phys_boundary(fclaw2d_domain_t *domain,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       fclaw_bool *intersects_bdry)
+{
+    // const int numfaces = get_faces_per_patch(domain);
+    int bdry[NumFaces];
+    fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
+    for(int i = 0; i < NumFaces; i++)
+    {
+        // Physical boundary conditions
+        intersects_bdry[i] = bdry[i] == 1;
+    }
+}
+
 
 /* -----------------------------------------------------------------------------
    Set physical boundary conditions on a patch
