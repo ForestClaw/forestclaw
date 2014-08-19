@@ -25,13 +25,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
+static
+void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
+                       fclaw_bool time_interp);
+
+static
+void copy2ghost(fclaw2d_domain_t *domain, int level,
+                fclaw_bool ignore_parallel_patches);
+
+static
+void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
+                   fclaw_bool time_interp,
+                   fclaw_bool ignore_parallel_patches);
+
+
 void intralevel_ghost_copy(fclaw2d_domain_t* domain, int minlevel,
                            int maxlevel, fclaw_bool ignore_parallel_patches)
 {
     /* Copy between grids that are at the same level. */
     for(int level = maxlevel; level >= minlevel; level--)
     {
-        copy2ghost(domain,level,ghost_cells);
+        copy2ghost(domain,level,ignore_parallel_patches);
     }
 }
 
@@ -40,12 +54,12 @@ void fill_coarse_ghost(fclaw2d_domain_t *domain,
                        int mincoarse,
                        int maxcoarse,
                        fclaw_bool time_interp,
-                       fclaw2d_ghost_cell_types_t ghost_cells)
+                       fclaw_bool ignore_parallel_patches)
 {
     /* Average fine grids to coarse grid ghost cells */
     for(int level = maxcoarse; level >= mincoarse; level--)
     {
-        average2ghost(domain,level,time_interp,ghost_cells);
+        average2ghost(domain,level,time_interp,ignore_parallel_patches);
     }
 }
 
@@ -79,7 +93,8 @@ fclaw_bool fclaw2d_patch_is_local(fclaw2d_patch_t *patch)
 }
 
 static
-void copy2ghost(fclaw2d_domain_t *domain, int level, fclaw_bool ignore_parallel_patches)
+void copy2ghost(fclaw2d_domain_t *domain, int level,
+                fclaw_bool ignore_parallel_patches)
 {
     fclaw2d_exchange_info_t e_info;
     e_info.exchange_type = FCLAW2D_COPY;
@@ -89,15 +104,16 @@ void copy2ghost(fclaw2d_domain_t *domain, int level, fclaw_bool ignore_parallel_
 
     /* face exchanges */
     fclaw2d_domain_iterate_level(domain, level, cb_face_fill,
-                                 (void *) &filltype);
+                                 (void *) &e_info);
 
     /* corner exchanges */
     fclaw2d_domain_iterate_level(domain, level, cb_corner_fill,
-                                 (void *) &filltype);
+                                 (void *) &e_info);
 
 }
 
 
+static
 void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
                    fclaw_bool time_interp,
                    fclaw_bool ignore_parallel_patches)
@@ -139,6 +155,7 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
     }
 }
 
+static
 void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
                        fclaw_bool time_interp)
 {
@@ -183,7 +200,6 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
        ghost patches */
     fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_fill,
                                  (void *) &e_info);
-
 }
 
 
@@ -252,7 +268,7 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
 
     /* Average fine grid data to the coarse grid. */
     fill_coarse_ghost(domain,mincoarse,maxcoarse, no_time_interp,
-                      FCLAW2D_LOCAL_BOUNDARY);
+                      ignore_parallel_patches);
 
     /* Supply physical boundary conditions on coarse grid */
     fill_physical_ghost(domain,mincoarse,maxcoarse,t,no_time_interp);
@@ -267,12 +283,13 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
       -------------------------------------------------------------- */
 
     /* Fill in ghost cells on parallel patch boundaries */
+    ignore_parallel_patches = fclaw_false;
     intralevel_ghost_copy(domain,minlevel,maxlevel,
-                          FCLAW2D_PARALLEL_BOUNDARY);
+                          ignore_parallel_patches);
 
     /* Average fine grid data to the coarse grid. */
     fill_coarse_ghost(domain,mincoarse,maxcoarse, no_time_interp,
-                      FCLAW2D_PARALLEL_BOUNDARY);
+                      ignore_parallel_patches);
 
     /* Supply physical boundary conditions on coarse grid */
     fill_physical_ghost(domain,mincoarse,maxcoarse,t,no_time_interp);
