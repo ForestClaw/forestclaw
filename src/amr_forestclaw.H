@@ -65,9 +65,6 @@ typedef struct fclaw2d_exchange_info
 {
     fclaw_bool time_interp;
     int level;
-    fclaw_bool is_coarse;
-    fclaw_bool is_fine;
-
     fclaw2d_exchange_type_t exchange_type;
     fclaw2d_grid_type_t grid_type;
 } fclaw2d_exchange_info_t;
@@ -118,47 +115,15 @@ void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,
 // Routines needed to communicate with p4est
 // -------------------------------------------
 
-// amr_neighbors.cpp
-void get_face_neighbors (fclaw2d_domain_t * domain,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         int iside,
-                         int *neighbor_block_idx,
-                         fclaw2d_patch_t * ghost_patches[],
-                         int **ref_flag_ptr,
-                         int **fine_grid_pos_ptr,
-                         int **iface_neighbor,
-                         int ftransform[]);
-
-void get_corner_neighbor (fclaw2d_domain_t * domain,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          int icorner,
-                          int iface,
-                          fclaw_bool is_block_corner,
-                          int *corner_block_idx,
-                          fclaw2d_patch_t ** ghost_patch,
-                          int **ref_flag_ptr,
-                          int* block_corner_count,
-                          int ftransform[]);
-
+#if 0
 void get_block_boundary (fclaw2d_domain_t * domain,
                          int this_block_idx,
                          int this_patch_idx, bool * intersects_block);
+#endif
 
 void get_phys_boundary (fclaw2d_domain_t * domain,
                         int this_block_idx,
                         int this_patch_idx, fclaw_bool * intersects_bc);
-
-void
-get_corner_type(fclaw2d_domain_t* domain,
-                int icorner,
-                fclaw_bool intersects_bdry[],
-                fclaw_bool intersects_block[],
-                fclaw_bool *interior_corner,
-                fclaw_bool *is_block_corner,
-                int *block_iface);
-
 
 void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
@@ -171,7 +136,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_block_idx,
                   int this_patch_idx,
                   void *user);
-
 
 // ----------------------------
 // Routines used by diagnostics
