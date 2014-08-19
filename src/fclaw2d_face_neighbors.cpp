@@ -151,18 +151,16 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
-
-    // Fill in ghost cells at level 'a_level' by averaging from level 'a_level + 1'
     const amr_options_t *gparms = get_domain_parms(domain);
     const int refratio = gparms->refratio;
 
-    /* Transform data needed at multi-block boundaries */
+    /* Transform data needed at block boundaries */
     fclaw2d_transform_data_t transform_data;
     transform_data.mx = gparms->mx;
     transform_data.my = gparms->my;
-    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.based = 1;                 /* cell-centered data in this routine. */
     transform_data.this_patch = this_patch;
-    transform_data.neighbor_patch = NULL;  // gets filled in below.
+    transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
     ClawPatch *this_cp = get_clawpatch(this_patch);
     for (int iface = 0; iface < NumFaces; iface++)
@@ -171,7 +169,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
         /* Output arguments */
         int neighbor_block_idx;
-        int relative_refinement_level;   // = -1, 0, 1
+        int relative_refinement_level;   /* = -1, 0, 1 */
         int *ref_flag_ptr = &relative_refinement_level;
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
@@ -195,7 +193,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                            &iface_neighbor_ptr,
                            transform_data.transform);
 
-        fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
+        /* fclaw_bool block_boundary = this_block_idx != neighbor_block_idx; */
         if (ref_flag_ptr == NULL)
         {
             /* No face neighbors - we are at a physical boundary */
@@ -219,8 +217,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         /* interpolate to igrid */
                         this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
                                                         refratio,fine_neighbor_cp,
-                                                        time_interp,
-                                                        block_boundary,igrid,
+                                                        time_interp,igrid,
                                                         &transform_data);
                     }
                     else if (average_from_neighbor)
@@ -228,8 +225,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         /* average */
                         this_cp->average_face_ghost(idir,iface,p4est_refineFactor,
                                                     refratio,fine_neighbor_cp,
-                                                    time_interp,
-                                                    block_boundary,igrid,
+                                                    time_interp,igrid,
                                                     &transform_data);
                     }
                 }
@@ -245,33 +241,41 @@ void cb_face_fill(fclaw2d_domain_t *domain,
         }
         else if (is_fine && remote_neighbor && !ignore_parallel_patches)
         {
-            if (relative_refinement_level == -1)
+            /* Swap 'this_patch' and the neighbor patch */
+            ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
+            ClawPatch *fine_cp = this_cp;
+
+            /* Figure out which grid we got */
+            int igrid = fine_grid_pos;  /* returned from get_face_neighbors, above */
+
+            int iface_coarse = iface_neighbor;
+            int this_face = iface;
+
+            /* Redo the transformation */
+            if (this_block_idx != neighbor_block_idx)
             {
-                /* We need to average to the parallel patches so that the
-                   interpolatation to corners (if needed) will work */
-                ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
-                ClawPatch *fine_cp = this_cp;
-                /* Figure out which grid we got */
-                int igrid = fine_grid_pos;
-
-                /* Swap out coarse and fine */
-                int iface_coarse = iface_neighbor;
-
-                fclaw_bool block_boundary = this_block_idx != neighbor_block_idx;
-                transform_data.this_patch = neighbor_patches[0];
-                transform_data.neighbor_patch = this_patch;
-                transform_data.fine_grid_pos = igrid;
-                if (average_from_neighbor)
-                {
-                    coarse_cp->average_face_ghost(idir,iface_coarse,
-                                                  p4est_refineFactor,refratio,
-                                                  fine_cp,time_interp,block_boundary,
-                                                  igrid, &transform_data);
-                }
+                fclaw2d_patch_face_transformation (iface_coarse, this_face,
+                                                   transform_data.transform);
             }
-            else if (relative_refinement_level == 0)
+            transform_data.this_patch = neighbor_patches[0];  /* only one (coarse) neighbor */
+            transform_data.neighbor_patch = this_patch;
+            transform_data.fine_grid_pos = igrid;
+
+            if (relative_refinement_level == -1 && average_from_neighbor)
             {
-                /* Copy to parallel patch */
+                /* Neighbor patch is a coarser grid;  we want to average 'this_patch' it */
+                coarse_cp->average_face_ghost(idir,iface_coarse,
+                                              p4est_refineFactor,refratio,
+                                              fine_cp,time_interp,
+                                              igrid, &transform_data);
+            }
+            else if (relative_refinement_level == 0 && copy_from_neighbor)
+            {
+                coarse_cp->exchange_face_ghost(iface_coarse,this_cp,&transform_data);
+            }
+            else
+            {
+                /* We don't need to interpolate to parallel patches */
             }
         }
     }

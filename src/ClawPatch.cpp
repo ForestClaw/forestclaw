@@ -405,7 +405,6 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_refratio,
                                    ClawPatch *neighbor_cp,
                                    fclaw_bool a_time_interp,
-                                   fclaw_bool a_block_boundary,
                                    const int& igrid,
                                    fclaw2d_transform_data_t* transform_data)
 {
@@ -432,7 +431,6 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_refratio,
                                        ClawPatch *neighbor_cp,
                                        fclaw_bool a_time_interp,
-                                       fclaw_bool a_block_boundary,
                                        const int& igrid,
                                        fclaw2d_transform_data_t* transform_data)
 {

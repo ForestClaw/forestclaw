@@ -76,7 +76,6 @@ public :
                             const int& a_refratio,
                             ClawPatch *neighbor_cp,
                             fclaw_bool a_time_interp,
-                            fclaw_bool a_block_boundary,
                             const int& igrid,
                             fclaw2d_transform_data_t* transform_data);
 
@@ -87,7 +86,6 @@ public :
                                 const int& a_refratio,
                                 ClawPatch *a_neighbor_cp,
                                 fclaw_bool a_time_interp,
-                                fclaw_bool a_block_boundary,
                                 const int& igrid,
                                 fclaw2d_transform_data_t* transform_data);
 
