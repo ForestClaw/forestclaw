@@ -279,7 +279,8 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     exchange_ghost_patch_data_all(domain);
 
     /* -------------------------------------------------------------
-      Repeat above, but now only with ghost cells.
+      Repeat above, but now with parallel ghost cells.
+      This may involve lots of repeated worked.
       -------------------------------------------------------------- */
 
     /* Fill in ghost cells on parallel patch boundaries */
