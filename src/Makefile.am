@@ -61,7 +61,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_face_neighbors.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
-	src/amr_neighbors.cpp \
 	src/amr_timeinterp.cpp \
 	src/amr_physbc.cpp \
 	src/amr_utils.cpp \
