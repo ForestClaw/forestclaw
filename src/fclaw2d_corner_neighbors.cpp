@@ -26,6 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_includes.H"
 #include "fclaw2d_map_query.h"
 
+/* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
+enum
+{
+    COARSER_GRID = -1,
+    SAMESIZE_GRID,
+    FINER_GRID
+};
+
+
 static
 void get_block_boundary(fclaw2d_domain_t *domain,
                         int this_block_idx,
@@ -346,15 +355,11 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             fclaw_bool remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
             if (is_coarse)
             {
-                /* Looking for finer grids which 'this_patch' can average from, or
-                   interpolate to (if patch is not remote).  We include in this
-                   grid at the same level, from which we copy values.  */
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
                 if (!is_block_corner)
                 {
-                    /* Neighbor is on the same processor */
-                    if (relative_refinement_level == 1)
+                    if (relative_refinement_level == FINER_GRID)
                     {
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
@@ -368,7 +373,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                                           time_interp, &transform_data);
                         }
                     }
-                    else if (relative_refinement_level == 0 && copy_from_neighbor)
+                    else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
                         this_cp->exchange_corner_ghost(icorner,corner_cp,
                                                        &transform_data);
@@ -381,7 +386,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     {
                         /* The block corners of the pillow sphere have to be handled as
                            a special case */
-                        if (relative_refinement_level == 1)
+                        if (relative_refinement_level == FINER_GRID)
                         {
                             if (interpolate_to_neighbor && !remote_neighbor)
                             {
@@ -394,7 +399,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                                                        corner_cp,time_interp);
                             }
                         }
-                        else if (relative_refinement_level == 0 && copy_from_neighbor)
+                        else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
                         {
                             this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
                         }

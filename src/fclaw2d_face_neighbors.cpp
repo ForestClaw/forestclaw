@@ -25,6 +25,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
+/* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
+enum
+{
+    COARSER_GRID = -1,
+    SAMESIZE_GRID,
+    FINER_GRID
+};
+
 static
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
@@ -205,7 +213,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
         remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
         if (is_coarse)
         {
-            if (relative_refinement_level == 1)
+            if (relative_refinement_level == FINER_GRID)
             {
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
@@ -222,7 +230,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     }
                     else if (average_from_neighbor)
                     {
-                        /* average */
+                        /* average from igrid */
                         this_cp->average_face_ghost(idir,iface,p4est_refineFactor,
                                                     refratio,fine_neighbor_cp,
                                                     time_interp,igrid,
@@ -230,9 +238,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }
-            else if (relative_refinement_level == 0 && copy_from_neighbor)
+            else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
             {
-                /* Copy */
+                /* Copy to same size patch */
                 fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                 ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
                 transform_data.neighbor_patch = neighbor_patches[0];
@@ -261,7 +269,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             transform_data.neighbor_patch = this_patch;
             transform_data.fine_grid_pos = igrid;
 
-            if (relative_refinement_level == -1 && average_from_neighbor)
+            if (relative_refinement_level == COARSER_GRID && average_from_neighbor)
             {
                 /* Neighbor patch is a coarser grid;  we want to average 'this_patch' it */
                 coarse_cp->average_face_ghost(idir,iface_coarse,
@@ -269,7 +277,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                               fine_cp,time_interp,
                                               igrid, &transform_data);
             }
-            else if (relative_refinement_level == 0 && copy_from_neighbor)
+            else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
             {
                 coarse_cp->exchange_face_ghost(iface_coarse,this_cp,&transform_data);
             }
