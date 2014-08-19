@@ -343,109 +343,74 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 continue;
             }
 
-            if (!fclaw2d_patch_is_ghost(corner_patch))
+            fclaw_bool remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
+            if (is_coarse)
             {
-                /* Neighbor is on the same processor */
-                if (copy_from_neighbor)
+                /* Looking for finer grids which 'this_patch' can average from, or
+                   interpolate to (if patch is not remote) */
+                ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                transform_data.neighbor_patch = corner_patch;
+                if (!is_block_corner)
                 {
-                    if (relative_refinement_level == 0)
+                    /* Neighbor is on the same processor */
+                    if (relative_refinement_level == 1)
                     {
-                        // fclaw2d_patch_t* corner_patch = neighbor_patch;
-                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                        transform_data.neighbor_patch = corner_patch;
-                        if (!is_block_corner)
+                        if (interpolate_to_neighbor && !remote_neighbor)
                         {
-                            this_cp->exchange_corner_ghost(icorner,corner_cp,
-                                                           &transform_data);
+                            /* We don't need to interpolate to parallel patches */
+                            this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
+                                                              time_interp,&transform_data);
                         }
-                        else
-                        {
-                            if (ispillowsphere_())
-                            {
-                                this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
-                            }
-                            else
-                            {
-                                /* Handle 4 and 5 corner block cases here;  nothing to do for
-                                   cubed sphere case. */
-                            }
-                        }
-                    }
-                }
-                else if (average_from_neighbor)
-                {
-                    if (relative_refinement_level == 1 && is_coarse)
-                    {
-                        /* Corner neighbor at a finer level, and so we need to average
-                           that corner onto the coarser corner ghost cells */
-                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                        transform_data.neighbor_patch = corner_patch;
-
-                        if (!is_block_corner)
+                        else if (average_from_neighbor)
                         {
                             this_cp->average_corner_ghost(icorner,refratio,corner_cp,
                                                           time_interp, &transform_data);
                         }
-                        else
-                        {
-                            if (ispillowsphere_())
-                            {
-                                this_cp->mb_average_block_corner_ghost(icorner,refratio,
-                                                                       corner_cp,time_interp);
-                            }
-                            else
-                            {
-                                /* Handle 4 and 5 corner block cases here */
-                            }
-                        }
+                    }
+                    else if (relative_refinement_level == 0 && copy_from_neighbor)
+                    {
+                        this_cp->exchange_corner_ghost(icorner,corner_cp,
+                                                       &transform_data);
                     }
                 }
-                else if (interpolate_to_neighbor)
+                else
                 {
-                    if (relative_refinement_level == 1 && is_coarse)
+                    /* We are at a block corner */
+                    if (ispillowsphere_())
                     {
-                        ClawPatch *corner_cp = get_clawpatch(corner_patch);
-                        transform_data.neighbor_patch = corner_patch;
-                        if (!is_block_corner)
+                        /* The block corners of the pillow sphere have to be handled as
+                           a special case */
+                        if (relative_refinement_level == 1)
                         {
-                            this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
-                                                              time_interp,&transform_data);
-                        }
-                        else
-                        {
-                            if (ispillowsphere_())
+                            if (interpolate_to_neighbor && !remote_neighbor)
                             {
                                 this_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
                                                                            corner_cp,time_interp);
                             }
-                            else
+                            else if (average_from_neighbor)
                             {
-                                /* Handle 4,5 patch corners; nothing to be done for cubed sphere */
+                                this_cp->mb_average_block_corner_ghost(icorner,refratio,
+                                                                       corner_cp,time_interp);
                             }
                         }
+                        else if (relative_refinement_level == 0 && copy_from_neighbor)
+                        {
+                            this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
+                        }
+                    }
+                    else
+                    {
+                        /* Handle 4 and 5 corner block cases here;  nothing to do for
+                           cubed sphere case. */
                     }
                 }
-            }  /* End of non-parallel patch case */
-            else
+            }  /* Ende of non-parallel patch case */
+            else if (remote_neighbor && is_fine)
             {
-                /* Neighbor is a parallel patch */
-                if (average_from_neighbor)
-                {
-                    /* Neighbor is a parallel patch */
-                    if (relative_refinement_level == -1 && is_fine)
-                    {
-                        /* We want to average 'this' onto the coarser parallel ghost patch */
-                        /* Assume that "rcornerno" correctly encodes the transformation at
-                           block boundaries */
-                    }
-                }
-                else if (interpolate_to_neighbor)
-                {
-                    if (relative_refinement_level == -1 && is_fine)
-                    {
-                        /* Figure out something here .... */
-                    }
-                }
+                /* Neighbor is a parallel patch and we need to switch 'this_patch' with
+                   the 'ghost_patch'.  */
+
+
             }  /* End of parallel case */
         }  /* End of 'interior_corner' */
     }  /* End of icorner loop */
