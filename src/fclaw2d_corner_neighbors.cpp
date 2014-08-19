@@ -406,7 +406,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }  /* Ende of non-parallel patch case */
-            else if (remote_neighbor && is_fine && !ignore_parallel_patches)
+            else if (remote_neighbor && is_fine)
             {
                 /* Neighbor is a parallel patch and we need to switch 'this_patch' with
                    the 'ghost_patch'.  */
