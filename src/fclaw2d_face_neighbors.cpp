@@ -177,8 +177,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
         /* Output arguments */
         int neighbor_block_idx;
-        int relative_refinement_level;   /* = -1, 0, 1 */
-        int *ref_flag_ptr = &relative_refinement_level;
+        int neighbor_level;   /* = -1, 0, 1 */
+        int *ref_flag_ptr = &neighbor_level;
         int fine_grid_pos;
         int *fine_grid_pos_ptr = &fine_grid_pos;
 
@@ -213,7 +213,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
         remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
         if (is_coarse)
         {
-            if (relative_refinement_level == FINER_GRID)
+            if (neighbor_level == FINER_GRID)
             {
                 for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                 {
@@ -238,7 +238,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }
-            else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
+            else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
             {
                 /* Copy to same size patch */
                 fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
@@ -269,16 +269,18 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             transform_data.neighbor_patch = this_patch;
             transform_data.fine_grid_pos = igrid;
 
-            if (relative_refinement_level == COARSER_GRID && average_from_neighbor)
+            if (neighbor_level == COARSER_GRID && average_from_neighbor)
             {
-                /* Neighbor patch is a coarser grid;  we want to average 'this_patch' it */
+                /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
                 coarse_cp->average_face_ghost(idir,iface_coarse,
                                               p4est_refineFactor,refratio,
                                               fine_cp,time_interp,
                                               igrid, &transform_data);
             }
-            else if (relative_refinement_level == SAMESIZE_GRID && copy_from_neighbor)
+            else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
             {
+                /* Copy to a parallal patch;  we need these values later for
+                   interpolation to on-proc fine grid corners */
                 coarse_cp->exchange_face_ghost(iface_coarse,this_cp,&transform_data);
             }
             else
