@@ -24,7 +24,10 @@ applications_advection_2d_filament_filament_SOURCES = \
 applications_advection_2d_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-# applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE -D TRAPFPE_OSX
+# applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE
+# applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE_OSX
+
+# applications_advection_2d_filament_filament_CPPFLAGS += -D MPI_DEBUG
 
 
 applications_advection_2d_filament_filament_LDADD = \
