@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fp_exception_glibc_extension.h>
+
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>

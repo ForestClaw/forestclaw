@@ -33,7 +33,7 @@ Numerics", 2004:
 
 http://lists.apple.com/archives/unix-porting/2003/May/msg00026.html
 
-Another version of the ppc legacy code is here: 
+Another version of the ppc legacy code is here:
 
 http://developer.apple.com/documentation/Performance/Conceptual/Mac_OSX_Numerics/Mac_OSX_Numerics.pdf
 
@@ -49,7 +49,7 @@ rather aborts with a diagnostic message.
 
 To compile it under Mac OS X, execute:
 
-  cc -o fe-handling fe-handling-example.c  
+  cc -o fe-handling fe-handling-example.c
 
 To compile it under Linux, execute:
 
@@ -87,7 +87,7 @@ http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.h
 #if DEFINED_PPC
 
 #define FE_EXCEPT_SHIFT 22  // shift flags right to get masks
-#define FM_ALL_EXCEPT    FE_ALL_EXCEPT >> FE_EXCEPT_SHIFT 
+#define FM_ALL_EXCEPT    FE_ALL_EXCEPT >> FE_EXCEPT_SHIFT
 
 /* GNU C Library:
 http://www.gnu.org/software/libc/manual/html_node/Control-Functions.html
@@ -96,7 +96,7 @@ http://www.gnu.org/software/libc/manual/html_node/Control-Functions.html
 
        The function returns a bitmask of all currently enabled
        exceptions.  It returns -1 in case of failure.
-   
+
    The excepts argument appears in other functions in fenv.h,
    and corresponds to the FE_xxx exception flag constants.  It
    is unclear whether the bitmask is for the flags or the masks.
@@ -299,7 +299,7 @@ fhdl ( int sig, siginfo_t *sip, ucontext_t *scp )
 }
 
 
-/*
+#if 0
 int main (int argc, char **argv)
 {
     double s;
@@ -308,7 +308,7 @@ int main (int argc, char **argv)
     act.sa_sigaction = (void(*))fhdl;
     sigemptyset (&act.sa_mask);
     act.sa_flags = SA_SIGINFO;
-    
+
 
 //  printf ("Old divByZero exception: 0x%08X\n", feenableexcept (FE_DIVBYZERO));
     printf ("Old invalid exception:   0x%08X\n", feenableexcept (FE_INVALID));
@@ -325,4 +325,4 @@ int main (int argc, char **argv)
     s = 0.0 / 0.0;  // FE_INVALID
     return 0;
 }
-*/
+#endif

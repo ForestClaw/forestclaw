@@ -23,9 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
+/* Use as an alternate to GNU feenableexcept */
+#include <fp_exception_glibc_extension.h>
+#include <fenv.h>
+#include <signal.h>
+#include <unistd.h>    //  To get process ids
 
 #include "fclaw2d_typedefs.h"
 

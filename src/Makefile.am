@@ -34,6 +34,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
 	src/fclaw2d_map_query.c \
+	src/fp_exception_glibc_extension.c \
 	src/mappings/block.f \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
@@ -59,6 +60,7 @@ libforestclaw_compiled_sources = \
 	src/amr_levelexchange.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
+	src/fclaw2d_mpi_debug.c \
 	src/fclaw2d_fill_ghost.cpp \
 	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
