@@ -2,7 +2,9 @@ s = 0;
 axis([-s 2+s -s 2+s])
 daspect([1 1 1]);
 
-% yrbcolormap;
+if (PlotParallelPartitions == 0)
+    yrbcolormap;
+end
 showpatchborders(1:6);
 % hidepatchborders;
 delete(get(gca,'title'));

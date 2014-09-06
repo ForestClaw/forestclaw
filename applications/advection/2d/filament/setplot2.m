@@ -69,4 +69,4 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 % Set to either a scalar, for automatic contours or a vector of contour levels.
 ContourValues = [];
 
-PlotParallelPartitions = 1;
+PlotParallelPartitions = 0;
