@@ -95,8 +95,8 @@ c     # than in the rest of the mesh.
 c     # Primary cells.  Note that we don't do anything special
 c     # in the diagonal cells - so the areas there are less accurate
 c     # than in the rest of the mesh.
-      do j = -mbc,my+mbc
-         do i = -mbc,mx+mbc
+      do j = -mbc,my+mbc+1
+         do i = -mbc,mx+mbc+1
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
             sum_area = 0.d0
@@ -440,7 +440,8 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
       end
 
       SUBROUTINE compute_surf_normals(mx,my,mbc,
-     &      xnormals,ynormals,edge_lengths,curvature,surfnormals,area)
+     &      xnormals,ynormals,edge_lengths,curvature,
+     &      surfnormals,area)
       IMPLICIT NONE
 
       INTEGER mx,my,mbc
@@ -452,31 +453,50 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
       double precision    curvature(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision         area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      INTEGER i,j,m
-      DOUBLE PRECISION nv(3), sp, nlen
+      integer i,j,m
+      double precision nv(3), sp, nlen, av(3), bv(3), kappa
+
+      logical isflat
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
-            do m = 1,3
-               nv(m) = 0
-            enddo
-            nlen = 0
-            do m = 1,3
-               nv(m) =
-     &               edge_lengths(i+1,j,1)*xnormals(i+1,j,m) -
-     &               edge_lengths(i,j,1)*xnormals(i,j,m) +
-     &               edge_lengths(i,j+1,2)*ynormals(i,j+1,m) -
-     &               edge_lengths(i,j,2)*ynormals(i,j,m)
-               nlen = nlen + nv(m)*nv(m)
-            enddo
-            nlen = sqrt(nlen)
+            if (isflat()) then
+c              # The surface normal can be computed from the cross product of
+c              # an xnormal and a ynormal.  The curvature is zero in this
+c              # case
+               do m = 1,3
+c                 # It shouldn't matter which ones we pick.
+                  av(m) = xnormals(i,j,m)
+                  bv(m) = ynormals(i,j,m)
+               enddo
+c              # construct cross product
+               nv(1) =   av(2)*bv(3) - av(3)*bv(2)
+               nv(2) = -(av(1)*bv(3) - av(3)*bv(1))
+               nv(3) =   av(1)*bv(2) - av(2)*bv(1)
+               nlen = sqrt(nv(1)*nv(1) + nv(2)*nv(2) + nv(3)*nv(3))
+               kappa = 0
+            else
+               nlen = 0
+               do m = 1,3
+                  nv(m) = 0
+               enddo
+               do m = 1,3
+                  nv(m) =
+     &                  edge_lengths(i+1,j,1)*xnormals(i+1,j,m) -
+     &                  edge_lengths(i,j,1)*xnormals(i,j,m) +
+     &                  edge_lengths(i,j+1,2)*ynormals(i,j+1,m) -
+     &                  edge_lengths(i,j,2)*ynormals(i,j,m)
+                  nlen = nlen + nv(m)*nv(m)
+               enddo
+               nlen = sqrt(nlen)
+               kappa = 0.5d0*nlen/area(i,j)
+            endif
             do m = 1,3
                surfnormals(i,j,m) = nv(m)/nlen
             enddo
-            curvature(i,j) = 0.5d0*nlen/area(i,j)
+            curvature(i,j) = kappa
          enddo
       enddo
-
 
 
       end
