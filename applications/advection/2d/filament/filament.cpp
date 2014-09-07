@@ -23,7 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifdef OSX
 #include <fp_exception_glibc_extension.h>
+#endif
 
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
@@ -118,6 +120,13 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_pillowdisk(rotate,scale);
       break;
   case 2:
+      if (gparms->mx*pow_int(2,gparms->minlevel) < 32)
+      {
+          printf("The squared-disk is inadmissable:  mx*2^minlevel " \
+                 "must be greater than or equal to 32.\n");
+          exit(0);
+      }
+
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_squareddisk (rotate,scale,R1,R2);
       break;
@@ -132,6 +141,7 @@ main (int argc, char **argv)
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
 
   /* ----------------------------------------------------------
      to retrieve the context.  Note that this is only be used for
