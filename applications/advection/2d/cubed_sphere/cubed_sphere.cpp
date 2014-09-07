@@ -23,6 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifdef OSX
+#include <fp_exception_glibc_extension.h>
+#endif
+
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
@@ -50,6 +54,10 @@ main (int argc, char **argv)
   double scale, theta, phi;
   double rotate[2];
 
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  feenableexcept(FE_INVALID);
+#endif
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
