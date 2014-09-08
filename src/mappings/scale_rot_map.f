@@ -105,9 +105,9 @@ c     # rotate in second direction (for full 3d map)
       enddo
       phi = rot_angle(2)
       r2(1,1) = cos(phi)
-      r2(1,2) = -sin(phi)
-      r2(2,1) = -r2(1,2)
-      r2(2,2) = r2(1,1)
+      r2(1,3) = -sin(phi)
+      r2(3,1) = -r2(1,3)
+      r2(3,3) = r2(1,1)
       do i = 1,3
          do j = 1,3
             rrot(i,j) = 0
