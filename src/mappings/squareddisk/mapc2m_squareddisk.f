@@ -6,14 +6,10 @@ c     # -------------------------------------------------------
       subroutine mapc2m_squareddisk(xc,yc,xp,yp,zp,alpha)
       implicit none
 
-      double precision xc_in,yc_in,xp,yp,zp
+      double precision xc,yc,xp,yp,zp
       double precision alpha
-c     double precision half_length
-c     double precision R2sqrbyR1, R1byR2, R1, R2
-      double precision xc1, yc1, xc, yc
+      double precision xc1, yc1
       integer blockno, get_block
-      logical l1,l2, u1, u2, iscorner
-      logical c0, c1, c2, c3
       double precision pi
 
       common /compi/ pi
@@ -23,15 +19,9 @@ c     double precision R2sqrbyR1, R1byR2, R1, R2
       blockno = get_block()
 
       if (blockno .eq. 2) then
-c         half_length = user_double(2);
          xp = (2*xc - 1)*alpha/sqrt(2.d0);
          yp = (2*yc - 1)*alpha/sqrt(2.d0);
       else
-c         R2sqrbyR1 = user_double(0)
-c         R1byR2 = user_double(1)
-c         R1 = user_double(0)
-c         R2 = user_double(1)
-
          if (blockno .eq. 0) then
             xc1 = xc
             yc1 = 1.d0-yc
@@ -63,22 +53,25 @@ c         R2 = user_double(1)
       implicit none
 
       double precision xi, eta, x,y
-      double precision R2sqrbyR1, R1byR2, R1, R2, alpha
-      double precision R, tan_xi, xi_prime
+      double precision alpha
+      double precision R, tau, xi_prime
 
-      double precision pi, a, eta1
+      double precision pi
 
       common /compi/ pi
 
-c     # Assume for basic mapping, that R1 = 1; R2 = alpha
-      eta1 = sin(pi*eta/2)
-      eta1 = eta
-      R = alpha**(1-eta1)
-      tan_xi = tan(0.5d0*pi*(xi - 0.5d0))
-      xi_prime = 2.d0*(1.d0 - eta1)*(xi-0.5d0)+eta1*tan_xi
+c     # Original R - might be smoother
+      R = alpha**(1-eta)
 
-      y = R/sqrt(1.d0 + eta*tan_xi**2 + (1.d0-eta1))
+c     # This seems to lead to more uniform cells
+c      R = (1-alpha)*eta + alpha
+
+      tau = tan(0.5d0*pi*(xi - 0.5d0))
+      xi_prime = 2.d0*(1.d0 - eta)*(xi-0.5d0)+eta*tau
+
+c      y = R/sqrt(1.d0 + eta*tau**2 + (1.d0-eta))
+
+      y = R/sqrt(2.d0 + eta*(tau**2 - 1))
       x = y*xi_prime
-
 
       end
