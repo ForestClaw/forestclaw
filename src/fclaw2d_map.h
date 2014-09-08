@@ -200,8 +200,11 @@ int ISPILLOWDISK();
 #define ISSQUAREDDISK FCLAW_F77_FUNC_(issquareddisk,ISSQUAREDDISK)
 int ISSQUAREDDISK();
 
+
+#if 0
 #define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
 int ISFLAT();
+#endif
 
 #define ISSPHERE FCLAW_F77_FUNC_(issphere,ISSPHERE)
 int ISSPHERE();
@@ -223,7 +226,7 @@ void ROTATE_MAP (double *xp, double *yp, double *zp);
 
 #define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
 void MAPC2M_SQUAREDDISK (double *xc, double *yc, double *xp, double *yp, double *zp,
-                         double user_double[]);
+                         double *alpha);
 
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
 void MAPC2M_PILLOWDISK (double *xc, double *yc, double *xp, double *yp, double *zp);
