@@ -44,6 +44,7 @@ c     # This should be refratio*refratio.
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
+      logical is_valid_interp
 
       mth = 5
       r2 = refratio*refratio
@@ -57,17 +58,12 @@ c     # This should be refratio*refratio.
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
 
-            jc1 = 1-igrid
-            jc2 = my/num_neighbors + (1-igrid)
-
-            jc_add = igrid*my/num_neighbors
             if (iface_coarse .eq. 0) then
                ic = 1
             elseif (iface_coarse .eq. 1) then
                ic = mx
             endif
-            do j = jc1, jc2
-               jc = j + jc_add
+            do jc = 1,mx
                qc = qcoarse(ic,jc,mq)
 c              # Compute limited slopes in both x and y. Note we are not
 c              # really computing slopes, but rather just differences.
@@ -86,6 +82,8 @@ c              # This works for smooth grid mappings as well.
                call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
                do m = 0,r2-1
+                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+     &                  cycle
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
                   value = qc + shiftx*gradx + shifty*grady
@@ -93,18 +91,12 @@ c              # This works for smooth grid mappings as well.
                enddo
             enddo
          else
-            ic_add = igrid*mx/num_neighbors
-c           # this ensures that we get 'hanging' corners
-            ic1 = 1-igrid
-            ic2 = mx/num_neighbors + (1-igrid)
-
             if (iface_coarse .eq. 2) then
                jc = 1
             elseif (iface_coarse .eq. 3) then
                jc = my
             endif
-            do i = ic1, ic2
-               ic = i + ic_add
+            do ic = 1,mx
                qc = qcoarse(ic,jc,mq)
 
                sl = (qc - qcoarse(ic-1,jc,mq))
@@ -122,6 +114,8 @@ c              # fine grid cells.
                call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
                do m = 0,r2-1
+                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+     &                  cycle
                   shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
                   shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
                   value = qc + shiftx*gradx + shifty*grady
@@ -130,6 +124,20 @@ c              # fine grid cells.
             enddo
          endif
       enddo
+
+      end
+
+      logical function is_valid_interp(i,j,mx,my,mbc)
+      implicit none
+      integer i,j,mx, my, mbc
+
+      logical i1, i2
+      logical j1, j2
+
+      i1 = 1-mbc .le. i .and. i .le. mx+mbc
+      j1 = 1-mbc .le. j .and. j .le. my+mbc
+
+      is_valid_interp = i1 .and. j1
 
       end
 

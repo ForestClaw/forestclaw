@@ -28,16 +28,17 @@ c     # these will be empty if we are not on a manifold.
       double precision sum, qf, kf
       logical is_manifold
 
-      integer mq,r2, m
-      integer i, ic_add, ibc
-      integer j, jc_add, jbc
+      integer mq,r2, m, m1
+      integer ic, ic1, ibc
+      integer jc, jc1, jbc
 
 c     # This should be refratio*refratio.
-      integer i1,j1
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
       double precision kc
+
+      logical is_valid_average, skip_this_grid
 
       is_manifold = manifold .eq. 1
 
@@ -53,71 +54,96 @@ c     # 'iface' is relative to the coarse grid
 c     # Average fine grid onto coarse grid
       do mq = 1,meqn
          if (idir .eq. 0) then
-            jc_add = igrid*my/num_neighbors
-            do j = 1,my/num_neighbors
+            do jc = 1,my
                do ibc = 1,mbc
 c                 # ibc = 1 corresponds to first layer of ghost cells, and
 c                 # ibc = 2 corresponds to the second layer
 
                   if (iface_coarse .eq. 0) then
-                     i1 = 1-ibc
-                     j1 = j+jc_add
+                     ic = 1-ibc
                   elseif (iface_coarse .eq. 1) then
-                     i1 = mx+ibc
-    1                j1 = j+jc_add
+                     ic = mx+ibc
                   endif
 
 c                 # New code
-                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
+                  ic1 = ic
+                  jc1 = jc
+                  call fclaw2d_transform_face_half(ic1,jc1,i2,j2,
      &                  transform_cptr)
-                  if (is_manifold) then
-                     sum = 0
-                     do m = 0,r2-1
-                        qf = qfine(i2(m),j2(m),mq)
-                        kf = areafine(i2(m),j2(m))
-                        sum = sum + qf*kf
-                     enddo
-                     kc = areacoarse(i1,j1)
-                     qcoarse(i1,j1,mq) = sum/kc
-                  else
-                     sum = 0
-                     do m = 0,r2-1
-                        sum = sum + qfine(i2(m),j2(m),mq)
-                     enddo
-                     qcoarse(i1,j1,mq) = sum/r2
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                     then
+                        skip_this_grid = .true.
+                     endif
+                  enddo
+
+c                  if (iface_coarse .eq. 0 .and. ic .eq. 0 .and.
+c     &                  igrid .eq. 0) then
+c                     write(6,'(A,2I4)') 'ic,jc : ', ic,jc
+c                     write(6,'(A,4I4)') 'i2    : ', (i2(m),m=0,3)
+c                     write(6,'(A,4I4)') 'j2    : ', (j2(m),m=0,3)
+c                     write(6,*) ' '
+c                  endif
+                  if (.not. skip_this_grid) then
+                     if (is_manifold) then
+                        sum = 0
+                        do m = 0,r2-1
+                           qf = qfine(i2(m),j2(m),mq)
+                           kf = areafine(i2(m),j2(m))
+                           sum = sum + qf*kf
+                        enddo
+                        kc = areacoarse(ic,jc)
+                        qcoarse(ic,jc,mq) = sum/kc
+                     else
+                        sum = 0
+                        do m = 0,r2-1
+                           sum = sum + qfine(i2(m),j2(m),mq)
+                        enddo
+                        qcoarse(ic,jc,mq) = sum/r2
+                     endif
                   endif
                enddo
             enddo
          else
-            ic_add = igrid*mx/num_neighbors
-            do i = 1,mx/num_neighbors
+c           # idir = 1 (faces 2,3)
+            do ic = 1,mx
                do jbc = 1,mbc
 
                   if (iface_coarse .eq. 2) then
-                     i1 = i+ic_add
-                     j1 = 1-jbc
+                     jc = 1-jbc
                   elseif (iface_coarse .eq. 3) then
-                     i1 = i+ic_add
-                     j1 = my+jbc
+                     jc = my+jbc
                   endif
 
-                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
+                  ic1 = ic
+                  jc1 = jc
+                  call fclaw2d_transform_face_half(ic1,jc1,i2,j2,
      &                  transform_cptr)
-                  if (is_manifold) then
-                     sum = 0
-                     do m = 0,r2-1
-                        qf = qfine(i2(m),j2(m),mq)
-                        kf = areafine(i2(m),j2(m))
-                        sum = sum + qf*kf
-                     enddo
-                     kc = areacoarse(i1,j1)
-                     qcoarse(i1,j1,mq) = sum/kc
-                  else
-                     sum = 0
-                     do m = 0,r2-1
-                        sum = sum + qfine(i2(m),j2(m),mq)
-                     enddo
-                     qcoarse(i1,j1,mq) = sum/r2
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                     then
+                        skip_this_grid = .true.
+                     endif
+                  enddo
+                  if (.not. skip_this_grid) then
+                     if (is_manifold) then
+                        sum = 0
+                        do m = 0,r2-1
+                           qf = qfine(i2(m),j2(m),mq)
+                           kf = areafine(i2(m),j2(m))
+                           sum = sum + qf*kf
+                        enddo
+                        kc = areacoarse(ic,jc)
+                        qcoarse(ic,jc,mq) = sum/kc
+                     else
+                        sum = 0
+                        do m = 0,r2-1
+                           sum = sum + qfine(i2(m),j2(m),mq)
+                        enddo
+                        qcoarse(ic,jc,mq) = sum/r2
+                     endif
                   endif
                enddo
             enddo
@@ -125,6 +151,20 @@ c                 # New code
       enddo
 
       end
+
+      logical function is_valid_average(i,j,mx,my)
+      implicit none
+
+      integer i,j,mx,my
+      logical i1, j1
+
+      i1 = 1 .le. i .and. i .le. mx
+      j1 = 1 .le. j .and. j .le. my
+
+      is_valid_average = i1 .and. j1
+
+      end
+
 
 c     Average fine grid to coarse grid or copy neighboring coarse grid
       subroutine average_corner_ghost(mx,my,mbc,meqn,
