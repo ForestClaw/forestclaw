@@ -21,7 +21,6 @@ applications_advection_2d_cubed_sphere_cubed_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
 applications_advection_2d_cubed_sphere_cubed_sphere = -D TRAPFPE
-# applications_advection_2d_cubed_sphere_cubed_sphere_CPPFLAGS += -D OSX
 
 # applications_advection_2d_cubed_sphere_cubed_sphere_FFLAGS = \
 #	$(AM_FFLAGS)
