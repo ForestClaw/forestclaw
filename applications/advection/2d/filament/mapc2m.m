@@ -1,8 +1,8 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 % map = 'squareddisk';
-% map = 'pillowdisk';
-map = 'cart';
+map = 'pillowdisk';
+% map = 'cart';
 
 switch map
     case 'pillowdisk'
