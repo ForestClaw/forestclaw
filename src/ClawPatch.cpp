@@ -572,8 +572,6 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha)
     double *qcurr = m_griddata.dataPtr();
     double *qinterp = m_griddata_time_interpolated.dataPtr();
 
-    /* copy interior values;  ghost values are invalid at this point */
-
     /* Copy everything first to fill in ghost cells of qinterp */
     memcpy(qinterp,qlast,size*sizeof(double));
 
