@@ -63,7 +63,7 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_cubedsphere(double rotate[], double scale)
+    fclaw2d_map_new_cubedsphere(const double rotate[], const double scale)
 {
     fclaw2d_map_context_t *cont;
 
@@ -74,7 +74,8 @@ fclaw2d_map_context_t *
     /* This stores rotate/scale parameters in common blocks for later
        retrieval by scale_map/rotate_map (called above).  These parameters
        can of course be stored as variables in a context field */
-    SETUP_MAPPEDGRID(rotate,&scale);
+    SET_ROTATION(rotate);
+    SET_SCALE(&scale);
 
     return cont;
 }

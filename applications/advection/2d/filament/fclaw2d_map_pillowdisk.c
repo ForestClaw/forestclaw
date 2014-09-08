@@ -56,18 +56,20 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_PILLOWDISK(&xc,&yc,xp,yp,zp);
 
-    *xp = (*xp) + 1;
-    *yp = (*yp) + 1;
-
     /* These can probably be replaced by C functions at some point. */
-    // SCALE_MAP(xp,yp,zp);
-    // ROTATE_MAP(xp,yp,zp);
+    SCALE_MAP(xp,yp,zp);
+    ROTATE_MAP(xp,yp,zp);
+    SHIFT_MAP(xp,yp,zp);
+
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(double rotate[], double scale)
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double rotate[],
+                                                  const double scale)
 {
     fclaw2d_map_context_t *cont;
+    double shift[3];
+    int m;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowdisk;
@@ -76,7 +78,13 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(double rotate[], double scale)
     /* This stores rotate/scale parameters in common blocks for later
        retrieval by scale_map/rotate_map (called above).  These parameters
        can of course be stored as variables in a context field */
-    SETUP_MAPPEDGRID(rotate,&scale);
+    SET_ROTATION(rotate);
+    SET_SCALE(&scale);
+    for (m = 0; m < 2; m++)
+    {
+        shift[m] = 1.0;
+    }
+    SET_SHIFT(shift);
 
     return cont;
 }

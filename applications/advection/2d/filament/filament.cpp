@@ -105,12 +105,12 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      -------------------------------------------------------------- */
-  double pi = 3.141592653589793;
+  double pi = M_PI;
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
+  scale = 1;
 
   double alpha = 0.5;
-
 
   switch (example) {
   case 1:
@@ -131,9 +131,8 @@ main (int argc, char **argv)
       break;
   case 3:
       /* in [0,1]x[0,1] */
-      scale = 2.0;
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart(scale);
+      cont = fclaw2d_map_new_cart(rotate, scale);
       break;
     default:
       sc_abort_collective ("Parameter example must be 1, 2 or 3");

@@ -96,7 +96,7 @@ main (int argc, char **argv)
      Domain geometry
      --------------------------------------------------------------- */
 
-  double pi = 3.141592653589793;
+  double pi = M_PI;
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
 

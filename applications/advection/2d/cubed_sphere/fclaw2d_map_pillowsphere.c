@@ -63,20 +63,15 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_pillowsphere(double rotate[], double scale)
+    fclaw2d_map_new_pillowsphere(const double rotate[], const double scale)
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowsphere;
     cont->mapc2m = fclaw2d_map_c2m_pillowsphere;
-
-    SETUP_MAPPEDGRID(rotate,&scale);
-
-    /*
-      Set (void*) user_data, if desired
-      cont->user_data = ...     // Put any mapping specific parameters here
-    */
+    SET_ROTATION(rotate);
+    SET_SCALE(&scale);
 
     return cont;
 }

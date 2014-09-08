@@ -52,24 +52,34 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
-    double scale;
-    scale = cont->user_double[0];
 
-    *xp = scale*xc;
-    *yp = scale*yc;
-    *zp = 0;
+    /* Unit square in [-1,1] x [-1,1] */
+    MAPC2M_CART(&xc,&yc,xp,yp,zp);
+
+    SCALE_MAP(xp,yp,zp);
+    ROTATE_MAP(xp,yp,zp);
+    SHIFT_MAP(xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(double scale)
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[],
+                                            const double scale)
 {
     fclaw2d_map_context_t *cont;
+    double shift[3];
+    int m;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
 
-    cont->user_double[0]= scale;
+    SET_ROTATION(rotate);
+    SET_SCALE(&scale);
+    for (m = 0; m < 3; m++)
+    {
+        shift[m] = 1;
+    }
+    SET_SHIFT(shift);
 
     return cont;
 }
