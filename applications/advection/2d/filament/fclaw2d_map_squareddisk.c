@@ -54,7 +54,8 @@ fclaw2d_map_c2m_squareddisk(fclaw2d_map_context_t * cont, int blockno,
                             double xc, double yc,
                             double *xp, double *yp, double *zp)
 {
-    MAPC2M_SQUAREDDISK(&xc,&yc,xp,yp,zp,cont->user_double);
+    double alpha = cont->user_double[0];
+    MAPC2M_SQUAREDDISK(&xc,&yc,xp,yp,zp,&alpha);
 
     *xp = *xp + 1;    /* Shift to center is at (1,1) */
     *yp = *yp + 1;
@@ -67,7 +68,7 @@ fclaw2d_map_c2m_squareddisk(fclaw2d_map_context_t * cont, int blockno,
 
 fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(double rotate[],
                                                    double scale,
-                                                   double R1, double R2)
+                                                   double alpha)
 {
     fclaw2d_map_context_t *cont;
 
@@ -75,9 +76,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(double rotate[],
     cont->query = fclaw2d_map_query_squareddisk;
     cont->mapc2m = fclaw2d_map_c2m_squareddisk;
 
-    cont->user_double[0] = R2 * R2 / R1;
-    cont->user_double[1] = R1 / R2;
-    cont->user_double[2] = R2 / M_SQRT2;        /* half length of square */
+    cont->user_double[0] = alpha;
 
     /* This stores rotate/scale parameters in common blocks for later
        retrieval by scale_map/rotate_map (called above).  These parameters
