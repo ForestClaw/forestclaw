@@ -34,5 +34,5 @@ c     # Set mapping scaling
       rot_angle(2) = 2.1
       rot_angle(1) = 0
       rot_angle(2) = 1.8
-      call setup_mappedgrid(rot_angle,scale)
+c      call setup_mappedgrid(rot_angle,scale)
       end
