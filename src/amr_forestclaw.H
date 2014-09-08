@@ -28,7 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_FORESTCLAW_H
 
 /* Use as an alternate to GNU feenableexcept */
+#ifdef OSX
 #include <fp_exception_glibc_extension.h>
+#endif
+
 #include <fenv.h>
 #include <signal.h>
 #include <unistd.h>    //  To get process ids
@@ -109,7 +112,8 @@ void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
 void timeinterp(fclaw2d_domain_t *domain,
                 int level, double alpha);
 
-void timeinterp_interior_(const int &mx, const int& my, const int& mbc,
+#define TIMEINTERP_INTERIOR FCLAW_F77_FUNC (timeinterp_interior, TIMEINTERP_INTERIOR)
+void TIMEINTERP_INTERIOR_(const int &mx, const int& my, const int& mbc,
                           const int &meqn,double qcurr[], double qlast[],
                           double qinterp[],const double& alpha);
 
