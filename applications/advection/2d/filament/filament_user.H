@@ -74,7 +74,7 @@ extern "C"
 }
 
 fclaw2d_map_context_t * fclaw2d_map_new_squareddisk (double rotate[], double scale,
-                                                     double R1, double R2);
+                                                     double alpha);
 fclaw2d_map_context_t * fclaw2d_map_new_pillowdisk (double rotate[], double scale);
 fclaw2d_map_context_t* fclaw2d_map_new_cart(double scale);
 

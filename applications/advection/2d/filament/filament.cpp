@@ -109,8 +109,7 @@ main (int argc, char **argv)
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
 
-  double R1 = 1.0;
-  double R2 = 0.35;
+  double alpha = 0.5;
 
 
   switch (example) {
@@ -128,7 +127,7 @@ main (int argc, char **argv)
       }
 
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_squareddisk (rotate,scale,R1,R2);
+      cont = fclaw2d_map_new_squareddisk (rotate,scale,alpha);
       break;
   case 3:
       /* in [0,1]x[0,1] */
