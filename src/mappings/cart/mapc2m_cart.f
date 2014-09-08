@@ -3,8 +3,9 @@
 
       double precision xc,yc,xp,yp,zp
 
-      xp = xc
-      yp = yc
+c     # return a map in [-1,1],[-1,1]
+      xp = 2.d0*(xc - 0.5d0)
+      yp = 2.d0*(yc - 0.5d0)
       zp = 0
 
 

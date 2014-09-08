@@ -133,6 +133,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     int corner_patch_idx;
     fclaw2d_patch_relation_t neighbor_type;
 
+    fclaw2d_map_context_t *cont = get_map_context(domain);
+    fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
+
     fclaw_bool has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain, this_block_idx, this_patch_idx,
                                        icorner, &rproc_corner, corner_block_idx,
@@ -190,7 +193,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     }
     else if (!has_corner_neighbor && is_block_corner)
     {
-        if (!ispillowsphere_())
+        if (!ispillowsphere)
         {
             *block_corner_count = 3;
             /* Exactly 3 patches meet at a corner, e.g. the cubed sphere.
@@ -293,6 +296,9 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw_bool is_interior_corner;
     int block_corner_count;
 
+    fclaw2d_map_context_t *cont = get_map_context(domain);
+    fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
+
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bdry);
 
@@ -383,7 +389,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 else
                 {
                     /* We are at a block corner */
-                    if (ispillowsphere_())
+                    if (ispillowsphere)
                     {
                         /* The block corners of the pillow sphere have to be handled as
                            a special case */

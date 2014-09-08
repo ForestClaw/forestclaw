@@ -1,55 +1,22 @@
-      subroutine setup_mappedgrid(rot_angle,scale)
+c     # ----------------------------------------------
+c     # Scaling routines
+c     # ----------------------------------------------
+      subroutine set_scale(scale)
       implicit none
-      double precision rot_angle(2), scale
+      double precision scale, scale_com
 
-      call set_scale(scale)
-      call set_rotation(rot_angle)
-
-      end
-
-      subroutine set_map_defaults()
-      implicit none
-      double precision rot_angle(2), scale
-
-      rot_angle(1) = 0.d0
-      rot_angle(2) = 0.d0
-      call set_rotation(rot_angle)
-
-      scale = 1.d0
-      call set_scale(scale)
+      common /comscale/ scale_com
+      scale_com = scale
 
       end
 
 
-      subroutine rotate_map(xp,yp,zp)
+      double precision function get_scale()
       implicit none
+      double precision scale_com
+      common /comscale/ scale_com
 
-      double precision xp,yp,zp
-      double precision v(3), vrot(3)
-      integer i,k
-      double precision rrot(3,3)
-
-      v(1) = xp
-      v(2) = yp
-      v(3) = zp
-
-      call get_rotation(rrot)
-
-      do i = 1,3
-         vrot(i) = v(i)
-      enddo
-
-c     # Rotate mapping
-      do i = 1,3
-         vrot(i) = 0
-         do k = 1,3
-            vrot(i) = vrot(i) + rrot(i,k)*v(k)
-         enddo
-      enddo
-
-      xp = vrot(1)
-      yp = vrot(2)
-      zp = vrot(3)
+      get_scale = scale_com
 
       end
 
@@ -67,6 +34,10 @@ c     # Rotate mapping
 
       end
 
+
+c     # ----------------------------------------------
+c     # Rotation routines
+c     # ----------------------------------------------
       subroutine set_rotation(rot_angle)
       implicit none
 
@@ -76,8 +47,6 @@ c     # Rotate mapping
 
       double precision th, phi
       integer i,j,k
-
-      logical isflat
 
       double precision rrot_com(3,3)
       common /comrot/ rrot_com
@@ -117,80 +86,11 @@ c     # rotate in second direction (for full 3d map)
          enddo
       enddo
 
-c     call set_rotation(rrot)
-
       do j = 1,3
          do i = 1,3
             rrot_com(i,j) = rrot(i,j)
          enddo
       enddo
-
-c      Writing a file like this is problematic in parallel.
-c      Only one rank should write this file.
-c
-c      open(10,file='rrot.dat')
-c      do i = 1,3
-c         write(10,100) (rrot(i,j),j=1,3)
-c      enddo
-c      close(10)
-c  100 format(3F24.16)
-
-      end
-
-
-      subroutine set_rotation_flat(rot_angle)
-      implicit none
-
-      double precision rot_angle(2), scale
-
-      double precision rrot(3,3), r1(3,3), r2(3,3)
-
-      double precision th, phi
-      integer i,j,k
-
-      logical isflat
-
-      double precision rrot_com(3,3)
-      common /comrot/ rrot_com
-
-c     # Rotates map so as to not bias the solution.
-      do i = 1,3
-         do j = 1,3
-            r1(i,j) = 0
-         enddo
-         r1(i,i) = 1
-      enddo
-
-      th = rot_angle(1)
-      r1(1,1) = cos(th)
-      r1(1,2) = -sin(th)
-      r1(2,1) = -r1(1,2)
-      r1(2,2) = r1(1,1)
-
-c     # rotate in one direction only
-      do i = 1,3
-         do j = 1,3
-            rrot(i,j) = r1(i,j)
-         enddo
-      enddo
-
-c      call set_rotation(rrot)
-
-      do j = 1,3
-         do i = 1,3
-            rrot_com(i,j) = rrot(i,j)
-         enddo
-      enddo
-
-c      Writing a file like this is problematic in parallel.
-c      Only one rank should write this file.
-c
-c      open(10,file='rrot.dat')
-c      do i = 1,3
-c         write(10,100) (rrot(i,j),j=1,3)
-c      enddo
-c      close(10)
-c  100 format(3F24.16)
 
       end
 
@@ -211,21 +111,109 @@ c  100 format(3F24.16)
 
       end
 
-      subroutine set_scale(scale)
-      implicit none
-      double precision scale, scale_com
 
-      common /comscale/ scale_com
-      scale_com = scale
+      subroutine rotate_map(xp,yp,zp)
+      implicit none
+
+      double precision xp,yp,zp
+      double precision v(3), vrot(3)
+      integer i,k
+      double precision rrot(3,3)
+
+      v(1) = xp
+      v(2) = yp
+      v(3) = zp
+
+      call get_rotation(rrot)
+
+      do i = 1,3
+         vrot(i) = v(i)
+      enddo
+
+c     # Rotate mapping
+      do i = 1,3
+         vrot(i) = 0
+         do k = 1,3
+            vrot(i) = vrot(i) + rrot(i,k)*v(k)
+         enddo
+      enddo
+
+      xp = vrot(1)
+      yp = vrot(2)
+      zp = vrot(3)
 
       end
 
 
-      double precision function get_scale()
-      implicit none
-      double precision scale_com
-      common /comscale/ scale_com
+c     # ----------------------------------------------
+c     # Shift routines
+c     # ----------------------------------------------
 
-      get_scale = scale_com
+      subroutine set_shift(shift)
+      implicit none
+
+      double precision shift(3), shift_com(3)
+      integer m
+
+      common /comshift/ shift_com
+
+      do m = 1,3
+         shift_com(m) = shift(m)
+      enddo
+
 
       end
+
+      subroutine get_shift(shift)
+      implicit none
+
+      double precision shift(3), shift_com(3)
+      integer m
+
+      common /comshift/ shift_com
+
+      do m = 1,3
+         shift(m) = shift_com(m)
+      enddo
+
+
+      end
+
+      subroutine shift_map(xp,yp,zp)
+      implicit none
+
+      double precision xp,yp,zp
+      double precision shift(3)
+      integer m
+
+
+      call get_shift(shift)
+
+      xp = xp + shift(1)
+      yp = yp + shift(2)
+      zp = zp + shift(3)
+      end
+
+
+
+c      subroutine setup_mappedgrid(rot_angle,scale)
+c      implicit none
+c      double precision rot_angle(2), scale
+c
+c      call set_scale(scale)
+c      call set_rotation(rot_angle)
+c
+c      end
+c
+c      subroutine set_map_defaults()
+c      implicit none
+c      double precision rot_angle(2), scale
+c
+c      rot_angle(1) = 0.d0
+c      rot_angle(2) = 0.d0
+c      call set_rotation(rot_angle)
+c
+c      scale = 1.d0
+c      call set_scale(scale)
+c
+c      end
