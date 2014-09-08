@@ -80,6 +80,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/claw_out2.f \
 	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \
+	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f
 
 # this variable is used for headers that are not publicly installed

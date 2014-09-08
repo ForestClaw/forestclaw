@@ -109,6 +109,11 @@ void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
 void timeinterp(fclaw2d_domain_t *domain,
                 int level, double alpha);
 
+void timeinterp_interior_(const int &mx, const int& my, const int& mbc,
+                          const int &meqn,double qcurr[], double qlast[],
+                          double qinterp[],const double& alpha);
+
+
 void update_ghost_all_levels(fclaw2d_domain_t* domain,
                              fclaw2d_timer_names_t running);
 
