@@ -133,7 +133,7 @@ main (int argc, char **argv)
 
      to retrieve the context.  Note that this is only be used for
      passing the context to a C/C++ routine.  Do not expect to be
-     able to access fields of the cont structure.
+     able to access fields of the cont structure from Fortran.
      ---------------------------------------------------------- */
     SET_CONTEXT(&cont);
 
