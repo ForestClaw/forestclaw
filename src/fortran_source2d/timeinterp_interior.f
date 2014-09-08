@@ -13,7 +13,7 @@
       do m = 1,meqn
          do i = 1,mx
             do j = 1,my
-               qinterp(i,j,m) = qlast(i,j,m) +
+               qinterp(i,j,m) = qinterp(i,j,m) +
      &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
             enddo
          enddo

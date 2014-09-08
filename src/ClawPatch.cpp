@@ -571,19 +571,15 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha)
     double *qlast = m_griddata_last.dataPtr();
     double *qcurr = m_griddata.dataPtr();
     double *qinterp = m_griddata_time_interpolated.dataPtr();
-    // int size = m_griddata_time_interpolated.size();
-
 
     /* copy interior values;  ghost values are invalid at this point */
 
-    timeinterp_interior_(m_mx,m_my,m_mbc,m_meqn,qcurr,qlast,qinterp,alpha);
+    /* Copy everything first to fill in ghost cells of qinterp */
+    memcpy(qinterp,qlast,size*sizeof(double));
 
-    /*
-    for(int i = 0; i < size; i++)
-    {
-        qinterp[i] = qlast[i] + alpha*(qcurr[i] - qlast[i]);
-    }
-    */
+    /* Do interpolation only on interior, since ghost cells in qcurr
+       are invalid and will lead to floating point exceptions */
+    timeinterp_interior_(m_mx,m_my,m_mbc,m_meqn,qcurr,qlast,qinterp,alpha);
 }
 
 
