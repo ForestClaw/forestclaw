@@ -40,11 +40,11 @@ c     # ----------------------------------------------------------
       double precision compute_slopes
 
 c     # This should be refratio*refratio.
-      integer i1,j1
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
       logical is_valid_interp
+      logical skip_this_grid
 
       mth = 5
       r2 = refratio*refratio
@@ -64,31 +64,39 @@ c           # this ensures that we get 'hanging' corners
                ic = mx
             endif
             do jc = 1,mx
-               qc = qcoarse(ic,jc,mq)
-c              # Compute limited slopes in both x and y. Note we are not
-c              # really computing slopes, but rather just differences.
-c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(ic-1,jc,mq))
-               sr = (qcoarse(ic+1,jc,mq) - qc)
-               gradx = compute_slopes(sl,sr,mth)
-
-               sl = (qc - qcoarse(ic,jc-1,mq))
-               sr = (qcoarse(ic,jc+1,mq) - qc)
-               grady = compute_slopes(sl,sr,mth)
-
-c              # This works for smooth grid mappings as well.
-               i1 = ic
-               j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+               call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &               transform_ptr)
+               skip_this_grid = .false.
                do m = 0,r2-1
                   if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
-     &                  cycle
-                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                  value = qc + shiftx*gradx + shifty*grady
-                  qfine(i2(m),j2(m),mq) = value
+     &                  then
+                     skip_this_grid = .true.
+                     exit
+                  endif
                enddo
+               if (.not. skip_this_grid) then
+                  qc = qcoarse(ic,jc,mq)
+c                 # Compute limited slopes in both x and y. Note we are not
+c                 # really computing slopes, but rather just differences.
+c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
+                  sl = (qc - qcoarse(ic-1,jc,mq))
+                  sr = (qcoarse(ic+1,jc,mq) - qc)
+                  gradx = compute_slopes(sl,sr,mth)
+
+                  sl = (qc - qcoarse(ic,jc-1,mq))
+                  sr = (qcoarse(ic,jc+1,mq) - qc)
+                  grady = compute_slopes(sl,sr,mth)
+
+c                 # This works for smooth grid mappings as well.
+                  do m = 0,r2-1
+                     shiftx =
+     &                     (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+                     shifty =
+     &                     (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+                     value = qc + shiftx*gradx + shifty*grady
+                     qfine(i2(m),j2(m),mq) = value
+                  enddo
+               endif
             enddo
          else
             if (iface_coarse .eq. 2) then
@@ -97,30 +105,46 @@ c              # This works for smooth grid mappings as well.
                jc = my
             endif
             do ic = 1,mx
-               qc = qcoarse(ic,jc,mq)
-
-               sl = (qc - qcoarse(ic-1,jc,mq))
-               sr = (qcoarse(ic+1,jc,mq) - qc)
-               gradx = compute_slopes(sl,sr,mth)
-
-               sl = (qc - qcoarse(ic,jc-1,mq))
-               sr = (qcoarse(ic,jc+1,mq) - qc)
-               grady = compute_slopes(sl,sr,mth)
-
-c              # Compute interpolant for each of four
-c              # fine grid cells.
-               i1 = ic
-               j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+               call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &               transform_ptr)
+c              # ---------------------------------------------
+c              # Two 'half-size' neighbors will be passed into
+c              # this routine.  Only half of the coarse grid ghost
+c              # indices will be valid for the particular grid
+c              # passed in.  We skip those ghost cells that will
+c              # have to be filled in by the other half-size
+c              # grid.
+c              # ---------------------------------------------
+               skip_this_grid = .false.
                do m = 0,r2-1
                   if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
-     &                  cycle
-                  shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                  shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                  value = qc + shiftx*gradx + shifty*grady
-                  qfine(i2(m),j2(m),mq) = value
+     &                  then
+                     skip_this_grid = .true.
+                     exit
+                  endif
                enddo
+               if (.not. skip_this_grid) then
+                  qc = qcoarse(ic,jc,mq)
+
+                  sl = (qc - qcoarse(ic-1,jc,mq))
+                  sr = (qcoarse(ic+1,jc,mq) - qc)
+                  gradx = compute_slopes(sl,sr,mth)
+
+                  sl = (qc - qcoarse(ic,jc-1,mq))
+                  sr = (qcoarse(ic,jc+1,mq) - qc)
+                  grady = compute_slopes(sl,sr,mth)
+
+c                 # Compute interpolant for each of four
+c                 # fine grid cells.
+                  do m = 0,r2-1
+                     shiftx =
+     &                     (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
+                     shifty =
+     &                     (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
+                     value = qc + shiftx*gradx + shifty*grady
+                     qfine(i2(m),j2(m),mq) = value
+                  enddo
+               endif
             enddo
          endif
       enddo

@@ -66,25 +66,25 @@ c                 # ibc = 2 corresponds to the second layer
                   endif
 
 c                 # New code
-                  ic1 = ic
-                  jc1 = jc
-                  call fclaw2d_transform_face_half(ic1,jc1,i2,j2,
+                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                  transform_cptr)
+c                 # ---------------------------------------------
+c                 # Two 'half-size' neighbors will be passed into
+c                 # this routine.  Only half of the coarse grid ghost
+c                 # indices will be valid for the particular grid
+c                 # passed in.  We skip those ghost cells that will
+c                 # have to be filled in by the other half-size
+c                 # grid.
+c                 # ---------------------------------------------
                   skip_this_grid = .false.
                   do m = 0,r2-1
                      if (.not. is_valid_average(i2(m),j2(m),mx,my))
      &                     then
                         skip_this_grid = .true.
+                        exit
                      endif
                   enddo
 
-c                  if (iface_coarse .eq. 0 .and. ic .eq. 0 .and.
-c     &                  igrid .eq. 0) then
-c                     write(6,'(A,2I4)') 'ic,jc : ', ic,jc
-c                     write(6,'(A,4I4)') 'i2    : ', (i2(m),m=0,3)
-c                     write(6,'(A,4I4)') 'j2    : ', (j2(m),m=0,3)
-c                     write(6,*) ' '
-c                  endif
                   if (.not. skip_this_grid) then
                      if (is_manifold) then
                         sum = 0
@@ -116,9 +116,7 @@ c           # idir = 1 (faces 2,3)
                      jc = my+jbc
                   endif
 
-                  ic1 = ic
-                  jc1 = jc
-                  call fclaw2d_transform_face_half(ic1,jc1,i2,j2,
+                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                  transform_cptr)
                   skip_this_grid = .false.
                   do m = 0,r2-1
