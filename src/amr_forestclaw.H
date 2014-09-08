@@ -113,7 +113,7 @@ void timeinterp(fclaw2d_domain_t *domain,
                 int level, double alpha);
 
 #define TIMEINTERP_INTERIOR FCLAW_F77_FUNC (timeinterp_interior, TIMEINTERP_INTERIOR)
-void TIMEINTERP_INTERIOR_(const int &mx, const int& my, const int& mbc,
+void TIMEINTERP_INTERIOR(const int &mx, const int& my, const int& mbc,
                           const int &meqn,double qcurr[], double qlast[],
                           double qinterp[],const double& alpha);
 
