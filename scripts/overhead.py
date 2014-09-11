@@ -10,15 +10,17 @@ a = float(sys.argv[1])
 e = float(sys.argv[2])
 r = float(sys.argv[3])
 
-o = r + e + a
+o = r + e
+t = r + e + a
 
 print " "
-# print "%40s %6.1f%%" % ("Overhead as percentage of ADVANCE",100.0*o/a)
-# print "%40s %6.1f%%" % ("Overhead as percentage of total",100.0*o/(a + o))
-print "%40s %6.1f%%" % ("ADVANCE as percentage of total",100.0*a/o)
-print "%40s %6.1f%%" % ("EXCHANGE as percentage of total",100.0*e/o)
-print "%40s %6.1f%%" % ("REGRID as percentage of total",100.0*r/o)
+print "%40s %6.1f%%" % ("ADVANCE as percentage of total",100.0*a/t)
+print "%40s %6.1f%%" % ("EXCHANGE as percentage of total",100.0*e/t)
+print "%40s %6.1f%%" % ("REGRID as percentage of total",100.0*r/t)
 print " "
 
-print "Grid advances take %5.2f times as long as exchange and regridding" % (a/o)
+if o > a:
+    print "Exchange and regridding take %5.2f times as long as grid advances" % (o/a)
+else:
+    print "Grid advances take %5.2f times as long as exchange and regridding" % (a/o)
 print " "
