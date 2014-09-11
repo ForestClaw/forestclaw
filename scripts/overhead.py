@@ -10,7 +10,7 @@ a = float(sys.argv[1])
 e = float(sys.argv[2])
 r = float(sys.argv[3])
 
-o = r + e
+o = r + e + a
 
 print " "
 # print "%40s %6.1f%%" % ("Overhead as percentage of ADVANCE",100.0*o/a)
