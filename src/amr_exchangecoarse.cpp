@@ -682,7 +682,6 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
                           fclaw_bool time_interp)
 {
     fclaw2d_exchange_info_t e_info;
-    e_info.exchange_type = FCLAW2D_COPY;
     e_info.grid_type = FCLAW2D_IS_COARSE;
     e_info.time_interp = fclaw_false;
 
