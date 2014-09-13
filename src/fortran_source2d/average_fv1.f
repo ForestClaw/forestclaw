@@ -38,7 +38,12 @@ c     # This should be refratio*refratio.
       integer i2(0:rr2-1),j2(0:rr2-1)
       double precision kc
 
+      integer blockno, get_block
+
       logical is_valid_average, skip_this_grid
+      double precision af_sum, qv(0:rr2-1)
+
+      blockno = get_block()
 
       is_manifold = manifold .eq. 1
 
@@ -88,13 +93,17 @@ c                 # ---------------------------------------------
                   if (.not. skip_this_grid) then
                      if (is_manifold) then
                         sum = 0
+                        af_sum = 0
                         do m = 0,r2-1
                            qf = qfine(i2(m),j2(m),mq)
+                           qv(m) = qf
                            kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
+                           af_sum = af_sum + kf
                         enddo
                         kc = areacoarse(ic,jc)
-                        qcoarse(ic,jc,mq) = sum/kc
+c                        qcoarse(ic,jc,mq) = sum/kc
+                        qcoarse(ic,jc,mq) = sum/af_sum
                      else
                         sum = 0
                         do m = 0,r2-1
@@ -128,13 +137,16 @@ c           # idir = 1 (faces 2,3)
                   if (.not. skip_this_grid) then
                      if (is_manifold) then
                         sum = 0
+                        af_sum = 0
                         do m = 0,r2-1
                            qf = qfine(i2(m),j2(m),mq)
                            kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
+                           af_sum = af_sum + kf
                         enddo
                         kc = areacoarse(ic,jc)
-                        qcoarse(ic,jc,mq) = sum/kc
+c                        qcoarse(ic,jc,mq) = sum/kc
+                        qcoarse(ic,jc,mq) = sum/af_sum
                      else
                         sum = 0
                         do m = 0,r2-1
@@ -192,6 +204,8 @@ c     # This should be refratio*refratio.
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
+      double precision af_sum
+
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
          write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
@@ -227,13 +241,16 @@ c              # available (be sure to pass in (i1,j1)
      &               transform_cptr)
                if (is_manifold) then
                   sum = 0
+                  af_sum = 0
                   do m = 0,r2-1
                      qf = qfine(i2(m),j2(m),mq)
                      kf = areafine(i2(m),j2(m))
                      sum = sum + kf*qf
+                     af_sum = af_sum + kf
                   enddo
                   kc = areacoarse(i1,j1)
-                  qcoarse(i1,j1,mq) = sum/kc
+c                  qcoarse(i1,j1,mq) = sum/kc
+                  qcoarse(i1,j1,mq) = sum/af_sum
                else
                   sum = 0
                   do m = 0,r2-1
