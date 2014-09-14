@@ -6,7 +6,7 @@ set flags = "$2 $3"
 echo "${target} ${flags}"
 
 
-set supp_c = --suppressions=${FORESTCLAW}/fclaw2d_vg.supp
+set supp_c = --suppressions=${FORESTCLAW}/scripts/fclaw2d_vg.supp
 set gen_supp = --gen-suppressions=all
 set log_file = --log-file=${target}.out
 set track = --track-origins=yes

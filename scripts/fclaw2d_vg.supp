@@ -139,3 +139,30 @@
    ...
    fun:HYD_pmci_wait_for_completion
 }
+
+{
+   Checking patch corner error
+   Memcheck:Cond
+   fun:step2_
+   fun:clawpatch2_
+   ...
+   fun:amrrun
+}
+
+{
+   MPI leak (1)
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:(below main)
+}
+
+{
+   MPI leak (2)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:(below main)
+}
+
