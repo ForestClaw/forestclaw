@@ -115,41 +115,7 @@ void filament_patch_initialize(fclaw2d_domain_t *domain,
 {
     SET_BLOCK(&this_block_idx);
 
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-    double *q = cp->q();
-
-    /* ----------------------------------------------------------- */
-    // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
-
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
-    double *aux;
-    int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
-
-    int ismanifold = gparms->manifold;
-
-    qinit_filament_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,ismanifold);
-
-    /*
     fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
-    */
 }
 
 
