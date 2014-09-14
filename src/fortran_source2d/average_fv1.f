@@ -38,12 +38,8 @@ c     # This should be refratio*refratio.
       integer i2(0:rr2-1),j2(0:rr2-1)
       double precision kc
 
-      integer blockno, get_block
-
       logical is_valid_average, skip_this_grid
       double precision af_sum, qv(0:rr2-1)
-
-      blockno = get_block()
 
       is_manifold = manifold .eq. 1
 
@@ -101,8 +97,11 @@ c                 # ---------------------------------------------
                            sum = sum + qf*kf
                            af_sum = af_sum + kf
                         enddo
-                        kc = areacoarse(ic,jc)
+c                        kc = areacoarse(ic,jc)
 c                        qcoarse(ic,jc,mq) = sum/kc
+
+c                       # Use area of the fine grids so that we get more
+c                       # accurate averages.
                         qcoarse(ic,jc,mq) = sum/af_sum
                      else
                         sum = 0
