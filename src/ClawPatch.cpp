@@ -133,6 +133,13 @@ void ClawPatch::define(const double&  a_xlower,
 
     if (m_manifold)
     {
+        m_xlower = a_xlower;
+        m_ylower = a_ylower;
+        m_xupper = a_xupper;
+        m_yupper = a_yupper;
+    }
+    else
+    {
         double ax = gparms->ax;
         double bx = gparms->bx;
         double ay = gparms->ay;
@@ -141,13 +148,6 @@ void ClawPatch::define(const double&  a_xlower,
         m_xupper = ax + (bx - ax)*a_xupper;
         m_ylower = ay + (by - ay)*a_ylower;
         m_yupper = ay + (by - ay)*a_yupper;
-    }
-    else
-    {
-        m_xlower = a_xlower;
-        m_ylower = a_ylower;
-        m_xupper = a_xupper;
-        m_yupper = a_yupper;
     }
 
     m_dx = (m_xupper - m_xlower)/m_mx;

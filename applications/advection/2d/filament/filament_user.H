@@ -85,6 +85,7 @@ fclaw2d_map_context_t * fclaw2d_map_new_squareddisk (const double rotate[], cons
 fclaw2d_map_context_t * fclaw2d_map_new_pillowdisk (const double rotate[], const double scale);
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[], const double scale);
+fclaw2d_map_context_t* fclaw2d_map_new_cart_nomap();
 
 
 void filament_link_solvers(fclaw2d_domain_t *domain);

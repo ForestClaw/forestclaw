@@ -9,6 +9,7 @@ applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/filament_user.cpp \
 	applications/advection/2d/filament/filament.cpp \
 	applications/advection/2d/filament/fclaw2d_map_cart.c \
+	applications/advection/2d/filament/fclaw2d_map_cart_nomap.c \
 	applications/advection/2d/filament/fclaw2d_map_pillowdisk.c \
 	applications/advection/2d/filament/fclaw2d_map_squareddisk.c \
 	applications/advection/2d/filament/psi.f \

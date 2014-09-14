@@ -133,25 +133,22 @@ main (int argc, char **argv)
   case 4:
       /* Size is set by [ax,bx] x [ay, by], set in .ini file */
       gparms->manifold = 0;
+      clawpack_parms->mcapa = 0;
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_cart_nomap();
       break;
   default:
       sc_abort_collective ("Parameter example must be 1, 2, 3 or 4");
   }
 
-  if (example < 4)
-  {
-      domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
   /* ----------------------------------------------------------
      to retrieve the context.  Note that this is only be used for
      passing the context to a C/C++ routine.  Do not expect to be
      able to access fields of the cont structure.
      ---------------------------------------------------------- */
-    SET_CONTEXT(&cont);
-  }
-  else
-  {
-      domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
-  }
+  SET_CONTEXT(&cont);
 
   /* ----------------------------------------------------------
      ---------------------------------------------------------- */

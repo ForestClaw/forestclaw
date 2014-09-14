@@ -58,13 +58,9 @@ static void
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart_nomap(const double rotate[],
-                                                  const double scale)
+fclaw2d_map_context_t* fclaw2d_map_new_cart_nomap()
 {
     fclaw2d_map_context_t *cont;
-    double shift[3];
-    int m;
-
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart_nomap;
     cont->mapc2m = fclaw2d_map_c2m_cart_nomap;
