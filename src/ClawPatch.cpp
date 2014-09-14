@@ -129,14 +129,26 @@ void ClawPatch::define(const double&  a_xlower,
     m_blockno = a_blockno;
     m_meqn = gparms->meqn;
 
-    double ax = gparms->ax;
-    double bx = gparms->bx;
-    double ay = gparms->ay;
-    double by = gparms->by;
-    m_xlower = ax + (bx - ax)*a_xlower;
-    m_xupper = ax + (bx - ax)*a_xupper;
-    m_ylower = ay + (by - ay)*a_ylower;
-    m_yupper = ay + (by - ay)*a_yupper;
+    m_manifold = gparms->manifold;
+
+    if (m_manifold)
+    {
+        double ax = gparms->ax;
+        double bx = gparms->bx;
+        double ay = gparms->ay;
+        double by = gparms->by;
+        m_xlower = ax + (bx - ax)*a_xlower;
+        m_xupper = ax + (bx - ax)*a_xupper;
+        m_ylower = ay + (by - ay)*a_ylower;
+        m_yupper = ay + (by - ay)*a_yupper;
+    }
+    else
+    {
+        m_xlower = a_xlower;
+        m_ylower = a_ylower;
+        m_xupper = a_xupper;
+        m_yupper = a_yupper;
+    }
 
     m_dx = (m_xupper - m_xlower)/m_mx;
     m_dy = (m_yupper - m_ylower)/m_my;
@@ -157,7 +169,6 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata_save.define(box, m_meqn);
     m_griddata_time_interpolated.define(box, m_meqn);
 
-    m_manifold = gparms->manifold;
     if (m_manifold)
     {
         setup_manifold(a_level,gparms);

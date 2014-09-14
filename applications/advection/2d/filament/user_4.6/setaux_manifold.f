@@ -20,22 +20,30 @@
       double precision dxdy, t, sum, pi, exact_area
       logical iscart, issphere, isdisk,debug
 
+      logical fclaw2d_map_is_used
+      integer**8 cont
+      integer blockno
+
       common /compi/ pi
 
 c     # keep debug false since only one mpirank should print output
       debug = .false.
       dxdy = dx*dy
 
-      sum = 0
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            aux(i,j,1) = area(i,j)/dxdy
-            if ((i .ge. 1 .and. i .le. mx) .and.
-     &            (j .ge. 1 .and. j .le. my)) then
-               sum = sum + area(i,j)
-            endif
+      cont = get_context()
+
+      if (fclaw2d_map_is_used(cont)) then
+         sum = 0
+         do i = 1-mbc,mx+mbc
+            do j = 1-mbc,my+mbc
+               aux(i,j,1) = area(i,j)/dxdy
+               if ((i .ge. 1 .and. i .le. mx) .and.
+     &               (j .ge. 1 .and. j .le. my)) then
+                  sum = sum + area(i,j)
+               endif
+            enddo
          enddo
-      enddo
+      endif
 
       if (debug) then
 c        # We don't get an exact area, because of the non-smoothness

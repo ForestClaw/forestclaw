@@ -38,6 +38,9 @@ extern "C"
 #endif
 #endif
 
+#define FCLAW2D_MAP_IS_USED FCLAW_F77_FUNC_(fclaw2d_map_is_used,FCLAW2D_MAP_IS_USED)
+int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** cont);
+
 #define FCLAW2D_MAP_IS_CART FCLAW_F77_FUNC_(fclaw2d_map_is_cart,FCLAW2D_MAP_IS_CART)
 int FCLAW2D_MAP_IS_CART(fclaw2d_map_context_t** cont);
 

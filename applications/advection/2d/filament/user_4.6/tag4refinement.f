@@ -30,7 +30,7 @@ c     # Refine based only on first variable in system.
             else
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
-               if (qmax - qmin .gt. 0.25d0) then
+               if (qmax - qmin .gt. 0.2d0) then
                   tag_patch = 1
                   return
                endif

@@ -25,6 +25,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_map_query.h>
 
+int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** pcont)
+{
+    int iresult;
+    fclaw2d_map_context_t *cont = *pcont;
+    int id = FCLAW2D_MAP_QUERY_IS_USED;
+    iresult = cont->query(cont,id);
+    return iresult != 0;
+}
+
 int FCLAW2D_MAP_IS_DISK(fclaw2d_map_context_t** pcont)
 {
     int iresult;

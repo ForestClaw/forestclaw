@@ -8,7 +8,7 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_AFFINE:
@@ -52,6 +52,9 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
+
+    printf("The Cartesian map should not be used\n");
+    exit(0);
 
     /* Unit square in [-1,1] x [-1,1] */
     MAPC2M_CART(&xc,&yc,xp,yp,zp);

@@ -40,15 +40,21 @@ c     #     0.1  otherwise
       integer blockno, get_block
       double precision r
 
+      logical fclaw2d_map_is_used
+
       cont = get_context()
       blockno = get_block()
 
-c      call mapc2m(xc,yc,xp,yp,zp)
-
-      call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
+      if (fclaw2d_map_is_used(cont)) then
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc,yc,xp,yp,zp)
+      else
+         xp = xc
+         yp = yc
+      endif
 
       r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 
       fdisc = r-0.25d0
+c      fdisc = xp - 1
       end
