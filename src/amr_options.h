@@ -88,7 +88,6 @@ struct amr_options
 
     /* Boolean values (switches) */
     int manifold;
-    int mapped;
     int subcycle;
     int noweightedp;            /**< Don't use weighted partition.
                                      Only relevant when subcycling. */

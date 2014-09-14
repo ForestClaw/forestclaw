@@ -181,17 +181,6 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower (ay)");
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper (by)");
 
-#if 0
-    /* bool is not allocated, disable for now */
-    /* Does bool get allocated somewhere? */
-    sc_options_add_string (opt, 0, "manifold", &bool, "F", "Manifold [F]");
-
-    amropt->manifold = bool[0] == 'T' ? 1 : 0;
-
-    sc_options_add_string (opt, 0, "mapped", &bool, "F", "Mapped grid [F]");
-    amropt->mapped = bool[0] == 'T' ? 1 : 0;
-#endif
-
     /* ------------------------------------------------------------------- */
     /* Right now all switch options default to false, need to change that */
     /* I am okay with them being set to false by default, since I expect that
@@ -199,8 +188,6 @@ amr_options_new (sc_options_t * opt)
      */
     sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
                            "Solution is on manifold [F]");
-    sc_options_add_switch (opt, 0, "mapped", &amropt->mapped,
-                           "Use mapped grid [F]");
     sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
                            "Use fixed coarse grid time step [F]");
     sc_options_add_switch (opt, 0, "check_conservation",
