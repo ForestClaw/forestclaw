@@ -62,7 +62,7 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
                           int this_patch_idx)
 {
     // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
+    SET_BLOCK(&this_block_idx);
 
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -90,9 +90,6 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
     int maux;
     fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ----------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
     double *xp = cp->xp();
@@ -103,8 +100,9 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
     double *zd = cp->zd();
     double *area = cp->area();
 
-    setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,area);
+    int ismanifold = gparms->manifold;
+    setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
+                     maux,aux,xp,yp,zp,xd,yd,zd,area,ismanifold);
 }
 
 
@@ -117,7 +115,42 @@ void filament_patch_initialize(fclaw2d_domain_t *domain,
                             int this_patch_idx)
 {
     SET_BLOCK(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+    double *q = cp->q();
+
+    /* ----------------------------------------------------------- */
+    // allocate space for the aux array
+    fclaw2d_clawpack_define_auxarray(domain,cp);
+
+    /* ----------------------------------------------------------- */
+    // Pointers needed to pass to class setaux call, and other setaux
+    // specific arguments
+    double *aux;
+    int maux;
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+
+    int ismanifold = gparms->manifold;
+
+    qinit_filament_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,ismanifold);
+
+    /*
     fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    */
 }
 
 
@@ -142,7 +175,9 @@ double filament_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
+    /*
     fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    */
 
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);

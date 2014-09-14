@@ -1,6 +1,6 @@
 c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+       subroutine qinit_filament(meqn,mbc,mx,my,xlower,ylower,
+     &      dx,dy,q,maux,aux,ismanifold)
 c     =====================================================
 
 c     # Set initial conditions for q.
@@ -12,11 +12,16 @@ c     #     0.1  otherwise
 
        integer maxmx, maxmy, meqn, mbc, mx, my, maux
        double precision xlower, ylower, dx, dy
-       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
+       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
+       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
+       logical ismanifold, ismanifold_com
 
        integer i, j, mq
        double precision xlow, ylow, w
+
+       common /commanifold/ ismanifold_com
+
+       ismanifold_com = ismanifold
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
@@ -40,6 +45,7 @@ c     #     0.1  otherwise
       integer blockno, get_block
       double precision r
 
+<<<<<<< HEAD
       logical fclaw2d_map_is_used
 
       cont = get_context()
