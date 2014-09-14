@@ -8,7 +8,7 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
-        return 0;
+        return 1;
     case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_AFFINE:
@@ -37,9 +37,9 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_cart (fclaw2d_map_query_defs.h) : "\
+        printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
                "Query id not identified;  Maybe the query is not up to "\
-               "date?\nSee fclaw2d_map_query_defs.h.\n");
+               "date?\nSee fclaw2d_map_cart.h.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
     }
@@ -52,10 +52,6 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
-
-    printf("The Cartesian map should not be used\n");
-    exit(0);
-
     /* Unit square in [-1,1] x [-1,1] */
     MAPC2M_CART(&xc,&yc,xp,yp,zp);
 

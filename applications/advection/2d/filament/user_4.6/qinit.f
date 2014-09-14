@@ -45,7 +45,6 @@ c     #     0.1  otherwise
       integer blockno, get_block
       double precision r
 
-<<<<<<< HEAD
       logical fclaw2d_map_is_used
 
       cont = get_context()

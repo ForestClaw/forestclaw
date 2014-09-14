@@ -138,7 +138,7 @@ main (int argc, char **argv)
       sc_abort_collective ("Parameter example must be 1, 2, 3 or 4");
   }
 
-  if (example != 4)
+  if (example < 4)
   {
       domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
   /* ----------------------------------------------------------

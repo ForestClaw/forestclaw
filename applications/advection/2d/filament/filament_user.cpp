@@ -100,9 +100,8 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
     double *zd = cp->zd();
     double *area = cp->area();
 
-    int ismanifold = gparms->manifold;
     setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,area,ismanifold);
+                     maux,aux,xp,yp,zp,xd,yd,zd,area);
 }
 
 

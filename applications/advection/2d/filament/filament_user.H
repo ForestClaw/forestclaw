@@ -56,7 +56,7 @@ extern "C"
                           const int& maux, double aux[],
                           double xp[], double yp[], double zp[],
                           double xd[], double yd[], double zd[],
-                          double area[],const int& ismanifold);
+                          double area[]);
 
     void qinit_filament_(const int& meqn, const int& mbc, const int& mx, const int& my,
                          const double& xlower, const double& ylower, const double& dx,

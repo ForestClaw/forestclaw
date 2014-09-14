@@ -1,6 +1,6 @@
       subroutine setaux_manifold(mbc,mx,my,
      &      xlower,ylower,dx,dy, maux,aux,xp,yp,zp,xd,yd,zd,
-     &      area,ismanifold)
+     &      area)
       implicit none
 
       integer mbc, mx,my, meqn, maux
@@ -23,16 +23,19 @@
       logical iscart, issphere, isdisk,debug
 
       logical fclaw2d_map_is_used
-      integer**8 cont
+      integer*8 cont, get_context
       integer blockno
 
       common /compi/ pi
+
+      debug = .false.
 
 c     # keep debug false since only one mpirank should print output
       dxdy = dx*dy
 
       cont = get_context()
 
+      t = 0
       if (fclaw2d_map_is_used(cont)) then
          sum = 0
          do i = 1-mbc,mx+mbc
@@ -44,6 +47,11 @@ c     # keep debug false since only one mpirank should print output
                endif
             enddo
          enddo
+         call compute_velocity_psi(mx,my,mbc,dx,dy,
+     &         t,xd,yd,zd,aux,maux)
+      else
+         call compute_velocity_psi_nomanifold(mx,my,mbc,dx,dy,
+     &         xlower,ylower,t,aux,maux)
       endif
 
       if (debug) then
@@ -62,14 +70,6 @@ c           # Hemisphere
 
          stop
   100    format(A15,E24.16)
-=======
-         t = 0
-         call compute_velocity_psi(mx,my,mbc,dx,dy,
-     &         t,xd,yd,zd,aux,maux)
-      else
-         call compute_velocity_psi_nomanifold(mx,my,mbc,dx,dy,
-     &         xlower,ylower,t,aux,maux)
->>>>>>> Everything should work without computing area,xp,yp,zp,...
       endif
 
       return
@@ -146,7 +146,7 @@ c           # y-faces
 
 
       subroutine compute_velocity_psi_nomanifold(mx,my,mbc,
-     &      xlower,ylower,dx,dy,t,aux,maux)
+     &      dx,dy,xlower,ylower,t,aux,maux)
       implicit none
 
       integer mx,my,mbc,maux
