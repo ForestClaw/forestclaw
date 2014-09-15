@@ -1,18 +1,18 @@
-      subroutine set_block(blockno)
-      implicit none
-
-      integer blockno, blockno_com
-      common /comblock/ blockno_com
-
-      blockno_com = blockno
-      end
-
-      integer function get_block()
-      implicit none
-
-      integer blockno_com
-      common /comblock/ blockno_com
-
-      get_block = blockno_com
-      return
-      end
+c      subroutine set_block(blockno)
+c      implicit none
+c
+c      integer blockno, blockno_com
+c      common /comblock/ blockno_com
+c
+c      blockno_com = blockno
+c      end
+c
+c      integer function get_block()
+c      implicit none
+c
+c      integer blockno_com
+c      common /comblock/ blockno_com
+c
+c      get_block = blockno_com
+c      return
+c      end
