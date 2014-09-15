@@ -3,7 +3,7 @@ c     # adapted from the C-function 'fclaw2d_map_c2m_disk'
 c     # in fclaw2d_map.c (C. Burstedde)
 c     # -------------------------------------------------------
 
-      subroutine mapc2m_squareddisk(xc,yc,xp,yp,zp,alpha)
+      subroutine mapc2m_squareddisk(blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
       double precision xc,yc,xp,yp,zp
@@ -15,8 +15,6 @@ c     # -------------------------------------------------------
       common /compi/ pi
 
       pi = 4.d0*atan(1.0)
-
-      blockno = get_block()
 
       if (blockno .eq. 2) then
          xp = (2*xc - 1)*alpha/sqrt(2.d0);

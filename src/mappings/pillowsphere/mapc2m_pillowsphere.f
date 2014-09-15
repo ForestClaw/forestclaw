@@ -7,20 +7,18 @@ c     # either the upper hemisphere (blockno == 0) or the lower hemisphere
 c     # (blockno == 1).
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_pillowsphere(xc1,yc1,xp,yp,zp)
+      subroutine mapc2m_pillowsphere(blockno, xc1,yc1,xp,yp,zp)
       implicit none
 
       double precision xc1,yc1, xp, yp, zp
 
       double precision x1, y1, d, rp2, xc, yc
       logical multiblock
-      integer blockno, get_block
+      integer blockno
       logical l1, l2
 
       xc = 2*xc1 - 1
       yc = 2*yc1 - 1
-
-      blockno = get_block()
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)

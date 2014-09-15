@@ -1,10 +1,8 @@
-      subroutine mapc2m_cubedsphere(xc,yc,xp,yp,zp)
+      subroutine mapc2m_cubedsphere(blockno,xc,yc,xp,yp,zp)
       implicit none
 
       double precision xc,yc,xp,yp,zp, R
-      integer blockno, get_block
-
-      blockno = get_block()
+      integer blockno
 
       if (blockno .eq. 0) then
          call csphere_basic(xc,yc,yp,xp,zp)

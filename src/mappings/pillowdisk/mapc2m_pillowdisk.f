@@ -6,11 +6,12 @@ c     # Maps a logically rectangular Cartesian grid in [-1,1]x[-1,1] to
 c     # the unit disk.
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_pillowdisk(x1,y1,xp,yp,zp)
+      subroutine mapc2m_pillowdisk(blockno,x1,y1,xp,yp,zp)
       implicit none
 
       double precision x1,y1,xp,yp,zp
       double precision xc,yc
+      integer blockno
 
       xc = 2*x1 - 1
       yc = 2*y1 - 1
