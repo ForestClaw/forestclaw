@@ -55,7 +55,7 @@ fclaw2d_map_c2m_squareddisk(fclaw2d_map_context_t * cont, int blockno,
                             double *xp, double *yp, double *zp)
 {
     double alpha = cont->user_double[0];
-    MAPC2M_SQUAREDDISK(&xc,&yc,xp,yp,zp,&alpha);
+    MAPC2M_SQUAREDDISK(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
     /* These can probably be replaced by C functions at some point. */
     SCALE_MAP(xp,yp,zp);
@@ -83,10 +83,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double rotate[],
        can of course be stored as variables in a context field */
     SET_ROTATION(rotate);
     SET_SCALE(&scale);
-    for (m = 0; m < 2; m++)
-    {
-        shift[m] = 1.0;
-    }
+    shift[0] = 1;
+    shift[1] = 1;
+    shift[2] = 0;
     SET_SHIFT(shift);
 
     return cont;
