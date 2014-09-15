@@ -27,14 +27,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
+/* This file should come first to retrieve configure-time information */
+#include <fclaw_config.h>
+
 /* Use as an alternate to GNU feenableexcept */
 #ifdef OSX
 #include <fp_exception_glibc_extension.h>
 #endif
 
+#ifdef FCLAW_HAVE_FENV_H
 #include <fenv.h>
+#endif
+
+#ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
-#include <unistd.h>    //  To get process ids
+#endif
+
+#ifdef FCLAW_HAVE_UNISTD_H
+#include <unistd.h>    /* To get process ids */
+#endif
 
 #include "fclaw2d_typedefs.h"
 

@@ -56,6 +56,10 @@ To compile it under Linux, execute:
   cc -DLINUX -lm -o fe-handling fe-handling-example.c
 */
 
+/* Added this ifdef to compile the file conditionally */
+/* Question: why does this file not include fp_exception_glibc_extension.h? */
+#include <fclaw_config.h>
+
 #ifdef LINUX
 /* BEGIN quote
 http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.html
@@ -78,7 +82,9 @@ http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.h
 /* END quote */
 #endif // LINUX
 
+#ifdef FCLAW_HAVE_FENV_H
 #include <fenv.h>
+#endif
 
 #define DEFINED_PPC      (defined(__ppc__) || defined(__ppc64__))
 #define DEFINED_INTEL    (defined(__i386__) || defined(__x86_64__))
@@ -221,7 +227,10 @@ typedef union {
 
 #endif  // DEFINED_INTEL
 
+#ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
+#endif
+
 #include <stdio.h>   // printf()
 #include <stdlib.h>  // abort(), exit()
 

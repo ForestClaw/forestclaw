@@ -15,7 +15,8 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_transform.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fclaw2d_map_query.h \
-	src/fclaw2d_map_query_defs.h
+	src/fclaw2d_map_query_defs.h \
+	src/fp_exception_glibc_extension.h
 
 libforestclaw_internal_headers = \
 	src/fortran_source2d/debug.i
