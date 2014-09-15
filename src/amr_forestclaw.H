@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_config.h>
 
 /* Use as an alternate to GNU feenableexcept */
-#ifdef OSX
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
 #include <fp_exception_glibc_extension.h>
 #endif
 
