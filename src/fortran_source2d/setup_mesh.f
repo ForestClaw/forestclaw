@@ -1,8 +1,8 @@
       subroutine setup_mesh(mx,my,mbc,xlower,ylower,dx,dy,
-     &      xp,yp,zp,xd,yd,zd)
+     &      blockno,xp,yp,zp,xd,yd,zd)
       implicit none
 
-      integer mx,my, mbc
+      integer mx,my, mbc, blockno
       double precision dx,dy,xlower,ylower
 
       double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -16,11 +16,9 @@
       integer i,j
       double precision dxf,dyf, xc,yc,xd1, yd1,zd1
 
-      integer blockno, get_block
       integer*8 map_context_ptr, get_context
 
       map_context_ptr = get_context()
-      blockno = get_block()
 
 c     # We need both cell centered and node locations to
 c     # compute the normals at cell edges.
@@ -56,10 +54,10 @@ c              # Physical locations of cell centers
       end
 
       subroutine compute_area(mx,my,mbc,dx,dy,xlower, ylower,
-     &      area, level,maxlevel,refratio)
+     &      blockno,area, level,maxlevel,refratio)
       implicit none
 
-      integer mx,my,mbc,level, refratio,maxlevel
+      integer mx,my,mbc,level, refratio,maxlevel, blockno
       double precision dx,dy, xlower, ylower
 
 
@@ -75,11 +73,9 @@ c              # Physical locations of cell centers
       double precision xef, yef, xe,ye
       integer k, m
 
-      integer blockno, get_block
       integer*8 map_context_ptr, get_context
 
       map_context_ptr = get_context()
-      blockno = get_block()
 
       rfactor = 1
       do ir = level,maxlevel-1

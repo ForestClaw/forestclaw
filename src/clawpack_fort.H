@@ -211,12 +211,13 @@ void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
    ---------------------------------------------------------------------------------- */
 void setup_mesh_(const int& mx, const int& my, const int& mbc,
                  const double& xlower, const double& ylower,
-                 const double& dx, const double& dy,
-                 double xp[], double yp[], double zp[], double xd[], double yd[], double zd[]);
+                 const double& dx, const double& dy,int& blockno,
+                 double xp[], double yp[], double zp[],
+                 double xd[], double yd[], double zd[]);
 
 void compute_area_(const int& mx, const int& my, const int& mbc,
                    const double& m_dx, const double& m_dy,const double& m_xlower,
-                   const double& m_ylower, double area[],
+                   const double& m_ylower, const int& blockno, double area[],
                    const int& level, const int& maxlevel, const int& refratio);
 
 void compute_normals_(const int& mx, const int& my, const int& mbc,

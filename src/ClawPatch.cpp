@@ -605,7 +605,7 @@ void ClawPatch::set_block_corner_count(const int icorner, const int block_corner
 void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
 {
     // Set fortran common block
-    set_block_(&m_blockno);
+    // set_block_(&m_blockno);
 
     int mx = gparms->mx;
     int my = gparms->my;
@@ -673,14 +673,14 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
     double *edge_lengths = m_edge_lengths.dataPtr();
 
     /* Compute centers and corners of mesh cell */
-    setup_mesh_(mx,my,mbc,m_xlower,m_ylower,m_dx,m_dy,
+    setup_mesh_(mx,my,mbc,m_xlower,m_ylower,m_dx,m_dy,m_blockno,
                 xp,yp,zp,xd,yd,zd);
 
     /* The level and the refratio is needed here to compute
        areas on coarser meshes based on areas of the finest
        level meshes. */
     compute_area_(mx, my, mbc, m_dx, m_dy,m_xlower, m_ylower,
-                  area, level, maxlevel, refratio);
+                  m_blockno, area, level, maxlevel, refratio);
 
     compute_normals_(mx,my,mbc,xp,yp,zp,xd,yd,zd,
                      xnormals,ynormals);

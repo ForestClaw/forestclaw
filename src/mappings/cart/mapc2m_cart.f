@@ -1,7 +1,8 @@
-      subroutine mapc2m_cart(xc,yc,xp,yp,zp)
+      subroutine mapc2m_cart(blockno,xc,yc,xp,yp,zp)
       implicit none
 
       double precision xc,yc,xp,yp,zp
+      integer blockno
 
 c     # return a map in [-1,1],[-1,1]
       xp = 2.d0*(xc - 0.5d0)
