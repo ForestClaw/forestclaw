@@ -54,7 +54,7 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
                       double xc, double yc,
                       double *xp, double *yp, double *zp)
 {
-    MAPC2M_PILLOWDISK(&xc,&yc,xp,yp,zp);
+    MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
     /* These can probably be replaced by C functions at some point. */
     SCALE_MAP(xp,yp,zp);

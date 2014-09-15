@@ -70,7 +70,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double rotate[],
 {
     fclaw2d_map_context_t *cont;
     double shift[3];
-    int m;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_squareddisk;

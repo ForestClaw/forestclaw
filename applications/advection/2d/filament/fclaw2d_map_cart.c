@@ -53,7 +53,7 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double *xp, double *yp, double *zp)
 {
     /* Unit square in [-1,1] x [-1,1] */
-    MAPC2M_CART(&xc,&yc,xp,yp,zp);
+    MAPC2M_CART(&blockno,&xc,&yc,xp,yp,zp);
 
     SCALE_MAP(xp,yp,zp);
     ROTATE_MAP(xp,yp,zp);

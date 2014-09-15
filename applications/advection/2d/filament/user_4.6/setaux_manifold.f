@@ -1,9 +1,8 @@
-      subroutine setaux_manifold(mbc,mx,my,
-     &      xlower,ylower,dx,dy, maux,aux,xp,yp,zp,xd,yd,zd,
-     &      area)
+      subroutine setaux_manifold(mbc,mx,my,xlower,ylower,dx,dy,
+     &      blockno,maux,aux,xp,yp,zp,xd,yd,zd,area)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, meqn, maux, blockno
       logical ismanifold
       double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
@@ -24,7 +23,6 @@
 
       logical fclaw2d_map_is_used
       integer*8 cont, get_context
-      integer blockno
 
       common /compi/ pi
 
@@ -48,7 +46,7 @@ c     # keep debug false since only one mpirank should print output
             enddo
          enddo
          call compute_velocity_psi(mx,my,mbc,dx,dy,
-     &         t,xd,yd,zd,aux,maux)
+     &         blockno, t,xd,yd,zd,aux,maux)
       else
          call compute_velocity_psi_nomanifold(mx,my,mbc,dx,dy,
      &         xlower,ylower,t,aux,maux)
@@ -77,10 +75,10 @@ c           # Hemisphere
 
 
       subroutine compute_velocity_psi(mx,my,mbc,
-     &      dx,dy,t,xd,yd,zd,aux,maux)
+     &      dx,dy,blockno,t,xd,yd,zd,aux,maux)
       implicit none
 
-      integer maxmx, maxmy, mx,my,mbc,maux
+      integer maxmx, maxmy, mx,my,mbc,maux, blockno
       double precision dx,dy, t
 
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
@@ -94,10 +92,6 @@ c           # Hemisphere
       double precision vn
 
       logical ispillowsphere
-
-      integer blockno, get_block
-      blockno = get_block()
-
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -149,7 +143,7 @@ c           # y-faces
      &      dx,dy,xlower,ylower,t,aux,maux)
       implicit none
 
-      integer mx,my,mbc,maux
+      integer mx,my,mbc,maux, blockno
       double precision dx,dy, t, xlower,ylower
 
 
@@ -158,10 +152,6 @@ c           # y-faces
 
       integer i,j
       double precision vn
-
-      integer blockno, get_block
-      blockno = get_block()
-
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
