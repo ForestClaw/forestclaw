@@ -194,7 +194,7 @@ main (int argc, char **argv)
   amr_options_destroy(gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
-  // fclaw2d_map_destroy(cont);
+  fclaw2d_map_destroy(cont);
 
   fclaw_mpi_finalize ();
 
