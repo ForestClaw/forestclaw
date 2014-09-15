@@ -199,21 +199,26 @@ void SET_CONTEXT (fclaw2d_map_context_t** a_context);
    'fclaw2d_map_<name>_new() function.
    ---------------------------------------------------------------------------------- */
 
+/* Single block mappings */
 #define MAPC2M_CART FCLAW_F77_FUNC (mapc2m_cart,MAPC2M_CART)
 void MAPC2M_CART (double *xc, double *yc, double *xp, double *yp, double *zp);
 
-#define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
-void MAPC2M_SQUAREDDISK (double *xc, double *yc, double *xp, double *yp, double *zp,
-                         double *alpha);
-
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
-void MAPC2M_PILLOWDISK (double *xc, double *yc, double *xp, double *yp, double *zp);
+void MAPC2M_PILLOWDISK (double *xc, double *yc,
+                        double *xp, double *yp, double *zp);
+
+/* multi-block mappings */
+#define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
+void MAPC2M_SQUAREDDISK (int *blockno, double *xc, double *yc,
+                         double *xp, double *yp, double *zp, double *alpha);
 
 #define MAPC2M_CUBEDSPHERE FCLAW_F77_FUNC (mapc2m_cubedsphere,MAPC2M_CUBEDSPHERE)
-void MAPC2M_CUBEDSPHERE (double *xc, double *yc, double *xp, double *yp, double *zp);
+void MAPC2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
+                         double *xp, double *yp, double *zp);
 
 #define MAPC2M_PILLOWSPHERE FCLAW_F77_FUNC (mapc2m_pillowsphere,MAPC2M_PILLOWSPHERE)
-void MAPC2M_PILLOWSPHERE (double *xc, double *yc, double *xp, double *yp, double *zp);
+void MAPC2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
+                          double *xp, double *yp, double *zp);
 /* ---------------------------------------------------------------------------------- */
 
 
