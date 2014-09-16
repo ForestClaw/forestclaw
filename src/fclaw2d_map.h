@@ -201,10 +201,11 @@ void SET_CONTEXT (fclaw2d_map_context_t** a_context);
 
 /* Single block mappings */
 #define MAPC2M_CART FCLAW_F77_FUNC (mapc2m_cart,MAPC2M_CART)
-void MAPC2M_CART (double *xc, double *yc, double *xp, double *yp, double *zp);
+void MAPC2M_CART (int* blockno, double *xc, double *yc,
+                  double *xp, double *yp, double *zp);
 
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
-void MAPC2M_PILLOWDISK (double *xc, double *yc,
+void MAPC2M_PILLOWDISK (int* blockno, double *xc, double *yc,
                         double *xp, double *yp, double *zp);
 
 /* multi-block mappings */
