@@ -13,6 +13,7 @@
       subroutine assign(n,x) bind(c,name="assign")
       use iso_c_binding
       use c_routines
+      implicit none
       double precision x(n)
       integer n, i
 
