@@ -61,9 +61,6 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
                           int this_block_idx,
                           int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    SET_BLOCK(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -90,18 +87,25 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
     int maux;
     fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
-    /* ----------------------------------------------------------- */
-    /* Modified clawpack setaux routine that passes in mapping terms */
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-    double *area = cp->area();
+    if (gparms->manifold)
+    {
+        /* ----------------------------------------------------------- */
+        /* Modified clawpack setaux routine that passes in mapping terms */
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+        double *area = cp->area();
 
-    setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,area);
+        setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,maux,aux,
+                         this_block_idx, xp,yp,zp,xd,yd,zd,area);
+    }
+    else
+    {
+        setaux_nomap_(mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
+    }
 }
 
 

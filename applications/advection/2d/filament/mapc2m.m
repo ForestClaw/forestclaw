@@ -2,7 +2,7 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 % map = 'squareddisk';
 % map = 'pillowdisk';
-map = 'cart';
+% map = 'cart';
 map = 'cart_nomap';
 
 switch map

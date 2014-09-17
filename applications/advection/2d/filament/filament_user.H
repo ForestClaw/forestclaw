@@ -54,9 +54,16 @@ extern "C"
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           const int& maux, double aux[],
+                          const int& blockno,
                           double xp[], double yp[], double zp[],
                           double xd[], double yd[], double zd[],
                           double area[]);
+
+    void setaux_nomap_(const int& mbc,const int& mx,const int& my,
+                       const double& xlower,const double& ylower,
+                       const double& dx,const double& dy,
+                       const int& maux,double aux[]);
+
 
     void qinit_filament_(const int& meqn, const int& mbc, const int& mx, const int& my,
                          const double& xlower, const double& ylower, const double& dx,
