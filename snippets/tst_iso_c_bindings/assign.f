@@ -1,8 +1,11 @@
       module c_routines
       implicit none
       interface
-         subroutine mult(n,x) bind(c,name="mult")
+         subroutine mult(s,n,x) bind(c,name="mult")
+         use iso_c_binding, only : c_ptr
          implicit none
+
+         type(c_ptr) s
          integer n
          double precision x(n)
          end subroutine
@@ -10,10 +13,12 @@
       end module
 
 
-      subroutine assign(n,x) bind(c,name="assign")
-      use iso_c_binding
+      subroutine assign(s,n,x) bind(c,name="assign")
+      use iso_c_binding, only : c_ptr
       use c_routines
       implicit none
+
+      type(c_ptr) s
       double precision x(n)
       integer n, i
 
@@ -21,6 +26,6 @@
            x(i) = i
       enddo
 
-      call mult(n,x)
+      call mult(s,n,x)
 
       end
