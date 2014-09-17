@@ -1,14 +1,14 @@
 
 
 c     =================================================
-      double precision function psi(x,y)
+      double precision function psi(x,y,z)
 c     =================================================
 
 c     # stream function
 
       implicit none
 
-      double precision x,y,pi,r
+      double precision x,y,z,pi,r
       common /compi/ pi
 
 c      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
