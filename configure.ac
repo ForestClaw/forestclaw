@@ -45,9 +45,9 @@ FCLAW_CHECK_LIBRARIES([FCLAW])
 
 echo "o---------------------------------------"
 echo "| Checking headers"
-echo "o---------------------------------------"
+echo "o---------------------------------------"s
 
-AC_CHECK_HEADERS([fenv.h signal.h])
+dnl AC_CHECK_HEADERS([fenv.h signal.h])
 
 echo "o---------------------------------------"
 echo "| Checking functions"

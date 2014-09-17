@@ -35,13 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fp_exception_glibc_extension.h>
 #endif
 
-#ifdef FCLAW_HAVE_FENV_H
 #include <fenv.h>
-#endif
-
-#ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
-#endif
 
 #ifdef FCLAW_HAVE_UNISTD_H
 #include <unistd.h>    /* To get process ids */
