@@ -7,7 +7,7 @@ typedef struct simple
 } simple_t;
 
 
-void mult(simple_t *s, int *n, double* x);
+void mult(simple_t *s, int *n, double x[]);
 void assign(simple_t *s, int* n, double x[]);
 
 int main()
@@ -16,8 +16,8 @@ int main()
     double *x;
     simple_t s;
 
-    n = 10;
-    s.multiplier = 5;
+    n = 3;
+    s.multiplier = 23;
     x = (double*) malloc(sizeof(double)*n);
     assign(&s,&n,x);
 
