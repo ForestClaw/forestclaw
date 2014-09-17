@@ -65,37 +65,6 @@ int FCLAW2D_MAP_IS_FLAT(fclaw2d_map_context_t** cont);
 #define FCLAW2D_MAP_IS_SPHERE FCLAW_F77_FUNC_(fclaw2d_map_is_sphere,FCLAW2D_MAP_IS_SPHERE)
 int FCLAW2D_MAP_IS_SPHERE(fclaw2d_map_context_t** cont);
 
-#if 0
-int fclaw2d_map_is_cart(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_disk(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_pillowdisk(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_pillowsphere(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_cubedsphere(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_flat(fclaw2d_map_context_t** cont);
-int fclaw2d_map_is_sphere(fclaw2d_map_context_t** cont);
-#endif
-
-
-/* These are short versions that can be called from Fortran;  leave off
-   the headers, though, to discourage use from C/C++.   For those calls,
-   pass in the entire map_context and use the above routines */
-#if 0
-#define ISPILLOWSPHERE FCLAW_F77_FUNC_(ispillowsphere,ISPILLOWSPHERE)
-int ISPILLOWSPHERE();
-
-#define IS_CUBEDSPHERE FCLAW_F77_FUNC_(iscubedsphere,ISCUBEDSPHERE)
-int ISCUBEDSPHERE();
-
-#define ISPILLOWDISK FCLAW_F77_FUNC_(ispillowdisk,ISPILLOWDISK)
-int ISPILLOWDISK();
-
-#define ISSQUAREDDISK FCLAW_F77_FUNC_(issquareddisk,ISSQUAREDDISK)
-int ISSQUAREDDISK();
-
-#define ISFLAT FCLAW_F77_FUNC_(isflat,ISFLAT)
-int ISFLAT();
-#endif
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
