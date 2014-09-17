@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <stdio.h>
+#ifdef FCLAW_ENABLE_MPI
+
 #include <mpi.h>
 #include <unistd.h>    //  To get process ids
 
@@ -33,7 +35,7 @@ void fclaw2d_mpi_debug()
   /* Find out process rank */
   int my_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  
+
   /* Find out number of processes */
   int num;
   MPI_Comm_size(MPI_COMM_WORLD, &num);
@@ -64,3 +66,5 @@ void fclaw2d_mpi_debug()
     /* Code will stop here;  set ii=1 to continue in gdb */
   }
 }
+
+#endif
