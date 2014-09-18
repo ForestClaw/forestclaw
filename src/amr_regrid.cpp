@@ -56,6 +56,7 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
         if (refine_patch)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+            /* refine all of the neighbors */
         }
     }
 }
@@ -237,7 +238,7 @@ void regrid(fclaw2d_domain_t **domain)
         // Average to new coarse grids and interpolate to new fine grids
         fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_domain_adapt,
                                        (void *) NULL);
-    
+
         /* TODO: can we use global min/maxlevels here? */
         /* DAC : I am not sure - The coarse/fine exchanges will
            probably break if passed levels on which there are no
@@ -262,7 +263,7 @@ void regrid(fclaw2d_domain_t **domain)
 
         /* Update all ghost patches and ghost cells */
         update_ghost_all_levels (*domain,FCLAW2D_TIMER_REGRID);
-    
+
         // Print global minimum and maximum levels
         if ((*domain)->mpirank == 0) {
             printf ("Global minlevel %d maxlevel %d\n",
