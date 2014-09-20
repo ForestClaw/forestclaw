@@ -63,13 +63,13 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_AFFINE:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_PLANAR:
@@ -81,7 +81,7 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
@@ -89,7 +89,9 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
-        return 1;
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_generic (fclaw2d_map_query_defs.h) : " \
@@ -122,6 +124,7 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
   query_results[FCLAW2D_MAP_QUERY_IS_SQUAREDDISK] = 0;
   query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;
   query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_FIVEPATCH] = 0;
 #endif
 
 #ifdef __cplusplus
