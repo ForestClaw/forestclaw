@@ -1,5 +1,4 @@
-      subroutine setaux_nomap(mbc,mx,my,xlower,ylower,dx,dy,
-     &      maux,aux)
+      subroutine setaux_nomap(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
       implicit none
 
       integer mbc, mx,my, meqn, maux

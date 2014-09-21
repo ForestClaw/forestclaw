@@ -67,9 +67,9 @@ main (int argc, char **argv)
      -------------------------------------------------------------- */
   options = sc_options_new(argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for pillow disk (scaled)," \
-                      "2 for 5-square disk (scaled), " \
-                      "3 for unit square (scaled)");
+                      "1 for pillow disk, " \
+                      "2 for 5-square disk, " \
+                      "3 for unit square");
 
   sc_options_add_double (options, 0, "scale", &scale, 1.0,
                          "Scale unit sphere (e.g. set radius [1])");
@@ -110,7 +110,7 @@ main (int argc, char **argv)
 
   switch (example) {
   case 1:
-      /* Map unit square to disk using mapc2m_disk.f */
+      /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
       conn = p4est_connectivity_new_unitsquare();
       cont = fclaw2d_map_new_pillowdisk(rotate,scale);
       break;
@@ -126,7 +126,7 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_squareddisk (rotate,scale,alpha);
       break;
   case 3:
-      /* in [0,1]x[0,1] */
+      /* in [-1,1]x[-1,1] */
       conn = p4est_connectivity_new_unitsquare();
       cont = fclaw2d_map_new_cart(rotate, scale);
       break;

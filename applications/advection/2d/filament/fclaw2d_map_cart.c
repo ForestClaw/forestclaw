@@ -68,15 +68,15 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[],
 {
     fclaw2d_map_context_t *cont;
     double shift[3];
-    int m;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
 
+    SET_SCALE(&scale);
     SET_ROTATION(rotate);
     shift[0] = 1;
-    shfit[1] = 1;
+    shift[1] = 1;
     shift[2] = 0;
     SET_SHIFT(shift);
 

@@ -69,7 +69,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double rotate[],
 {
     fclaw2d_map_context_t *cont;
     double shift[3];
-    int m;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowdisk;
@@ -80,10 +79,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double rotate[],
        can of course be stored as variables in a context field */
     SET_ROTATION(rotate);
     SET_SCALE(&scale);
-    for (m = 0; m < 2; m++)
-    {
-        shift[m] = 1.0;
-    }
+    shift[0] = 1;
+    shift[1] = 1;
+    shift[2] = 0;
     SET_SHIFT(shift);
 
     return cont;
