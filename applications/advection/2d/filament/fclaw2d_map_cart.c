@@ -35,6 +35,8 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
@@ -73,11 +75,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[],
     cont->mapc2m = fclaw2d_map_c2m_cart;
 
     SET_ROTATION(rotate);
-    SET_SCALE(&scale);
-    for (m = 0; m < 3; m++)
-    {
-        shift[m] = 1;
-    }
+    shift[0] = 1;
+    shfit[1] = 1;
+    shift[2] = 0;
     SET_SHIFT(shift);
 
     return cont;

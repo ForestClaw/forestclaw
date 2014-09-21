@@ -5,8 +5,8 @@
       integer blockno
 
 c     # return a map in [-1,1],[-1,1]
-      xp = 2.d0*(xc - 0.5d0)
-      yp = 2.d0*(yc - 0.5d0)
+      xp = 2*xc - 1
+      yp = 2*yc - 1
       zp = 0
 
 
