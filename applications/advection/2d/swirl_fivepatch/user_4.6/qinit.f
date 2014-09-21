@@ -1,6 +1,7 @@
 c     =====================================================
-       subroutine qinit(maxmx,maxmy, meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+       subroutine qinit_manifold(meqn,mbc,mx,my,
+     &      xlower,ylower,
+     &      dx,dy,blockno,q,maux,aux)
 c     =====================================================
 
 c     # Set initial conditions for q.
@@ -10,13 +11,15 @@ c     #     0.1  otherwise
 
        implicit none
 
-       integer meqn, mbc, mx, my, maux, maxmx, maxmy
+       integer meqn, mbc, mx, my, maux, blockno
        double precision xlower, ylower, dx, dy
-       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
+       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
+       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
        integer i, j, mq
        double precision xlow,ylow,w
+
+       call set_block(blockno)
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc

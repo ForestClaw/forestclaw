@@ -93,14 +93,13 @@ main (int argc, char **argv)
      Domain geometry
      -------------------------------------------------------------- */
 
-  double scale = 2;
   double alpha = 0.5;
 
   switch (example) {
   case 1:
       /* Map unit square to disk using mapc2m_disk.f */
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart(scale);
+      cont = fclaw2d_map_new_cart();
       break;
   case 2:
       conn = p4est_connectivity_new_disk ();

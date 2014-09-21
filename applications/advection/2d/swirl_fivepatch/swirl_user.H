@@ -61,6 +61,13 @@ extern "C"
                             const int& level,const int& blockno,
                             const int& mpirank);
 
+    void qinit_manifold_(const int& meqn, const int& mbc,
+                         const int& mx, const int& my,
+                         const double& xlower, const double& ylower,
+                         const double& dx, const double& dy,
+                         const int& blockno,double q[],
+                         const int& maux, double aux[]);
+
     void setaux_manifold_(const int& mbc,const int& mx, const int& my,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
@@ -73,9 +80,10 @@ extern "C"
     void b4step2_manifold_(const int& mbc,const int& mx,const int& my,
                            const int& meqn, double q[],
                            const double& dx,const double& dy,
-                           const int& blockno, const double& time,
+                           const int& blockno,
                            double xd[], double yd[], double zd[],
-                           const double dt, const int& maux, double aux[]);
+                           const double& time,
+                           const double& dt, const int& maux, double aux[]);
 
 
 }

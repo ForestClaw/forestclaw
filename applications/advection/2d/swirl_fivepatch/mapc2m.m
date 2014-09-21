@@ -1,10 +1,10 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
+% map = 'cart';
 map = 'fivepatch';
-% map = 'nomap';
 
 switch map
-    case 'nomap'
+    case 'cart'
         xp = xc;
         yp = yc;
         zp = 0*xp;

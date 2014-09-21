@@ -3,30 +3,20 @@
       implicit none
 
       integer mbc, mx,my, meqn, maux, blockno
-      logical ismanifold
       double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
-
-      double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-
-      double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
-
-      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j
       double precision dxdy, t, sum
 
+      include 'metric_terms.i'
+
 c     # keep debug false since only one mpirank should print output
       dxdy = dx*dy
 
-      sum = 0
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            aux(i,j,1) = area(i,j)/dxdy
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
+            aux(i,j,3) = area(i,j)/dxdy
          enddo
       enddo
       t = 0
@@ -41,7 +31,7 @@ c     # keep debug false since only one mpirank should print output
      &      dx,dy,blockno,t,xd,yd,zd,aux,maux)
       implicit none
 
-      integer maxmx, maxmy, mx,my,mbc,maux, blockno
+      integer mx,my,mbc,maux, blockno
       double precision dx,dy, t
 
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
@@ -73,7 +63,7 @@ c           # x-faces
                   vn = -vn
                endif
             endif
-            aux(i,j,2) = vn
+            aux(i,j,1) = vn
          enddo
       enddo
 
@@ -95,7 +85,7 @@ c           # y-faces
                endif
             endif
 
-            aux(i,j,3) = -vn
+            aux(i,j,2) = -vn
          enddo
       enddo
 

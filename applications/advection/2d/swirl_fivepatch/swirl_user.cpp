@@ -107,7 +107,34 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int mbc = gparms->mbc;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+    double *q = cp->q();
+
+    /* ----------------------------------------------------------- */
+    // Pointers needed to pass to class setaux call, and other setaux
+    // specific arguments
+    double *aux;
+    int maux;
+    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+
+    int blockno = this_block_idx;
+
+    qinit_manifold_(meqn,mbc,mx,my,xlower,ylower,dx,dy,blockno,
+                    q, maux,aux);
 }
 
 
@@ -141,8 +168,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
     /* ----------------------------------------------------------- */
     // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
     double *xd = cp->xd();
@@ -159,8 +184,8 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
     fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     /* Update the velocity field */
-    b4step_manifold_(mbc,mx,my,meqn,q,dx,dy,blockno,
-                     xd,yd,zd,dt,maux,aux);
+    b4step2_manifold_(mbc,mx,my,meqn,q,dx,dy,blockno,
+                     xd,yd,zd,t, dt,maux,aux);
 
 
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,

@@ -19,7 +19,7 @@ c     # Refine based only on first variable in system.
       do i = 1,mx
          do j = 1,my
 
-            if (init_flag .eq. 1) then
+            if (init_flag .eq. 1 .and. .false.) then
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
 c               if (abs(xc + yc-1) .lt. dy) then
