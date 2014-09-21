@@ -53,7 +53,8 @@ extern "C"
 #define FCLAW2D_MAP_QUERY_IS_SQUAREDDISK   12     /* Squared disk */
 #define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  13     /* Pillow sphere */
 #define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   14     /* Cubed sphere */
-#define FCLAW2D_MAP_QUERY_LAST             15     /* Number of "official" queries. */
+#define FCLAW2D_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
+#define FCLAW2D_MAP_QUERY_LAST             16     /* Number of "official" queries. */
 
 #if 0
 /* Generic query function (kept up to date with list above) */
