@@ -54,17 +54,30 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
-    /* Unit square in [0,1]x[0,1] */
+    /* Unit square in [-1,1]x[-1,1] */
     MAPC2M_CART(&blockno,&xc,&yc,xp,yp,zp);
+    SCALE_MAP(xp,yp,zp);
+    SHIFT_MAP(xp,yp,zp);
 }
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart()
 {
     fclaw2d_map_context_t *cont;
+    double scale;
+    double shift[3];
+
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
+
+    scale = 0.5;
+    shift[0] = 0.5;
+    shift[1] = 0.5;
+    shift[2] = 0;
+    SET_SCALE(&scale);
+    SET_SHIFT(shift);
+
 
     return cont;
 }

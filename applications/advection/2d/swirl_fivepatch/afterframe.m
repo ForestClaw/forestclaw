@@ -4,7 +4,8 @@ daspect([1 1 1]);
 axis off;
 
 yrbcolormap;
-showpatchborders(1:10);
+% showpatchborders(1:10);
+hidepatchborders;
 caxis([0,1])
 qlo = 0;
 qhi = 1;
