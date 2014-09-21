@@ -220,6 +220,11 @@ void MAPC2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
 #define MAPC2M_PILLOWSPHERE FCLAW_F77_FUNC (mapc2m_pillowsphere,MAPC2M_PILLOWSPHERE)
 void MAPC2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
                           double *xp, double *yp, double *zp);
+
+#define MAPC2M_FIVEPATCH FCLAW_F77_FUNC (mapc2m_fivepatch,MAPC2M_FIVEPATCH)
+void MAPC2M_FIVEPATCH (int* blockno, double *xc, double *yc,
+                       double *xp, double *yp, double *zp,double *alpha);
+
 /* ---------------------------------------------------------------------------------- */
 
 
