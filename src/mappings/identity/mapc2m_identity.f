@@ -1,0 +1,13 @@
+      subroutine mapc2m_nomap(blockno,xc,yc,xp,yp,zp)
+      implicit none
+
+      double precision xc,yc,xp,yp,zp
+      integer blockno
+
+c     # Map in [0,1]x[0,1]
+      xp = xc
+      yp = yc
+      zp = 0
+
+
+      end
