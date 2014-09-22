@@ -39,7 +39,9 @@
 %
 %      See also PLOTCLAW2, SetPlotGrid, setPlotGridEdges.
 
-% OutputFlag = 'ascii'         % default value.
+OutputFlag = 'forestclaw'         % default value.
+
+ForestClaw = 1;
 
 PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)

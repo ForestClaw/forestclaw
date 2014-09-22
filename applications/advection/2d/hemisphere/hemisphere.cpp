@@ -23,11 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_single_step.h"
-#include "fclaw2d_clawpack.H"
+#include <amr_single_step.h>
+#include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+#include <fclaw2d_map_query.h>
 
 #include "hemisphere_user.H"
 
@@ -35,11 +38,26 @@ int
 main (int argc, char **argv)
 {
   int			lp;
+  int                   example;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
+
+  double theta;
+
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  feenableexcept(FE_INVALID);
+#endif
+
+#ifdef MPI_DEBUG
+  fclaw2d_mpi_debug();
+#endif
+
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
@@ -48,6 +66,12 @@ main (int argc, char **argv)
   /* propose option handling as present in p4est/libsc */
   /* the option values live in amr_options, see amr_options.h */
   options = sc_options_new (argv[0]);
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "1 for Cartesian," \
+                      "2 for five patch square");
+
+  sc_options_add_double (options, 0, "theta", &theta, 0,
+                         "Rotation angle theta (degrees) about z axis [0]");
 
   /* Read in values from default .ini files */
   gparms = amr_options_new (options);
@@ -64,10 +88,39 @@ main (int argc, char **argv)
   amr_checkparms(gparms);
   fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
 
-  // ---------------------------------------------------------------
-  // Domain geometry
-  // ---------------------------------------------------------------
-  domain = fclaw2d_domain_new_unitsquare(mpicomm,gparms->minlevel);
+  /* ---------------------------------------------------------------
+     Domain geometry
+     --------------------------------------------------------------- */
+  double alpha = 0.5;
+  double scale = 1;
+  double rotate[2];
+  rotate[0] = theta;
+  rotate[1] = 0;
+
+  switch (example) {
+  case 1:
+      /* Map unit square to disk using mapc2m_disk.f */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_pillowsphere(scale,rotate);
+      break;
+  case 2:
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_fivepatch(scale,rotate,alpha);
+      break;
+  default:
+      sc_abort_collective ("Parameter example must be 1 or 2");
+  }
+
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure.
+     ---------------------------------------------------------- */
+  SET_CONTEXT(&cont);
+
+
 
   if (gparms->verbosity > 0)
   {

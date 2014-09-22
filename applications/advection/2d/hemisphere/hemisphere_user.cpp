@@ -48,6 +48,11 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &fclaw2d_clawpack_bc2;
     sf->f_patch_single_step_update = &hemisphere_update;
 
+    fclaw2d_output_functions_t *of = get_output_functions(domain);
+    of->f_patch_write_header = &hemisphere_parallel_write_header;
+    of->f_patch_write_output = &hemisphere_parallel_write_output;
+
+
     fclaw2d_clawpack_link_to_clawpatch();
 }
 
@@ -146,14 +151,9 @@ void hemisphere_qinit(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
-
     /* ------------------------------------------------------- */
     // Call to classic Clawpack 'qinit' routine.
-    qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,
-                    xp,yp,zp);
+    qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
 void hemisphere_b4step2(fclaw2d_domain_t *domain,
@@ -281,6 +281,65 @@ fclaw_bool hemisphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
+
+void hemisphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    double time = get_domain_time(domain);
+
+    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+
+    /* Increase the number of fields by 1 so we can printout the mpi rank */
+    int mfields = gparms->meqn;
+    int maux = 0;
+    hemisphere_write_tfile_(iframe,time,mfields,ngrids,maux);
+
+    /* This opens file 'fort.qXXXX' for replace
+       (where XXXX = <zero padding><iframe>, e.g. 0001, 0010, 0114),
+       and closes the file. */
+    new_qfile_(iframe);
+}
+
+
+void hemisphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int iframe,int num,int level)
+{
+    // In case this is needed by the setaux routine
+    set_block_(&this_block_idx);
+
+    /* ----------------------------------------------------------- */
+    // Global parameters
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+
+    /* ----------------------------------------------------------- */
+    // Patch specific parameters
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double xlower = cp->xlower();
+    double ylower = cp->ylower();
+    double dx = cp->dx();
+    double dy = cp->dy();
+
+    /* ------------------------------------------------------------ */
+    // Pointers needed to pass to Fortran
+    double* q = cp->q();
+
+    // Other input arguments
+    int maxmx = mx;
+    int maxmy = my;
+
+    /* ------------------------------------------------------------- */
+    int matlab_level = level + 1;
+
+    int mpirank = domain->mpirank;
+    /* This opens a file for append and writes in the 'clawout' style. */
+    hemisphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                            iframe,num,matlab_level,this_block_idx,mpirank);
+}
 
 
 
