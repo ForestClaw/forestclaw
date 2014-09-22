@@ -59,6 +59,11 @@ main (int argc, char **argv)
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
+#ifdef MPI_DEBUG
+  /* this has to go after MPI has been initialized */
+  fclaw2d_mpi_debug();
+#endif
+
   /* ---------------------------------------------------------------
      Read in parameters and options
      --------------------------------------------------------------- */
