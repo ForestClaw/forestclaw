@@ -38,7 +38,6 @@ int
 main (int argc, char **argv)
 {
   int			lp;
-  int                   example;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
@@ -54,26 +53,32 @@ main (int argc, char **argv)
   feenableexcept(FE_INVALID);
 #endif
 
-#ifdef MPI_DEBUG
-  fclaw2d_mpi_debug();
-#endif
-
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-  /* propose option handling as present in p4est/libsc */
-  /* the option values live in amr_options, see amr_options.h */
+#ifdef MPI_DEBUG
+  /* this has to go after MPI has been initialized */
+  fclaw2d_mpi_debug();
+#endif
+
+
+  /* ----------------------------------------------------------
+     Read in command line options
+     ---------------------------------------------------------- */
+  int example;
   options = sc_options_new (argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for Cartesian," \
+                      "1 for Cartesian, " \
                       "2 for five patch square");
 
   sc_options_add_double (options, 0, "theta", &theta, 0,
                          "Rotation angle theta (degrees) about z axis [0]");
 
-  /* Read in values from default .ini files */
+  /* ----------------------------------------------------------
+     Read in values from .ini files.  These are overwritten by
+     command line options read above.
+     ---------------------------------------------------------- */
   gparms = amr_options_new (options);
   clawpack_parms = fclaw2d_clawpack_parms_new(options);
 
@@ -89,7 +94,7 @@ main (int argc, char **argv)
   fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
 
   /* ---------------------------------------------------------------
-     Domain geometry
+     Set up the domain geometry
      --------------------------------------------------------------- */
   double alpha = 0.5;
   double scale = 1;
