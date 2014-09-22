@@ -8,6 +8,7 @@ bin_PROGRAMS += applications/advection/2d/swirl_fivepatch/swirl
 applications_advection_2d_swirl_fivepatch_swirl_SOURCES = \
 	applications/advection/2d/swirl_fivepatch/swirl_user.cpp \
 	applications/advection/2d/swirl_fivepatch/swirl.cpp \
+	applications/advection/2d/swirl_fivepatch/mapc2m.f \
 	applications/advection/2d/swirl_fivepatch/setaux_manifold.f \
 	applications/advection/2d/swirl_fivepatch/fclaw2d_map_fivepatch.c \
 	applications/advection/2d/swirl_fivepatch/fclaw2d_map_cart.c \
