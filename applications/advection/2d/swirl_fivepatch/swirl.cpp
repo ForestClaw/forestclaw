@@ -60,8 +60,11 @@ main (int argc, char **argv)
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG
+  /* this has to go after MPI has been initialized */
   fclaw2d_mpi_debug();
 #endif
+
+
 
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and
