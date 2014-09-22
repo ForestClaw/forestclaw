@@ -9,4 +9,4 @@ cpp_tst:
 	g++ -o tst_prog prog.o assign.o
 
 clean:
-	rm -f *.o *~ tst_prog
+	rm -f *.o *~ *.mod tst_prog
