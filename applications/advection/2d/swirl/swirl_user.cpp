@@ -48,23 +48,16 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
     fclaw2d_clawpack_setprob(domain);
 }
 
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx)
 {
-    /* Set velocity data */
     fclaw2d_clawpack_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-
-
-    /* Set up diffusion coefficients? Read in velocity data? Material properties? */
 }
 
 
@@ -99,7 +92,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-
     fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
@@ -179,7 +171,7 @@ void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn + 1;
+    int mfields = gparms->meqn;
     int maux = 0;
     swirl_write_tfile_(iframe,time,mfields,ngrids,maux);
 
@@ -218,7 +210,7 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
 
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level + 1;
+    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,

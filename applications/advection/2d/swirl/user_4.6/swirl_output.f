@@ -35,8 +35,8 @@
       end
 
       subroutine swirl_write_qfile(meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
-     &      mpirank)
+     &      xlower,ylower,dx,dy,q,iframe,patch_num,
+     &      level,blockno,mpirank)
 
       implicit none
 
@@ -93,11 +93,11 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
                endif
             enddo
 
-            write(matunit1,120) mpirank,(q(i,j,mq),mq=1,meqn)
+            write(matunit1,120) (q(i,j,mq),mq=1,meqn)
          enddo
          write(matunit1,*) ' '
       enddo
-  120 format (I5,50E26.16)
+  120 format (50E26.16)
 
       close(matunit1)
 

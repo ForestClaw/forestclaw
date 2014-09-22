@@ -61,6 +61,27 @@ extern "C"
                             const int& level,const int& blockno,
                             const int& mpirank);
 
+    void setaux_manifold_(const int& mbc,const int& mx, const int& my,
+                          const double& xlower, const double& ylower,
+                          const double& dx, const double& dy,
+                          const int& maux, double aux[],
+                          const int& blockno,
+                          double xp[], double yp[], double zp[],
+                          double xd[], double yd[], double zd[],
+                          double area[]);
+
+    void setaux_nomap_(const int& mbc,const int& mx,const int& my,
+                       const double& xlower,const double& ylower,
+                       const double& dx,const double& dy,
+                       const int& maux,double aux[]);
+
+    void b4step2_manifold_(const int& mbc,const int& mx,const int& my,
+                           const int& meqn, double q[],
+                           const double& dx,const double& dy,
+                           const int& blockno, const double& time,
+                           double xd[], double yd[], double zd[],
+                           const double dt, const int& maux, double aux[]);
+
 
 }
 
@@ -105,11 +126,17 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       int blockno,
                                       int patchno);
 
+
 void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                  int iframe,int num,int level);
 
 void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+
+
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
 
 #ifdef __cplusplus
 #if 0

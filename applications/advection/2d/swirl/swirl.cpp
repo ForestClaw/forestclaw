@@ -23,25 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* --------------------------------------------------------
-   Needed for trapping floating point errors.
- ---------------------------------------------------------- */
-#ifdef TRAPFPE_OSX
-#include "fp_exception_glibc_extension.h"
-#endif
-/* Are these all that is needed for non-OSX systems? */
-#include <fenv.h>
-#include <signal.h>
-#include <unistd.h>    //  To get process ids
-/* -------------------------------------------------------- */
+#include <amr_single_step.h>
+#include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
 
-// This needs to go away.  The p4est namespace should not be used directly.
-#include <p4est.h>
+#include <amr_forestclaw.H>
+#include <amr_utils.H>
+#include <fclaw2d_map_query.h>
 
-#include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw2d_clawpack.H"
-#include "amr_options.h"
+
 
 #include "swirl_user.H"
 
@@ -51,9 +42,12 @@ main (int argc, char **argv)
   int		        lp;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
   fclaw2d_domain_t	*domain;
-  amr_options_t         *gparms;
+  amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  *clawpack_parms;
+
 
 #ifdef TRAPFPE
   printf("Enabling floating point traps\n");
@@ -94,8 +88,23 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      -------------------------------------------------------------- */
-  domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
 
+  /* Map unit square to disk using mapc2m_disk.f */
+  gparms->manifold = 0;
+  conn = p4est_connectivity_new_unitsquare();
+  cont = fclaw2d_map_new_nomap();
+
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure.
+     ---------------------------------------------------------- */
+  SET_CONTEXT(&cont);
+
+  /* ----------------------------------------------------------
+     ---------------------------------------------------------- */
   if (gparms->verbosity > 0)
   {
       fclaw2d_domain_list_levels(domain, lp);

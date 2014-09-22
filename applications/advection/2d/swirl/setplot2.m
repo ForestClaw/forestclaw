@@ -50,11 +50,12 @@ PlotType = 1;                % type of plot to produce:
 			     % 3 = Schlieren
 			     % 4 = scatter plot of q vs. r
 
-mq = 2;                      % which component of q to plot
+mq = 1;                      % which component of q to plot
 UserVariable = 0;            % set to 1 to specify a user-defined variable
 UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
-Manifold = 0;
+Manifold = 0
+;
 ReadBlockNumber = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;
@@ -72,7 +73,5 @@ ContourValues = [];
 
 %---------------------------------
 
-% Use this for plotting cool proc colors rather than actual data.
-UserColorMapping = mq == 1;  % Partition field.
 
-ShowUnderOverShoots = 0;
+ShowUnderOverShoots = 1;
