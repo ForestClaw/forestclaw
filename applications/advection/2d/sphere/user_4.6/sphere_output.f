@@ -1,4 +1,4 @@
-      subroutine cubed_sphere_write_tfile(iframe,time,
+      subroutine sphere_write_tfile(iframe,time,
      &      mfields,ngrids,maux)
       implicit none
 
@@ -35,7 +35,7 @@
 
       end
 
-      subroutine cubed_sphere_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine sphere_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
      &      mpirank)
 

@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CUBED_SPHERE_USER_H
-#define CUBED_SPHERE_USER_H
+#ifndef SPHERE_USER_H
+#define SPHERE_USER_H
 
 #include <amr_forestclaw.H>
 
@@ -33,13 +33,13 @@ extern "C"
     void mapc2m_(const double *xc, const double *yc,
                  double *xp, double *yp, double *zp);
 
-    void cubed_sphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
+    void sphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, const double& xlower,
                                 const double& ylower, const double& dx, const double& dy,
                                 double q[], const int& init_flag, const int& blockno,
                                 int& tag_patch);
 
-    void cubed_sphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+    void sphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn,const double& xlower,
                                 const double& ylower, const double& dx, const double& dy,
                                 double qcoarsened[], int& tag_patch);
@@ -65,11 +65,11 @@ extern "C"
                            const double& t, const int& maux, double aux[],
                            double xd[], double yd[], double zd[]);
 
-    void cubed_sphere_write_tfile_(const int& iframe,const double& time,
+    void sphere_write_tfile_(const int& iframe,const double& time,
                             const int& mfields,const int& ngrids,
                             const int& maux);
 
-    void cubed_sphere_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+    void sphere_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
                             const int& mbc, const int& mx,const int& my,
                             const double& xlower,const double& ylower,
                             const double& dx, const double& dy,
@@ -86,29 +86,29 @@ extern "C"
 #endif
 #endif
 
-void cubed_sphere_link_solvers(fclaw2d_domain_t *domain);
+void sphere_link_solvers(fclaw2d_domain_t *domain);
 
-void cubed_sphere_problem_setup(fclaw2d_domain_t* domain);
+void sphere_problem_setup(fclaw2d_domain_t* domain);
 
 
-void cubed_sphere_patch_setup(fclaw2d_domain_t *domain,
+void sphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
 
-void cubed_sphere_qinit(fclaw2d_domain_t *domain,
+void sphere_qinit(fclaw2d_domain_t *domain,
                   fclaw2d_patch_t *this_patch,
                   int this_block_idx,
                   int this_patch_idx);
 
-void cubed_sphere_b4step2(fclaw2d_domain_t *domain,
+void sphere_b4step2(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
                     double t,
                     double dt);
 
-void cubed_sphere_patch_physical_bc(fclaw2d_domain *domain,
+void sphere_patch_physical_bc(fclaw2d_domain *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -117,26 +117,26 @@ void cubed_sphere_patch_physical_bc(fclaw2d_domain *domain,
                               fclaw_bool intersects_bc[]);
 
 
-double cubed_sphere_update(fclaw2d_domain_t *domain,
+double sphere_update(fclaw2d_domain_t *domain,
                      fclaw2d_patch_t *this_patch,
                      int this_block_idx,
                      int this_patch_idx,
                      double t,
                      double dt);
 
-fclaw_bool cubed_sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int this_block_idx, int this_patch_idx,
                                        int initflag);
 
-fclaw_bool cubed_sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno);
 
-void cubed_sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
-void cubed_sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level);
 

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 #include "fclaw2d_clawpack.H"
-#include "cubed_sphere_user.H"
+#include "sphere_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,28 +36,28 @@ extern "C"
 #endif
 
 
-void cubed_sphere_link_solvers(fclaw2d_domain_t *domain)
+void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
-    sf->f_patch_setup              = &cubed_sphere_patch_setup;
-    sf->f_patch_initialize         = &cubed_sphere_qinit;
-    sf->f_patch_single_step_update = &cubed_sphere_update;
+    sf->f_patch_setup              = &sphere_patch_setup;
+    sf->f_patch_initialize         = &sphere_qinit;
+    sf->f_patch_single_step_update = &sphere_update;
 
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
-    rf->f_patch_tag4refinement = &cubed_sphere_patch_tag4refinement;
-    rf->f_patch_tag4coarsening = &cubed_sphere_patch_tag4coarsening;
+    rf->f_patch_tag4refinement = &sphere_patch_tag4refinement;
+    rf->f_patch_tag4coarsening = &sphere_patch_tag4coarsening;
 
     fclaw2d_output_functions_t *of = get_output_functions(domain);
-    of->f_patch_write_header = &cubed_sphere_parallel_write_header;
-    of->f_patch_write_output = &cubed_sphere_parallel_write_output;
+    of->f_patch_write_header = &sphere_parallel_write_header;
+    of->f_patch_write_output = &sphere_parallel_write_output;
 
     /* This is needed to get constructors for user data */
     fclaw2d_clawpack_link_to_clawpatch();
 }
 
-void cubed_sphere_problem_setup(fclaw2d_domain_t* domain)
+void sphere_problem_setup(fclaw2d_domain_t* domain)
 {
     // This calls setprob_, which might be null.  This is used
     // mostly for setting up things related to Fortran.
@@ -65,7 +65,7 @@ void cubed_sphere_problem_setup(fclaw2d_domain_t* domain)
     fclaw2d_clawpack_setprob(domain);
 }
 
-void cubed_sphere_patch_setup(fclaw2d_domain_t *domain,
+void sphere_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx)
@@ -116,7 +116,7 @@ void cubed_sphere_patch_setup(fclaw2d_domain_t *domain,
                      maux,aux,xp,yp,zp,xd,yd,zd,area);
 }
 
-void cubed_sphere_qinit(fclaw2d_domain_t *domain,
+void sphere_qinit(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx)
@@ -162,7 +162,7 @@ void cubed_sphere_qinit(fclaw2d_domain_t *domain,
                     xp,yp,zp);
 }
 
-void cubed_sphere_patch_physical_bc(fclaw2d_domain *domain,
+void sphere_patch_physical_bc(fclaw2d_domain *domain,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
@@ -170,11 +170,11 @@ void cubed_sphere_patch_physical_bc(fclaw2d_domain *domain,
                                     double dt,
                                     fclaw_bool intersects_bc[])
 {
-    // The cubed_sphere has no physical boundaries
+    // The sphere has no physical boundaries
 }
 
 
-void cubed_sphere_b4step2(fclaw2d_domain_t *domain,
+void sphere_b4step2(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -215,14 +215,14 @@ void cubed_sphere_b4step2(fclaw2d_domain_t *domain,
     b4step2_manifold_(maxmx,maxmy,mbc,mx,my,dx,dy,t,maux,aux,xd,yd,zd);
 }
 
-double cubed_sphere_update(fclaw2d_domain_t *domain,
+double sphere_update(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
                          double dt)
 {
-    cubed_sphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    sphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
@@ -232,7 +232,7 @@ double cubed_sphere_update(fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-fclaw_bool cubed_sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                              fclaw2d_patch_t *this_patch,
                                              int this_block_idx, int this_patch_idx,
                                              int initflag)
@@ -259,12 +259,12 @@ fclaw_bool cubed_sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
 
     int tag_patch = 0;  // == 0 or 1
 
-    cubed_sphere_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
+    sphere_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
                            this_block_idx,tag_patch);
     return tag_patch == 1;
 }
 
-fclaw_bool cubed_sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                              fclaw2d_patch_t *this_patch,
                                              int blockno_idx,
                                              int patchno)
@@ -290,11 +290,11 @@ fclaw_bool cubed_sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     int tag_patch;  // == 0 or 1
-    cubed_sphere_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
+    sphere_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
     return tag_patch == 0;
 }
 
-void cubed_sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
@@ -304,7 +304,7 @@ void cubed_sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, in
     /* Increase the number of fields by 1 so we can printout the mpi rank */
     int mfields = gparms->meqn;
     int maux = 0;
-    cubed_sphere_write_tfile_(iframe,time,mfields,ngrids,maux);
+    sphere_write_tfile_(iframe,time,mfields,ngrids,maux);
 
     /* This opens file 'fort.qXXXX' for replace
        (where XXXX = <zero padding><iframe>, e.g. 0001, 0010, 0114),
@@ -313,7 +313,7 @@ void cubed_sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, in
 }
 
 
-void cubed_sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level)
 {
@@ -349,7 +349,7 @@ void cubed_sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_
 
     int mpirank = domain->mpirank;
     /* This opens a file for append and writes in the 'clawout' style. */
-    cubed_sphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+    sphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                         iframe,num,matlab_level,this_block_idx,mpirank);
 }
 

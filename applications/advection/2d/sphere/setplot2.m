@@ -72,4 +72,4 @@ ContourValues = [];
 %---------------------------------
 
 ShowUnderOverShoots = 0;
-UseColorMapping = 'ParallelPartions';
+PlotParallelPartitions = 0;

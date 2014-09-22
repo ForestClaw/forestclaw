@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include <fclaw2d_map_query.h>
 
-#include "cubed_sphere_user.H"
+#include "sphere_user.H"
 
 int
 main (int argc, char **argv)
@@ -157,9 +157,9 @@ main (int argc, char **argv)
   set_clawpack_parms(domain,clawpack_parms);
 
   /* Link solvers to the domain */
-  link_problem_setup(domain,cubed_sphere_problem_setup);
+  link_problem_setup(domain,sphere_problem_setup);
 
-  cubed_sphere_link_solvers(domain);
+  sphere_link_solvers(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation

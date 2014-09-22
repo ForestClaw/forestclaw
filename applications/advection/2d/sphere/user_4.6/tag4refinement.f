@@ -1,4 +1,4 @@
-      subroutine cubed_sphere_tag4refinement(mx,my,mbc,meqn,
+      subroutine sphere_tag4refinement(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, q,init_flag, blockno, tag_patch)
       implicit none
 
@@ -27,7 +27,7 @@
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine cubed_sphere_tag4coarsening(mx,my,mbc,meqn,
+      subroutine sphere_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy,qcoarsened, tag_patch)
       implicit none
 
