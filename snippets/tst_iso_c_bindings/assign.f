@@ -13,6 +13,6 @@ c     # Headers for c routine 'mult'
          x(i) = i
       enddo
 
-      call mult(s,n,x)
+      call c_mult(s,n,x)
 
       end

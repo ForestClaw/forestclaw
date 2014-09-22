@@ -2,7 +2,7 @@ C     -*- FORTRAN -*-
 
 c     # Headers files for C routines
       interface
-         subroutine mult(s,n,x) bind(c,name="mult")
+         subroutine c_mult(s,n,x) bind(c,name="mult")
          use iso_c_binding, only : c_ptr
          implicit none
 

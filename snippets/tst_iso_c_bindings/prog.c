@@ -23,7 +23,7 @@ int main()
 
     for (i = 0; i < n; i++)
     {
-        printf("x is %4.0f\n",x[i]);
+        printf("x(%d) is %4.0f\n",i,x[i]);
     }
 
     return 0;

@@ -22,7 +22,7 @@ int main()
 
     for (int i = 0; i < n; i++)
     {
-        std::cout << x[i] << std::endl;
+        std::cout << "x[" << i << "] = " << x[i] << std::endl;
     }
 
     return 0;
