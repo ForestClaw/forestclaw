@@ -54,7 +54,8 @@ extern "C"
 #define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  13     /* Pillow sphere */
 #define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   14     /* Cubed sphere */
 #define FCLAW2D_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
-#define FCLAW2D_MAP_QUERY_LAST             16     /* Number of "official" queries. */
+#define FCLAW2D_MAP_QUERY_IS_HEMISPHERE    16     /* Hemisphere grid */
+#define FCLAW2D_MAP_QUERY_LAST             17     /* Number of "official" queries. */
 
 #if 0
 /* Generic query function (kept up to date with list above) */
@@ -93,6 +94,8 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_HEMISPHERE:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_generic (fclaw2d_map_query_defs.h) : " \
@@ -126,6 +129,7 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
   query_results[FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE] = 0;
   query_results[FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE] = 0;
   query_results[FCLAW2D_MAP_QUERY_IS_FIVEPATCH] = 0;
+  query_results[FCLAW2D_MAP_QUERY_IS_HEMISPHERE] = 0;
 #endif
 
 #ifdef __cplusplus

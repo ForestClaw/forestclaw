@@ -1,8 +1,10 @@
-function [xp,yp,zp] = mapc2m_pillow(xc1,yc1)
+function [xp,yp,zp] = mapc2m_pillowsphere(xc1,yc1)
 %
 % Map [-1,1] to the hemisphere.  Use the block number to
 % determine sign of z-coordinate.
 %
+
+global notpillowsphere;
 
 comp_grid = false;
 
@@ -42,8 +44,10 @@ mghost = (abs(xc) > 1) | (abs(yc) > 1);
 
 zp(mghost) = -zp(mghost);          % negate z in lower hemisphere
 
-if (blockno == 1)
-    zp = -zp;
+if (~notpillowsphere)
+    if (blockno == 1)
+        zp = -zp;
+    end
 end
 
 % [xp,yp,zp] = rotate_map(xp,yp,zp);

@@ -16,6 +16,8 @@ c     # ------------------------------------------------------------------
       logical multiblock
       integer blockno
       logical l1, l2
+      logical ispillowsphere
+
 
       xc = 2*xc1 - 1
       yc = 2*yc1 - 1
@@ -55,8 +57,10 @@ c     # This maps everything to the unit sphere
       zp = zp/sqrt(2.d0)
 
 c     # Set lower hemisphere
-      if (blockno .eq. 1) then
-         zp = -zp
+      if (ispillowsphere()) then
+         if (blockno .eq. 1) then
+            zp = -zp
+         endif
       endif
 
       return

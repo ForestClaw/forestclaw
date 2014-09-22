@@ -10,7 +10,7 @@ include src/solvers/fclaw2d_clawpack4.6/Makefile.am
 # ----------------------------------
 
 include applications/dummy/Makefile.am
-include applications/advection/2d/no_solver/Makefile.am
+# include applications/no_solver/Makefile.am
 
 include applications/advection/2d/swirl_fivepatch/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
