@@ -2,6 +2,10 @@
 
 #include <fclaw2d_map.h>
 
+void mapc2m(int* blockno, double* xc, double *yc,
+            double *xp, double *yp, double *zp,
+            double *alpha);
+
 static int
 fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -55,7 +59,8 @@ fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t * cont, int blockno,
                           double *xp, double *yp, double *zp)
 {
     double alpha = cont->user_double[0];
-    MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+    /* MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha); */
+    mapc2m(&blockno,&xc, &yc,xp,yp,zp,&alpha);
 }
 
 
