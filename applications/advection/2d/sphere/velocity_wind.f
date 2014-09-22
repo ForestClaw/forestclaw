@@ -18,6 +18,8 @@ c     # Set kappa to zero to get solid body rotation
          psi = kappa*sin(lp)**2*cos(th)**2*cos(pi*t/Tfinal) -
      &         2*pi*sin(th)/Tfinal
       else if (isdisk()) then
+         write(6,*) 'Is disk'
+         stop
          psi = -2*pi*(xd**2 + yd**2)/Tfinal
       endif
 

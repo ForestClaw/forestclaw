@@ -1,5 +1,5 @@
+setviews;
 s = 1e-2;
-axis image;
 daspect([1 1 1]);
 axis off;
 
@@ -28,7 +28,7 @@ else
   yrbcolormap;
   caxis([0 1]);
   showgridlines(1:2);
-  showpatchborders(1:5);
+  showpatchborders(1:7);
   if (ShowUnderOverShoots == 1)
     under_label = sprintf('%6.2e',qmin);
     over_label = sprintf('1 + %6.2e',qmax-1);
@@ -48,9 +48,15 @@ if (prt)
   disp(pstr);
   eval(pstr);
 end;
-
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
+zoom(1.1);
 shg;
+
 
 clear afterframe;
 clear mapc2m;
-clear mapc2m_pillow;
+clear mapc2m_cubed_sphere;
