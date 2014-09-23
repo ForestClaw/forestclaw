@@ -12,6 +12,7 @@ include src/solvers/fclaw2d_clawpack4.6/Makefile.am
 # simple examples that don't do anything
 include applications/dummy/Makefile.am
 include applications/no_solver/Makefile.am
+include applications/test_parms/Makefile.am
 
 # Scalar advection examples
 include applications/advection/2d/swirl_fivepatch/Makefile.am
