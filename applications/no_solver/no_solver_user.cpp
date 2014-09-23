@@ -56,7 +56,7 @@ void no_solver_linker(fclaw2d_domain_t* domain)
 
 void no_solver_setprob(fclaw2d_domain_t* domain)
 {
-    // setprob.f
+    /* Call to setprob */
 }
 
 
@@ -65,17 +65,14 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
-
-    set_block_(&this_block_idx);
-
-    // Global parameters
+    /* Global parameters */
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    // Parameters specific to this patch
+    /* Parameters specific to this patch */
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
@@ -85,7 +82,8 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
 
     int mpirank = domain->mpirank;
 
-    initialize_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,mpirank);
+    int blockno = this_block_idx;
+    initialize_(mx,my,meqn,mbc,blockno,xlower,ylower,dx,dy,q);
 }
 
 double no_solver_update(fclaw2d_domain_t *domain,

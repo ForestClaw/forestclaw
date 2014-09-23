@@ -23,9 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "amr_options.h"
+// #include <amr_single_step.h>
+// #include <fclaw2d_clawpack.H>
+// #include <amr_forestclaw.H>
+// #include <amr_utils.H>
+
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
+
+
 #include "no_solver_user.H"
 
 int
@@ -60,6 +67,11 @@ main (int argc, char **argv)
      -------------------------------------------------------------- */
   options = sc_options_new(argv[0]);
 
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "0 no mapping (use [ax,bx]x[ay,by], " \
+                      "1 for Cartesian," \
+                      "2 for five patch square");
+
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
 
@@ -74,7 +86,38 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      -------------------------------------------------------------- */
-  domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
+
+  double alpha = 0.5;
+
+  switch (example) {
+  case 0:
+      /* Don't use a mapping.  Be sure [ax,ay]x[ay,by] instead */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_nomap ();
+      break;
+  case 1:
+      /* Map unit square to disk using mapc2m_disk.f */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_cart ();
+      break;
+  case 2:
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_fivepatch (alpha);
+      break;
+  default:
+      sc_abort_collective ("Parameter example must be 1 or 2");
+  }
+
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure.
+     ---------------------------------------------------------- */
+  SET_CONTEXT(&cont);
+
+  /* ---------------------------------------------------------- */
 
   if (gparms->verbosity > 0)
   {

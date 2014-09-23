@@ -1,8 +1,8 @@
-      subroutine initialize(mx,my,meqn,mbc,xlower,ylower,
-     &      dx,dy,q,mpirank)
+      subroutine initialize(mx,my,meqn,mbc,blockno,
+     &      xlower,ylower,dx,dy,q)
       implicit none
 
-      integer maxmx, maxmy, meqn, mbc, mx, my, mpirank
+      integer meqn, mbc, mx, my, blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
@@ -10,6 +10,8 @@
       double precision xlow, ylow,wl
 
       common /com_init/ ichoice
+
+      call set_block(blockno)
 
       ichoice = 2
 
@@ -28,20 +30,30 @@
       return
       end
 
-      double precision function fdisc(x,y)
+      double precision function fdisc(xc,yc)
       implicit none
 
-      double precision x,y, r
-      double precision xp, yp, rp, th, x0
+      double precision xc,yc, r
+      double precision xp, yp, zp, rp, th, x0
       double precision y0, pi
-      integer m, ichoice
+      integer m, ichoice, blockno
+
+      integer*8 cont
 
       common /com_init/ ichoice
 
+      cont = get_context()
+      blockno = get_block()
+
       pi = 4.d0*atan(1.d0)
 
-      xp = x
-      yp = y
+      if (fclaw2d_map_is_used(cont)) then
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc,yc,xp,yp,zp)
+      else
+         xp = xc
+         yp = yc
+      endif
 
       fdisc = -1
       rp = sqrt((xp)**2 + (yp)**2)
