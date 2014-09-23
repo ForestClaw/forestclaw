@@ -23,15 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This needs to go away.  The p4est namespace should not be used directly.
-#include <p4est.h>
-
-#include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "amr_waveprop.H"
-#include "amr_options.h"
-
-#include "test_parms_user.H"
+#include <fclaw2d_clawpack.H>
 
 
 int
@@ -40,38 +32,61 @@ main (int argc, char **argv)
   int		        lp;
   MPI_Comm              mpicomm;
   sc_options_t          *options;
-  amr_options_t         *gparms;
-  amr_waveprop_parms_t  *waveprop_parms;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
+
+  /* ----------------------------------------------------------
+     Read in command line options
+     ---------------------------------------------------------- */
+  int example;
+  options = sc_options_new (argv[0]);
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "1 for AMR options, " \
+                      "2 for Clawpack parms");
+
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and
      do parameter checking.
      -------------------------------------------------------------- */
-  options = sc_options_new(argv[0]);
-
-  /* Register default parameters and any solver parameters */
-  gparms = amr_options_new(options);
-  waveprop_parms = test_parms_new(options);
-
-  /* Parse any command line arguments.  Argument gparms is no longer needed
-     as an input since the array conversion is now done in 'postprocess' */
   amr_options_parse(options,argc,argv,lp);
 
-  /* Any arrays are converted here */
-  amr_postprocess_parms(gparms);
-  test_parms_postprocess_parms(waveprop_parms);
 
-  /*/
+  switch (example) {
+  case 1:
+      amr_options_t  *gparms;
+
+      /* Register default parameters and any solver parameters */
+      gparms = amr_options_new(options);
+      amr_options_parse(options,argc,argv,lp);
+      amr_postprocess_parms(gparms);
+
+      break;
+  case 2:
+      fclaw2d_clawpack_parms_t  *clawpack_parms;
+
+      clawpack_parms = fclaw2d_clawpack_parms_new(options);
+
+      /* Command line arguments */
+      amr_options_parse(options,argc,argv,lp);
+
+      fclaw2d_clawpack_postprocess_parms(clawpack_parms);
+
+      fclaw2d_clawpack_parms_delete(clawpack_parms);
+
+      break;
+  default:
+      sc_abort_collective ("Use command line --example=1 or --example=2");
+  }
+
+
+  /* -----------------------------------------------
      Skip everything that actually does something...
-  */
+     ----------------------------------------------- */
 
-  sc_options_destroy(options);         /* this could be moved up */
-  amr_options_destroy(gparms);
-  test_parms_delete(waveprop_parms);
+  sc_options_destroy (options);
 
   fclaw_mpi_finalize ();
 
