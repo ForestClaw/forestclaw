@@ -1,4 +1,4 @@
-      subroutine assign(s,n,x) bind(c,name="assign")
+      subroutine assign(s,n,x) bind(c,name="f_assign")
       use iso_c_binding, only : c_ptr
       implicit none
 

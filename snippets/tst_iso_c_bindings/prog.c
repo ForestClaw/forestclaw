@@ -6,9 +6,8 @@ typedef struct simple
     int multiplier;
 } simple_t;
 
-
-void mult(simple_t *s, int *n, double x[]);
-void assign(simple_t *s, int* n, double x[]);
+void mult(simple_t *s, const int* n, double x[]);
+void f_assign(simple_t *s, const int * n, double x[]);
 
 int main()
 {
@@ -19,7 +18,7 @@ int main()
     n = 3;
     s.multiplier = 23;
     x = (double*) malloc(sizeof(double)*n);
-    assign(&s,&n,x);
+    f_assign(&s,&n,x);
 
     for (i = 0; i < n; i++)
     {
@@ -29,7 +28,7 @@ int main()
     return 0;
 }
 
-void mult(simple_t *s, int *n, double* x)
+void mult(simple_t *s, const int* n, double x[])
 {
     int i;
 

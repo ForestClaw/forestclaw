@@ -8,17 +8,17 @@ typedef struct simple
 
 extern "C"
 {
-    void mult(simple_t *s, int *n, double* x);
-    void assign(simple_t *s, int* n, double x[]);
+    void mult(simple_t *s, const int& n, double x[]);
+    void f_assign(simple_t *s, const int& n, double x[]);
 }
 
 int main()
 {
     int n = 10;
     double *x = new double[n];
-    simple_t s;
+    simple_t s, *s_ptr = &s;
     s.multiplier = 3;
-    assign(&s,&n,x);
+    f_assign(s_ptr,n,x);
 
     for (int i = 0; i < n; i++)
     {
@@ -28,9 +28,9 @@ int main()
     return 0;
 }
 
-void mult(simple_t *s, int *n, double* x)
+void mult(simple_t *s, const int& n, double x[])
 {
-    for (int i = 0; i < *n; i++)
+    for (int i = 0; i < n; i++)
     {
         x[i] = s->multiplier*x[i];
     }
