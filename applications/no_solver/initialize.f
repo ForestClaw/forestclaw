@@ -20,12 +20,7 @@
                ylow = ylower + (j-1)*dy
 
                call cellave2(xlow,ylow,dx,dy,wl)
-
-               if (mq .eq. 1) then
-                  q(i,j,mq) = mpirank
-               else
-                  q(i,j,mq) = wl
-               endif
+               q(i,j,mq) = wl
             enddo
          enddo
       enddo

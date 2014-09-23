@@ -23,9 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This needs to go away.  The p4est namespace should not be used directly.
-#include <p4est.h>
-
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "amr_options.h"
@@ -37,13 +34,25 @@ main (int argc, char **argv)
   int		        lp;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
   fclaw2d_domain_t	*domain;
-  amr_options_t         *gparms;
+  amr_options_t         samr_options, *gparms = &samr_options;
 
+
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  feenableexcept(FE_INVALID);
+#endif
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+
+#ifdef MPI_DEBUG
+  fclaw2d_mpi_debug();
+#endif
+
 
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and
@@ -54,11 +63,6 @@ main (int argc, char **argv)
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
 
-  /* Parse any command line arguments.  Argument gparms is no longer needed
-     as an input since the array conversion is now done in 'postprocess' */
-#if 0
-  amr_options_parse(options, gparms, argc, argv, lp);
-#endif
   amr_options_parse(options,argc,argv,lp);
 
   /* Any arrays are converted here */

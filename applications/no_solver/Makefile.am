@@ -8,8 +8,8 @@ bin_PROGRAMS += applications/no_solver/no_solver
 applications_no_solver_no_solver_SOURCES = \
 	applications/no_solver/no_solver.cpp \
 	applications/no_solver/no_solver_user.cpp \
-	applications/no_solver/user_4.6/tag4refinement.f \
-	applications/no_solver/user_4.6/initialize.f
+	applications/no_solver/tag4refinement.f \
+	applications/no_solver/initialize.f
 
 # applications_no_solver_no_solver_CPPFLAGS = \
 #       $(AM_CPPFLAGS)

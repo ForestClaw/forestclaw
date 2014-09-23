@@ -81,8 +81,6 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
-
-    // Pointers needed for the fortran
     double* q = cp->q();
 
     int mpirank = domain->mpirank;
