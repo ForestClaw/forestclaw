@@ -71,6 +71,7 @@ main (int argc, char **argv)
      do parameter checking.
      -------------------------------------------------------------- */
   options = sc_options_new(argv[0]);
+
   sc_options_add_int (options, 0, "example", &example, 0,
                       "1 for Cartesian," \
                       "2 for five patch square");
@@ -121,8 +122,7 @@ main (int argc, char **argv)
      ---------------------------------------------------------- */
   SET_CONTEXT(&cont);
 
-  /* ----------------------------------------------------------
-     ---------------------------------------------------------- */
+  /* ---------------------------------------------------------- */
   if (gparms->verbosity > 0)
   {
       fclaw2d_domain_list_levels(domain, lp);
