@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m_fivepatch(xc,yc)
 blockno = getblocknumber();
 
-alpha = 0.4;
+alpha = 0.5;
 
 if (blockno == 2)
     xp = (2*xc - 1)*alpha;
@@ -31,8 +31,6 @@ else
             error(str);
     end
 end
-xp = (xp+1)/2;
-yp = (yp+1)/2;
 zp = 0*xp;
     
 end
