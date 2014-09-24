@@ -60,11 +60,18 @@ fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t * cont, int blockno,
 {
     double alpha = cont->user_double[0];
     /* MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha); */
-    mapc2m(&blockno,&xc, &yc,xp,yp,zp,&alpha);
+
+    /* Test iso_c_bindings */
+    mapc2m(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+
+    SCALE_MAP(xp,yp,zp);
+    SHIFT_MAP(xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(double alpha)
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
+                                                 double shift[],
+                                                 double alpha)
 {
     fclaw2d_map_context_t *cont;
 
@@ -73,6 +80,8 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(double alpha)
     cont->mapc2m = fclaw2d_map_c2m_fivepatch;
 
     cont->user_double[0] = alpha;
+    SET_SCALE(&scale);
+    SET_SHIFT(shift);
 
     return cont;
 }

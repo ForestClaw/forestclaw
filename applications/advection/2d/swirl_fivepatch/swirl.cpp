@@ -98,16 +98,22 @@ main (int argc, char **argv)
      -------------------------------------------------------------- */
 
   double alpha = 0.5;
+  double scale = 0.5;
+  double shift[3];
+  shift[0] = 0.5;
+  shift[1] = 0.5;
+  shift[2] = 0;
 
   switch (example) {
   case 1:
-      /* Map unit square to disk using mapc2m_disk.f */
+      /* Map unit square to disk using mapc2m_disk.f;
+         Scale and shift from [-1,1]x[-1,1] */
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart();
+      cont = fclaw2d_map_new_cart(scale,shift);
       break;
   case 2:
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_fivepatch (alpha);
+      cont = fclaw2d_map_new_fivepatch (scale,shift,alpha);
       break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");

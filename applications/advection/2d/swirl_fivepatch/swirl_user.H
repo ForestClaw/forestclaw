@@ -137,8 +137,11 @@ void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
 
 
 /* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(double alpha);
-fclaw2d_map_context_t* fclaw2d_map_new_cart();
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
+                                                 double shift[],
+                                                 double alpha);
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale,
+                                            double shift[]);
 
 
 #ifdef __cplusplus
