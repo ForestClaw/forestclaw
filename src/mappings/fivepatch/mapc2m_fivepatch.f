@@ -1,3 +1,4 @@
+C     # This returns a unit square map in [-1,1]x[-1,1]
       subroutine mapc2m_fivepatch(blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
@@ -32,10 +33,6 @@
             stop
          endif
       endif
-
-c     # Map back to [0,1]x[0,1]
-      xp = (xp + 1)/2.d0
-      yp = (yp + 1)/2.d0
       zp = 0
       end
 
