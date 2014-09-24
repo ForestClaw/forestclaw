@@ -36,9 +36,10 @@
       double precision xc,yc, r
       double precision xp, yp, zp, rp, th, x0
       double precision y0, pi
-      integer m, ichoice, blockno
+      integer m, ichoice, blockno, get_block
+      logical fclaw2d_map_is_used
 
-      integer*8 cont
+      integer*8 cont, get_context
 
       common /com_init/ ichoice
 

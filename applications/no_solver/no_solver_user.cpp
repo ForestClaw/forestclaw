@@ -80,8 +80,6 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     double dy = cp->dy();
     double* q = cp->q();
 
-    int mpirank = domain->mpirank;
-
     int blockno = this_block_idx;
     initialize_(mx,my,meqn,mbc,blockno,xlower,ylower,dx,dy,q);
 }

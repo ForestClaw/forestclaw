@@ -37,7 +37,7 @@ extern "C"
                      const int& mbc,const int& blockno,
                      const double& xlower, const double& ylower,
                      const double& dx, const double& dy,
-                     double *q, const int& mpirank);
+                     double *q);
 
     void no_solver_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                    const int& meqn, const double& xlower,
@@ -89,6 +89,15 @@ void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrid
 void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level);
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
+                                                 double shift[],
+                                                 const double alpha);
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale,
+                                            double shift[]);
+
+
 
 #ifdef __cplusplus
 #if 0
