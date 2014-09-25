@@ -63,11 +63,11 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[],
-                                            const double scale)
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale,
+                                            const double shift[],
+                                            const double rotate[])
 {
     fclaw2d_map_context_t *cont;
-    double shift[3];
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
@@ -75,9 +75,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(const double rotate[],
 
     SET_SCALE(&scale);
     SET_ROTATION(rotate);
-    shift[0] = 1;
-    shift[1] = 1;
-    shift[2] = 0;
     SET_SHIFT(shift);
 
     return cont;

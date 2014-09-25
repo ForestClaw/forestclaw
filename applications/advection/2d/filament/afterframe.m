@@ -5,10 +5,12 @@ daspect([1 1 1]);
 if (PlotParallelPartitions == 0)
     yrbcolormap;
 end
-showpatchborders(1:6);
+showpatchborders(1:7);
 % hidepatchborders;
 delete(get(gca,'title'));
 caxis([0 1]);
+
+% colormap(white);
 
 
 shg;

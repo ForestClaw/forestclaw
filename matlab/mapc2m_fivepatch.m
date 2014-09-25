@@ -1,6 +1,8 @@
 function [xp,yp,zp] = mapc2m_fivepatch(xc,yc)
 blockno = getblocknumber();
 
+[m,n] = size(xc);
+
 alpha = 0.5;
 
 if (blockno == 2)
@@ -31,6 +33,8 @@ else
             error(str);
     end
 end
+xp = reshape(xp,m,n);
+yp = reshape(yp,m,n);
 zp = 0*xp;
     
 end
@@ -54,11 +58,13 @@ len = length(xi(:));
 
 xb = zeros(size(xi));
 yb = zeros(size(eta));
-for k = 1:len,
-  pt = a + u1*xi(k) + v1*eta(k) + (v2-v1)*xi(k)*eta(k);
-  xb(k) = pt(1);
-  yb(k) = pt(2);
-end
+% for k = 1:len,
+%   pt = a + u1*xi(k) + v1*eta(k) + (v2-v1)*xi(k)*eta(k);
+%   xb(k) = pt(1);
+%   yb(k) = pt(2);
+% end
+xb = a(1) + u1(1)*xi + v1(1)*eta + (v2(1)-v1(1))*xi.*eta;
+yb = a(2) + u1(2)*xi + v1(2)*eta + (v2(2)-v1(2))*xi.*eta;
 
 end
 

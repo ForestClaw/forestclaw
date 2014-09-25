@@ -12,8 +12,7 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 maptype = 'disk';
 
-xc = 2*xc1 - 1;    % Get into [-1,1]x[-1,1]
-yc = 2*yc1 - 1;
+[xc,yc,zc] = mapc2m_cart(xc1,yc1);
 
 
 xp = xc;
@@ -22,8 +21,8 @@ zp = 0*xp;
 
 r1 = 1;
 
-ijlower = find(xc < -1);           % indices of points in lower hemisphere
-xc(ijlower) = -2 - xc(ijlower);
+% ijlower = find(xc < -1);           % indices of points in lower hemisphere
+% xc(ijlower) = -2 - xc(ijlower);
 
 d = max(abs(xc),abs(yc));  % value on diagonal of computational grid
 d = max(d, 1e-10);         % to avoid divide by zero at origin

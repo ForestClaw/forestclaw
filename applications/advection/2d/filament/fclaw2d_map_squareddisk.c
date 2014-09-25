@@ -64,12 +64,12 @@ fclaw2d_map_c2m_squareddisk(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double rotate[],
-                                                   const double scale,
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale,
+                                                   const double shift[],
+                                                   const double rotate[],
                                                    const double alpha)
 {
     fclaw2d_map_context_t *cont;
-    double shift[3];
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_squareddisk;
@@ -77,14 +77,8 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double rotate[],
 
     cont->user_double[0] = alpha;
 
-    /* This stores rotate/scale parameters in common blocks for later
-       retrieval by scale_map/rotate_map (called above).  These parameters
-       can of course be stored as variables in a context field */
     SET_ROTATION(rotate);
     SET_SCALE(&scale);
-    shift[0] = 1;
-    shift[1] = 1;
-    shift[2] = 0;
     SET_SHIFT(shift);
 
     return cont;

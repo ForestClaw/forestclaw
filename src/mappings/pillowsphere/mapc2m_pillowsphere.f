@@ -12,15 +12,14 @@ c     # ------------------------------------------------------------------
 
       double precision xc1,yc1, xp, yp, zp
 
-      double precision x1, y1, d, rp2, xc, yc
+      double precision x1, y1, d, rp2, xc, yc, zc
       logical multiblock
       integer blockno
       logical l1, l2
       logical ispillowsphere
 
-
-      xc = 2*xc1 - 1
-      yc = 2*yc1 - 1
+c     # Map to [-1,1]x[-1,1]
+      call mapc2m_cart(xc1,yc1,xc,yc,zc)
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)

@@ -8,10 +8,11 @@ bin_PROGRAMS += applications/advection/2d/filament/filament
 applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/filament_user.cpp \
 	applications/advection/2d/filament/filament.cpp \
+	applications/advection/2d/filament/fclaw2d_map_nomap.c \
 	applications/advection/2d/filament/fclaw2d_map_cart.c \
-	applications/advection/2d/filament/fclaw2d_map_cart_nomap.c \
 	applications/advection/2d/filament/fclaw2d_map_pillowdisk.c \
 	applications/advection/2d/filament/fclaw2d_map_squareddisk.c \
+	applications/advection/2d/filament/fclaw2d_map_pillowfivepatch.c \
 	applications/advection/2d/filament/psi.f \
 	applications/advection/2d/filament/setprob.f \
 	applications/advection/2d/filament/user_4.6/tag4refinement.f \
@@ -26,7 +27,7 @@ applications_advection_2d_filament_filament_SOURCES = \
 applications_advection_2d_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE
+# applications_advection_2d_filament_filament_CPPFLAGS += -D TRAPFPE
 
 # applications_advection_2d_filament_filament_CPPFLAGS += -D MPI_DEBUG
 

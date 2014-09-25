@@ -67,9 +67,11 @@ main (int argc, char **argv)
      -------------------------------------------------------------- */
   options = sc_options_new(argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for pillow disk, " \
-                      "2 for 5-square disk, " \
-                      "3 for unit square");
+                      "0 for no mapping, " \
+                      "1 for Cartesian, " \
+                      "2 for pillow disk, " \
+                      "3 for squared disk, " \
+                      "4 for pillow five patch");
 
   sc_options_add_double (options, 0, "scale", &scale, 1.0,
                          "Scale unit sphere (e.g. set radius [1])");
@@ -104,17 +106,35 @@ main (int argc, char **argv)
   double pi = M_PI;
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
+
   scale = 1;
+
+  double shift[3];
+  shift[0] = 1;
+  shift[1] = 1;
+  shift[2] = 0;
 
   double alpha = 0.5;
 
   switch (example) {
-  case 1:
-      /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
+  case 0:
+      /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+      gparms->manifold = 0;
+      clawpack_parms->mcapa = 0;
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_pillowdisk(rotate,scale);
+      cont = fclaw2d_map_new_nomap();
+      break;
+  case 1:
+      /* in [-1,1]x[-1,1] */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_cart(scale,shift,rotate);
       break;
   case 2:
+      /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_pillowdisk(scale,shift,rotate);
+      break;
+  case 3:
       if (gparms->mx*pow_int(2,gparms->minlevel) < 32)
       {
           printf("The squared-disk is inadmissable:  mx*2^minlevel " \
@@ -123,22 +143,15 @@ main (int argc, char **argv)
       }
 
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_squareddisk (rotate,scale,alpha);
-      break;
-  case 3:
-      /* in [-1,1]x[-1,1] */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart(rotate, scale);
+      cont = fclaw2d_map_new_squareddisk (scale,shift,rotate,alpha);
       break;
   case 4:
-      /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-      gparms->manifold = 0;
-      clawpack_parms->mcapa = 0;
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart_nomap();
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_pillowfivepatch (scale,shift,rotate,alpha);
       break;
+
   default:
-      sc_abort_collective ("Parameter example must be 1, 2, 3 or 4");
+      sc_abort_collective ("Parameter example must be 0, 1, 2, 3 or 4");
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
