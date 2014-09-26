@@ -142,7 +142,7 @@ main (int argc, char **argv)
       break;
   case 4:
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_pillowfivepatch (scale,shift,rotate,alpha);
+      cont = fclaw2d_map_new_pillowdisk5 (scale,shift,rotate,alpha);
       break;
 
   default:

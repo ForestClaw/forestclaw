@@ -101,10 +101,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowfivepatch(const double scale[],
-                                                       const double shift[],
-                                                       const double rotate[],
-                                                       const double alpha);
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
 
 void filament_link_solvers(fclaw2d_domain_t *domain);
 
