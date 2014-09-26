@@ -47,8 +47,6 @@ main (int argc, char **argv)
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
-  double rotate[2];
-  double scale;
   double theta, phi;
 
 #ifdef TRAPFPE
@@ -72,9 +70,6 @@ main (int argc, char **argv)
                       "2 for pillow disk, " \
                       "3 for squared disk, " \
                       "4 for pillow five patch");
-
-  sc_options_add_double (options, 0, "scale", &scale, 1.0,
-                         "Scale unit sphere (e.g. set radius [1])");
 
   sc_options_add_double (options, 0, "theta", &theta, 0,
                          "Rotation angle theta (degrees) about z axis [0]");
@@ -104,15 +99,15 @@ main (int argc, char **argv)
      Domain geometry
      -------------------------------------------------------------- */
   double pi = M_PI;
+  double rotate[2];
+  double scale[3];
+  double shift[3];
+  set_default_transform(scale,shift,rotate);
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
 
-  scale = 1;
-
-  double shift[3];
   shift[0] = 1;
   shift[1] = 1;
-  shift[2] = 0;
 
   double alpha = 0.5;
 

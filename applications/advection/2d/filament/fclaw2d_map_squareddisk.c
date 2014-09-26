@@ -57,14 +57,14 @@ fclaw2d_map_c2m_squareddisk(fclaw2d_map_context_t * cont, int blockno,
     double alpha = cont->user_double[0];
     MAPC2M_SQUAREDDISK(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
-    /* These can probably be replaced by C functions at some point. */
-    SCALE_MAP(xp,yp,zp);
-    ROTATE_MAP(xp,yp,zp);
-    SHIFT_MAP(xp,yp,zp);
+    /* scale_map(cont, xp,yp,zp); */
+
+    rotate_map(cont, xp,yp,zp);
+    shift_map(cont, xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale,
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha)
@@ -77,9 +77,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale,
 
     cont->user_double[0] = alpha;
 
-    SET_ROTATION(rotate);
-    SET_SCALE(&scale);
-    SET_SHIFT(shift);
+    set_rotate(cont,rotate);
+    set_scale(cont,scale);
+    set_shift(cont,shift);
 
     return cont;
 }
