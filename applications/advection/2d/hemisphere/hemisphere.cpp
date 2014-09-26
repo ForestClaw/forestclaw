@@ -97,20 +97,23 @@ main (int argc, char **argv)
      Set up the domain geometry
      --------------------------------------------------------------- */
   double alpha = 0.5;
-  double scale = 1;
+  double scale[3];
+  double shift[3];
   double rotate[2];
+  set_default_transform(scale,shift,rotate);
   rotate[0] = theta;
   rotate[1] = 0;
+
 
   switch (example) {
   case 1:
       /* Map unit square to disk using mapc2m_disk.f */
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_pillowsphere(scale,rotate);
+      cont = fclaw2d_map_new_pillowsphere(scale,shift,rotate);
       break;
   case 2:
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_fivepatch(scale,rotate,alpha);
+      cont = fclaw2d_map_new_pillowsphere5(scale,shift,rotate,alpha);
       break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");

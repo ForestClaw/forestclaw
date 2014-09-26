@@ -7,7 +7,7 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/hemisphere.cpp \
 	applications/advection/2d/hemisphere/velocity_wind.f \
 	applications/advection/2d/hemisphere/fclaw2d_map_pillowsphere.f \
-	applications/advection/2d/hemisphere/fclaw2d_map_fivepatch.f \
+	applications/advection/2d/hemisphere/fclaw2d_map_pillowsphere5.f \
 	applications/advection/2d/hemisphere/setprob.f \
 	applications/advection/2d/hemisphere/user_4.6/tag4refinement.f \
 	applications/advection/2d/hemisphere/user_4.6/hemisphere_output.f \

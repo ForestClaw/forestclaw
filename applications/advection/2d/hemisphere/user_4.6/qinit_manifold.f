@@ -35,8 +35,6 @@
       cont = get_context()
       blockno = get_block()
 
-c      call mapc2m(xc,yc,xp,yp,zp)
-
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
