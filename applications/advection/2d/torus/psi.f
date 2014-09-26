@@ -9,7 +9,7 @@
 
 
       if (iscart()) then
-         psi = y - x
+         psi = x
       else
          r = sqrt(x*x + y*y)
          psi = r**2

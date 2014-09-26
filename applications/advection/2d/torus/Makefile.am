@@ -6,7 +6,6 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/torus_user.cpp \
 	applications/advection/2d/torus/torus.cpp \
 	applications/advection/2d/torus/fclaw2d_map_torus.c \
-	applications/advection/2d/torus/fclaw2d_map_nomap.c \
 	applications/advection/2d/torus/fclaw2d_map_cart.c \
 	applications/advection/2d/torus/setprob.f \
 	applications/advection/2d/torus/psi.f \

@@ -42,7 +42,7 @@
       if (.not. iscart()) then
          fdisc = -xp
       else
-         rp = sqrt((xp+0.5)**2 + yp**2)
+         rp = sqrt((xp)**2 + yp**2)
          fdisc = rp-0.25d0
       endif
 
