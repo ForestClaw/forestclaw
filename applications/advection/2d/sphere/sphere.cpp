@@ -47,8 +47,7 @@ main (int argc, char **argv)
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
 
-  double scale, theta, phi;
-  double rotate[2];
+  double theta, phi;
 
 #ifdef TRAPFPE
   printf("Enabling floating point traps\n");
@@ -72,8 +71,6 @@ main (int argc, char **argv)
                       "1 for pillow grid, "\
                       "2 for cubed sphere ");
 
-  sc_options_add_double (options, 0, "scale", &scale, 1.0,
-                         "Scale unit sphere (e.g. set radius [1])");
   sc_options_add_double (options, 0, "theta", &theta, 0,
                          "Rotation angle theta (degrees) about z axis [0]");
 
@@ -98,17 +95,20 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
 
   double pi = M_PI;
+  double rotate[2];
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
+  double scale[3];
+  double shift[3];
 
   switch (example) {
   case 1:
       conn = p4est_connectivity_new_pillow();
-      cont = fclaw2d_map_new_pillowsphere(rotate,scale);
+      cont = fclaw2d_map_new_pillowsphere(scale,shift,rotate);
       break;
   case 2:
       conn = p4est_connectivity_new_cubed();
-      cont = fclaw2d_map_new_cubedsphere(rotate,scale);
+      cont = fclaw2d_map_new_cubedsphere(scale,shift,rotate);
       break;
     default:
       sc_abort_collective ("Parameter example must be 1 (pillow sphere) or 2 (cubed sphere)");

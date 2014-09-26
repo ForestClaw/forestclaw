@@ -140,8 +140,13 @@ void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level);
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double rotate[], const double scale);
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double rotate[], const double scale);
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double shift[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double shfit[],
+                                                      const double rotate[]);
 
 
 #ifdef __cplusplus
