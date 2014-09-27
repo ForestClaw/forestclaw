@@ -9,8 +9,7 @@ global notpillowsphere;
 comp_grid = false;
 
 % First, get into [-1 1] from [0,1]
-xc = 2*xc1 - 1;
-yc = 2*yc1 - 1;
+[xc,yc,zc] = mapc2m_cart(xc1,yc1);
 
 r1 = 1;
 
