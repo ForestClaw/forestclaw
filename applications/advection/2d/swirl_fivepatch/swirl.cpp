@@ -73,8 +73,9 @@ main (int argc, char **argv)
   options = sc_options_new(argv[0]);
 
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for Cartesian," \
-                      "2 for five patch square");
+                      "1 for identity mapping [0,1]x[0,1]" \
+                      "2 for Cartesian mapping" \
+                      "3 for five patch square");
 
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
