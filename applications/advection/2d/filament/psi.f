@@ -14,6 +14,11 @@ c     # stream function
 c      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 
       r = sqrt((x-1.d0)**2 + (y-1.d0)**2)
+
+c     # Rigid body rotation
+c      psi = r**2
+
+c     # Filament formation
       psi = (4.d0/3.d0)*r**3
 
 c      psi = x - y

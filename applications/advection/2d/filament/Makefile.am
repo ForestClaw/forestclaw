@@ -34,4 +34,3 @@ applications_advection_2d_filament_filament_CPPFLAGS = \
 
 applications_advection_2d_filament_filament_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
-## @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la
