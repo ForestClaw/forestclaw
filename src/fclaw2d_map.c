@@ -58,6 +58,8 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
 
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
 
+/* This mapping is now in a separate file in the 'torus' example */
+#if 0
 static int
 fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -119,6 +121,7 @@ fclaw2d_map_new_torus (double R1, double R2)
 
     return cont;
 }
+#endif   /* end of torus */
 
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
 
@@ -379,4 +382,72 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
     cont->user_data = (void *) mapc2m;
 
     return cont;
+}
+
+
+void set_scale(fclaw2d_map_context_t* cont, const double scale[])
+{
+    memcpy(cont->scale,scale,3*sizeof(double));
+}
+
+void set_shift(fclaw2d_map_context_t* cont, const double shift[])
+{
+    memcpy(cont->shift,shift,3*sizeof(double));
+}
+
+void set_default_transform(double scale[],double shift[],double rotate[])
+{
+  shift[0] = 0;
+  shift[1] = 0;
+  shift[2] = 0;
+  scale[0] = 1;
+  scale[1] = 1;
+  scale[2] = 1;
+  rotate[0] = 0;
+  rotate[1] = 0;
+}
+
+
+
+void set_rotate(fclaw2d_map_context_t* cont, const double rotate[])
+{
+    double rotate_mat[9];
+    SET_ROTATION_MATRIX(rotate,rotate_mat);
+    memcpy(cont->rotate,rotate_mat,9*sizeof(double));
+}
+
+void scale_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+{
+    *xp *= cont->scale[0];
+    *yp *= cont->scale[1];
+    *zp *= cont->scale[2];
+}
+
+void shift_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+{
+    *xp += cont->shift[0];
+    *yp += cont->shift[1];
+    *zp += cont->shift[2];
+}
+
+void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+{
+    double v[3], vrot[3];
+    int i,j;
+
+    v[0] = *xp;
+    v[1] = *yp;
+    v[2] = *zp;
+
+    for(i = 0; i < 3; i++)
+    {
+        vrot[i] = 0;
+        for(j = 0; j < 3; j++)
+        {
+            vrot[i] += cont->rotate[3*j + i]*v[j];
+        }
+    }
+    *xp = vrot[0];
+    *yp = vrot[1];
+    *zp = vrot[2];
 }

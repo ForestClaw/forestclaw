@@ -87,8 +87,31 @@ struct fclaw2d_map_context
     fclaw2d_map_destroy_t destroy;
     int user_int[16];
     double user_double[16];
+
+    double scale[3];
+    double shift[3];
+    double rotate[9];
+
     void *user_data;
 };
+
+void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
+void set_shift(fclaw2d_map_context_t* cont, const double shift[]);
+void set_rotate(fclaw2d_map_context_t* cont, const double rotate[]);
+void set_default_transform(double scale[],double shift[],double rotate[]);
+
+
+void scale_map(fclaw2d_map_context_t* cont,
+               double *xp, double *yp, double *zp);
+void shift_map(fclaw2d_map_context_t* cont,
+               double *xp, double *yp, double *zp);
+void rotate_map(fclaw2d_map_context_t* cont,
+                double *xp, double *yp, double *zp);
+
+#define SET_ROTATION_MATRIX FCLAW_F77_FUNC (set_rotation_matrix,SET_ROTATION_MATRIX)
+void SET_ROTATION_MATRIX (const double rot_angles[],double rrot[]);
+
+
 
 
 /** Query function for the mapping that can be called from Fortran.
@@ -131,6 +154,8 @@ void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
    defined in fortran.
    ---------------------------------------------------------------------------------- */
 
+/* The torus is now defined in its own file in an example directory */
+#if 0
 /** Create a torus mapping for one block with [0, 1]^2 (for now).
  * \param [in] R1       Large radius of the torus.
  * \param [in] R2       Small radius of the torus.
@@ -142,6 +167,8 @@ fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
  * \param [in] R        Radius of the cubed sphere surface.
  * \return              Mapping context.
  */
+#endif
+
 fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
 
 /** Create a planar spherical disk mapping from five trees.
@@ -171,7 +198,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
    ---------------------------------------------------------------------------------- */
 
 #define SET_SCALE FCLAW_F77_FUNC_(set_scale, SET_SCALE)
-void SET_SCALE(const double *scale);
+void SET_SCALE(const double scale[]);
 
 #define SET_ROTATION FCLAW_F77_FUNC_(set_rotation, SET_ROTATION)
 void SET_ROTATION(const double rot_angle[]);
@@ -200,18 +227,32 @@ void SET_CONTEXT (fclaw2d_map_context_t** a_context);
    ---------------------------------------------------------------------------------- */
 
 /* Single block mappings */
+#define MAPC2M_IDENTITY FCLAW_F77_FUNC (mapc2m_identity,MAPC2M_IDENTITY)
+void MAPC2M_IDENTITY (int* blockno, double *xc, double *yc,
+                      double *xp, double *yp, double *zp);
+
+/* Single block mappings */
 #define MAPC2M_CART FCLAW_F77_FUNC (mapc2m_cart,MAPC2M_CART)
 void MAPC2M_CART (int* blockno, double *xc, double *yc,
                   double *xp, double *yp, double *zp);
+
 
 #define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
 void MAPC2M_PILLOWDISK (int* blockno, double *xc, double *yc,
                         double *xp, double *yp, double *zp);
 
+#define MAPC2M_PILLOWDISK5 FCLAW_F77_FUNC (mapc2m_pillowdisk5,MAPC2M_PILLOWDISK5)
+void MAPC2M_PILLOWDISK5 (int* blockno, double *xc, double *yc,
+                         double *xp, double *yp, double *zp, double *alpha);
+
 /* multi-block mappings */
 #define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
 void MAPC2M_SQUAREDDISK (int *blockno, double *xc, double *yc,
                          double *xp, double *yp, double *zp, double *alpha);
+
+#define MAPC2M_FIVEPATCH FCLAW_F77_FUNC (mapc2m_fivepatch,MAPC2M_FIVEPATCH)
+void MAPC2M_FIVEPATCH (int* blockno, double *xc, double *yc,
+                       double *xp, double *yp, double *zp,double *alpha);
 
 #define MAPC2M_CUBEDSPHERE FCLAW_F77_FUNC (mapc2m_cubedsphere,MAPC2M_CUBEDSPHERE)
 void MAPC2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
@@ -221,9 +262,9 @@ void MAPC2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
 void MAPC2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
                           double *xp, double *yp, double *zp);
 
-#define MAPC2M_FIVEPATCH FCLAW_F77_FUNC (mapc2m_fivepatch,MAPC2M_FIVEPATCH)
-void MAPC2M_FIVEPATCH (int* blockno, double *xc, double *yc,
-                       double *xp, double *yp, double *zp,double *alpha);
+#define MAPC2M_TORUS FCLAW_F77_FUNC (mapc2m_torus,MAPC2M_TORUS)
+void MAPC2M_TORUS (int* blockno, double *xc, double *yc,
+                   double *xp, double *yp, double *zp, double* alpha);
 
 /* ---------------------------------------------------------------------------------- */
 
