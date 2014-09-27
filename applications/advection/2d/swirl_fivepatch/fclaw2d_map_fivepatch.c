@@ -54,7 +54,7 @@ fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
                           double xc, double yc,
                           double *xp, double *yp, double *zp)
 {
@@ -64,14 +64,16 @@ fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t * cont, int blockno,
     /* Test iso_c_bindings */
     mapc2m(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
-    SCALE_MAP(xp,yp,zp);
-    SHIFT_MAP(xp,yp,zp);
+    scale_map(cont, xp,yp,zp);
+    shift_map(cont, xp,yp,zp);
+    rotate_map(cont, xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
-                                                 double shift[],
-                                                 double alpha)
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double rotate[],
+                                                 const double alpha)
 {
     fclaw2d_map_context_t *cont;
 
@@ -79,9 +81,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
     cont->query = fclaw2d_map_query_fivepatch;
     cont->mapc2m = fclaw2d_map_c2m_fivepatch;
 
+    set_scale(cont,scale);
+    set_shift(cont,shift);
+    set_rotate(cont,rotate);
+
     cont->user_double[0] = alpha;
-    SET_SCALE(&scale);
-    SET_SHIFT(shift);
 
     return cont;
 }

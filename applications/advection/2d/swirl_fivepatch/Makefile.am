@@ -10,8 +10,9 @@ applications_advection_2d_swirl_fivepatch_swirl_SOURCES = \
 	applications/advection/2d/swirl_fivepatch/swirl.cpp \
 	applications/advection/2d/swirl_fivepatch/mapc2m.f \
 	applications/advection/2d/swirl_fivepatch/setaux_manifold.f \
-	applications/advection/2d/swirl_fivepatch/fclaw2d_map_fivepatch.c \
 	applications/advection/2d/swirl_fivepatch/fclaw2d_map_cart.c \
+	applications/advection/2d/swirl_fivepatch/fclaw2d_map_identity.c \
+	applications/advection/2d/swirl_fivepatch/fclaw2d_map_fivepatch.c \
 	applications/advection/2d/swirl_fivepatch/setprob.f \
 	applications/advection/2d/swirl_fivepatch/psi.f \
 	applications/advection/2d/swirl_fivepatch/user_4.6/b4step2_manifold.f \
@@ -30,4 +31,3 @@ applications_advection_2d_swirl_fivepatch_swirl_CPPFLAGS += -D TRAPFPE
 
 applications_advection_2d_swirl_fivepatch_swirl_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
-## @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la
