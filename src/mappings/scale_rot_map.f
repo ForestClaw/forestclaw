@@ -1,55 +1,114 @@
 c     # ----------------------------------------------
 c     # Scaling routines
 c     # ----------------------------------------------
-      subroutine set_scale(scale)
-      implicit none
-      double precision scale, scale_com
 
-      common /comscale/ scale_com
-      scale_com = scale
+c      subroutine set_scale(scale)
+c      implicit none
+c      double precision scale(3), scale_com(3)
+c      integer m
+c
+c      common /comscale/ scale_com
+c
+c      do m = 1,3
+c         scale_com(m) = scale(m)
+c      enddo
+c
+c      end
+c
+c
+c      subroutine  get_scale(scale)
+c      implicit none
+c      double precision scale_com(3), scale(3)
+c      integer m
+c      common /comscale/ scale_com
+c
+c      do m = 1,3
+c         scale(m) = scale_com(m)
+c      enddo
+c
+c
+c      end
+c
+c      subroutine scale_map(xp,yp,zp)
+c      implicit none
+c
+c      double precision xp,yp,zp
+c      double precision s(3)
+c
+c      call get_scale(scale)
+c
+c      xp = s(1)*xp
+c      yp = s(2)*yp
+c      zp = s(3)*zp
+c
+c      end
 
-      end
 
-
-      double precision function get_scale()
-      implicit none
-      double precision scale_com
-      common /comscale/ scale_com
-
-      get_scale = scale_com
-
-      end
-
-      subroutine scale_map(xp,yp,zp)
-      implicit none
-
-      double precision xp,yp,zp
-      double precision s, get_scale
-
-      s = get_scale()
-
-      xp = s*xp
-      yp = s*yp
-      zp = s*zp
-
-      end
-
+c     # ----------------------------------------------
+c     # Shift routines
+c     # ----------------------------------------------
+c
+c      subroutine set_shift(shift)
+c      implicit none
+c
+c      double precision shift(3), shift_com(3)
+c      integer m
+c
+c      common /comshift/ shift_com
+c
+c      do m = 1,3
+c         shift_com(m) = shift(m)
+c      enddo
+c
+c
+c      end
+c
+c      subroutine get_shift(shift)
+c      implicit none
+c
+c      double precision shift(3), shift_com(3)
+c      integer m
+c
+c      common /comshift/ shift_com
+c
+c      do m = 1,3
+c         shift(m) = shift_com(m)
+c      enddo
+c
+c
+c      end
+c
+c      subroutine shift_map(xp,yp,zp)
+c      implicit none
+c
+c      double precision xp,yp,zp
+c      double precision shift(3)
+c      integer m
+c
+c
+c      call get_shift(shift)
+c
+c      xp = xp + shift(1)
+c      yp = yp + shift(2)
+c      zp = zp + shift(3)
+c      end
 
 c     # ----------------------------------------------
 c     # Rotation routines
 c     # ----------------------------------------------
-      subroutine set_rotation(rot_angle)
+      subroutine set_rotation_matrix(rot_angle,rrot)
       implicit none
 
-      double precision rot_angle(2), scale
+      double precision rot_angle(2)
+      double precision rrot(3,3)
 
-      double precision rrot(3,3), r1(3,3), r2(3,3)
+      double precision r1(3,3), r2(3,3)
 
       double precision th, phi
       integer i,j,k
 
-      double precision rrot_com(3,3)
-      common /comrot/ rrot_com
+c      double precision rrot_com(3,3)
+c      common /comrot/ rrot_com
 
 c     # Rotates map so as to not bias the solution.
       do i = 1,3
@@ -86,134 +145,60 @@ c     # rotate in second direction (for full 3d map)
          enddo
       enddo
 
-      do j = 1,3
-         do i = 1,3
-            rrot_com(i,j) = rrot(i,j)
-         enddo
-      enddo
+c      do j = 1,3
+c         do i = 1,3
+c            rrot_com(i,j) = rrot(i,j)
+c         enddo
+c      enddo
 
       end
 
 
-      subroutine get_rotation(rrot)
-      implicit none
-
-      double precision rrot(3,3), rrot_com(3,3)
-      common /comrot/ rrot_com
-
-      integer i,j
-
-      do j = 1,3
-         do i = 1,3
-            rrot(i,j) = rrot_com(i,j)
-         enddo
-      enddo
-
-      end
-
-
-      subroutine rotate_map(xp,yp,zp)
-      implicit none
-
-      double precision xp,yp,zp
-      double precision v(3), vrot(3)
-      integer i,k
-      double precision rrot(3,3)
-
-      v(1) = xp
-      v(2) = yp
-      v(3) = zp
-
-      call get_rotation(rrot)
-
-      do i = 1,3
-         vrot(i) = v(i)
-      enddo
-
-c     # Rotate mapping
-      do i = 1,3
-         vrot(i) = 0
-         do k = 1,3
-            vrot(i) = vrot(i) + rrot(i,k)*v(k)
-         enddo
-      enddo
-
-      xp = vrot(1)
-      yp = vrot(2)
-      zp = vrot(3)
-
-      end
-
-
-c     # ----------------------------------------------
-c     # Shift routines
-c     # ----------------------------------------------
-
-      subroutine set_shift(shift)
-      implicit none
-
-      double precision shift(3), shift_com(3)
-      integer m
-
-      common /comshift/ shift_com
-
-      do m = 1,3
-         shift_com(m) = shift(m)
-      enddo
-
-
-      end
-
-      subroutine get_shift(shift)
-      implicit none
-
-      double precision shift(3), shift_com(3)
-      integer m
-
-      common /comshift/ shift_com
-
-      do m = 1,3
-         shift(m) = shift_com(m)
-      enddo
-
-
-      end
-
-      subroutine shift_map(xp,yp,zp)
-      implicit none
-
-      double precision xp,yp,zp
-      double precision shift(3)
-      integer m
-
-
-      call get_shift(shift)
-
-      xp = xp + shift(1)
-      yp = yp + shift(2)
-      zp = zp + shift(3)
-      end
-
-
-
-c      subroutine setup_mappedgrid(rot_angle,scale)
+c      subroutine get_rotation(rrot)
 c      implicit none
-c      double precision rot_angle(2), scale
 c
-c      call set_scale(scale)
-c      call set_rotation(rot_angle)
+c      double precision rrot(3,3), rrot_com(3,3)
+c      common /comrot/ rrot_com
+c
+c      integer i,j
+c
+c      do j = 1,3
+c         do i = 1,3
+c            rrot(i,j) = rrot_com(i,j)
+c         enddo
+c      enddo
 c
 c      end
-c
-c      subroutine set_map_defaults()
+
+
+c      subroutine rotate_mapping(rrot,xp,yp,zp)
 c      implicit none
-c      double precision rot_angle(2), scale
 c
-c      rot_angle(1) = 0.d0
-c      rot_angle(2) = 0.d0
-c      call set_rotation(rot_angle)
+c      double precision xp,yp,zp
+c      double precision v(3), vrot(3)
+c      integer i,k
+c      double precision rrot(3,3)
 c
-c      scale = 1.d0
-c      call set_scale(scale)
+c      v(1) = xp
+c      v(2) = yp
+c      v(3) = zp
+c
+c      call get_rotation(rrot)
+c
+c      do i = 1,3
+c         vrot(i) = v(i)
+c      enddo
+c
+cc     # Rotate mapping
+c      do i = 1,3
+c         vrot(i) = 0
+c         do k = 1,3
+c            vrot(i) = vrot(i) + rrot(i,k)*v(k)
+c         enddo
+c      enddo
+c
+c      xp = vrot(1)
+c      yp = vrot(2)
+c      zp = vrot(3)
 c
 c      end
