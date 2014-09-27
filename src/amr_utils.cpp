@@ -80,6 +80,10 @@ void init_domain_data(fclaw2d_domain_t *domain)
     fclaw2d_output_functions_t* output_functions = FCLAW2D_ALLOC(fclaw2d_output_functions_t, 1);
     initialize_output_functions(output_functions);
     ddata->output_functions = output_functions;
+
+    fclaw2d_diagnostic_functions_t * diagnostic_functions =
+        FCLAW2D_ALLOC(fclaw2d_diagnostic_functions_t, 1);
+
 }
 
 void delete_domain_data(fclaw2d_domain_t* domain)

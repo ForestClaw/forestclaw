@@ -32,30 +32,40 @@ extern "C"
 {
 
     void setprob_();
+#if 0
     void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
                          const int& mbc, const int& mx, const int& my,
                          const double& xlower, const double& ylower,
                          const double& dx, const double& dy,
                          double q[], const int& maux, double aux[],
                          double xp[], double yp[], double zp[]);
+#endif
 
-    void output_metric_(const int& maxmx, const int& maxmy, const int& meqn,
+    void metric_check_(const int& mbc,const int& mx, const int& my,
+                       const double& xlower, const double& ylower,
+                       const double& dx,const double& dy,
+                       const int& blockno,
+                       const double xp[], double yp[],const double zp[],
+                       const double xd[], double yd[],const double zd[],
+                       const double area[], const int& mpirank);
+
+    void metric_output_(const int& meqn,
                         const int& mbc, const int& mx, const int& my,
                         const double& xlower, const double& ylower,
                         const double& dx, const double& dy,
                         double q[], const int& iframe, const int& patch_num,
-                        const int& level, const int& blockno, double curvature[]);
+                        const int& level, const int& blockno, const int& mpirank);
 
-    void tag4refinement_(const int& mx, const int& my, const int& mbc,
-                         const int& meqn,const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double curvature[], const int& init_flag,
-                         const int& blockno, const int& tag_patch);
+    void metric_tag4refinement_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn,const double& xlower, const double& ylower,
+                                const double& dx, const double& dy,
+                                double curvature[], const int& init_flag,
+                                const int& blockno, const int& tag_patch);
 
-    void tag4coarsening_(const int& mx, const int& my, const int& mbc,
-                         const int& meqn,const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double qcoarsened[], const int& tag_patch);
+    void metric_tag4coarsening_(const int& mx, const int& my, const int& mbc,
+                                const int& meqn,const double& xlower, const double& ylower,
+                                const double& dx, const double& dy,
+                                double qcoarsened[], const int& tag_patch);
 }
 
 #ifdef __cplusplus
@@ -66,22 +76,22 @@ extern "C"
 #endif
 #endif
 
-void sphere_link_patch(fclaw2d_domain_t *domain);
+void metric_link_patch(fclaw2d_domain_t *domain);
 
-void sphere_setprob(fclaw2d_domain_t* domain);
+void metric_setprob(fclaw2d_domain_t* domain);
 
-void sphere_qinit(fclaw2d_domain_t *domain,
+void metric_qinit(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx);
 
 
-fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool metric_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int this_block_idx, int this_patch_idx,
                                        int initflag);
 
-fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno);
@@ -91,6 +101,37 @@ void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                          int iframe,int num,int matlab_level);
 
 void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
+
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+                                            const double shift[],
+                                            const double rotate[]);
+
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double rotate[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+                                                    const double shift[],
+                                                    const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
 
 
 #ifdef __cplusplus

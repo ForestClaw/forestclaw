@@ -9,17 +9,4 @@
 
       pi = 4.d0*atan(1.d0)
 
-      call set_maptype_sphere()
-
-c     # -------------------------------------------------
-c     # Mapping routines
-c     # -------------------------------------------------
-
-c     # Set mapping scaling
-      scale = 1
-      rot_angle(1) = 1.34
-      rot_angle(2) = 2.1
-      rot_angle(1) = 0
-      rot_angle(2) = 1.8
-      call setup_mappedgrid(rot_angle,scale)
       end

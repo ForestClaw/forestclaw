@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "ClawPatch.H"
-#include "sphere_user.H"
+#include "metric_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -35,22 +35,34 @@ extern "C"
 #endif
 #endif
 
-void sphere_link_patch(fclaw2d_domain_t *domain)
+void metric_link_patch(fclaw2d_domain_t *domain)
 {
+    /* Nothing to link here? Use dummy routines for everything? */
 }
 
-void sphere_setprob(fclaw2d_domain_t* domain)
+void metric_setprob(fclaw2d_domain_t* domain)
 {
-    set_maptype_sphere_();
-    setprob_();
+    /* set up any mappings? */
 }
 
+void metric_check(fclaw2d_domain_t* domain)
+{
+
+}
+
+void metric_patch_initialize(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx)
+{
+    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+}
 
 
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+fclaw_bool metric_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno, int this_patch_idx,
                                        int initflag)
@@ -76,12 +88,12 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     double* curvature = cp->curvature();
 
     int tag_patch = 0;  // == 0 or 1
-    tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,curvature,initflag,
-                    blockno, tag_patch);
+    metric_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,curvature,initflag,
+                           blockno, tag_patch);
     return tag_patch == 1;
 }
 
-fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno)
@@ -107,7 +119,7 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     int tag_patch = 1;  // == 0 or 1
-    tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
+    metric_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
     return tag_patch == 0;
 }
 
@@ -123,19 +135,15 @@ void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
     int maux = 0;
     write_tfile_(iframe,time,meqn,ngrids,maux);
 
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
+    /* Initialize fort.qXXXX */
     new_qfile_(iframe);
 }
 
 
 void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                          int this_block_idx, int this_patch_idx,
-                         int iframe,int num,int matlab_level)
+                         int iframe,int num,int level)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -153,19 +161,16 @@ void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
     double dy = cp->dy();
 
     /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
 
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
+    double *q = cp->curvature();
 
-    double *curvature = cp->curvature();
+    int blockno = this_block_idx;
+    int mpirank = domain->mpirank;
 
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
-    output_metric_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                  iframe,num,matlab_level,this_block_idx,curvature);
+    metric_output_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                   iframe,num,level,blockno,mpirank);
 }
 
 

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 #include "amr_regrid.H"
 #include "amr_output.H"
+#include "fclaw2d_diagnostics.H"
 
 class ClawPatch;
 
@@ -88,6 +89,7 @@ typedef struct fclaw2d_domain_data
     fclaw2d_regrid_functions_t *regrid_functions;
     fclaw2d_solver_functions_t *solver_functions;
     fclaw2d_output_functions_t *output_functions;
+    fclaw2d_diagnostic_functions_t *diagnostic_functions;
 
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;

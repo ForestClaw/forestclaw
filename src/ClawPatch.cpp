@@ -709,17 +709,21 @@ double ClawPatch::compute_sum()
 {
     double *q = m_griddata.dataPtr();
     double sum;
-    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,sum);
+    double *area = m_area.dataPtr();
+    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,area,sum);
     return sum;
 }
 
+#if 0
 void ClawPatch::dump(int mq)
 {
     double *q;
     q = m_griddata.dataPtr();
     dump_patch_(m_mx,m_my,m_mbc,m_meqn,mq,q);
 }
+#endif
 
+#if 0
 void ClawPatch::dump_last()
 {
     double *q;
@@ -735,6 +739,7 @@ void ClawPatch::dump_last()
         printf("\n");
     }
 }
+#endif
 
 #if 0
 void ClawPatch::dump_time_interp()

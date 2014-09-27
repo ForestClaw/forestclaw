@@ -249,8 +249,8 @@ void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int
                   const int& patch_idx,const int& level,const int& blockno);
 
 void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                  const double& dx,
-                  const double& dy, double q[], double& sum);
+                  const double& dx, const double& dy,
+                  const double q[], const double area[], double& sum);
 
 void interpdata_(const int& m,double qlast[],double qcurr[], double qinterp[],
                  const double& alpha);

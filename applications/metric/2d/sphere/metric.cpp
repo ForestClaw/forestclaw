@@ -25,26 +25,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+#include <fclaw2d_map.h>
 
-#include "sphere_user.H"
+#include "metric_user.H"
 
 int
 main (int argc, char **argv)
 {
   int			lp;
+  int                   example;
   MPI_Comm		mpicomm;
   sc_options_t          *options;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
+
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  feenableexcept(FE_INVALID);
+#endif
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
+#ifdef MPI_DEBUG
+  /* This has to come after MPI has been initialized */
+  fclaw2d_mpi_debug();
+#endif
+
   /* ---------------------------------------------------------------
      Read in parameters and options
      --------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
+
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "0 no mapping (use [ax,bx]x[ay,by], " \
+                      "1 for Cartesian," \
+                      "2 for five patch square," \
+                      "3 for squared disk," \
+                      "4 for pillow disk," \
+                      "5 for pillow/five patch disk," \
+                      "6 for pillow sphere," \
+                      "7 for cubed sphere");
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
@@ -59,14 +83,65 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  /* For sphere */
-  domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
+  double alpha = 0.5;
+  double scale[3];
+  double shift[3];
+  double rotate[2];
+  set_default_transform(scale,shift,rotate);
 
-  /* For hemisphere */
-  /* domain = fclaw2d_domain_new_unitsquare (mpicomm,gparms->minlevel); */
+  switch (example) {
+  case 0:
+      /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
+      gparms->manifold = 0;
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_nomap ();
+      break;
+  case 1:
+      /* Map [0,1]x[0,1] to [-1,1],[-1,1] */
+      conn = p4est_connectivity_new_unitsquare();
+      cont = fclaw2d_map_new_cart (scale, shift,rotate);
+      break;
+  case 2:
+      /* Map [0,1],[0,1] to five patch square */
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_fivepatch (scale,shift,rotate, alpha);
+      break;
+  case 3:
+      /* Map [0,1],[0,1] to squared disk */
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_squareddisk (scale,shift,rotate,alpha);
+      break;
+  case 4:
+      /* Map [0,1],[0,1] to pillow disk */
+      conn = p4est_connectivity_new_unitsquare ();
+      cont = fclaw2d_map_new_pillowdisk (scale,shift,rotate);
+      break;
+  case 5:
+      /* Map [0,1]x[0,1] to five patch --> pillow disk */
+      conn = p4est_connectivity_new_unitsquare ();
+      cont = fclaw2d_map_new_pillowdisk5 (scale,shift,rotate,alpha);
+      break;
+  default:
+      sc_abort_collective ("Parameter example must be 1 or 2");
+  }
 
-  fclaw2d_domain_list_levels(domain, lp);
-  fclaw2d_domain_list_neighbors(domain, lp);
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure.
+     ---------------------------------------------------------- */
+  SET_CONTEXT(&cont);
+
+  /* ---------------------------------------------------------- */
+
+  if (gparms->verbosity > 0)
+  {
+      fclaw2d_domain_list_levels(domain, lp);
+      fclaw2d_domain_list_neighbors(domain, lp);
+  }
+
 
   /* ---------------------------------------------------------------
      Set domain data.
@@ -76,20 +151,23 @@ main (int argc, char **argv)
   /* Store parameters */
   set_domain_parms(domain,gparms);
 
-  link_problem_setup(domain,sphere_setprob);
-  link_regrid_functions(domain,sphere_patch_tag4refinement,
-                        sphere_patch_tag4coarsening);
+  link_problem_setup(domain,metric_setprob);
+  link_regrid_functions(domain,metric_patch_tag4refinement,
+                        metric_patch_tag4coarsening);
   link_output_functions(domain,metric_write_header, metric_write_output);
 
   // Link other routines that need to be included.
-  sphere_link_patch(domain);
+  metric_link_patch(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation
      -------------------------------------------------- */
+
+#if 0
   amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
+#endif
 
   /* --------------------------------------------------
      Clean up.

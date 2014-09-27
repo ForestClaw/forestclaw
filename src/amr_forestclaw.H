@@ -165,10 +165,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
 // amr_diagnostics.cpp
 void check_conservation (fclaw2d_domain_t * domain);
+
+#if 0
 void dump_patch (fclaw2d_domain_t * domain, int dump_patch);
 void dump_last_patch (fclaw2d_domain_t * domain, int dump_patch);
 void dump_time_interp_patch (fclaw2d_domain_t * domain, int dump_patch);
 void dump_auxarray (fclaw2d_domain_t * domain, int dump_patchno);
+#endif
 
 
 
