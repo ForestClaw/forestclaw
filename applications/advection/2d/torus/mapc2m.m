@@ -1,16 +1,22 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-global iscart;
+global map isflat;
 
-map = 'cart';
-% map = 'torus';
+% map = 'nomap';
+% map = 'cart';
+map = 'torus';
 
 switch map
+    case 'nomap'
+        isflat = true;
+        xp = xc;
+        yp = yc;
+        zp = 0*xp;
     case 'cart'
-        iscart = true;
+        isflat = true;
         [xp,yp,zp] = mapc2m_cart(xc,yc);
     case 'torus'
-        iscart = false;
+        isflat = false;
         [xp,yp,zp] = mapc2m_torus(xc,yc);
 end
 

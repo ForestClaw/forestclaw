@@ -107,10 +107,16 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
     double *xd = cp->xd();
     double *yd = cp->yd();
     double *zd = cp->zd();
+    double *xnormals = cp->xface_normals();
+    double *ynormals = cp->yface_normals();
+    double *edge_lengths = cp->edge_lengths();
     double *area = cp->area();
 
+
+
     setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,area);
+                     maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
+                     edge_lengths,area);
 }
 
 void torus_qinit(fclaw2d_domain_t *domain,

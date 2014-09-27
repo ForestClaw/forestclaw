@@ -1,11 +1,18 @@
-global iscart;
+setviews;
 
-if (iscart)
-    s = 1e-2;
+global map isflat;
+
+alpha = 0.4;
+s = 1e-2;    
+if strcmp(map,'nomap')
+    alim = [0 1];
+elseif strcmp(map,'cart')    
+    alim = [-1 1];
 else
-    s = alpha+1e-2;
+    alim = [-1-alpha,1+alpha];
 end
-axis([-1-s 1+s -1-s 1+s])
+alim = alim + [-s s];
+axis([alim alim]);
 daspect([1 1 1]);
 axis off;
 
@@ -26,10 +33,10 @@ if (ShowUnderOverShoots)
 end
 daspect([1,1,1]);
 
-if (iscart)
+if (isflat)
     view(2);
 else
-    view(3);
+    view(vtop);    
 end
 
 NoQuery = 0;

@@ -55,8 +55,10 @@ extern "C"
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],double area[]);
+                          const double xp[], const double yp[], const double zp[],
+                          const double xd[], const double yd[], const double zd[],
+                          const double xnormals[], const double ynormals[],
+                          const double egde_lengths[], const double area[]);
 
     void torus_write_tfile_(const int& iframe,const double& time,
                             const int& mfields,const int& ngrids,

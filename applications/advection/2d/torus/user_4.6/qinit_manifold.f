@@ -31,7 +31,11 @@
       double precision xc,yc, xp, yp, zp, rp
       integer*8 cont, get_context
       integer blockno, get_block
+      double precision th, tp
       logical iscart
+
+      double precision pi
+      common /compi/ pi
 
       cont = get_context()
       blockno = get_block()
@@ -39,11 +43,13 @@
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
-      if (.not. iscart()) then
-         fdisc = -xp
-      else
-         rp = sqrt((xp)**2 + yp**2)
+      if (iscart()) then
+         rp = sqrt(xp**2 + yp**2)
          fdisc = rp-0.25d0
+      else
+         th = atan2(yp,xp)
+         tp = abs(th - pi/2.d0)
+         fdisc = tp - pi/8.d0
       endif
 
       end
