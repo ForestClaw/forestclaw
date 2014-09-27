@@ -19,7 +19,7 @@ c     # ------------------------------------------------------------------
       logical ispillowsphere
 
 c     # Map to [-1,1]x[-1,1]
-      call mapc2m_cart(xc1,yc1,xc,yc,zc)
+      call mapc2m_cart(blockno,xc1,yc1,xc,yc,zc)
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)
