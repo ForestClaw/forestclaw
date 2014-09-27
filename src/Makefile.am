@@ -41,11 +41,14 @@ libforestclaw_compiled_sources = \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
 	src/mappings/cart/mapc2m_cart.f \
+	src/mappings/identity/mapc2m_identity.f \
 	src/mappings/pillowdisk/mapc2m_pillowdisk.f \
 	src/mappings/squareddisk/mapc2m_squareddisk.f \
+	src/mappings/pillowdisk5/mapc2m_pillowdisk5.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
 	src/mappings/fivepatch/mapc2m_fivepatch.f \
+	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
