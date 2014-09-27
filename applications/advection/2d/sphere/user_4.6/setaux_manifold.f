@@ -23,38 +23,14 @@
 
       common /compi/ pi
 
-c     # keep debug false since only one mpirank should print output
-      debug = .false.
       dxdy = dx*dy
 
       sum = 0
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
-            if ((i .ge. 1 .and. i .le. mx) .and.
-     &            (j .ge. 1 .and. j .le. my)) then
-               sum = sum + area(i,j)
-            endif
          enddo
       enddo
-
-      if (debug) then
-c        # We don't get an exact area, because of the non-smoothness
-c        # across the diagonals
-         write(6,100) 'Surface area', sum
-         if (isdisk()) then
-            exact_area = pi
-         elseif (iscart()) then
-            exact_area = 4.d0
-         elseif (issphere()) then
-c           # Hemisphere
-            exact_area = 2*pi
-         endif
-         write(6,100) 'Error', abs(sum - exact_area)
-
-         stop
-  100    format(A15,E24.16)
-      endif
 
       t = 0
       call compute_velocity_psi(mx,my,mbc,dx,dy,
