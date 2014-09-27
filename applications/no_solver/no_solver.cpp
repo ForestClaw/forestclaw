@@ -39,7 +39,7 @@ int
 main (int argc, char **argv)
 {
   int		        lp;
-  int example;
+  int                   example;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
@@ -58,6 +58,7 @@ main (int argc, char **argv)
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG
+  /* This has to come after MPI has been initialized */
   fclaw2d_mpi_debug();
 #endif
 
@@ -89,11 +90,11 @@ main (int argc, char **argv)
      -------------------------------------------------------------- */
 
   double alpha = 0.5;
-  double scale = 1;
+
+  double scale[3];
   double shift[3];
-  shift[0] = 0;
-  shift[1] = 0;
-  shift[2] = 0;
+  double rotate[2];
+  set_default_transform(scale,shift,rotate);
 
   switch (example) {
   case 0:
@@ -105,11 +106,19 @@ main (int argc, char **argv)
   case 1:
       /* Map unit square to disk using mapc2m_disk.f */
       conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart (scale, shift);
+      cont = fclaw2d_map_new_cart (scale, shift, rotate);
       break;
   case 2:
       conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_fivepatch (scale,shift,alpha);
+      cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
+      break;
+  case 3:
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_pillowdisk (scale,shift,rotate);
+      break;
+  case 4:
+      conn = p4est_connectivity_new_disk ();
+      cont = fclaw2d_map_new_pillowfivepatch (scale,shift,rotate,alpha);
       break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");

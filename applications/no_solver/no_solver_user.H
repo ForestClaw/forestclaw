@@ -91,11 +91,24 @@ void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
                                   int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale,
-                                                 double shift[],
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double rotate[],
                                                  const double alpha);
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale,
-                                            double shift[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+                                            const double shift[],
+                                            const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowfivepatch(const double scale[],
+                                                       const double shift[],
+                                                       const double rotate[],
+                                                       const double alpha);
 
 
 
