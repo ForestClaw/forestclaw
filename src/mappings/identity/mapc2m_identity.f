@@ -1,4 +1,4 @@
-      subroutine mapc2m_nomap(blockno,xc,yc,xp,yp,zp)
+      subroutine mapc2m_identity(blockno,xc,yc,xp,yp,zp)
       implicit none
 
       double precision xc,yc,xp,yp,zp
