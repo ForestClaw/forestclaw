@@ -91,7 +91,7 @@ struct amr_options
     int subcycle;
     int noweightedp;            /**< Don't use weighted partition.
                                      Only relevant when subcycling. */
-    int check_conservation;
+    int run_diagnostics;
     int use_fixed_dt;
 
     /* xlower,xupper,ylower,yupper for block.

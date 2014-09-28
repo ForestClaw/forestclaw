@@ -190,9 +190,9 @@ amr_options_new (sc_options_t * opt)
                            "Solution is on manifold [F]");
     sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
                            "Use fixed coarse grid time step [F]");
-    sc_options_add_switch (opt, 0, "check_conservation",
-                           &amropt->check_conservation,
-                           "Check conservation [F]");
+    sc_options_add_switch (opt, 0, "run_diagnostics",
+                           &amropt->run_diagnostics,
+                           "Run diagnostics [F]");
     sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
                            "Use subcycling in time [F]");
     sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,

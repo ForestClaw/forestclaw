@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_diagnostics.H"
 
 
+/* global_maximum is in forestclaw2d.c */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
 {
     double neg_d;
