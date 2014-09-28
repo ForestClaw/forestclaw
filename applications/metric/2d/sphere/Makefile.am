@@ -10,15 +10,19 @@ applications_metric_2d_sphere_metric_SOURCES = \
 	applications/metric/2d/sphere/metric_output.f \
 	applications/metric/2d/sphere/metric_check.f \
 	applications/metric/2d/sphere/setprob.f \
+	applications/metric/2d/sphere/diagnostics.f \
 	applications/metric/2d/sphere/fclaw2d_map_nomap.c \
 	applications/metric/2d/sphere/fclaw2d_map_cart.c \
 	applications/metric/2d/sphere/fclaw2d_map_fivepatch.c \
 	applications/metric/2d/sphere/fclaw2d_map_pillowdisk.c \
 	applications/metric/2d/sphere/fclaw2d_map_pillowdisk5.c \
-	applications/metric/2d/sphere/fclaw2d_map_squareddisk.c
+	applications/metric/2d/sphere/fclaw2d_map_squareddisk.c \
+	applications/metric/2d/sphere/fclaw2d_map_pillowsphere.c \
+	applications/metric/2d/sphere/fclaw2d_map_cubedsphere.c \
+	applications/metric/2d/sphere/fclaw2d_map_torus.c
 
 applications_advection_2d_metric_metric_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
+        $(AM_CPPFLAGS)
 
 
 # applications_advection_2d_metric_metric_CPPFLAGS += -D TRAPFPE

@@ -66,6 +66,15 @@ extern "C"
                                 const int& meqn,const double& xlower, const double& ylower,
                                 const double& dx, const double& dy,
                                 double qcoarsened[], const int& tag_patch);
+
+    double total_area_(const int& mx, const int& my, const int& mbc,
+                     const double area[]);
+
+    void min_grid_cell_area_(const int& mx, const int& my, const int& mbc,
+                               const double area[],double *minvalue);
+
+    void max_grid_cell_area_(const int& mx, const int& my, const int& mbc,
+                               const double area[], double *maxvalue);
 }
 
 #ifdef __cplusplus
@@ -81,9 +90,12 @@ void metric_link_patch(fclaw2d_domain_t *domain);
 void metric_setprob(fclaw2d_domain_t* domain);
 
 void metric_qinit(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx);
+                  fclaw2d_patch_t *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx);
+
+void metric_diagnostics(fclaw2d_domain_t *domain, const double t);
+
 
 
 fclaw_bool metric_patch_tag4refinement(fclaw2d_domain_t *domain,
@@ -96,11 +108,11 @@ fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        int blockno,
                                        int patchno);
 
-void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                         int this_block_idx, int this_patch_idx,
-                         int iframe,int num,int matlab_level);
+void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int matlab_level);
 
-void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
+void metric_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
@@ -128,10 +140,19 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
                                                     const double shift[],
                                                     const double rotate[]);
 
+fclaw2d_map_context_t* fclaw2d_map_new_cubedsphere(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[]);
+
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_torus(const double scale[],
+                                             const double shift[],
+                                             const double rotate[],
+                                             const double alpha);
 
 
 #ifdef __cplusplus

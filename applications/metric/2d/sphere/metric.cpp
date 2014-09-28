@@ -62,13 +62,14 @@ main (int argc, char **argv)
 
   sc_options_add_int (options, 0, "example", &example, 0,
                       "0 no mapping (use [ax,bx]x[ay,by], " \
-                      "1 for Cartesian," \
-                      "2 for five patch square," \
-                      "3 for squared disk," \
-                      "4 for pillow disk," \
-                      "5 for pillow/five patch disk," \
-                      "6 for pillow sphere," \
-                      "7 for cubed sphere");
+                      "1 for Cartesian, " \
+                      "2 for five patch square, " \
+                      "3 for squared disk, " \
+                      "4 for pillow disk, " \
+                      "5 for pillow/five patch disk, " \
+                      "6 for pillow sphere, " \
+                      "7 for cubed sphere, "\
+                      "8 for torus");
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
@@ -83,7 +84,7 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  double alpha = 0.5;
+  double alpha = 0.4;
   double scale[3];
   double shift[3];
   double rotate[2];
@@ -121,6 +122,21 @@ main (int argc, char **argv)
       conn = p4est_connectivity_new_unitsquare ();
       cont = fclaw2d_map_new_pillowdisk5 (scale,shift,rotate,alpha);
       break;
+  case 6:
+      /* Map [0,1]x[0,1] to five patch --> pillow disk */
+      conn = p4est_connectivity_new_pillow ();
+      cont = fclaw2d_map_new_pillowsphere (scale,shift,rotate);
+      break;
+  case 7:
+      /* Map [0,1]x[0,1] to five patch --> pillow disk */
+      conn = p4est_connectivity_new_cubed ();
+      cont = fclaw2d_map_new_cubedsphere (scale,shift,rotate);
+      break;
+  case 8:
+      /* Map [0,1]x[0,1] to five patch --> pillow disk */
+      conn = p4est_connectivity_new_periodic ();
+      cont = fclaw2d_map_new_torus (scale,shift,rotate,alpha);
+      break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");
   }
@@ -151,23 +167,24 @@ main (int argc, char **argv)
   /* Store parameters */
   set_domain_parms(domain,gparms);
 
+  /* Link functions that are called for the whole domain */
   link_problem_setup(domain,metric_setprob);
-  link_regrid_functions(domain,metric_patch_tag4refinement,
-                        metric_patch_tag4coarsening);
-  link_output_functions(domain,metric_write_header, metric_write_output);
+  link_run_diagnostics(domain,metric_diagnostics);
 
-  // Link other routines that need to be included.
+  /* Link other routines that need to be included. */
   metric_link_patch(domain);
 
   /* --------------------------------------------------
      Initialize and run the simulation
      -------------------------------------------------- */
 
-#if 0
   amrinit(&domain);
+
+  run_diagnostics(domain);
+
   amrrun(&domain);
+
   amrreset(&domain);
-#endif
 
   /* --------------------------------------------------
      Clean up.

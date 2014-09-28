@@ -1,18 +1,10 @@
-s = 1e-2;
-% axis([-1-s 1+s -1-s 1+s -1-s 1+s])
 axis image;
 daspect([1 1 1]);
-axis off;
 
 colormap(jet);
-caxis([qmin qmax]);
 
-showgridlines(1:3);
-setpatchborderprops(1:6,'linewidth',2);
 showpatchborders;
 setviews;
-
-colorbar;
 
 NoQuery = 0;
 prt = false;
@@ -25,6 +17,8 @@ if (prt)
   disp(pstr);
   eval(pstr);
 end;
+
+shg;
 
 clear afterframe;
 clear mapc2m;

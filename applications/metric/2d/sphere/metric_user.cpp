@@ -37,16 +37,105 @@ extern "C"
 
 void metric_link_patch(fclaw2d_domain_t *domain)
 {
-    /* Nothing to link here? Use dummy routines for everything? */
+    fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
+    rf->f_patch_tag4refinement = &metric_patch_tag4refinement;
+    rf->f_patch_tag4coarsening = &metric_patch_tag4coarsening;
+
+    fclaw2d_output_functions_t *of = get_output_functions(domain);
+    of->f_patch_write_header = &metric_parallel_write_header;
+    of->f_patch_write_output = &metric_parallel_write_output;
+
 }
 
 void metric_setprob(fclaw2d_domain_t* domain)
 {
-    /* set up any mappings? */
+    /* Any general problem set up here */
+    setprob_();  /* Set value of pi */
 }
 
-void metric_check(fclaw2d_domain_t* domain)
+void cb_total_area(fclaw2d_domain_t *domain,
+                   fclaw2d_patch_t *this_patch,
+                   int this_block_idx,
+                   int this_patch_idx,
+                   void *user)
 {
+    double *sum = (double*) user;
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double *area = cp->area();
+
+    *sum += total_area_(mx,my,mbc,area);
+}
+
+void cb_min_cell_area(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      void *user)
+{
+    double *minvalue = (double*) user;
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double *area = cp->area();
+
+    min_grid_cell_area_(mx,my,mbc,area,minvalue);
+}
+
+void cb_max_cell_area(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx,
+                      void *user)
+{
+    double *maxvalue = (double*) user;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    ClawPatch *cp = get_clawpatch(this_patch);
+    double *area = cp->area();
+
+    max_grid_cell_area_(mx,my,mbc,area,maxvalue);
+}
+
+
+void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
+{
+    /* Compute a global sum */
+    double sum = 0;
+    fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
+    sum = fclaw2d_domain_global_sum (domain, sum);
+    printf("%30s %24.16f\n","Total area",sum);
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+    if (gparms->minlevel == gparms->maxlevel)
+    {
+        /* Only compare ratio of smallest grid cell to largest if the grid is
+           uniformly refined */
+        double minvalue = 100;
+        fclaw2d_domain_iterate_patches(domain,cb_min_cell_area,(void *) &minvalue);
+        minvalue = fclaw2d_domain_global_minimum (domain, minvalue);
+
+        double maxvalue = 0;
+        fclaw2d_domain_iterate_patches(domain,cb_max_cell_area,(void *) &maxvalue);
+        maxvalue = fclaw2d_domain_global_maximum (domain, maxvalue);
+
+        printf("%30s %24.16f\n","Minimum value",minvalue);
+        printf("%30s %24.16f\n","Maximum value",maxvalue);
+        printf("%30s %24.8f\n","Ratio of largest to smallest",maxvalue/minvalue);
+    }
+    printf("\n\n");
 
 }
 
@@ -55,7 +144,7 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
                              int this_block_idx,
                              int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    /* fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx); */
 }
 
 
@@ -123,7 +212,7 @@ fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
-void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
+void metric_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
@@ -140,9 +229,9 @@ void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 }
 
 
-void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                         int this_block_idx, int this_patch_idx,
-                         int iframe,int num,int level)
+void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                                  int this_block_idx, int this_patch_idx,
+                                  int iframe,int num,int level)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
