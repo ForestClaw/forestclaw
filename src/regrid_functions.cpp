@@ -57,7 +57,7 @@ fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
                                       int this_block_idx, int this_patch_idx,
                                       int initflag)
 {
-    return fclaw_false;  /* don't coarsen */
+    return fclaw_false;  /* don't refine */
 }
 
 
