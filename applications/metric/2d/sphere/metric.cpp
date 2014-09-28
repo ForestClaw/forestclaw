@@ -61,7 +61,6 @@ main (int argc, char **argv)
   options = sc_options_new (argv[0]);
 
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "0 no mapping (use [ax,bx]x[ay,by], " \
                       "1 for Cartesian, " \
                       "2 for five patch square, " \
                       "3 for squared disk, " \
@@ -91,12 +90,6 @@ main (int argc, char **argv)
   set_default_transform(scale,shift,rotate);
 
   switch (example) {
-  case 0:
-      /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
-      gparms->manifold = 0;
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_nomap ();
-      break;
   case 1:
       /* Map [0,1]x[0,1] to [-1,1],[-1,1] */
       conn = p4est_connectivity_new_unitsquare();
@@ -119,7 +112,7 @@ main (int argc, char **argv)
       break;
   case 5:
       /* Map [0,1]x[0,1] to five patch --> pillow disk */
-      conn = p4est_connectivity_new_unitsquare ();
+      conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_pillowdisk5 (scale,shift,rotate,alpha);
       break;
   case 6:
@@ -180,9 +173,16 @@ main (int argc, char **argv)
 
   amrinit(&domain);
 
-  run_diagnostics(domain);
+  if (gparms->run_diagnostics)
+  {
+      run_diagnostics(domain);
+  }
 
-  amrrun(&domain);
+  int iframe = 0;
+  amrout(domain,iframe);
+
+
+  /* amrrun(&domain); */
 
   amrreset(&domain);
 

@@ -32,14 +32,6 @@ extern "C"
 {
 
     void setprob_();
-#if 0
-    void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[],
-                         double xp[], double yp[], double zp[]);
-#endif
 
     void metric_check_(const int& mbc,const int& mx, const int& my,
                        const double& xlower, const double& ylower,
@@ -53,7 +45,8 @@ extern "C"
                         const int& mbc, const int& mx, const int& my,
                         const double& xlower, const double& ylower,
                         const double& dx, const double& dy,
-                        double q[], const int& iframe, const int& patch_num,
+                        double area[], double curvature[],
+                        const int& iframe, const int& patch_num,
                         const int& level, const int& blockno, const int& mpirank);
 
     void metric_tag4refinement_(const int& mx, const int& my, const int& mbc,

@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "ClawPatch.H"
 #include "metric_user.H"
+#include "fclaw2d_map_query.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -52,101 +53,6 @@ void metric_setprob(fclaw2d_domain_t* domain)
     /* Any general problem set up here */
     setprob_();  /* Set value of pi */
 }
-
-void cb_total_area(fclaw2d_domain_t *domain,
-                   fclaw2d_patch_t *this_patch,
-                   int this_block_idx,
-                   int this_patch_idx,
-                   void *user)
-{
-    double *sum = (double*) user;
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double *area = cp->area();
-
-    *sum += total_area_(mx,my,mbc,area);
-}
-
-void cb_min_cell_area(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
-{
-    double *minvalue = (double*) user;
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double *area = cp->area();
-
-    min_grid_cell_area_(mx,my,mbc,area,minvalue);
-}
-
-void cb_max_cell_area(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
-{
-    double *maxvalue = (double*) user;
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double *area = cp->area();
-
-    max_grid_cell_area_(mx,my,mbc,area,maxvalue);
-}
-
-
-void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
-{
-    /* Compute a global sum */
-    double sum = 0;
-    fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
-    sum = fclaw2d_domain_global_sum (domain, sum);
-    printf("%30s %24.16f\n","Total area",sum);
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-    if (gparms->minlevel == gparms->maxlevel)
-    {
-        /* Only compare ratio of smallest grid cell to largest if the grid is
-           uniformly refined */
-        double minvalue = 100;
-        fclaw2d_domain_iterate_patches(domain,cb_min_cell_area,(void *) &minvalue);
-        minvalue = fclaw2d_domain_global_minimum (domain, minvalue);
-
-        double maxvalue = 0;
-        fclaw2d_domain_iterate_patches(domain,cb_max_cell_area,(void *) &maxvalue);
-        maxvalue = fclaw2d_domain_global_maximum (domain, maxvalue);
-
-        printf("%30s %24.16f\n","Minimum value",minvalue);
-        printf("%30s %24.16f\n","Maximum value",maxvalue);
-        printf("%30s %24.8f\n","Ratio of largest to smallest",maxvalue/minvalue);
-    }
-    printf("\n\n");
-
-}
-
-void metric_patch_initialize(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx)
-{
-    /* fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx); */
-}
-
 
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
@@ -214,15 +120,15 @@ fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 void metric_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    // const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
-    int meqn = gparms->meqn + 1;  // Write out an extra field
+    int mfields = 3;  // Write out an extra field
     int maux = 0;
-    write_tfile_(iframe,time,meqn,ngrids,maux);
+    write_tfile_(iframe,time,mfields,ngrids,maux);
 
     /* Initialize fort.qXXXX */
     new_qfile_(iframe);
@@ -251,14 +157,15 @@ void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
 
     /* ------------------------------------------------------------ */
 
-    double *q = cp->curvature();
+    double *area = cp->area();
+    double *curvature = cp->curvature();
 
     int blockno = this_block_idx;
     int mpirank = domain->mpirank;
 
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
-    metric_output_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+    metric_output_(meqn,mbc,mx,my,xlower,ylower,dx,dy,area,curvature,
                    iframe,num,level,blockno,mpirank);
 }
 

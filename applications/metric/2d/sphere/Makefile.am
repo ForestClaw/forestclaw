@@ -4,8 +4,9 @@ bin_PROGRAMS += applications/metric/2d/sphere/metric
 
 
 applications_metric_2d_sphere_metric_SOURCES = \
-	applications/metric/2d/sphere/metric_user.cpp \
 	applications/metric/2d/sphere/metric.cpp \
+	applications/metric/2d/sphere/metric_user.cpp \
+	applications/metric/2d/sphere/metric_diagnostics.cpp \
 	applications/metric/2d/sphere/tag4refinement.f \
 	applications/metric/2d/sphere/metric_output.f \
 	applications/metric/2d/sphere/metric_check.f \
