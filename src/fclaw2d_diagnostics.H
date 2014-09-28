@@ -34,49 +34,19 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_diagnostic_functions fclaw2d_diagnostic_functions_t;
-
-
 typedef void (*fclaw2d_run_diagnostics_t)(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          double t);
+                                          const double t);
 
-typedef void (*fclaw2d_cb_check_sum_t)(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx,
-                                       int this_patch_idx,
-                                       void *user);
+/* See forestclaw2d.h for the maximum version of this function */
+double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
-typedef void (*fclaw2d_cb_check_minimum_t)(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           void *user);
+void link_run_diagnostics(fclaw2d_domain_t* domain,
+                          fclaw2d_run_diagnostics_t f_run_diagnostics);
 
-typedef void (*fclaw2d_cb_check_maximum_t)(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           void *user);
+void run_diagnostics_default(fclaw2d_domain_t* domain, const double t);
 
+void run_diagnostics(fclaw2d_domain_t *domain);
 
-void fclaw2d_check_sum(fclaw2d_domain_t *domain,
-                       fclaw2d_cb_check_sum_t cb_check_sum);
-
-void fclaw2d_check_minimum(fclaw2d_domain_t *domain,
-                           fclaw2d_cb_check_minimum_t cb_check_minimum,
-                           double *minvalue);
-
-void fclaw2d_check_maximum(fclaw2d_domain_t *domain,
-                           fclaw2d_cb_check_minimum_t cb_check_maximum,
-                           double* maxvalue);
-
-
-struct fclaw2d_diagnostic_functions
-{
-    fclaw2d_run_diagnostics_t f_patch_diagnostics;
-};
 
 #ifdef __cplusplus
 #if 0

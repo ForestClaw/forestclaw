@@ -134,7 +134,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-                check_conservation(*domain);
+                run_diagnostics(*domain);
 
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
@@ -345,7 +345,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-            check_conservation(*domain);
+            run_diagnostics(*domain);
 
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
@@ -477,7 +477,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
             fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-            check_conservation(*domain);
+            run_diagnostics(*domain);
 
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }

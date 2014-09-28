@@ -16,6 +16,7 @@ libforestclaw_installed_headers = \
 	src/fortran_source2d/metric_terms.i \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
+	src/fclaw2d_diagnostics.H \
 	src/fp_exception_glibc_extension.h
 
 libforestclaw_internal_headers = \
@@ -50,6 +51,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/fivepatch/mapc2m_fivepatch.f \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
+	src/fclaw2d_diagnostics.cpp \
 	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \
@@ -59,7 +61,6 @@ libforestclaw_compiled_sources = \
 	src/amr_advance.cpp \
 	src/amr_regrid.cpp \
 	src/amr_output.cpp \
-	src/amr_diagnostics.cpp \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \

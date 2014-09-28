@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "ClawPatch.H"
 #include "fclaw2d_transform.h"
+#include "fclaw2d_diagnostics.H"
 
 /* Note: either we make this a C .h file, or we remove the extern "C". */
 

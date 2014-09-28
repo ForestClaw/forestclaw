@@ -85,11 +85,11 @@ typedef struct fclaw2d_domain_data
     double curr_time;
 
     fclaw2d_problem_setup_t f_problem_setup;
+    fclaw2d_run_diagnostics_t f_run_diagnostics;
 
-    fclaw2d_regrid_functions_t *regrid_functions;
-    fclaw2d_solver_functions_t *solver_functions;
-    fclaw2d_output_functions_t *output_functions;
-    fclaw2d_diagnostic_functions_t *diagnostic_functions;
+    fclaw2d_regrid_functions_t     *regrid_functions;
+    fclaw2d_solver_functions_t     *solver_functions;
+    fclaw2d_output_functions_t     *output_functions;
 
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;

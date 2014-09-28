@@ -26,97 +26,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "fclaw2d_diagnostics.H"
 
-static
-void cb_check_conservation(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           void *user)
-{
-    ClawPatch *this_cp = get_clawpatch(this_patch);
-    double *sum = (double*) user;
 
-    *sum += this_cp->compute_sum();
+double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
+{
+    double neg_d;
+    double maxvalue;
+    neg_d = -d;
+    maxvalue = fclaw2d_domain_global_maximum(domain,neg_d);
+    return -maxvalue;
 }
 
 
-void fclaw2d_check_sum(fclaw2d_domain_t *domain,
-                       fclaw2d_cb_check_sum_t cb_check_sum)
+void link_run_diagnostics(fclaw2d_domain_t* domain,
+                          fclaw2d_run_diagnostics_t f_run_diagnostics)
 {
-    double sum = 0;
-    fclaw2d_domain_iterate_patches(domain,cb_check_sum,(void *) &sum);
-
-    sum = fclaw2d_domain_global_sum (domain, sum);
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->f_run_diagnostics = f_run_diagnostics;
 }
 
 
-static
-void cb_check_minimum(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
+void run_diagnostics_default(fclaw2d_domain_t* domain, const double t)
 {
-    ClawPatch *this_cp = get_clawpatch(this_patch);
-    double *minvalue = (double*) user;
-
-    double mv = this_cp->compute_minimum();
-    if (mv < *minvalue)
-    {
-        *minvalue = mv;
-    }
-}
-
-void fclaw2d_check_minimum(fclaw2d_domain_t *domain,
-                           fclaw2d_cb_check_minimum_t cb_check_minimum,
-                           double *minvalue)
-{
-    /* minvalue should be set in calling function */
-    fclaw2d_domain_iterate_patches(domain,cb_check_minimum,(void *) minvalue);
-
-    *minvalue = fclaw2d_domain_global_minimum (domain, *minvalue);
+    /* don't run any diagnostics */
 }
 
 
-static
-void cb_check_maximum(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      void *user)
+void run_diagnostics(fclaw2d_domain_t *domain)
 {
-    ClawPatch *this_cp = get_clawpatch(this_patch);
-    double *maxvalue = (double*) user;
-
-    double mv = this_cp->compute_max();
-    if (mv > *maxvalue)
-    {
-        *maxvalue = mv;
-    }
-}
-
-
-void fclaw2d_check_maximum(fclaw2d_domain_t *domain,
-                           fclaw2d_cb_check_minimum_t cb_check_maximum,
-                           double* maxvalue)
-{
-    /* Maxvalue should be set by the calling function */
-    fclaw2d_domain_iterate_patches(domain,cb_check_maximum,(void *) maxvalue);
-
-    *maxvalue = fclaw2d_domain_global_maximum (domain, *maxvalue);
-}
-
-void patch_diagnostics_dummy(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx, int this_patch_idx,
-                             double t)
-{
-    /* Don't do anything */
-}
-
-
-
-void initialize_diagnostic_functions(fclaw2d_diagnostic_functions_t* diagnostic_functions)
-{
-    diagnostic_functions->f_patch_diagnostics = patch_diagnostics_dummy;
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    double t = get_domain_time(domain);
+    (ddata->f_run_diagnostics)(domain,t);
 }

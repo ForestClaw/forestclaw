@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_utils.H"
 #include "fclaw2d_solvers.H"
+#include "fclaw2d_diagnostics.H"
 
 int pow_int(int a, int n)
 {
@@ -38,10 +39,11 @@ int pow_int(int a, int n)
     return b;
 }
 
-static void problem_setup_default(fclaw2d_domain_t* domain)
+static
+void problem_setup_default(fclaw2d_domain_t* domain)
 {
+    /* This is linked via "link_problem_setup", below */
 }
-
 
 /* -----------------------------------------------------------------
    Initialize data
@@ -68,6 +70,7 @@ void init_domain_data(fclaw2d_domain_t *domain)
 
     /* I put this here because somehow it is not part of a 'solver' */
     ddata->f_problem_setup = &problem_setup_default;
+    ddata->f_run_diagnostics = &run_diagnostics_default;
 
     fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC(fclaw2d_solver_functions_t, 1);
     initialize_solver_functions(solver_functions);
@@ -80,10 +83,6 @@ void init_domain_data(fclaw2d_domain_t *domain)
     fclaw2d_output_functions_t* output_functions = FCLAW2D_ALLOC(fclaw2d_output_functions_t, 1);
     initialize_output_functions(output_functions);
     ddata->output_functions = output_functions;
-
-    fclaw2d_diagnostic_functions_t * diagnostic_functions =
-        FCLAW2D_ALLOC(fclaw2d_diagnostic_functions_t, 1);
-
 }
 
 void delete_domain_data(fclaw2d_domain_t* domain)
@@ -243,6 +242,7 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     ddata_new->curr_time = ddata_old->curr_time;
 
     ddata_new->f_problem_setup = ddata_old->f_problem_setup;
+    ddata_new->f_run_diagnostics = ddata_old->f_run_diagnostics;
 
     copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
     copy_regrid_functions(ddata_old->regrid_functions,ddata_new->regrid_functions);
