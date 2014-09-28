@@ -40,25 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* Just putting this here for now */
-
-// void fclaw2d_mapc2m_(fclaw2d_map_context_t **cont,
-//                      int* blockno,
-//                      const double* xc, const double* yc,
-//                      double *xp, double *yp, double *zp)
-// {
-//
-//     /*
-//       void fclaw2d_map_c2m_ (fclaw2d_map_context_t * cont, int *blockno,
-//                        const double *xc, const double *yc,
-//                        double *xp, double *yp, double *zp);
-//     */
-//
-//     fclaw2d_map_c2m_(*cont, blockno,xc, yc, xp, yp, zp);
-//
-// }
-
-
 static
 void set_qnan(double& f)
 {
