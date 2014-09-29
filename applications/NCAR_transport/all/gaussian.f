@@ -273,7 +273,8 @@ c     # ------------------------------------------------
       double precision rsphere, get_scale
       integer m
 
-      rsphere = get_scale()
+c      rsphere = get_scale()
+      rsphere = 1.0
 
       p(1) = x
       p(2) = y

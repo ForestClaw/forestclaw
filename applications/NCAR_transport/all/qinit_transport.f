@@ -1,10 +1,13 @@
       subroutine qinit_transport(mx,my,meqn,mbc,
-     &      xlower,ylower,dx,dy,q,maux,aux, xp,yp,zp)
+     &      xlower,ylower,dx,dy,q,maux,aux,
+     &      blockno, cont, xp,yp,zp)
 
       implicit none
 
       integer meqn, mbc, mx, my, maux,this_block_idx
       double precision xlower, ylower, dx, dy
+      integer*8 cont
+      integer blockno
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
@@ -19,11 +22,12 @@
 
       ichoice = get_init_choice()
 
+      call set_block(blockno)
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            xlow = xlower + (i-1)*dx
-            ylow = ylower + (j-1)*dy
+c            xlow = xlower + (i-1)*dx
+c            ylow = ylower + (j-1)*dy
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
@@ -51,8 +55,15 @@ c               call cellave2(xlow,ylow,dx,dy,w)
 
       double precision xc,yc, xp, yp, zp
       double precision q, slotted_disk_sum
+      integer*8 cont, get_context
+      integer blockno, get_block
 
-      call mapc2m(xc,yc,xp,yp,zp)
+      cont = get_context()
+      blockno = get_block()
+
+      call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+
+c     # call mapc2m(xc,yc,xp,yp,zp)
 
 c     # Returns 0 or 1.
       q = slotted_disk_sum(xp,yp,zp)

@@ -50,6 +50,7 @@ c     # Set the capacity function needed by Clawpack
 
       double precision xd1(3),xd2(3)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      logical ispillowsphere
 
       integer i,j
       double precision vn
@@ -70,8 +71,10 @@ c           # x-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dy,vn,t)
-            if (blockno == 1) then
-               vn = -vn
+            if (ispillowsphere()) then
+               if (blockno == 1) then
+                  vn = -vn
+               endif
             endif
             aux(i,j,2) = vn
          enddo
@@ -89,8 +92,10 @@ c           # y-faces
             xd2(3) = zd(i,j)
 
             call get_vel_psi(xd1,xd2,dx,vn,t)
-            if (blockno == 1) then
-               vn = -vn
+            if (ispillowsphere()) then
+               if (blockno == 1) then
+                  vn = -vn
+               endif
             endif
 
             aux(i,j,3) = -vn

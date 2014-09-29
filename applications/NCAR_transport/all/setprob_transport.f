@@ -15,9 +15,6 @@
 
       pi = 4.d0*atan(1.d0)
 
-      call set_maptype_sphere()
-      call set_map_defaults()
-
 c     # TODO : Need a better way to read in data parameters in
 c     # Fortran for parallel cases
 
@@ -41,12 +38,6 @@ c     # -------------------------------------------------
 c     # -------------------------------------------------
 c     # Set up sphere mapping
 c     # -------------------------------------------------
-
-c     # Set mapping scaling
-      scale = 1
-      rot_angle(1) = 0
-      rot_angle(2) = 0.0
-      call setup_mappedgrid(rot_angle,scale)
 
 c     # -------------------------------------------------
 c     # Setup location of cosine or Gaussians in array wc.
