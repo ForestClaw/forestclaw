@@ -23,4 +23,3 @@ include applications/advection/2d/sphere/Makefile.am
 include applications/advection/2d/filament/Makefile.am
 include applications/advection/2d/torus/Makefile.am
 include applications/NCAR_transport/slotted_disk/Makefile.am
-include applications/euler/2d/quadrants/Makefile.am
