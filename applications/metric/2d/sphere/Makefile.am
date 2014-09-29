@@ -9,7 +9,6 @@ applications_metric_2d_sphere_metric_SOURCES = \
 	applications/metric/2d/sphere/metric_diagnostics.cpp \
 	applications/metric/2d/sphere/tag4refinement.f \
 	applications/metric/2d/sphere/metric_output.f \
-	applications/metric/2d/sphere/metric_check.f \
 	applications/metric/2d/sphere/setprob.f \
 	applications/metric/2d/sphere/diagnostics.f \
 	applications/metric/2d/sphere/fclaw2d_map_nomap.c \

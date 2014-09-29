@@ -72,6 +72,8 @@ void cb_min_cell_area(fclaw2d_domain_t *domain,
 
     ClawPatch *cp = get_clawpatch(this_patch);
     double *area = cp->area();
+    double dx = cp->dx();
+    double dy = cp->dy();
 
     min_grid_cell_area_(mx,my,mbc,area,minvalue);
 }
@@ -91,30 +93,11 @@ void cb_max_cell_area(fclaw2d_domain_t *domain,
 
     ClawPatch *cp = get_clawpatch(this_patch);
     double *area = cp->area();
+    double dx = cp->dx();
+    double dy = cp->dy();
 
     max_grid_cell_area_(mx,my,mbc,area,maxvalue);
 }
-
-void cb_compute_error_torus(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             void *user)
-{
-    double *maxvalue = (double*) user;
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double *area = cp->area();
-
-    max_grid_cell_area_(mx,my,mbc,area,maxvalue);
-}
-
-
-
 
 void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
 {
@@ -132,6 +115,7 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     {
         /* Only compare ratio of smallest grid cell to largest if the grid is
            uniformly refined */
+
         double minvalue = 100;
         fclaw2d_domain_iterate_patches(domain,cb_min_cell_area,(void *) &minvalue);
         minvalue = fclaw2d_domain_global_minimum (domain, minvalue);
@@ -142,8 +126,8 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
 
         if (domain->mpirank == 0)
         {
-            printf("%30s %24.16f\n","Minimum value",minvalue);
-            printf("%30s %24.16f\n","Maximum value",maxvalue);
+            printf("%30s %24.16e\n","Minimum value",minvalue);
+            printf("%30s %24.16e\n","Maximum value",maxvalue);
             printf("%30s %24.8f\n","Ratio of largest to smallest",maxvalue/minvalue);
             printf("\n\n");
         }
