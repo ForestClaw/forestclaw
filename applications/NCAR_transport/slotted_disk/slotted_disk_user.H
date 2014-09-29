@@ -50,6 +50,7 @@ extern "C"
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           double q[], const int& maux, double aux[],
+                          const int& blockno, fclaw2d_map_context_t **cont,
                           double xp[], double yp[], double zp[]);
 
     void setaux_transport_(const int& mx, const int& my, const int& mbc,
@@ -142,6 +143,16 @@ void slotted_disk_parallel_write_output(fclaw2d_domain_t *domain,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         int iframe,int num,int level);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double shift[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double shfit[],
+                                                      const double rotate[]);
+
+
 
 #ifdef __cplusplus
 #if 0

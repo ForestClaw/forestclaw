@@ -117,9 +117,6 @@ void slotted_disk_qinit(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* -------------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -149,8 +146,10 @@ void slotted_disk_qinit(fclaw2d_domain_t *domain,
     double *zp = cp->zp();
 
     /* -------------------------------------------------------------- */
+    int blockno = this_block_idx;
+    fclaw2d_map_context_t *cont = get_map_context(domain);
     qinit_transport_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,maux,aux,
-                     xp,yp,zp);
+                     blockno,&cont,xp,yp,zp);
 }
 
 void slotted_disk_patch_physical_bc(fclaw2d_domain *domain,
@@ -295,7 +294,7 @@ void slotted_disk_parallel_write_header(fclaw2d_domain_t* domain,
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Increase the number of fields by 1 so we can printout the mpi rank
-    int mfields = gparms->meqn + 1;
+    int mfields = gparms->meqn;
     int maux = 0;
     slotted_disk_write_tfile_(iframe,time,mfields,ngrids,maux);
 
@@ -336,7 +335,7 @@ void slotted_disk_parallel_write_output(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     /* -------------------------------------------------------------- */
-    int matlab_level = level + 1;
+    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     /* This opens a file for append and writes in the 'clawout' style. */

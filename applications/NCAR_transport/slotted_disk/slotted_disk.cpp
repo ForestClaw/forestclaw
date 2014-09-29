@@ -25,9 +25,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_single_step.h>
 #include <fclaw2d_clawpack.H>
-
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
 
 #include "slotted_disk_user.H"
 
@@ -35,20 +38,45 @@ int
 main (int argc, char **argv)
 {
   int			lp;
+  int                   example;
   MPI_Comm		mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
+  p4est_connectivity_t  *conn = NULL;
+  fclaw2d_map_context_t *cont = NULL;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
+
+  double theta, phi;
+
+#ifdef TRAPFPE
+  printf("Enabling floating point traps\n");
+  feenableexcept(FE_INVALID);
+#endif
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
+#ifdef MPI_DEBUG
+  /* this has to go after MPI has been initialized */
+  fclaw2d_mpi_debug();
+#endif
+
+
   /* ---------------------------------------------------------------
      Read in parameters and options
      --------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
+  sc_options_add_int (options, 0, "example", &example, 0,
+                      "1 for pillow grid, "\
+                      "2 for cubed sphere ");
+
+  sc_options_add_double (options, 0, "theta", &theta, 0,
+                         "Rotation angle theta (degrees) about z axis [0]");
+
+  sc_options_add_double (options, 0, "phi", &phi, 0,
+                         "Rotation angle phi (degrees) about x axis [0]");
 
   /* Read parameters from .ini file */
   gparms = amr_options_new (options); // Sets default values
@@ -66,8 +94,54 @@ main (int argc, char **argv)
   /* ---------------------------------------------------------------
      Domain geometry
      --------------------------------------------------------------- */
-  /* For slotted_disk */
-  domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
+
+  double pi = M_PI;
+  double rotate[2];
+  rotate[0] = pi*theta/180.0;
+  rotate[1] = pi*phi/180.0;
+  double scale[3];
+  double shift[3];
+
+  switch (example) {
+  case 1:
+      conn = p4est_connectivity_new_pillow();
+      cont = fclaw2d_map_new_pillowsphere(scale,shift,rotate);
+      break;
+  case 2:
+      conn = p4est_connectivity_new_cubed();
+      cont = fclaw2d_map_new_cubedsphere(scale,shift,rotate);
+      break;
+  default:
+      sc_abort_collective ("Parameter example must be 1 (pillow sphere) or 2 (cubed sphere)");
+  }
+
+  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+  /* ----------------------------------------------------------
+     Set mapping context for Fortran.  The context will now be
+     available via get_context(), as a integer*8.  This argument
+     will show up as a (fclaw2d_map_context_t**) in C/C++.
+     From Fortran, use
+
+     c      # From fortran :
+            integer*8 cont
+            integer blockno
+
+     c      # .......
+
+            cont = get_context()
+            blockno = get_block()
+
+     c      # Call the mapping function
+            call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+
+     c      # .......
+
+     to retrieve the context.  Note that this is only be used for
+     passing the context to a C/C++ routine.  Do not expect to be
+     able to access fields of the cont structure from Fortran.
+     ---------------------------------------------------------- */
+  SET_CONTEXT(&cont);
 
   if (gparms->verbosity > 0)
   {
@@ -99,6 +173,7 @@ main (int argc, char **argv)
   /* --------------------------------------------------
      Clean up.
      -------------------------------------------------- */
+  fclaw2d_map_destroy (cont);
   amr_options_destroy(gparms);
   sc_options_destroy(options);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
