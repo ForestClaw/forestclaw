@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 #include "quadrants_user.H"
 
 #ifdef __cplusplus
@@ -51,7 +51,7 @@ void quadrants_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &quadrants_parallel_write_header;
     of->f_patch_write_output = &quadrants_parallel_write_output;
 
-    amr_waveprop_link_to_clawpatch();
+    fclaw2d_clawpack_link_to_clawpatch();
 }
 
 void quadrants_problem_setup(fclaw2d_domain_t* domain)
@@ -59,7 +59,7 @@ void quadrants_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    amr_waveprop_setprob(domain);
+    fclaw2d_clawpack_setprob(domain);
 }
 
 
@@ -71,7 +71,7 @@ void quadrants_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    amr_waveprop_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -84,8 +84,8 @@ void quadrants_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    amr_waveprop_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc, time_interp);
+    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+                         t,dt,intersects_bc, time_interp);
 }
 
 
@@ -96,10 +96,8 @@ double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-  //amr_waveprop_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
-
-    double maxcfl = amr_waveprop_step2(domain,this_patch,this_block_idx,
-                                       this_patch_idx,t,dt);
+    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
+                                           this_patch_idx,t,dt);
     return maxcfl;
 }
 
@@ -108,9 +106,9 @@ double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
 fclaw_bool quadrants_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag)
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          int initflag)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -176,7 +174,7 @@ void quadrants_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int n
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn + 1;
+    int mfields = gparms->meqn;
     int maux = 0;
     quadrants_write_tfile_(iframe,time,mfields,ngrids,maux);
 
@@ -190,9 +188,6 @@ void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *
                                      int this_block_idx, int this_patch_idx,
                                      int iframe,int num,int level)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -213,17 +208,11 @@ void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ------------------------------------------------------------- */
-    // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level + 1;
 
     int mpirank = domain->mpirank;
-    quadrants_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                           iframe,num,matlab_level,this_block_idx,mpirank);
+    quadrants_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                           iframe,num,level,this_block_idx,mpirank);
 }
 
 

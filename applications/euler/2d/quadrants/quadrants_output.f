@@ -34,17 +34,17 @@
 
       end
 
-      subroutine quadrants_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine quadrants_write_qfile(meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
      &      mpirank)
 
       implicit none
 
-      integer maxmx, maxmy,meqn,mbc,mx,my, mpirank
+      integer meqn,mbc,mx,my, mpirank
       integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
 
-      double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       character*10 matname1
       integer matunit1
@@ -62,10 +62,11 @@
 
       open(matunit1,file=matname1,access='append');
 
-      write(matunit1,1001) patch_num, level, blockno, mx, my
+      write(matunit1,1001) patch_num,level,blockno,mpirank,mx, my
  1001 format(i5,'                 grid_number',/,
      &       i5,'                 AMR_level',/,
      &       i5,'                 block_number',/,
+     &       i5,'                 mpi_rank',/,
      &       i5,'                 mx',/,
      &       i5,'                 my')
 
@@ -92,11 +93,11 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
                endif
             enddo
 
-            write(matunit1,120) mpirank,(q(i,j,mq),mq=1,meqn)
+            write(matunit1,120) (q(i,j,mq),mq=1,meqn)
          enddo
          write(matunit1,*) ' '
       enddo
-  120 format (I5,50E26.16)
+  120 format (50E26.16)
 
       close(matunit1)
 

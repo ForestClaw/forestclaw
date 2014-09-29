@@ -1,17 +1,13 @@
-c     ==================
       subroutine setprob
-c     ==================
+      implicit none
 
-      implicit double precision (a-h,o-z)
+      double precision gamma,gamma1
       common /param/  gamma,gamma1
-c
-      open(unit=7,file='setprob.data',status='old',form='formatted')
 
-c
-       read(7,*) gamma
-       gamma1 = gamma - 1.d0
+      open(unit=7,file='setprob.data')
 
-       call set_maptype()
+      read(7,*) gamma
+      gamma1 = gamma - 1.d0
 
       return
       end

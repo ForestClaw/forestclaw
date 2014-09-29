@@ -1,35 +1,5 @@
-
-c
-c
-c     =====================================================
       subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
      &                  wave,s,amdq,apdq)
-c     =====================================================
-c
-c     # Roe-solver for the Euler equations
-c     # mwaves = 4:  separate shear and entropy waves.
-c
-c     # solve Riemann problems along one slice of data.
-c
-c     # On input, ql contains the state vector at the left edge of each cell
-c     #           qr contains the state vector at the right edge of each cell
-c
-c     # This data is along a slice in the x-direction if ixy=1 
-c     #                            or the y-direction if ixy=2.
-c     # On output, wave contains the waves, s the speeds, 
-c     # and amdq, apdq the decomposition of the flux difference
-c     #   f(qr(i-1)) - f(ql(i))  
-c     # into leftgoing and rightgoing parts respectively.
-c     # With the Roe solver we have   
-c     #    amdq  =  A^- \Delta q    and    apdq  =  A^+ \Delta q
-c     # where A is the Roe matrix.  An entropy fix can also be incorporated
-c     # into the flux differences.
-c
-c     # Note that the i'th Riemann problem has left state qr(i-1,:)
-c     #                                    and right state ql(i,:)
-c     # From the basic clawpack routines, this routine is called with ql = qr
-c
-c
       implicit double precision (a-h,o-z)
 c
       dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
@@ -47,14 +17,14 @@ c     ------------
       common /param/  gamma,gamma1
       common /comroe/ u2v2(-1:maxm2),
      &       u(-1:maxm2),v(-1:maxm2),enth(-1:maxm2),a(-1:maxm2),
-     &       g1a2(-1:maxm2),euv(-1:maxm2) 
+     &       g1a2(-1:maxm2),euv(-1:maxm2)
 c
       data efix /.true./    !# use entropy fix for transonic rarefactions
 c
       if (-1.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
          write(6,*) 'need to increase maxm2 in rpn2'
          stop
-         endif
+      endif
 c
 c     # set mu to point to  the component of the system that corresponds
 c     # to momentum in the direction of this slice, mv to the orthogonal
@@ -68,7 +38,7 @@ c
           mv = 2
         endif
 c
-c     # note that notation for u and v reflects assumption that the 
+c     # note that notation for u and v reflects assumption that the
 c     # Riemann problems are in the x-direction with u in the normal
 c     # direciton and v in the orthogonal direcion, but with the above
 c     # definitions of mu and mv the routine also works with ixy=2
@@ -96,7 +66,7 @@ c
          a2 = gamma1*(enth(i) - .5d0*u2v2(i))
          a(i) = dsqrt(a2)
          g1a2(i) = gamma1 / a2
-         euv(i) = enth(i) - u2v2(i) 
+         euv(i) = enth(i) - u2v2(i)
    10    continue
 c
 c
@@ -108,14 +78,14 @@ c     # find a1 thru a4, the coefficients of the 4 eigenvectors:
          delta(2) = ql(i,mu) - qr(i-1,mu)
          delta(3) = ql(i,mv) - qr(i-1,mv)
          delta(4) = ql(i,4) - qr(i-1,4)
-         a3 = g1a2(i) * (euv(i)*delta(1) 
+         a3 = g1a2(i) * (euv(i)*delta(1)
      &      + u(i)*delta(2) + v(i)*delta(3) - delta(4))
          a2 = delta(3) - v(i)*delta(1)
          a4 = (delta(2) + (a(i)-u(i))*delta(1) - a(i)*a3) / (2.d0*a(i))
          a1 = delta(1) - a3 - a4
 c
 c        # Compute the waves.
-c        # Note that the 2-wave and 3-wave travel at the same speed and 
+c        # Note that the 2-wave and 3-wave travel at the same speed and
 c        # are lumped together in wave(.,.,2).  The 4-wave is then stored in
 c        # wave(.,.,3).
 c
@@ -173,7 +143,7 @@ c
                  endif
    90          continue
   100       continue
-      go to 900     
+      go to 900
 c
 c-----------------------------------------------------
 c
@@ -193,7 +163,7 @@ c        # check 1-wave:
 c        ---------------
 c
          rhoim1 = qr(i-1,1)
-         pim1 = gamma1*(qr(i-1,4) - 0.5d0*(qr(i-1,mu)**2 
+         pim1 = gamma1*(qr(i-1,4) - 0.5d0*(qr(i-1,mu)**2
      &           + qr(i-1,mv)**2) / rhoim1)
          cim1 = dsqrt(gamma*pim1/rhoim1)
          s0 = qr(i-1,mu)/rhoim1 - cim1     !# u-c in left state (cell i-1)
@@ -204,7 +174,7 @@ c            # everything is right-going
              do 60 m=1,meqn
                 amdq(i,m) = 0.d0
    60           continue
-             go to 200 
+             go to 200
              endif
 c
          rho1 = qr(i-1,1) + wave(i,1,1)
@@ -241,7 +211,7 @@ c        # check 4-wave:
 c        ---------------
 c
          rhoi = ql(i,1)
-         pi = gamma1*(ql(i,4) - 0.5d0*(ql(i,mu)**2 
+         pi = gamma1*(ql(i,4) - 0.5d0*(ql(i,mu)**2
      &           + ql(i,mv)**2) / rhoi)
          ci = dsqrt(gamma*pi/rhoi)
          s3 = ql(i,mu)/rhoi + ci     !# u+c in right state  (cell i)
@@ -259,7 +229,7 @@ c            # transonic rarefaction in the 4-wave
            else if (s(i,4) .lt. 0.d0) then
 c            # 4-wave is leftgoing
              sfract = s(i,4)
-           else 
+           else
 c            # 4-wave is rightgoing
              go to 200
            endif

@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define QUADRANTS_USER_H
 
 #include "amr_forestclaw.H"
-#include "amr_waveprop.H"
+#include "fclaw2d_clawpack.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,20 +40,20 @@ extern "C"
 extern "C"
 {
     void quadrants_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn, const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double q[], const int& init_flag, int& tag_patch);
+                                   const int& meqn, const double& xlower,
+                                   const double& ylower, const double& dx, const double& dy,
+                                   double q[], const int& init_flag, int& tag_patch);
 
     void quadrants_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn,const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double qcoarsened[], int& tag_patch);
+                                   const int& meqn,const double& xlower,
+                                   const double& ylower, const double& dx, const double& dy,
+                                   double qcoarsened[], int& tag_patch);
 
     void quadrants_write_tfile_(const int& iframe,const double& time,
                                 const int& mfields,const int& ngrids,
                                 const int& maux);
 
-    void quadrants_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+    void quadrants_write_qfile_(const int& meqn,
                                 const int& mbc, const int& mx,const int& my,
                                 const double& xlower,const double& ylower,
                                 const double& dx, const double& dy,
@@ -79,35 +79,49 @@ void quadrants_patch_initialize(fclaw2d_domain_t *domain,
                             int this_patch_idx);
 
 void quadrants_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp);
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 double t,
+                                 double dt,
+                                 fclaw_bool intersects_bc[],
+                                 fclaw_bool time_interp);
 
 double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt);
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx,
+                                          int this_patch_idx,
+                                          double t,
+                                          double dt);
 
 fclaw_bool quadrants_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
+                                          fclaw2d_patch_t *this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          int initflag);
 
 fclaw_bool quadrants_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
+                                          fclaw2d_patch_t *this_patch,
+                                          int blockno,
+                                          int patchno);
 void quadrants_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
 void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                      int this_block_idx, int this_patch_idx,
                                      int iframe,int num,int level);
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity();
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+                                            const double shift[],
+                                            const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double rotate[],
+                                                 const double alpha);
+
 
 
 #ifdef __cplusplus
