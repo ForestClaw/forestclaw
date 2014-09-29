@@ -4,15 +4,13 @@
       integer mx,my,mbc
       double precision dx,dy
       double precision sum
-      integer*8 cont, get_context
-      integer blockno, get_block
       integer i,j
 
       include 'metric_terms.i'
 
       sum = 0
-      do i = 1,mx
-         do j = 1,my
+      do j = 1,my
+         do i = 1,mx
             sum = sum + area(i,j)
          enddo
       enddo
@@ -28,8 +26,6 @@
       integer mx,my,mbc
       double precision dx,dy,dxdy
       double precision minvalue
-      integer*8 cont, get_context
-      integer blockno, get_block
       integer i,j
 
       include 'metric_terms.i'
@@ -52,8 +48,6 @@ c     # compare it here.
       integer mx,my,mbc
       double precision dx,dy,dxdy
       double precision maxvalue
-      integer*8 cont, get_context
-      integer blockno, get_block
       integer i,j
 
       include 'metric_terms.i'

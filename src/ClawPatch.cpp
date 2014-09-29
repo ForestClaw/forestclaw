@@ -200,6 +200,27 @@ FArrayBox ClawPatch::newGrid()
     return A;
 }
 
+Box ClawPatch::dataBox()
+{
+    return m_griddata.box();
+}
+
+Box ClawPatch::areaBox()
+{
+    return m_area.box();
+}
+
+Box ClawPatch::edgeBox()
+{
+    return m_edge_lengths.box();
+}
+
+Box ClawPatch::nodeBox()
+{
+    return m_xp.box();
+}
+
+
 /* Return a pointer to either time interpolated data or regular grid data */
 double* ClawPatch::q_time_sync(fclaw_bool time_interp)
 {
@@ -604,9 +625,6 @@ void ClawPatch::set_block_corner_count(const int icorner, const int block_corner
 
 void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
 {
-    // Set fortran common block
-    // set_block_(&m_blockno);
-
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -696,7 +714,13 @@ void ClawPatch::setup_manifold(const int& level, const amr_options_t *gparms)
    Output and diagnostics
    ---------------------------------------------------------------- */
 
+int ClawPatch::size()
+{
+    /* Use this to create new data */
+    return m_griddata.size();
+}
 
+#if 0
 void ClawPatch::write_patch_data(const int& a_iframe,
                                  const int& a_patch_num, const int& a_level)
 {
@@ -713,6 +737,7 @@ double ClawPatch::compute_sum()
     compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,area,sum);
     return sum;
 }
+#endif
 
 #if 0
 void ClawPatch::dump(int mq)

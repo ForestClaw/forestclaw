@@ -1,14 +1,14 @@
       subroutine metric_output(meqn,mbc,mx,my,
-     &      xlower,ylower, dx,dy,area,curvature,iframe,
+     &      xlower,ylower, dx,dy,q,iframe,
      &      patch_num,level,blockno,mpirank)
+     &      bind(c,name="metric_output")
 
       implicit none
 
       integer meqn,mbc,mx,my, maux, mpirank
       integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
-
-      double precision qv(3)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer m,mfields
 
       character*10 matname1
@@ -55,15 +55,12 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
       mfields = 3
       do j = 1,my
          do i = 1,mx
-            qv(1) = area(i,j)
-            qv(2) = curvature(i,j)
-            qv(3) = log10(abs(curvature(i,j)-1))
             do m = 1,mfields
-               if (abs(qv(m)) .lt. 1d-99) then
-                  qv(m) = 0.d0
+               if (abs(q(i,j,m)) .lt. 1d-99) then
+                  q(i,j,m) = 0.d0
                endif
             enddo
-            write(matunit1,120) (qv(m), m=1,mfields)
+            write(matunit1,120) (q(i,j,m), m=1,mfields)
          enddo
          write(matunit1,*) ' '
       enddo

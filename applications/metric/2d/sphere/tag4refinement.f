@@ -1,10 +1,11 @@
       subroutine metric_tag4refinement(mx,my,mbc,meqn,xlower,ylower,
-     &      dx,dy,curvature,init_flag, blockno, tag_patch)
+     &      dx,dy,q,init_flag, blockno, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
       integer blockno
       double precision xlower, ylower, dx, dy, xc
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, m
 
@@ -13,7 +14,7 @@
       tag_patch = 0
       do i = 1,mx
          do j = 1,my
-            if (abs(curvature(i,j)-1) .gt. 1e-4) then
+            if (q(i,j,3) .gt. 5e-6) then
                tag_patch = 1
                return
             endif
@@ -24,13 +25,12 @@
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
       subroutine metric_tag4coarsening(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,qcoarsened, tag_patch)
+     &      xlower,ylower,dx,dy,q, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch
       double precision xlower, ylower, dx, dy
-      double precision qcoarsened(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
+      double precision q(1-mbc:mx+mbc,1-mbc:my+1,meqn)
       integer i,j
       double precision qmin, qmax
 
@@ -45,9 +45,7 @@ c     # we would coarsen an initial grid.
       tag_patch = 0
       do i = 1,mx
          do j = 1,my
-            qmin = min(qcoarsened(i,j,1),qmin)
-            qmax = max(qcoarsened(i,j,1),qmax)
-            if (qmax - qmin .gt. 0.5d0) then
+            if (q(i,j,3) .gt. 5e-6) then
                tag_patch = 1
                return
             endif

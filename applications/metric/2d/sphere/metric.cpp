@@ -96,12 +96,12 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_cart (scale, shift,rotate);
       break;
   case 2:
-      /* Map [0,1],[0,1] to five patch square */
+      /* Map [0,1],[0,1] to five patch square [-1,1]x[-1,1] */
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_fivepatch (scale,shift,rotate, alpha);
       break;
   case 3:
-      /* Map [0,1],[0,1] to squared disk */
+      /* Map [0,1],[0,1] to squared disk (radius 1, centered at the origin) */
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_squareddisk (scale,shift,rotate,alpha);
       break;
@@ -180,7 +180,6 @@ main (int argc, char **argv)
 
   int iframe = 0;
   amrout(domain,iframe);
-
 
   /* amrrun(&domain); */
 

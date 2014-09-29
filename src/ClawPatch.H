@@ -62,6 +62,11 @@ public :
     double* q_time_interp();
     FArrayBox newGrid();
 
+    Box dataBox();  /* Box containing data pointer q */
+    Box areaBox();  /* Box containing area */
+    Box edgeBox();  /* Box containing edge based values */
+    Box nodeBox();  /* Box containing nodes */
+
     /* ----------------------------------------------------------------
        Internal boundary conditions
        ---------------------------------------------------------------- */
@@ -167,16 +172,10 @@ public :
     void set_block_corner_count(const int icorner, const int block_corner_count);
 
     // ----------------------------------------------------------------
-    // Output and diagnostics
+    // Miscellaneous
     // ----------------------------------------------------------------
-    void write_patch_data(const int& a_iframe,
-                          const int& a_patch_num,
-                          const int& a_level);
-    double compute_sum();
 
-    void dump(int mq);
-    void dump_last();
-    void dump_time_interp();
+    int size();
 
     // ----------------------------------------------------------------
     // Access functions

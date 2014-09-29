@@ -41,24 +41,43 @@ extern "C"
                        const double xd[], double yd[],const double zd[],
                        const double area[], const int& mpirank);
 
-    void metric_output_(const int& meqn,
-                        const int& mbc, const int& mx, const int& my,
-                        const double& xlower, const double& ylower,
-                        const double& dx, const double& dy,
-                        double area[], double curvature[],
-                        const int& iframe, const int& patch_num,
-                        const int& level, const int& blockno, const int& mpirank);
+    /* Using iso_c_binding here */
+    void compute_error(const int& meqn,const int& mbc,const int& mx,const int& my,
+                       fclaw2d_map_context_t** cont,const int& blockno,
+                       const double& xlower,const double& ylower,
+                       const double& dx,const double& dy,
+                       const double curvature[],const double error_ptr[]);
+
+    /* Using iso_c_binding here */
+    void initialize(const int& mx, const int& my,
+                    const int& meqn, const int& mbc,
+                    fclaw2d_map_context_t** cont, const int& blockno,
+                    const double& xlower, const double& ylower,
+                    const double& dx, const double& dy,
+                    double q[], const double error[],
+                    const double curvature[], const double area[]);
+
+
+    /* Using iso_c_binding here */
+    void metric_output(const int& meqn,
+                       const int& mbc, const int& mx, const int& my,
+                       const double& xlower, const double& ylower,
+                       const double& dx, const double& dy,
+                       const double q[],const int& iframe, const int& patch_num,
+                       const int& level, const int& blockno, const int& mpirank);
 
     void metric_tag4refinement_(const int& mx, const int& my, const int& mbc,
-                                const int& meqn,const double& xlower, const double& ylower,
+                                const int& meqn,
+                                const double& xlower, const double& ylower,
                                 const double& dx, const double& dy,
-                                double curvature[], const int& init_flag,
+                                const double q[], const int& init_flag,
                                 const int& blockno, const int& tag_patch);
 
     void metric_tag4coarsening_(const int& mx, const int& my, const int& mbc,
-                                const int& meqn,const double& xlower, const double& ylower,
+                                const int& meqn,
+                                const double& xlower, const double& ylower,
                                 const double& dx, const double& dy,
-                                double qcoarsened[], const int& tag_patch);
+                                double q[], const int& tag_patch);
 
     double total_area_(const int& mx, const int& my, const int& mbc,
                      const double area[]);
@@ -70,7 +89,13 @@ extern "C"
     void max_grid_cell_area_(const int& mx, const int& my, const int& mbc,
                              const double& dx, const double& dy,
                              const double area[], double *maxvalue);
+    void metric_patch_initialize(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx);
+
 }
+
 
 #ifdef __cplusplus
 extern "C"

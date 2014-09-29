@@ -9,8 +9,8 @@ global notpillowsphere;
 % map = 'pillowdisk';      % 4
 % map = 'pillowdisk5';     % 5
 % map = 'pillowsphere';    % 6
-% map = 'cubedsphere';     % 7
-map = 'torus';           % 8
+map = 'cubedsphere';     % 7
+% map = 'torus';           % 8
 
 alpha = 0.5;
 

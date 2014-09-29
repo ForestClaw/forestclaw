@@ -59,8 +59,11 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 
     /* These can probably be replaced by C functions at some point. */
 
-    /* scale_map(cont,xp,yp,zp); */
-    rotate_map(cont,xp,yp,zp);
+    /*
+      scale_map(cont,xp,yp,zp);
+      shift_map(cont,xp,yp,zp);
+      rotate_map(cont,xp,yp,zp);
+    */
 }
 
 fclaw2d_map_context_t *
@@ -73,8 +76,12 @@ fclaw2d_map_context_t *
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowsphere;
     cont->mapc2m = fclaw2d_map_c2m_pillowsphere;
-    set_rotate(cont,rotate);
-    /* set_scale(cont,scale); */
+
+    /*
+      set_scale(cont,scale);
+      set_shift(cont,shift);
+      set_rotate(cont,rotate);
+    */
 
     return cont;
 }

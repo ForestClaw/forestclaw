@@ -37,6 +37,32 @@ extern "C"
 #endif
 
 static
+double metric_surface_area(fclaw2d_map_context_t* cont)
+{
+    double exact_area;
+
+    double alpha = 0.4;
+    if (FCLAW2D_MAP_IS_DISK(&cont))
+    {
+        exact_area = M_PI;
+    }
+    else if (FCLAW2D_MAP_IS_SPHERE(&cont))
+    {
+        exact_area = 4.0*M_PI;
+    }
+    else if (FCLAW2D_MAP_IS_TORUS(&cont))
+    {
+        exact_area = 4.0*alpha*(M_PI)*(M_PI);
+    }
+    else
+    {
+        exact_area = 4.0;
+    }
+    return exact_area;
+}
+
+
+static
 void cb_total_area(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
                    int this_block_idx,
@@ -107,7 +133,13 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     sum = fclaw2d_domain_global_sum (domain, sum);
     if (domain->mpirank ==0)
     {
+        fclaw2d_map_context_t* cont = get_map_context(domain);
+        double exact_area = metric_surface_area(cont);
+
         printf("%30s %24.16f\n","Total area",sum);
+        printf("%30s %24.16f\n","Exact area",exact_area);
+        printf("%30s %24.4e\n","Error ",fabs(exact_area-sum));
+        printf("\n");
     }
 
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -126,13 +158,12 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
 
         if (domain->mpirank == 0)
         {
-            printf("%30s %24.16f\n","Minimum value",minvalue);
-            printf("%30s %24.16f\n","Maximum value",maxvalue);
+            printf("%30s %24.8e\n","Minimum value (kappa)",minvalue);
+            printf("%30s %24.8e\n","Maximum value (kappa)",maxvalue);
             printf("%30s %24.8f\n","Ratio of largest to smallest",maxvalue/minvalue);
             printf("\n\n");
         }
     }
-
 }
 
 

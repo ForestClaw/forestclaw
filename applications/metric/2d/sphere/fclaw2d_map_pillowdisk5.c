@@ -58,11 +58,11 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
     /*
-    rotate_map(cont,xp,yp,zp);
-    shift_map(cont, xp,yp,zp);
+      scale_map(cont,xp,yp,zp);
+      rotate_map(cont,xp,yp,zp);
+      shift_map(cont, xp,yp,zp);
     */
 }
-
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                        const double shift[],
@@ -77,9 +77,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 
     cont->user_double[0] = alpha;
 
-    set_rotate(cont, rotate);
-    set_scale(cont, scale);
-    set_shift(cont, shift);
+    /*
+       set_rotate(cont, rotate);
+       set_scale(cont, scale);
+       set_shift(cont, shift);
+    */
 
     return cont;
 }

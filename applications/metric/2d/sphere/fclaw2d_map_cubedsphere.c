@@ -57,9 +57,11 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-    /* scale_map(cont,xp,yp,zp); */
-    rotate_map(cont,xp,yp,zp);
+    /*
+       scale_map(cont,xp,yp,zp);
+       shift_map(cont,xp,yp,zp);
+       rotate_map(cont,xp,yp,zp);
+    */
 }
 
 fclaw2d_map_context_t *
@@ -73,11 +75,11 @@ fclaw2d_map_context_t *
     cont->query = fclaw2d_map_query_cubedsphere;
     cont->mapc2m = fclaw2d_map_c2m_cubedsphere;
 
-    /* This stores rotate/scale parameters in common blocks for later
-       retrieval by scale_map/rotate_map (called above).  These parameters
-       can of course be stored as variables in a context field */
-    set_rotate(cont,rotate);
-    /* set_scale(cont,scale); */
+    /*
+      set_scale(cont,scale);
+      set_shift(cont,shift);
+      set_rotate(cont,rotate);
+    */
 
     return cont;
 }

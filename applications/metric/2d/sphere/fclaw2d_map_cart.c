@@ -38,12 +38,15 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
         return 0;
     default:
+        return 0;
+#if 0
         printf("\n");
         printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
                "Query id not identified;  Maybe the query is not up to "\
                "date?\nSee fclaw2d_map_cart.h.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
+#endif
     }
     return 0;
 }
@@ -57,11 +60,12 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     /* Unit square in [-1,1]x[-1,1] */
     MAPC2M_CART(&blockno,&xc,&yc,xp,yp,zp);
 
-    /* Scale and shift to [0,1]x[0,1] */
-    scale_map(cont,xp,yp,zp);
-    shift_map(cont,xp,yp,zp);
+    /*
+       scale_map(cont,xp,yp,zp);
+       shift_map(cont,xp,yp,zp);
+       rotate_map(cont,xp,yp,zp);
+    */
 }
-
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
                                             const double shift[],
@@ -73,9 +77,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
 
+    /*
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);
+    */
 
 
     return cont;
