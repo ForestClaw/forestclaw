@@ -21,12 +21,12 @@
       end
 
 
-      subroutine min_grid_cell_area(mx,my,mbc,area,
-     &      minvalue)
+      subroutine min_grid_cell_area(mx,my,mbc,dx,dy,
+     &      area,minvalue)
       implicit none
 
       integer mx,my,mbc
-      double precision dx,dy
+      double precision dx,dy,dxdy
       double precision minvalue
       integer*8 cont, get_context
       integer blockno, get_block
@@ -36,20 +36,21 @@
 
 c     # minvalue comes in with a value;  we only
 c     # compare it here.
+      dxdy = dx*dy
       do i = 1,mx
          do j = 1,my
-            minvalue = min(minvalue,area(i,j))
+            minvalue = min(minvalue,area(i,j)/dxdy)
          enddo
       enddo
 
       end
 
-      subroutine max_grid_cell_area(mx,my,mbc,area,
-     &      maxvalue)
+      subroutine max_grid_cell_area(mx,my,mbc,dx,dy,
+     &      area,maxvalue)
       implicit none
 
       integer mx,my,mbc
-      double precision dx,dy
+      double precision dx,dy,dxdy
       double precision maxvalue
       integer*8 cont, get_context
       integer blockno, get_block
@@ -59,9 +60,10 @@ c     # compare it here.
 
 c     # maxvalue comes in with a value;  we only
 c     # compare it here.
+      dxdy = dx*dy
       do i = 1,mx
          do j = 1,my
-            maxvalue = max(maxvalue,area(i,j))
+            maxvalue = max(maxvalue,area(i,j)/dxdy)
          enddo
       enddo
 

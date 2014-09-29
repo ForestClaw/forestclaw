@@ -64,10 +64,12 @@ extern "C"
                      const double area[]);
 
     void min_grid_cell_area_(const int& mx, const int& my, const int& mbc,
-                               const double area[],double *minvalue);
+                             const double& dx, const double& dy,
+                             const double area[],double *minvalue);
 
     void max_grid_cell_area_(const int& mx, const int& my, const int& mbc,
-                               const double area[], double *maxvalue);
+                             const double& dx, const double& dy,
+                             const double area[], double *maxvalue);
 }
 
 #ifdef __cplusplus
