@@ -173,7 +173,7 @@ amr_options_new (sc_options_t * opt)
                         "Maximum refinement level");
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
-                        0, "Regrid every ''regrid_interval'' steps");
+                        1, "Regrid every ''regrid_interval'' steps [1]");
 
 
     sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower (ax)");
