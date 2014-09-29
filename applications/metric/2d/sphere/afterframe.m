@@ -3,8 +3,9 @@ daspect([1 1 1]);
 
 colormap(jet);
 
-showpatchborders;
+hidepatchborders;
 setviews;
+axis off;
 
 NoQuery = 0;
 prt = false;

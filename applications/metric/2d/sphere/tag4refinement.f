@@ -14,7 +14,7 @@
       tag_patch = 0
       do i = 1,mx
          do j = 1,my
-            if (q(i,j,3) .gt. 5e-6) then
+            if (q(i,j,3) .gt. 1e-5) then
                tag_patch = 1
                return
             endif
@@ -45,7 +45,7 @@ c     # we would coarsen an initial grid.
       tag_patch = 0
       do i = 1,mx
          do j = 1,my
-            if (q(i,j,3) .gt. 5e-6) then
+            if (q(i,j,3) .gt. 1e-5) then
                tag_patch = 1
                return
             endif

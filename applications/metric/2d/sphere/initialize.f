@@ -15,12 +15,9 @@
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-c            q(i,j,1) = area(i,j)
-c            q(i,j,2) = curvature(i,j)
-c            q(i,j,3) = error(i,j)
-            q(i,j,1) = 0
-            q(i,j,2) = 0
-            q(i,j,3) = 0
+            q(i,j,1) = area(i,j)
+            q(i,j,2) = curvature(i,j)
+            q(i,j,3) = error(i,j)*area(i,j)
          enddo
       enddo
 
