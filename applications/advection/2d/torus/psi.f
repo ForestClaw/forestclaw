@@ -1,18 +1,22 @@
       double precision function psi(x,y,z,t)
       implicit none
 
-      double precision x, y, z, t
-      double precision pi, r2
+      double precision x, y, z, t,r
+      double precision pi, r2, phi, pi2, alpha
       logical iscart
+      double precision revs_per_s
 
       common /compi/ pi
 
+      revs_per_s = 1.d0
 
+      alpha = 0.4d0
+      pi2 = 2*pi
       if (iscart()) then
          psi = x
       else
-         r2 = x*x + y*y
-         psi = -r2/2.d0
+c        # Finally works... !
+         psi = revs_per_s*pi2*alpha*(pi2*y + alpha*sin(pi2*y))
       endif
 
       end
