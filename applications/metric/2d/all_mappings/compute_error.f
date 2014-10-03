@@ -24,10 +24,9 @@ c     # Copied from 'metric_terms.i' (which, unfortunately, also includes xp,yp,
          do j = 1,mx
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
 
             if (fclaw2d_map_is_sphere(cont)) then
-               error(i,j) = abs(curvature(i,j)-1)
+               error(i,j) = abs(curvature(i,j)-1.d0)
             elseif (fclaw2d_map_is_torus(cont)) then
                kappa = (1 + 2*alpha*cos(2*pi*yc))/
      &               (2*alpha*(1 + alpha*cos(2*pi*yc)))

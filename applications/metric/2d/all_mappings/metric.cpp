@@ -188,6 +188,7 @@ main (int argc, char **argv)
   /* --------------------------------------------------
      Clean up.
      -------------------------------------------------- */
+  fclaw2d_map_destroy(cont);
   amr_options_destroy(gparms);
   sc_options_destroy(options);
 

@@ -6,15 +6,16 @@
       integer blockno
       double precision xlower, ylower, dx, dy, xc
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qe
 
       integer i,j, m
 
       include 'metric_terms.i'
 
       tag_patch = 0
-      do i = 1,mx
-         do j = 1,my
-            if (q(i,j,3) .gt. 1e-5) then
+      do j = 1,my
+         do i = 1,mx
+            if (q(i,j,3) .gt. 1.0d-3) then
                tag_patch = 1
                return
             endif
@@ -42,10 +43,11 @@ c     # we would coarsen an initial grid.
 
       qmin = 100.d0
       qmax = -100.d0
-      tag_patch = 0
+      tag_patch = 1
+      return
       do i = 1,mx
          do j = 1,my
-            if (q(i,j,3) .gt. 1e-5) then
+            if (q(i,j,3) .gt. 1) then
                tag_patch = 1
                return
             endif
