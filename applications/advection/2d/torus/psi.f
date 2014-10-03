@@ -8,7 +8,7 @@
 
       common /compi/ pi
 
-      revs_per_s = 1.d0
+      revs_per_s = 0.5d0
 
       alpha = 0.4d0
       pi2 = 2*pi
