@@ -345,7 +345,7 @@ void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
     int maxmy = my;
 
     /* ------------------------------------------------------------- */
-    int matlab_level = level + 1;
+    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     /* This opens a file for append and writes in the 'clawout' style. */

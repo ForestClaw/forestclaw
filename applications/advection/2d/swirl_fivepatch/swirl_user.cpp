@@ -304,7 +304,7 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
 
     /* ------------------------------------------------------------- */
     // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level + 1;
+    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
