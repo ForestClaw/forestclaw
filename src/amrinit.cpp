@@ -132,6 +132,9 @@ void amrinit (fclaw2d_domain_t **domain)
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
 
+    fclaw2d_map_context_t *cont = get_map_context(*domain);
+    SET_CONTEXT(&cont);
+
     // This is where the timing starts.
     ddata->is_latest_domain = 1;
     for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {

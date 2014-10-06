@@ -117,32 +117,6 @@ main (int argc, char **argv)
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-  /* ----------------------------------------------------------
-     Set mapping context for Fortran.  The context will now be
-     available via get_context(), as a integer*8.  This argument
-     will show up as a (fclaw2d_map_context_t**) in C/C++.
-     From Fortran, use
-
-     c      # From fortran :
-            integer*8 cont
-            integer blockno
-
-     c      # .......
-
-            cont = get_context()
-            blockno = get_block()
-
-     c      # Call the mapping function
-            call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
-
-     c      # .......
-
-     to retrieve the context.  Note that this is only be used for
-     passing the context to a C/C++ routine.  Do not expect to be
-     able to access fields of the cont structure from Fortran.
-     ---------------------------------------------------------- */
-  SET_CONTEXT(&cont);
-
   if (gparms->verbosity > 0)
   {
       fclaw2d_domain_list_levels(domain, lp);

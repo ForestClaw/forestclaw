@@ -122,12 +122,7 @@ main (int argc, char **argv)
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-    /* ----------------------------------------------------------
-     to retrieve the context.  Note that this is only be used for
-     passing the context to a C/C++ routine.  Do not expect to be
-     able to access fields of the cont structure.
-     ---------------------------------------------------------- */
-  SET_CONTEXT(&cont);
+
 
   /* ---------------------------------------------------------- */
   if (gparms->verbosity > 0)
