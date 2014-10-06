@@ -70,7 +70,7 @@ double update_level_solution(fclaw2d_domain_t *domain,
     /* This needs to be cleaned up a bit */
     time_data->maxcfl = max(time_data->maxcfl,cfl);
 
-    return time_data->maxcfl;
+    return cfl;
 }
 
 static
@@ -88,9 +88,9 @@ double advance_level(fclaw2d_domain_t *domain,
 
     if (verbose)
     {
-        cout << endl;
-        cout << "Advancing level " << a_level << " from step " <<
-            a_curr_fine_step << " at time " << t_level << endl;
+        printf("\n");
+        printf("Advancing level %d from step %d at time %12.6e\n",
+               this_level,a_curr_fine_step,t_level);
     }
 
     /* -- Coming into this routine, all ghost cell information
@@ -110,7 +110,7 @@ double advance_level(fclaw2d_domain_t *domain,
 
     time_data.t_level = t_level;
     time_data.t_initial = a_time_stepper->initial_time();
-    time_data.dt = a_time_stepper->dt(a_level);
+    time_data.dt = a_time_stepper->dt(this_level);
     time_data.fixed_dt = a_time_stepper->nosubcycle();
     time_data.maxcfl = maxcfl;
 
@@ -121,6 +121,12 @@ double advance_level(fclaw2d_domain_t *domain,
     double cfl_step = update_level_solution(domain,this_level,
                                             &time_data);
     maxcfl = max(maxcfl,cfl_step);
+
+    if (verbose)
+    {
+        printf("------ Max CFL on level %d is %12.4e " \
+               " (using dt = %12.4e)\n",this_level,cfl_step,time_data.dt);
+    }
 
     a_time_stepper->increment_step_counter(this_level);
     a_time_stepper->increment_time(this_level);
@@ -160,9 +166,8 @@ double advance_level(fclaw2d_domain_t *domain,
                     double(new_curr_step % coarse_inc)/coarse_inc;
                 if (verbose)
                 {
-                    cout << "Time interpolating level " <<
-                        coarser_level << " using alpha = "
-                         << alpha << endl;
+                    printf("Time interpolating level %d using alpha = %5.2f\n",
+                           coarser_level,alpha);
                 }
 
                 timeinterp(domain,coarser_level,alpha);
@@ -173,8 +178,9 @@ double advance_level(fclaw2d_domain_t *domain,
 
     if (verbose)
     {
-        cout << "Advance on level " << a_level << " done at time " <<
-            a_time_stepper->level_time(a_level) << endl << endl;
+        printf("\n");
+        printf("Advance on level %d done at time %12.6e\n\n",
+               a_level,a_time_stepper->level_time(a_level));
     }
 
     return maxcfl;  // Maximum from level iteration

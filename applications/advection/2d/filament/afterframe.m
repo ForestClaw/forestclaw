@@ -5,7 +5,8 @@ daspect([1 1 1]);
 if (PlotParallelPartitions == 0)
     yrbcolormap;
 end
-showpatchborders(1:8);
+showpatchborders(1:9);
+setpatchborderprops('linewidth',1);
 % hidepatchborders;
 delete(get(gca,'title'));
 caxis([0 1]);
@@ -18,9 +19,8 @@ shg;
 NoQuery = 0;
 prt = false;
 if (prt)
-    MaxFrames = 65;
-    filename = framename(Frame,'filament0000','png');
-    print('-dpng',filename);
+    filename = framename(Frame,'filament0000','png');    
+    print('-dpng','-r1600',filename);
 end;
 
 clear afterframe

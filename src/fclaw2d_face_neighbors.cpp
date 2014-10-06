@@ -153,7 +153,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
     fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
 
-    fclaw_bool ignore_parallel_patches = filltype->ignore_parallel_patches;
+    fclaw_bool read_parallel_patches = filltype->read_parallel_patches;
 
     fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
     fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
@@ -248,7 +248,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
             }
         }
-        else if (is_fine && remote_neighbor && !ignore_parallel_patches)
+        else if (is_fine && remote_neighbor && read_parallel_patches)
         {
             /* Swap 'this_patch' and the neighbor patch */
             ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
