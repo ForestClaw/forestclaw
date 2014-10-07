@@ -44,38 +44,40 @@ extern "C"
                                 const double& ylower, const double& dx, const double& dy,
                                 double qcoarsened[], int& tag_patch);
 
-    void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[],
-                         double xp[], double yp[], double zp[]);
+#if 0
+    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
+                const int& mbc, const int& mx, const int& my,
+                const double& xlower, const double& ylower,
+                const double& dx, const double& dy,
+                double q[], const int& maux, double aux[]);
+#endif
 
-    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
+    void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
+                          const int& blockno,
                           double xd[], double yd[], double zd[],double area[]);
 
-    void b4step2_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
+    void b4step2_manifold_(const int& mbc,
                            const int& mx, const int& my,
                            const double& dx, const double& dy,
                            const double& t, const int& maux, double aux[],
+                           const int& blockno,
                            double xd[], double yd[], double zd[]);
 
     void sphere_write_tfile_(const int& iframe,const double& time,
-                            const int& mfields,const int& ngrids,
-                            const int& maux);
+                             const int& mfields,const int& ngrids,
+                             const int& maux);
 
     void sphere_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
-                            const int& mbc, const int& mx,const int& my,
-                            const double& xlower,const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& iframe,const int& patch_num,
-                            const int& level,const int& blockno,
-                            const int& mpirank);
+                             const int& mbc, const int& mx,const int& my,
+                             const double& xlower,const double& ylower,
+                             const double& dx, const double& dy,
+                             double q[], const int& iframe,const int& patch_num,
+                             const int& level,const int& blockno,
+                             const int& mpirank);
 }
 
 #ifdef __cplusplus
