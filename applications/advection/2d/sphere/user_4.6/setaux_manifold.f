@@ -19,7 +19,6 @@
 
       integer i,j
       double precision dxdy, t, sum, pi, exact_area
-      logical iscart, issphere, isdisk,debug
 
       common /compi/ pi
 
