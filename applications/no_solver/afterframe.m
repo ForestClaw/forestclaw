@@ -7,7 +7,6 @@ yrbcolormap;
 showpatchborders(1:10);
 caxis([0,1])
 
-
 view(2);
 
 NoQuery = 0;
