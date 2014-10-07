@@ -1,7 +1,6 @@
 c     =====================================================
        subroutine qinit_manifold(meqn,mbc,mx,my,
-     &      xlower,ylower,
-     &      dx,dy,blockno,q,maux,aux)
+     &      xlower,ylower,dx,dy,blockno,q,maux,aux)
 c     =====================================================
 
 c     # Set initial conditions for q.
@@ -19,14 +18,12 @@ c     #     0.1  otherwise
        integer i, j, mq
        double precision xlow,ylow,w
 
-       call set_block(blockno)
-
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
              xlow = xlower + (i-0.5d0)*dx
              do j = 1-mbc,my+mbc
                 ylow = ylower + (j-1d0)*dy
-                call cellave2(xlow,ylow,dx,dy,w)
+                call cellave2(blockno,xlow,ylow,dx,dy,w)
                 q(i,j,1) = w
              enddo
           enddo
@@ -35,19 +32,18 @@ c     #     0.1  otherwise
        return
        end
 
-      double precision function  fdisc(xc,yc)
+      double precision function  fdisc(blockno,xc,yc)
       implicit none
 
       double precision xc,yc, xp, yp, zp
+      integer blockno
       integer*8 cont, get_context
 
-      integer blockno, get_block
       double precision r
 
       logical fclaw2d_map_is_used
 
       cont = get_context()
-      blockno = get_block()
 
       if (fclaw2d_map_is_used(cont)) then
          call fclaw2d_map_c2m(cont,

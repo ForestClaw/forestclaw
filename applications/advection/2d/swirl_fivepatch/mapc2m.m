@@ -1,8 +1,8 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-map = 'identity';
-map = 'cart';
-% map = 'fivepatch';
+% map = 'identity';
+% map = 'cart';
+map = 'fivepatch';
 
 
 switch map

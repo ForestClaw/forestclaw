@@ -98,16 +98,18 @@ main (int argc, char **argv)
      Domain geometry
      -------------------------------------------------------------- */
 
+  /* Five_patch square : Ratio of inner square size to square size */
   double alpha = 0.5;
-  double shift[3];
-  shift[0] = 0.5;
-  shift[1] = 0.5;
+
 
   double scale[3];
-  shift[2] = 0;
   scale[0] = 0.5;
   scale[1] = 0.5;
   scale[2] = 1;
+
+  double shift[3];
+  shift[0] = 0.5;
+  shift[1] = 0.5;
 
   double rotate[2];
   rotate[0] = 0;
@@ -115,14 +117,14 @@ main (int argc, char **argv)
 
   switch (example) {
   case 1:
-      /* Map unit square to disk using mapc2m_disk.f;
-         Scale and shift from [-1,1]x[-1,1] */
+      /* Map unit square in [0,1]x[0,1] to [0,1]x[0,1] */
       conn = p4est_connectivity_new_unitsquare();
       cont = fclaw2d_map_new_identity();
       break;
   case 2:
-      /* Map unit square to disk using mapc2m_disk.f;
-         Scale and shift from [-1,1]x[-1,1] */
+      /* Map unit square in [0,1] to [-1,1]x[-1,1]
+         Scale and shift from [-1,1]x[-1,1] back to
+         [0,1]x[0,1] */
       conn = p4est_connectivity_new_unitsquare();
       cont = fclaw2d_map_new_cart(scale,shift,rotate);
       break;
