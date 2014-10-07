@@ -1,10 +1,10 @@
-      subroutine setaux_manifold(maxmx,maxmy,mbc,mx,my,
+      subroutine setaux_manifold(mbc,mx,my,
      &      xlower,ylower,dx,dy,
      &      maux,aux,xp,yp,zp,xd,yd,zd,
      &      xnormals,ynormals,edge_lengths,area)
       implicit none
 
-      integer maxmx, maxmy, mbc, mx,my, meqn, maux
+      integer mbc, mx,my, meqn, maux
       double precision dx,dy, xlower, ylower, z
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 

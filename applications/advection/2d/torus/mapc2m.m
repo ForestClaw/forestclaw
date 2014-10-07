@@ -3,8 +3,8 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 global map isflat;
 
 % map = 'nomap';
-% map = 'cart';
-map = 'torus';
+map = 'cart';
+% map = 'torus';
 
 switch map
     case 'nomap'

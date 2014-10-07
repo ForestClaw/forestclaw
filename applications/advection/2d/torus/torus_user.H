@@ -30,9 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern "C"
 {
-    void mapc2m_(const double *xc, const double *yc,
-                 double *xp, double *yp, double *zp);
-
     void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, const double& xlower,
                                 const double& ylower, const double& dx, const double& dy,
@@ -44,13 +41,7 @@ extern "C"
                                 const double& ylower, const double& dx, const double& dy,
                                 double qcoarsened[], int& tag_patch);
 
-    void qinit_manifold_(const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[]);
-
-    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
+    void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
