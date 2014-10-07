@@ -35,17 +35,17 @@
 
       end
 
-      subroutine hemisphere_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine hemisphere_write_qfile(meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
      &      mpirank)
 
       implicit none
 
-      integer maxmx, maxmy,meqn,mbc,mx,my, mpirank
+      integer meqn,mbc,mx,my, mpirank
       integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
 
-      double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       character*10 matname1
       integer matunit1

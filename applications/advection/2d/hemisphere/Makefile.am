@@ -14,7 +14,6 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/user_4.6/rpn2noncons.f \
 	applications/advection/2d/hemisphere/user_4.6/rpt2noncons.f \
 	applications/advection/2d/hemisphere/user_4.6/qinit_manifold.f \
-	applications/advection/2d/hemisphere/user_4.6/b4step2_manifold.f \
 	applications/advection/2d/hemisphere/user_4.6/setaux_manifold.f
 
 applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \

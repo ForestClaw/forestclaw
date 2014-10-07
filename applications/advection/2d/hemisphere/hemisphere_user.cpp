@@ -69,9 +69,6 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -98,21 +95,15 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     int maux;
     fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ----------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
     double *xd = cp->xd();
     double *yd = cp->yd();
     double *zd = cp->zd();
     double *area = cp->area();
 
-    setaux_manifold_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,area);
+    setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
+                     maux,aux,this_block_idx,xd,yd,zd,area);
 }
 
 void hemisphere_qinit(fclaw2d_domain_t *domain,
@@ -120,40 +111,7 @@ void hemisphere_qinit(fclaw2d_domain_t *domain,
                       int this_block_idx,
                       int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    double *aux;
-    int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
-
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
-    /* ------------------------------------------------------- */
-    // Call to classic Clawpack 'qinit' routine.
-    qinit_manifold_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
+    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 void hemisphere_b4step2(fclaw2d_domain_t *domain,
@@ -163,45 +121,9 @@ void hemisphere_b4step2(fclaw2d_domain_t *domain,
                         double t,
                         double dt)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
+    fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,
+                             this_patch_idx,t,dt);
 
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    double *aux;
-    int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
-
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-
-    /* ------------------------------------------------------- */
-    // Classic call to b4step2(..)
-    b4step2_manifold_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux,
-                      xd,yd,zd);
 }
 
 double hemisphere_update(fclaw2d_domain_t *domain,
@@ -211,8 +133,6 @@ double hemisphere_update(fclaw2d_domain_t *domain,
                          double t,
                          double dt)
 {
-    hemisphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
-
     double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     return maxcfl;
@@ -305,9 +225,6 @@ void hemisphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t 
                                       int this_block_idx, int this_patch_idx,
                                       int iframe,int num,int level)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -328,17 +245,12 @@ void hemisphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t 
     // Pointers needed to pass to Fortran
     double* q = cp->q();
 
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
     /* ------------------------------------------------------------- */
-    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     /* This opens a file for append and writes in the 'clawout' style. */
-    hemisphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                            iframe,num,matlab_level,this_block_idx,mpirank);
+    hemisphere_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
+                            iframe,num,level,this_block_idx,mpirank);
 }
 
 

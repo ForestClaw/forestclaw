@@ -33,41 +33,35 @@ extern "C"
 {
     void hemisphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                     const int& meqn, const double& xlower,
-                                    const double& ylower, const double& dx, const double& dy,
+                                    const double& ylower, const double& dx,
+                                    const double& dy,
                                     double q[], const int& init_flag, int& tag_patch);
 
     void hemisphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                                     const int& meqn,const double& xlower,
-                                    const double& ylower, const double& dx, const double& dy,
+                                    const double& ylower, const double& dx,
+                                    const double& dy,
                                     double qcoarsened[], int& tag_patch);
 
-    void qinit_manifold_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& maux, double aux[]);
+    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
+                const int& mbc, const int& mx, const int& my,
+                const double& xlower, const double& ylower,
+                const double& dx, const double& dy,
+                double q[], const int& maux, double aux[]);
 
-    void setaux_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
+    void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           const int& maux, double aux[],
-                          double xp[], double yp[], double zp[],
+                          const int& blockno,
                           double xd[], double yd[], double zd[],double area[]);
-
-    void b4step2_manifold_(const int& maxmx, const int& maxmy, const int& mbc,
-                           const int& mx, const int& my, const int& meqn,
-                           double q[], const double& xlower, const double& ylower,
-                           const double& dx, const double& dy,
-                           const double& t, const double& dt,
-                           const int& maux, double aux[],
-                           double xd[], double yd[], double zd[]);
 
     void hemisphere_write_tfile_(const int& iframe,const double& time,
                                  const int& mfields,const int& ngrids,
                                  const int& maux);
 
-    void hemisphere_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+    void hemisphere_write_qfile_(const int& meqn,
                                  const int& mbc, const int& mx,const int& my,
                                  const double& xlower,const double& ylower,
                                  const double& dx, const double& dy,
