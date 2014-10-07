@@ -15,15 +15,17 @@ c     #     0.1  otherwise
        double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
        double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
-       integer i, j, mq
+       integer i, j, mq, blockno, clawpack_get_block
        double precision xlow, ylow, w
+
+       blockno = clawpack_get_block()
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
              do j = 1-mbc,my+mbc
                 xlow = xlower + (i-1)*dx
                 ylow = ylower + (j-1)*dy
-                call cellave2(xlow,ylow,dx,dy,w)
+                call cellave2(blockno,xlow,ylow,dx,dy,w)
                 q(i,j,mq) = w
              enddo
           enddo
@@ -31,19 +33,18 @@ c     #     0.1  otherwise
 
        end
 
-      double precision function  fdisc(xc,yc)
+      double precision function  fdisc(blockno,xc,yc)
       implicit none
 
       double precision xc,yc, xp, yp, zp
+      integer blockno
       integer*8 cont, get_context
 
-      integer blockno, get_block
       double precision r
 
       logical fclaw2d_map_is_used
 
       cont = get_context()
-      blockno = get_block()
 
       if (fclaw2d_map_is_used(cont)) then
          call fclaw2d_map_c2m(cont,
