@@ -14,8 +14,8 @@ setviews;
 NoQuery = 0;
 prt = false;
 if (prt)
-  MaxFrames = 21;
-  filename = framename(Frame,'ccb000','png');
+  MaxFrames = 41;
+  filename = framename(Frame,'ccb0000','png');
   fprintf('Printing file %s\n',filename);
   print('-dpng','-r800',filename);
 end;
