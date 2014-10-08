@@ -101,9 +101,6 @@ amr_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
                               fclaw2d_patch_t * this_patch,
                               int this_block_idx, int this_patch_idx, char *a)
 {
-    // In case this is needed by the setaux routine
-    set_block_ (&this_block_idx);
-
     // Global parameters
     const amr_options_t *gparms = get_domain_parms (domain);
     const int mx = gparms->mx;
@@ -136,9 +133,6 @@ amr_output_vtk_value_cb (fclaw2d_domain_t * domain,
                          fclaw2d_patch_t * this_patch,
                          int this_block_idx, int this_patch_idx, char *a)
 {
-    // In case this is needed by the setaux routine
-    set_block_ (&this_block_idx);
-
     // Global parameters
     const amr_options_t *gparms = get_domain_parms (domain);
     const int mx = gparms->mx;

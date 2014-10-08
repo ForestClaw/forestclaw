@@ -100,9 +100,6 @@ void fclaw2d_clawpack_setaux(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -137,13 +134,10 @@ void fclaw2d_clawpack_setaux(fclaw2d_domain_t *domain,
 }
 
 void fclaw2d_clawpack_qinit(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx)
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -174,19 +168,17 @@ void fclaw2d_clawpack_qinit(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------- */
     // Call to classic Clawpack 'qinit' routine.
+    CLAWPACK_SET_BLOCK(&this_block_idx);
     qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
 void fclaw2d_clawpack_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt)
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double dt)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -217,19 +209,17 @@ void fclaw2d_clawpack_b4step2(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------- */
     // Classic call to b4step2(..)
+    CLAWPACK_SET_BLOCK(&this_block_idx);
     b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
 }
 
 void fclaw2d_clawpack_src2(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt)
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           double t,
+                           double dt)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -260,6 +250,7 @@ void fclaw2d_clawpack_src2(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------- */
     // Classic call to src2(..)
+    CLAWPACK_SET_BLOCK(&this_block_idx);
     src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
 }
 
@@ -289,9 +280,6 @@ void fclaw2d_clawpack_bc2(fclaw2d_domain *domain,
                       fclaw_bool intersects_phys_bdry[],
                       fclaw_bool time_interp)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -350,6 +338,7 @@ void fclaw2d_clawpack_bc2(fclaw2d_domain *domain,
 
     /* ------------------------------------------------------- */
     // Classic call to bc2(..)
+    CLAWPACK_SET_BLOCK(&this_block_idx);
     bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
 }
 

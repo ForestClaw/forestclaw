@@ -1,9 +1,10 @@
 c     =================================================
-      subroutine cellave2(xlow,ylow,dx,dy,wl)
+      subroutine cellave2(blockno,xlow,ylow,dx,dy,wl)
 c     =================================================
       implicit none
 
       double precision xlow, ylow, dx, dy, wl
+      integer blockno
 
       integer i, iv
 
@@ -38,7 +39,7 @@ c
 c
       do 20 i=1,4
 
-         fl(i) = fdisc(xx(i),yy(i)) .lt. 0.d0
+         fl(i) = fdisc(blockno,xx(i),yy(i)) .lt. 0.d0
          alll = alll .and. fl(i)
          allr = allr .and. (.not. fl(i))
    20    continue
@@ -66,7 +67,7 @@ c
                yc0 = yy(i)
                xc1 = xx(i+1)
                yc1 = yy(i+1)
-               ss = zeroin(0.d0, 1.d0, fss, 1d-8)
+               ss = zeroin(blockno,0.d0, 1.d0, fss, 1d-8)
 c              write(27,*) 'xc,yc,ss:',xc0,yc0,xc1,yc1,ss
                x(iv) = xx(i) + ss*(xx(i+1)-xx(i))
                y(iv) = yy(i) + ss*(yy(i+1)-yy(i))
@@ -99,29 +100,31 @@ c
 c
 c
 c     =================================================
-      double precision function fss(s)
+      double precision function fss(blockno,s)
 c     =================================================
       implicit none
 
       double precision xc0, yc0, xc1, yc1, x, y, s, fdisc
+      integer blockno
       common/fsscorn/ xc0,yc0,xc1,yc1
 c
 c     # compute fdisc at distance s between corners (xc0,yc0) and (xc1,yc1)
 c
       x = xc0 + s*(xc1-xc0)
       y = yc0 + s*(yc1-yc0)
-      fss = fdisc(x,y)
+      fss = fdisc(blockno,x,y)
       return
       end
 
 c     =================================================
-      double precision function zeroin(ax,bx,f,tol)
+      double precision function zeroin(blockno,ax,bx,f,tol)
 c     =================================================
       implicit none
 
 
       external f
       double precision ax, bx, f, tol, eps, tol1, a, b, fa, fb
+      integer blockno
       double precision c, fc, d, e, xm, s, p, q, r
 c
 c      a zero of the function  f(x)  is computed in the interval ax,bx .
@@ -163,8 +166,8 @@ c initialization
 c
       a = ax
       b = bx
-      fa = f(a)
-      fb = f(b)
+      fa = f(blockno,a)
+      fb = f(blockno,b)
 c
 c begin step
 c
@@ -243,7 +246,7 @@ c      if (abs(d) .le. tol1) b = b + sign(tol1,xm)
             b = b - xm
          endif
       endif
-      fb = f(b)
+      fb = f(blockno,b)
       if ((fb*(fc/abs(fc))) .gt. 0.d0) go to 20
       go to 30
 c

@@ -91,6 +91,11 @@ extern "C"
 #define SET_CORNERS FCLAW_F77_FUNC(set_corners, SET_CORNERS)
 void SET_CORNERS(int block_corners_count[]);
 
+#define CLAWPACK_SET_BLOCK FCLAW_F77_FUNC(clawpack_set_block, CLAWPACK_SET_BLOCK)
+void CLAWPACK_SET_BLOCK(int* blockno);
+
+#define CLAWPACK_GET_BLOCK FCLAW_F77_FUNC(clawpack_get_block, CLAWPACK_GET_BLOCK)
+int CLAWPACK_GET_BLOCK();
 
 typedef struct fclaw2d_clawpack_parms fclaw2d_clawpack_parms_t;
 typedef struct fclaw2d_clawpack_patch_data fclaw2d_clawpack_patch_data_t;
