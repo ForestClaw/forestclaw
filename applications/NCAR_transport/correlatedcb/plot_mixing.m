@@ -86,12 +86,12 @@ for i = 1:1,
   ylabel('\Psi(\phi)','fontsize',14);
   title(sprintf('iframe = %d',iframe),'fontsize',18);
 
-  prt = true;
+  prt = false;
   if (prt == true)
-    str = [fname{i} '.png'];
-    prtstr = ['print -dpng ' str];
+    filename = [fname{i} '.png'];
+    prtstr = ['print -dpng ' filename];
     fprintf('%s\n',prtstr);
-    eval(['print -dpng ' str]);
+    print(filename,'png');
   end
   fprintf('--------------------------------------------------------\n');
 
