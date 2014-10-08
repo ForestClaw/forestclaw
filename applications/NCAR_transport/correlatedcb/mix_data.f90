@@ -1,5 +1,5 @@
 !!
-!!
+!! gfortran -o mix_data -fdefault-real-8 -fdefault-double-8 -g mix_data.f90
 !!
 
 
@@ -19,6 +19,8 @@ PROGRAM mix_data
   CHARACTER :: c
   INTEGER :: nstp, ipos, idigit, l1, l2
 
+  INTEGER :: mpirank
+
 !! Get iframe and file name to create
   OPEN(10,file='diag.dat')
   READ(10,*) iframe
@@ -34,26 +36,6 @@ PROGRAM mix_data
      nstp = nstp / 10
   ENDDO
 
-!!   l1 = LEN_TRIM(fname3)
-!!   fname3(l1+1:l1+1) = '.'
-!!   nstp = iframe
-!!   IF (iframe .EQ. 0) THEN
-!!      l2 = 1
-!!   ELSE
-!!      l2 = 0
-!!      DO WHILE (nstp .GT. 0)
-!!         nstp = nstp/10
-!!         l2 = l2 + 1
-!!      END DO
-!!   ENDIF
-!!   nstp = iframe
-!!   DO ipos = l1+l2 + 1,l1 + 2, -1
-!!      idigit = MOD(nstp,10)
-!!      fname3(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-!!      nstp = nstp / 10
-!!   ENDDO
-
-
   OPEN(10,file=fname2)
   READ(10,*) t
   READ(10,*) meqn
@@ -67,6 +49,7 @@ PROGRAM mix_data
      READ(10,*) ngrid
      READ(10,*) level
      READ(10,*) blocknumber
+     READ(10,*) mpirank
      READ(10,*) mx
      READ(10,*) my
      READ(10,*) xlow
@@ -74,19 +57,13 @@ PROGRAM mix_data
      READ(10,*) dx
      READ(10,*) dy
 
-     ALLOCATE(q(0:mx+1,0:my+1,meqn))
-
+     ALLOCATE(q(mx,my,meqn))
 
      DO j = 1,my
         DO i = 1,mx
            READ(10,*) (q(i,j,m),m = 1,meqn)
-           !! Store third entry as area element, not as a capacity
-           q(i,j,3) = dx*dy*q(i,j,3)
         ENDDO
      ENDDO
-
-     !! fname1(17:17) = CHAR(ICHAR('0') + iframe)
-     !! fname2(17:17) = CHAR(ICHAR('0') + iframe)
 
      DO i = 1,mx
         DO j = 1,my
@@ -97,8 +74,8 @@ PROGRAM mix_data
      DEALLOCATE(q)
   END DO
   CLOSE(20)
-  close(10)
-120  FORMAT(3F24.16)
+  CLOSE(10)
+120  FORMAT(3E24.16)
 
 100 FORMAT(A,E10.4)
 

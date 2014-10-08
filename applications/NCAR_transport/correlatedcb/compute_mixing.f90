@@ -27,7 +27,6 @@ PROGRAM compute_diag
 !! Size of Lat-long grid
   OPEN(10,file='diag.dat')
   READ(10,*) iframe
-  READ(10,*) kmax
   CLOSE(10)
 
   fname1 = 'fort.qxxxx'
@@ -45,6 +44,18 @@ PROGRAM compute_diag
   READ(10,*) meqn
   READ(10,*) ngrids
   CLOSE(10)
+
+!! Get mx,my
+  OPEN(10,file=fname1)
+  READ(10,*) ngrid
+  READ(10,*) level
+  READ(10,*) block_number
+  READ(10,*) mpirank
+  READ(10,*) mx
+  READ(10,*) my
+  CLOSE(10)
+
+  kmax = ngrids*mx*my
 
   ALLOCATE(f1(kmax),f2(kmax),dA(kmax))
 
@@ -68,10 +79,10 @@ PROGRAM compute_diag
            READ(10,*) f1(k),f2(k),dA(k)
            s = s + f1(k)*dA(k)
            k = k + 1
-           IF (k .GT. kmax) THEN
-              WRITE(6,*) 'k > kmax; kmax = ', kmax
-              stop
-           ENDIF
+!!           IF (k .GT. kmax) THEN
+!!              WRITE(6,*) 'k > kmax; kmax = ', kmax
+!!              STOP
+!!           ENDIF
         ENDDO
      ENDDO
   END DO

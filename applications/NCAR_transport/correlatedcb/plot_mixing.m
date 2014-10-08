@@ -1,5 +1,5 @@
 function plot_mixing
-close all;
+close all
 
 
 fname = cell(6,1);
@@ -29,7 +29,7 @@ for i = 1:1,
     Lr = sumA;
     Lu = 0;
     Lo = 0;
-  end;
+  end
 
   fprintf('\n\n\n');
   fprintf('--------------------------------------------------------\n');
@@ -90,10 +90,12 @@ for i = 1:1,
     prtstr = ['print -dpng ' str];
     fprintf('%s\n',prtstr);
     eval(['print -dpng ' str]);
-  end;
+  end
   fprintf('--------------------------------------------------------\n');
 
-end;
+end
+
+end
 
 % ------------------------------------------------------------------
 function [Lr,Lu,Lo,mr,mu,mo,sumA] = compute_diag(xk,yk,a,b,area)
@@ -145,4 +147,6 @@ if ((sum(mu) + sum(mr) + sum(mo)) ~= K)
   fprintf('Total     = %d\n',sum(mr) + sum(mu) + sum(mo));
   fprintf('K         = %d\n',K);
   error('compute_diag : Not all points accounted for');
-end;
+end
+
+end

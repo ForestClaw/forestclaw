@@ -59,8 +59,8 @@ void correlatedcb_link_solvers(fclaw2d_domain_t *domain)
 
 void correlatedcb_setprob(fclaw2d_domain_t* domain)
 {
-    int vflag = 1;       // specify edge normal velocities
-    int init_choice = 3; // for cosine bell
+    int vflag = 1;        /* specify edge normal velocities */
+    int init_choice = 3;  /* for cosine bell */
     setprob_transport_(vflag,init_choice);
 }
 
@@ -282,7 +282,7 @@ void correlatedcb_parallel_write_header(fclaw2d_domain_t* domain,
 
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
-    // Increase the number of fields by 1 so we can printout the mpi rank
+    /* Increase the number of fields by 1 to include area(i,j) */
     int mfields = gparms->meqn + 1;
     int maux = 0;
     correlatedcb_write_tfile_(iframe,time,mfields,ngrids,maux);
