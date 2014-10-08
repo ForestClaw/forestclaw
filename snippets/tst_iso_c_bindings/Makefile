@@ -1,11 +1,11 @@
 all:
-	gcc -c prog.c
-	gfortran -c assign.f
+	gcc -g -c prog.c
+	gfortran -g -c assign.f
 	gcc -o tst_prog prog.o assign.o
 
 cpp_tst:
-	g++ -c prog.cpp
-	gfortran -c assign.f
+	g++ -c -g prog.cpp
+	gfortran -c -g assign.f
 	g++ -o tst_prog prog.o assign.o
 
 clean:
