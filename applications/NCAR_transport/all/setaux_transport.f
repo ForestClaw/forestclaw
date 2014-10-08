@@ -1,14 +1,11 @@
       subroutine setaux_transport(mx,my,mbc,xlower,ylower,dx,dy,
-     &      maux,aux,xp,yp,zp,xd,yd,zd,area)
+     &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
 
       integer mbc, mx,my, meqn, maux
+      integer blockno
       double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
-
-      double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
       double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
@@ -31,17 +28,18 @@ c     # Set the capacity function needed by Clawpack
 
       t = 0
       call compute_velocity_psi(mx,my,mbc,dx,dy,
-     &      t,xd,yd,zd,aux,maux)
+     &      t,blockno,xd,yd,zd,aux,maux)
 
       return
       end
 
 
       subroutine compute_velocity_psi(mx,my,mbc,
-     &      dx,dy,t,xd,yd,zd,aux,maux)
+     &      dx,dy,t,blockno,xd,yd,zd,aux,maux)
       implicit none
 
-      integer maxmx, maxmy, mx,my,mbc,maux
+      integer mx,my,mbc,maux
+      integer blockno
       double precision dx,dy, t
 
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
@@ -54,10 +52,6 @@ c     # Set the capacity function needed by Clawpack
 
       integer i,j
       double precision vn
-
-      integer blockno, get_block
-      blockno = get_block()
-
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc

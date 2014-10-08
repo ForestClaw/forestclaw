@@ -1,6 +1,5 @@
       subroutine qinit_transport(mx,my,meqn,mbc,
-     &      xlower,ylower,dx,dy,q,maux,aux,
-     &      blockno, cont, xp,yp,zp)
+     &      xlower,ylower,dx,dy,q,maux,aux,blockno,xp,yp,zp)
 
       implicit none
 
@@ -19,15 +18,14 @@
       double precision x,y,z, xlow, ylow, w
       double precision gaussian_sum, cosine_bell_sum
       double precision correlated_bell,slotted_disk_sum
+      double precision r,hmax,b,c
 
       ichoice = get_init_choice()
 
-      call set_block(blockno)
+      call get_td_sdisk_parms(r,hmax,b,c)
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-c            xlow = xlower + (i-1)*dx
-c            ylow = ylower + (j-1)*dy
             x = xp(i,j)
             y = yp(i,j)
             z = zp(i,j)
@@ -40,8 +38,11 @@ c            ylow = ylower + (j-1)*dy
                   q(i,j,2) = correlated_bell(q(i,j,1))
                endif
             elseif (ichoice .eq. 4) then
-c               call cellave2(xlow,ylow,dx,dy,w)
-               q(i,j,1) = slotted_disk_sum(x,y,z)
+               xlow = xlower + (i-1)*dx
+               ylow = ylower + (j-1)*dy
+               call cellave2(blockno,xlow,ylow,dx,dy,w)
+               q(i,j,1) = b + c*w
+c               q(i,j,1) = slotted_disk_sum(x,y,z)
             endif
          enddo
       enddo
@@ -50,25 +51,26 @@ c               call cellave2(xlow,ylow,dx,dy,w)
       end
 
 
-      double precision function  fdisc(xc,yc)
+      double precision function  fdisc(blockno,xc,yc)
       implicit none
 
       double precision xc,yc, xp, yp, zp
+      integer blockno
       double precision q, slotted_disk_sum
       integer*8 cont, get_context
-      integer blockno, get_block
+      double precision r,hmax,b,c,qv
 
       cont = get_context()
-      blockno = get_block()
 
       call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
 
-c     # call mapc2m(xc,yc,xp,yp,zp)
+      call get_td_sdisk_parms(r,hmax,b,c)
 
 c     # Returns 0 or 1.
       q = slotted_disk_sum(xp,yp,zp)
 
-      fdisc = q
+      qv = (q-b)/c
+      fdisc = 1 - 2*qv
       end
 
 
