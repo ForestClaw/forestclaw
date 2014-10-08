@@ -59,8 +59,8 @@ void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
 
 void slotted_disk_setprob(fclaw2d_domain_t* domain)
 {
-    int vflag = 1;       // specify edge normal velocities
-    int init_choice = 4; // for slotted disk
+    int vflag = 1;       /* specify edge normal velocities */
+    int init_choice = 4; /* for slotted disk */
     setprob_transport_(vflag,init_choice);
 }
 
@@ -69,9 +69,6 @@ void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
                               int this_block_idx,
                               int this_patch_idx)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* -------------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -99,17 +96,14 @@ void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
 
     /* -------------------------------------------------------------- */
-    // Modified clawpack setaux routine that passes in mapping terms
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
+    /* Modified clawpack setaux routine that passes in mapping terms */
     double *xd = cp->xd();
     double *yd = cp->yd();
     double *zd = cp->zd();
     double *area = cp->area();
 
     setaux_transport_(mx,my,mbc,xlower,ylower,dx,dy,
-                      maux,aux,xp,yp,zp,xd,yd,zd,area);
+                      maux,aux,this_block_idx,xd,yd,zd,area);
 }
 
 void slotted_disk_qinit(fclaw2d_domain_t *domain,
@@ -147,9 +141,8 @@ void slotted_disk_qinit(fclaw2d_domain_t *domain,
 
     /* -------------------------------------------------------------- */
     int blockno = this_block_idx;
-    fclaw2d_map_context_t *cont = get_map_context(domain);
     qinit_transport_(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,maux,aux,
-                     blockno,&cont,xp,yp,zp);
+                     blockno,xp,yp,zp);
 }
 
 void slotted_disk_patch_physical_bc(fclaw2d_domain *domain,
@@ -171,9 +164,6 @@ void slotted_disk_b4step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* -------------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -198,7 +188,7 @@ void slotted_disk_b4step2(fclaw2d_domain_t *domain,
     double *zd = cp->zd();
 
     /* -------------------------------------------------------------- */
-    b4step2_transport_(mx,my,mbc,dx,dy,t,maux,aux,xd,yd,zd);
+    b4step2_transport_(mx,my,mbc,dx,dy,t,maux,aux,this_block_idx,xd,yd,zd);
 }
 
 double slotted_disk_update(fclaw2d_domain_t *domain,
@@ -311,9 +301,6 @@ void slotted_disk_parallel_write_output(fclaw2d_domain_t *domain,
                                         int this_patch_idx,
                                         int iframe,int num,int level)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* -------------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);

@@ -50,19 +50,20 @@ extern "C"
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           double q[], const int& maux, double aux[],
-                          const int& blockno, fclaw2d_map_context_t **cont,
+                          const int& blockno,
                           double xp[], double yp[], double zp[]);
 
     void setaux_transport_(const int& mx, const int& my, const int& mbc,
                            const double& xlower, const double& ylower,
                            const double& dx, const double& dy,
                            const int& maux, double aux[],
-                           double xp[], double yp[], double zp[],
+                           const int& blockno,
                            double xd[], double yd[], double zd[],double area[]);
 
     void b4step2_transport_(const int& mx, const int& my, const int& mbc,
                             const double& dx, const double& dy,
                             const double& t, const int& maux, double aux[],
+                            const int& blockno,
                             double xd[], double yd[], double zd[]);
 
     void slotted_disk_write_tfile_(const int& iframe,const double& time,
