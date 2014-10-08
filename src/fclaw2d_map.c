@@ -346,6 +346,7 @@ fclaw2d_map_new_disk (double R1, double R2)
     return cont;
 }
 
+#if 0
 /* Use an existing Fortran mapc2m routine.
  * The answers to the queries are expected in user_int[0] through [4].
  * The pointer to the Fortran mapping function is stored in user_data.
@@ -383,7 +384,7 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 
     return cont;
 }
-
+#endif
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[])
 {
