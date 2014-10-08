@@ -196,9 +196,6 @@ void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int num,int level)
 {
-    // In case this is needed by the setaux routine
-    set_block_(&this_block_idx);
-
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);

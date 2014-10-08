@@ -90,7 +90,7 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
     int blockno = this_block_idx;
     compute_error(meqn,mbc,mx,my,&cont,blockno,xlower,ylower,dx,dy,
                   curvature,error_ptr);
-    initialize(mx,my,meqn,mbc,&cont,blockno,xlower,ylower,dx,dy,q,
+    initialize(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,
                error_ptr,curvature,area);
 }
 

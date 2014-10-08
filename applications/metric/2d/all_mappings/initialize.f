@@ -1,4 +1,4 @@
-      subroutine initialize(mx,my,meqn,mbc,cont,blockno,
+      subroutine initialize(mx,my,meqn,mbc,
      &      xlower,ylower,dx,dy,q,error,curvature,area)
      &      bind(c,name="initialize")
       implicit none
@@ -16,7 +16,7 @@
       dxdy = dx*dy
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            q(i,j,1) = area(i,j)
+            q(i,j,1) = area(i,j)/dxdy
             q(i,j,2) = curvature(i,j)
             q(i,j,3) = error(i,j)
          enddo

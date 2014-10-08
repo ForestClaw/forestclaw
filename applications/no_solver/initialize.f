@@ -11,8 +11,6 @@
 
       common /com_init/ ichoice
 
-      call set_block(blockno)
-
       ichoice = 2
 
       do mq = 1,meqn
@@ -21,7 +19,7 @@
             do j = 1-mbc,my+mbc
                ylow = ylower + (j-1)*dy
 
-               call cellave2(xlow,ylow,dx,dy,wl)
+               call cellave2(blockno,xlow,ylow,dx,dy,wl)
                q(i,j,mq) = wl
             enddo
          enddo
@@ -30,13 +28,13 @@
       return
       end
 
-      double precision function fdisc(xc,yc)
+      double precision function fdisc(blockno,xc,yc)
       implicit none
 
       double precision xc,yc, r
       double precision xp, yp, zp, rp, th, x0
       double precision y0, pi
-      integer m, ichoice, blockno, get_block
+      integer m, ichoice, blockno
       logical fclaw2d_map_is_used
 
       integer*8 cont, get_context
@@ -44,7 +42,6 @@
       common /com_init/ ichoice
 
       cont = get_context()
-      blockno = get_block()
 
       pi = 4.d0*atan(1.d0)
 
