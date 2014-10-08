@@ -7,7 +7,6 @@ applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/NCAR_transport/slotted_disk/slotted_disk.cpp \
 	applications/NCAR_transport/slotted_disk/slotted_disk_output.f \
 	applications/NCAR_transport/slotted_disk/tag4refinement.f \
-	applications/NCAR_transport/slotted_disk/setprob.f \
 	applications/NCAR_transport/slotted_disk/fclaw2d_map_cubedsphere.c \
 	applications/NCAR_transport/slotted_disk/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/all/setprob_transport.f \
