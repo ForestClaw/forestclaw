@@ -51,7 +51,6 @@ extern "C"
     /* Using iso_c_binding here */
     void initialize(const int& mx, const int& my,
                     const int& meqn, const int& mbc,
-                    fclaw2d_map_context_t** cont, const int& blockno,
                     const double& xlower, const double& ylower,
                     const double& dx, const double& dy,
                     double q[], const double error[],

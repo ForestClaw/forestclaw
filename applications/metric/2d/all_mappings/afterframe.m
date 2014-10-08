@@ -8,7 +8,7 @@ setviews;
 axis off;
 
 showpatchborders;
-caxis([0,1])
+caxis([qmin qmax])
 qlo = 0;
 qhi = 1;
 under_label = sprintf('0 - %7.1e',qlo-qmin);
@@ -22,6 +22,7 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
+view(2);
 
 fprintf('%20s %16.8e\n','qmin',qmin);
 fprintf('%20s %16.8e\n','qmax',qmax);

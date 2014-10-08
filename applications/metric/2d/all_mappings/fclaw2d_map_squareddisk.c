@@ -28,7 +28,7 @@ fclaw2d_map_query_squareddisk (fclaw2d_map_context_t * cont, int query_identifie
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
