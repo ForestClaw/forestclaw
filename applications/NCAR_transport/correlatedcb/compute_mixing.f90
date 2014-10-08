@@ -11,6 +11,7 @@ PROGRAM compute_diag
   INTEGER :: i,j, k,kmax, block_number
   INTEGER :: ngrid, level, mx, my, meqn, ngrids, igrid
   DOUBLE PRECISION :: xlow, ylow, dx, dy, t
+  INTEGER :: mpirank
 
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: f1, f2, dA
   DOUBLE PRECISION s
@@ -26,9 +27,8 @@ PROGRAM compute_diag
 !! Size of Lat-long grid
   OPEN(10,file='diag.dat')
   READ(10,*) iframe
+  READ(10,*) kmax
   CLOSE(10)
-
-  kmax = 512*1024
 
   fname1 = 'fort.qxxxx'
   fname2 = 'fort.txxxx'
@@ -55,6 +55,7 @@ PROGRAM compute_diag
      READ(10,*) ngrid
      READ(10,*) level
      READ(10,*) block_number
+     READ(10,*) mpirank
      READ(10,*) mx
      READ(10,*) my
      READ(10,*) xlow
