@@ -13,6 +13,8 @@ fname{6} = 'mix-CLAW-dx0.1875-un-CFL0.95.dat';
 
 fname{1} = 'mix.out';
 
+iframe = load('diag.dat');
+
 a = -0.8;
 b = 0.9;
 
@@ -82,7 +84,7 @@ for i = 1:1,
 
   xlabel('\phi','fontsize',14);
   ylabel('\Psi(\phi)','fontsize',14);
-  title(sprintf('%s',fname{i}),'fontsize',18);
+  title(sprintf('iframe = %d',iframe),'fontsize',18);
 
   prt = true;
   if (prt == true)
