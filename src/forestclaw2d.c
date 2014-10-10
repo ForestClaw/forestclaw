@@ -29,6 +29,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
 
+/* This is already deprecated:
+ * I need to go back to fclaw_base and see how to make that usable. */
+void
+fclaw2d_global_log (int log_priority, const char * message)
+{
+    /* TODO: establish an fclaw_package_id */
+    SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, log_priority, message);
+}
+
 double
 fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
 {
