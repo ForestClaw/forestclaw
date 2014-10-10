@@ -33,10 +33,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.H"
 
+static int
+torus_checkparms (int example, int lp)
+{
+    if (example < 1 || example > 2) {
+        fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 int
 main (int argc, char **argv)
 {
   int                   lp;
+  int                   retval;
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
@@ -54,6 +66,7 @@ main (int argc, char **argv)
 
 
 #ifdef TRAPFPE
+  /* TODO: This should be done in fclaw_mpi_init? */
   printf("Enabling floating point traps\n");
   feenableexcept(FE_INVALID);
 #endif
@@ -63,6 +76,7 @@ main (int argc, char **argv)
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG
+  /* TODO: What is this for? Should be absorbed into fclaw_mpi_init. */
   fclaw2d_mpi_debug();
 #endif
   /* ---------------------------------------------------------------
@@ -83,6 +97,8 @@ main (int argc, char **argv)
   gparms = amr_options_new (options);
   clawpack_parms = fclaw2d_clawpack_parms_new(options);
 
+  /* TODO: would it make sense to provide this code up to and excluding
+   *       torus_checkparms into a reusable function? */
   /* parse command line; these values take precedence */
   amr_options_parse (options,argc, argv, lp);
 
@@ -90,9 +106,17 @@ main (int argc, char **argv)
   amr_postprocess_parms(gparms);
   fclaw2d_clawpack_postprocess_parms(clawpack_parms);
 
-  /* Check final state of parameters */
-  amr_checkparms(gparms);
+  /* Check final state of parameters.
+   * The call to amr_checkparms2 also checks for a --help message.
+   * We are exploiting C short-circuit boolean evaluation.
+   */
+  retval = amr_checkparms2 (options, gparms, lp);
+  /* TODO: Convert this similarly to amr_checkparms2 */
   fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
+  /* TODO: example, phi, theta should live in a struct that can be passed */
+  retval = retval || torus_checkparms (example, lp);
+  if (!retval) {
+     /* the do-the-work block. TODO: put everything below into a function */
 
   /* ---------------------------------------------------------------
      Domain geometry
@@ -117,7 +141,7 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha);
       break;
   default:
-      sc_abort_collective ("Parameter example must be 1 or 2");
+      SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
@@ -150,6 +174,8 @@ main (int argc, char **argv)
   amrinit(&domain);
   amrrun(&domain);
   amrreset(&domain);
+
+  } /* this bracket ends the do_the_work block */
 
   sc_options_destroy (options);         /* this could be moved up */
   amr_options_destroy (gparms);
