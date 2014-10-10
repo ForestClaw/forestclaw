@@ -38,10 +38,6 @@ extern "C"
 
 typedef struct amr_options amr_options_t;
 
-typedef void *(*fclaw2d_user_parms_new_t) (sc_options_t * opt);
-
-typedef void (*fclaw2d_user_parms_destroy_t) (amr_options_t * gparms);
-
 struct amr_options
 {
     /* Fixed grid size for each grid */
@@ -101,6 +97,8 @@ struct amr_options
     double ay;
     double by;
 
+    /** This switch variable is set to nonzero by --help and --usage. */
+    int help;
 };
 
 /** Convert a string with multiple integers into an integer array.
@@ -153,7 +151,15 @@ void amr_options_destroy (amr_options_t * amropt);
 
 
 void amr_postprocess_parms (amr_options_t * amropt);
+
+/** Check options and call exit (1) if something is wrong.
+ * TODO: convert all code to use \a amr_checkparms2 below.
+ */
 void amr_checkparms (amr_options_t * amropt);
+
+/** Check amr options, keeping the program alive.
+ * \return 0 if there are no errors, nonzero otherwise. */
+int amr_checkparms2 (sc_options_t * options, amr_options_t * amropt, int lp);
 
 #ifdef __cplusplus
 #if 0

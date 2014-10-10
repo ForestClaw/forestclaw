@@ -181,10 +181,15 @@ amr_options_new (sc_options_t * opt)
     sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower (ay)");
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper (by)");
 
+
     /* ------------------------------------------------------------------- */
     /* Right now all switch options default to false, need to change that */
     /* I am okay with them being set to false by default, since I expect that
        user will set everything in the input file
+
+       CB: sc now has a new type of option, the bool.  While switch
+           increments the value of the variable on each call, the bool
+           can be initialized to either true or false and changed both ways.
      */
     sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
                            "Solution is on manifold [F]");
@@ -197,7 +202,12 @@ amr_options_new (sc_options_t * opt)
                            "Use subcycling in time [F]");
     sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
                            "No weighting when subcycling [F]");
-    /* ------------------------------------------------------------------- */
+
+    /* ---------------------- Usage information -------------------------- */
+    sc_options_add_switch (opt, 0, "help", &amropt->help,
+                           "Print usage information (same as --usage)");
+    sc_options_add_switch (opt, 0, "usage", &amropt->help,
+                           "Print usage information (same as --help)");
 
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
@@ -248,6 +258,12 @@ amr_checkparms (amr_options_t * gparms)
             printf
                 ("For fixed dt, initial time step size must divide tfinal/nout "
                  "exactly.\n");
+
+            /*
+             * TODO: exit should only be called from the main program.
+             * In forestclaw, probably not even there:
+             * We should exit gracefully by calling mpi_finalize etc.
+             */
             exit (1);
         }
     }
@@ -255,16 +271,43 @@ amr_checkparms (amr_options_t * gparms)
     /* Could also do basic sanity checks on mx,my,... */
 }
 
+int
+amr_checkparms2 (sc_options_t * options, amr_options_t * gparms, int lp)
+{
+    /* Check for user help argument */
+    if (gparms->help) {
+        sc_options_print_usage (sc_package_id, lp, options, NULL);
+        return -1;
+    }
 
+    /* Check outstyle. */
+    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
+    {
+        double dT_outer = gparms->tfinal / gparms->nout;
+        double dT_inner = gparms->initial_dt;
+        int nsteps = (int) floor (dT_outer / dT_inner + .5);
+        if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
+        {
+            SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, lp,
+                        "For fixed dt, initial time step size must divide"
+                        " tfinal/nout exactly.\n");
+            return -1;
+        }
+    }
 
+    /* Could also do basic sanity checks on mx,my,... */
+
+    /* Everything is good */
+    return 0;
+}
 
 #if 0
 void
 amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                    int argc, char **argv, int log_priority)
 #endif
-     void amr_options_parse (sc_options_t * opt, int argc, char **argv,
-                             int log_priority)
+     void amr_options_parse (sc_options_t * opt,
+                             int argc, char **argv, int log_priority)
 {
     int retval;
 
@@ -272,7 +315,8 @@ amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
     if (retval < 0)
     {
         sc_options_print_usage (sc_package_id, log_priority, opt, NULL);
-        sc_abort_collective ("Option parsing failed");
+        sc_abort_collective ("Option parsing failed;"
+                             " please see above usage information");
     }
     sc_options_print_summary (sc_package_id, log_priority, opt);
     if (sc_is_root ())
