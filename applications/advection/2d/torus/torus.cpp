@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_single_step.H>
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
@@ -38,7 +37,7 @@ int
 main (int argc, char **argv)
 {
   int                   lp;
-  MPI_Comm              mpicomm;
+  sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
   fclaw2d_map_context_t *cont = NULL;
@@ -60,7 +59,7 @@ main (int argc, char **argv)
 #endif
 
   lp = SC_LP_PRODUCTION;
-  mpicomm = MPI_COMM_WORLD;
+  mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG

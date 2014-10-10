@@ -30,11 +30,11 @@ int
 main (int argc, char **argv)
 {
   int		        lp;
-  MPI_Comm              mpicomm;
+  sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
 
   lp = SC_LP_PRODUCTION;
-  mpicomm = MPI_COMM_WORLD;
+  mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 

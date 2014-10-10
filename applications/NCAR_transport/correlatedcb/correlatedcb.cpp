@@ -38,7 +38,7 @@ int
 main (int argc, char **argv)
 {
   int			lp;
-  MPI_Comm		mpicomm;
+  sc_MPI_Comm		mpicomm;
   int                   example;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
@@ -55,7 +55,7 @@ main (int argc, char **argv)
 #endif
 
   lp = SC_LP_PRODUCTION;
-  mpicomm = MPI_COMM_WORLD;
+  mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG
