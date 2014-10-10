@@ -47,7 +47,7 @@ echo "o---------------------------------------"
 echo "| Checking headers"
 echo "o---------------------------------------"s
 
-dnl AC_CHECK_HEADERS([fenv.h signal.h])
+AC_CHECK_HEADERS([fenv.h signal.h])
 
 echo "o---------------------------------------"
 echo "| Checking functions"
