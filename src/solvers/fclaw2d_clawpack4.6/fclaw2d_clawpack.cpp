@@ -517,19 +517,6 @@ fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
     amr_options_add_int_array (opt, 0, "mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
                                "Waves limiters (one for each wave)");
-    /*
-     * At this point amropt->mthlim is allocated, but for precisely 1 wave,
-     * since that is the default value provided to clawpack_parms->waves above.
-     * If the number of waves (clawpack_parms->mwaves) is changed by option
-     * parsing, then this array needs to be converted anew. This can be done
-     * by calling fclaw2d_clawpack_postprocess_parms.
-     */
-
-
-    /* -----------------------------------------------------------------------
-       Read in options from file
-       ----------------------------------------------------------------------- */
-
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-W' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -537,7 +524,7 @@ fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
        WARNING: The long option name must be unique within the whole program.
                 Just 'inifile' is already used in amr_options.c.
        ----------------------------------------------------------------------- */
-    sc_options_add_inifile (opt, 'W', "clawpack_inifile",
+    sc_options_add_inifile (opt, 'W', "fclaw2d_clawpack.ini",
                             "Read clawpack options from this file [default : fclaw2d_clawpack.ini]");
 
     /* -----------------------------------------------------------------------
