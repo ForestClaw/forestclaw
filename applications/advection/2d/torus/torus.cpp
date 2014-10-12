@@ -77,6 +77,9 @@ main (int argc, char **argv)
 
 #ifdef MPI_DEBUG
   /* TODO: What is this for? Should be absorbed into fclaw_mpi_init. */
+  /* This is code that suspends processing (with an infinite loop) so that
+     multiple processes can be attached and debugged with GDB.  I am happy to
+     move it.  Didn't know where... */
   fclaw2d_mpi_debug();
 #endif
   /* ---------------------------------------------------------------
