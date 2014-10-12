@@ -131,16 +131,21 @@ main (int argc, char **argv)
 
   /* Ratio of inner radius to outer radius */
   alpha = 0.4;
+  int mi, ni, a,b;
+  mi = 1;
+  ni = 1;
+  a = 0;
+  b = 1;
 
   /* default torus has outer radius 1 and inner radius alpha */
   switch (example)
   {
   case 1:
-      conn = p4est_connectivity_new_periodic();
+      conn = p4est_connectivity_new_brick(mi,ni,a,b);
       cont = fclaw2d_map_new_cart(scale,shift,rotate);
       break;
   case 2:
-      conn = p4est_connectivity_new_periodic();
+      conn = p4est_connectivity_new_brick(mi,ni,a,b);
       cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha);
       break;
   default:
