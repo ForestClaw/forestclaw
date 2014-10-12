@@ -69,7 +69,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->attributes = attributes != NULL ? attributes : sc_keyvalue_new ();
     nm = 0;
     domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
-    if (domain->num_exchange_patches > 0) {
+    if (domain->num_exchange_patches > 0)
+    {
         mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
         mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
         FCLAW_ASSERT (mirror_quadrant_num >= 0);
@@ -130,9 +131,11 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
                 patch->flags |= FCLAW2D_PATCH_FIRST_SIBLING;
             }
             FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
-            if (mirror_quadrant_num == local_num_patches) {
+            if (mirror_quadrant_num == local_num_patches)
+            {
                 patch->flags |= FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY;
-                if (++nm < domain->num_exchange_patches) {
+                if (++nm < domain->num_exchange_patches)
+                {
                     mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
                     mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
                     FCLAW_ASSERT (mirror_quadrant_num > local_num_patches);
@@ -203,8 +206,9 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     /* parallel communication of minimum and maximum levels */
     levels[0] = domain->local_minlevel;
     levels[1] = -domain->local_maxlevel;
-    mpiret = sc_MPI_Allreduce (levels, global_levels, 2, sc_MPI_INT, sc_MPI_MIN,
-                               domain->mpicomm);
+    mpiret =
+        sc_MPI_Allreduce (levels, global_levels, 2, sc_MPI_INT, sc_MPI_MIN,
+                          domain->mpicomm);
     SC_CHECK_MPI (mpiret);
     domain->global_minlevel = global_levels[0];
     domain->global_maxlevel = -global_levels[1];
@@ -299,8 +303,8 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
                              p4est_connectivity_t * conn,
                              fclaw2d_map_context_t * cont)
 {
-    p4est_wrap_t       *wrap;
-    fclaw2d_domain_t   *domain;
+    p4est_wrap_t *wrap;
+    fclaw2d_domain_t *domain;
 
     fclaw2d_check_initial_level (mpicomm, initial_level);
     wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
