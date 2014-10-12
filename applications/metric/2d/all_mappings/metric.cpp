@@ -71,10 +71,10 @@ main (int argc, char **argv)
                       "8 for torus");
 
   /* Read parameters from .ini file */
-  gparms = amr_options_new (options); // Sets default values
+  gparms = amr_options_new (options);   /* Sets default values */
 
   /* Parse command line */
-  amr_options_parse (options, argc, argv, lp);  // Reads options from a file
+  amr_options_parse (options, argc, argv, lp);  /* Reads options from a file */
 
   /* Postprocess arrays */
   amr_postprocess_parms(gparms);
