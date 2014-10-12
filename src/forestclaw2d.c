@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* This is already deprecated:
  * I need to go back to fclaw_base and see how to make that usable. */
 void
-fclaw2d_global_log (int log_priority, const char * message)
+fclaw2d_global_log (int log_priority, const char *message)
 {
     /* TODO: establish an fclaw_package_id */
     SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, log_priority, message);
@@ -834,11 +834,11 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
 void
 fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno)
 {
-  int swap;
+    int swap;
 
-  swap = *cornerno;
-  *cornerno = *rcornerno;
-  *rcornerno = swap;
+    swap = *cornerno;
+    *cornerno = *rcornerno;
+    *rcornerno = swap;
 }
 
 void
@@ -923,96 +923,6 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
             }
         }
     }
-#if 0
-    else
-    {
-        const int *my_axis = &ftransform[0];
-        const int *target_axis = &ftransform[3];
-        const int *edge_reverse = &ftransform[6];
-        int bt, bn;
-        int nx, ny;
-        int sx, sy;
-        double my_xyz[2], target_xyz[2];
-
-        /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmx + 2. * (*i + .5 - based);
-        my_xyz[1] = ipatch->ylower * Rmx + 2. * (*j + .5 - based);
-
-        /* transform transversal direction */
-        target_xyz[target_axis[0]] =
-            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
-
-        /* transform normal direction */
-        switch (edge_reverse[2])
-        {
-        case 0:
-            target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
-            break;
-        case 1:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
-            break;
-        case 2:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
-            break;
-        case 3:
-            target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
-            break;
-        default:
-            SC_ABORT_NOT_REACHED ();
-        }
-
-        /* move back into integer coordinates: this is exact */
-        di = (int) (target_xyz[0] - opatch->xlower * Rmx) + based - 1;
-        dj = (int) (target_xyz[1] - opatch->ylower * Rmx) + based - 1;
-
-        /* Run through the child cells in order of the small patch */
-        for (sy = 0; sy < 2; ++sy)
-        {
-            for (sx = 0; sx < 2; ++sx)
-            {
-
-                /* Compute small patch coordinate in (transverse, normal) order */
-                if (target_axis[0])
-                {
-                    kt = sy;
-                    kn = sx;
-                }
-                else
-                {
-                    kt = sx;
-                    kn = sy;
-                }
-
-                /* Transform into big patch (transverse, normal) coordinate */
-                bt = !edge_reverse[0] ? kt : !kt;
-                bn = (edge_reverse[2] == 1
-                      || edge_reverse[2] == 2) ? kn : !kn;
-
-                /* Compute coordinate relative to the big patch */
-                if (my_axis[0])
-                {
-                    nx = bn;
-                    ny = bt;
-                }
-                else
-                {
-                    nx = bt;
-                    ny = bn;
-                }
-
-                /* assign value in proper place */
-                i[2 * ny + nx] = di + sx;
-                j[2 * ny + nx] = dj + sy;
-            }
-        }
-    }
-#endif
-
-#if 0
-    printf ("Test O: OP %g %g %d I %d %d %d %d J %d %d %d %d\n",
-            opatch->xlower, opatch->ylower, opatch->level,
-            i[0], i[1], i[2], i[3], j[0], j[1], j[2], j[3]);
-#endif
 }
 
 void

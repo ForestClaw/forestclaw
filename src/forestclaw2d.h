@@ -124,7 +124,7 @@ struct fclaw2d_domain
 
 /** Log a message only on rank zero.
  * This is a hack: I shall check fclaw_base and make that useful instead. */
-void fclaw2d_global_log (int log_priority, const char * message);
+void fclaw2d_global_log (int log_priority, const char *message);
 
 /***************************** DOMAIN ATTRIBUTES **************************/
 
