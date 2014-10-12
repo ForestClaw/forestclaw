@@ -746,20 +746,13 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     local_num = block->num_patches_before + patchno;
     qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
 
-    /* We are not yet ready for true multiblock connectivities */
-    if (qid < 0)
-    {
-        /* The value -1 is expected for a corner on the physical boundary */
-        /* It is -2 for one or more true corner neighbors */
-        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
-    }
-    else
+    /* We are not yet ready for general multiblock connectivities */
+    if (qid >= 0)
     {
         FCLAW_ASSERT (0 <= qid);
         if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
         {
-            /* this is a corner neighbor across an inter-tree face */
-            /* TODO: currently p4est does not expose true corner neighbors */
+            /* This is an inter-tree (face or corner) corner neighbor */
             cornerid =
                 qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
             FCLAW_ASSERT (cornerid < mesh->local_num_corners);
@@ -768,18 +761,41 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             cend =
                 fclaw2d_array_index_locidx (mesh->corner_offset,
                                             cornerid + 1);
-            FCLAW_ASSERT (cstart + 1 == cend);  /* TODO: ok on faces */
-            qid = fclaw2d_array_index_locidx (mesh->corner_quad, cstart);
-            *rcorner = (int)
-                *(int8_t *) sc_array_index_int (mesh->corner_corner,
-                                                (int) cstart);
-            FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+            if (cstart + 1 < cend)
+            {
+                /* At least a five-corner, which is currently not supported */
+                qid = -1;
+            }
+            else
+            {
+                FCLAW_ASSERT (cstart + 1 == cend);
+                qid = fclaw2d_array_index_locidx (mesh->corner_quad, cstart);
+                *rcorner = (int)
+                    *(int8_t *) sc_array_index_int (mesh->corner_corner,
+                                                    (int) cstart);
+                FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+                if (cornerno + *rcorner != P4EST_CHILDREN - 1)
+                {
+                    /* This corner is not diagonally opposite and ignored */
+                    qid = -1;
+                }
+            }
         }
         else
         {
             /* for intra-tree corners we take the corner is opposite */
             *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
         }
+    }
+
+    if (qid < 0)
+    {
+        /* The value -1 is expected for a corner on the physical boundary */
+        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
+        *rcorner = -1;
+    }
+    else
+    {
         if (qid < mesh->local_num_quadrants)
         {
             /* local quadrant may be in a different tree */
@@ -844,10 +860,10 @@ fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno)
 void
 fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                 fclaw2d_patch_t * opatch,
-                                int icorner,
+                                int icorner, int is_block_boundary,
                                 int mx, int my, int based, int *i, int *j)
 {
-    double Rmx;
+    double Rmx, xshift, yshift;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
@@ -865,26 +881,53 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
             mx, *i, *j, based);
 #endif
 
-    /* work with doubles -- exact for integers up to 52 bits of precision */
+    /* Work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx *(double) (1 << ipatch->level);
-
-    if (1)
+    if (!is_block_boundary)
     {
-        /* The two patches are in the same block */
-        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
-        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
+        /* The lower left coordinates are with respect to the same origin */
+        xshift = yshift = 0.;
     }
+    else
+    {
+        /* We need to add/substract the shift due to translation of one block */
+        if ((icorner & 1) == 0)
+        {
+            /* This corner is on the left face of the patch */
+            xshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the right face of the patch */
+            xshift = -1.;
+        }
+        if ((icorner & 2) == 0)
+        {
+            /* This corner is on the bottom face of the patch */
+            yshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the top face of the patch */
+            yshift = -1.;
+        }
+    }
+
+    /* The two patches are in the same block, or in a different block
+     * that has a coordinate system with the same orientation */
+    *i += (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmx);
+    *j += (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx);
 }
 
 void
 fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
                                  fclaw2d_patch_t * opatch,
-                                 int icorner,
+                                 int icorner, int is_block_boundary,
                                  int mx, int my, int based, int i[], int j[])
 {
     int kt, kn;
     int di, dj;
-    double Rmx;
+    double Rmx, xshift, yshift;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
@@ -904,23 +947,52 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
     Rmx = (double) mx *(double) (1 << opatch->level);
-
-    if (1)
+    if (!is_block_boundary)
     {
-        /* The two patches are in the same block */
-        di = based + (int)
-            ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
-        dj = based + (int)
-            ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
-
-        /* In the same block, the order of child cells is canonical */
-        for (kt = 0; kt < 2; ++kt)
+        /* The lower left coordinates are with respect to the same origin */
+        xshift = yshift = 0.;
+    }
+    else
+    {
+        /* We need to add/substract the shift due to translation of one block */
+        if ((icorner & 1) == 0)
         {
-            for (kn = 0; kn < 2; ++kn)
-            {
-                i[2 * kt + kn] = di + kn;
-                j[2 * kt + kn] = dj + kt;
-            }
+            /* This corner is on the left face of the patch */
+            xshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the right face of the patch */
+            xshift = -1.;
+        }
+        if ((icorner & 2) == 0)
+        {
+            /* This corner is on the bottom face of the patch */
+            yshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the top face of the patch */
+            yshift = -1.;
+        }
+    }
+
+    /* The two patches are in the same block, or in a different block
+     * that has a coordinate system with the same orientation */
+    di = based
+        + (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmx +
+                 2. * (*i - based));
+    dj = based
+        + (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx +
+                 2. * (*j - based));
+
+    /* Without any rotation, the order of child cells is canonical */
+    for (kt = 0; kt < 2; ++kt)
+    {
+        for (kn = 0; kn < 2; ++kn)
+        {
+            i[2 * kt + kn] = di + kn;
+            j[2 * kt + kn] = dj + kt;
         }
     }
 }

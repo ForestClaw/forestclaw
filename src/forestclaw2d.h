@@ -397,6 +397,8 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
+ * Inter-tree corners are only returned if the number of meeting corners is
+ * exactly four, and if the neighbor's coordinate system is not rotated.
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
@@ -430,10 +432,10 @@ void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
- * This function assumes that the two patches are in the SAME block.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
@@ -443,15 +445,16 @@ void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
  */
 void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                      fclaw2d_patch_t * opatch,
-                                     int icorner, int mx, int my,
+                                     int icorner, int is_block_boundary,
+                                     int mx, int my,
                                      int based, int *i, int *j);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
- * This function assumes that the two patches are in the SAME block.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
@@ -467,7 +470,7 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
  */
 void fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
                                       fclaw2d_patch_t * opatch,
-                                      int icorner,
+                                      int icorner, int is_block_boundary,
                                       int mx, int my, int based,
                                       int i[], int j[]);
 
