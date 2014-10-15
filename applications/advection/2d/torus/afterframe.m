@@ -40,9 +40,9 @@ else
 end
 
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-  filename = framename(Frame,'swirl0000','png');
+  filename = framename(Frame,'torus0000','png');
   print('-dpng',filename);
 end
 
