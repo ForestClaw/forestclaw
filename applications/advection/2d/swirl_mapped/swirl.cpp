@@ -129,6 +129,13 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_cart(scale,shift,rotate);
       break;
   case 3:
+      if (gparms->mx*pow_int(2,gparms->minlevel) < 32)
+      {
+          printf("The squared-disk is inadmissable:  mx*2^minlevel " \
+                 "must be greater than or equal to 32.\n");
+          exit(0);
+      }
+
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
       break;

@@ -54,6 +54,7 @@ typedef struct fclaw2d_transform_data
     /* 1 for cell-centered (1 .. mx); 0 for node-based (0 .. mx) */
     int based;
     int fine_grid_pos;          /* Fine grid position (0 or 1) */
+    int is_block_boundary;
 }
 fclaw2d_transform_data_t;
 

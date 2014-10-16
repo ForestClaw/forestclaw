@@ -127,25 +127,25 @@ c     case, the corner ghost cells are copied from a face neighbor.
                   if (icorner .eq. 1) then
                      qthis(mx+ibc,jbc-mbc,mq) =
      &                     qneighbor(ibc,jbc-mbc,mq)
-c                     qneighbor(ibc-mbc,jbc-mbc,mq) =
-c     &                     qthis(mx+ibc-mbc,jbc-mbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc-mbc,jbc-mbc,mq)
                   elseif (icorner .eq. 3) then
                      qthis(mx+ibc,my+jbc,mq) =
      &                     qneighbor(ibc,my+jbc,mq)
-c                     qneighbor(ibc-mbc,my+jbc,mq) =
-c     &                     qthis(mx+ibc-mbc,my+jbc,mq)
+                     qneighbor(ibc-mbc,my+jbc,mq) =
+     &                     qthis(mx+ibc-mbc,my+jbc,mq)
                   endif
                elseif (iface .eq. 3) then
                   if (icorner .eq. 2) then
                      qthis(ibc-mbc,my+jbc,mq) =
      &                     qneighbor(ibc-mbc,jbc,mq)
-c                     qneighbor(ibc-mbc,jbc-mbc,mq) =
-c     &                     qthis(ibc-mbc,my+jbc-mbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(ibc-mbc,my+jbc-mbc,mq)
                   elseif(icorner .eq. 3) then
                      qthis(mx+ibc,my+jbc,mq) =
      &                     qneighbor(mx+ibc,jbc,mq)
-c                     qneighbor(mx+ibc,jbc-mbc,mq) =
-c     &                     qthis(mx+ibc,my+jbc-mbc,mq)
+                     qneighbor(mx+ibc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc,my+jbc-mbc,mq)
                   endif
                endif
             enddo

@@ -50,7 +50,7 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
     *j2 = *j1;
     if (tdata->iface >= 0)
     {
-        /* block-face but no block-corner */
+        /* block-face but not a block-corner */
         FCLAW_ASSERT (tdata->iface < 4);
         fclaw2d_patch_transform_face (tdata->this_patch,
                                       tdata->neighbor_patch, tdata->transform,
@@ -97,7 +97,7 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     j2[0] = *j1;
     if (tdata->iface >= 0)
     {
-        /* block-face but no block-corner */
+        /* block-face but not a block-corner */
         FCLAW_ASSERT (tdata->iface < 4);
         fclaw2d_patch_transform_face2 (tdata->this_patch,
                                        tdata->neighbor_patch,

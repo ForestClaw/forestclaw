@@ -55,11 +55,11 @@ void get_corner_type(fclaw2d_domain_t* domain,
     int corner_faces[SpaceDim];
     fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
-    // Both faces are at a physical boundary
+    /* Both faces are at a physical boundary */
     fclaw_bool is_phys_corner =
         intersects_bdry[corner_faces[0]] && intersects_bdry[corner_faces[1]];
 
-    // Corner lies in interior of physical boundary edge.
+    /* Corner lies in interior of physical boundary edge. */
     fclaw_bool corner_on_phys_face = !is_phys_corner &&
              (intersects_bdry[corner_faces[0]] || intersects_bdry[corner_faces[1]]);
 
@@ -68,21 +68,22 @@ void get_corner_type(fclaw2d_domain_t* domain,
        (i.e. no reentrant corners). */
     *interior_corner = !corner_on_phys_face && !is_phys_corner;
 
-    // Both faces are at a block boundary
+    /* Both faces are at a block boundary */
     *is_block_corner =
         intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
 
     *block_iface = -1;
     if (!*is_block_corner)
     {
+        /* At most one of these is true if corner is not a block corner */
         if (intersects_block[corner_faces[0]])
         {
-            // Corner is on a block face.
+            /* Corner is on a block face. */
             *block_iface = corner_faces[0];
         }
         else if (intersects_block[corner_faces[1]])
         {
-            // Corner is on a block face.
+            /* Corner is on a block face. */
             *block_iface = corner_faces[1];
         }
     }
