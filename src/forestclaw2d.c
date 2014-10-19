@@ -663,7 +663,6 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         {
             for (sx = 0; sx < 2; ++sx)
             {
-
                 /* Compute small patch coordinate in (transverse, normal) order */
                 if (target_axis[0])
                 {

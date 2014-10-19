@@ -338,6 +338,8 @@ void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
  *                          1: q' = q + 1
  *                          2: q' = q - 1
  *                          3: q' = 2 - q
+ *                          [8] & 4: Both patches are in the same block,
+ *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).
  */
 void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
