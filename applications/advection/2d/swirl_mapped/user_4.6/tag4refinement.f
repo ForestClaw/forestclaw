@@ -1,28 +1,37 @@
-      subroutine swirl_tag4refinement(mx,my,mbc,meqn,
+      subroutine swirl_tag4refinement(mx,my,mbc,meqn,blockno,
      &      xlower,ylower,dx,dy,q,init_flag, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, init_flag
+      integer mx,my, mbc, meqn, tag_patch, init_flag, blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq,m
       double precision xc,yc, qmin, qmax
       double precision dq, dqi, dqj
+      double precision xp,yp,zp
+      integer*8 cont, get_context
+
+      cont = get_context()
 
       qmin = 100.d0
       qmax = -100.d0
       tag_patch = 0
 
+
 c     # Refine based only on first variable in system.
       mq = 1
       do i = 1,mx
          do j = 1,my
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+            call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+c            if (xp .ge. 0.5d0) then
+c               tag_patch = 1
+c               return
+c            endif
 
             if (init_flag .eq. 1 .and. .false.) then
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-c               if (abs(xc + yc-1) .lt. dy) then
                if (abs(xc-0.5) .lt. dy) then
                   tag_patch = 1
                   return

@@ -40,8 +40,9 @@ extern "C"
 extern "C"
 {
     void swirl_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn, const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
+                               const int& meqn, const int& blockno,
+                               const double& xlower, const double& ylower,
+                               const double& dx, const double& dy,
                                double q[], const int& init_flag, int& tag_patch);
 
     void swirl_tag4coarsening_(const int& mx,const int& my,const int& mbc,
