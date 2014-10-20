@@ -37,7 +37,7 @@ static
 void get_face_neighbors(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx,
-                        int iside,
+                        int iside, int is_block_face,
                         int *neighbor_block_idx,
                         fclaw2d_patch_t* neighbor_patches[],
                         int **ref_flag_ptr,
@@ -74,7 +74,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
       FCLAW2D_PATCH_DOUBLESIZE
       ------------------------------- */
 
-    *neighbor_block_idx = rblockno;
+    *neighbor_block_idx = is_block_face ? rblockno : -1;
 
     if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
     {
@@ -88,9 +88,10 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     {
         // Get encoding of transforming a neighbor coordinate across a face
         fclaw2d_patch_face_transformation (iside, rfaceno, ftransform);
-        if (this_block_idx == rblockno)
+        if (!is_block_face)
         {
             // If we are within one patch this is a special case
+            FCLAW_ASSERT (*neighbor_block_idx == -1);
             ftransform[8] = 4;
         }
 
@@ -174,6 +175,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     for (int iface = 0; iface < NumFaces; iface++)
     {
         int idir = iface/2;
+        int iface_flags = fclaw2d_patch_block_face_flags[iface];
+        int is_block_face = (this_patch->flags & iface_flags) != 0;
 
         /* Output arguments */
         int neighbor_block_idx;
@@ -193,7 +196,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
         get_face_neighbors(domain,
                            this_block_idx,
                            this_patch_idx,
-                           iface,
+                           iface, is_block_face,
                            &neighbor_block_idx,
                            neighbor_patches,
                            &ref_flag_ptr,
@@ -201,7 +204,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                            &iface_neighbor_ptr,
                            transform_data.transform);
 
-        /* fclaw_bool block_boundary = this_block_idx != neighbor_block_idx; */
+        /* fclaw_bool block_boundary = (neighbor_block_idx >= 0); */
         if (ref_flag_ptr == NULL)
         {
             /* No face neighbors - we are at a physical boundary */
@@ -261,7 +264,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             int this_face = iface;
 
             /* Redo the transformation */
-            if (this_block_idx != neighbor_block_idx)
+            if (neighbor_block_idx >= 0)
             {
                 fclaw2d_patch_face_transformation (iface_coarse, this_face,
                                                    transform_data.transform);
