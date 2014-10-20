@@ -48,9 +48,19 @@ typedef enum
     FCLAW2D_PATCH_CHILDID = 0x7,
     FCLAW2D_PATCH_FIRST_SIBLING = 0x8,
     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10,
-    FCLAW2D_PATCH_IS_GHOST = 0x20
+    FCLAW2D_PATCH_IS_GHOST = 0x20,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_0 = 0x040,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_1 = 0x080,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_4_ONLY_FOR_3D = 0x400,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_5_ONLY_FOR_3D = 0x800,
+    FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
 }
 fclaw2d_patch_flags_t;
+
+/** For each of the four faces, the corresponding block boundary flag. */
+extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
 /*
  * The domain structure gives a processor local view of the grid hierarchy.

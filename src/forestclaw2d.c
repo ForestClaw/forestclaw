@@ -29,6 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
 
+const fclaw2d_patch_flags_t
+fclaw2d_patch_block_face_flags[4] = {
+    FCLAW2D_PATCH_ON_BLOCK_FACE_0,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_1,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_2,
+    FCLAW2D_PATCH_ON_BLOCK_FACE_3
+};
+
 /* This is already deprecated:
  * I need to go back to fclaw_base and see how to make that usable. */
 void
@@ -305,6 +313,8 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     block = domain->blocks + blockno;
 #endif
     FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+
+    /* TODO: Use patch block face flags as shortcut */
 
     tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
     totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;

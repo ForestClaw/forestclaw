@@ -29,6 +29,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
+static void
+fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
+                                     p4est_quadrant_t * quad)
+{
+  p4est_qcoord_t      qh;
+
+  qh = P4EST_QUADRANT_LEN (quad->level);
+  if (quad->x == 0) {
+    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_0;
+  }
+  if (quad->x + qh == P4EST_ROOT_LEN) {
+    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_1;
+  }
+  if (quad->y == 0) {
+    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_2;
+  }
+  if (quad->y + qh == P4EST_ROOT_LEN) {
+    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_3;
+  }
+  /* This suffices to test for block corners by using bitwise and */
+
+  patch->xlower = quad->x * fclaw2d_smallest_h;
+  patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+  patch->ylower = quad->y * fclaw2d_smallest_h;
+  patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+}
+
 /** Domain constructor takes ownership of wrap.
  */
 static fclaw2d_domain_t *
@@ -43,7 +70,6 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     int tree_minlevel, local_minlevel;
     int tree_maxlevel, local_maxlevel;
     int levels[2], global_levels[2];
-    p4est_qcoord_t qh;
     p4est_connectivity_t *conn = wrap->conn;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -148,11 +174,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
                     mirror_quadrant_num = -1;
                 }
             }
-            qh = P4EST_QUADRANT_LEN (level);
-            patch->xlower = quad->x * fclaw2d_smallest_h;
-            patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
-            patch->ylower = quad->y * fclaw2d_smallest_h;
-            patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+            fclaw2d_patch_set_boundary_xylower (patch, quad);
             if (block->patchbylevel[level] == NULL)
             {
                 /* this is the first patch of this level in this block */
@@ -195,11 +217,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         patch->flags =
             p4est_quadrant_child_id (quad) | FCLAW2D_PATCH_IS_GHOST;
         FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
-        qh = P4EST_QUADRANT_LEN (level);
-        patch->xlower = quad->x * fclaw2d_smallest_h;
-        patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
-        patch->ylower = quad->y * fclaw2d_smallest_h;
-        patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+        fclaw2d_patch_set_boundary_xylower (patch, quad);
         patch->u.blockno = (int) quad->p.which_tree;
     }
 
