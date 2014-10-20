@@ -41,6 +41,11 @@ Makefile.fclaw.mk : Makefile.fclaw.pre
 fclawaclocaldir = $(datadir)/aclocal
 dist_fclawaclocal_DATA = config/fclaw_include.m4
 
+# install example .ini files in a dedicated directory
+fclawinidir = $(datadir)/ini
+dist_fclawini_DATA =
+AM_CPPFLAGS += -DFCLAW_INIDIR=\"$(fclawinidir)\"
+
 # setup test environment
 if FCLAW_MPIRUN
 LOG_COMPILER = @FCLAW_MPIRUN@
