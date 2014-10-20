@@ -37,9 +37,8 @@ enum
 
 
 static
-void get_block_boundary(fclaw2d_domain_t *domain,
-                        int this_block_idx,
-                        int this_patch_idx,
+void get_block_boundary(fclaw2d_domain_t * domain,
+                        fclaw2d_patch_t * patch,
                         fclaw_bool *intersects_block);
 
 static
@@ -68,7 +67,7 @@ void get_corner_type(fclaw2d_domain_t* domain,
        (i.e. no reentrant corners). */
     *interior_corner = !corner_on_phys_face && !is_phys_corner;
 
-    /* Both faces are at a block boundary */
+    /* Both faces are at a block boundary, physical or not */
     *is_block_corner =
         intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
 
@@ -303,8 +302,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     get_phys_boundary(domain,this_block_idx,this_patch_idx,
                       intersects_bdry);
 
-    get_block_boundary(domain,this_block_idx,this_patch_idx,
-                       intersects_block);
+    get_block_boundary(domain, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -328,8 +326,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         &is_block_corner,
                         &transform_data.iface);
 
-        if (is_interior_corner)  /* Interior to the domain, not necessarily to a block */
+        if (is_interior_corner)
         {
+            /* Interior to the domain, not necessarily to a block */
+
             int corner_block_idx;
             int neighbor_level;
             int *ref_flag_ptr = &neighbor_level;
@@ -431,45 +431,16 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 }
 
 static
-void get_block_boundary(fclaw2d_domain_t *domain,
-                        int this_block_idx,
-                        int this_patch_idx,
+void get_block_boundary(fclaw2d_domain_t * domain,
+                        fclaw2d_patch_t * patch,
                         fclaw_bool *intersects_block)
 {
-    int rproc[p4est_refineFactor];
-    int rblockno;
-    int rpatchno[p4est_refineFactor];
-    int rfaceno;
-
     for (int iside = 0; iside < NumFaces; iside++)
     {
-        fclaw2d_patch_relation_t neighbor_type =
-            fclaw2d_patch_face_neighbors(domain,
-                                         this_block_idx,
-                                         this_patch_idx,
-                                         iside,
-                                         rproc,
-                                         &rblockno,
-                                         rpatchno,
-                                         &rfaceno);
-        /* --------------------------
-           neighbor_type is one of :
-           FCLAW2D_PATCH_BOUNDARY,
-           FCLAW2D_PATCH_HALFSIZE,
-           FCLAW2D_PATCH_SAMESIZE,
-           FCLAW2D_PATCH_DOUBLESIZE
-           --------------------------*/
+        int iface_flags = fclaw2d_patch_block_face_flags[iside];
+        int is_block_face = (patch->flags & iface_flags) != 0;
 
-        if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
-        {
-            /* 'iside' is a physical boundary (and so it must also be a
-               block boundary */
-            intersects_block[iside] = fclaw_true;
-        }
-        else
-        {
-            // We have a neighbor patch on block 'rblockno'.
-            intersects_block[iside] = this_block_idx != rblockno;
-        }
+        /* True for physical and block boundaries across a face */
+        intersects_block[iside] = is_block_face;
     }
 }
