@@ -146,6 +146,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
                                             const double shift[],
                                             const double rotate[]);
 
+fclaw2d_map_context_t* fclaw2d_map_new_brick(const double scale[],
+                                             const double shift[],
+                                             const double rotate[],
+                                             int mi, int mj);
+
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],

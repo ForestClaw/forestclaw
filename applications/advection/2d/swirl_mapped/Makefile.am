@@ -11,6 +11,7 @@ applications_advection_2d_swirl_mapped_swirl_SOURCES = \
 	applications/advection/2d/swirl_mapped/mapc2m.f \
 	applications/advection/2d/swirl_mapped/setaux_manifold.f \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_cart.c \
+	applications/advection/2d/swirl_mapped/fclaw2d_map_brick.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_identity.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_fivepatch.c \
 	applications/advection/2d/swirl_mapped/setprob.f \

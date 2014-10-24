@@ -75,7 +75,8 @@ main (int argc, char **argv)
   sc_options_add_int (options, 0, "example", &example, 0,
                       "1 for identity mapping [0,1]x[0,1]" \
                       "2 for Cartesian mapping" \
-                      "3 for five patch square");
+                      "3 for five patch square" \
+                      "4 for brick");
 
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
@@ -115,6 +116,12 @@ main (int argc, char **argv)
   rotate[0] = 0;
   rotate[1] = 0;
 
+  int mi,mj,a,b;
+  mi = 4;
+  mj = 4;
+  a = 0;   /* periodic in x */
+  b = 0;   /* periodic in y */
+
   switch (example) {
   case 1:
       /* Map unit square in [0,1]x[0,1] to [0,1]x[0,1] */
@@ -138,6 +145,14 @@ main (int argc, char **argv)
 
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
+      break;
+  case 4 :
+      shift[0] = 0;
+      shift[1] = 0;
+      scale[0] = (double) 1.0/mi; /* without a cast, I get 1.0/mi = 0.5  Why? */
+      scale[1] = (double) 1.0/mj;
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,mj);
       break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");
