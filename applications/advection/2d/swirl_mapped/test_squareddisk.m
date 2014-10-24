@@ -75,6 +75,12 @@ xc = [0 c 1 fliplr(c) 0 0];
 yc = [0 zeros(size(c)) 1 ones(size(c)) 1 0];
 [xp,yp,zp] = mapc2m(xc,yc);
 plot(xp,yp,'k','linewidth',2);
+[xp,yp,zp] = mapc2m(0,0);
+p1 = plot(xp,yp,'g.','markersize',30);
+[xp,yp,zp] = mapc2m(1,0);
+p2 = plot(xp,yp,'y.','markersize',30);
+legend([p1 p2],{'(0,0)','(1,0)'});
+
 s = sprintf('mx = %d; minlevel = %d\n',mx,minlevel);
 title(s,'fontsize',18);
 
