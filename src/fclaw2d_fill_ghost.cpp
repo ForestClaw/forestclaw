@@ -274,28 +274,30 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     /* Supply physical boundary conditions on coarse grid */
     fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
 
-    /* -------------------------------------------------------------
-      Parallel ghost patch exchange
-      -------------------------------------------------------------- */
-    exchange_ghost_patch_data_all(domain);
+    if (domain->mpisize > 1)
+    {
+        /* -------------------------------------------------------------
+           Parallel ghost patch exchange
+           -------------------------------------------------------------- */
+        exchange_ghost_patch_data_all(domain);
 
-    /* -------------------------------------------------------------
-      Repeat above, but now with parallel ghost cells.
-      This may involve lots of repeated worked.
-      -------------------------------------------------------------- */
+        /* -------------------------------------------------------------
+           Repeat above, but now with parallel ghost cells.
+           This may involve lots of repeated worked.
+           -------------------------------------------------------------- */
 
-    /* Fill in ghost cells on parallel patch boundaries */
-    read_parallel_patches = fclaw_false;
-    intralevel_ghost_copy(domain,minlevel,maxlevel,
+        /* Fill in ghost cells on parallel patch boundaries */
+        read_parallel_patches = fclaw_true;
+        intralevel_ghost_copy(domain,minlevel,maxlevel,
+                              read_parallel_patches);
+
+        /* Average fine grid data to the coarse grid. */
+        fill_coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
                           read_parallel_patches);
 
-    /* Average fine grid data to the coarse grid. */
-    fill_coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
-                      read_parallel_patches);
-
-    /* Supply physical boundary conditions on coarse grid */
-    fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
-
+        /* Supply physical boundary conditions on coarse grid */
+        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+    }
 
     /* ---------------------------------------------------------
        Fill in fine grid data via interpolation.  Fine grid ghost
@@ -307,10 +309,10 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
 
     fill_fine_ghost(domain,minfine, maxfine,time_interp);
 
-    /* Fill in fine grid ghost cells at physical boundaries. This is
-     needed to make sure we have valid values in the fine grid corners at
-     the physical boundaries. */
-    fill_physical_ghost(domain,minfine,maxfine,t,time_interp);
+    /* --------------------------------------------------------- */
+    /* Do a final fill in of boundary conditions of all physical
+       values */
+    fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
 
     /* --------------------------------------------------------- */
 
