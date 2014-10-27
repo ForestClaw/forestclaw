@@ -39,6 +39,23 @@ FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
                                   tdata->mx, tdata->my, tdata->based, i2, j2);
 }
 
+
+/* Half size neighbor across a face */
+void
+FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
+                             int i2[], int j2[],
+                             fclaw2d_transform_data_t** ptdata)
+{
+    fclaw2d_transform_data_t *tdata = *ptdata;
+    i2[0] = *i1;
+    j2[0] = *j1;
+    fclaw2d_patch_transform_face2 (tdata->this_patch,
+                                   tdata->neighbor_patch,
+                                   tdata->transform, tdata->mx, tdata->my,
+                                   tdata->based, i2, j2);
+}
+
+
 /* TODO: Extend this for a block-block corner */
 void
 FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
@@ -63,27 +80,13 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
         FCLAW_ASSERT (tdata->iface == -1);
         fclaw2d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
-                                        tdata->icorner, 0,
+                                        tdata->icorner, tdata->is_block_corner,
                                         tdata->mx, tdata->my,
                                         tdata->based, i2, j2);
     }
+    /* Done. */
     /* TODO: We need to permit that it's a block corner.  In this case,
      * call fclaw2d_patch_transform_corner with is_block_boundary = 1 */
-}
-
-/* Half size neighbor across a face */
-void
-FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
-                             int i2[], int j2[],
-                             fclaw2d_transform_data_t** ptdata)
-{
-    fclaw2d_transform_data_t *tdata = *ptdata;
-    i2[0] = *i1;
-    j2[0] = *j1;
-    fclaw2d_patch_transform_face2 (tdata->this_patch,
-                                   tdata->neighbor_patch,
-                                   tdata->transform, tdata->mx, tdata->my,
-                                   tdata->based, i2, j2);
 }
 
 /* TODO: Extend this for a block-block corner */
@@ -110,10 +113,11 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
         FCLAW_ASSERT (tdata->iface == -1);
         fclaw2d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
-                                         tdata->icorner, 0,
+                                         tdata->icorner, tdata->is_block_corner,
                                          tdata->mx, tdata->my,
                                          tdata->based, i2, j2);
     }
+    /* Done */
     /* TODO: We need to permit that it's a block corner.  In this case,
      * call fclaw2d_patch_transform_corner2 with is_block_boundary = 1 */
 }

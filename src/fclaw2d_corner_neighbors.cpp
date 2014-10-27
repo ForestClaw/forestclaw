@@ -36,7 +36,6 @@ enum
 };
 
 
-static
 void get_block_boundary(fclaw2d_domain_t * domain,
                         fclaw2d_patch_t * patch,
                         fclaw_bool *intersects_block);
@@ -146,11 +145,10 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     if (has_corner_neighbor && is_block_corner)
     {
         /* 4 or more patches meet at a block corner */
-        printf("get_corner_neighbors (amr_neighbors.f) : "             \
-               "Four or more patches meet at a block corner; "         \
-               "(not implemented yet).\n");
-        /* Set block_corner_count to number of patches that meet */
-        exit(0);
+        *block_corner_count = 4;  /* assume four for now */
+        /* We don't have a block corner transformation, so I am going to
+           treat this as if it were an interior corner */
+        ftransform[8] = 4;
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
@@ -161,8 +159,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     }
     else if (has_corner_neighbor && !is_block_corner)
     {
-        /* 'icorner' is an interior corner or a a block edge */
-        /* Need to return a valid transform in 'ftransform' */
+        /* 'icorner' is an interior corner, at a block edge,
+         or we are on a periodic block.  Need to return a valid
+         transform in 'ftransform' */
         if (this_block_idx == *corner_block_idx)
         {
             /* Both patches are in the same block, so we set the transform to
@@ -312,6 +311,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
+    transform_data.is_block_corner = 0;
 
     int refratio = gparms->refratio;
 
@@ -351,6 +351,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 transform_data.transform);
 
             this_cp->set_block_corner_count(icorner,block_corner_count);
+            transform_data.is_block_corner = is_block_corner;
 
             if (ref_flag_ptr == NULL)
             {
@@ -365,7 +366,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             {
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
-                if (!is_block_corner)
+                if (!ispillowsphere)
                 {
                     if (neighbor_level == FINER_GRID)
                     {
@@ -389,33 +390,24 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 }
                 else
                 {
-                    /* We are at a block corner */
-                    if (ispillowsphere)
+                    /* Pillowsphere : The block corners of the pillow sphere have to
+                       be handled as a special case */
+                    if (neighbor_level == FINER_GRID)
                     {
-                        /* The block corners of the pillow sphere have to be handled as
-                           a special case */
-                        if (neighbor_level == FINER_GRID)
+                        if (interpolate_to_neighbor && !remote_neighbor)
                         {
-                            if (interpolate_to_neighbor && !remote_neighbor)
-                            {
-                                this_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
-                                                                           corner_cp,time_interp);
-                            }
-                            else if (average_from_neighbor)
-                            {
-                                this_cp->mb_average_block_corner_ghost(icorner,refratio,
+                            this_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
                                                                        corner_cp,time_interp);
-                            }
                         }
-                        else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
+                        else if (average_from_neighbor)
                         {
-                            this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
+                            this_cp->mb_average_block_corner_ghost(icorner,refratio,
+                                                                   corner_cp,time_interp);
                         }
                     }
-                    else
+                    else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
-                        /* Handle 4 and 5 corner block cases here;  nothing to do for
-                           cubed sphere case. */
+                        this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
                     }
                 }
             }  /* Ende of non-parallel patch case */
@@ -430,7 +422,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     }  /* End of icorner loop */
 }
 
-static
 void get_block_boundary(fclaw2d_domain_t * domain,
                         fclaw2d_patch_t * patch,
                         fclaw_bool *intersects_block)

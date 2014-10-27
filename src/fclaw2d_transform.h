@@ -44,17 +44,16 @@ typedef struct fclaw2d_transform_data
     int transform[9];
     int mx;
     int my;
-    /*
-      -1 for interior corners or block corners; otherwise it is a
-      block face (but not a block corner).  IN this case, set to face number. In
-      this case, ftransform[] is well defined.
-    */
-    int iface;
     int icorner;
-    /* 1 for cell-centered (1 .. mx); 0 for node-based (0 .. mx) */
-    int based;
-    int fine_grid_pos;          /* Fine grid position (0 or 1) */
-    int is_block_boundary;
+    int based;      /* 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx) */
+    int is_block_face;    /* not a corner */
+    int is_block_corner;
+
+
+    /* These don't seem to be used */
+    int fine_grid_pos;         /* Fine grid position (0 or 1) */
+    int iface;                 /* -1 for interior/block corners */
+    int is_block_boundary;     /* is_block_face ? */
 }
 fclaw2d_transform_data_t;
 
