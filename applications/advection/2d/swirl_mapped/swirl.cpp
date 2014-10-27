@@ -119,8 +119,8 @@ main (int argc, char **argv)
   int mi,mj,a,b;
   mi = 4;
   mj = 4;
-  a = 0;   /* periodic in x */
-  b = 0;   /* periodic in y */
+  a = 1;   /* periodic in x */
+  b = 1;   /* periodic in y */
 
   switch (example) {
   case 1:
