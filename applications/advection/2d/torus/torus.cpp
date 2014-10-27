@@ -134,7 +134,7 @@ main (int argc, char **argv)
   int mi, ni, a,b;
   mi = 1;
   ni = 1;
-  a = 0;
+  a = 1;
   b = 1;
 
   /* default torus has outer radius 1 and inner radius alpha */
