@@ -272,13 +272,13 @@ double fclaw2d_clawpack_step2_rhs(fclaw2d_domain_t *domain,
 
 
 void fclaw2d_clawpack_bc2(fclaw2d_domain *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt,
-                      fclaw_bool intersects_phys_bdry[],
-                      fclaw_bool time_interp)
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt,
+                          fclaw_bool intersects_phys_bdry[],
+                          fclaw_bool time_interp)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -317,8 +317,6 @@ void fclaw2d_clawpack_bc2(fclaw2d_domain *domain,
     }
 
     /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
-
 
     /*
       We may be imposing boundary conditions on time-interpolated data;
