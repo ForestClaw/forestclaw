@@ -132,8 +132,8 @@ main (int argc, char **argv)
   /* Ratio of inner radius to outer radius */
   alpha = 0.4;
   int mi, ni, a,b;
-  mi = 1;
-  ni = 1;
+  mi = 2;
+  ni = 2;
   a = 1;
   b = 1;
 
@@ -141,12 +141,16 @@ main (int argc, char **argv)
   switch (example)
   {
   case 1:
+      shift[0] = -1;   /* [0,2]x[0,2] --> [-1,1]x[-1,1] */
+      shift[1] = -1;
       conn = p4est_connectivity_new_brick(mi,ni,a,b);
-      cont = fclaw2d_map_new_cart(scale,shift,rotate);
+      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,ni);
       break;
   case 2:
+      mi = 2;
+      ni = 1;
       conn = p4est_connectivity_new_brick(mi,ni,a,b);
-      cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha);
+      cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha,mi,ni);
       break;
   default:
       SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

@@ -13,7 +13,7 @@
       alpha = 0.4d0
       pi2 = 2*pi
       if (iscart()) then
-         psi = x
+         psi = y
       else
 c        # Finally works... !
          psi = revs_per_s*pi2*alpha*(pi2*y + alpha*sin(pi2*y))

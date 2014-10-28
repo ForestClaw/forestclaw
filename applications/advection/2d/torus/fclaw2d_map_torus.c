@@ -40,9 +40,9 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_pillowsphere (fclaw2d_map.c) : Query id not "\
+        printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not "\
                "identified;  Maybe the query is not up to date?\nSee "  \
-               "fclaw2d_map_query_defs.h.\n");
+               "fclaw2d_map_torus.c.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
     }
@@ -55,6 +55,18 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
+
+    int mi, mj;
+    mi = cont->user_int[0];
+    mj = cont->user_int[1];
+    MAPC2M_BRICK(&blockno,&xc,&yc,xp,yp,zp,&mi, &mj);
+
+    /* map back to [0,1]x[0,1] */
+    xc = (double) *xp/mi;
+    yc = (double) *yp/mj;
+
+    /* blockno is ignored in the current torus mapping;  it just assumes
+       a single "logical" block in [0,1]x[0,1] */
     double alpha = cont->user_double[0];
     MAPC2M_TORUS(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
@@ -65,7 +77,9 @@ fclaw2d_map_context_t *
     fclaw2d_map_new_torus (const double scale[],
                            const double shift[],
                            const double rotate[],
-                           const double alpha)
+                           const double alpha,
+                           const int mi,
+                           const int ni)
 {
     fclaw2d_map_context_t *cont;
 
@@ -74,6 +88,8 @@ fclaw2d_map_context_t *
     cont->mapc2m = fclaw2d_map_c2m_torus;
 
     cont->user_double[0] = alpha;
+    cont->user_int[0] = mi;
+    cont->user_int[1] = ni;
 
     set_scale(cont,scale);
     set_shift(cont,shift);
