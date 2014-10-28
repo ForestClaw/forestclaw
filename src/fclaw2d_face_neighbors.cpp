@@ -101,10 +101,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         /* This case should be excluded by earlier checkes */
         printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch found\n");
         exit(0);
-        /*
-        *ref_flag_ptr = NULL;
-        *iface_neighbor_ptr = NULL;
-        */
     }
     else
     {
@@ -234,7 +230,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
             fclaw2d_patch_t* neighbor_patches[p4est_refineFactor];
 
-            transform_data.iface = iface;
+            /* transform_data.block_iface = iface; */
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
