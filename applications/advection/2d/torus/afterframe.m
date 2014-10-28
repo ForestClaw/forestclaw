@@ -36,11 +36,11 @@ daspect([1,1,1]);
 if (isflat)
     view(2);
 else
-    view(vtop);    
+    view(3);    
 end
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
   filename = framename(Frame,'torus0000','png');
   print('-dpng',filename);

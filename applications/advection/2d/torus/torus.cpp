@@ -63,6 +63,7 @@ main (int argc, char **argv)
   double shift[3];
   double alpha;
   int example;
+  int mi, mj, a,b;
 
 
 #ifdef TRAPFPE
@@ -126,31 +127,32 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
   pi = M_PI;
   set_default_transform(scale,shift,rotate);
+
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
 
   /* Ratio of inner radius to outer radius */
   alpha = 0.4;
-  int mi, ni, a,b;
-  mi = 2;
-  ni = 2;
-  a = 1;
+  a = 1;  /* Periodicity */
   b = 1;
 
   /* default torus has outer radius 1 and inner radius alpha */
   switch (example)
   {
   case 1:
+      mi = 2;
+      mj = 2;
       shift[0] = -1;   /* [0,2]x[0,2] --> [-1,1]x[-1,1] */
       shift[1] = -1;
-      conn = p4est_connectivity_new_brick(mi,ni,a,b);
-      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,ni);
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,mj);
       break;
   case 2:
+      /* Generally, we should have mj \approx \alpha*mi */
       mi = 2;
-      ni = 1;
-      conn = p4est_connectivity_new_brick(mi,ni,a,b);
-      cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha,mi,ni);
+      mj = 1;
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha,mi,mj);
       break;
   default:
       SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
