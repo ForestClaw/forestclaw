@@ -449,7 +449,8 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
                                         fclaw2d_patch_t * patch, int block_no,
                                         int patch_no, void *user)
 {
-    fclaw2d_domain_list_neighbors_t *ln = user;
+    fclaw2d_domain_list_neighbors_t *ln =
+      (fclaw2d_domain_list_neighbors_t *) user;
     fclaw2d_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
     int rproc[2], rblockno, rpatchno[2], rfaceno;
