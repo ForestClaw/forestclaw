@@ -118,7 +118,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
                          int icorner,
-                         int iface,
+                         int block_iface,
                          fclaw_bool is_block_corner,
                          int *corner_block_idx,
                          fclaw2d_patch_t** corner_patch,
@@ -162,17 +162,11 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         /* 'icorner' is an interior corner, at a block edge,
          or we are on a periodic block.  Need to return a valid
          transform in 'ftransform' */
-        if (this_block_idx == *corner_block_idx)
-        {
-            /* Both patches are in the same block, so we set the transform to
-               a default transform */
-            ftransform[8] = 4;
-        }
-        else
+        if (block_iface >= 0)
         {
             /* The corner is on a block edge (but is not a block corner).
-               In this case, we need to compute a transform between blocks.
-               To to this, we need the remote face number */
+               Compute a transform between blocks. First, get the
+               remote face number */
             int rfaceno;
             int rproc[p4est_refineFactor];
             int rpatchno;
@@ -180,14 +174,25 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             fclaw2d_patch_face_neighbors(domain,
                                          this_block_idx,
                                          this_patch_idx,
-                                         iface,
+                                         block_iface,
                                          rproc,
                                          &rblockno,
                                          &rpatchno,
                                          &rfaceno);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw2d_patch_face_transformation (iface, rfaceno, ftransform);
+            fclaw2d_patch_face_transformation (block_iface, rfaceno, ftransform);
+        }
+        else if (this_block_idx == *corner_block_idx)
+        {
+            /* Both patches are in the same block, so we set the transform to
+               a default transform */
+            ftransform[8] = 4;
+        }
+        else
+        {
+            printf("get_corner_neighbors (fclaw2d_corner_neighbors.cpp : We should not be here\n");
+            exit(0);
         }
     }
     else if (!has_corner_neighbor && is_block_corner)
@@ -324,7 +329,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         intersects_block,
                         &is_interior_corner,
                         &is_block_corner,
-                        &transform_data.iface);
+                        &transform_data.block_iface);
 
         if (is_interior_corner)
         {
@@ -341,7 +346,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,
                                 icorner,
-                                transform_data.iface,
+                                transform_data.block_iface,
                                 is_block_corner,
                                 &corner_block_idx,
                                 &corner_patch,
