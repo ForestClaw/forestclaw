@@ -65,10 +65,10 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
     fclaw2d_transform_data_t *tdata = *ptdata;
     *i2 = *i1;
     *j2 = *j1;
-    if (tdata->iface >= 0)
+    if (tdata->block_iface >= 0)
     {
         /* block-face but not a block-corner */
-        FCLAW_ASSERT (tdata->iface < 4);
+        FCLAW_ASSERT (tdata->block_iface < 4);
         fclaw2d_patch_transform_face (tdata->this_patch,
                                       tdata->neighbor_patch, tdata->transform,
                                       tdata->mx, tdata->my,
@@ -77,7 +77,7 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
     else
     {
         /* corner within a block */
-        FCLAW_ASSERT (tdata->iface == -1);
+        FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
                                         tdata->icorner, tdata->is_block_corner,
@@ -98,10 +98,10 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     fclaw2d_transform_data_t *tdata = *ptdata;
     i2[0] = *i1;
     j2[0] = *j1;
-    if (tdata->iface >= 0)
+    if (tdata->block_iface >= 0)
     {
         /* block-face but not a block-corner */
-        FCLAW_ASSERT (tdata->iface < 4);
+        FCLAW_ASSERT (tdata->block_iface < 4);
         fclaw2d_patch_transform_face2 (tdata->this_patch,
                                        tdata->neighbor_patch,
                                        tdata->transform, tdata->mx, tdata->my,
@@ -110,7 +110,7 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     else
     {
         /* corner within a block */
-        FCLAW_ASSERT (tdata->iface == -1);
+        FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
                                          tdata->icorner, tdata->is_block_corner,
