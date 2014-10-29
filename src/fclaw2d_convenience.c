@@ -70,6 +70,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     int tree_minlevel, local_minlevel;
     int tree_maxlevel, local_maxlevel;
     int levels[2], global_levels[2];
+    p4est_topidx_t vnum;
     p4est_connectivity_t *conn = wrap->conn;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -129,6 +130,20 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->xupper = 1.;
         block->ylower = 0.;
         block->yupper = 1.;
+        if (conn->vertices != NULL && conn->tree_to_vertex != NULL)
+        {
+            for (j = 0; j < P4EST_CHILDREN; ++j)
+            {
+                vnum = conn->tree_to_vertex[P4EST_CHILDREN * i + j];
+                FCLAW_ASSERT (0 <= vnum && vnum < conn->num_vertices);
+                memcpy (block->vertices + 3 * j, conn->vertices + 3 * vnum,
+                        3 * sizeof (double));
+            }
+        }
+        else
+        {
+            memset (block->vertices, 0, P4EST_CHILDREN * 3 * sizeof (double));
+        }
         for (face = 0; face < P4EST_FACES; ++face)
         {
             if (conn->tree_to_tree[P4EST_FACES * i + face] ==

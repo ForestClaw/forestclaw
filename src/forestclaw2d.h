@@ -89,6 +89,8 @@ struct fclaw2d_block
 {
     double xlower, xupper;
     double ylower, yupper;
+    double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
+                                     of the p4est_connectivity structure */
     int is_boundary[4];         /* physical boundary flag */
     int num_patches;            /* local patches in this block */
     int num_patches_before;     /* in all previous blocks */
