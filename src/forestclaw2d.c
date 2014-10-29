@@ -754,7 +754,8 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     local_num = block->num_patches_before + patchno;
     qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
 
-    /* We are not yet ready for general multiblock connectivities */
+    /* We are not yet ready for general multiblock connectivities where more
+     * than four blocks meet at a corner */
     if (qid >= 0)
     {
         FCLAW_ASSERT (0 <= qid);
@@ -782,11 +783,13 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                     *(int8_t *) sc_array_index_int (mesh->corner_corner,
                                                     (int) cstart);
                 FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+#if 0           /* return any kind of rotated/flipped corner  */
                 if (cornerno + *rcorner != P4EST_CHILDREN - 1)
                 {
                     /* This corner is not diagonally opposite and ignored */
                     qid = -1;
                 }
+#endif
             }
         }
         else
@@ -799,6 +802,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     if (qid < 0)
     {
         /* The value -1 is expected for a corner on the physical boundary */
+        /* Currently we also return this for five- and more-corners */
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
         *rcorner = -1;
     }
