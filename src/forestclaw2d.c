@@ -29,8 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
 
-const fclaw2d_patch_flags_t
-fclaw2d_patch_block_face_flags[4] = {
+const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
     FCLAW2D_PATCH_ON_BLOCK_FACE_0,
     FCLAW2D_PATCH_ON_BLOCK_FACE_1,
     FCLAW2D_PATCH_ON_BLOCK_FACE_2,

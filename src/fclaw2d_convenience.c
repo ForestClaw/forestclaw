@@ -31,29 +31,33 @@ const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
 static void
 fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
-                                     p4est_quadrant_t * quad)
+                                    p4est_quadrant_t * quad)
 {
-  p4est_qcoord_t      qh;
+    p4est_qcoord_t qh;
 
-  qh = P4EST_QUADRANT_LEN (quad->level);
-  if (quad->x == 0) {
-    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_0;
-  }
-  if (quad->x + qh == P4EST_ROOT_LEN) {
-    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_1;
-  }
-  if (quad->y == 0) {
-    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_2;
-  }
-  if (quad->y + qh == P4EST_ROOT_LEN) {
-    patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_3;
-  }
-  /* This suffices to test for block corners by using bitwise and */
+    qh = P4EST_QUADRANT_LEN (quad->level);
+    if (quad->x == 0)
+    {
+        patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_0;
+    }
+    if (quad->x + qh == P4EST_ROOT_LEN)
+    {
+        patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_1;
+    }
+    if (quad->y == 0)
+    {
+        patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_2;
+    }
+    if (quad->y + qh == P4EST_ROOT_LEN)
+    {
+        patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_3;
+    }
+    /* This suffices to test for block corners by using bitwise and */
 
-  patch->xlower = quad->x * fclaw2d_smallest_h;
-  patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
-  patch->ylower = quad->y * fclaw2d_smallest_h;
-  patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+    patch->xlower = quad->x * fclaw2d_smallest_h;
+    patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+    patch->ylower = quad->y * fclaw2d_smallest_h;
+    patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
 }
 
 /** Domain constructor takes ownership of wrap.
@@ -465,7 +469,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
                                         int patch_no, void *user)
 {
     fclaw2d_domain_list_neighbors_t *ln =
-      (fclaw2d_domain_list_neighbors_t *) user;
+        (fclaw2d_domain_list_neighbors_t *) user;
     fclaw2d_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
     int rproc[2], rblockno, rpatchno[2], rfaceno;
