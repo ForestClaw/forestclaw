@@ -1,10 +1,10 @@
       subroutine setaux_manifold(mbc,mx,my,
-     &      xlower,ylower,dx,dy,
+     &      blockno,xlower,ylower,dx,dy,
      &      maux,aux,xp,yp,zp,xd,yd,zd,
      &      xnormals,ynormals,edge_lengths,area)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, meqn, maux, blockno
       double precision dx,dy, xlower, ylower, z
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
@@ -24,7 +24,7 @@
       enddo
 
       call compute_velocity_psi_comp(mx,my,mbc,dx,dy,
-     &      t,xlower,ylower,aux,maux)
+     &      t,blockno,xlower,ylower,aux,maux)
 
 c     # Compute the velocity in Cartesian coordinates;
 c     # project onto edge normals and scale. This
@@ -98,10 +98,10 @@ c           # Do y-face
 
 
       subroutine compute_velocity_psi_comp(mx,my,mbc,
-     &      dx,dy,t,xlower,ylower,aux,maux)
+     &      dx,dy,t,blockno,xlower,ylower,aux,maux)
       implicit none
 
-      integer mx,my,mbc,maux
+      integer mx,my,mbc,maux,blockno
       double precision dx,dy, t, xlower,ylower
 
       double precision xd1(2),xd2(2)
@@ -119,7 +119,7 @@ c           # x-faces
             xd2(1) = xlower + (i-1)*dx
             xd2(2) = ylower + (j-1)*dy
 
-            call get_vel_psi_comp(xd1,xd2,dy,vn,t)
+            call get_vel_psi_comp(blockno,xd1,xd2,dy,vn,t)
             aux(i,j,2) = vn
          enddo
       enddo
@@ -133,19 +133,20 @@ c           # y-faces
             xd2(1) = xlower + (i-1)*dx
             xd2(2) = ylower + (j-1)*dy
 
-            call get_vel_psi_comp(xd1,xd2,dx,vn,t)
+            call get_vel_psi_comp(blockno,xd1,xd2,dx,vn,t)
             aux(i,j,3) = -vn
          enddo
       enddo
 
       end
 
-      subroutine get_vel_psi_comp(xd1,xd2,ds,vn,t)
+      subroutine get_vel_psi_comp(blockno,xd1,xd2,ds,vn,t)
       implicit none
 
       double precision xd1(2),xd2(2), ds, vn, psi,t
+      integer blockno
 
-      vn = (psi(xd1(1),xd1(2),t) -
-     &      psi(xd2(1),xd2(2),t))/ds
+      vn = (psi(blockno,xd1(1),xd1(2),t) -
+     &      psi(blockno,xd2(1),xd2(2),t))/ds
 
       end
