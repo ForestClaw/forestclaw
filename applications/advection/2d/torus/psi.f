@@ -1,22 +1,33 @@
-      double precision function psi(x,y,z,t)
+      double precision function psi(blockno,xc,yc,t)
       implicit none
 
-      double precision x, y, z, t,r
+      double precision xc, yc, t,r
+      integer blockno
       double precision pi, r2, phi, pi2, alpha
-      logical iscart
+      logical iscart, issphere
       double precision revs_per_s
+      integer*8 cont, get_context
+
+      double precision xp,yp,zp
 
       common /compi/ pi
+
+      cont = get_context()
+
+      call fclaw2d_map_c2m(cont,
+     &      blockno,xc,yc,xp,yp,zp)
 
       revs_per_s = 0.5d0
 
       alpha = 0.4d0
       pi2 = 2*pi
       if (iscart()) then
-         psi = y
+         psi = revs_per_s*(xc + pi*yc/2.d0);
+      elseif (issphere()) then
+         psi = pi2*revs_per_s*zp
       else
-c        # Finally works... !
-         psi = revs_per_s*pi2*alpha*(pi2*y + alpha*sin(pi2*y))
+c        # torus
+         psi = revs_per_s*pi2*alpha*(pi2*yc + alpha*sin(pi2*yc))
       endif
 
       end

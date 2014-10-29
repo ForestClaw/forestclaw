@@ -2,16 +2,11 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 global map isflat;
 
-% map = 'nomap';
-% map = 'brick';
-map = 'torus';
+map = 'brick';
+% map = 'torus';
+% map = 'latlong';
 
 switch map
-    case 'nomap'
-        isflat = true;
-        xp = xc;
-        yp = yc;
-        zp = 0*xp;
     case 'brick'
         mi = 2;
         ni = 2;
@@ -27,6 +22,17 @@ switch map
         xc1 = xc1/mi;
         yc1 = yc1/mj;
         [xp,yp,zp] = mapc2m_torus(xc1,yc1);
+    case 'latlong'
+        isflat = false;
+        mi = 2;
+        mj = 1;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc);
+        xc1 = xc1/mi;
+        yc1 = yc1/mj;
+        a = 0.5-40/180;
+        b = 0.5+40/180;
+        yc1 = a + (b-a)*yc1;        
+        [xp,yp,zp] = mapc2m_latlong(xc1,yc1);
 end
 
 end

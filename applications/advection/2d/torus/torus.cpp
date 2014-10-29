@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int
 torus_checkparms (int example, int lp)
 {
-    if (example < 1 || example > 2) {
+    if (example < 1 || example > 3) {
         fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
         return -1;
     }
@@ -64,6 +64,9 @@ main (int argc, char **argv)
   double alpha;
   int example;
   int mi, mj, a,b;
+  double R_earth;
+  double lat[2];
+  double longitude[2];
 
 
 #ifdef TRAPFPE
@@ -140,6 +143,8 @@ main (int argc, char **argv)
   switch (example)
   {
   case 1:
+      a = 1;
+      b = 0;
       mi = 2;
       mj = 2;
       shift[0] = -1;   /* [0,2]x[0,2] --> [-1,1]x[-1,1] */
@@ -153,6 +158,23 @@ main (int argc, char **argv)
       mj = 1;
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
       cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha,mi,mj);
+      break;
+  case 3:
+      /* Lat-long example */
+      mi = 2;
+      mj = 1;
+      a = 1;
+      b = 0;
+      longitude[0] = 0; /* x-coordinate */
+      longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
+      lat[0] = -80;  /* y-coordinate */
+      lat[1] = 80;
+      R_earth = 6378.1;
+      scale[0] = 1;
+      scale[1] = 1;
+      scale[2] = 1;
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      cont = fclaw2d_map_new_latlong(scale,shift,rotate,lat,longitude,mi,mj,a,b);
       break;
   default:
       SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

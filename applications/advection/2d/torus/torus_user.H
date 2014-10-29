@@ -43,6 +43,7 @@ extern "C"
 
     void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,
+                          const int& blockno,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
                           const int& maux, double aux[],
@@ -139,6 +140,16 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(const double scale[],
                                              const int mi,
                                              const int mj);
 
+fclaw2d_map_context_t *
+    fclaw2d_map_new_latlong (const double scale[],
+                             const double shift[],
+                             const double rotate[],
+                             const double lat[],
+                             const double longitude[],
+                             const int mi,
+                             const int ni,
+                             const int a,
+                             const int b);
 
 #ifdef __cplusplus
 #if 0

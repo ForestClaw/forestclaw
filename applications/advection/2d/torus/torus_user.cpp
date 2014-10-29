@@ -107,8 +107,7 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
     double *area = cp->area();
 
 
-
-    setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
+    setaux_manifold_(mbc,mx,my,this_block_idx,xlower,ylower,dx,dy,
                      maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
                      edge_lengths,area);
 }
