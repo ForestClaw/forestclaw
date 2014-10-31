@@ -260,7 +260,7 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
        so boundary patches will have to be updated after the exchange.
        ---------------------------------------------------------- */
     int mincoarse = minlevel;
-    int maxcoarse = maxlevel-1;
+    int maxcoarse = maxlevel-1;   /* Be careful with minlevel-maxlevel */
 
     /* Copy ghost cells at coarse levels.  Include finest level, although it isn't
        needed immediately */
@@ -271,7 +271,8 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     fill_coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
                       read_parallel_patches);
 
-    /* Supply physical boundary conditions on coarse grid */
+    /* Supply physical boundary conditions on coarse grid;  We don't do the
+       physical BCs for the finest level grids */
     fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
 
     if (domain->mpisize > 1)

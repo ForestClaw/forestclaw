@@ -45,6 +45,10 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_initialize         = &torus_qinit;
     sf->f_patch_single_step_update = &torus_update;
 
+    /* Boundary conditions */
+    sf->f_patch_physical_bc        = &fclaw2d_clawpack_bc2;
+
+
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
     rf->f_patch_tag4refinement = &torus_patch_tag4refinement;
     rf->f_patch_tag4coarsening = &torus_patch_tag4coarsening;
