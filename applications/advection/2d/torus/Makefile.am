@@ -8,6 +8,7 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/fclaw2d_map_torus.c \
 	applications/advection/2d/torus/fclaw2d_map_latlong.c \
 	applications/advection/2d/torus/fclaw2d_map_brick.c \
+	applications/advection/2d/torus/fclaw2d_map_brick2.c \
 	applications/advection/2d/torus/fclaw2d_map_cart.c \
 	applications/advection/2d/torus/setprob.f \
 	applications/advection/2d/torus/psi.f \

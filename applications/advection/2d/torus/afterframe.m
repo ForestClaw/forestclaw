@@ -37,6 +37,7 @@ if (isflat)
     view(2);
 else
     view(3);    
+    zoom(1.5);
 end
 
 NoQuery = 0;

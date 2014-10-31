@@ -145,12 +145,14 @@ main (int argc, char **argv)
   case 1:
       a = 1;
       b = 0;
-      mi = 2;
-      mj = 2;
+      mi = 4;
+      mj = 4;
+      scale[0] = (double) 2.0/mi;
+      scale[1] = (double) 2.0/mj;
       shift[0] = -1;   /* [0,2]x[0,2] --> [-1,1]x[-1,1] */
       shift[1] = -1;
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,mj);
+      cont = fclaw2d_map_new_brick2(domain,mi,mj);
       break;
   case 2:
       /* Generally, we should have mj \approx \alpha*mi */

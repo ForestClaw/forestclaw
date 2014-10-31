@@ -8,12 +8,14 @@ map = 'brick';
 
 switch map
     case 'brick'
-        mi = 2;
-        ni = 2;
+        mi = 4;
+        ni = 4;
         isflat = true;        
         [xp,yp,zp] = mapc2m_brick(xc,yc);
-        xp = xp - 1;
-        yp = yp - 1;
+        xp = xp/mi;
+        yp = yp/ni;
+        xp = 2*xp - 1;
+        yp = 2*yp - 1;
     case 'torus'
         isflat = false;
         mi = 2;
