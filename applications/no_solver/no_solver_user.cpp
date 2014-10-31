@@ -34,7 +34,6 @@ extern "C"
 #endif
 #endif
 
-
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
     link_problem_setup(domain,no_solver_setprob);

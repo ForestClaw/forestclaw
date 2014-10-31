@@ -23,10 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SPHERE_USER_H
-#define SPHERE_USER_H
+#ifndef METRIC_USER_H
+#define METRIC_USER_H
 
 #include "amr_forestclaw.H"
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 
 extern "C"
 {
@@ -95,14 +105,6 @@ extern "C"
 
 }
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 void metric_link_patch(fclaw2d_domain_t *domain);
 

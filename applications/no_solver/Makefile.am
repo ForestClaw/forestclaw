@@ -16,7 +16,7 @@ applications_no_solver_no_solver_SOURCES = \
 	applications/no_solver/tag4refinement.f \
 	applications/no_solver/initialize.f
 
-# applications_no_solver_no_solver_CPPFLAGS = \
-#       $(AM_CPPFLAGS)
+applications_no_solver_no_solver_CPPFLAGS = \
+	       $(AM_CPPFLAGS)
 
 applications_no_solver_no_solver_LDADD = $(LDADD) $(FLIBS)

@@ -28,6 +28,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 
 extern "C"
 {
@@ -49,15 +57,6 @@ extern "C"
                                    const double& ylower, const double& dx, const double& dy,
                                    double qcoarsened[], int& tag_patch);
 }
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 
 void no_solver_linker(fclaw2d_domain_t* domain);
 
@@ -92,14 +91,14 @@ void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
+fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+                                            const double shift[],
+                                            const double rotate[]);
+
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],
                                                  const double alpha);
-
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
-                                            const double shift[],
-                                            const double rotate[]);
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],

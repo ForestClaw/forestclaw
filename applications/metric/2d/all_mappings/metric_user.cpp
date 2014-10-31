@@ -206,9 +206,6 @@ void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
                   iframe,patch_num,level,blockno,mpirank);
 }
 
-
-
-
 #ifdef __cplusplus
 #if 0
 {

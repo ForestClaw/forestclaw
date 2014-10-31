@@ -23,8 +23,8 @@ applications_metric_2d_all_mappings_metric_SOURCES = \
 	applications/metric/2d/all_mappings/fclaw2d_map_cubedsphere.c \
 	applications/metric/2d/all_mappings/fclaw2d_map_torus.c
 
-# applications_metric_2d_all_mappings_metric_CPPFLAGS = \
-#        $(AM_CPPFLAGS)
+applications_metric_2d_all_mappings_metric_CPPFLAGS = \
+	        $(AM_CPPFLAGS)
 
 # applications_metric_2d_all_mappings_metric_CPPFLAGS += -D MPI_DEBUG
 
