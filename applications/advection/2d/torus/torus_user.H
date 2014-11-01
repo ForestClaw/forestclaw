@@ -27,6 +27,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TORUS_USER_H
 
 #include <amr_forestclaw.H>
+#include <p4est_connectivity.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+typedef struct fclaw2d_map_composition fclaw2d_map_composition_t;
+
 
 #ifdef __cplusplus
 extern "C"
@@ -123,38 +135,39 @@ void torus_parallel_write_output(fclaw2d_domain_t *domain,
                                  int this_block_idx, int this_patch_idx,
                                  int iframe,int num,int level);
 
-fclaw2d_map_context_t * fclaw2d_map_new_torus (const double scale[],
-                                               const double shift[],
-                                               const double rotate[],
-                                               const double alpha,
-                                               const int mi,
-                                               const int ni);
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t* conn,
+                                             int mi,
+                                             int mj);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
                                             const double shift[],
                                             const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick2(fclaw2d_domain_t* domain,
-                                              const int mi,
-                                              const int mj)
-
-fclaw2d_map_context_t* fclaw2d_map_new_brick(const double scale[],
-                                             const double shift[],
-                                             const double rotate[],
-                                             const int mi,
-                                             const int mj);
+fclaw2d_map_context_t *
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double shift[],
+                           const double rotate[],
+                           const double alpha);
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (const double scale[],
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
                              const double shift[],
                              const double rotate[],
                              const double lat[],
                              const double longitude[],
-                             const int mi,
-                             const int ni,
-                             const int a,
-                             const int b);
+                             const int a, const int b);
+
+
+struct fclaw2d_map_composition
+{
+    fclaw2d_map_context_t* brick;
+    fclaw2d_map_context_t* torus;
+};
 
 #ifdef __cplusplus
 #if 0

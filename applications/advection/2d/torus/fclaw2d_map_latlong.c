@@ -63,25 +63,21 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
-
-    int mi, mj;
     double lat[2], longitude[2];
+    double xc1,yc1,zc1;
 
-    mi = cont->user_int[0];
-    mj = cont->user_int[1];
-    MAPC2M_BRICK(&blockno,&xc,&yc,xp,yp,zp,&mi, &mj);
+    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
 
-    /* map back to [0,1]x[0,1] */
-    xc = (double) *xp/mi;
-    yc = (double) *yp/mj;
+    /* Scale's brick mapping to [0,1]x[0,1] */
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* Scale into lat/long box */
     lat[0] = cont->user_double[0];
     lat[1] = cont->user_double[1];
     longitude[0] = cont->user_double[2];
     longitude[1] = cont->user_double[3];
-    xc = longitude[0] + (longitude[1]-longitude[0])*xc;
-    yc = lat[0] + (lat[1]-lat[0])*yc;
+    xc = longitude[0] + (longitude[1]-longitude[0])*xc1;
+    yc = lat[0] + (lat[1]-lat[0])*yc1;
 
     /* blockno is ignored in the current latlong mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
@@ -92,15 +88,13 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (const double scale[],
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
                              const double shift[],
                              const double rotate[],
                              const double lat[],
                              const double longitude[],
-                             const int mi,
-                             const int ni,
-                             const int a,
-                             const int b)
+                             const int a, const int b)
 {
     fclaw2d_map_context_t *cont;
 
@@ -115,12 +109,11 @@ fclaw2d_map_context_t *
     {
         cont->user_double[3] = longitude[0] + 360.0;
     }
-    cont->user_int[0] = mi;
-    cont->user_int[1] = ni;
-
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);
+
+    cont->brick = brick;
 
     return cont;
 }

@@ -66,21 +66,21 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 {
     double xc1,yc1,zc1;
 
-    fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data;
+    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
 
-    /* Scale's brick mapping to [0,1]x[0,1] */
-    fclaw2d_map_c2m(brick_map,blockno,xc,yc,&xc1,&yc1,&zc1);
+    /* Brick mapping to computational coordinates [0,1]x[0,1] */
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* square in [-1,1] x [-1,1] */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
-    /* scale_map(cont, xp,yp,zp); */
     /* rotate_map(cont, xp,yp,zp); */
+    scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick_map,
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double scale[],
                                             const double shift[],
                                             const double rotate[])
@@ -94,8 +94,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick_map,
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);
-
-    cont->user_data = (void*) brick_map;
+    cont->brick = (void*) brick;
 
     return cont;
 }

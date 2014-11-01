@@ -9,10 +9,14 @@
       integer*8 cont, get_context
 
       double precision xp,yp,zp
+      double precision xc1, yc1, zc1
 
       common /compi/ pi
 
       cont = get_context()
+
+      call fclaw2d_map_brick2c(cont,
+     &      blockno,xc,yc,xc1,yc1,zc1)
 
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
@@ -22,12 +26,12 @@
       alpha = 0.4d0
       pi2 = 2*pi
       if (iscart()) then
-         psi = revs_per_s*(xc + pi*yc/2.d0);
+         psi = revs_per_s*(xc1 + pi*yc1/2.d0);
       elseif (issphere()) then
          psi = pi2*revs_per_s*zp
       else
 c        # torus
-         psi = revs_per_s*pi2*alpha*(pi2*yc + alpha*sin(pi2*yc))
+         psi = revs_per_s*pi2*alpha*(pi2*yc1 + alpha*sin(pi2*yc1))
       endif
 
       end

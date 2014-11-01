@@ -52,7 +52,7 @@ main (int argc, char **argv)
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
+  fclaw2d_map_context_t *cont = NULL, *brick = NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
@@ -64,7 +64,6 @@ main (int argc, char **argv)
   double alpha;
   int example;
   int mi, mj, a,b;
-  double R_earth;
   double lat[2];
   double longitude[2];
 
@@ -101,6 +100,12 @@ main (int argc, char **argv)
   sc_options_add_double (options, 0, "phi", &phi, 0,
                          "Rotation angle phi (degrees) about x axis [0]");
 
+  sc_options_add_int (options, 0, "mi", &mi, 1,
+                         "mi : Number of bricks in the x direction [1]");
+
+  sc_options_add_int (options, 0, "mj", &mj, 1,
+                         "mj : Number of bricks in the y direction [1]");
+
   gparms = amr_options_new (options);
   clawpack_parms = fclaw2d_clawpack_parms_new(options);
 
@@ -134,49 +139,52 @@ main (int argc, char **argv)
   rotate[0] = pi*theta/180.0;
   rotate[1] = pi*phi/180.0;
 
-  /* Ratio of inner radius to outer radius */
-  alpha = 0.4;
-  a = 1;  /* Periodicity */
-  b = 1;
-
   /* default torus has outer radius 1 and inner radius alpha */
   switch (example)
   {
   case 1:
       a = 1;
-      b = 0;
-      mi = 4;
-      mj = 4;
-      scale[0] = (double) 2.0/mi;
-      scale[1] = (double) 2.0/mj;
-      shift[0] = -1;   /* [0,2]x[0,2] --> [-1,1]x[-1,1] */
-      shift[1] = -1;
+      b = 1;
+      set_default_transform(scale,shift,rotate);
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      cont = fclaw2d_map_new_brick2(domain,mi,mj);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
       break;
   case 2:
       /* Generally, we should have mj \approx \alpha*mi */
-      mi = 2;
-      mj = 1;
+      /* Ratio of inner radius to outer radius */
+      a = 1;
+      b = 1;
+      alpha = 0.4;
+      mj = alpha*mi;
+      if (mj == 0)
+      {
+          mi = 1;
+          mj = 1;
+      }
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      cont = fclaw2d_map_new_torus(scale,shift,rotate,alpha,mi,mj);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_torus(brick,scale,shift,rotate,alpha);
       break;
   case 3:
       /* Lat-long example */
-      mi = 2;
-      mj = 1;
       a = 1;
       b = 0;
       longitude[0] = 0; /* x-coordinate */
       longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
-      lat[0] = -80;  /* y-coordinate */
-      lat[1] = 80;
-      R_earth = 6378.1;
-      scale[0] = 1;
-      scale[1] = 1;
-      scale[2] = 1;
+      lat[0] = -70;  /* y-coordinate */
+      lat[1] = 70;
+      set_default_transform(scale,shift,rotate);
+      alpha = (lat[1]-lat[0])/180;
+      mj = alpha*mi/2.0;
+      if (mj == 0)
+      {
+          mi = 1;
+          mj = 1;
+      }
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      cont = fclaw2d_map_new_latlong(scale,shift,rotate,lat,longitude,mi,mj,a,b);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
       break;
   default:
       SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
@@ -214,6 +222,11 @@ main (int argc, char **argv)
   amrreset(&domain);
 
   } /* this bracket ends the do_the_work block */
+
+  /* Destroy mapping functions */
+  fclaw2d_map_destroy(brick);
+  fclaw2d_map_destroy(cont);
+
 
   sc_options_destroy (options);         /* this could be moved up */
   amr_options_destroy (gparms);

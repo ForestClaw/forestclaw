@@ -49,7 +49,7 @@
          fdisc = rp-0.25d0
       else
          th = atan2(yp,xp)
-         tp = abs(th - pi/2.d0)
+         tp = abs(th + pi/2.d0)
          fdisc = tp - pi/8.d0
       endif
 

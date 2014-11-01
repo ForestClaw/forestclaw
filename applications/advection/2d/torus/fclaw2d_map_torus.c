@@ -63,31 +63,26 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
+    double xc1,yc1,zc1;
 
-    int mi, mj;
-    mi = cont->user_int[0];
-    mj = cont->user_int[1];
-    MAPC2M_BRICK(&blockno,&xc,&yc,xp,yp,zp,&mi, &mj);
-
-    /* map back to [0,1]x[0,1] */
-    xc = (double) *xp/mi;
-    yc = (double) *yp/mj;
+    /* Scale's brick mapping to [0,1]x[0,1] */
+    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* blockno is ignored in the current torus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
     double alpha = cont->user_double[0];
-    MAPC2M_TORUS(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+    MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
 
     rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (const double scale[],
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
                            const double shift[],
                            const double rotate[],
-                           const double alpha,
-                           const int mi,
-                           const int ni)
+                           const double alpha)
 {
     fclaw2d_map_context_t *cont;
 
@@ -96,12 +91,12 @@ fclaw2d_map_context_t *
     cont->mapc2m = fclaw2d_map_c2m_torus;
 
     cont->user_double[0] = alpha;
-    cont->user_int[0] = mi;
-    cont->user_int[1] = ni;
 
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);
+
+    cont->brick = brick;
 
     return cont;
 }
