@@ -42,6 +42,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/map_query.f \
 	src/mappings/cart/mapc2m_cart.f \
 	src/mappings/brick/mapc2m_brick.f \
+	src/mappings/brick/write_brick_data.f \
 	src/mappings/identity/mapc2m_identity.f \
 	src/mappings/pillowdisk/mapc2m_pillowdisk.f \
 	src/mappings/squareddisk/mapc2m_squareddisk.f \
