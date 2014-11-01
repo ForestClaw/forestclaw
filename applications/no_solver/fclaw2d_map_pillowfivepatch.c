@@ -2,7 +2,13 @@
 
 #include <fclaw2d_map.h>
 
-
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
 
 static int
 fclaw2d_map_query_pillowfivepatch (fclaw2d_map_context_t * cont, int query_identifier)
@@ -87,3 +93,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowfivepatch(const double scale[],
 
     return cont;
 }
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

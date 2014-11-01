@@ -6,6 +6,14 @@ void mapc2m(int* blockno, double* xc, double *yc,
             double *xp, double *yp, double *zp,
             double *alpha);
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 static int
 fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -82,3 +90,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
 
     return cont;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

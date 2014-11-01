@@ -2,6 +2,14 @@
 
 #include <fclaw2d_map.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 void mapc2m(int* blockno, double* xc, double *yc,
             double *xp, double *yp, double *zp,
             double *alpha);
@@ -89,3 +97,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
 
     return cont;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

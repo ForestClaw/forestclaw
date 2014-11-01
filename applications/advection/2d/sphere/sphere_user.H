@@ -28,6 +28,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_forestclaw.H>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
+
 extern "C"
 {
     void mapc2m_(const double *xc, const double *yc,
@@ -79,14 +89,6 @@ extern "C"
                              const int& level,const int& blockno,
                              const int& mpirank);
 }
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 void sphere_link_solvers(fclaw2d_domain_t *domain);
 

@@ -28,4 +28,5 @@ applications_advection_2d_swirl_swirl_CPPFLAGS += -D TRAPFPE
 
 applications_advection_2d_swirl_swirl_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
+
 ## @top_builddir@/src/solvers/fclaw2d_clawpack4.6/libclawpack4.6.la

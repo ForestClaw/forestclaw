@@ -59,6 +59,16 @@ To compile it under Linux, execute:
 /* Added this ifdef to compile the file conditionally */
 /* Question: why does this file not include fp_exception_glibc_extension.h? */
 #include <fclaw_config.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
 
 #ifdef LINUX
@@ -336,3 +346,10 @@ int main (int argc, char **argv)
 #endif
 
 #endif /* !FCLAW_HAVE_FEENABLEEXCEPT */
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

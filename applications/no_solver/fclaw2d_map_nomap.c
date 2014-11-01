@@ -2,6 +2,15 @@
 
 #include <fclaw2d_map.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 static int
 fclaw2d_map_query_nomap (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -69,3 +78,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap()
 
     return cont;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

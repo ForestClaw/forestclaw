@@ -39,8 +39,6 @@ extern "C"
 
 extern "C"
 {
-    void no_solver_setprob(fclaw2d_domain_t* domain);
-
     void initialize_(const int& mx, const int& my, const int& meqn,
                      const int& mbc,const int& blockno,
                      const double& xlower, const double& ylower,
@@ -57,6 +55,8 @@ extern "C"
                                    const double& ylower, const double& dx, const double& dy,
                                    double qcoarsened[], int& tag_patch);
 }
+
+void no_solver_setprob(fclaw2d_domain_t* domain);
 
 void no_solver_linker(fclaw2d_domain_t* domain);
 

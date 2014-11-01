@@ -28,6 +28,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_forestclaw.H>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 extern "C"
 {
     void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
@@ -65,14 +74,6 @@ extern "C"
                             const int& mpirank);
 
 }
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
