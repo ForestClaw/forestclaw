@@ -92,6 +92,7 @@ struct fclaw2d_map_context
     double shift[3];
     double rotate[9];
 
+    void *brick;
     void *user_data;
 };
 
@@ -139,6 +140,22 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
 void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc,
                       double *xp, double *yp, double *zp);
+
+#define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c,FCLAW2D_MAP_BRICK2C)
+
+/** Map brick to computational coordinates in [0,1]x[0,1]
+ * \param [in] cont     Mapping context with matching callback functions.
+ * \param [in] blockno  Number of the block to be transformed.
+ * \param [in] cx       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] cy       Y-coordinate in [block->ylower, block->yupper].
+ * \param [out] mx      Transformed x-coordinate.
+ * \param [out] my      Transformed y-coordinate.
+ * \param [out] mz      Transformed z-coordinate.
+ */
+void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** cont, int *blockno,
+                          const double *xc, const double *yc,
+                          double *xp, double *yp, double *zp);
+
 
 /** Deallocate a mapping context.
  * If the \a destroy member is not NULL, it is called on the context.
