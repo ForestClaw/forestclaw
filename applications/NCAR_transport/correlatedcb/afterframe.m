@@ -10,6 +10,8 @@ showpatchborders(1:8);
 setpatchborderprops(1:8,'linewidth',1);
 view([-51.5,0]);
 
+showgridlines(3);
+
 setviews;
 NoQuery = 0;
 prt = false;
@@ -18,7 +20,7 @@ if (prt)
   filename = framename(Frame,'ccb0000','png');
   fprintf('Printing file %s\n',filename);
   print('-dpng','-r800',filename);
-end;
+end
 
 clear afterframe;
 clear mapc2m;
