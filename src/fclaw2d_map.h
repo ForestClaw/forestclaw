@@ -295,6 +295,10 @@ void MAPC2M_BRICK2 (int* blockno, double *xc, double *yc,
 void MAPC2M_LATLONG (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp);
 
+#define MAPC2M_ANNULUS FCLAW_F77_FUNC (mapc2m_annulus,MAPC2M_ANNULUS)
+void MAPC2M_ANNULUS (int* blockno, double *xc, double *yc,
+                     double *xp, double *yp, double *zp, double *alpha);
+
 /* ---------------------------------------------------------------------------------- */
 
 
