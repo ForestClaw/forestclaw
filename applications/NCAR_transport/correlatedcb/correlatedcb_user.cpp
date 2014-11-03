@@ -321,7 +321,7 @@ void correlatedcb_parallel_write_output(fclaw2d_domain_t *domain,
     double* q = cp->q();
 
     /* -------------------------------------------------------------- */
-    int matlab_level = level + 1;
+    int matlab_level = level;
 
     int mpirank = domain->mpirank;
     double *area = cp->area();
