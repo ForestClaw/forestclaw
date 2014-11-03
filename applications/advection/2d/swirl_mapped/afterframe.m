@@ -21,6 +21,8 @@ end
 
 
 view(2);
+axis image;
+axis on
 
 NoQuery = 0;
 prt = false;

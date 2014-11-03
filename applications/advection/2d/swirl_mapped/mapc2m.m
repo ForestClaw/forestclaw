@@ -1,28 +1,48 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 % map = 'identity';
-% map = 'cart';
+map = 'cart';
 % map = 'fivepatch';
-map = 'brick';
 
 switch map
     case 'identity'
         xp = xc;
         yp = yc;        
     case 'cart'
-        [xp,yp,zp] = mapc2m_cart(xc,yc);
-        xp = (xp+1)/2;
-        yp = (yp+1)/2;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc);
+        [xp,yp,zp] = mapc2m_cart(xc1,yc1);
+        
+        brick_data = load('brick.dat');
+        mi = brick_data(1,1);
+        mj = brick_data(1,2);
+        xv = brick_data(2:end,1);
+        yv = brick_data(2:end,2);
+
+        blockno = getblocknumber();
+        xs = (xv(blockno+1)+1-mi/2)*0.05;
+        ys = (yv(blockno+1)+1-mj/2)*0.05;
+        xp = xp + xs;
+        yp = yp + ys;
+
     case 'fivepatch'
         [xp,yp,zp] = mapc2m_fivepatch(xc,yc);
-        xp = (xp+1)/2;
-        yp = (yp+1)/2;
+        b = getblocknumber();
+        s = 0.025;
+        switch b
+            case 0
+                yp = yp - s;
+            case 1
+                xp = xp - s;
+            case 3
+                xp = xp + s;
+            case 4
+                yp = yp + s;
+        end
+        % xp = (xp+1)/2;
+        % yp = (yp+1)/2;
+        
     case 'brick'
-        mi = 4;
-        mj = 4;
         [xp,yp,zp] = mapc2m_brick(xc,yc);        
-        xp = xp/mi;
-        yp = yp/mj;
 end
 zp = 0*xp;
 
