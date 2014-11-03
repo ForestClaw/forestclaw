@@ -2,8 +2,8 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 global notpillowsphere;
 
-% map = 'pillow';
-map = 'pillowsphere5';
+map = 'pillow';
+% map = 'pillowsphere5';
 
 switch map
     case 'pillow'

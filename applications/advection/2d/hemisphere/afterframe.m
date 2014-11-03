@@ -16,6 +16,8 @@ else
   fprintf('%12s %24.16f\n\n','qmax',qmax);
 end;
 
+setviews;
+view(vtop);
 
 
 NoQuery = 0;
