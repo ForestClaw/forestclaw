@@ -44,11 +44,15 @@ main (int argc, char **argv)
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
+  fclaw2d_map_context_t *cont = NULL, *brick=NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
+  int mi,mj,a,b;
+  double rotate[2];
+  double shift[3];
+  double scale[3];
 
 #ifdef TRAPFPE
   printf("Enabling floating point traps\n");
@@ -74,9 +78,14 @@ main (int argc, char **argv)
 
   sc_options_add_int (options, 0, "example", &example, 0,
                       "1 for identity mapping [0,1]x[0,1]" \
-                      "2 for Cartesian mapping" \
-                      "3 for five patch square" \
-                      "4 for brick");
+                      "2 for Cartesian brick mapping" \
+                      "3 for five patch square");
+
+  sc_options_add_int (options, 0, "mi", &mi, 1,
+                         "mi : Number of bricks in the x direction [1]");
+
+  sc_options_add_int (options, 0, "mj", &mj, 1,
+                         "mj : Number of bricks in the y direction [1]");
 
   /* Register default parameters and any solver parameters */
   gparms = amr_options_new(options);
@@ -103,22 +112,16 @@ main (int argc, char **argv)
   double alpha = 0.5;
 
 
-  double scale[3];
   scale[0] = 0.5;
   scale[1] = 0.5;
   scale[2] = 1;
 
-  double shift[3];
   shift[0] = 0.5;
   shift[1] = 0.5;
 
-  double rotate[2];
   rotate[0] = 0;
   rotate[1] = 0;
 
-  int mi,mj,a,b;
-  mi = 4;
-  mj = 4;
   a = 1;   /* periodic in x */
   b = 1;   /* periodic in y */
 
@@ -129,11 +132,9 @@ main (int argc, char **argv)
       cont = fclaw2d_map_new_identity();
       break;
   case 2:
-      /* Map unit square in [0,1] to [-1,1]x[-1,1]
-         Scale and shift from [-1,1]x[-1,1] back to
-         [0,1]x[0,1] */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart(scale,shift,rotate);
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
       break;
   case 3:
       if (gparms->mx*pow_int(2,gparms->minlevel) < 32)
@@ -145,14 +146,6 @@ main (int argc, char **argv)
 
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
-      break;
-  case 4 :
-      shift[0] = 0;
-      shift[1] = 0;
-      scale[0] = (double) 1.0/mi; /* without a cast, I get 1.0/mi = 0.5  Why? */
-      scale[1] = (double) 1.0/mj;
-      conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      cont = fclaw2d_map_new_brick(scale,shift,rotate,mi,mj);
       break;
   default:
       sc_abort_collective ("Parameter example must be 1 or 2");
@@ -196,6 +189,8 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
+  fclaw2d_map_destroy(cont);
+  fclaw2d_map_destroy(brick);
   sc_options_destroy(options);         /* this could be moved up */
   amr_options_destroy(gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
