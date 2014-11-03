@@ -6,9 +6,9 @@ if (PlotParallelPartitions == 0)
     yrbcolormap;
 end
 showpatchborders(1:9);
-setpatchborderprops('linewidth',1);
+setpatchborderprops('linewidth',2);
 % hidepatchborders;
-delete(get(gca,'title'));
+% delete(get(gca,'title'));
 caxis([0 1]);
 
 % colormap(white);

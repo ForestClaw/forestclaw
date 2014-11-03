@@ -1,3 +1,4 @@
+OutputDir = './';
 OutputFlag = 'forestclaw';         % default value.
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
