@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int
 torus_checkparms (int example, int lp)
 {
-    if (example < 1 || example > 3) {
+    if (example < 1 || example > 4) {
         fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
         return -1;
     }
@@ -101,10 +101,11 @@ main (int argc, char **argv)
                          "Rotation angle phi (degrees) about x axis [0]");
 
   sc_options_add_int (options, 0, "mi", &mi, 1,
-                         "mi : Number of bricks in the x direction [1]");
+                         "Number of blocks in x direction [1]");
 
-  sc_options_add_int (options, 0, "mj", &mj, 1,
-                         "mj : Number of bricks in the y direction [1]");
+  sc_options_add_int (options, 0, "mj", &mj, 0,
+                         "Number of blocks in y direction  [1]");
+
 
   gparms = amr_options_new (options);
   clawpack_parms = fclaw2d_clawpack_parms_new(options);
@@ -172,8 +173,8 @@ main (int argc, char **argv)
       b = 0;
       longitude[0] = 0; /* x-coordinate */
       longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
-      lat[0] = -70;  /* y-coordinate */
-      lat[1] = 70;
+      lat[0] = -50;  /* y-coordinate */
+      lat[1] = 50;
       set_default_transform(scale,shift,rotate);
       alpha = (lat[1]-lat[0])/180;
       mj = alpha*mi/2.0;
@@ -186,6 +187,22 @@ main (int argc, char **argv)
       brick = fclaw2d_map_new_brick(conn,mi,mj);
       cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
       break;
+  case 4:
+      /* Annulus */
+      a = 1;
+      b = 0;
+      alpha = 0.4;  /* Inner radius */
+      mj = (1-alpha)/(1+alpha)*mi/pi;
+      if (mj == 0)
+      {
+          mi = 1;
+          mj = 1;
+      }
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_annulus(brick,scale,shift,rotate,alpha);
+      break;
+
   default:
       SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
   }

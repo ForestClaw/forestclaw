@@ -40,15 +40,6 @@ extern "C"
 typedef struct fclaw2d_map_composition fclaw2d_map_composition_t;
 
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 extern "C"
 {
     void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
@@ -152,6 +143,13 @@ fclaw2d_map_context_t *
                            const double shift[],
                            const double rotate[],
                            const double alpha);
+
+fclaw2d_map_context_t *
+    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double shift[],
+                             const double rotate[],
+                             const double alpha);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
