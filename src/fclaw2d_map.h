@@ -92,7 +92,7 @@ struct fclaw2d_map_context
     double shift[3];
     double rotate[9];
 
-    void *brick;
+    fclaw2d_map_context_t *brick;
     void *user_data;
 };
 

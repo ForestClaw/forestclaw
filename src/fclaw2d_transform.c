@@ -25,6 +25,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_transform.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+
 /* Same size neighbor across a face */
 void
 FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
@@ -121,3 +130,10 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     /* TODO: We need to permit that it's a block corner.  In this case,
      * call fclaw2d_patch_transform_corner2 with is_block_boundary = 1 */
 }
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
