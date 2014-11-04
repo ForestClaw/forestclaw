@@ -1,7 +1,7 @@
 daspect([1 1 1]);
 axis off;
 
-showgridlines(1:4)
+% showgridlines(1:4)
 showpatchborders();
 
 yrbcolormap;

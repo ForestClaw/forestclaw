@@ -12,12 +12,14 @@ switch map
     case 'pillowsphere'
         notpillowsphere = false;
         [xp,yp,zp] = mapc2m_pillowsphere(xc1,yc1);
-        s = 0.5;
+        %{
+        s = 0.0;
         if b == 0
             zp = zp + s/2;
         else
             zp = zp - s/2;
         end
+        %}
     case 'cubedsphere'
         [xp,yp,zp] = mapc2m_cubedsphere(xc1,yc1);
         s = 0.1;

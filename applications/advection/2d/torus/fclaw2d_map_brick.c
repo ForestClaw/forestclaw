@@ -18,22 +18,13 @@ void write_brick_data_(int* n,
                        double xv[],
                        double yv[]);
 
-
-
 typedef struct fclaw2d_block_ll
 {
+    int nb;
+    int mi, mj;
     double *xv;
     double *yv;
 } fclaw2d_block_ll_t;
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 
 static int
 fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
@@ -123,6 +114,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
     bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
     bv->xv = FCLAW_ALLOC_ZERO(double,nb);
     bv->yv = FCLAW_ALLOC_ZERO(double,nb);
+
+    bv->nb = nb;
+    bv->mi = mi;
+    bv->mj = mj;
+
     for (i = 0; i < nb; i++)
     {
         vnum = conn->tree_to_vertex[4 * i];
