@@ -26,15 +26,6 @@ typedef struct fclaw2d_block_ll
     double *yv;
 } fclaw2d_block_ll_t;
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 static int
 fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
 {
