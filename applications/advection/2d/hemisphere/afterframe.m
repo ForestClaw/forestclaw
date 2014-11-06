@@ -17,7 +17,7 @@ else
 end;
 
 setviews;
-view(vtop);
+view([-92 18]);
 
 
 NoQuery = 0;
