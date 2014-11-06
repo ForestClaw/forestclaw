@@ -371,7 +371,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             {
                 ClawPatch *corner_cp = get_clawpatch(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
-                if (!ispillowsphere)
+                if (!(ispillowsphere && is_block_corner))
                 {
                     if (neighbor_level == FINER_GRID)
                     {
@@ -393,7 +393,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                                        &transform_data);
                     }
                 }
-                else
+                else /* is_block_corner && ispillowsphere */
                 {
                     /* Pillowsphere : The block corners of the pillow sphere have to
                        be handled as a special case */
