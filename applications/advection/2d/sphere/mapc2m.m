@@ -3,8 +3,8 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 global notpillowsphere;
 
-map = 'pillowsphere';
-% map = 'cubedsphere';
+% map = 'pillowsphere';
+map = 'cubedsphere';
 
 b = getblocknumber();
 
@@ -22,7 +22,7 @@ switch map
         %}
     case 'cubedsphere'
         [xp,yp,zp] = mapc2m_cubedsphere(xc1,yc1);
-        s = 0.1;
+        s = 0.0;
         switch b
             case 0
                 zp = zp - s;

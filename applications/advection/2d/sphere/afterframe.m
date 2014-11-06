@@ -54,9 +54,7 @@ zoom(1.1);
 zoom(1.1);
 zoom(1.1);
 zoom(1.1);
-hidepatchborders;
 hidegridlines;
-showgridlines(1:6);
 shg;
 
 
