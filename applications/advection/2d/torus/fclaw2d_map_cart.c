@@ -94,7 +94,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);
-    cont->brick = (void*) brick;
+    cont->brick = brick;
 
     return cont;
 }
