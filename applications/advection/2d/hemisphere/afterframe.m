@@ -1,3 +1,5 @@
+setviews;
+
 daspect([1 1 1]);
 axis off;
 
@@ -16,9 +18,7 @@ else
   fprintf('%12s %24.16f\n\n','qmax',qmax);
 end;
 
-setviews;
-view([-92 18]);
-
+view(3);
 
 NoQuery = 0;
 prt = false;
