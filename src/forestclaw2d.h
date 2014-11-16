@@ -574,6 +574,7 @@ void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 typedef struct fclaw2d_domain_exchange
 {
     size_t data_size;
+
     /* These two members are for consistency checking */
     int num_exchange_patches;
     int num_ghost_patches;
@@ -596,6 +597,13 @@ typedef struct fclaw2d_domain_exchange
        It will not be necessary to dereference this memory explicitly.
      */
     char *ghost_contiguous_memory;
+
+    /** Temporary storage required for asynchronous ghost exchange.
+     * It is allocated and freed by the begin/end calls below.
+     */
+    void *async_state;
+    int inside_async;           /**< Between asynchronous begin and end? */
+    int by_levels;              /**< Did we use levels on the inside? */
 }
 fclaw2d_domain_exchange_t;
 
@@ -627,6 +635,27 @@ void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e,
                                     int exchange_minlevel,
                                     int exchange_maxlevel);
+
+/** Start asynchronous exchange of parallel ghost neighbors.
+ * The arguments are the same as for fclaw2d_domain_ghost_exchange.
+ * It must be followed by a call to fclaw2d_domain_ghost_exchange_end.
+ * \param [in,out] e            Its ghost_data member must survive and not
+ *                              be written to until the completion of
+ *                              fclaw2d_domain_ghost_exchange_end.
+ *                              Its patch_data member may already be
+ *                              overwritten after this function returns.
+ */
+void fclaw2d_domain_ghost_exchange_begin (fclaw2d_domain_t * domain,
+                                          fclaw2d_domain_exchange_t * e,
+                                          int exchange_minlevel,
+                                          int exchange_maxlevel);
+
+/** Complete asynchronous exchange of parallel ghost neighbors.
+ * Must be called at some point after fclaw2d_domain_ghost_exchange_begin.
+ * \param [in,out] e            Its ghost_data member must have survived.
+ */
+void fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
+                                        fclaw2d_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.

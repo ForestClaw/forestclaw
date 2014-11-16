@@ -1180,6 +1180,10 @@ fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
         m += data_size;
     }
 
+    e->async_state = NULL;
+    e->by_levels = 0;
+    e->inside_async = 0;
+
     return e;
 }
 
@@ -1188,11 +1192,30 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
                                fclaw2d_domain_exchange_t * e,
                                int exchange_minlevel, int exchange_maxlevel)
 {
+    FCLAW_ASSERT (e->async_state == NULL);
+    FCLAW_ASSERT (!e->inside_async);
+
+    fclaw2d_domain_ghost_exchange_begin
+      (domain, e, exchange_minlevel, exchange_maxlevel);
+    fclaw2d_domain_ghost_exchange_end (domain, e);
+}
+
+void
+fclaw2d_domain_ghost_exchange_begin (fclaw2d_domain_t * domain,
+                                     fclaw2d_domain_exchange_t * e,
+                                     int exchange_minlevel,
+                                     int exchange_maxlevel)
+{
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
+    p4est_ghost_exchange_t *exc;
+
+    /* we must not be in an active exchange already */
+    FCLAW_ASSERT (e->async_state == NULL);
+    FCLAW_ASSERT (!e->inside_async);
 
 #if 0
-    P4EST_LDEBUGF ("Patches exchange %d %d, ghost %d %d\n",
+    P4EST_LDEBUGF ("Patches exchange begin %d %d, ghost %d %d\n",
                    e->num_exchange_patches, (int) ghost->mirrors.elem_count,
                    e->num_ghost_patches, (int) ghost->ghosts.elem_count);
 #endif
@@ -1202,18 +1225,42 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
     if (exchange_minlevel <= domain->global_minlevel &&
         domain->global_maxlevel <= exchange_maxlevel)
     {
-        p4est_ghost_exchange_custom (wrap->p4est, ghost, e->data_size,
-                                     e->patch_data,
-                                     e->ghost_contiguous_memory);
+        e->by_levels = 0;
+        exc = p4est_ghost_exchange_custom_begin
+            (wrap->p4est, ghost,
+             e->data_size, e->patch_data, e->ghost_contiguous_memory);
     }
     else
     {
-        p4est_ghost_exchange_custom_levels (wrap->p4est, ghost,
-                                            exchange_minlevel,
-                                            exchange_maxlevel,
-                                            e->data_size, e->patch_data,
-                                            e->ghost_contiguous_memory);
+        e->by_levels = 1;
+        exc = p4est_ghost_exchange_custom_levels_begin
+            (wrap->p4est, ghost,
+             exchange_minlevel, exchange_maxlevel, e->data_size,
+             e->patch_data, e->ghost_contiguous_memory);
     }
+    e->async_state = exc;
+    e->inside_async = 1;
+}
+
+void
+fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
+                                   fclaw2d_domain_exchange_t * e)
+{
+    p4est_ghost_exchange_t * exc = (p4est_ghost_exchange_t *) e->async_state;
+
+    FCLAW_ASSERT (exc != NULL);
+    FCLAW_ASSERT (e->inside_async);
+
+    if (!e->by_levels)
+    {
+        p4est_ghost_exchange_custom_end (exc);
+    }
+    else {
+        p4est_ghost_exchange_custom_levels_end (exc);
+    }
+
+    e->async_state = NULL;
+    e->inside_async = 0;
 }
 
 void
