@@ -66,12 +66,18 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
 void
 fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
 {
-  if (cont->destroy == NULL) {
-    FCLAW_FREE (cont);
-  }
-  else {
-    cont->destroy (cont);
-  }
+    if (cont->brick != NULL)
+    {
+        fclaw2d_map_destroy(cont->brick);  /* recursive call */
+    }
+    if (cont->destroy == NULL)
+    {
+        FCLAW_FREE (cont);
+    }
+    else
+    {
+        cont->destroy (cont);
+    }
 }
 
 /* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */

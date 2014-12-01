@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
+#include <p4est_connectivity.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -209,6 +210,15 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
                                                 const int
                                                 query_results
                                                 [FCLAW2D_MAP_QUERY_LAST]);
+
+
+/* ----------------------------------------------------------------------------------
+   Brick mapping
+   ---------------------------------------------------------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t* conn,
+                                             int mi,
+                                             int mj);
 
 /* ----------------------------------------------------------------------------------
    Some mapping utility functions
