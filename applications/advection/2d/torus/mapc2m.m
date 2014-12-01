@@ -39,7 +39,7 @@ switch map
         th = atan2(yp,xp);
         phi = atan2(zp,xp-1);        
         v = [xp-cos(th),yp-sin(th),zp];
-        s = 0.1;
+        s = 0.0;
         
         [xc1,yc1,~] = mapc2m_brick(xc,yc);
         [xp,yp,zp] = mapc2m_torus(xc1,yc1);

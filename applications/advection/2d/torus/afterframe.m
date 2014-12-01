@@ -38,7 +38,10 @@ if (isflat)
 else
     view(3);    
     zoom(1.5);
+    % hidepatchborders;
+    % camlight;
 end
+
 
 NoQuery = 0;
 prt = false;
