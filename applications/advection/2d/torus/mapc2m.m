@@ -3,9 +3,9 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 global map isflat;
 
 map = 'cart';
-% map = 'torus';
+map = 'torus';
 % map = 'latlong';
-map = 'annulus';
+% map = 'annulus';
 
 R = 1;
 r = 0.4;
@@ -15,9 +15,7 @@ switch map
         isflat = true;        
         [xc1,yc1,~] = mapc2m_brick(xc,yc);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
-                [xc1,yc1,~] = mapc2m_brick(xc,yc);
-        [xp,yp,zp] = mapc2m_cart(xc1,yc1);
-        xp = 5*(xp+1);
+        xp = 5*(xp + 1);
         yp = 3*(yp + 1);
         
         brick_data = load('brick.dat');
@@ -27,8 +25,9 @@ switch map
         yv = brick_data(2:end,2);
 
         blockno = getblocknumber();
-        xs = (xv(blockno+1)+1-mi/2)*0.2;
-        ys = (yv(blockno+1)+1-mj/2)*0.2;
+        s = 0.02;
+        xs = (xv(blockno+1)+1-mi/2)*s;
+        ys = (yv(blockno+1)+1-mj/2)*s;
         xp = xp + xs;
         yp = yp + ys;
 
@@ -40,7 +39,7 @@ switch map
         th = atan2(yp,xp);
         phi = atan2(zp,xp-1);        
         v = [xp-cos(th),yp-sin(th),zp];
-        s = 0.2;
+        s = 0.1;
         
         [xc1,yc1,~] = mapc2m_brick(xc,yc);
         [xp,yp,zp] = mapc2m_torus(xc1,yc1);

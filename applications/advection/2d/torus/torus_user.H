@@ -128,10 +128,6 @@ void torus_parallel_write_output(fclaw2d_domain_t *domain,
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t* conn,
-                                             int mi,
-                                             int mj);
-
 fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double scale[],
                                             const double shift[],
