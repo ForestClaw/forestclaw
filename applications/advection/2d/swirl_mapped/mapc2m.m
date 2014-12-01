@@ -19,8 +19,9 @@ switch map
         yv = brick_data(2:end,2);
 
         blockno = getblocknumber();
-        xs = (xv(blockno+1)+1-mi/2)*0.05;
-        ys = (yv(blockno+1)+1-mj/2)*0.05;
+        s = 0.02;
+        xs = (xv(blockno+1)+1-mi/2)*s;
+        ys = (yv(blockno+1)+1-mj/2)*s;
         xp = xp + xs;
         yp = yp + ys;
 
