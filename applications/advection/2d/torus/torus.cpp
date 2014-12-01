@@ -241,7 +241,6 @@ main (int argc, char **argv)
   } /* this bracket ends the do_the_work block */
 
   /* Destroy mapping functions */
-  fclaw2d_map_destroy(brick);
   fclaw2d_map_destroy(cont);
 
 

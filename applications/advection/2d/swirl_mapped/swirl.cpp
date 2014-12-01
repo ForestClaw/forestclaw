@@ -143,12 +143,11 @@ main (int argc, char **argv)
                  "must be greater than or equal to 32.\n");
           exit(0);
       }
-
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
       break;
   default:
-      sc_abort_collective ("Parameter example must be 1 or 2");
+      sc_abort_collective ("Parameter example must be 1, 2 or 3.");
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
@@ -189,8 +188,7 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
-  fclaw2d_map_destroy(cont);
-  fclaw2d_map_destroy(brick);
+  fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
   sc_options_destroy(options);         /* this could be moved up */
   amr_options_destroy(gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);

@@ -12,16 +12,17 @@ extern "C"
 #endif
 #endif
 
+/* This is used for communicating with Matlab about the mapping */
 void write_brick_data_(int* n,
                        int* mi,
                        int* mj,
                        double xv[],
                        double yv[]);
 
-
-
 typedef struct fclaw2d_block_ll
 {
+    int nb;
+    int mi, mj;
     double *xv;
     double *yv;
 } fclaw2d_block_ll_t;
@@ -80,9 +81,10 @@ fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
+    /* Map the brick coordinates to global [0,1] coordinates. */
     fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) cont->user_data;
-    *xp = (double) (bv->xv[blockno] + xc)/cont->user_int[0];
-    *yp = (double) (bv->yv[blockno] + yc)/cont->user_int[1];
+    *xp = (double) (bv->xv[blockno] + xc)/bv->mi;
+    *yp = (double) (bv->yv[blockno] + yc)/bv->mj;
     *zp = 0;
 }
 
@@ -112,8 +114,16 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
 
     nb = (int) conn->num_trees;
     bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
+
+    /* We don't store this in user_double[], since that only has limited
+       storage (16 doubles) */
     bv->xv = FCLAW_ALLOC_ZERO(double,nb);
     bv->yv = FCLAW_ALLOC_ZERO(double,nb);
+
+    bv->nb = nb;  /* These integer values could also be stored in user_int[] data */
+    bv->mi = mi;
+    bv->mj = mj;
+
     for (i = 0; i < nb; i++)
     {
         vnum = conn->tree_to_vertex[4 * i];
@@ -121,10 +131,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
         bv->xv[i] = conn->vertices[3*vnum];
         bv->yv[i] = conn->vertices[3*vnum+1];
     }
-
     cont->user_data = (void*) bv;
-    cont->user_int[0] = mi;
-    cont->user_int[1] = mj;
 
     /* Write data for Matlab plotting */
     write_brick_data_(&nb,&mi,&mj,bv->xv,bv->yv);
