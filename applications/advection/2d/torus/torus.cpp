@@ -92,7 +92,7 @@ main (int argc, char **argv)
   options = sc_options_new (argv[0]);
 
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1=flat; 2 = torus");
+                      "1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
 
   sc_options_add_double (options, 0, "theta", &theta, 0,
                          "Rotation angle theta (degrees) about z axis [0]");
@@ -146,6 +146,8 @@ main (int argc, char **argv)
   case 1:
       a = 1;
       b = 1;
+      rotate[0] = 0;
+      rotate[1] = 0;
       set_default_transform(scale,shift,rotate);
       conn = p4est_connectivity_new_brick(mi,mj,a,b);
       brick = fclaw2d_map_new_brick(conn,mi,mj);
@@ -153,7 +155,7 @@ main (int argc, char **argv)
       break;
   case 2:
       /* Generally, we should have mj \approx \alpha*mi */
-      /* Ratio of inner radius to outer radius */
+      /* where alpha is the ratio of inner radius to outer radius */
       a = 1;
       b = 1;
       alpha = 0.4;
