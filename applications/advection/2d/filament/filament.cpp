@@ -42,12 +42,13 @@ main (int argc, char **argv)
   sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
+  fclaw2d_map_context_t *cont = NULL, *brick = NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
   double theta, phi;
+  int mi, mj, a,b;
 
 #ifdef TRAPFPE
   printf("Enabling floating point traps\n");
@@ -66,10 +67,16 @@ main (int argc, char **argv)
   options = sc_options_new(argv[0]);
   sc_options_add_int (options, 0, "example", &example, 0,
                       "0 for no mapping, " \
-                      "1 for Cartesian, " \
+                      "1 for Cartesian (with brick), " \
                       "2 for pillow disk, " \
                       "3 for squared disk, " \
                       "4 for pillow five patch");
+
+  sc_options_add_int (options, 0, "mi", &mi, 1,
+                         "mi : Number of bricks in the x direction [1]");
+
+  sc_options_add_int (options, 0, "mj", &mj, 1,
+                         "mj : Number of bricks in the y direction [1]");
 
   sc_options_add_double (options, 0, "theta", &theta, 0,
                          "Rotation angle theta (degrees) about z axis [0]");
@@ -121,8 +128,11 @@ main (int argc, char **argv)
       break;
   case 1:
       /* in [-1,1]x[-1,1] */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart(scale,shift,rotate);
+      a = 0;
+      b = 0;
+      conn = p4est_connectivity_new_brick(mi,mj,a,b);
+      brick = fclaw2d_map_new_brick(conn,mi,mj);
+      cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
       break;
   case 2:
       /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */

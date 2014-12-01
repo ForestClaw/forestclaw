@@ -88,7 +88,8 @@ extern "C"
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart (const double scale[],
+fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
+                                             const double scale[],
                                              const double shift[],
                                              const double rotate[]);
 
