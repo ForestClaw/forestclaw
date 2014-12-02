@@ -55,6 +55,8 @@ struct amr_options
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:
                                      Will kill all parallel performance. */
+    int trapfpe;
+
     const char *prefix;         /**< This is prepended to output files */
 
     /* VTK output control */

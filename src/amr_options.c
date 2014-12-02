@@ -202,6 +202,8 @@ amr_options_new (sc_options_t * opt)
                            "Use subcycling in time [F]");
     sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
                            "No weighting when subcycling [F]");
+    sc_options_add_switch (opt, 0, "trapfpe", &amropt->trapfpe,
+                           "Enable floating point exceptions [F]");
 
     /* ---------------------- Usage information -------------------------- */
     sc_options_add_switch (opt, 0, "help", &amropt->help,
