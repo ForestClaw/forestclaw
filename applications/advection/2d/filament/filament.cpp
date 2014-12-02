@@ -50,12 +50,6 @@ main (int argc, char **argv)
   double theta, phi;
   int mi, mj, a,b;
 
-#ifdef TRAPFPE
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
-
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
@@ -102,6 +96,16 @@ main (int argc, char **argv)
   amr_checkparms(gparms);
   fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
 
+
+  /* ---------------------------------------------------------------
+     Floating point traps
+     -------------------------------------------------------------- */
+  if (gparms->trapfpe == 1)
+  {
+      printf("Enabling floating point traps\n");
+      feenableexcept(FE_INVALID);
+  }
+
   /* ---------------------------------------------------------------
      Domain geometry
      -------------------------------------------------------------- */
@@ -142,11 +146,10 @@ main (int argc, char **argv)
   case 3:
       if (gparms->mx*pow_int(2,gparms->minlevel) < 32)
       {
-          printf("The squared-disk is inadmissable:  mx*2^minlevel " \
+          printf("The squared-disk is inadmissable:  mx*2^minlevel "    \
                  "must be greater than or equal to 32.\n");
           exit(0);
       }
-
       conn = p4est_connectivity_new_disk ();
       cont = fclaw2d_map_new_squareddisk (scale,shift,rotate,alpha);
       break;
