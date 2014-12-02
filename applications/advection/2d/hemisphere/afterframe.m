@@ -19,6 +19,7 @@ else
 end;
 
 view(3);
+zoom(1.1^4);
 
 NoQuery = 0;
 prt = false;
@@ -36,4 +37,3 @@ shg;
 
 clear afterframe;
 clear mapc2m;
-clear mapc2m_pillow;

@@ -13,7 +13,7 @@ switch map
     case 'cubedsphere'
         [xp,yp,zp] = mapc2m_cubedsphere(xc1,yc1);
         b = getblocknumber();
-        s = 0.1;
+        s = 0;
         switch b
             case 0
                 zp = zp - s;
