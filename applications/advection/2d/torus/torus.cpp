@@ -243,11 +243,9 @@ main (int argc, char **argv)
       amrrun(&domain);
       amrreset(&domain);
 
+      /* Destroy mapping functions */
+      fclaw2d_map_destroy(cont);
   } /* this bracket ends the do_the_work block */
-
-  /* Destroy mapping functions */
-  fclaw2d_map_destroy(cont);
-
 
   sc_options_destroy (options);         /* this could be moved up */
   amr_options_destroy (gparms);
