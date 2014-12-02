@@ -578,8 +578,8 @@ void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms
 
 void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
-    SC_FREE(clawpack_parms->order);
-    SC_FREE(clawpack_parms->mthlim);
+    FCLAW_FREE(clawpack_parms->order);
+    FCLAW_FREE(clawpack_parms->mthlim);
     FCLAW2D_FREE(clawpack_parms);
     clawpack_parms = NULL;
 }
