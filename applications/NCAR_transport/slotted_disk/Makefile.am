@@ -24,7 +24,5 @@ applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 applications_NCAR_transport_slotted_disk_slotted_disk_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_NCAR_transport_slotted_disk_slotted_disk_CPPFLAGS += -D TRAPFPE
-
 applications_NCAR_transport_slotted_disk_slotted_disk_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

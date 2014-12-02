@@ -41,11 +41,6 @@ main (int argc, char **argv)
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
 
-#ifdef TRAPFPE
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
@@ -79,6 +74,15 @@ main (int argc, char **argv)
   /* Postprocess arrays */
   amr_postprocess_parms(gparms);
   amr_checkparms(gparms);
+
+  /* ---------------------------------------------------------------
+     Floating point traps
+     -------------------------------------------------------------- */
+  if (gparms->trapfpe == 1)
+  {
+      printf("Enabling floating point traps\n");
+      feenableexcept(FE_INVALID);
+  }
 
   /* ---------------------------------------------------------------
      Domain geometry

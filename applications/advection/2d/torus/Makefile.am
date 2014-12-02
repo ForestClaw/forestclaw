@@ -21,7 +21,5 @@ applications_advection_2d_torus_torus_SOURCES = \
 applications_advection_2d_torus_torus_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-# applications_advection_2d_torus_torus_CPPFLAGS += -D TRAPFPE
-
 applications_advection_2d_torus_torus_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

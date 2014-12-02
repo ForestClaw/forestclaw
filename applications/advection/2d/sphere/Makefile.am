@@ -20,8 +20,5 @@ applications_advection_2d_sphere_sphere_SOURCES = \
 applications_advection_2d_sphere_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_advection_2d_sphere_sphere_CPPFLAGS += -D TRAPFPE
-
-
 applications_advection_2d_sphere_sphere_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

@@ -49,11 +49,6 @@ main (int argc, char **argv)
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
 
-#ifdef TRAPFPE
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
@@ -96,6 +91,15 @@ main (int argc, char **argv)
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
+  /* ---------------------------------------------------------------
+     Floating point traps
+     -------------------------------------------------------------- */
+  if (gparms->trapfpe == 1)
+  {
+      printf("Enabling floating point traps\n");
+      feenableexcept(FE_INVALID);
+  }
+
   /* --------------------------------------------------------------
      Print out info
      -------------------------------------------------------------- */
@@ -135,6 +139,7 @@ main (int argc, char **argv)
   amrrun(&domain);
   amrreset(&domain);
 
+  fclaw2d_map_destroy(cont);
   sc_options_destroy(options);         /* this could be moved up */
   amr_options_destroy(gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);

@@ -25,8 +25,6 @@ applications_advection_2d_swirl_mapped_swirl_SOURCES = \
 applications_advection_2d_swirl_mapped_swirl_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_advection_2d_swirl_mapped_swirl_CPPFLAGS += -D TRAPFPE
-
 # applications_advection_2d_swirl_mapped_swirl_CPPFLAGS += -D MPI_DEBUG
 
 applications_advection_2d_swirl_mapped_swirl_LDADD = \

@@ -49,11 +49,6 @@ main (int argc, char **argv)
 
   double theta, phi;
 
-#ifdef TRAPFPE
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
@@ -89,6 +84,15 @@ main (int argc, char **argv)
   /* Read in clawpack parms, process and check them */
   amr_checkparms (gparms);
   fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
+
+  /* ---------------------------------------------------------------
+     Floating point traps
+     -------------------------------------------------------------- */
+  if (gparms->trapfpe == 1)
+  {
+      printf("Enabling floating point traps\n");
+      feenableexcept(FE_INVALID);
+  }
 
   /* ---------------------------------------------------------------
      Domain geometry

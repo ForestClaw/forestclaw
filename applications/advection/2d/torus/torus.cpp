@@ -68,12 +68,6 @@ main (int argc, char **argv)
   double longitude[2];
 
 
-#ifdef TRAPFPE
-  /* TODO: This should be done in fclaw_mpi_init? */
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
-
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
@@ -131,114 +125,123 @@ main (int argc, char **argv)
   if (!retval) {
      /* the do-the-work block. TODO: put everything below into a function */
 
-  /* ---------------------------------------------------------------
-     Domain geometry
-     --------------------------------------------------------------- */
-  pi = M_PI;
-  set_default_transform(scale,shift,rotate);
+      /* ---------------------------------------------------------------
+         Floating point traps
+         -------------------------------------------------------------- */
+      if (gparms->trapfpe == 1)
+      {
+          printf("Enabling floating point traps\n");
+          feenableexcept(FE_INVALID);
+      }
 
-  rotate[0] = pi*theta/180.0;
-  rotate[1] = pi*phi/180.0;
-
-  /* default torus has outer radius 1 and inner radius alpha */
-  switch (example)
-  {
-  case 1:
-      a = 1;
-      b = 1;
-      rotate[0] = 0;
-      rotate[1] = 0;
+      /* ---------------------------------------------------------------
+         Domain geometry
+         --------------------------------------------------------------- */
+      pi = M_PI;
       set_default_transform(scale,shift,rotate);
-      conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      brick = fclaw2d_map_new_brick(conn,mi,mj);
-      cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
-      break;
-  case 2:
-      /* Generally, we should have mj \approx \alpha*mi */
-      /* where alpha is the ratio of inner radius to outer radius */
-      a = 1;
-      b = 1;
-      alpha = 0.4;
-      mj = alpha*mi;
-      if (mj == 0)
+
+      rotate[0] = pi*theta/180.0;
+      rotate[1] = pi*phi/180.0;
+
+      /* default torus has outer radius 1 and inner radius alpha */
+      switch (example)
       {
-          mi = 1;
-          mj = 1;
+      case 1:
+          a = 1;
+          b = 1;
+          rotate[0] = 0;
+          rotate[1] = 0;
+          set_default_transform(scale,shift,rotate);
+          conn = p4est_connectivity_new_brick(mi,mj,a,b);
+          brick = fclaw2d_map_new_brick(conn,mi,mj);
+          cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
+          break;
+      case 2:
+          /* Generally, we should have mj \approx \alpha*mi */
+          /* where alpha is the ratio of inner radius to outer radius */
+          a = 1;
+          b = 1;
+          alpha = 0.4;
+          mj = alpha*mi;
+          if (mj == 0)
+          {
+              mi = 1;
+              mj = 1;
+          }
+          conn = p4est_connectivity_new_brick(mi,mj,a,b);
+          brick = fclaw2d_map_new_brick(conn,mi,mj);
+          cont = fclaw2d_map_new_torus(brick,scale,shift,rotate,alpha);
+          break;
+      case 3:
+          /* Lat-long example */
+          a = 1;
+          b = 0;
+          longitude[0] = 0; /* x-coordinate */
+          longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
+          lat[0] = -50;  /* y-coordinate */
+          lat[1] = 50;
+          set_default_transform(scale,shift,rotate);
+          alpha = (lat[1]-lat[0])/180;
+          mj = alpha*mi/2.0;
+          if (mj == 0)
+          {
+              mi = 1;
+              mj = 1;
+          }
+          conn = p4est_connectivity_new_brick(mi,mj,a,b);
+          brick = fclaw2d_map_new_brick(conn,mi,mj);
+          cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
+          break;
+      case 4:
+          /* Annulus */
+          a = 1;
+          b = 0;
+          alpha = 0.4;  /* Inner radius */
+          mj = (1-alpha)/(1+alpha)*mi/pi;
+          if (mj == 0)
+          {
+              mi = 1;
+              mj = 1;
+          }
+          conn = p4est_connectivity_new_brick(mi,mj,a,b);
+          brick = fclaw2d_map_new_brick(conn,mi,mj);
+          cont = fclaw2d_map_new_annulus(brick,scale,shift,rotate,alpha);
+          break;
+
+      default:
+          SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
       }
-      conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      brick = fclaw2d_map_new_brick(conn,mi,mj);
-      cont = fclaw2d_map_new_torus(brick,scale,shift,rotate,alpha);
-      break;
-  case 3:
-      /* Lat-long example */
-      a = 1;
-      b = 0;
-      longitude[0] = 0; /* x-coordinate */
-      longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
-      lat[0] = -50;  /* y-coordinate */
-      lat[1] = 50;
-      set_default_transform(scale,shift,rotate);
-      alpha = (lat[1]-lat[0])/180;
-      mj = alpha*mi/2.0;
-      if (mj == 0)
+
+      domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+
+      /* ---------------------------------------------------------- */
+      if (gparms->verbosity > 0)
       {
-          mi = 1;
-          mj = 1;
+          fclaw2d_domain_list_levels(domain, lp);
+          fclaw2d_domain_list_neighbors(domain, lp);
       }
-      conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      brick = fclaw2d_map_new_brick(conn,mi,mj);
-      cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
-      break;
-  case 4:
-      /* Annulus */
-      a = 1;
-      b = 0;
-      alpha = 0.4;  /* Inner radius */
-      mj = (1-alpha)/(1+alpha)*mi/pi;
-      if (mj == 0)
-      {
-          mi = 1;
-          mj = 1;
-      }
-      conn = p4est_connectivity_new_brick(mi,mj,a,b);
-      brick = fclaw2d_map_new_brick(conn,mi,mj);
-      cont = fclaw2d_map_new_annulus(brick,scale,shift,rotate,alpha);
-      break;
 
-  default:
-      SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
-  }
+      /* ---------------------------------------------------------------
+         Set domain data.
+         --------------------------------------------------------------- */
+      init_domain_data(domain);
 
-  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+      set_domain_parms(domain,gparms);
+      set_clawpack_parms(domain,clawpack_parms);
+
+      link_problem_setup(domain,torus_problem_setup);
+
+      torus_link_solvers(domain);
+
+      link_regrid_functions(domain,
+                            torus_patch_tag4refinement,
+                            torus_patch_tag4coarsening);
 
 
-  /* ---------------------------------------------------------- */
-  if (gparms->verbosity > 0)
-  {
-      fclaw2d_domain_list_levels(domain, lp);
-      fclaw2d_domain_list_neighbors(domain, lp);
-  }
-
-  /* ---------------------------------------------------------------
-     Set domain data.
-     --------------------------------------------------------------- */
-  init_domain_data(domain);
-
-  set_domain_parms(domain,gparms);
-  set_clawpack_parms(domain,clawpack_parms);
-
-  link_problem_setup(domain,torus_problem_setup);
-
-  torus_link_solvers(domain);
-
-  link_regrid_functions(domain,
-                        torus_patch_tag4refinement,
-                        torus_patch_tag4coarsening);
-
-
-  amrinit(&domain);
-  amrrun(&domain);
-  amrreset(&domain);
+      amrinit(&domain);
+      amrrun(&domain);
+      amrreset(&domain);
 
   } /* this bracket ends the do_the_work block */
 

@@ -24,7 +24,5 @@ applications_NCAR_transport_correlatedcb_correlatedcb_SOURCES = \
 applications_NCAR_transport_correlatedcb_correlatedcb_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_NCAR_transport_correlatedcb_correlatedcb_CPPFLAGS += -D TRAPFPE
-
 applications_NCAR_transport_correlatedcb_correlatedcb_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

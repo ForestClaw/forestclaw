@@ -19,8 +19,6 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
-applications_advection_2d_hemisphere_hemisphere = -D TRAPFPE
-
 # applications_advection_2d_hemisphere_hemisphere_FFLAGS = \
 #	$(AM_FFLAGS)
 
