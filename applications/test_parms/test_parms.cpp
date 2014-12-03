@@ -62,6 +62,7 @@ main (int argc, char **argv)
       gparms = amr_options_new(options);
       amr_options_parse(options,argc,argv,lp);
       amr_postprocess_parms(gparms);
+      amr_options_destroy(gparms);
 
       break;
   case 2:
