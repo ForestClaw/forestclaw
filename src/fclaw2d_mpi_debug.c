@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_mpi_debug()
 {
+  int i;
+
   /* Find out process rank */
   int my_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -40,7 +42,7 @@ void fclaw2d_mpi_debug()
   int num;
   MPI_Comm_size(MPI_COMM_WORLD, &num);
 
-  // Don't do anything until we are done with this part
+  /* Don't do anything until we are done with this part */
   MPI_Barrier(MPI_COMM_WORLD);
   if (my_rank == 0)
   {
@@ -49,7 +51,6 @@ void fclaw2d_mpi_debug()
       printf("------------------------------------\n");
   }
   MPI_Barrier(MPI_COMM_WORLD);
-  int i;
   for(i = 0; i < num; i++)
   {
       if (my_rank == i)
@@ -67,4 +68,8 @@ void fclaw2d_mpi_debug()
   }
 }
 
+#else
+void fclaw2d_mpi_debug()
+{
+}
 #endif
