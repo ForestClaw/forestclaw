@@ -45,7 +45,6 @@ amr_options_add_int_array (sc_options_t * opt,
     *int_array = NULL;
     sc_options_add_string (opt, opt_char, opt_name,
                            array_string, default_string, help_string);
-    amr_options_convert_int_array (*array_string, int_array, initial_length);
 }
 
 void
@@ -90,36 +89,54 @@ amr_options_convert_arrays (amr_options_t * amropt)
 }
 #endif
 
-
+/* This is here for backwards compatibility */
 amr_options_t *
 amr_options_new (sc_options_t * opt)
 {
-    amr_options_t *amropt;
+    amr_options_t *amropt = fclaw2d_new_options();
+    fclaw2d_register_options(opt,amropt);
+    fclaw2d_read_options_from_file(opt);
+    return amropt;
+}
 
+void fclaw2d_read_options_from_file(sc_options_t* opt)
+{
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
+                     "fclaw2d_defaults.ini");
+}
+
+amr_options_t* fclaw2d_new_options ()
+{
+    amr_options_t* amropt;
     amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
 
+    return amropt;
+}
+
+void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
+{
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
-                        "Number of grid cells per patch in x");
+                        "[forestclaw] Number of grid cells per patch in x [8]");
 
     sc_options_add_int (opt, 0, "my", &amropt->my, 8,
-                        "Number of grid cells per patch in y");
+                        "[forestclaw] Number of grid cells per patch in y [8]");
 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
-                           "Initial time step size");
+                           "[forestclaw] Initial time step size [0.1]");
 
     sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 1,
-                        "Output style (1,2,3)");
+                        "[forestclaw] Output style (1,2,3) [1]");
 
     /* If outstyle == 1 */
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 1.0,
-                           "Final time");
+                           "[forestclaw] Final time [1.0]");
 
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 10,
-                        "Number of time steps");
+                        "[forestclaw] Number of time steps [10]");
 
     /* Only needed if outstyle == 3 */
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
-                        "Number of steps to take between printing output files.");
+                        "[forestclaw] Number of steps between output files [1]");
 
 
     /* This is a hack to control the VTK output while still in development.
@@ -129,57 +146,57 @@ amr_options_new (sc_options_t * opt)
      * 2 - output whenever amr_output() is called.
      */
     sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
-                        "VTK output method");
+                        "[forestclaw] VTK output method [F]");
     sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
-                           "VTK visual spacing");
+                           "[forestclaw] VTK visual spacing [F]");
     sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
-                        "VTK write variant");
+                        "[forestclaw] VTK write variant [F]");
 
     /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
-                        "Verbosity mode [0]");
+                        "[forestclaw] Verbosity mode [0]");
     sc_options_add_switch (opt, 0, "serialout", &amropt->serialout,
-                           "Enable serial output [F]");
+                            "[forestclaw] Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
-                           "Output file prefix [fort]");
+                           "[forestclaw] Output file prefix [fort]");
 
     /* more clawpack options */
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
-                           "Maximum CFL allowed [1]");
+                           "[forestclaw] Maximum CFL allowed [1]");
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                           "Maximum CFL allowed [0.9]");
+                           "[forestclaw] Maximum CFL allowed [0.9]");
 
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "Number of equations [1]");
+                        "[forestclaw] Number of equations [1]");
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
-                        "Number of ghost cells [2]");
+                        "[forestclaw] Number of ghost cells [2]");
 
     /* Array of NumFaces many values */
     amr_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
                                &amropt->mthbc, fclaw2d_NumFaces,
-                               "Physical boundary condition type");
+                               "[forestclaw] Physical boundary condition type [NULL]");
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
-                        "Refinement ratio (fixed) [2]");
+                        "[forestclaw] Refinement ratio (fixed) [2]");
 
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
-                        "Minimum refinement level [0]");
+                        "[forestclaw] Minimum refinement level [0]");
 
     sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
-                        "Maximum refinement level");
+                        "[forestclaw] Maximum refinement level[0]");
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
-                        1, "Regrid every ''regrid_interval'' steps [1]");
+                        1, "[forestclaw] Regridding frequency [1]");
 
 
-    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower (ax)");
-    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper (bx)");
-    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower (ay)");
-    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper (by)");
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "[forestclaw] xlower [0]");
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "[forestclaw] xupper [1]");
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "[forestclaw] ylower [0]");
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "[forestclaw] yupper [1]");
 
 
     /* ------------------------------------------------------------------- */
@@ -192,54 +209,40 @@ amr_options_new (sc_options_t * opt)
            can be initialized to either true or false and changed both ways.
      */
     sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
-                           "Solution is on manifold [F]");
+                           "[forestclaw] Solution is on manifold [F]");
     sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
-                           "Use fixed coarse grid time step [F]");
+                           "[forestclaw] Use fixed coarse grid time step [F]");
     sc_options_add_switch (opt, 0, "run_diagnostics",
                            &amropt->run_diagnostics,
-                           "Run diagnostics [F]");
+                           "[forestclaw] Run diagnostics [F]");
     sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
-                           "Use subcycling in time [F]");
+                           "[forestclaw] Use subcycling in time [F]");
     sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
-                           "No weighting when subcycling [F]");
+                           "[forestclaw] No weighting when subcycling [F]");
+
     sc_options_add_switch (opt, 0, "trapfpe", &amropt->trapfpe,
-                           "Enable floating point exceptions [F]");
+                           "[forestclaw] Enable floating point exceptions [F]");
 
     /* ---------------------- Usage information -------------------------- */
     sc_options_add_switch (opt, 0, "help", &amropt->help,
-                           "Print usage information (same as --usage)");
+                           "[forestclaw] Print usage information (same as --usage) [F]");
     sc_options_add_switch (opt, 0, "usage", &amropt->help,
-                           "Print usage information (same as --help)");
+                           "[forestclaw] Print usage information (same as --help) [F]");
 
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
        ----------------------------------------------------------------------- */
     sc_options_add_inifile (opt, 'F', "inifile",
-                            "Read waveprop options from this file");
+                            "[forestclaw] Read options from this file [fclaw2d_defaults.ini]");
 
-    /* -----------------------------------------------------------------------
-       This is the default file that will be read if no command line options are
-       given.  This file is tracked by Git.
-       ----------------------------------------------------------------------- */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
-                     "fclaw2d_defaults.ini");
-
-    amr_postprocess_parms (amropt);
-
-    return amropt;
 }
 
 void
 amr_postprocess_parms (amr_options_t * amropt)
 {
-    /* -----------------------------------------------------------------------
-       This has to happen after parameters have been parsed, but before we
-       check parameters.
-       ----------------------------------------------------------------------- */
-    amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   fclaw2d_NumFaces);
-
+      amr_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                     fclaw2d_NumFaces);
 }
 
 
@@ -308,8 +311,9 @@ void
 amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
                    int argc, char **argv, int log_priority)
 #endif
-     void amr_options_parse (sc_options_t * opt,
-                             int argc, char **argv, int log_priority)
+
+void amr_options_parse (sc_options_t * opt,
+                        int argc, char **argv, int log_priority)
 {
     int retval;
 

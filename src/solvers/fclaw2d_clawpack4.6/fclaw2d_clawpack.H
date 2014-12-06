@@ -135,6 +135,11 @@ void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t *clawpack_parms,amr_op
 void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t *clawpack_parms);
 void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
 
+fclaw2d_clawpack_parms_t*  clawpack46_new_options();
+void clawpack46_read_options_from_file(sc_options_t* opt);
+void clawpack46_register_options (sc_options_t* opt, fclaw2d_clawpack_parms_t* clawpack_parms);
+
+
 /* Linking solvers */
 void fclaw2d_clawpack_link_solvers(fclaw2d_domain_t* domain);
 

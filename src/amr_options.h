@@ -38,6 +38,40 @@ extern "C"
 
 typedef struct amr_options amr_options_t;
 
+/** Create storage for option values specific to forestclaw.
+ * \param [in,out] opt          Used for command line parsing.
+ * \return                      Options with preset default values.
+ */
+amr_options_t *amr_options_new (sc_options_t * opt);
+
+amr_options_t*  fclaw2d_new_options();
+void fclaw2d_register_options      (sc_options_t* opt,amr_options_t* amropt);
+void fclaw2d_read_options_from_file(sc_options_t* opt);
+
+/* Parse options and populate values in registered amr_options structure.
+ */
+void amr_options_parse (sc_options_t * opt, int argc, char **argv,
+                        int log_priority);
+
+
+/** Clean up option storage.
+ * \param [in,out]              Option storage will be deallocated.
+ */
+void amr_options_destroy (amr_options_t * amropt);
+
+
+void amr_postprocess_parms (amr_options_t * amropt);
+
+/** Check options and call exit (1) if something is wrong.
+ * TODO: convert all code to use \a amr_checkparms2 below.
+ */
+void amr_checkparms (amr_options_t * amropt);
+
+/** Check amr options, keeping the program alive.
+ * \return 0 if there are no errors, nonzero otherwise. */
+int amr_checkparms2 (sc_options_t * options, amr_options_t * amropt, int lp);
+
+
 struct amr_options
 {
     /* Fixed grid size for each grid */
@@ -129,39 +163,6 @@ void amr_options_add_int_array (sc_options_t * opt,
                                 const char *default_string,
                                 int **int_array, int initial_length,
                                 const char *help_string);
-
-/** Create storage for option values specific to forestclaw.
- * \param [in,out] opt          Used for command line parsing.
- * \return                      Options with preset default values.
- */
-amr_options_t *amr_options_new (sc_options_t * opt);
-
-/* Parse options and populate values in registered amr_options structure.
- */
-#if 0
-void amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
-                        int argc, char **argv, int log_priority);
-#endif
-void amr_options_parse (sc_options_t * opt, int argc, char **argv,
-                        int log_priority);
-
-
-/** Clean up option storage.
- * \param [in,out]              Option storage will be deallocated.
- */
-void amr_options_destroy (amr_options_t * amropt);
-
-
-void amr_postprocess_parms (amr_options_t * amropt);
-
-/** Check options and call exit (1) if something is wrong.
- * TODO: convert all code to use \a amr_checkparms2 below.
- */
-void amr_checkparms (amr_options_t * amropt);
-
-/** Check amr options, keeping the program alive.
- * \return 0 if there are no errors, nonzero otherwise. */
-int amr_checkparms2 (sc_options_t * options, amr_options_t * amropt, int lp);
 
 #ifdef __cplusplus
 #if 0

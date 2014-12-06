@@ -484,37 +484,53 @@ void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
 
 }
 
-
 fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
+{
+    fclaw2d_clawpack_parms_t* clawpack_parms = clawpack46_new_options();
+    clawpack46_register_options(opt,clawpack_parms);
+    clawpack46_read_options_from_file(opt);
+    return clawpack_parms;
+}
+
+fclaw2d_clawpack_parms_t*  clawpack46_new_options()
+{
+    fclaw2d_clawpack_parms_t *clawpack_parms;
+    clawpack_parms = FCLAW2D_ALLOC_ZERO(fclaw2d_clawpack_parms_t, 1);
+    return clawpack_parms;
+}
+
+void clawpack46_read_options_from_file(sc_options_t* opt)
+{
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_clawpack.ini");
+}
+
+
+void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
     /* This is a good example of a place where a [Section] would be nice.
        Something like [clawpack].  See fclaw_defaults.ini */
 
-    fclaw2d_clawpack_parms_t *clawpack_parms;
-
-    clawpack_parms = FCLAW2D_ALLOC_ZERO(fclaw2d_clawpack_parms_t, 1);
-
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
     amr_options_add_int_array (opt, 0, "order", &clawpack_parms->order_string, NULL,
                                &clawpack_parms->order, SpaceDim,
-                               "Normal and transverse orders");
+                               "[clawpack4.6] Normal and transverse orders");
 
-    sc_options_add_int (opt, 'M', "mcapa", &clawpack_parms->mcapa, -1,
-                        "Location of capacity function in aux array [-1]");
+    sc_options_add_int (opt, 0, "mcapa", &clawpack_parms->mcapa, -1,
+                        "[clawpack4.6] Location of capacity function in aux array [-1]");
 
     sc_options_add_int (opt, 0, "maux", &clawpack_parms->maux, 0,
-                        "Number of auxiliary variables [0]");
+                        "[clawpack4.6] Number of auxiliary variables [0]");
 
     sc_options_add_int (opt, 0, "src_term", &clawpack_parms->src_term, 0,
-                        "Source term option [0]");
+                        "[clawpack4.6] Source term option [0]");
 
     sc_options_add_int (opt, 0, "mwaves", &clawpack_parms->mwaves, 1,
-                        "Number of waves [1]");
+                        "[clawpack4.6] Number of waves [1]");
 
     /* Array of mwaves many values */
     amr_options_add_int_array (opt, 0, "mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
-                               "Waves limiters (one for each wave)");
+                               "[clawpack4.6] Waves limiters");
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-W' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -522,18 +538,8 @@ fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
        WARNING: The long option name must be unique within the whole program.
                 Just 'inifile' is already used in amr_options.c.
        ----------------------------------------------------------------------- */
-    sc_options_add_inifile (opt, 'W', "fclaw2d_clawpack.ini",
-                            "Read clawpack options from this file [default : fclaw2d_clawpack.ini]");
-
-    /* -----------------------------------------------------------------------
-       This is the default file that will be read if no command line options are
-       given.  This file is tracked by Git.
-       ----------------------------------------------------------------------- */
-   sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_clawpack.ini");
-
-   fclaw2d_clawpack_postprocess_parms(clawpack_parms);
-
-   return clawpack_parms;
+    sc_options_add_inifile (opt,0, "fclaw2d_clawpack.ini",
+                            "[clawpack4.6] Read options from this file [fclaw2d_clawpack.ini]");
 
 }
 
@@ -561,6 +567,43 @@ void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms, amr_o
     /* Should also check mthbc, mthlim, etc. */
 
 }
+
+int fclaw2d_clawpack_checkparms2(sc_options_t* options,
+                                 fclaw2d_clawpack_parms_t* clawpack_parms,
+                                 amr_options_t* gparms,
+                                 int lp)
+{
+    /* Check for user help argument */
+    if (gparms->help) {
+        sc_options_print_usage (sc_package_id, lp, options, NULL);
+        return -1;
+    }
+
+    /* -----------------------------------------------------------------------
+       Set up 'method' vector used by Clawpack.
+       ------------------------------------------------------------------------ */
+    clawpack_parms->method[0] = gparms->use_fixed_dt;
+
+    clawpack_parms->method[1] = clawpack_parms->order[0];
+    if (SpaceDim == 2)
+    {
+        clawpack_parms->method[2] = clawpack_parms->order[1];
+    }
+    else
+    {
+        clawpack_parms->method[2] = 10*clawpack_parms->order[1] + clawpack_parms->order[2];
+    }
+    clawpack_parms->method[3] = gparms->verbosity;
+    clawpack_parms->method[4] = clawpack_parms->src_term;
+    clawpack_parms->method[5] = clawpack_parms->mcapa;
+    clawpack_parms->method[6] = clawpack_parms->maux;
+
+    /* Should also check mthbc, mthlim, etc. */
+
+    return 0;    /* Nothing can go wrong here! */
+
+}
+
 
 void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
 {

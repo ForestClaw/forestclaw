@@ -37,7 +37,7 @@ static int
 torus_checkparms (int example, int lp)
 {
     if (example < 1 || example > 4) {
-        fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
+        fclaw2d_global_log (lp, "Option --example must be 1, 2, 3 or 4\n");
         return -1;
     }
 
@@ -67,51 +67,62 @@ main (int argc, char **argv)
   double lat[2];
   double longitude[2];
 
+  int trapfpe;
+  int mpi_debug;
+
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-#ifdef MPI_DEBUG
-  /* TODO: What is this for? Should be absorbed into fclaw_mpi_init. */
-  /* This is code that suspends processing (with an infinite loop) so that
-     multiple processes can be attached and debugged with GDB.  I am happy to
-     move it.  Didn't know where... */
-  fclaw2d_mpi_debug();
-#endif
   /* ---------------------------------------------------------------
      Read parameters from .ini file, parse command line, and
      do parameter checking.
      -------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
 
+  /* Register local options */
   sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
+                      "[Example] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
 
+  /* Register mapping options */
   sc_options_add_double (options, 0, "theta", &theta, 0,
-                         "Rotation angle theta (degrees) about z axis [0]");
+                         "[Mapping] Rotation angle theta (degrees) about z axis [0]");
 
   sc_options_add_double (options, 0, "phi", &phi, 0,
-                         "Rotation angle phi (degrees) about x axis [0]");
+                         "[Mapping] Rotation angle phi (degrees) about x axis [0]");
 
   sc_options_add_int (options, 0, "mi", &mi, 1,
-                         "Number of blocks in x direction [1]");
+                         "[Mapping] Number of blocks in x direction [1]");
 
-  sc_options_add_int (options, 0, "mj", &mj, 0,
-                         "Number of blocks in y direction  [1]");
+  sc_options_add_int (options, 0, "mj", &mj, 1,
+                         "[Mapping] Number of blocks in y direction  [1]");
 
+  sc_options_add_switch (options, 0, "mpi_debug", &mpi_debug,
+                      "[Init] Start MPI debug session to attach processes to gdb [F]");
 
-  gparms = amr_options_new (options);
-  clawpack_parms = fclaw2d_clawpack_parms_new(options);
+  sc_options_add_switch (options, 0, "trapfpe", &trapfpe,
+                      "[Init] Trap floating point exceptions [T]");
+
+  /* [forestclaw] Register general ForestClaw options */
+  gparms = fclaw2d_new_options();
+  fclaw2d_register_options(options,gparms);
+  fclaw2d_read_options_from_file(options);
+  amr_postprocess_parms(gparms);  /* post-process array input */
+
+  /* [clawpack] Register solver options */
+  clawpack_parms = clawpack46_new_options();
+  clawpack46_register_options(options,clawpack_parms);
+  clawpack46_read_options_from_file(options);
+  fclaw2d_clawpack_postprocess_parms(clawpack_parms);  /* post-process array input */
 
   /* TODO: would it make sense to provide this code up to and excluding
    *       torus_checkparms into a reusable function? */
   /* parse command line; these values take precedence */
   amr_options_parse (options,argc, argv, lp);
 
-  /* Any arrays are converted here */
-  amr_postprocess_parms(gparms);
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
+  amr_postprocess_parms(gparms); /* post-process array input */
+  fclaw2d_clawpack_postprocess_parms(clawpack_parms); /* post-process array input */
 
   /* Check final state of parameters.
    * The call to amr_checkparms2 also checks for a --help message.
@@ -128,10 +139,15 @@ main (int argc, char **argv)
       /* ---------------------------------------------------------------
          Floating point traps
          -------------------------------------------------------------- */
-      if (gparms->trapfpe == 1)
+      if (trapfpe == 1)
       {
           printf("Enabling floating point traps\n");
           feenableexcept(FE_INVALID);
+      }
+
+      if (mpi_debug == 1)
+      {
+          fclaw2d_mpi_debug();
       }
 
       /* ---------------------------------------------------------------
