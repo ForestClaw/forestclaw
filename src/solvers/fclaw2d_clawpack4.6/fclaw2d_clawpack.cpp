@@ -532,6 +532,7 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
     amr_options_add_int_array (opt, 0, "mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
                                "[clawpack4.6] Waves limiters");
+
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-W' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -638,8 +639,10 @@ void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
     FCLAW_FREE(clawpack_parms->order);
     FCLAW_FREE(clawpack_parms->mthlim);
+#if 0
     FCLAW2D_FREE(clawpack_parms);
     clawpack_parms = NULL;
+#endif
 }
 
 static
