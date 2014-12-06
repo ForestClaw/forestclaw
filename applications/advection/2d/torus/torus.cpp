@@ -57,46 +57,29 @@ main (int argc, char **argv)
   amr_options_t         samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t* clawpack_parms;
 
-  double pi, theta, phi;
-  double rotate[2];
-  double scale[3];
-  double shift[3];
-  double alpha;
   int example;
-  int mi, mj, a,b;
+  double pi;
+
+  /* Mapping variables */
+  double rotate[2];
+  double alpha;  /* Ratio of torus inner radius to outer radius */
   double lat[2];
   double longitude[2];
+  int mi, mj, a,b;
+  fclaw2d_map_data_t map_data;  /* For reading in options */
 
   int trapfpe;
   int mpi_debug;
-
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-  /* ---------------------------------------------------------------
-     Read parameters from .ini file, parse command line, and
-     do parameter checking.
-     -------------------------------------------------------------- */
   options = sc_options_new (argv[0]);
 
   /* Register local options */
   sc_options_add_int (options, 0, "example", &example, 0,
                       "[Example] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
-
-  /* Register mapping options */
-  sc_options_add_double (options, 0, "theta", &theta, 0,
-                         "[Mapping] Rotation angle theta (degrees) about z axis [0]");
-
-  sc_options_add_double (options, 0, "phi", &phi, 0,
-                         "[Mapping] Rotation angle phi (degrees) about x axis [0]");
-
-  sc_options_add_int (options, 0, "mi", &mi, 1,
-                         "[Mapping] Number of blocks in x direction [1]");
-
-  sc_options_add_int (options, 0, "mj", &mj, 1,
-                         "[Mapping] Number of blocks in y direction  [1]");
 
   sc_options_add_switch (options, 0, "mpi_debug", &mpi_debug,
                       "[Init] Start MPI debug session to attach processes to gdb [F]");
@@ -110,9 +93,18 @@ main (int argc, char **argv)
   fclaw2d_read_options_from_file(options);
   amr_postprocess_parms(gparms);  /* post-process array input */
 
+  /* [Mapping] Register general mapping data */
+  fclaw2d_register_map_data(options,&map_data); /* sets default values */
+  fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
+  mi = map_data.mi;
+  mj = map_data.mj;
+  pi = M_PI;
+  rotate[0] = pi*map_data.theta/180.0;
+  rotate[1] = pi*map_data.phi/180.0;
+
   /* [clawpack] Register solver options */
   clawpack_parms = clawpack46_new_options();
-  clawpack46_register_options(options,clawpack_parms);
+  clawpack46_register_options(options,clawpack_parms); /* Change name space? */
   clawpack46_read_options_from_file(options);
   fclaw2d_clawpack_postprocess_parms(clawpack_parms);  /* post-process array input */
 
@@ -136,9 +128,6 @@ main (int argc, char **argv)
   if (!retval) {
      /* the do-the-work block. TODO: put everything below into a function */
 
-      /* ---------------------------------------------------------------
-         Floating point traps
-         -------------------------------------------------------------- */
       if (trapfpe == 1)
       {
           printf("Enabling floating point traps\n");
@@ -151,26 +140,16 @@ main (int argc, char **argv)
       }
 
       /* ---------------------------------------------------------------
-         Domain geometry
+         Mapping geometry
          --------------------------------------------------------------- */
-      pi = M_PI;
-      set_default_transform(scale,shift,rotate);
-
-      rotate[0] = pi*theta/180.0;
-      rotate[1] = pi*phi/180.0;
-
-      /* default torus has outer radius 1 and inner radius alpha */
       switch (example)
       {
       case 1:
           a = 1;
           b = 1;
-          rotate[0] = 0;
-          rotate[1] = 0;
-          set_default_transform(scale,shift,rotate);
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
+          cont = fclaw2d_map_new_cart(brick,map_data.scale,map_data.shift,rotate);
           break;
       case 2:
           /* Generally, we should have mj \approx \alpha*mi */
@@ -186,7 +165,7 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_torus(brick,scale,shift,rotate,alpha);
+          cont = fclaw2d_map_new_torus(brick,map_data.scale,map_data.shift,rotate,alpha);
           break;
       case 3:
           /* Lat-long example */
@@ -196,7 +175,6 @@ main (int argc, char **argv)
           longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
           lat[0] = -50;  /* y-coordinate */
           lat[1] = 50;
-          set_default_transform(scale,shift,rotate);
           alpha = (lat[1]-lat[0])/180;
           mj = alpha*mi/2.0;
           if (mj == 0)
@@ -206,7 +184,8 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
+          cont = fclaw2d_map_new_latlong(brick,map_data.scale,map_data.shift,
+                                         rotate,lat,longitude,a,b);
           break;
       case 4:
           /* Annulus */
@@ -221,7 +200,8 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_annulus(brick,scale,shift,rotate,alpha);
+          cont = fclaw2d_map_new_annulus(brick,map_data.scale,map_data.shift,
+                                         rotate,alpha);
           break;
 
       default:
@@ -253,8 +233,6 @@ main (int argc, char **argv)
       link_regrid_functions(domain,
                             torus_patch_tag4refinement,
                             torus_patch_tag4coarsening);
-
-
       amrinit(&domain);
       amrrun(&domain);
       amrreset(&domain);
