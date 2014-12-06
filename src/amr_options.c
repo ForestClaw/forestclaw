@@ -305,12 +305,6 @@ amr_checkparms2 (sc_options_t * options, amr_options_t * gparms, int lp)
     return 0;
 }
 
-#if 0
-void
-amr_options_parse (sc_options_t * opt, amr_options_t * amropt,
-                   int argc, char **argv, int log_priority)
-#endif
-
 void amr_options_parse (sc_options_t * opt,
                         int argc, char **argv, int log_priority)
 {
@@ -338,8 +332,10 @@ void amr_options_parse (sc_options_t * opt,
 }
 
 void
-amr_options_destroy (amr_options_t * amropt)
+amr_options_destroy (amr_options_t * gparms)
 {
-    FCLAW_FREE (amropt->mthbc);
-    FCLAW_FREE(amropt);
+    FCLAW_FREE (gparms->mthbc);
+
+    /* We shouldn't do this if the user has a static declaration of gparms */
+    FCLAW_FREE(gparms);
 }
