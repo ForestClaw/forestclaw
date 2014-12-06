@@ -35,57 +35,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
-void
-fclaw2d_options_add_int_array (sc_options_t * opt,
-                               int opt_char, const char *opt_name,
-                               const char **array_string,
-                               const char *default_string,
-                               int **int_array, int initial_length,
-                               const char *help_string)
-{
-    *int_array = NULL;
-    sc_options_add_string (opt, opt_char, opt_name,
-                           array_string, default_string, help_string);
-}
-
-void
-fclaw2d_options_convert_int_array (const char *array_string,
-                                   int **int_array, int new_length)
-{
-    int i;
-    const char *beginptr;
-    char *endptr;
-
-    new_length = SC_MAX (new_length, 0);
-    *int_array = FCLAW_REALLOC (*int_array, int, new_length);
-
-    beginptr = array_string;
-    for (i = 0; i < new_length; ++i)
-    {
-        if (beginptr == NULL)
-        {
-            (*int_array)[i] = 0;
-        }
-        else
-        {
-            (*int_array)[i] = (int) strtol (beginptr, &endptr, 10);
-            beginptr = endptr;
-        }
-    }
-}
-
-void fclaw2d_read_options_from_file(sc_options_t* opt)
-{
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
-                     "fclaw2d_defaults.ini");
-}
-
+/* Use this with 'fclaw2d_destroy_options' */
 amr_options_t* fclaw2d_new_options ()
 {
     amr_options_t* amropt;
     amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
 
     return amropt;
+}
+
+void fclaw2d_read_options_from_file(sc_options_t* opt)
+{
+    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
+                     "fclaw2d_defaults.ini");
 }
 
 void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
@@ -185,23 +147,23 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
      */
     sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
                            "[forestclaw] Solution is on manifold [F]");
-    sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
+    sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
                            "[forestclaw] Use fixed coarse grid time step [F]");
-    sc_options_add_switch (opt, 0, "run_diagnostics",
-                           &amropt->run_diagnostics,
-                           "[forestclaw] Run diagnostics [F]");
-    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
+    sc_options_add_bool (opt, 0, "run_diagnostics",
+                         &amropt->run_diagnostics,0,
+                         "[forestclaw] Run diagnostics [F]");
+    sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
                            "[forestclaw] Use subcycling in time [F]");
-    sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
+    sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
                            "[forestclaw] No weighting when subcycling [F]");
 
-    sc_options_add_switch (opt, 0, "trapfpe", &amropt->trapfpe,
+    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
                            "[forestclaw] Enable floating point exceptions [F]");
 
     /* ---------------------- Usage information -------------------------- */
-    sc_options_add_switch (opt, 0, "help", &amropt->help,
+    sc_options_add_bool (opt, 0, "help", &amropt->help, 0,
                            "[forestclaw] Print usage information (same as --usage) [F]");
-    sc_options_add_switch (opt, 0, "usage", &amropt->help,
+    sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
                            "[forestclaw] Print usage information (same as --help) [F]");
 
     /* -----------------------------------------------------------------------
@@ -277,7 +239,53 @@ void fclaw2d_parse_command_line(sc_options_t * opt,
 }
 
 void
-fclaw2d_options_destroy (amr_options_t * amropt)
+fclaw2d_options_destroy_arrays (amr_options_t * amropt)
 {
     FCLAW_FREE (amropt->mthbc);
+}
+
+/* Use this with 'fclaw2d_new_options' */
+void fclaw2d_options_destroy(amr_options_t* amropt)
+{
+    FCLAW_FREE (amropt);
+}
+
+
+void
+fclaw2d_options_add_int_array (sc_options_t * opt,
+                               int opt_char, const char *opt_name,
+                               const char **array_string,
+                               const char *default_string,
+                               int **int_array, int initial_length,
+                               const char *help_string)
+{
+    *int_array = NULL;
+    sc_options_add_string (opt, opt_char, opt_name,
+                           array_string, default_string, help_string);
+}
+
+void
+fclaw2d_options_convert_int_array (const char *array_string,
+                                   int **int_array, int new_length)
+{
+    int i;
+    const char *beginptr;
+    char *endptr;
+
+    new_length = SC_MAX (new_length, 0);
+    *int_array = FCLAW_REALLOC (*int_array, int, new_length);
+
+    beginptr = array_string;
+    for (i = 0; i < new_length; ++i)
+    {
+        if (beginptr == NULL)
+        {
+            (*int_array)[i] = 0;
+        }
+        else
+        {
+            (*int_array)[i] = (int) strtol (beginptr, &endptr, 10);
+            beginptr = endptr;
+        }
+    }
 }
