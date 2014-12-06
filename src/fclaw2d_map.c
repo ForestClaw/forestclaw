@@ -440,7 +440,7 @@ void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_da
        Shift
        --------------------------------------------------------------------*/
     sc_options_add_double (options,0, "shift_x", &map_data->shift[0], 0,
-                           "[Mapping] Shift x direction [0]");
+                           "[Mapping] Shift in the x direction [0]");
 
     sc_options_add_double (options,0, "shift_y", &map_data->shift[1], 0,
                            "[Mapping] Shift in the y direction [0]");
@@ -452,10 +452,10 @@ void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_da
        Rotate
        --------------------------------------------------------------------*/
     sc_options_add_double (options, 0, "theta", &map_data->theta, 0,
-                           "[Mapping] Rotation angle theta (degrees) about z axis [0]");
+                           "[Mapping] Rotation angle about z axis (degrees) [0]");
 
     sc_options_add_double (options, 0, "phi", &map_data->phi, 0,
-                           "[Mapping] Rotation angle phi (degrees) about x axis [0]");
+                           "[Mapping] Rotation angle about x axis (degrees) [0]");
 }
 
 
