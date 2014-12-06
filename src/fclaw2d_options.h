@@ -42,6 +42,7 @@ extern "C"
  * \return                      Options with preset default values.
  */
 
+amr_options_t* fclaw2d_new_options ();
 void fclaw2d_register_options      (sc_options_t* opt, amr_options_t* amropt);
 void fclaw2d_read_options_from_file(sc_options_t* opt);
 void fclaw2d_parse_command_line (sc_options_t * opt, int argc, char **argv,
@@ -50,7 +51,10 @@ void fclaw2d_parse_command_line (sc_options_t * opt, int argc, char **argv,
 /** Clean up option storage.
  * \param [in,out]              Option storage will be deallocated.
  */
-void fclaw2d_options_destroy (amr_options_t * amropt);
+
+void fclaw2d_options_destroy_arrays (amr_options_t * amropt);
+
+void fclaw2d_options_destroy (amr_options_t * amropt);  /* use with fclaw2d_new_options */
 
 
 void fclaw2d_postprocess_parms (amr_options_t * amropt);
