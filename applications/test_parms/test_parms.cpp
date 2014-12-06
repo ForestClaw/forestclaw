@@ -58,27 +58,26 @@ int main (int argc, char **argv)
     sc_options_add_int (options, 0, "example", &example, 0,
                         "[Example] Example 1 or 2. ");
 
-    fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-    fclaw2d_parse_command_line(options,argc,argv,lp);
-    retval = test_parms_checkparms(example,lp);
-
     /* [Mapping] General mapping parameters (mi,mj,scale,shift,phi,theta) */
     fclaw2d_register_map_data(options,map_data); /* sets default values */
-    fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-    fclaw2d_parse_command_line(options,argc,argv,lp);
 
     /* [forestclaw] General ForestClaw parameters */
     fclaw2d_register_options(options,gparms);
     fclaw2d_read_options_from_file(options);
-    fclaw2d_parse_command_line(options,argc,argv,lp);
     fclaw2d_postprocess_parms(gparms);  /* convert array inputs */
-    retval = retval || fclaw2d_checkparms(options,gparms,lp);
 
     /* [clawpack46] Parameters from Clawpack solver */
     clawpack46_register_options(options,clawpack_parms);
     clawpack46_read_options_from_file(options);
-    fclaw2d_parse_command_line(options,argc,argv,lp);
     clawpack46_postprocess_parms(clawpack_parms);  /* convert array inputs */
+
+    fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
+
+    fclaw2d_parse_command_line(options,argc,argv,lp);
+
+    retval = 0;
+    retval = retval || fclaw2d_checkparms(options,gparms,lp);
+    retval = retval || test_parms_checkparms(example,lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
 
     if (!retval)
@@ -99,7 +98,7 @@ int main (int argc, char **argv)
     }
 
     fclaw2d_clawpack_parms_delete(clawpack_parms);
-    fclaw2d_options_destroy(gparms);
+    fclaw2d_options_destroy_arrays(gparms);
     sc_options_destroy (options);
 
     fclaw_mpi_finalize ();
