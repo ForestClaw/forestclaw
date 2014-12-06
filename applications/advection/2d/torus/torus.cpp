@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+#include <fclaw2d_options.h>
 #include <fclaw2d_map_query.h>
 
 #include "torus_user.H"
@@ -55,10 +56,10 @@ main (int argc, char **argv)
   fclaw2d_map_context_t *cont = NULL, *brick = NULL;
   fclaw2d_domain_t	*domain;
   amr_options_t         samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t* clawpack_parms;
+  fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
 
   int example;
-  double pi;
+  double pi = M_PI;
 
   /* Mapping variables */
   double rotate[2];
@@ -66,7 +67,7 @@ main (int argc, char **argv)
   double lat[2];
   double longitude[2];
   int mi, mj, a,b;
-  fclaw2d_map_data_t map_data;  /* For reading in options */
+  fclaw2d_map_data_t smap_data, *map_data = &smap_data;
 
   int trapfpe;
   int mpi_debug;
@@ -88,43 +89,41 @@ main (int argc, char **argv)
                       "[Init] Trap floating point exceptions [T]");
 
   /* [forestclaw] Register general ForestClaw options */
-  gparms = fclaw2d_new_options();
   fclaw2d_register_options(options,gparms);
   fclaw2d_read_options_from_file(options);
-  amr_postprocess_parms(gparms);  /* post-process array input */
+  fclaw2d_postprocess_parms(gparms);  /* post-process array input */
 
   /* [Mapping] Register general mapping data */
-  fclaw2d_register_map_data(options,&map_data); /* sets default values */
+  fclaw2d_register_map_data(options,map_data); /* sets default values */
   fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-  mi = map_data.mi;
-  mj = map_data.mj;
-  pi = M_PI;
-  rotate[0] = pi*map_data.theta/180.0;
-  rotate[1] = pi*map_data.phi/180.0;
+  mi = map_data->mi;
+  mj = map_data->mj;
+  rotate[0] = pi*map_data->theta/180.0;
+  rotate[1] = pi*map_data->phi/180.0;
 
   /* [clawpack] Register solver options */
-  clawpack_parms = clawpack46_new_options();
   clawpack46_register_options(options,clawpack_parms); /* Change name space? */
   clawpack46_read_options_from_file(options);
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms);  /* post-process array input */
+  clawpack46_postprocess_parms(clawpack_parms);  /* post-process array input */
 
   /* TODO: would it make sense to provide this code up to and excluding
    *       torus_checkparms into a reusable function? */
-  /* parse command line; these values take precedence */
-  amr_options_parse (options,argc, argv, lp);
+  /* Hm... maybe.  But such a reusable function would have to be specific for
+     each example, I think. And it isn't clear how it would be get re-used. */
 
-  amr_postprocess_parms(gparms); /* post-process array input */
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms); /* post-process array input */
+  /* This prints out all the current options */
+  fclaw2d_parse_command_line (options,argc, argv, lp);
+
+  fclaw2d_postprocess_parms(gparms); /* post-process array input */
+  clawpack46_postprocess_parms(clawpack_parms); /* post-process array input */
 
   /* Check final state of parameters.
    * The call to amr_checkparms2 also checks for a --help message.
    * We are exploiting C short-circuit boolean evaluation.
    */
-  retval = amr_checkparms2 (options, gparms, lp);
-  /* TODO: Convert this similarly to amr_checkparms2 */
-  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
-  /* TODO: example, phi, theta should live in a struct that can be passed */
-  retval = retval || torus_checkparms (example, lp);
+  retval = fclaw2d_checkparms (options, gparms, lp);
+  retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
+  retval = retval || torus_checkparms (example, lp);  /* No more to check here */
   if (!retval) {
      /* the do-the-work block. TODO: put everything below into a function */
 
@@ -149,7 +148,7 @@ main (int argc, char **argv)
           b = 1;
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_cart(brick,map_data.scale,map_data.shift,rotate);
+          cont = fclaw2d_map_new_cart(brick,map_data->scale,map_data->shift,rotate);
           break;
       case 2:
           /* Generally, we should have mj \approx \alpha*mi */
@@ -165,7 +164,7 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_torus(brick,map_data.scale,map_data.shift,rotate,alpha);
+          cont = fclaw2d_map_new_torus(brick,map_data->scale,map_data->shift,rotate,alpha);
           break;
       case 3:
           /* Lat-long example */
@@ -184,7 +183,7 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_latlong(brick,map_data.scale,map_data.shift,
+          cont = fclaw2d_map_new_latlong(brick,map_data->scale,map_data->shift,
                                          rotate,lat,longitude,a,b);
           break;
       case 4:
@@ -200,7 +199,7 @@ main (int argc, char **argv)
           }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_annulus(brick,map_data.scale,map_data.shift,
+          cont = fclaw2d_map_new_annulus(brick,map_data->scale,map_data->shift,
                                          rotate,alpha);
           break;
 
@@ -242,7 +241,7 @@ main (int argc, char **argv)
   } /* this bracket ends the do_the_work block */
 
   sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms);
+  fclaw2d_options_destroy (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
