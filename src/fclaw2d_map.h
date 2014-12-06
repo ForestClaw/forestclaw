@@ -51,6 +51,7 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
+typedef struct fclaw2d_map_data fclaw2d_map_data_t;
 
 /** This function is used to query the map for general properties.
  * \param [in] cont     Matching mapping context.
@@ -89,6 +90,7 @@ struct fclaw2d_map_context
     int user_int[16];
     double user_double[16];
 
+    /* This will be deprecated soon ... */
     double scale[3];
     double shift[3];
     double rotate[9];
@@ -96,6 +98,21 @@ struct fclaw2d_map_context
     fclaw2d_map_context_t *brick;
     void *user_data;
 };
+
+
+struct fclaw2d_map_data
+{
+    int mi;
+    int mj;
+    int periodic_x;
+    int periodic_y;
+    double scale[3];
+    double shift[3];
+    double theta;
+    double phi;
+};
+
+void fclaw2d_register_map_data(sc_options_t* opt, fclaw2d_map_data_t* map_data);
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
 void set_shift(fclaw2d_map_context_t* cont, const double shift[]);

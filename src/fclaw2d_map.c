@@ -410,6 +410,55 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 }
 #endif
 
+void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_data)
+{
+    sc_options_add_int (options, 0, "mi", &map_data->mi, 1,
+                        "[Mapping] Number of blocks in x direction [1]");
+
+    sc_options_add_int (options, 0, "mj", &map_data->mj, 1,
+                        "[Mapping] Number of blocks in y direction  [1]");
+
+    sc_options_add_int (options, 0, "periodic_x", &map_data->periodic_x, 0,
+                        "[Mapping] Periodic in x direction [0]");
+
+    sc_options_add_int (options, 0, "periodic_y", &map_data->periodic_y, 0,
+                        "[Mapping] Periodic in y direction  [0]");
+
+    /* --------------------------------------------------------------------
+       Scale
+       --------------------------------------------------------------------*/
+    sc_options_add_double (options,0, "scale_x", &map_data->scale[0], 1,
+                           "[Mapping] Scale factor in the x direction [1]");
+
+    sc_options_add_double (options,0, "scale_y", &map_data->scale[1], 1,
+                           "[Mapping] Scale factor in the y direction [1]");
+
+    sc_options_add_double (options,0, "scale_z", &map_data->scale[2], 1,
+                           "[Mapping] Scale factor in the z direction [1]");
+
+    /* --------------------------------------------------------------------
+       Shift
+       --------------------------------------------------------------------*/
+    sc_options_add_double (options,0, "shift_x", &map_data->shift[0], 0,
+                           "[Mapping] Shift x direction [0]");
+
+    sc_options_add_double (options,0, "shift_y", &map_data->shift[1], 0,
+                           "[Mapping] Shift in the y direction [0]");
+
+    sc_options_add_double (options,0, "shift_z", &map_data->shift[2], 0,
+                           "[Mapping] Shift in the z direction [0]");
+
+    /* --------------------------------------------------------------------
+       Rotate
+       --------------------------------------------------------------------*/
+    sc_options_add_double (options, 0, "theta", &map_data->theta, 0,
+                           "[Mapping] Rotation angle theta (degrees) about z axis [0]");
+
+    sc_options_add_double (options, 0, "phi", &map_data->phi, 0,
+                           "[Mapping] Rotation angle phi (degrees) about x axis [0]");
+}
+
+
 void set_scale(fclaw2d_map_context_t* cont, const double scale[])
 {
     memcpy(cont->scale,scale,3*sizeof(double));
@@ -431,7 +480,6 @@ void set_default_transform(double scale[],double shift[],double rotate[])
   rotate[0] = 0;
   rotate[1] = 0;
 }
-
 
 
 void set_rotate(fclaw2d_map_context_t* cont, const double rotate[])
@@ -476,7 +524,6 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *yp = vrot[1];
     *zp = vrot[2];
 }
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
