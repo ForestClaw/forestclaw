@@ -58,17 +58,29 @@ main (int argc, char **argv)
   case 1:
       amr_options_t  *gparms;
 
-      /* Register default parameters and any solver parameters */
-      gparms = amr_options_new(options);
+      /* [forestclaw] General ForestClaw parameters */
+      gparms = fclaw2d_new_options();
+      fclaw2d_register_options(options,gparms);
+      fclaw2d_read_options_from_file(options);
+      amr_postprocess_parms(gparms);  /* convert array inputs */
+
+      /* Command line arguments */
       amr_options_parse(options,argc,argv,lp);
+
       amr_postprocess_parms(gparms);
+      amr_checkparms2(options,gparms,lp);
+
       amr_options_destroy(gparms);
 
       break;
   case 2:
       fclaw2d_clawpack_parms_t  *clawpack_parms;
 
-      clawpack_parms = fclaw2d_clawpack_parms_new(options);
+      /* [clawpack46] Parameters from Clawpack solver */
+      clawpack_parms = clawpack46_new_options();
+      clawpack46_register_options(options,clawpack_parms);
+      clawpack46_read_options_from_file(options);
+      fclaw2d_clawpack_postprocess_parms(clawpack_parms);  /* convert array inputs */
 
       /* Command line arguments */
       amr_options_parse(options,argc,argv,lp);
