@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_options.h"
 #include "clawpack_fort.H"
 #include "amr_forestclaw.H"
+#include "fclaw2d_options.h"
 
 
 extern "C"
@@ -131,13 +132,20 @@ void fclaw2d_clawpack_get_auxarray(fclaw2d_domain_t* domain,
 /* Reading in parameters */
 void set_clawpack_parms(fclaw2d_domain_t* domain,fclaw2d_clawpack_parms_t* clawpack_parms);
 fclaw2d_clawpack_parms_t* fclaw2d_clawpack_parms_new(sc_options_t *opt);
-void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t *clawpack_parms,amr_options_t* gparms);
+void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t *clawpack_parms,
+                                 amr_options_t* gparms);
+
 void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t *clawpack_parms);
 void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
 
 fclaw2d_clawpack_parms_t*  clawpack46_new_options();
 void clawpack46_read_options_from_file(sc_options_t* opt);
 void clawpack46_register_options (sc_options_t* opt, fclaw2d_clawpack_parms_t* clawpack_parms);
+void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
+int clawpack46_checkparms(sc_options_t *opt,
+                           fclaw2d_clawpack_parms_t *clawpack_parms,
+                           amr_options_t* gparms,
+                           int lp);
 
 
 /* Linking solvers */

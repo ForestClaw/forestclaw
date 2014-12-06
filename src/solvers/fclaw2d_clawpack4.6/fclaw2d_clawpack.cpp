@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_clawpack.H"
+#include "fclaw2d_options.h"
 
 void set_clawpack_parms(fclaw2d_domain_t* domain,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -543,7 +544,8 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
 
 }
 
-void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms, amr_options_t* gparms)
+void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms,
+                                 amr_options_t* gparms)
 {
     /* -----------------------------------------------------------------------
        Set up 'method' vector used by Clawpack.
@@ -572,6 +574,14 @@ int fclaw2d_clawpack_checkparms2(sc_options_t* options,
                                  fclaw2d_clawpack_parms_t* clawpack_parms,
                                  amr_options_t* gparms,
                                  int lp)
+{
+    return clawpack46_checkparms(options, clawpack_parms, gparms,lp);
+}
+
+int clawpack46_checkparms(sc_options_t* options,
+                          fclaw2d_clawpack_parms_t* clawpack_parms,
+                          amr_options_t* gparms,
+                          int lp)
 {
     /* Check for user help argument */
     if (gparms->help) {
@@ -604,17 +614,22 @@ int fclaw2d_clawpack_checkparms2(sc_options_t* options,
 
 }
 
-
 void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
+{
+    clawpack46_postprocess_parms(clawpack_parms);
+}
+
+
+void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
     /* -----------------------------------------------------------------------
        Some post-processing of arrays
        ------------------------------------------------------------------------ */
 
-    amr_options_convert_int_array (clawpack_parms->mthlim_string, &clawpack_parms->mthlim,
+    fclaw2d_options_convert_int_array (clawpack_parms->mthlim_string, &clawpack_parms->mthlim,
                                    clawpack_parms->mwaves);
 
-    amr_options_convert_int_array (clawpack_parms->order_string, &clawpack_parms->order,
+    fclaw2d_options_convert_int_array (clawpack_parms->order_string, &clawpack_parms->order,
                                    SpaceDim);
 }
 
