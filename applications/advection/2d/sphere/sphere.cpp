@@ -170,7 +170,7 @@ int main (int argc, char **argv)
         fclaw2d_map_destroy (cont);
     }
 
-    fclaw2d_options_destroy(gparms);  /* Delete any array options */
+    fclaw2d_options_destroy_arrays(gparms);  /* Delete any array options */
     sc_options_destroy(options);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
 

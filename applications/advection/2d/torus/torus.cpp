@@ -241,7 +241,7 @@ main (int argc, char **argv)
   } /* this bracket ends the do_the_work block */
 
   sc_options_destroy (options);         /* this could be moved up */
-  fclaw2d_options_destroy (gparms);
+  fclaw2d_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();
