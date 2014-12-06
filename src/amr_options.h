@@ -44,12 +44,10 @@ typedef struct amr_options amr_options_t;
  */
 amr_options_t *amr_options_new (sc_options_t * opt);
 
-amr_options_t*  fclaw2d_new_options();
-void fclaw2d_register_options      (sc_options_t* opt,amr_options_t* amropt);
-void fclaw2d_read_options_from_file(sc_options_t* opt);
-
-/* Parse options and populate values in registered amr_options structure.
- */
+/* New functions */
+amr_options_t*  amr_new_options();
+void amr_register_options      (sc_options_t* opt,amr_options_t* amropt);
+void amr_read_options_from_file(sc_options_t* opt);
 void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
 

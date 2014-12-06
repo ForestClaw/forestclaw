@@ -89,31 +89,30 @@ amr_options_convert_arrays (amr_options_t * amropt)
 }
 #endif
 
+amr_options_t* amr_new_options ()
+{
+    amr_options_t* amropt;
+    amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
+    return amropt;
+}
+
 /* This is here for backwards compatibility */
 amr_options_t *
 amr_options_new (sc_options_t * opt)
 {
-    amr_options_t *amropt = fclaw2d_new_options();
-    fclaw2d_register_options(opt,amropt);
-    fclaw2d_read_options_from_file(opt);
+    amr_options_t *amropt = amr_new_options();
+    amr_register_options(opt,amropt);
+    amr_read_options_from_file(opt);
     return amropt;
 }
 
-void fclaw2d_read_options_from_file(sc_options_t* opt)
+void amr_read_options_from_file(sc_options_t* opt)
 {
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
                      "fclaw2d_defaults.ini");
 }
 
-amr_options_t* fclaw2d_new_options ()
-{
-    amr_options_t* amropt;
-    amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
-
-    return amropt;
-}
-
-void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
+void amr_register_options (sc_options_t * opt, amr_options_t* amropt)
 {
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "[forestclaw] Number of grid cells per patch in x [8]");
@@ -341,10 +340,6 @@ void amr_options_parse (sc_options_t * opt,
 void
 amr_options_destroy (amr_options_t * amropt)
 {
-    /* These are now stored under amropt->clawpack_parms */
-    /* FCLAW_FREE (amropt->->order); */
-    /* FCLAW_FREE (amropt->mthlim); */
     FCLAW_FREE (amropt->mthbc);
-    FCLAW_FREE (amropt);
-
+    FCLAW_FREE(amropt);
 }
