@@ -76,10 +76,9 @@ int main (int argc, char **argv)
     /* [clawpack46] Parameters from Clawpack solver */
     clawpack46_register_options(options,clawpack_parms);
 
-    fclaw2d_options_read_from_file(options,lp);  /* Read from fclaw2d_defaults.ini */
+    fclaw_options_read_from_file(options,lp);  /* Read from fclaw_defaults.ini */
 
-    /* Always parse command line to look for .ini file input (in case above didn't work)
-     Should we require that the user supply a defaults file? */
+    /* Override any values with command line values or from --inifile */
     retval = fclaw_options_parse_command_line(options,argc,argv,lp);
 
     fclaw2d_postprocess_parms(gparms);  /* convert array inputs */
