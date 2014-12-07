@@ -30,6 +30,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_base.c \
 	src/amr_options.c \
 	src/fclaw2d_options.c \
+	src/fclaw_options.c \
 	src/fclaw2d_base.c \
 	src/forestclaw2d.c \
 	src/fclaw2d_convenience.c \

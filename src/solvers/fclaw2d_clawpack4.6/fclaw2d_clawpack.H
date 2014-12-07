@@ -140,6 +140,8 @@ void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms
 
 fclaw2d_clawpack_parms_t*  clawpack46_new_options();
 void clawpack46_read_options_from_file(sc_options_t* opt);
+int clawpack46_options_read_from_file(sc_options_t* opt,int log_priority);
+
 void clawpack46_register_options (sc_options_t* opt, fclaw2d_clawpack_parms_t* clawpack_parms);
 void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
 int clawpack46_checkparms(sc_options_t *opt,

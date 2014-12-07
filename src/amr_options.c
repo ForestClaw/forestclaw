@@ -154,7 +154,7 @@ void amr_register_options (sc_options_t * opt, amr_options_t* amropt)
     /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "[forestclaw] Verbosity mode [0]");
-    sc_options_add_switch (opt, 0, "serialout", &amropt->serialout,
+    sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
                             "[forestclaw] Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
                            "[forestclaw] Output file prefix [fort]");
@@ -207,25 +207,25 @@ void amr_register_options (sc_options_t * opt, amr_options_t* amropt)
            increments the value of the variable on each call, the bool
            can be initialized to either true or false and changed both ways.
      */
-    sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
+    sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
                            "[forestclaw] Solution is on manifold [F]");
-    sc_options_add_switch (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt,
+    sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
                            "[forestclaw] Use fixed coarse grid time step [F]");
-    sc_options_add_switch (opt, 0, "run_diagnostics",
-                           &amropt->run_diagnostics,
+    sc_options_add_bool (opt, 0, "run_diagnostics",
+                         &amropt->run_diagnostics, 0,
                            "[forestclaw] Run diagnostics [F]");
-    sc_options_add_switch (opt, 0, "subcycle", &amropt->subcycle,
+    sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 0,
                            "[forestclaw] Use subcycling in time [F]");
-    sc_options_add_switch (opt, 0, "noweightedp", &amropt->noweightedp,
+    sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp,0,
                            "[forestclaw] No weighting when subcycling [F]");
 
-    sc_options_add_switch (opt, 0, "trapfpe", &amropt->trapfpe,
+    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
                            "[forestclaw] Enable floating point exceptions [F]");
 
     /* ---------------------- Usage information -------------------------- */
-    sc_options_add_switch (opt, 0, "help", &amropt->help,
+    sc_options_add_bool (opt, 0, "help", &amropt->help, 0,
                            "[forestclaw] Print usage information (same as --usage) [F]");
-    sc_options_add_switch (opt, 0, "usage", &amropt->help,
+    sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
                            "[forestclaw] Print usage information (same as --help) [F]");
 
     /* -----------------------------------------------------------------------

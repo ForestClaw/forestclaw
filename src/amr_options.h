@@ -132,6 +132,7 @@ struct amr_options
     double by;
 
     /** This switch variable is set to nonzero by --help and --usage. */
+    int print_options;
     int help;
 };
 

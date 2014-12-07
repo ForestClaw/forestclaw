@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_OPTIONS_H
 
 #include <fclaw_base.h>
+#include <fclaw_options.h>
 #include <amr_options.h>
 
 #ifdef __cplusplus
@@ -44,9 +45,15 @@ extern "C"
 
 amr_options_t* fclaw2d_new_options ();
 void fclaw2d_register_options      (sc_options_t* opt, amr_options_t* amropt);
-void fclaw2d_read_options_from_file(sc_options_t* opt);
+int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority);
 void fclaw2d_parse_command_line (sc_options_t * opt, int argc, char **argv,
                                  int log_priority);
+
+int fclaw2d_parse_cl (sc_options_t * opt, int argc, char **argv,
+                      int log_priority);
+
+void fclaw_check_usage(sc_options_t* options, amr_options_t* gparms,int lp);
+
 
 /** Clean up option storage.
  * \param [in,out]              Option storage will be deallocated.

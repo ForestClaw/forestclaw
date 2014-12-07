@@ -505,6 +505,18 @@ void clawpack46_read_options_from_file(sc_options_t* opt)
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_clawpack.ini");
 }
 
+int clawpack46_options_read_from_file(sc_options_t* opt, int log_priority)
+{
+    int retval;
+    retval = sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_clawpack.ini");
+    if (retval < 0)
+    {
+        fclaw2d_global_log (log_priority, "Cannot read options file 'fclaw2d_clawpack.ini'.  " \
+                            "Options are set to default registration values.\n");
+    }
+    return retval;
+}
+
 
 void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -512,37 +524,33 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
        Something like [clawpack].  See fclaw_defaults.ini */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
-    amr_options_add_int_array (opt, 0, "order", &clawpack_parms->order_string, NULL,
+    amr_options_add_int_array (opt, 0, "clawpack46:order", &clawpack_parms->order_string, NULL,
                                &clawpack_parms->order, SpaceDim,
-                               "[clawpack4.6] Normal and transverse orders");
+                               "[clawpack46] Normal and transverse orders");
 
-    sc_options_add_int (opt, 0, "mcapa", &clawpack_parms->mcapa, -1,
-                        "[clawpack4.6] Location of capacity function in aux array [-1]");
+    sc_options_add_int (opt, 0, "clawpack46:mcapa", &clawpack_parms->mcapa, -1,
+                        "[clawpack46] Location of capacity function in aux array [-1]");
 
-    sc_options_add_int (opt, 0, "maux", &clawpack_parms->maux, 0,
-                        "[clawpack4.6] Number of auxiliary variables [0]");
+    sc_options_add_int (opt, 0, "clawpack46:maux", &clawpack_parms->maux, 0,
+                        "[clawpack46] Number of auxiliary variables [0]");
 
-    sc_options_add_int (opt, 0, "src_term", &clawpack_parms->src_term, 0,
-                        "[clawpack4.6] Source term option [0]");
+    sc_options_add_int (opt, 0, "clawpack46:src_term", &clawpack_parms->src_term, 0,
+                        "[clawpack46] Source term option [0]");
 
-    sc_options_add_int (opt, 0, "mwaves", &clawpack_parms->mwaves, 1,
-                        "[clawpack4.6] Number of waves [1]");
+    sc_options_add_int (opt, 0, "clawpack46:mwaves", &clawpack_parms->mwaves, 1,
+                        "[clawpack46] Number of waves [1]");
 
     /* Array of mwaves many values */
-    amr_options_add_int_array (opt, 0, "mthlim", &clawpack_parms->mthlim_string, NULL,
+    amr_options_add_int_array (opt, 0, "clawpack46:mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
-                               "[clawpack4.6] Waves limiters");
+                  "[clawpack4.6] Waves limiters (one entry per wave; values 0-4) [NULL]");
 
-    /* -----------------------------------------------------------------------
-       Options will be read from this file, if a '-W' flag is used at the command
-       line.  Use this file for local modifications that are not tracked by Git.
-
-       WARNING: The long option name must be unique within the whole program.
-                Just 'inifile' is already used in amr_options.c.
-       ----------------------------------------------------------------------- */
-    sc_options_add_inifile (opt,0, "fclaw2d_clawpack.ini",
+#if 0
+    /* This doesn't work very reliably, i.e. depends on order in which ini files are read.
+       So we will only allow clawpack variables to read from this default file */
+    sc_options_add_inifile (opt,0, "inifile_clawpack",
                             "[clawpack4.6] Read options from this file [fclaw2d_clawpack.ini]");
-
+#endif
 }
 
 void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms,
@@ -627,10 +635,10 @@ void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
        Some post-processing of arrays
        ------------------------------------------------------------------------ */
 
-    fclaw2d_options_convert_int_array (clawpack_parms->mthlim_string, &clawpack_parms->mthlim,
+    fclaw_options_convert_int_array (clawpack_parms->mthlim_string, &clawpack_parms->mthlim,
                                    clawpack_parms->mwaves);
 
-    fclaw2d_options_convert_int_array (clawpack_parms->order_string, &clawpack_parms->order,
+    fclaw_options_convert_int_array (clawpack_parms->order_string, &clawpack_parms->order,
                                    SpaceDim);
 }
 

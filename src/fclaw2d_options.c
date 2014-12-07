@@ -24,8 +24,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_base.h>
 #include <amr_options.h>
+#include <forestclaw2d.h>
 
 /* Proposed naming convention:
  * Parameter names in config file (= long option names) identical to the
@@ -44,11 +46,36 @@ amr_options_t* fclaw2d_new_options ()
     return amropt;
 }
 
-void fclaw2d_read_options_from_file(sc_options_t* opt)
+void
+fclaw2d_options_destroy_arrays (amr_options_t * amropt)
 {
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
-                     "fclaw2d_defaults.ini");
+    FCLAW_FREE (amropt->mthbc);
 }
+
+/* Use this with 'fclaw2d_new_options' */
+void fclaw2d_options_destroy(amr_options_t* amropt)
+{
+    FCLAW_FREE (amropt);
+}
+
+int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority)
+{
+    int retval;
+    retval = sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
+                              "fclaw2d_defaults.ini");
+    if (retval < 0)
+    {
+        fclaw2d_global_log (log_priority,      \
+                            "Cannot find (or cannot open) fclaw2d_defaults.ini.\n");
+    }
+    else
+    {
+        fclaw2d_global_log (log_priority,      \
+                            "Reading file fclaw2d_defaults.ini.\n");
+    }
+    return retval;
+}
+
 
 void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
 {
@@ -69,11 +96,11 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
                            "[forestclaw] Final time [1.0]");
 
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 10,
-                        "[forestclaw] Number of time steps [10]");
+                        "[forestclaw] Number of time steps, used with outstyle=3 [10]");
 
     /* Only needed if outstyle == 3 */
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
-                        "[forestclaw] Number of steps between output files [1]");
+                        "[forestclaw] Steps between output files, used with outstyle=3 [1]");
 
 
     /* This is a hack to control the VTK output while still in development.
@@ -92,7 +119,7 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
     /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "[forestclaw] Verbosity mode [0]");
-    sc_options_add_switch (opt, 0, "serialout", &amropt->serialout,
+    sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
                             "[forestclaw] Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
                            "[forestclaw] Output file prefix [fort]");
@@ -112,9 +139,11 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
                         "[forestclaw] Number of ghost cells [2]");
 
     /* Array of NumFaces many values */
-    fclaw2d_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
-                               &amropt->mthbc, fclaw2d_NumFaces,
-                               "[forestclaw] Physical boundary condition type [NULL]");
+    fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
+        &amropt->mthbc, fclaw2d_NumFaces,
+        "[forestclaw] Physical boundary condition type (4 entries; values 0-4) [NULL]");
+
+
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
@@ -136,16 +165,14 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "[forestclaw] yupper [1]");
 
 
-    /* ------------------------------------------------------------------- */
-    /* Right now all switch options default to false, need to change that */
-    /* I am okay with them being set to false by default, since I expect that
-       user will set everything in the input file
-
+    /* -------------------------------------------------------------------
        CB: sc now has a new type of option, the bool.  While switch
-           increments the value of the variable on each call, the bool
-           can be initialized to either true or false and changed both ways.
+       increments the value of the variable on each call, the bool
+       can be initialized to either true or false and changed both ways.
+
+       DC : Cool - thanks!
      */
-    sc_options_add_switch (opt, 0, "manifold", &amropt->manifold,
+    sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
                            "[forestclaw] Solution is on manifold [F]");
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
                            "[forestclaw] Use fixed coarse grid time step [F]");
@@ -166,6 +193,9 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
                            "[forestclaw] Print usage information (same as --help) [F]");
 
+    sc_options_add_bool (opt, 0, "print_options", &amropt->print_options, 0,
+                         "[forestclaw] Print current option settings [F]");
+
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -178,8 +208,8 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
 void
 fclaw2d_postprocess_parms (amr_options_t * amropt)
 {
-      fclaw2d_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                     fclaw2d_NumFaces);
+      fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                         fclaw2d_NumFaces);
 }
 
 
@@ -190,8 +220,14 @@ int
 fclaw2d_checkparms (sc_options_t * options, amr_options_t * gparms, int lp)
 {
     /* Check for user help argument */
-    if (gparms->help) {
+    if (gparms->help)
+    {
         sc_options_print_usage (sc_package_id, lp, options, NULL);
+        return -1;
+    }
+    if (gparms->print_options)
+    {
+        fclaw_options_print_summary(options,lp);
         return -1;
     }
 
@@ -214,78 +250,4 @@ fclaw2d_checkparms (sc_options_t * options, amr_options_t * gparms, int lp)
 
     /* Everything is good */
     return 0;
-}
-
-void fclaw2d_parse_command_line(sc_options_t * opt,
-                                int argc, char **argv,
-                                int log_priority)
-{
-    int retval;
-
-    retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
-    if (retval < 0)
-    {
-        sc_options_print_usage (sc_package_id, log_priority, opt, NULL);
-        sc_abort_collective ("Option parsing failed;"
-                             " please see above usage information");
-    }
-    sc_options_print_summary (sc_package_id, log_priority, opt);
-    if (sc_is_root ())
-    {
-        retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
-                                  "fclaw2d_defaults.ini.used");
-        SC_CHECK_ABORT (!retval, "Option save failed");
-    }
-}
-
-void
-fclaw2d_options_destroy_arrays (amr_options_t * amropt)
-{
-    FCLAW_FREE (amropt->mthbc);
-}
-
-/* Use this with 'fclaw2d_new_options' */
-void fclaw2d_options_destroy(amr_options_t* amropt)
-{
-    FCLAW_FREE (amropt);
-}
-
-
-void
-fclaw2d_options_add_int_array (sc_options_t * opt,
-                               int opt_char, const char *opt_name,
-                               const char **array_string,
-                               const char *default_string,
-                               int **int_array, int initial_length,
-                               const char *help_string)
-{
-    *int_array = NULL;
-    sc_options_add_string (opt, opt_char, opt_name,
-                           array_string, default_string, help_string);
-}
-
-void
-fclaw2d_options_convert_int_array (const char *array_string,
-                                   int **int_array, int new_length)
-{
-    int i;
-    const char *beginptr;
-    char *endptr;
-
-    new_length = SC_MAX (new_length, 0);
-    *int_array = FCLAW_REALLOC (*int_array, int, new_length);
-
-    beginptr = array_string;
-    for (i = 0; i < new_length; ++i)
-    {
-        if (beginptr == NULL)
-        {
-            (*int_array)[i] = 0;
-        }
-        else
-        {
-            (*int_array)[i] = (int) strtol (beginptr, &endptr, 10);
-            beginptr = endptr;
-        }
-    }
 }
