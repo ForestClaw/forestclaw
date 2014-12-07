@@ -46,42 +46,65 @@ int main (int argc, char **argv)
     amr_options_t             sparms, *gparms = &sparms;
 
     int example, retval;
+    int trapfpe, mpi_debug;
+    double test_fpe;
     fclaw2d_map_data_t smap_data, *map_data=&smap_data;
 
     lp = SC_LP_PRODUCTION;
     mpicomm = sc_MPI_COMM_WORLD;
     fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
+    /* Dictionary to store options */
     options = sc_options_new (argv[0]);
 
     /* [Example] Register example option */
-    sc_options_add_int (options, 0, "example", &example, 0,
-                        "[Example] Example 1 or 2. ");
+    sc_options_add_int (options, 0, "main:example", &example, 1,
+                        "[main] Example = 1 or 2 [1]");
 
-    /* [Mapping] General mapping parameters (mi,mj,scale,shift,phi,theta) */
+    sc_options_add_bool (options, 0, "main:trapfpe", &trapfpe, 1,
+                        "[main] Trap floating point exceptions [1]");
+
+    sc_options_add_bool (options, 0, "main:mpi_debug", &mpi_debug, 0,
+                        "[main] Start MPI debug process [0]");
+
+    /* [mapping] General mapping parameters (mi,mj,scale,shift,phi,theta) */
     fclaw2d_register_map_data(options,map_data); /* sets default values */
 
     /* [forestclaw] General ForestClaw parameters */
     fclaw2d_register_options(options,gparms);
-    fclaw2d_read_options_from_file(options);
-    fclaw2d_postprocess_parms(gparms);  /* convert array inputs */
 
     /* [clawpack46] Parameters from Clawpack solver */
     clawpack46_register_options(options,clawpack_parms);
-    clawpack46_read_options_from_file(options);
+
+    fclaw2d_options_read_from_file(options,lp);  /* Read from fclaw2d_defaults.ini */
+
+    /* Always parse command line to look for .ini file input (in case above didn't work)
+     Should we require that the user supply a defaults file? */
+    retval = fclaw_options_parse_command_line(options,argc,argv,lp);
+
+    fclaw2d_postprocess_parms(gparms);  /* convert array inputs */
     clawpack46_postprocess_parms(clawpack_parms);  /* convert array inputs */
 
-    fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-
-    fclaw2d_parse_command_line(options,argc,argv,lp);
-
-    retval = 0;
     retval = retval || fclaw2d_checkparms(options,gparms,lp);
     retval = retval || test_parms_checkparms(example,lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
 
     if (!retval)
     {
+        fclaw_options_print_summary(options,lp);
+
+        if (mpi_debug == 1)
+        {
+            /* This doesn't work yet, since I don't have FCLAW_ENABLE_MPI defined */
+            fclaw2d_mpi_debug();
+        }
+
+        if (trapfpe == 1)
+        {
+            feenableexcept(FE_INVALID);
+            test_fpe = sqrt(-1.0);
+        }
+
         printf("\n");
         switch (example)
         {
