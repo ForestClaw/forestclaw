@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMR_OPTIONS_H
 
 #include <fclaw_base.h>
+#include <fclaw_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,8 +36,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-typedef struct amr_options amr_options_t;
 
 /** Create storage for option values specific to forestclaw.
  * \param [in,out] opt          Used for command line parsing.
@@ -70,73 +69,6 @@ void amr_checkparms (amr_options_t * amropt);
 int amr_checkparms2 (sc_options_t * options, amr_options_t * amropt, int lp);
 
 
-struct amr_options
-{
-    /* Fixed grid size for each grid */
-    int mx, my;
-
-    /* Time stepping */
-    double initial_dt;
-    double tfinal;
-    int outstyle;
-    int nout;
-    double *tout;
-    int nstep;
-
-    /* more output control */
-    int verbosity;              /**< TODO: Do we have guidelines here? */
-    int serialout;              /**< Allow for serial output.  WARNING:
-                                     Will kill all parallel performance. */
-    const char *prefix;         /**< This is prepended to output files */
-
-    /* VTK output control */
-    int vtkout;      /**< 0 for no output, 1 for output during amrinit,
-                          2 for output when in amr_output.  Can be or'd. */
-    double vtkspace; /**< between 0. and 1. to separate patches visually */
-    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
-
-    /* wave prop parameters */
-    double max_cfl;
-    double desired_cfl;
-
-    /* Number of equations in the system of PDEs */
-    int meqn;
-
-    /* Boundary condition information */
-    int mbc;
-
-    const char *mthbc_string;
-    int *mthbc;
-
-    /* Refinement parameters */
-    int refratio;
-    int minlevel;
-    int maxlevel;
-    int regrid_interval;
-
-    /* Boolean values (switches) */
-    int manifold;
-    int subcycle;
-    int noweightedp;            /**< Don't use weighted partition.
-                                     Only relevant when subcycling. */
-    int run_diagnostics;
-    int use_fixed_dt;
-
-    /* xlower,xupper,ylower,yupper for block.
-       This is probably only useful in the single block case  */
-    double ax;
-    double bx;
-    double ay;
-    double by;
-
-    /* These are only used in main, but I put them here for convenience */
-    int trapfpe;
-    int mpi_debug;
-
-    /** This switch variable is set to nonzero by --help and --usage. */
-    int print_options;
-    int help;
-};
 
 /** Convert a string with multiple integers into an integer array.
  * \param [in] array_string     A string of space-separated integers.

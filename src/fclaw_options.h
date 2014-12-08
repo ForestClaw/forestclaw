@@ -23,12 +23,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file
+ *
+ * Routines for handling general ForestClaw input options.
+ *
+ */
+
+
 #ifndef FCLAW_OPTIONS_H
 #define FCLAW_OPTIONS_H
 
 #include <fclaw_base.h>
 #include <fclaw_options.h>
-#include <amr_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,11 +44,23 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw_options fclaw_options_t;
 
+/* Plan is to replace amr_options_t with fclaw_options_t */
+typedef struct amr_options amr_options_t;
+
+/** Allocate new ForestClaw options container.   Use this with fclaw_options_destroy()
+ */
 amr_options_t* fclaw_options_new ();
+
+/** Delete ForestClaw options container.  Use this with fclaw_options_new()
+ */
 void fclaw_options_destroy(amr_options_t* amropt);
-void fclaw_options_destroy_arrays (amr_options_t * amropt);
+
+
+/** Free option arrays defined in ForestClaw container amr_options_t
+ * \param [out] fclawopt        Option container for ForestClaw
+ */
+void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
 void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt);
 
@@ -100,11 +118,10 @@ void fclaw_options_convert_double_array (const char *array_string,
 void fclaw_options_destroy_array(void* array);
 
 
-#if 0
 /* Plan is to replace amr_options_t with fclaw_options_t.
    Maybe use a macro as an intermediate step? */
 
-struct fclaw_options
+struct amr_options
 {
     /* Fixed grid size for each grid */
     int mx, my;
@@ -171,7 +188,6 @@ struct fclaw_options
     int print_options;
     int help;
 };
-#endif
 
 
 #ifdef __cplusplus
