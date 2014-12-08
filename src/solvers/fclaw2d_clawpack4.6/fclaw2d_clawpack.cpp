@@ -524,9 +524,8 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
        Something like [clawpack].  See fclaw_defaults.ini */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
-    amr_options_add_int_array (opt, 0, "clawpack46:order", &clawpack_parms->order_string,
-                               "2 2",
-                               &clawpack_parms->order, SpaceDim,
+    fclaw_options_add_int_array (opt, 0, "clawpack46:order", &clawpack_parms->order_string,
+                               "2 2", &clawpack_parms->order, SpaceDim,
                                "[clawpack46] Normal and transverse orders [2 2]");
 
     sc_options_add_int (opt, 0, "clawpack46:mcapa", &clawpack_parms->mcapa, -1,
@@ -542,7 +541,7 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
                         "[clawpack46] Number of waves [1]");
 
     /* Array of mwaves many values */
-    amr_options_add_int_array (opt, 0, "clawpack46:mthlim", &clawpack_parms->mthlim_string, NULL,
+    fclaw_options_add_int_array (opt, 0, "clawpack46:mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
                   "[clawpack46] Waves limiters (one entry per wave; values 0-4) [NULL]");
 }
