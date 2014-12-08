@@ -543,7 +543,7 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
     /* Array of mwaves many values */
     amr_options_add_int_array (opt, 0, "clawpack46:mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
-                  "[clawpack4.6] Waves limiters (one entry per wave; values 0-4) [NULL]");
+                  "[clawpack46] Waves limiters (one entry per wave; values 0-4) [NULL]");
 
 #if 0
     /* This doesn't work very reliably, i.e. depends on order in which ini files are read.
