@@ -23,6 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file
+ * Fill ghost cells.
+ *
+ *
+ **/
+
 #include "amr_includes.H"
 
 static
@@ -51,6 +57,10 @@ void intralevel_ghost_copy(fclaw2d_domain_t* domain, int minlevel,
 }
 
 
+/**
+ * \ingroup Averaging
+ * Fill in coarse grid ghost cells by averaging or copying  from neighboring fine grids.
+ **/
 void fill_coarse_ghost(fclaw2d_domain_t *domain,
                        int mincoarse,
                        int maxcoarse,
@@ -207,28 +217,25 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
 
 
 
-/* -------------------------------------------------------------------
-   Main routine in this file
-   ------------------------------------------------------------------- */
-
-/* ------------------------------------------------------------
-   This does a complete exchange over all levels.
-
-   -- Parallel ghost patches are exchanged at all levels
-   -- Every level exchanges ghost cells with other patches
-      at that level
-   -- Every finer level exchanges with a coarser level
-   -- No time interpolation is assumed, as all levels are time
-      synchronized at this point.
-   -- This the only routine that is called for the non-subcycled
-      case.
-   -- All levels will be updated in next update step, regardless of
-      whether we are in the subcycled or non-subcycled case.
-
-  The reason for two separate ghost cell exchange routines is that
-  the logic here is considerably simpler than for the partial
-  update used in intermediate steps in the subcycled case.
-  ------------------------------------------------------------- */
+/**
+ * <summary>Complete exchange of all ghost patches at all levels.</summary>
+ * <remarks>All parallel ghost patches are also exchanged at all
+ * levels.</remarks>
+ * <list>
+ *    <item>Every level exchanges ghost cells with other patches
+ *       at that level</item>
+ *    <item>Every finer level exchanges with a coarser level</item>
+ *    <item>No time interpolation is assumed, as all levels are time
+ *       synchronized at this point.</item>
+ *    <item>This the only routine that is called for the non-subcycled
+ *       case.</item>
+ *    <item> All levels will be updated in next update step, regardless of
+ *       whether we are in the subcycled or non-subcycled case.</item>
+ *       </list>
+ *   The reason for two separate ghost cell exchange routines is that
+ *   the logic here is considerably simpler than for the partial
+ *   update used in intermediate steps in the subcycled case.
+ **/
 void update_ghost_all_levels(fclaw2d_domain_t* domain,
                              fclaw2d_timer_names_t running)
 {

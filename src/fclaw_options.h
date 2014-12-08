@@ -49,14 +49,13 @@ typedef struct amr_options amr_options_t;
 
 
 /** Create storage for option values specific to ForestClaw.
- * \param [in,out] opt          Used for command line parsing.
- * \return                      Options with preset default values.
+ * \return     New options container (values undefined).
  */
 amr_options_t* fclaw_options_new ();
 
 /** Clean up option storage.  Use fclaw_options_destroy_arrays to deallocate
  * storage for array options.
- * \param [in,out]              Option storage will be deallocated.
+ * \param [in,out] amropt  Option storage will be deallocated.
  */
 void fclaw_options_destroy(amr_options_t* amropt);
 
@@ -89,6 +88,7 @@ void fclaw_options_print_summary(sc_options_t *opt, int log_priority);
  * \param [in,out] int_array    Pointer to an int array that gets resized
  *                              and populated with values from the string.
  * \param [in] initial_length   Initial length of int_array.
+ * \param [in] help_string      Help message (used with --help).
  */
 void fclaw_options_add_int_array (sc_options_t * opt,
                                 int opt_char, const char *opt_name,

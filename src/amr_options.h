@@ -23,6 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file
+ *
+ * Routines for reading input options.
+ *
+ * Routines for reading from a file (`fclaw_options.ini`), and for parsing
+ * command line options.
+ *
+ * This file is deprecated. and all of its functionality will be replaced by
+ * routines in @ref fclaw_options.h.
+ */
+
 #ifndef AMR_OPTIONS_H
 #define AMR_OPTIONS_H
 
@@ -37,10 +48,10 @@ extern "C"
 #endif
 #endif
 
-/* This file is on its way out ... */
-
 amr_options_t* amr_options_new(sc_options_t* opt);
+
 void amr_read_options_from_file(sc_options_t* opt);
+
 void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
 

@@ -267,9 +267,8 @@ fclaw_options_add_double_array (sc_options_t * opt,
                            array_string, default_string, help_string);
 }
 
-void
-    fclaw_options_convert_int_array (const char *array_string,
-                                     int **int_array, int new_length)
+void fclaw_options_convert_int_array (const char *array_string,
+                                      int **int_array, int new_length)
 {
     int i;
     const char *beginptr;
@@ -293,8 +292,7 @@ void
     }
 }
 
-void
-    fclaw_options_convert_double_array (const char *array_string,
+void fclaw_options_convert_double_array (const char *array_string,
                                         double **double_array, int new_length)
 {
     int i;
