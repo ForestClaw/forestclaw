@@ -42,13 +42,13 @@ int main (int argc, char **argv)
     int		              lp;
     sc_MPI_Comm               mpicomm;
     sc_options_t             *options;
+
     fclaw2d_clawpack_parms_t  sclawparms,  *clawpack_parms = &sclawparms;
     amr_options_t             sparms, *gparms = &sparms;
+    fclaw2d_map_data_t        smap_data, *map_data=&smap_data;
 
     int example, retval;
-    int trapfpe, mpi_debug;
     double test_fpe;
-    fclaw2d_map_data_t smap_data, *map_data=&smap_data;
 
     lp = SC_LP_PRODUCTION;
     mpicomm = sc_MPI_COMM_WORLD;
@@ -57,33 +57,31 @@ int main (int argc, char **argv)
     /* Dictionary to store options */
     options = sc_options_new (argv[0]);
 
-    /* [Example] Register example option */
+    /* [main] Register example option */
     sc_options_add_int (options, 0, "main:example", &example, 1,
                         "[main] Example = 1 or 2 [1]");
 
-    sc_options_add_bool (options, 0, "main:trapfpe", &trapfpe, 1,
-                        "[main] Trap floating point exceptions [1]");
-
-    sc_options_add_bool (options, 0, "main:mpi_debug", &mpi_debug, 0,
-                        "[main] Start MPI debug process [0]");
-
-    /* [mapping] General mapping parameters (mi,mj,scale,shift,phi,theta) */
-    fclaw2d_register_map_data(options,map_data); /* sets default values */
-
-    /* [forestclaw] General ForestClaw parameters */
+    /* [Options] General ForestClaw options */
     fclaw2d_register_options(options,gparms);
 
-    /* [clawpack46] Parameters from Clawpack solver */
+    /* [mapping] General mapping options (mi,mj,scale,shift,phi,theta) */
+    fclaw2d_register_map_data(options,map_data); /* sets default values */
+
+    /* [clawpack46] Options from Clawpack solver */
     clawpack46_register_options(options,clawpack_parms);
 
-    fclaw_options_read_from_file(options,lp);  /* Read from fclaw_defaults.ini */
+    /* Read from fclaw_options.ini */
+    fclaw_options_read_from_file(options,lp);
 
     /* Override any values with command line values or from --inifile */
     retval = fclaw_options_parse_command_line(options,argc,argv,lp);
 
-    fclaw2d_postprocess_parms(gparms);  /* convert array inputs */
-    clawpack46_postprocess_parms(clawpack_parms);  /* convert array inputs */
+    /* convert array inputs */
+    fclaw2d_postprocess_parms(gparms);
+    clawpack46_postprocess_parms(clawpack_parms);
+    fclaw2d_options_postprocess_map_data(map_data);
 
+    /* Final check on options */
     retval = retval || fclaw2d_checkparms(options,gparms,lp);
     retval = retval || test_parms_checkparms(example,lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
@@ -92,15 +90,16 @@ int main (int argc, char **argv)
     {
         fclaw_options_print_summary(options,lp);
 
-        if (mpi_debug == 1)
+        if (gparms->mpi_debug == 1)
         {
             /* This doesn't work yet, since I don't have FCLAW_ENABLE_MPI defined */
             fclaw2d_mpi_debug();
         }
 
-        if (trapfpe == 1)
+        if (gparms->trapfpe == 1)
         {
             feenableexcept(FE_INVALID);
+            printf("Trapping a floating point error (this is not a bug!)\n");
             test_fpe = sqrt(-1.0);
         }
 
@@ -118,7 +117,7 @@ int main (int argc, char **argv)
         }
         printf("\n");
     }
-
+    fclaw2d_map_destroy_arrays(map_data);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
     fclaw2d_options_destroy_arrays(gparms);
     sc_options_destroy (options);
