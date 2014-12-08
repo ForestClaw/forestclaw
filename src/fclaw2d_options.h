@@ -43,14 +43,20 @@ extern "C"
  * \return                      Options with preset default values.
  */
 
-amr_options_t* fclaw2d_new_options ();
-void fclaw2d_register_options      (sc_options_t* opt, amr_options_t* amropt);
+amr_options_t* fclaw2d_options_new ();
+void fclaw2d_options_destroy_arrays (amr_options_t * amropt);
+void fclaw2d_options_destroy (amr_options_t * amropt);
+
+void fclaw2d_options_register      (sc_options_t* opt, amr_options_t* amropt);
 int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority);
+
+#if 0
 void fclaw2d_parse_command_line (sc_options_t * opt, int argc, char **argv,
                                  int log_priority);
 
 int fclaw2d_parse_cl (sc_options_t * opt, int argc, char **argv,
                       int log_priority);
+#endif
 
 void fclaw_check_usage(sc_options_t* options, amr_options_t* gparms,int lp);
 
@@ -58,11 +64,6 @@ void fclaw_check_usage(sc_options_t* options, amr_options_t* gparms,int lp);
 /** Clean up option storage.
  * \param [in,out]              Option storage will be deallocated.
  */
-
-void fclaw2d_options_destroy_arrays (amr_options_t * amropt);
-
-void fclaw2d_options_destroy (amr_options_t * amropt);  /* use with fclaw2d_new_options */
-
 
 void fclaw2d_postprocess_parms (amr_options_t * amropt);
 

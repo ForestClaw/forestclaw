@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --new-datafile=<Filename>.
  */
 
-/* Use this with 'fclaw2d_destroy_options' */
-amr_options_t* fclaw2d_new_options ()
+/* Use this with 'fclaw2d_options_destroy' */
+amr_options_t* fclaw2d_options_new ()
 {
     amr_options_t* amropt;
     amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
@@ -46,16 +46,17 @@ amr_options_t* fclaw2d_new_options ()
     return amropt;
 }
 
+/* Use this with 'fclaw2d_options_new' */
+void fclaw2d_options_destroy(amr_options_t* amropt)
+{
+    FCLAW_FREE (amropt);
+}
+
+
 void
 fclaw2d_options_destroy_arrays (amr_options_t * amropt)
 {
     FCLAW_FREE (amropt->mthbc);
-}
-
-/* Use this with 'fclaw2d_new_options' */
-void fclaw2d_options_destroy(amr_options_t* amropt)
-{
-    FCLAW_FREE (amropt);
 }
 
 #if 0
@@ -79,7 +80,7 @@ int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority)
 #endif
 
 
-void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
+void fclaw2d_options_register (sc_options_t * opt, amr_options_t* amropt)
 {
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
@@ -142,9 +143,9 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
                         "[Options] Number of ghost cells [2]");
 
     /* Array of NumFaces many values */
-    fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
+    fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, "1 1 1 1",
         &amropt->mthbc, fclaw2d_NumFaces,
-        "[Options] Physical boundary condition type (4 entries; values 0-4) [NULL]");
+        "[Options] Physical boundary condition type [1 1 1 1]");
 
 
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
