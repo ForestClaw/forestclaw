@@ -44,7 +44,6 @@ extern "C"
 #endif
 #endif
 
-
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
 
@@ -124,7 +123,8 @@ void fclaw_options_destroy_array(void* array);
 struct amr_options
 {
     /* Fixed grid size for each grid */
-    int mx, my;
+    int mx;  /**< Number of cells in x direction (fixed for all grids) */
+    int my;  /**< Number of cells in y direction (fixed for all grids) */
 
     /* Time stepping */
     double initial_dt;
