@@ -37,65 +37,18 @@ extern "C"
 #endif
 #endif
 
-/** Create storage for option values specific to forestclaw.
- * \param [in,out] opt          Used for command line parsing.
- * \return                      Options with preset default values.
- */
-amr_options_t *amr_options_new (sc_options_t * opt);
+/* This file is on its way out ... */
 
-/* New functions */
-amr_options_t*  amr_new_options();
-void amr_register_options      (sc_options_t* opt,amr_options_t* amropt);
+amr_options_t* amr_options_new(sc_options_t* opt);
 void amr_read_options_from_file(sc_options_t* opt);
 void amr_options_parse (sc_options_t * opt, int argc, char **argv,
                         int log_priority);
 
-
-/** Clean up option storage.
- * \param [in,out]              Option storage will be deallocated.
- */
 void amr_options_destroy (amr_options_t * amropt);
-
 
 void amr_postprocess_parms (amr_options_t * amropt);
 
-/** Check options and call exit (1) if something is wrong.
- * TODO: convert all code to use \a amr_checkparms2 below.
- */
 void amr_checkparms (amr_options_t * amropt);
-
-/** Check amr options, keeping the program alive.
- * \return 0 if there are no errors, nonzero otherwise. */
-int amr_checkparms2 (sc_options_t * options, amr_options_t * amropt, int lp);
-
-
-
-/** Convert a string with multiple integers into an integer array.
- * \param [in] array_string     A string of space-separated integers.
- * \param [in,out] int_array    Pointer to an int array that gets resized
- *                              and populated with values from the string.
- *                              If string too short or NULL, set to 0.
- * \param [in] new_length       Length of int_array.
- */
-void amr_options_convert_int_array (const char *array_string,
-                                    int **int_array, int new_length);
-
-/** Add a string option and prepare using it for an integer array.
- * \param [in,out] opt          Option container (see sc/sc_options.h).
- * \param [in] opt_char         Option character for command line (or 0).
- * \param [in] opt_name         Long option name for command line (or NULL).
- * \param [in,out] array_string Address that will point to the option string.
- * \param [in] default_string   Default string to be used or NULL.
- * \param [in,out] int_array    Pointer to an int array that gets resized
- *                              and populated with values from the string.
- * \param [in] initial_length   Initial length of int_array.
- */
-void amr_options_add_int_array (sc_options_t * opt,
-                                int opt_char, const char *opt_name,
-                                const char **array_string,
-                                const char *default_string,
-                                int **int_array, int initial_length,
-                                const char *help_string);
 
 #ifdef __cplusplus
 #if 0
