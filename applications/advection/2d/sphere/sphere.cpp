@@ -30,8 +30,9 @@
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+#include <fclaw_options.h>
+
 #include <fclaw2d_map_query.h>
-#include <fclaw2d_options.h>
 
 #include "sphere_user.H"
 
@@ -80,11 +81,11 @@ int main (int argc, char **argv)
                         "[main] 1 for pillow grid, "\
                         "2 for cubed sphere ");
 
+    /* [Options] General mapping functions */
+    fclaw_options_register (options,gparms);
+
     /* [mapping] General mapping functions */
     fclaw2d_register_map_data(options,map_data); /* sets default values */
-
-    /* [Options] General mapping functions */
-    fclaw2d_register_options(options,gparms);
 
     /* [clawpack46] Clawpack solver options */
     clawpack46_register_options(options,clawpack_parms);
@@ -95,10 +96,10 @@ int main (int argc, char **argv)
     retval = retval || fclaw_options_parse_command_line (options, argc, argv, lp);
 
     /* Post-process any array input */
-    fclaw2d_postprocess_parms (gparms);
+    fclaw_options_postprocess (gparms);
     clawpack46_postprocess_parms(clawpack_parms);
 
-    retval = retval || fclaw2d_checkparms (options, gparms, lp);
+    retval = retval || fclaw_options_check (options, gparms, lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
     retval = retval || sphere_checkparms (example, lp);
 
@@ -172,7 +173,7 @@ int main (int argc, char **argv)
         fclaw2d_map_destroy (cont);
     }
 
-    fclaw2d_options_destroy_arrays(gparms);  /* Delete any array options */
+    fclaw_options_destroy_arrays(gparms);  /* Delete any array options */
     sc_options_destroy(options);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
 

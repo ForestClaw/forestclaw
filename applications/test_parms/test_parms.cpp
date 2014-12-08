@@ -24,7 +24,7 @@
 */
 
 #include <fclaw2d_clawpack.H>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 static int
     test_parms_checkparms (int example, int lp)
@@ -62,7 +62,7 @@ int main (int argc, char **argv)
                         "[main] Example = 1 or 2 [1]");
 
     /* [Options] General ForestClaw options */
-    fclaw2d_register_options(options,gparms);
+    fclaw_options_register(options,gparms);
 
     /* [mapping] General mapping options (mi,mj,scale,shift,phi,theta) */
     fclaw2d_register_map_data(options,map_data); /* sets default values */
@@ -77,12 +77,12 @@ int main (int argc, char **argv)
     retval = fclaw_options_parse_command_line(options,argc,argv,lp);
 
     /* convert array inputs */
-    fclaw2d_postprocess_parms(gparms);
+    fclaw_options_postprocess(gparms);
     clawpack46_postprocess_parms(clawpack_parms);
     fclaw2d_options_postprocess_map_data(map_data);
 
     /* Final check on options */
-    retval = retval || fclaw2d_checkparms(options,gparms,lp);
+    retval = retval || fclaw_options_check(options,gparms,lp);
     retval = retval || test_parms_checkparms(example,lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
 
@@ -119,7 +119,7 @@ int main (int argc, char **argv)
     }
     fclaw2d_map_destroy_arrays(map_data);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
-    fclaw2d_options_destroy_arrays(gparms);
+    fclaw_options_destroy_arrays(gparms);
     sc_options_destroy (options);
 
     fclaw_mpi_finalize ();

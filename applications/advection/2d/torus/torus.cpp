@@ -25,13 +25,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
-#include <fclaw2d_options.h>
-#include <fclaw2d_map_query.h>
 #include <fclaw_options.h>
+
+#include <p4est_connectivity.h>
 
 #include "torus_user.H"
 
@@ -90,19 +90,20 @@ main (int argc, char **argv)
   sc_options_add_double (options, 0, "main:alpha", &alpha, 0.4,
                          "[main] Ratio r/R, r=outer radius, R=inner radius " \
                          "(used for torus) [0.4]");
-  fclaw_options_add_double_array(options, 0, "main:latitude", &latitude_string, NULL,
-                                 &latitude, 2,
-                                 "[main] Latitude range (degrees) (2 entries) [NULL]");
+
+  fclaw_options_add_double_array(options, 0, "main:latitude", &latitude_string,
+                                 "-50 50", &latitude, 2,
+                                 "[main] Latitude range (degrees) [-50 50]");
 
   fclaw_options_add_double_array(options, 0, "main:longitude", &longitude_string,
-                                 NULL, &longitude, 2,
-                                 "[main] Longitude range (degrees) (2 entries) [NULL]");
+                                 "0 360", &longitude, 2,
+                                 "[main] Longitude range (degrees) [0 360]");
 
   sc_options_add_double (options, 0, "main:beta", &beta, 0.4,
                          "[main] Inner radius of annulus [0.4]");
 
   /* [Options] Register general ForestClaw options */
-  fclaw2d_register_options(options,gparms);
+  fclaw_options_register(options,gparms);
 
   /* [mapping] Register general mapping data */
   fclaw2d_register_map_data(options,map_data);
@@ -117,7 +118,7 @@ main (int argc, char **argv)
   retval = retval || fclaw_options_parse_command_line (options,argc, argv, lp);
 
   /* post-process array input */
-  fclaw2d_postprocess_parms(gparms);
+  fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
   fclaw2d_options_postprocess_map_data(map_data);
 
@@ -128,7 +129,7 @@ main (int argc, char **argv)
   }
 
   /* Check final state of parameters.  Return from help message, if necessary. */
-  retval = retval || fclaw2d_checkparms (options, gparms, lp);
+  retval = retval || fclaw_options_check (options, gparms, lp);
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
   retval = retval || torus_checkparms (example, lp);  /* Nothing more to check here */
   if (!retval)
@@ -216,9 +217,8 @@ main (int argc, char **argv)
       amrrun(&domain);
       amrreset(&domain);
 
-      /* Destroy mapping functions */
       fclaw2d_map_destroy(cont);
-  } /* this bracket ends the do_the_work block */
+  }
 
   /* Destroy arrays used in options  */
   if (example == 3)
@@ -229,7 +229,7 @@ main (int argc, char **argv)
 
   fclaw2d_map_destroy_arrays(map_data);
   sc_options_destroy (options);
-  fclaw2d_options_destroy_arrays (gparms);
+  fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_mpi_finalize ();

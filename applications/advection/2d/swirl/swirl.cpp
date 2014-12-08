@@ -24,13 +24,15 @@
 */
 
 #include <fclaw_options.h>
-#include <fclaw2d_clawpack.H>
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
-
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
+
+#include <fclaw2d_clawpack.H>
+#include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
+
+#include <p4est_connectivity.h>
+
 
 #include "swirl_user.H"
 
@@ -59,7 +61,7 @@ main (int argc, char **argv)
     options = sc_options_new(argv[0]);
 
     /* Register [Options] and [clawpack46].  Very basic default values are set */
-    fclaw2d_options_register(options,gparms);
+    fclaw_options_register(options,gparms);
     clawpack46_register_options(options,clawpack_parms);
 
     /* Read values first from fclaw2d_options.ini and then from the command line */
@@ -67,11 +69,11 @@ main (int argc, char **argv)
     retval = retval || fclaw_options_parse_command_line (options,argc, argv, lp);
 
     /* post-process array options */
-    fclaw2d_postprocess_parms(gparms);
+    fclaw_options_postprocess(gparms);
     clawpack46_postprocess_parms(clawpack_parms);
 
     /* Check final state of parameters.  Return from help message, if necessary. */
-    retval = retval || fclaw2d_checkparms (options, gparms, lp);
+    retval = retval || fclaw_options_check (options, gparms, lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
 
     if (!retval)
@@ -137,7 +139,7 @@ main (int argc, char **argv)
     }
 
     sc_options_destroy(options);
-    fclaw2d_options_destroy_arrays(gparms);
+    fclaw_options_destroy_arrays(gparms);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
 
     fclaw_mpi_finalize ();
