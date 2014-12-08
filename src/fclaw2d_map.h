@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
 #include <p4est_connectivity.h>
+#include <fclaw_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,9 +38,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-
-
 
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
