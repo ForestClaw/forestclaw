@@ -47,11 +47,16 @@ extern "C"
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
 
-/** Allocate new ForestClaw options container.   Use this with fclaw_options_destroy()
+
+/** Create storage for option values specific to ForestClaw.
+ * \param [in,out] opt          Used for command line parsing.
+ * \return                      Options with preset default values.
  */
 amr_options_t* fclaw_options_new ();
 
-/** Delete ForestClaw options container.  Use this with fclaw_options_new()
+/** Clean up option storage.  Use fclaw_options_destroy_arrays to deallocate
+ * storage for array options.
+ * \param [in,out]              Option storage will be deallocated.
  */
 void fclaw_options_destroy(amr_options_t* amropt);
 
@@ -59,6 +64,7 @@ void fclaw_options_destroy(amr_options_t* amropt);
 /** Free option arrays defined in ForestClaw container amr_options_t
  * \param [out] fclawopt        Option container for ForestClaw
  */
+
 void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
 void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt);
