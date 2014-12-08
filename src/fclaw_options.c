@@ -23,11 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_base.h>
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
 
-/* Use this with 'fclaw2d_options_destroy' */
+/* Use this with 'fclaw_options_destroy' */
 amr_options_t* fclaw_options_new ()
 {
     amr_options_t* amropt;
@@ -36,7 +35,7 @@ amr_options_t* fclaw_options_new ()
     return amropt;
 }
 
-/* Use this with 'fclaw2d_options_new' */
+/* Use this with 'fclaw_options_new' */
 void fclaw_options_destroy(amr_options_t* amropt)
 {
     FCLAW_FREE (amropt);
@@ -214,9 +213,6 @@ int fclaw_options_parse_command_line(sc_options_t * opt,
     retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
     if (retval < 0)
     {
-#if 0
-        sc_options_print_usage (sc_package_id, log_priority, opt, NULL);
-#endif
         fclaw2d_global_log (log_priority, "Command line option parsing failed.  " \
                             "Use --help option to see valid option settings.\n");
         return retval;
@@ -258,10 +254,12 @@ fclaw_options_add_int_array (sc_options_t * opt,
 
 void
 fclaw_options_add_double_array (sc_options_t * opt,
-                                int opt_char, const char *opt_name,
+                                int opt_char,
+                                const char *opt_name,
                                 const char **array_string,
                                 const char *default_string,
-                                double **double_array, int initial_length,
+                                double **double_array,
+                                int initial_length,
                                 const char *help_string)
 {
     *double_array = NULL;
@@ -315,7 +313,7 @@ void
         }
         else
         {
-            (*double_array)[i] = (double) strtof (beginptr, &endptr);
+            (*double_array)[i] = (double) strtod (beginptr, &endptr);
             beginptr = endptr;
         }
     }
