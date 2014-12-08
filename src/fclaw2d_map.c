@@ -413,49 +413,54 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_data)
 {
     sc_options_add_int (options, 0, "mapping:mi", &map_data->mi, 1,
-                        "[Mapping] Number of blocks in x direction [1]");
+                        "[mapping] Number of blocks in x direction [1]");
 
     sc_options_add_int (options, 0, "mapping:mj", &map_data->mj, 1,
-                        "[Mapping] Number of blocks in y direction  [1]");
+                        "[mapping] Number of blocks in y direction  [1]");
 
     sc_options_add_int (options, 0, "mapping:periodic_x", &map_data->periodic_x, 0,
-                        "[Mapping] Periodic in x direction [0]");
+                        "[mapping] Periodic in x direction [0]");
 
     sc_options_add_int (options, 0, "mapping:periodic_y", &map_data->periodic_y, 0,
-                        "[Mapping] Periodic in y direction  [0]");
+                        "[mapping] Periodic in y direction  [0]");
 
     /* --------------------------------------------------------------------
        Scale
        --------------------------------------------------------------------*/
-    sc_options_add_double (options,0, "mapping:scale_x", &map_data->scale[0], 1,
-                           "[Mapping] Scale factor in the x direction [1]");
-
-    sc_options_add_double (options,0, "mapping:scale_y", &map_data->scale[1], 1,
-                           "[Mapping] Scale factor in the y direction [1]");
-
-    sc_options_add_double (options,0, "mapping:scale_z", &map_data->scale[2], 1,
-                           "[Mapping] Scale factor in the z direction [1]");
+    fclaw_options_add_double_array (options,0, "mapping:scale",
+                                    &map_data->scale_string, NULL,
+                                    &map_data->scale, 3,
+                                    "[mapping] Scale factor [1,1,1]");
 
     /* --------------------------------------------------------------------
        Shift
        --------------------------------------------------------------------*/
-    sc_options_add_double (options,0, "mapping:shift_x", &map_data->shift[0], 0,
-                           "[Mapping] Shift in the x direction [0]");
-
-    sc_options_add_double (options,0, "mapping:shift_y", &map_data->shift[1], 0,
-                           "[Mapping] Shift in the y direction [0]");
-
-    sc_options_add_double (options,0, "mapping:shift_z", &map_data->shift[2], 0,
-                           "[Mapping] Shift in the z direction [0]");
+    fclaw_options_add_double_array (options,0, "mapping:shift",
+                                    &map_data->shift_string, NULL,
+                                    &map_data->shift, 3,
+                                    "[mapping] Shift array [0,0,0]");
 
     /* --------------------------------------------------------------------
        Rotate
        --------------------------------------------------------------------*/
     sc_options_add_double (options, 0, "mapping:theta", &map_data->theta, 0,
-                           "[Mapping] Rotation angle about z axis (degrees) [0]");
+                           "[mapping] Rotation angle about z axis (degrees) [0]");
 
     sc_options_add_double (options, 0, "mapping:phi", &map_data->phi, 0,
-                           "[Mapping] Rotation angle about x axis (degrees) [0]");
+                           "[mapping] Rotation angle about x axis (degrees) [0]");
+}
+
+void fclaw2d_map_destroy_arrays(fclaw2d_map_data_t* map_data)
+{
+    FCLAW_FREE (map_data->scale);
+    FCLAW_FREE (map_data->shift);
+}
+
+void
+fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
+{
+    fclaw_options_convert_double_array (map_data->scale_string, &map_data->scale,3);
+    fclaw_options_convert_double_array (map_data->shift_string, &map_data->shift,3);
 }
 
 
