@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_clawpack.H"
-#include "fclaw2d_options.h"
+#include "fclaw_options.h"
 
 void set_clawpack_parms(fclaw2d_domain_t* domain,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -524,9 +524,10 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
        Something like [clawpack].  See fclaw_defaults.ini */
 
     /* Array of SpaceDim many values, with no defaults is set to all 0's */
-    amr_options_add_int_array (opt, 0, "clawpack46:order", &clawpack_parms->order_string, NULL,
+    amr_options_add_int_array (opt, 0, "clawpack46:order", &clawpack_parms->order_string,
+                               "2 2",
                                &clawpack_parms->order, SpaceDim,
-                               "[clawpack46] Normal and transverse orders");
+                               "[clawpack46] Normal and transverse orders [2 2]");
 
     sc_options_add_int (opt, 0, "clawpack46:mcapa", &clawpack_parms->mcapa, -1,
                         "[clawpack46] Location of capacity function in aux array [-1]");
@@ -544,13 +545,6 @@ void clawpack46_register_options (sc_options_t* opt,fclaw2d_clawpack_parms_t* cl
     amr_options_add_int_array (opt, 0, "clawpack46:mthlim", &clawpack_parms->mthlim_string, NULL,
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
                   "[clawpack46] Waves limiters (one entry per wave; values 0-4) [NULL]");
-
-#if 0
-    /* This doesn't work very reliably, i.e. depends on order in which ini files are read.
-       So we will only allow clawpack variables to read from this default file */
-    sc_options_add_inifile (opt,0, "inifile_clawpack",
-                            "[clawpack4.6] Read options from this file [fclaw2d_clawpack.ini]");
-#endif
 }
 
 void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms,
