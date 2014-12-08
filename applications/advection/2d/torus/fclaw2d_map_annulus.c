@@ -33,7 +33,7 @@ fclaw2d_map_query_annulus (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_ALIGNED:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FLAT:
-        return 0;
+        return 1;
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
