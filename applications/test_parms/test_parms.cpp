@@ -48,6 +48,9 @@ int main (int argc, char **argv)
     fclaw2d_map_data_t        smap_data, *map_data=&smap_data;
 
     int example, retval;
+    const char* frames_string, *density_string;
+    int *frames;
+    double *density;
     double test_fpe;
 
     lp = SC_LP_PRODUCTION;
@@ -60,6 +63,14 @@ int main (int argc, char **argv)
     /* [main] Register example option */
     sc_options_add_int (options, 0, "main:example", &example, 1,
                         "[main] Example = 1 or 2 [1]");
+
+    fclaw_options_add_int_array(options,0,"main:frames",&frames_string,
+                                "1 2", &frames,2,
+                                "[main] Frames these frames [1 2]");
+
+    fclaw_options_add_double_array(options,0,"main:density",&density_string,
+                                   "1000.01 900.45",&density, 2,
+                                   "[main] Density [1000.01 900.45]");
 
     /* [Options] General ForestClaw options */
     fclaw_options_register(options,gparms);
@@ -81,6 +92,10 @@ int main (int argc, char **argv)
     clawpack46_postprocess_parms(clawpack_parms);
     fclaw2d_options_postprocess_map_data(map_data);
 
+    /* Post-process arrays created in [main] */
+    fclaw_options_convert_int_array(frames_string,&frames,2);
+    fclaw_options_convert_double_array(density_string,&density,2);
+
     /* Final check on options */
     retval = retval || fclaw_options_check(options,gparms,lp);
     retval = retval || test_parms_checkparms(example,lp);
@@ -99,8 +114,6 @@ int main (int argc, char **argv)
         if (gparms->trapfpe == 1)
         {
             feenableexcept(FE_INVALID);
-            printf("Trapping a floating point error (this is not a bug!)\n");
-            test_fpe = sqrt(-1.0);
         }
 
         printf("\n");
@@ -110,13 +123,22 @@ int main (int argc, char **argv)
             printf("Running example 1 ... Done!\n");
             break;
         case 2:
-            printf("Running example 2 ... Done!\n");
+            printf("Running example 2 ... \n");
+            for(int i = 0; i < 2; i++)
+            {
+                printf("Density in frame %d : %f\n",frames[i],density[i]);
+            }
+            printf("Now let's trap a floating point error (this is not a bug!)\n");
+            test_fpe = sqrt(-1.0);
+            printf("Done!\n");
             break;
         default:
             SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
         }
         printf("\n");
     }
+    fclaw_options_destroy_array((void*) frames);
+    fclaw_options_destroy_array((void*) density);
     fclaw2d_map_destroy_arrays(map_data);
     fclaw2d_clawpack_parms_delete(clawpack_parms);
     fclaw_options_destroy_arrays(gparms);
