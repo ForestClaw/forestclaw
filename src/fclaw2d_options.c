@@ -58,6 +58,7 @@ void fclaw2d_options_destroy(amr_options_t* amropt)
     FCLAW_FREE (amropt);
 }
 
+#if 0
 int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority)
 {
     int retval;
@@ -75,32 +76,34 @@ int fclaw2d_options_read_from_file(sc_options_t* opt, int log_priority)
     }
     return retval;
 }
+#endif
 
 
 void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
 {
+
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
-                        "[forestclaw] Number of grid cells per patch in x [8]");
+                        "[Options] Number of grid cells per patch in x [8]");
 
     sc_options_add_int (opt, 0, "my", &amropt->my, 8,
-                        "[forestclaw] Number of grid cells per patch in y [8]");
+                        "[Options] Number of grid cells per patch in y [8]");
 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
-                           "[forestclaw] Initial time step size [0.1]");
+                           "[Options] Initial time step size [0.1]");
 
     sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 1,
-                        "[forestclaw] Output style (1,2,3) [1]");
+                        "[Options] Output style (1,2,3) [1]");
 
     /* If outstyle == 1 */
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 1.0,
-                           "[forestclaw] Final time [1.0]");
+                           "[Options] Final time [1.0]");
 
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 10,
-                        "[forestclaw] Number of time steps, used with outstyle=3 [10]");
+                        "[Options] Number of time steps, used with outstyle=3 [10]");
 
     /* Only needed if outstyle == 3 */
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
-                        "[forestclaw] Steps between output files, used with outstyle=3 [1]");
+                        "[Options] Steps between output files, used with outstyle=3 [1]");
 
 
     /* This is a hack to control the VTK output while still in development.
@@ -110,60 +113,63 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
      * 2 - output whenever amr_output() is called.
      */
     sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
-                        "[forestclaw] VTK output method [F]");
+                        "[Options] VTK output method [F]");
     sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
-                           "[forestclaw] VTK visual spacing [F]");
+                           "[Options] VTK visual spacing [F]");
     sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
-                        "[forestclaw] VTK write variant [F]");
+                        "[Options] VTK write variant [F]");
 
     /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
-                        "[forestclaw] Verbosity mode [0]");
+                        "[Options] Verbosity mode [0]");
     sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
-                            "[forestclaw] Enable serial output [F]");
+                            "[Options] Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
-                           "[forestclaw] Output file prefix [fort]");
+                           "[Options] Output file prefix [fort]");
 
     /* more clawpack options */
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
-                           "[forestclaw] Maximum CFL allowed [1]");
+                           "[Options] Maximum CFL allowed [1]");
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                           "[forestclaw] Maximum CFL allowed [0.9]");
+                           "[Options] Maximum CFL allowed [0.9]");
 
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "[forestclaw] Number of equations [1]");
+                        "[Options] Number of equations [1]");
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
-                        "[forestclaw] Number of ghost cells [2]");
+                        "[Options] Number of ghost cells [2]");
 
     /* Array of NumFaces many values */
     fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, NULL,
         &amropt->mthbc, fclaw2d_NumFaces,
-        "[forestclaw] Physical boundary condition type (4 entries; values 0-4) [NULL]");
+        "[Options] Physical boundary condition type (4 entries; values 0-4) [NULL]");
 
 
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
-                        "[forestclaw] Refinement ratio (fixed) [2]");
+                        "[Options] Refinement ratio (fixed) [2]");
 
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
-                        "[forestclaw] Minimum refinement level [0]");
+                        "[Options] Minimum refinement level [0]");
 
     sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
-                        "[forestclaw] Maximum refinement level[0]");
+                        "[Options] Maximum refinement level[0]");
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
-                        1, "[forestclaw] Regridding frequency [1]");
+                        1, "[Options] Regridding frequency [1]");
 
 
-    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "[forestclaw] xlower [0]");
-    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "[forestclaw] xupper [1]");
-    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "[forestclaw] ylower [0]");
-    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "[forestclaw] yupper [1]");
-
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "[Options] xlower " \
+                           "(used only with manifold=0) [0]");
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "[Options] xupper " \
+                           "(used only with manifold=0)[1]");
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "[Options] ylower " \
+                           "(used only with manifold=0)[0]");
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "[Options] yupper " \
+                           "(used only with manifold=0)[1]");
 
     /* -------------------------------------------------------------------
        CB: sc now has a new type of option, the bool.  While switch
@@ -173,35 +179,40 @@ void fclaw2d_register_options (sc_options_t * opt, amr_options_t* amropt)
        DC : Cool - thanks!
      */
     sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
-                           "[forestclaw] Solution is on manifold [F]");
+                           "[Options] Solution is on manifold [F]");
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
-                           "[forestclaw] Use fixed coarse grid time step [F]");
+                           "[Options] Use fixed coarse grid time step [F]");
     sc_options_add_bool (opt, 0, "run_diagnostics",
                          &amropt->run_diagnostics,0,
-                         "[forestclaw] Run diagnostics [F]");
+                         "[Options] Run diagnostics [F]");
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
-                           "[forestclaw] Use subcycling in time [F]");
+                           "[Options] Use subcycling in time [F]");
     sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
-                           "[forestclaw] No weighting when subcycling [F]");
-
-    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
-                           "[forestclaw] Enable floating point exceptions [F]");
+                           "[Options] No weighting when subcycling [F]");
 
     /* ---------------------- Usage information -------------------------- */
     sc_options_add_bool (opt, 0, "help", &amropt->help, 0,
-                           "[forestclaw] Print usage information (same as --usage) [F]");
+                           "[Options] Print usage information (same as --usage) [F]");
     sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
-                           "[forestclaw] Print usage information (same as --help) [F]");
+                           "[Options] Print usage information (same as --help) [F]");
 
     sc_options_add_bool (opt, 0, "print_options", &amropt->print_options, 0,
-                         "[forestclaw] Print current option settings [F]");
+                         "[Options] Print current option settings [F]");
+
+    /* ---------------------- Control execution -------------------------- */
+    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
+                         "[Options] Trap floating point exceptions [1]");
+
+    sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug, 0,
+                        "[Options] Start MPI debug session (for attaching processes in gdb) [0]");
 
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
        ----------------------------------------------------------------------- */
     sc_options_add_inifile (opt, 'F', "inifile",
-                            "[forestclaw] Read options from this file [fclaw2d_defaults.ini]");
+                            "[Options] File used to override one or more options " \
+                            "in fclaw_options.ini [empty]");
 
 }
 
