@@ -70,53 +70,55 @@ int main (int argc, char **argv)
     mpicomm = sc_MPI_COMM_WORLD;
     fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
-#ifdef MPI_DEBUG
-    /* this has to go after MPI has been initialized */
-    fclaw2d_mpi_debug();
-#endif
-
     /* ---------------------------------------------------------------
        Read in parameters and options
        --------------------------------------------------------------- */
     options = sc_options_new (argv[0]);
-    sc_options_add_int (options, 0, "example", &example, 0,
-                        "[Example] 1 for pillow grid, "\
+
+    /* [main] options */
+    sc_options_add_int (options, 0, "main:example", &example, 0,
+                        "[main] 1 for pillow grid, "\
                         "2 for cubed sphere ");
 
-    /* [Mapping] General mapping functions */
+    /* [mapping] General mapping functions */
     fclaw2d_register_map_data(options,map_data); /* sets default values */
-    fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-    rotate[0] = pi*map_data->theta/180.0;
-    rotate[1] = pi*map_data->phi/180.0;
 
-    /* [forestclaw] General mapping functions */
+    /* [Options] General mapping functions */
     fclaw2d_register_options(options,gparms);
-    fclaw2d_read_options_from_file(options);
-    fclaw2d_postprocess_parms(gparms);
 
     /* [clawpack46] Clawpack solver options */
     clawpack46_register_options(options,clawpack_parms);
-    clawpack46_read_options_from_file(options);
-    clawpack46_postprocess_parms(clawpack_parms);
 
-    /* This prints out all the current options */
-    fclaw2d_parse_command_line (options, argc, argv, lp);
+    retval = clawpack46_options_read_from_file(options,lp);
+    retval = retval || fclaw_options_read_from_file(options,lp);
 
-    /* [forestclaw] */
+    retval = retval || fclaw_options_parse_command_line (options, argc, argv, lp);
+
+    /* Post-process any array input */
     fclaw2d_postprocess_parms (gparms);
     clawpack46_postprocess_parms(clawpack_parms);
 
-    retval = fclaw2d_checkparms (options, gparms, lp);
+    retval = retval || fclaw2d_checkparms (options, gparms, lp);
     retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
     retval = retval || sphere_checkparms (example, lp);
 
     if (!retval)
     {
+        fclaw_options_print_summary(options,lp);
+
         if (gparms->trapfpe == 1)
         {
             printf("Enabling floating point traps\n");
             feenableexcept(FE_INVALID);
         }
+
+        if (gparms->mpi_debug == 1)
+        {
+            fclaw2d_mpi_debug();
+        }
+
+        rotate[0] = pi*map_data->theta/180.0;
+        rotate[1] = pi*map_data->phi/180.0;
 
         switch (example) {
         case 1:
