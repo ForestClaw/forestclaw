@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include <fclaw2d_options.h>
 #include <fclaw2d_map_query.h>
+#include <fclaw_options.h>
 
 #include "torus_user.H"
 
@@ -45,32 +46,44 @@ torus_checkparms (int example, int lp)
     return 0;
 }
 
+static
+void fclaw2d_set_options(sc_options_t* options, int argc, char **argv, int lp,
+                         amr_options_t* gparms, fclaw2d_clawpack_parms_t* clawpack_parms,
+                         fclaw2d_map_data_t* map_data)
+{
+    /* [Options] Register general ForestClaw options */
+    fclaw2d_register_options(options,gparms);
+
+    /* [mapping] Register general mapping data */
+    fclaw2d_register_map_data(options,map_data);
+
+    /* [clawpack46] Register solver options */
+    clawpack46_register_options(options,clawpack_parms);
+}
+
 int
 main (int argc, char **argv)
 {
-  int                   lp;
-  int                   retval;
-  sc_MPI_Comm           mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL, *brick = NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
+  int                      lp;
+  sc_MPI_Comm              mpicomm;
+  sc_options_t             *options;
+  p4est_connectivity_t     *conn = NULL;
+  fclaw2d_domain_t	   *domain;
 
-  int example;
+  fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+  amr_options_t             samr_options, *gparms = &samr_options;
+  fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
+  fclaw2d_map_data_t        smap_data, *map_data = &smap_data;
+
+  int example, retval;
   double pi = M_PI;
 
   /* Mapping variables */
   double rotate[2];
-  double alpha;  /* Ratio of torus inner radius to outer radius */
-  double lat[2];
-  double longitude[2];
+  double alpha, beta;  /* Ratio of torus inner radius to outer radius */
+  const char* latitude_string, *longitude_string;
+  double *latitude, *longitude;
   int mi, mj, a,b;
-  fclaw2d_map_data_t smap_data, *map_data = &smap_data;
-
-  int trapfpe;
-  int mpi_debug;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
@@ -78,62 +91,72 @@ main (int argc, char **argv)
 
   options = sc_options_new (argv[0]);
 
-  /* Register local options */
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "[Example] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
 
-  sc_options_add_switch (options, 0, "mpi_debug", &mpi_debug,
-                      "[Init] Start MPI debug session to attach processes to gdb [F]");
 
-  sc_options_add_switch (options, 0, "trapfpe", &trapfpe,
-                      "[Init] Trap floating point exceptions [T]");
+  /* [main] Register parameters local to the example.  This could be put into
+     a function,  which might make things more readable.  One slight hassle is
+     that the strings needed to read arrays have to then be passed back so they
+     can be converted to numerical arrays after the file and command line have
+     been read. */
 
-  /* [forestclaw] Register general ForestClaw options */
+  sc_options_add_int (options, 0, "main:example", &example, 0,
+                      "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
+
+  sc_options_add_double (options, 0, "main:alpha", &alpha, 0.4,
+                         "[main] Ratio r/R, r=outer radius, R=inner radius " \
+                         "(used for torus) [0.4]");
+  fclaw_options_add_double_array(options, 0, "main:latitude", &latitude_string, NULL,
+                                 &latitude, 2,
+                                 "[main] Latitude range (degrees) (2 entries) [NULL]");
+
+  fclaw_options_add_double_array(options, 0, "main:longitude", &longitude_string,
+                                 NULL, &longitude, 2,
+                                 "[main] Longitude range (degrees) (2 entries) [NULL]");
+
+  sc_options_add_double (options, 0, "main:beta", &beta, 0.4,
+                         "[main] Inner radius of annulus [0.4]");
+
+  /* [Options] Register general ForestClaw options */
   fclaw2d_register_options(options,gparms);
-  fclaw2d_read_options_from_file(options);
-  fclaw2d_postprocess_parms(gparms);  /* post-process array input */
 
-  /* [Mapping] Register general mapping data */
-  fclaw2d_register_map_data(options,map_data); /* sets default values */
-  fclaw2d_read_options_from_file(options);  /* Read options from fclaw2d_defaults.ini */
-  mi = map_data->mi;
-  mj = map_data->mj;
-  rotate[0] = pi*map_data->theta/180.0;
-  rotate[1] = pi*map_data->phi/180.0;
+  /* [mapping] Register general mapping data */
+  fclaw2d_register_map_data(options,map_data);
 
-  /* [clawpack] Register solver options */
-  clawpack46_register_options(options,clawpack_parms); /* Change name space? */
-  clawpack46_read_options_from_file(options);
-  clawpack46_postprocess_parms(clawpack_parms);  /* post-process array input */
+  /* [clawpack46] Register solver options */
+  clawpack46_register_options(options,clawpack_parms);
 
-  /* TODO: would it make sense to provide this code up to and excluding
-   *       torus_checkparms into a reusable function? */
-  /* Hm... maybe.  But such a reusable function would have to be specific for
-     each example, I think. And it isn't clear how it would be get re-used. */
+  /* Read options from fclaw_options.ini */
+  retval = fclaw_options_read_from_file(options, lp);
 
-  /* This prints out all the current options */
-  fclaw2d_parse_command_line (options,argc, argv, lp);
+  /* Parse command line */
+  retval = retval || fclaw_options_parse_command_line (options,argc, argv, lp);
 
-  fclaw2d_postprocess_parms(gparms); /* post-process array input */
-  clawpack46_postprocess_parms(clawpack_parms); /* post-process array input */
+  /* post-process array input */
+  fclaw2d_postprocess_parms(gparms);
+  clawpack46_postprocess_parms(clawpack_parms);
+  fclaw2d_options_postprocess_map_data(map_data);
 
-  /* Check final state of parameters.
-   * The call to amr_checkparms2 also checks for a --help message.
-   * We are exploiting C short-circuit boolean evaluation.
-   */
-  retval = fclaw2d_checkparms (options, gparms, lp);
+  if (example == 3)
+  {
+      fclaw_options_convert_double_array (latitude_string, &latitude,2);
+      fclaw_options_convert_double_array (longitude_string, &longitude,2);
+  }
+
+  /* Check final state of parameters.  Return from help message, if necessary. */
+  retval = retval || fclaw2d_checkparms (options, gparms, lp);
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
-  retval = retval || torus_checkparms (example, lp);  /* No more to check here */
-  if (!retval) {
-     /* the do-the-work block. TODO: put everything below into a function */
+  retval = retval || torus_checkparms (example, lp);  /* Nothing more to check here */
+  if (!retval)
+  {
+      fclaw_options_print_summary(options,lp);
 
-      if (trapfpe == 1)
+      if (gparms->trapfpe == 1)
       {
           printf("Enabling floating point traps\n");
           feenableexcept(FE_INVALID);
       }
 
-      if (mpi_debug == 1)
+      if (gparms->mpi_debug == 1)
       {
           fclaw2d_mpi_debug();
       }
@@ -141,66 +164,38 @@ main (int argc, char **argv)
       /* ---------------------------------------------------------------
          Mapping geometry
          --------------------------------------------------------------- */
+      mi = map_data->mi;
+      mj = map_data->mj;
+      rotate[0] = pi*map_data->theta/180.0;
+      rotate[1] = pi*map_data->phi/180.0;
+      a = map_data->periodic_x;
+      b = map_data->periodic_y;
+
       switch (example)
       {
       case 1:
-          a = 1;
-          b = 1;
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_cart(brick,map_data->scale,map_data->shift,rotate);
           break;
       case 2:
-          /* Generally, we should have mj \approx \alpha*mi */
-          /* where alpha is the ratio of inner radius to outer radius */
-          a = 1;
-          b = 1;
-          alpha = 0.4;
-          mj = alpha*mi;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_torus(brick,map_data->scale,map_data->shift,rotate,alpha);
           break;
       case 3:
           /* Lat-long example */
-          a = 1;
-          b = 0;
-          longitude[0] = 0; /* x-coordinate */
-          longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
-          lat[0] = -50;  /* y-coordinate */
-          lat[1] = 50;
-          alpha = (lat[1]-lat[0])/180;
-          mj = alpha*mi/2.0;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_latlong(brick,map_data->scale,map_data->shift,
-                                         rotate,lat,longitude,a,b);
+                                         rotate,latitude,longitude,a,b);
           break;
       case 4:
           /* Annulus */
-          a = 1;
-          b = 0;
-          alpha = 0.4;  /* Inner radius */
-          mj = (1-alpha)/(1+alpha)*mi/pi;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_annulus(brick,map_data->scale,map_data->shift,
-                                         rotate,alpha);
+                                         rotate,beta);
           break;
 
       default:
@@ -240,7 +235,15 @@ main (int argc, char **argv)
       fclaw2d_map_destroy(cont);
   } /* this bracket ends the do_the_work block */
 
-  sc_options_destroy (options);         /* this could be moved up */
+  /* Destroy arrays used in options  */
+  if (example == 3)
+  {
+      fclaw_options_destroy_array((void*) latitude);
+      fclaw_options_destroy_array((void*) longitude);
+  }
+
+  fclaw2d_map_destroy_arrays(map_data);
+  sc_options_destroy (options);
   fclaw2d_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
