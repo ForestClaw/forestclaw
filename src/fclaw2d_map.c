@@ -428,26 +428,27 @@ void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_da
        Scale
        --------------------------------------------------------------------*/
     fclaw_options_add_double_array (options,0, "mapping:scale",
-                                    &map_data->scale_string, NULL,
+                                    &map_data->scale_string, "1 1 1",
                                     &map_data->scale, 3,
-                                    "[mapping] Scale factor [1,1,1]");
+                                    "[mapping] Scale factor [1 1 1]");
 
     /* --------------------------------------------------------------------
        Shift
        --------------------------------------------------------------------*/
     fclaw_options_add_double_array (options,0, "mapping:shift",
-                                    &map_data->shift_string, NULL,
+                                    &map_data->shift_string, "0 0 0",
                                     &map_data->shift, 3,
-                                    "[mapping] Shift array [0,0,0]");
+                                    "[mapping] Shift array [0 0 0]");
 
     /* --------------------------------------------------------------------
        Rotate
        --------------------------------------------------------------------*/
+    sc_options_add_double (options, 0, "mapping:phi", &map_data->phi, 0,
+                           "[mapping] Rotation angle about x axis (degrees) [0]");
+
     sc_options_add_double (options, 0, "mapping:theta", &map_data->theta, 0,
                            "[mapping] Rotation angle about z axis (degrees) [0]");
 
-    sc_options_add_double (options, 0, "mapping:phi", &map_data->phi, 0,
-                           "[mapping] Rotation angle about x axis (degrees) [0]");
 }
 
 void fclaw2d_map_destroy_arrays(fclaw2d_map_data_t* map_data)

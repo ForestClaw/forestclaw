@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPACK_H
 #define FCLAW2D_CLAWPACK_H
 
-#include "forestclaw2d.h"
-#include "amr_options.h"
-#include "clawpack_fort.H"
-#include "amr_forestclaw.H"
-#include "fclaw2d_options.h"
+#include <forestclaw2d.h>
+#include <fclaw_options.h>
+#include <clawpack_fort.H>
+#include <amr_forestclaw.H>
 
 
 extern "C"
