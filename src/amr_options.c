@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <amr_options.h>
-#include <fclaw2d_base.h>
 
 
 /* This is here for backwards compatibility */
