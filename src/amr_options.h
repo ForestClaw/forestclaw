@@ -87,8 +87,6 @@ struct amr_options
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:
                                      Will kill all parallel performance. */
-    int trapfpe;
-
     const char *prefix;         /**< This is prepended to output files */
 
     /* VTK output control */
@@ -130,6 +128,10 @@ struct amr_options
     double bx;
     double ay;
     double by;
+
+    /* These are only used in main, but I put them here for convenience */
+    int trapfpe;
+    int mpi_debug;
 
     /** This switch variable is set to nonzero by --help and --usage. */
     int print_options;
