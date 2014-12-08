@@ -46,21 +46,6 @@ torus_checkparms (int example, int lp)
     return 0;
 }
 
-static
-void fclaw2d_set_options(sc_options_t* options, int argc, char **argv, int lp,
-                         amr_options_t* gparms, fclaw2d_clawpack_parms_t* clawpack_parms,
-                         fclaw2d_map_data_t* map_data)
-{
-    /* [Options] Register general ForestClaw options */
-    fclaw2d_register_options(options,gparms);
-
-    /* [mapping] Register general mapping data */
-    fclaw2d_register_map_data(options,map_data);
-
-    /* [clawpack46] Register solver options */
-    clawpack46_register_options(options,clawpack_parms);
-}
-
 int
 main (int argc, char **argv)
 {
