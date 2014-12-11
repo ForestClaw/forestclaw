@@ -29,3 +29,6 @@ include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # Euler example
 include applications/euler/2d/quadrants/Makefile.am
+
+# Mountain problem - SSE
+include applications/Mountain/Makefile.am
