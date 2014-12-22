@@ -1,7 +1,6 @@
+#                                            ForestClaw
 
-ForestClaw: see also http://www.forestclaw.org/
-
-ForestClaw is a parallel, multi-block adaptive finite volume code based on the
+[ForestClaw](http://www.forestclaw.org) is a parallel, multi-block adaptive finite volume code based on the
 wave propagation algorithms in ClawPack (R. J. LeVeque, Univ. of Washington),
 and the parallel, scalable octree infrastructure in p4est (Carsten Burstedde,
 Univ. of Bonn).
