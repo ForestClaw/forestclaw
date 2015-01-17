@@ -85,21 +85,8 @@ typedef enum fclaw_verbosity
 }
 fclaw_verbosity_t;
 
-/** An application container whose use is optional.
- * TODO: shall we turn this object into an opaque pointer?
- *       Meaning keeping the typedef here but hiding the struct declaration
- *       in the .c file so that members can only be accessed via functions.
- */
-typedef struct fclaw_app
-{
-    sc_MPI_Comm mpicomm;
-    int mpisize, mpirank;
-    int *argc;
-    char ***argv;
-    sc_options_t *opt;
-    void *user;
-}
-fclaw_app_t;
+/** An application container whose use is optional. */
+typedef struct fclaw_app fclaw_app_t;
 
 /* macros for memory allocation, will abort if out of memory */
 #define FCLAW_ALLOC(t,n)          (t *) sc_malloc (fclaw_get_package_id (), \
@@ -189,13 +176,22 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
  * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
  * It is possible to change these levels with sc_package_set_verbosity.
+ * \param [in,out] argc         Command line argument count.
+ * \param [in,out] argv         Command line arguments.
+ * \param [in,out] user         Will not be changed by our code.
+ * \return            An allocated and initialized application object.
  */
-void fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user);
+fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
 
 /** Close down all systems that were setup in fclaw_init.
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  */
-void fclaw_app_reset (fclaw_app_t * a);
+void fclaw_app_destroy (fclaw_app_t * a);
+
+/** Return a pointer to the options structure.
+ * TODO: aiming to provide an encapsulation that will not need this function.
+ */
+sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
 
 #ifdef __cplusplus
 #if 0

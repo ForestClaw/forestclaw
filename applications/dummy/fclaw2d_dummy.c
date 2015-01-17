@@ -49,15 +49,17 @@ main (int argc, char **argv)
     int verbosity;
     int first_arg;
     sc_keyvalue_t *kv_verbosity;
-    fclaw_app_t sapp, *a = &sapp;
+    sc_options_t *opt;
+    fclaw_app_t *a;
 
     /* initialize application */
-    fclaw_app_init (a, &argc, &argv, NULL);
+    a = fclaw_app_new (&argc, &argv, NULL);
+    opt = fclaw_app_get_options (a);
     fclaw_package_id = fclaw_get_package_id ();
 
     /* THIS WILL BE DONE PER-PACKAGE IN AN INTERFACE YET TO BE DEVELOPED */
     /* register options */
-    sc_options_add_int (a->opt, '\0', "dummy", &dummyvar, 5, "Dummy integer");
+    sc_options_add_int (opt, '\0', "dummy", &dummyvar, 5, "Dummy integer");
     kv_verbosity = sc_keyvalue_new ();
     sc_keyvalue_set_int (kv_verbosity, "default", FCLAW_VERBOSITY_DEFAULT);
     sc_keyvalue_set_int (kv_verbosity, "debug", FCLAW_VERBOSITY_DEBUG);
@@ -67,26 +69,26 @@ main (int argc, char **argv)
     sc_keyvalue_set_int (kv_verbosity, "essential",
                          FCLAW_VERBOSITY_ESSENTIAL);
     sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
-    sc_options_add_keyvalue (a->opt, 'V', "fclaw-verbosity", &verbosity,
+    sc_options_add_keyvalue (opt, 'V', "fclaw-verbosity", &verbosity,
                              "default", kv_verbosity, "Set verbosity level");
 
     /* THIS BLOCK WILL BE ENCAPSULATED -- NOT FOR APPLICATION EXAMPLES */
     /* we're still missing to load/save .ini files */
     /* parse command line options */
     first_arg = sc_options_parse (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL,
-                                  a->opt, argc, argv);
+                                  opt, argc, argv);
     if (first_arg < 0)
     {
         fclaw_global_essentialf ("Option parsing failed\n");
         sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,
-                                a->opt, NULL);
+                                opt, NULL);
         fclaw_global_essentialf ("Terminating program\n");
     }
     else
     {
         fclaw_global_infof ("Option parsing successful\n");
         sc_options_print_summary (fclaw_package_id,
-                                  FCLAW_VERBOSITY_PRODUCTION, a->opt);
+                                  FCLAW_VERBOSITY_PRODUCTION, opt);
 
         /* set verbosity levels */
         sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
@@ -99,7 +101,7 @@ main (int argc, char **argv)
     }
 
     /* cleanup application */
-    fclaw_app_reset (a);
+    fclaw_app_destroy (a);
 
     return 0;
 }

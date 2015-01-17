@@ -27,6 +27,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int fclaw_package_id = -1;
 
+/** An application container whose use is optional.
+ */
+struct fclaw_app
+{
+    sc_MPI_Comm mpicomm;
+    int mpisize, mpirank;
+    int *argc;
+    char ***argv;
+    sc_options_t *opt;
+    void *user;
+};
+
 int
 fclaw_get_package_id (void)
 {
@@ -120,8 +132,8 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
     fclaw_global_productionf ("%-*s %s\n", w, "LIBS", FCLAW_LIBS);
 }
 
-void
-fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user)
+fclaw_app_t *
+fclaw_app_new (int *argc, char ***argv, void *user)
 {
 #ifdef FCLAW_ENABLE_DEBUG
     const int LP_lib = SC_LP_INFO;
@@ -131,11 +143,19 @@ fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
+    MPI_Comm mpicomm;
+    fclaw_app_t *a;
 
     mpiret = sc_MPI_Init (argc, argv);
     SC_CHECK_MPI (mpiret);
+    mpicomm = sc_MPI_COMM_WORLD;
 
-    a->mpicomm = sc_MPI_COMM_WORLD;
+    sc_init (mpicomm, 1, 1, NULL, LP_lib);
+    p4est_init (NULL, LP_lib);
+    fclaw_init (NULL, LP_fclaw);
+
+    a = FCLAW_ALLOC (fclaw_app_t, 1);
+    a->mpicomm = mpicomm;
     mpiret = sc_MPI_Comm_size (a->mpicomm, &a->mpisize);
     SC_CHECK_MPI (mpiret);
     mpiret = sc_MPI_Comm_rank (a->mpicomm, &a->mpirank);
@@ -145,23 +165,29 @@ fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user)
     a->argc = argc;
     a->argv = argv;
     a->user = user;
-
-    sc_init (a->mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
-
     a->opt = sc_options_new ((*argv)[0]);
+
+    return a;
 }
 
 void
-fclaw_app_reset (fclaw_app_t * a)
+fclaw_app_destroy (fclaw_app_t * a)
 {
     int mpiret;
 
     sc_options_destroy_deep (a->opt);
+    FCLAW_FREE (a);
 
     sc_finalize ();
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+sc_options_t *
+fclaw_app_get_options (fclaw_app_t * a)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    return a->opt;
 }
