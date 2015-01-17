@@ -69,7 +69,26 @@ extern "C"
 #endif
 #endif
 
+/** These are our verbosity levels.
+ * They should usually be set via fclaw_app_init.
+ * For production runs, try PRODUCTION or ESSENTIAL.
+ * For debugging, try INFO for libraries and DEBUG for forestclaw.
+ */
+typedef enum fclaw_verbosity
+{
+    FCLAW_VERBOSITY_SILENT = SC_LP_SILENT,
+    FCLAW_VERBOSITY_ESSENTIAL = SC_LP_ESSENTIAL,
+    FCLAW_VERBOSITY_PRODUCTION = SC_LP_PRODUCTION,
+    FCLAW_VERBOSITY_INFO = SC_LP_INFO,
+    FCLAW_VERBOSITY_DEBUG = SC_LP_DEBUG,
+    FCLAW_VERBOSITY_DEFAULT
+}
+fclaw_verbosity_t;
+
 /** An application container whose use is optional.
+ * TODO: shall we turn this object into an opaque pointer?
+ *       Meaning keeping the typedef here but hiding the struct declaration
+ *       in the .c file so that members can only be accessed via functions.
  */
 typedef struct fclaw_app
 {
@@ -116,8 +135,8 @@ int fclaw_get_package_id (void);
 
 /*
  * Functions for printing log messages that rely on sc_logv (see sc.h).
- * The category SC_LP_GLOBAL means that only rank 0 prints any output.
- * The category SC_LP_NORMAL means that all ranks prints output, which is
+ * The category SC_LC_GLOBAL means that only rank 0 prints any output.
+ * The category SC_LC_NORMAL means that all ranks prints output, which is
  * generally undesired in production runs (that is, without --enable-debug).
  * The log levels below match SC_LP_ESSENTIAL, _PRODUCTION, _INFO, and _DEBUG.
  */
@@ -138,6 +157,11 @@ void fclaw_global_productionf (const char *fmt, ...)
 #endif
     ;
 void fclaw_global_infof (const char *fmt, ...)
+#ifndef FCLAW_DOXYGEN
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+    ;
+void fclaw_infof (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
 #endif
@@ -164,8 +188,13 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  * level is set as well and depends on the configure option `--enable-debug`.
  * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
  * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
+ * It is possible to change these levels with sc_package_set_verbosity.
  */
 void fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user);
+
+/** Close down all systems that were setup in fclaw_init.
+ * If a keyvalue structure has been added to a->opt, it is destroyed too.
+ */
 void fclaw_app_reset (fclaw_app_t * a);
 
 #ifdef __cplusplus

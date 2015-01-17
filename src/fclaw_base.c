@@ -80,6 +80,16 @@ fclaw_global_infof (const char *fmt, ...)
 }
 
 void
+fclaw_infof (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_NORMAL, SC_LP_INFO, fmt, ap);
+    va_end (ap);
+}
+
+void
 fclaw_debugf (const char *fmt, ...)
 {
     va_list ap;
@@ -148,7 +158,7 @@ fclaw_app_reset (fclaw_app_t * a)
 {
     int mpiret;
 
-    sc_options_destroy (a->opt);
+    sc_options_destroy_deep (a->opt);
 
     sc_finalize ();
 
