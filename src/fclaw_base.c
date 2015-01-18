@@ -27,18 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int fclaw_package_id = -1;
 
-/** An application container whose use is optional.
- */
-struct fclaw_app
-{
-    sc_MPI_Comm mpicomm;
-    int mpisize, mpirank;
-    int *argc;
-    char ***argv;
-    sc_options_t *opt;
-    void *user;
-};
-
 int
 fclaw_get_package_id (void)
 {

@@ -88,6 +88,20 @@ fclaw_verbosity_t;
 /** An application container whose use is optional. */
 typedef struct fclaw_app fclaw_app_t;
 
+/** An application container whose use is optional.
+ */
+struct fclaw_app
+{
+    sc_MPI_Comm mpicomm;
+    int mpisize;
+    int mpirank;
+    int *argc;
+    char ***argv;
+    sc_options_t *opt;
+    void *user;
+};
+
+
 /* macros for memory allocation, will abort if out of memory */
 #define FCLAW_ALLOC(t,n)          (t *) sc_malloc (fclaw_get_package_id (), \
                                                    (n) * sizeof(t))
