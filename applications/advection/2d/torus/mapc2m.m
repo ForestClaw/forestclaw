@@ -13,42 +13,33 @@ r = 0.4;
 switch map
     case 'cart'
         isflat = true;        
-        [xc1,yc1,~] = mapc2m_brick(xc,yc);
+        s = 0.02;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
         xp = 5*(xp + 1);
         yp = 3*(yp + 1);
         
-        brick_data = load('brick.dat');
-        mi = brick_data(1,1);
-        mj = brick_data(1,2);
-        xv = brick_data(2:end,1);
-        yv = brick_data(2:end,2);
-
-        blockno = getblocknumber();
-        s = 0.02;
-        xs = (xv(blockno+1)+1-mi/2)*s;
-        ys = (yv(blockno+1)+1-mj/2)*s;
-        xp = xp + xs;
-        yp = yp + ys;
+%         brick_data = load('brick.dat');
+%         mi = brick_data(1,1);
+%         mj = brick_data(1,2);
+%         xv = brick_data(2:end,1);
+%         yv = brick_data(2:end,2);
+% 
+%         blockno = getblocknumber();
+%         s = 0.02;
+%         xs = (xv(blockno+1)+1-mi/2)*s;
+%         ys = (yv(blockno+1)+1-mj/2)*s;
+%         xp = xp + xs;
+%         yp = yp + ys;
 
     case 'torus'
         isflat = false;
-        % Find center to expand radius around.                        
-        [xc1,yc1,~] = mapc2m_brick(0.5,0.5);
+        % Find center to expand radius around.    
+        
+        s = 0.02;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_torus(xc1,yc1);
-        th = atan2(yp,xp);
-        phi = atan2(zp,xp-1);        
-        v = [xp-cos(th),yp-sin(th),zp];
-        s = 0.0;
-        
-        [xc1,yc1,~] = mapc2m_brick(xc,yc);
-        [xp,yp,zp] = mapc2m_torus(xc1,yc1);
-        
-        % 
-        xp = xp + s*(cos(th) + v(1));
-        yp = yp + s*(sin(th) + v(2));
-        zp = zp + s*v(3);
-        
+                
     case 'latlong'
         isflat = false;
         lat = [-50 50];
