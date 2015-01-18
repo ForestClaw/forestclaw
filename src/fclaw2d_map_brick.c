@@ -3,6 +3,7 @@
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_convenience.h>
+#include <fclaw2d_map_brick.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -12,20 +13,7 @@ extern "C"
 #endif
 #endif
 
-/* This is used for communicating with Matlab about the mapping */
-void write_brick_data_(int* n,
-                       int* mi,
-                       int* mj,
-                       double xv[],
-                       double yv[]);
 
-typedef struct fclaw2d_block_ll
-{
-    int nb;
-    int mi, mj;
-    double *xv;
-    double *yv;
-} fclaw2d_block_ll_t;
 
 static int
 fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)

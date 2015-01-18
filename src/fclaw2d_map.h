@@ -297,10 +297,6 @@ void MAPC2M_TORUS (int* blockno, double *xc, double *yc,
 void MAPC2M_BRICK (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp, int *mi, int *mj);
 
-#define MAPC2M_BRICK2 FCLAW_F77_FUNC (mapc2m_brick2,MAPC2M_BRICK2)
-void MAPC2M_BRICK2 (int* blockno, double *xc, double *yc,
-                   double *xp, double *yp, double *zp, int *mi, int *mj);
-
 #define MAPC2M_LATLONG FCLAW_F77_FUNC (mapc2m_latlong,MAPC2M_LATLONG)
 void MAPC2M_LATLONG (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp);
