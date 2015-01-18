@@ -23,16 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_single_step.h>
-#include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
+#include <fclaw2d_clawpack.H>
 #include <p4est_connectivity.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
 #include <fclaw2d_map_query.h>
-
-
 
 #include "mountain_user.H"
 

@@ -8,7 +8,7 @@ bin_PROGRAMS += applications/Mountain/mountain
 applications_Mountain_mountain_SOURCES = \
 	applications/Mountain/mountain_user.cpp \
 	applications/Mountain/mountain.cpp \
-	applications/Mountain/mountain.f \
+	applications/Mountain/mountain_fort.f \
 	applications/Mountain/setaux_manifold.f \
 	applications/Mountain/fclaw2d_map_mountain.c \
 	applications/Mountain/fclaw2d_map_identity.c \
@@ -19,7 +19,7 @@ applications_Mountain_mountain_SOURCES = \
 	applications/Mountain/user_4.6/rpn2ad1.f \
 	applications/Mountain/user_4.6/rpt2ad1.f \
 	applications/Mountain/user_4.6/qinit.f \
-	applications/Mountain/user_4.6/swirl_output.f
+	applications/Mountain/user_4.6/mountain_output.f
 
 applications_Mountain_mountain_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
