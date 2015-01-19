@@ -23,6 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <forestclaw2d.h>
+#include <fclaw_options.h>
+#include <fclaw_base.h>
+
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
@@ -34,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_connectivity.h>
 
 #include "torus_user.H"
+
+static int fclaw_package_id;
 
 static int
 torus_checkparms (int example)
@@ -49,7 +55,6 @@ torus_checkparms (int example)
 int
 main (int argc, char **argv)
 {
-  int                      fclaw_package_id;
   sc_MPI_Comm              mpicomm;
   sc_options_t             *options;
   fclaw_app_t *app;
@@ -60,7 +65,6 @@ main (int argc, char **argv)
   amr_options_t             samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
   fclaw2d_map_data_t        smap_data, *map_data = &smap_data;
-  sc_keyvalue_t *kv_verbosity;
 
   int example, retval;
   double pi = M_PI;
@@ -79,7 +83,6 @@ main (int argc, char **argv)
   fclaw_package_id = fclaw_get_package_id ();
   mpicomm = app->mpicomm;
 
-
 #if 0
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
@@ -88,28 +91,9 @@ main (int argc, char **argv)
   options = sc_options_new (argv[0]);
 #endif
 
-
-  kv_verbosity = sc_keyvalue_new ();
-  sc_keyvalue_set_int (kv_verbosity, "default", FCLAW_VERBOSITY_DEFAULT);
-  sc_keyvalue_set_int (kv_verbosity, "debug", FCLAW_VERBOSITY_DEBUG);
-  sc_keyvalue_set_int (kv_verbosity, "info", FCLAW_VERBOSITY_INFO);
-  sc_keyvalue_set_int (kv_verbosity, "production",
-                       FCLAW_VERBOSITY_PRODUCTION);
-  sc_keyvalue_set_int (kv_verbosity, "essential",
-                       FCLAW_VERBOSITY_ESSENTIAL);
-  sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
-  sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", &verbosity,
-                           "default", kv_verbosity, "Set verbosity level");
-
-  sc_package_set_verbosity (p4est_package_id,FCLAW_VERBOSITY_SILENT);
-
-
-  /* [main] Register parameters local to the example.  This could be put into
-     a function,  which might make things more readable.  One slight hassle is
-     that the strings needed to read arrays have to then be passed back so they
-     can be converted to numerical arrays after the file and command line have
-     been read. */
-
+  /* -------------------------------------------------------------
+     - Register variables
+     ------------------------------------------------------------- */
   sc_options_add_int (options, 0, "main:example", &example, 0,
                       "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
@@ -137,13 +121,18 @@ main (int argc, char **argv)
   /* [clawpack46] Register solver options */
   clawpack46_register_options(options,clawpack_parms);
 
-  /* Read options from fclaw_options.ini */
-  retval = fclaw_options_read_from_file(options);
+  /* Set and register verbosity level */
+  fclaw_set_verbosity(options,&verbosity,FCLAW_VERBOSITY_SILENT);
 
-  /* Parse command line */
+  /* -------------------------------------------------------------
+     - Read options from fclaw_options.ini
+     - Parse command line
+     - postprocess array input
+     - checkparms
+     ------------------------------------------------------------- */
+  retval = fclaw_options_read_from_file(options);
   retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 
-  /* post-process array input */
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
   fclaw2d_options_postprocess_map_data(map_data);
@@ -154,10 +143,12 @@ main (int argc, char **argv)
       fclaw_options_convert_double_array (longitude_string, &longitude,2);
   }
 
-  /* Check final state of parameters.  Return from help message, if necessary. */
   retval = retval || fclaw_options_check (options, gparms);
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
   retval = retval || torus_checkparms (example);  /* Nothing more to check here */
+  /* -------------------------------------------------------------
+     - Run program
+     ------------------------------------------------------------- */
   if (!retval)
   {
       fclaw_options_print_summary(options);
