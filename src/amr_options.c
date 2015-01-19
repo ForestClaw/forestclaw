@@ -39,7 +39,7 @@ amr_options_t * amr_options_new (sc_options_t * opt)
 void amr_options_parse (sc_options_t * opt,
                         int argc, char **argv, int log_priority)
 {
-    fclaw_options_parse_command_line(opt,argc,argv,log_priority);
+    fclaw_options_parse_command_line(opt,argc,argv);
 }
 
 void amr_options_destroy (amr_options_t * gparms)

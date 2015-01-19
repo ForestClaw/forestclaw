@@ -511,8 +511,8 @@ int clawpack46_options_read_from_file(sc_options_t* opt, int log_priority)
     retval = sc_options_load (sc_package_id, SC_LP_ALWAYS, opt, "fclaw2d_clawpack.ini");
     if (retval < 0)
     {
-        fclaw2d_global_log (log_priority, "Cannot read options file 'fclaw2d_clawpack.ini'.  " \
-                            "Options are set to default registration values.\n");
+        fclaw_global_essentialf ("Cannot read options file 'fclaw2d_clawpack.ini'.  " \
+                                 "Options are set to default registration values.\n");
     }
     return retval;
 }
@@ -577,17 +577,20 @@ int fclaw2d_clawpack_checkparms2(sc_options_t* options,
                                  amr_options_t* gparms,
                                  int lp)
 {
-    return clawpack46_checkparms(options, clawpack_parms, gparms,lp);
+    return clawpack46_checkparms(options, clawpack_parms, gparms);
 }
 
 int clawpack46_checkparms(sc_options_t* options,
                           fclaw2d_clawpack_parms_t* clawpack_parms,
-                          amr_options_t* gparms,
-                          int lp)
+                          amr_options_t* gparms)
 {
     /* Check for user help argument */
-    if (gparms->help) {
+    if (gparms->help)
+    {
+#if 0
         sc_options_print_usage (sc_package_id, lp, options, NULL);
+#endif
+        fclaw_options_print_summary(options);
         return -1;
     }
 

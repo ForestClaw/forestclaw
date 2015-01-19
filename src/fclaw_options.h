@@ -68,16 +68,16 @@ void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
 void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt);
 
-int  fclaw_options_read_from_file(sc_options_t* opt, int log_priority);
+int  fclaw_options_read_from_file(sc_options_t* opt);
 
 int  fclaw_options_parse_command_line (sc_options_t * opt, int argc,
-                                      char **argv,int log_priority);
+                                       char **argv);
 
 void fclaw_options_postprocess (amr_options_t * amropt);
 
-int  fclaw_options_check (sc_options_t * options, amr_options_t * gparms, int lp);
+int  fclaw_options_check (sc_options_t * options, amr_options_t * gparms);
 
-void fclaw_options_print_summary(sc_options_t *opt, int log_priority);
+void fclaw_options_print_summary(sc_options_t *opt);
 
 /** Add a string option and prepare using it for an integer array.
  * \param [in,out] opt          Option container (see sc/sc_options.h).
@@ -121,6 +121,9 @@ void fclaw_options_convert_double_array (const char *array_string,
 
 
 void fclaw_options_destroy_array(void* array);
+
+void fclaw_set_verbosity(sc_options_t* options,int *verbosity, int p4est_verbosity);
+
 
 
 /* Plan is to replace amr_options_t with fclaw_options_t.

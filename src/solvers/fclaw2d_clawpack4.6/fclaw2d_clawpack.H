@@ -145,8 +145,7 @@ void clawpack46_register_options (sc_options_t* opt, fclaw2d_clawpack_parms_t* c
 void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
 int clawpack46_checkparms(sc_options_t *opt,
                            fclaw2d_clawpack_parms_t *clawpack_parms,
-                           amr_options_t* gparms,
-                           int lp);
+                          amr_options_t* gparms);
 
 
 /* Linking solvers */

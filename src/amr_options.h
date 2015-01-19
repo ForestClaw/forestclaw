@@ -52,8 +52,7 @@ amr_options_t* amr_options_new(sc_options_t* opt);
 
 void amr_read_options_from_file(sc_options_t* opt);
 
-void amr_options_parse (sc_options_t * opt, int argc, char **argv,
-                        int log_priority);
+void amr_options_parse (sc_options_t * opt, int argc, char **argv, int lp);
 
 void amr_options_destroy (amr_options_t * amropt);
 

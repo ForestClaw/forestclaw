@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
+#include <fclaw_base.h>
+
 
 /* Use this with 'fclaw_options_destroy' */
 amr_options_t* fclaw_options_new ()
@@ -185,41 +187,51 @@ void fclaw_options_destroy_arrays (amr_options_t * amropt)
 }
 
 
-int fclaw_options_read_from_file(sc_options_t* opt, int log_priority)
+int fclaw_options_read_from_file(sc_options_t* opt)
 {
     int retval;
     retval = sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
                               "fclaw_options.ini");
     if (retval < 0)
     {
+        /*
         fclaw2d_global_log (log_priority,      \
+        "Cannot find (or cannot open) fclaw_options.ini.\n");
+        */
+        fclaw_global_essentialf( \
                             "Cannot find (or cannot open) fclaw_options.ini.\n");
     }
     else
     {
+        /*
         fclaw2d_global_log (log_priority,      \
-                            "Reading file fclaw_options.ini.\n");
+        "Reading file fclaw_options.ini.\n");
+        */
+        fclaw_global_essentialf ("Reading file fclaw_options.ini.\n");
     }
     return retval;
 }
 
 
 int fclaw_options_parse_command_line(sc_options_t * opt,
-                                     int argc, char **argv,
-                                     int log_priority)
+                                     int argc, char **argv)
 {
     int retval;
 
     retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
     if (retval < 0)
     {
+#if 0
         fclaw2d_global_log (log_priority, "Command line option parsing failed.  " \
                             "Use --help option to see valid option settings.\n");
+#endif
+        fclaw_global_essentialf ("Command line option parsing failed.  " \
+                                 "Use --help option to see valid option settings.\n");
         return retval;
     }
     else
     {
-        fclaw2d_global_log (log_priority, "Reading command line.\n");
+        fclaw_global_essentialf ("Reading command line.\n");
     }
     if (sc_is_root ())
     {
@@ -227,16 +239,22 @@ int fclaw_options_parse_command_line(sc_options_t * opt,
                                   "fclaw_options.ini.used");
         if (retval < 0)
         {
-            fclaw2d_global_log (log_priority, "Cannot save fclaw_options.ini.used.  ");
+            fclaw_global_essentialf("Cannot save fclaw_options.ini.used.  ");
             return retval;
         }
     }
     return retval;
 }
 
-void fclaw_options_print_summary(sc_options_t *opt, int log_priority)
+void fclaw_options_print_summary(sc_options_t *opt)
 {
+#if 0
     sc_options_print_summary (sc_package_id, log_priority, opt);
+#endif
+    int fclaw_package_id;
+    fclaw_package_id = fclaw_get_package_id();
+    sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,
+                            opt, NULL);
 }
 
 void
@@ -332,17 +350,20 @@ void fclaw_options_postprocess (amr_options_t * amropt)
 /* -----------------------------------------------------------------
    Check input parms
    ----------------------------------------------------------------- */
-int fclaw_options_check (sc_options_t * options, amr_options_t * gparms, int lp)
+int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
 {
     /* Check for user help argument */
     if (gparms->help)
     {
-        sc_options_print_usage (sc_package_id, lp, options, NULL);
+        fclaw_options_print_summary(options);
+        /*
+           sc_options_print_usage (sc_package_id, lp, options, NULL);
+        */
         return -1;
     }
     if (gparms->print_options)
     {
-        fclaw_options_print_summary(options,lp);
+        fclaw_options_print_summary(options);
         return -1;
     }
 
@@ -354,9 +375,13 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms, int lp)
         int nsteps = (int) floor (dT_outer / dT_inner + .5);
         if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
         {
+#if 0
             SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, lp,
                         "For fixed dt, initial time step size must divide"
                         " tfinal/nout exactly.\n");
+#endif
+            fclaw_global_essentialf( "For fixed dt, initial time step size must divide" \
+                                     " tfinal/nout exactly.\n");
             return -1;
         }
     }
@@ -365,4 +390,23 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms, int lp)
 
     /* Everything is good */
     return 0;
+}
+
+void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity, int p4est_verbosity)
+{
+    sc_keyvalue_t *kv_verbosity;
+    kv_verbosity = sc_keyvalue_new ();
+
+    sc_keyvalue_set_int (kv_verbosity, "default", FCLAW_VERBOSITY_DEFAULT);
+    sc_keyvalue_set_int (kv_verbosity, "debug", FCLAW_VERBOSITY_DEBUG);
+    sc_keyvalue_set_int (kv_verbosity, "info", FCLAW_VERBOSITY_INFO);
+    sc_keyvalue_set_int (kv_verbosity, "production",FCLAW_VERBOSITY_PRODUCTION);
+    sc_keyvalue_set_int (kv_verbosity, "essential",FCLAW_VERBOSITY_ESSENTIAL);
+    sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
+
+    sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", fclaw_verbosity,
+                             "default", kv_verbosity, "Set verbosity level");
+
+    /* This probably doesn't go here... */
+    sc_package_set_verbosity (p4est_package_id,p4est_verbosity);
 }
