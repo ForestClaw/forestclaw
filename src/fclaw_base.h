@@ -70,7 +70,7 @@ extern "C"
 #endif
 
 /** These are our verbosity levels.
- * They should usually be set via fclaw_app_init.
+ * They should usually be set via \ref fclaw_app_new.
  * For production runs, try PRODUCTION or ESSENTIAL.
  * For debugging, try INFO for libraries and DEBUG for forestclaw.
  */
@@ -117,17 +117,23 @@ typedef struct fclaw_app fclaw_app_t;
   do { (void) (expression); } while (0)
 #endif
 
-/* functions for mananging the package identity within libsc */
+/** Query the package identity for use with libsc functions.
+ * This is -1 until fclaw_init or fclaw_app_new has been called.
+ * \return              A package identifier to pass to log functions etc.
+ */
 int fclaw_get_package_id (void);
 
-/*
- * Functions for printing log messages that rely on sc_logv (see sc.h).
- * The category SC_LC_GLOBAL means that only rank 0 prints any output.
- * The category SC_LC_NORMAL means that all ranks prints output, which is
- * generally undesired in production runs (that is, without --enable-debug).
- * The log levels below match SC_LP_ESSENTIAL, _PRODUCTION, _INFO, and _DEBUG.
- */
 /* *INDENT-OFF* */
+/** Function for printing log messages that rely on sc_logv (see \b sc.h).
+ * \param [in] category     The category SC_LC_GLOBAL means that only rank 0
+ *                          prints any output.  SC_LC_NORMAL means that all
+ *                          ranks prints output, which is generally undesired
+ *                          in production runs (that is, without
+ *                          --enable-debug).
+ * \param [in] priority     The log level can be FCLAW_VERBOSITY_ESSENTIAL,
+ *                          _PRODUCTION, _INFO, and _DEBUG, (see SC_LP_*).
+ * \param [in] fmt          Format string as in printf.
+ */
 void fclaw_logf (int category, int priority, const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 3, 4)))
@@ -164,7 +170,7 @@ void fclaw_debugf (const char *fmt, ...)
  * It is not necessary to call this function, but it makes the log output more
  * useful and separates ForestClaw's memory allocation from other packages.
  * This function is usually not called directly since it is automatically
- * called from [fclaw_app_init](@ref fclaw_app_init).
+ * called from \ref fclaw_app_new.
  * \param [in] log_handler   Declared in sc.h.  Usually, NULL is fine.
  * \param [in] log_threshold Declared in sc.h.  SC_LP_DEFAULT is fine.
  *                           You can also choose from log levels SC_LP_*.
@@ -187,6 +193,21 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  */
 void fclaw_app_destroy (fclaw_app_t * a);
+
+/** Return the user pointer passed on \ref fclaw_app_new.
+ * \param [in] a         Initialized forestclaw application.
+ * \return               This pointer is returned unchanged.
+ */
+void *fclaw_app_get_user (fclaw_app_t * a);
+
+/** Query MPI size and rank for an application.
+ * \param [in] a        Initialized forestclaw application.
+ * \param [out] mpisize Will be set to the size of the world communicator.
+ * \param [out] mpirank Will be set to the size of the world communicator.
+ * \return              The communicator that was used to setup \b a.
+ */
+MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
+                                      int *mpisize, int *mpirank);
 
 /** Return a pointer to the options structure.
  * TODO: aiming to provide an encapsulation that will not need this function.

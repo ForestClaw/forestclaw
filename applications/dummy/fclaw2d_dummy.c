@@ -30,10 +30,14 @@ static int fclaw_package_id;
 static void
 run_program (fclaw_app_t * a)
 {
+    int debug_size, debug_rank;
+
     fclaw_global_essentialf ("So this is the beginning of the program\n");
+    (void) fclaw_app_get_mpi_size_rank (a, &debug_size, &debug_rank);
 
     /* this is where we would do some numerics */
-    fclaw_debugf ("Debug message (individual)\n");
+    fclaw_debugf ("Debug message (rank %d/%d)\n",
+                  debug_rank, debug_size);
     fclaw_infof ("Info message (individual)\n");
     fclaw_global_infof ("Info message\n");
     fclaw_global_productionf ("Production message\n");
