@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "torus_user.H"
 
 static int
-torus_checkparms (int example, int lp)
+torus_checkparms (int example)
 {
     if (example < 1 || example > 4) {
-        fclaw2d_global_log (lp, "Option --example must be 1, 2, 3 or 4\n");
+        fclaw_global_essentialf ("Option --example must be 1, 2, 3 or 4\n");
         return -1;
     }
 
@@ -49,9 +49,10 @@ torus_checkparms (int example, int lp)
 int
 main (int argc, char **argv)
 {
-  int                      lp;
+  int                      fclaw_package_id;
   sc_MPI_Comm              mpicomm;
   sc_options_t             *options;
+  fclaw_app_t *app;
   p4est_connectivity_t     *conn = NULL;
   fclaw2d_domain_t	   *domain;
 
@@ -59,6 +60,7 @@ main (int argc, char **argv)
   amr_options_t             samr_options, *gparms = &samr_options;
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
   fclaw2d_map_data_t        smap_data, *map_data = &smap_data;
+  sc_keyvalue_t *kv_verbosity;
 
   int example, retval;
   double pi = M_PI;
@@ -69,13 +71,37 @@ main (int argc, char **argv)
   const char* latitude_string, *longitude_string;
   double *latitude, *longitude;
   int mi, mj, a,b;
+  int verbosity;
 
+  /* initialize application */
+  app = fclaw_app_new (&argc, &argv, NULL);
+  options = fclaw_app_get_options (app);
+  fclaw_package_id = fclaw_get_package_id ();
+  mpicomm = app->mpicomm;
+
+
+#if 0
   lp = SC_LP_PRODUCTION;
   mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
   options = sc_options_new (argv[0]);
+#endif
 
+
+  kv_verbosity = sc_keyvalue_new ();
+  sc_keyvalue_set_int (kv_verbosity, "default", FCLAW_VERBOSITY_DEFAULT);
+  sc_keyvalue_set_int (kv_verbosity, "debug", FCLAW_VERBOSITY_DEBUG);
+  sc_keyvalue_set_int (kv_verbosity, "info", FCLAW_VERBOSITY_INFO);
+  sc_keyvalue_set_int (kv_verbosity, "production",
+                       FCLAW_VERBOSITY_PRODUCTION);
+  sc_keyvalue_set_int (kv_verbosity, "essential",
+                       FCLAW_VERBOSITY_ESSENTIAL);
+  sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
+  sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", &verbosity,
+                           "default", kv_verbosity, "Set verbosity level");
+
+  sc_package_set_verbosity (p4est_package_id,FCLAW_VERBOSITY_SILENT);
 
 
   /* [main] Register parameters local to the example.  This could be put into
@@ -112,10 +138,10 @@ main (int argc, char **argv)
   clawpack46_register_options(options,clawpack_parms);
 
   /* Read options from fclaw_options.ini */
-  retval = fclaw_options_read_from_file(options, lp);
+  retval = fclaw_options_read_from_file(options);
 
   /* Parse command line */
-  retval = retval || fclaw_options_parse_command_line (options,argc, argv, lp);
+  retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 
   /* post-process array input */
   fclaw_options_postprocess(gparms);
@@ -129,12 +155,12 @@ main (int argc, char **argv)
   }
 
   /* Check final state of parameters.  Return from help message, if necessary. */
-  retval = retval || fclaw_options_check (options, gparms, lp);
-  retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
-  retval = retval || torus_checkparms (example, lp);  /* Nothing more to check here */
+  retval = retval || fclaw_options_check (options, gparms);
+  retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
+  retval = retval || torus_checkparms (example);  /* Nothing more to check here */
   if (!retval)
   {
-      fclaw_options_print_summary(options,lp);
+      fclaw_options_print_summary(options);
 
       if (gparms->trapfpe == 1)
       {
@@ -192,11 +218,14 @@ main (int argc, char **argv)
 
 
       /* ---------------------------------------------------------- */
+#if 0
+      /* I am not sure what to replace this with ... */
       if (gparms->verbosity > 0)
       {
           fclaw2d_domain_list_levels(domain, lp);
           fclaw2d_domain_list_neighbors(domain, lp);
       }
+#endif
 
       /* ---------------------------------------------------------------
          Set domain data.
@@ -228,11 +257,15 @@ main (int argc, char **argv)
   }
 
   fclaw2d_map_destroy_arrays(map_data);
-  sc_options_destroy (options);
   fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
+#if 0
+  sc_options_destroy (options);
   fclaw_mpi_finalize ();
+#endif
+
+  fclaw_app_destroy (app);
 
   return 0;
 }
