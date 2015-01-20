@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * macros.  It should be included regardless of the space dimension that
  * the code is compiled for.
  *
- * This file also provides logging and memory allocation functions.
+ * This file also provides logging and memory allocation functions, and a
+ * convenience application object that should reduce boilerplate code.
  */
 
 #ifndef FCLAW_BASE_H
@@ -69,10 +70,33 @@ extern "C"
 #endif
 #endif
 
-/** These are our verbosity levels.
- * They should usually be set via \ref fclaw_app_new.
- * For production runs, try PRODUCTION or ESSENTIAL.
- * For debugging, try INFO for libraries and DEBUG for forestclaw.
+/** These are our log levels, sorted by priority.
+ * These levels have two different roles to play:
+ *
+ * 1. Each logging function is suffixed with its priority.
+ *    This means that FCLAW_VERBOSITY_ESSENTIAL should only be used
+ *    for very important messages, such as a version number on startup,
+ *    or unexpected error conditions.  Conversely, log messages that
+ *    help in debugging and clutter the output a lot can use
+ *    the FCLAW_VERBOSITY_DEBUG priority.
+ * 2. The function \b sc_package_set_verbosity
+ *    accepts a priority level below which all messages will be ignored.
+ *    Eventually, the \ref fclaw_app_t object will read the desired
+ *    verbosity from the command line and/or configuration files.
+ *    As an example, if the verbosity is set to FCLAW_VERBOSITY_INFO, then
+ *    debug messages will not be printed, but essential messages will.
+ *
+ * The verbosity of libraries, like p4est and sc, can be controlled
+ * individually, and separately from the verbosity of forestclaw.
+ * For production runs, try to set the verbosity to PRODUCTION or ESSENTIAL.
+ * This is copied from \b sc.h:
+ *
+ * * PRODUCTION messages should log a few lines for a major api function.
+ *              A good example would be the numerical error at the
+ *              end of the program, timings, printing important parameters.
+ * * ESSENTIAL messages must only cause a few lines for the whole run.
+ *
+ * For debugging, try INFO or PRODUCTION for libraries and DEBUG for forestclaw.
  */
 typedef enum fclaw_verbosity
 {
