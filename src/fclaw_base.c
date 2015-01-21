@@ -27,6 +27,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int fclaw_package_id = -1;
 
+/** An application container whose use is optional.
+ */
+struct fclaw_app
+{
+    sc_MPI_Comm mpicomm;      /**< Communicator is set to MPI_COMM_WORLD. */
+    int mpisize;              /**< Size of communicator. */
+    int mpirank;              /**< Rank of this process in \b mpicomm. */
+    int *argc;                /**< Pointer to main function's argument count. */
+    char ***argv;             /**< Pointer to main function's argument list. */
+    sc_options_t *opt;        /**< Central options structure. */
+    void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+};
+
 int
 fclaw_get_package_id (void)
 {
@@ -170,6 +183,27 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+MPI_Comm
+fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
+{
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (mpisize != NULL);
+    FCLAW_ASSERT (mpirank != NULL);
+
+    *mpisize = a->mpisize;
+    *mpirank = a->mpirank;
+
+    return a->mpicomm;
+}
+
+void *
+fclaw_app_get_user (fclaw_app_t * a)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    return a->user;
 }
 
 sc_options_t *
