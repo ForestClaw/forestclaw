@@ -78,10 +78,10 @@ main (int argc, char **argv)
   int verbosity;
 
   /* initialize application */
+  fclaw_package_id = fclaw_get_package_id ();
   app = fclaw_app_new (&argc, &argv, NULL);
   options = fclaw_app_get_options (app);
-  fclaw_package_id = fclaw_get_package_id ();
-  mpicomm = app->mpicomm;
+  mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
 #if 0
   lp = SC_LP_PRODUCTION;
