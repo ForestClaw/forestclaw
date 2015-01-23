@@ -189,12 +189,13 @@ MPI_Comm
 fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
 {
     FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (mpisize != NULL);
-    FCLAW_ASSERT (mpirank != NULL);
 
-    *mpisize = a->mpisize;
-    *mpirank = a->mpirank;
-
+    if (mpisize != NULL) {
+        *mpisize = a->mpisize;
+    }
+    if (mpirank != NULL) {
+        *mpirank = a->mpirank;
+    }
     return a->mpicomm;
 }
 
