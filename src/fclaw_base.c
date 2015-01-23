@@ -50,6 +50,7 @@ struct fclaw_app
     sc_MPI_Comm mpicomm;      /**< Communicator is set to MPI_COMM_WORLD. */
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */
+    int first_arg;            /**< Location of first non-option argument after parsing. */
     int *argc;                /**< Pointer to main function's argument count. */
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
@@ -182,6 +183,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     SC_CHECK_MPI (mpiret);
 
     srand (a->mpirank);
+    a->first_arg = -1;
     a->argc = argc;
     a->argv = argv;
     a->user = user;
@@ -195,9 +197,27 @@ void
 fclaw_app_destroy (fclaw_app_t * a)
 {
     int mpiret;
+    size_t zz;
+    fclaw_app_options_t *ao;
 
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (a->opt_pkg != NULL);
+    FCLAW_ASSERT (a->opt != NULL);
+
+    /* let the options packages clean up their memory */
+    for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        FCLAW_ASSERT (ao != NULL);
+        if (ao->vt.options_destroy != NULL)
+        {
+            ao->vt.options_destroy (a, ao->package, ao->registered);
+        }
+    }
     sc_array_destroy (a->opt_pkg);
-    sc_options_destroy_deep (a->opt);
+
+    /* free central structures */
+    sc_options_destroy (a->opt);
     FCLAW_FREE (a);
 
     sc_finalize ();
@@ -209,7 +229,8 @@ fclaw_app_destroy (fclaw_app_t * a)
 void
 fclaw_app_options_register (fclaw_app_t * a,
                             const char *section, const char *configfile,
-                            fclaw_app_options_vtable_t * vt, void *package)
+                            const fclaw_app_options_vtable_t * vt,
+                            void *package)
 {
     sc_options_t *popt;
     fclaw_app_options_t *ao;
@@ -233,9 +254,10 @@ fclaw_app_options_register (fclaw_app_t * a,
     }
 }
 
-void
-fclaw_app_options_parse (fclaw_app_t * a)
+fclaw_exit_type_t
+fclaw_app_options_parse (fclaw_app_t * a, int * first_arg)
 {
+  return FCLAW_NOEXIT;
 }
 
 MPI_Comm
@@ -243,10 +265,12 @@ fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
 {
     FCLAW_ASSERT (a != NULL);
 
-    if (mpisize != NULL) {
+    if (mpisize != NULL)
+    {
         *mpisize = a->mpisize;
     }
-    if (mpirank != NULL) {
+    if (mpirank != NULL)
+    {
         *mpirank = a->mpirank;
     }
     return a->mpicomm;

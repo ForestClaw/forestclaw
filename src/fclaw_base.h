@@ -98,6 +98,9 @@ extern "C"
  *              A good example would be the numerical error at the
  *              end of the program, timings, printing important parameters.
  * * ESSENTIAL messages must only cause a few lines for the whole run, if at all.
+ * * DEFAULT depends on the configure options --enable-debug and --enable_logging=...
+ *              With --enable-debug, this will be a very chatty at level DEBUG.
+ *              Otherwise it's INFO, if not overridden with --enable-logging=...
  *
  * This is copied from \b sc.h for reference:
  *
@@ -158,15 +161,16 @@ typedef void *(*fclaw_app_options_register_t) (fclaw_app_t * a,
 /** Callback function type for postprocessing options per-package.
  * This function as called after option parsing.
  * Its return value can be used to report an error in option processing. */
-typedef int (*fclaw_app_options_postprocess_t) (fclaw_app_t * a,
-                                                void *package,
-                                                void *registered);
+typedef fclaw_exit_type_t
+    (*fclaw_app_options_postprocess_t) (fclaw_app_t * a,
+                                        void *package, void *registered);
 
 /** Callback function type for checking for option errors per-package.
  * This function as called after option parsing and postprocessing.
  * Its return value is used to report an error in option processing. */
-typedef int (*fclaw_app_options_check_t) (fclaw_app_t * a, void *package,
-                                          void *registered);
+typedef fclaw_exit_type_t
+    (*fclaw_app_options_check_t) (fclaw_app_t * a,
+                                  void *package, void *registered);
 
 /** Virtual function to destroy any memory created on registration.
  * This is called at the end of the program and reverses any allocation
@@ -349,10 +353,13 @@ void fclaw_app_destroy (fclaw_app_t * a);
  *                              the caller.  Is passed to all options callbacks in
  *                              \b vt.  This can be used in addition, or instead of,
  *                              accessing the user pointer from the application object.
+ *                              The application may define that package is owned by
+ *                              the internal options processing and free it in the
+ *                              options_destroy callback, or impose other conventions.
  */
 void fclaw_app_options_register (fclaw_app_t * a,
                                  const char *section, const char *configfile,
-                                 fclaw_app_options_vtable_t * vt,
+                                 const fclaw_app_options_vtable_t * vt,
                                  void *package);
 
 /** Parse the command line options.
@@ -360,8 +367,11 @@ void fclaw_app_options_register (fclaw_app_t * a,
  * for postprocessing and checking options, and will abort the program if any
  * error occurs.
  * TODO: This function shall read default configuration files before parsing.
+ * \param [in] a         Initialized forestclaw application.
+ * \param [out] first_arg       If not NULL, position of first non-option argument.
+ * \return               Whether to continue, exit gracefully, or exit with error.
  */
-void fclaw_app_options_parse (fclaw_app_t * a);
+fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg);
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.
