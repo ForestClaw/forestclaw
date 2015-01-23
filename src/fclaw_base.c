@@ -27,8 +27,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int fclaw_package_id = -1;
 
-/** An application container whose use is optional.
- */
+/** Each options packages lives in a structure like this. */
+typedef struct fclaw_app_options
+{
+    char *section;              /**< NULL or used in sc_options_add_suboptions. */
+    char *configfile;           /**< NULL or an .ini file's basename to read. */
+    fclaw_app_options_vtable_t vt;      /**< Virtual table for option processing. */
+    void *package;              /**< The package user data from options_register. */
+    void *registered;           /**< Whatever is returend by options_register. */
+}
+fclaw_app_options_t;
+
+/** An application container whose use is optional. */
 struct fclaw_app
 {
     sc_MPI_Comm mpicomm;      /**< Communicator is set to MPI_COMM_WORLD. */
@@ -38,6 +48,9 @@ struct fclaw_app
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+
+    /* options packages */
+    sc_array_t *opt_pkg;      /**< An array of fclaw_app_options types. */
 };
 
 int
@@ -167,6 +180,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->argv = argv;
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
+    a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 
     return a;
 }
@@ -176,6 +190,7 @@ fclaw_app_destroy (fclaw_app_t * a)
 {
     int mpiret;
 
+    sc_array_destroy (a->opt_pkg);
     sc_options_destroy_deep (a->opt);
     FCLAW_FREE (a);
 
@@ -183,6 +198,38 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_app_options_register (fclaw_app_t * a,
+                            const char *section, const char *configfile,
+                            fclaw_app_options_vtable_t * vt, void *package)
+{
+    sc_options_t *popt;
+    fclaw_app_options_t *ao;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (vt != NULL && vt->options_register != NULL);
+
+    ao = (fclaw_app_options_t *) sc_array_push (a->opt_pkg);
+    ao->section = section == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->vt = *vt;
+    ao->package = package;
+
+    popt = section == NULL ? a->opt : sc_options_new (section);
+    ao->registered = vt->options_register (a, package, popt);
+    if (section != NULL)
+    {
+        FCLAW_ASSERT (popt != a->opt);
+        sc_options_add_suboptions (a->opt, popt, section);
+        sc_options_destroy (popt);
+    }
+}
+
+void
+fclaw_app_options_parse (fclaw_app_t * a)
+{
 }
 
 MPI_Comm

@@ -129,6 +129,40 @@ fclaw_verbosity_t;
 /** An application container whose use is optional. */
 typedef struct fclaw_app fclaw_app_t;
 
+/** Callback function type for registering options per-package. */
+typedef void *(*fclaw_app_options_register_t) (fclaw_app_t * a,
+                                               void *package,
+                                               sc_options_t * options);
+
+/** Callback function type for postprocessing options per-package.
+ * This function as called after option parsing.
+ * Its return value can be used to report an error in option processing. */
+typedef int (*fclaw_app_options_postprocess_t) (fclaw_app_t * a,
+                                                void *package,
+                                                void *registered);
+
+/** Callback function type for checking for option errors per-package.
+ * This function as called after option parsing and postprocessing.
+ * Its return value is used to report an error in option processing. */
+typedef int (*fclaw_app_options_check_t) (fclaw_app_t * a, void *package,
+                                          void *registered);
+
+/** Virtual function to destroy any memory created on registration.
+ * This is called at the end of the program and reverses any allocation
+ * that has been done on option registration. */
+typedef void (*fclaw_app_options_destroy_t) (fclaw_app_t * a, void *package,
+                                             void *registered);
+
+/** An extended table of virtual functions for package-wise option parsing. */
+typedef struct fclaw_app_options_vtable
+{
+    fclaw_app_options_register_t options_register;       /**< Calls sc_options_add_*. */
+    fclaw_app_options_postprocess_t options_postprocess; /**< Called after parsing. */
+    fclaw_app_options_check_t options_check;     /**< Reports on validity of option values. */
+    fclaw_app_options_destroy_t options_destroy;     /**< Called at end of program. */
+}
+fclaw_app_options_vtable_t;
+
 /* macros for memory allocation, will abort if out of memory */
 
 /** Allocate memory for n objects of a certain type. */
@@ -267,6 +301,46 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  */
 void fclaw_app_destroy (fclaw_app_t * a);
+
+/** Register an options package with an application.
+ * This function calls the virtual function for registering its options.
+ * \param [in,out] a            A valid application object from \ref fclaw_app_new.
+ *                              The callback functions from \b vt may access its
+ *                              user data, or work with \b package, or both.
+ * \param [in] section          This variable decides about the options being
+ *                              under the default "Options" section in a possible
+ *                              configuration file, or under its own section.
+ *                              If this is NULL, the options will be used with 
+ *                              the names they are added to the options structure.
+ *                              If not NULL, we will use \b sc_options_add_suboptions:
+ *                              The true option name will be prefixed with \b section,
+ *                              and they will appear under [section] in a .ini file.
+ * \param [in] configfile       IF not NULL, the name of a configuration file without
+ *                              the path or its ending .ini.  The file is read before
+ *                              option parsing occurs, so the command line overrides.
+ *                              TODO: this feature is not yet active.
+ * \param [in] vt               Functions for options processing.  At least the
+ *                              member \b options_register must be non-NULL.
+ *                              If any of the virtual function produce console output,
+ *                              they shall use the fclaw_global_* logging functions,
+ *                              or custom functions that only print on rank zero.
+ * \param [in] package          Any kind of context, or NULL, as a convenience for
+ *                              the caller.  Is passed to all options callbacks in
+ *                              \b vt.  This can be used in addition, or instead of,
+ *                              accessing the user pointer from the application object.
+ */
+void fclaw_app_options_register (fclaw_app_t * a,
+                                 const char *section, const char *configfile,
+                                 fclaw_app_options_vtable_t * vt,
+                                 void *package);
+
+/** Parse the command line options.
+ * This function will loop through all registered packages and call the functions
+ * for postprocessing and checking options, and will abort the program if any
+ * error occurs.
+ * TODO: This function shall read default configuration files before parsing.
+ */
+void fclaw_app_options_parse (fclaw_app_t * a);
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.
