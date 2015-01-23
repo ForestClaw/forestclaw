@@ -254,16 +254,17 @@ fclaw_app_options_register (fclaw_app_t * a,
     }
 }
 
+/** This is the internal state of an options structure for core variables. */
 typedef struct fclaw_options_core
 {
-    int print_help;
-    int print_version;
-    int fclaw_verbosity;
-    int lib_verbosity;
-    sc_keyvalue_t *kv_verbosity;
+    int print_help;        /**< Option variable to activate help message */
+    int print_version;     /**< Option variable to print the version */
+    int fclaw_verbosity;   /**< Option variable for ForestClaw verbosity */
+    int lib_verbosity;     /**< Option variable for p4est, sc, and others */
+    sc_keyvalue_t *kv_verbosity;      /**< Holds key-values for log levels */
 
     /* this is just for ForestClaw debugging, no need to adopt elsewhere */
-    int is_registered;
+    int is_registered;     /**< Internal variable to double-check the flow */
 }
 fclaw_options_core_t;
 
@@ -444,7 +445,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg)
         break;
     case FCLAW_EXIT_QUIET:
         /* we assume that the application has or will print something */
-        fclaw_global_infof ("Quiet exit has been indicated\n");
         break;
     case FCLAW_EXIT_USAGE:
         /* we assume that the application has or will print something */

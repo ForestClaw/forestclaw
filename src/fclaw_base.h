@@ -98,9 +98,9 @@ extern "C"
  *              A good example would be the numerical error at the
  *              end of the program, timings, printing important parameters.
  * * ESSENTIAL messages must only cause a few lines for the whole run, if at all.
- * * DEFAULT depends on the configure options --enable-debug and --enable_logging=...
- *              With --enable-debug, this will be a very chatty at level DEBUG.
- *              Otherwise it's INFO, if not overridden with --enable-logging=...
+ * * DEFAULT depends on the configure options `--enable-debug` and `--enable_logging=...`
+ *              With `--enable-debug`, this will be a very chatty at level DEBUG.
+ *              Otherwise it is INFO, if not overridden with `--enable-logging=...`
  *
  * This is copied from \b sc.h for reference:
  *
@@ -310,10 +310,10 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  * level is set as well and depends on the configure option `--enable-debug`.
  * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
  * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
- * This can be influenced at compile time with --enable-logging=SC_LP_DEBUG
+ * This can be influenced at compile time with `--enable-logging=SC_LP_DEBUG`
  * for example, but this is somewhat clumsy and usually unnecessary since this
  * option does not differentiate between the forestclaw and its submodules.
- * It is possible and encouraged to change the levels with sc_package_set_verbosity.
+ * It is possible and encouraged to change the levels with \b sc_package_set_verbosity.
  * Attempts to reduce them (i.e., to cause more verbosity) at runtime are ignored.
  * \param [in,out] argc         Command line argument count.
  * \param [in,out] argv         Command line arguments.
@@ -371,9 +371,9 @@ void fclaw_app_options_register (fclaw_app_t * a,
  *   -?, --help                 Print a usages message for all options and exit.
  *   -v, --version              Print a version string and exit.
  *   -V, --verbosity=...        Set the verbosity for ForestClaw; a string in
- *                              CAPTIAL LETTERS without the prefix FCLAW_VERBOSITY_.
+ *                              lowercase (!) letters without the prefix FCLAW_VERBOSITY_.
  *   --lib-verbosity=...        Like verbosity, but for the libraries p4est and sc.
- * \param [in,out] app          A valid application object.
+ * \param [in,out] a            A valid application object.
  * \param [in] configfile       If not NULL, an .ini configuration file is read before
  *                              option parsing.  This is its name without path and suffix.
  */
