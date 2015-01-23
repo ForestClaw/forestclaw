@@ -254,10 +254,222 @@ fclaw_app_options_register (fclaw_app_t * a,
     }
 }
 
-fclaw_exit_type_t
-fclaw_app_options_parse (fclaw_app_t * a, int * first_arg)
+typedef struct fclaw_options_core
 {
-  return FCLAW_NOEXIT;
+    int print_help;
+    int print_version;
+    int fclaw_verbosity;
+    int lib_verbosity;
+    sc_keyvalue_t *kv_verbosity;
+
+    /* this is just for ForestClaw debugging, no need to adopt elsewhere */
+    int is_registered;
+}
+fclaw_options_core_t;
+
+static void *
+options_register_core (fclaw_app_t * a, void *package, sc_options_t * opt)
+{
+    sc_keyvalue_t *kv;
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
+
+    /* allocated storage for this package's option values */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (!core->is_registered);
+
+    /* this key-value pair understands the verbosity levels */
+    kv = core->kv_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "default", FCLAW_VERBOSITY_DEFAULT);
+    sc_keyvalue_set_int (kv, "debug", FCLAW_VERBOSITY_DEBUG);
+    sc_keyvalue_set_int (kv, "info", FCLAW_VERBOSITY_INFO);
+    sc_keyvalue_set_int (kv, "production", FCLAW_VERBOSITY_PRODUCTION);
+    sc_keyvalue_set_int (kv, "essential", FCLAW_VERBOSITY_ESSENTIAL);
+    sc_keyvalue_set_int (kv, "silent", FCLAW_VERBOSITY_SILENT);
+
+    /* set the options for the core package */
+    sc_options_add_switch (opt, 'h', "help", &core->print_help,
+                           "Print usage information");
+    sc_options_add_switch (opt, 'v', "version", &core->print_version,
+                           "Print ForestClaw version");
+    sc_options_add_keyvalue (opt, 'V', "verbosity", &core->fclaw_verbosity,
+                             "default", kv, "Set ForestClaw verbosity");
+    sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
+                             "essential", kv, "Set verbosity for libraries");
+
+    /* we do not need to work with the return value */
+    core->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_postprocess_core (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* errors from the key-value options would have showed up in parsing */
+
+    /* postprocess this package */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (core->is_registered);
+
+    /* go through this packages options */
+    sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
+    sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
+    sc_package_set_verbosity (fclaw_package_id, core->fclaw_verbosity);
+
+    /* print help and/or version information and exit gracefully */
+    if (core->print_help)
+    {
+        return FCLAW_EXIT_USAGE;
+    }
+    if (core->print_version)
+    {
+        fclaw_global_essentialf ("ForestClaw version %s\n",
+                                 FCLAW_PACKAGE_VERSION);
+        return FCLAW_EXIT_QUIET;
+    }
+
+    /* at this point there are no errors to report */
+    return FCLAW_NOEXIT;
+}
+
+static void
+options_destroy_core (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* free this package */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (core->is_registered);
+    FCLAW_ASSERT (core->kv_verbosity != NULL);
+    sc_keyvalue_destroy (core->kv_verbosity);
+
+    FCLAW_FREE (core);
+}
+
+static const fclaw_app_options_vtable_t options_vtable_core = {
+    options_register_core,
+    options_postprocess_core,
+    NULL,
+    options_destroy_core
+};
+
+void
+fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
+{
+    fclaw_options_core_t *core;
+
+    FCLAW_ASSERT (a != NULL);
+
+    /* allocate storage for core's option values */
+    /* we will free it in the options_destroy callback */
+    core = FCLAW_ALLOC_ZERO (fclaw_options_core_t, 1);
+
+    /* sneaking the version string into the package pointer */
+    /* when there are more parameters to pass, create a structure to pass */
+    fclaw_app_options_register (a, NULL, configfile, &options_vtable_core,
+                                core);
+}
+
+fclaw_exit_type_t
+fclaw_app_options_parse (fclaw_app_t * a, int *first_arg)
+{
+    size_t zz;
+    fclaw_exit_type_t vexit;
+    fclaw_app_options_t *ao;
+
+    FCLAW_ASSERT (a != NULL);
+
+    /* TODO: read configuration files */
+
+    /* parse command line options with given priority for errors */
+    a->first_arg =
+        sc_options_parse (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
+                          a->opt, *a->argc, *a->argv);
+
+    /* check for option and parameter errors */
+    if (a->first_arg < 0)
+    {
+        /* option processing was not successful */
+        vexit = FCLAW_EXIT_ERROR;
+    }
+    else
+    {
+        /* go through options packages for further processing and verification */
+        vexit = FCLAW_NOEXIT;
+        for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+        {
+            fclaw_exit_type_t aoexit;
+
+            ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+            FCLAW_ASSERT (ao != NULL);
+            if (ao->vt.options_postprocess != NULL)
+            {
+                aoexit = ao->vt.options_postprocess (a, ao->package,
+                                                     ao->registered);
+                vexit = SC_MAX (aoexit, vexit);
+            }
+            if (ao->vt.options_check != NULL)
+            {
+                aoexit = ao->vt.options_check (a, ao->package,
+                                               ao->registered);
+                vexit = SC_MAX (aoexit, vexit);
+            }
+        }
+    }
+
+    /* let's see what we print */
+    /* rationale: only use ESSENTIAL for the primary purpose of an exit condition
+     *            only use PRODUCTION for really useful information
+     *            partially redundant output can go with INFO
+     */
+    switch (vexit)
+    {
+    case FCLAW_NOEXIT:
+        fclaw_global_infof ("Option parsing successful\n");
+        sc_options_print_summary (fclaw_package_id,
+                                  FCLAW_VERBOSITY_PRODUCTION, a->opt);
+        break;
+    case FCLAW_EXIT_QUIET:
+        /* we assume that the application has or will print something */
+        fclaw_global_infof ("Quiet exit has been indicated\n");
+        break;
+    case FCLAW_EXIT_USAGE:
+        /* we assume that the application has or will print something */
+        /* but it has been specifically requested to print usage information */
+        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
+                                a->opt, NULL);
+        fclaw_global_infof ("Terminating program\n");
+        break;
+    case FCLAW_EXIT_ERROR:
+        /* some error has been encountered */
+        fclaw_global_essentialf ("Configuration / option parsing failed\n");
+        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_PRODUCTION,
+                                a->opt, NULL);
+        fclaw_global_infof ("Terminating program\n");
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    /* we are done */
+    if (first_arg != NULL)
+    {
+        *first_arg = a->first_arg;
+    }
+    return vexit;
 }
 
 MPI_Comm

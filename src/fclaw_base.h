@@ -362,6 +362,24 @@ void fclaw_app_options_register (fclaw_app_t * a,
                                  const fclaw_app_options_vtable_t * vt,
                                  void *package);
 
+/** Register a central convenience options package with default behavior.
+ * It is just an example and completely fine not to use this function.
+ * This is not a replacement for calling fclaw_app_options_register,
+ * which may be used any number of times for other custom options packages.
+ * It merely calls fclaw_app_options_register with predefined operations.
+ * This options package provides the following options:
+ *   -?, --help                 Print a usages message for all options and exit.
+ *   -v, --version              Print a version string and exit.
+ *   -V, --verbosity=...        Set the verbosity for ForestClaw; a string in
+ *                              CAPTIAL LETTERS without the prefix FCLAW_VERBOSITY_.
+ *   --lib-verbosity=...        Like verbosity, but for the libraries p4est and sc.
+ * \param [in,out] app          A valid application object.
+ * \param [in] configfile       If not NULL, an .ini configuration file is read before
+ *                              option parsing.  This is its name without path and suffix.
+ */
+void fclaw_app_options_register_core (fclaw_app_t * a,
+                                      const char *configfile);
+
 /** Parse the command line options.
  * This function will loop through all registered packages and call the functions
  * for postprocessing and checking options, and will abort the program if any
