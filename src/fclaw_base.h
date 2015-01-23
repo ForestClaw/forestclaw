@@ -53,8 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error "MPI I/O configured differently in ForestClaw and libsc"
 #endif
 #include <p4est_base.h>
-#define _fclaw_const _sc_const
-#define _fclaw_restrict _sc_restrict
+#define _fclaw_const _sc_const          /**< Replaces the const keyword. */
+#define _fclaw_restrict _sc_restrict    /**< Replaces the restrict keyword. */
 
 /* include some standard headers */
 
@@ -130,13 +130,20 @@ fclaw_verbosity_t;
 typedef struct fclaw_app fclaw_app_t;
 
 /* macros for memory allocation, will abort if out of memory */
+
+/** Allocate memory for n objects of a certain type. */
 #define FCLAW_ALLOC(t,n)          (t *) sc_malloc (fclaw_get_package_id (), \
                                                    (n) * sizeof(t))
+/** Allocate memory for n objects of a certain type and initialize to all zeros. */
 #define FCLAW_ALLOC_ZERO(t,n)     (t *) sc_calloc (fclaw_get_package_id (), \
                                                    (size_t) (n), sizeof(t))
+/** Reallocate memory of a certain type to n objects. */
 #define FCLAW_REALLOC(p,t,n)      (t *) sc_realloc (fclaw_get_package_id (), \
                                                     (p), (n) * sizeof(t))
+/** Allocate memory for a given string and copy the string into it. */
 #define FCLAW_STRDUP(s)                 sc_strdup (fclaw_get_package_id (), (s))
+/** Free memory from any of the FCLAW_ allocation functions.
+ * This macro must not be used to free memory from p4est, sc, or other packages. */
 #define FCLAW_FREE(p)                   sc_free (fclaw_get_package_id (), (p))
 
 /* some error checking */
@@ -151,9 +158,12 @@ typedef struct fclaw_app fclaw_app_t;
        SC_CHECK_ABORT (_fclaw_i, "Expected true: '" #expression "'");   \
   } while (0)
 #else
+/** Without --enable-debug, assertions do nothing. */
 #define FCLAW_ASSERT(c) SC_NOOP ()
+/** Calculate a given expression.  No side effects. */
 #define FCLAW_EXECUTE_ASSERT_FALSE(expression) \
   do { (void) (expression); } while (0)
+/** Calculate a given expression.  No side effects. */
 #define FCLAW_EXECUTE_ASSERT_TRUE(expression) \
   do { (void) (expression); } while (0)
 #endif
@@ -180,26 +190,45 @@ void fclaw_logf (int category, int priority, const char *fmt, ...)
     __attribute__ ((format (printf, 3, 4)))
 #endif
     ;
+/** Print a message only on the root processor with priority FCLAW_VERBOSITY_ESSENTIAL.
+ * This priority must be used \a very sparingly, such as for a version number,
+ * package registration, and error messages.
+ * \param [in] fmt      A printf-style format string.
+ */
 void fclaw_global_essentialf (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
+/** Print a message only on the root processor with priority FCLAW_VERBOSITY_PRODUCTION.
+ * This priority is useful for high-level results or statistics output.
+ * \param [in] fmt      A printf-style format string.
+ */
 void fclaw_global_productionf (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
+/** Print a message only on the root processor with priority FCLAW_VERBOSITY_INFO.
+ * This priority is useful for less important message on the flow of the program.
+ * \param [in] fmt      A printf-style format string.
+ */
 void fclaw_global_infof (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
+/** Print a processor-local message with priority FCLAW_VERBOSITY_INFO.
+ * \param [in] fmt      A printf-style format string.
+ */
 void fclaw_infof (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
+/** Print a processor-local message with priority FCLAW_VERBOSITY_DEBUG.
+ * \param [in] fmt      A printf-style format string.
+ */
 void fclaw_debugf (const char *fmt, ...)
 #ifndef FCLAW_DOXYGEN
     __attribute__ ((format (printf, 1, 2)))
@@ -222,7 +251,11 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  * level is set as well and depends on the configure option `--enable-debug`.
  * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
  * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
- * It is possible to change these levels with sc_package_set_verbosity.
+ * This can be influenced at compile time with --enable-logging=SC_LP_DEBUG
+ * for example, but this is somewhat clumsy and usually unnecessary since this
+ * option does not differentiate between the forestclaw and its submodules.
+ * It is possible and encouraged to change the levels with sc_package_set_verbosity.
+ * Attempts to reduce them (i.e., to cause more verbosity) at runtime are ignored.
  * \param [in,out] argc         Command line argument count.
  * \param [in,out] argv         Command line arguments.
  * \param [in,out] user         Will not be changed by our code.
