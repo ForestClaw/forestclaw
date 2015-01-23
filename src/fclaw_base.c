@@ -27,6 +27,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int fclaw_package_id = -1;
 
+int
+fclaw_app_exit_type_to_status (fclaw_exit_type_t vexit)
+{
+    return vexit == FCLAW_EXIT_ERROR ? EXIT_FAILURE : EXIT_SUCCESS;
+}
+
 /** Each options packages lives in a structure like this. */
 typedef struct fclaw_app_options
 {

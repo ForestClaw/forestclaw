@@ -126,6 +126,27 @@ typedef enum fclaw_verbosity
 }
 fclaw_verbosity_t;
 
+/** This enumeration defines values to be returned from option checking.
+ * The order of these constants is important; we rely on it internally.
+ * */
+typedef enum fclaw_exit_type
+{
+    FCLAW_NOEXIT,               /**< We are completely clean and may continue.
+                                     By the C standard, this constant has value 0. */
+    FCLAW_EXIT_QUIET,           /**< We decided to to terminate quietly. */
+    FCLAW_EXIT_USAGE,           /**< We are to do an informative job and then quit.
+                                     ForestClaw will print a usage message. */
+    FCLAW_EXIT_ERROR            /**< We have encountered an error and quit noisily. */
+}
+fclaw_exit_type_t;
+
+/** This function turns an exit type into a value suitable for ending main ().
+ * \param [in] vexit    Exit type from enumeration.
+ * \return              A value suitable for returning from main () or
+ *                      as an argument to exit ().
+ */
+int fclaw_app_exit_type_to_status (fclaw_exit_type_t vexit);
+
 /** An application container whose use is optional. */
 typedef struct fclaw_app fclaw_app_t;
 
