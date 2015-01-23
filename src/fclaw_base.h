@@ -89,14 +89,31 @@ extern "C"
  * The verbosity of libraries, like p4est and sc, can be controlled
  * individually, and separately from the verbosity of forestclaw.
  * For production runs, try to set the verbosity to PRODUCTION or ESSENTIAL.
- * This is copied from \b sc.h:
+ *
+ * Valid ForestClaw settings:
+ *     FCLAW_VERBOSITY_DEFAULT, DEBUG, INFO, PRODUCTION, ESSENTIAL, SILENT
+ * (although I suppose we could use others; see below for the list of SC_LP_ values).
  *
  * * PRODUCTION messages should log a few lines for a major api function.
  *              A good example would be the numerical error at the
  *              end of the program, timings, printing important parameters.
- * * ESSENTIAL messages must only cause a few lines for the whole run.
+ * * ESSENTIAL messages must only cause a few lines for the whole run, if at all.
+ *
+ * This is copied from \b sc.h for reference:
  *
  * For debugging, try INFO or PRODUCTION for libraries and DEBUG for forestclaw.
+ *
+ *     #define SC_LP_DEFAULT   (-1)    this selects the SC default threshold
+ *     #define SC_LP_ALWAYS      0     this will log everything
+ *     #define SC_LP_TRACE       1     this will prefix file and line number
+ *     #define SC_LP_DEBUG       2     any information on the internal state
+ *     #define SC_LP_VERBOSE     3     information on conditions, decisions
+ *     #define SC_LP_INFO        4     the main things a function is doing
+ *     #define SC_LP_STATISTICS  5     important for consistency/performance
+ *     #define SC_LP_PRODUCTION  6     a few lines for a major api function
+ *     #define SC_LP_ESSENTIAL   7     this logs a few lines max per program
+ *     #define SC_LP_ERROR       8     this logs errors only
+ *     #define SC_LP_SILENT      9     this never logs anything
  */
 typedef enum fclaw_verbosity
 {
