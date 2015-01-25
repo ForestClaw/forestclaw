@@ -78,9 +78,9 @@ main (int argc, char **argv)
   int verbosity;
 
   /* initialize application */
-  fclaw_package_id = fclaw_get_package_id ();
   app = fclaw_app_new (&argc, &argv, NULL);
   options = fclaw_app_get_options (app);
+  fclaw_package_id = fclaw_get_package_id ();
   mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
 #if 0
@@ -151,11 +151,17 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
   if (!retval)
   {
+      /* set verbosity levels */
+      sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
+      sc_package_set_verbosity (p4est_package_id, FCLAW_VERBOSITY_ESSENTIAL);
+      sc_package_set_verbosity (fclaw_package_id, verbosity);
+
+      /* Only print options if verbosity >= info */
       fclaw_options_print_summary(options);
 
       if (gparms->trapfpe == 1)
       {
-          printf("Enabling floating point traps\n");
+          fclaw_global_infof("Enabling floating point traps\n");
           feenableexcept(FE_INVALID);
       }
 
@@ -210,7 +216,7 @@ main (int argc, char **argv)
 
       /* ---------------------------------------------------------- */
 #if 0
-      /* I am not sure what to replace this with ... */
+      /* TODO : Replace this with an updated version? */
       if (gparms->verbosity > 0)
       {
           fclaw2d_domain_list_levels(domain, lp);
