@@ -194,20 +194,12 @@ int fclaw_options_read_from_file(sc_options_t* opt)
                               "fclaw_options.ini");
     if (retval < 0)
     {
-        /*
-        fclaw2d_global_log (log_priority,      \
-        "Cannot find (or cannot open) fclaw_options.ini.\n");
-        */
         fclaw_global_essentialf( \
                             "Cannot find (or cannot open) fclaw_options.ini.\n");
     }
     else
     {
-        /*
-        fclaw2d_global_log (log_priority,      \
-        "Reading file fclaw_options.ini.\n");
-        */
-        fclaw_global_essentialf ("Reading file fclaw_options.ini.\n");
+        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
     }
     return retval;
 }
@@ -218,20 +210,16 @@ int fclaw_options_parse_command_line(sc_options_t * opt,
 {
     int retval;
 
-    retval = sc_options_parse (sc_package_id, SC_LP_ERROR, opt, argc, argv);
+    retval = sc_options_parse (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL, opt, argc, argv);
     if (retval < 0)
     {
-#if 0
-        fclaw2d_global_log (log_priority, "Command line option parsing failed.  " \
-                            "Use --help option to see valid option settings.\n");
-#endif
         fclaw_global_essentialf ("Command line option parsing failed.  " \
                                  "Use --help option to see valid option settings.\n");
         return retval;
     }
     else
     {
-        fclaw_global_essentialf ("Reading command line.\n");
+        fclaw_global_infof ("Reading command line.\n");
     }
     if (sc_is_root ())
     {
@@ -248,13 +236,10 @@ int fclaw_options_parse_command_line(sc_options_t * opt,
 
 void fclaw_options_print_summary(sc_options_t *opt)
 {
-#if 0
-    sc_options_print_summary (sc_package_id, log_priority, opt);
-#endif
     int fclaw_package_id;
     fclaw_package_id = fclaw_get_package_id();
-    sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,
-                            opt, NULL);
+    /* This is printed assuming vebosity level 'INFO' */
+    sc_options_print_summary (fclaw_package_id, FCLAW_VERBOSITY_INFO,opt);
 }
 
 void
@@ -356,9 +341,6 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
     if (gparms->help)
     {
         fclaw_options_print_summary(options);
-        /*
-           sc_options_print_usage (sc_package_id, lp, options, NULL);
-        */
         return -1;
     }
     if (gparms->print_options)
@@ -375,11 +357,6 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
         int nsteps = (int) floor (dT_outer / dT_inner + .5);
         if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
         {
-#if 0
-            SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, lp,
-                        "For fixed dt, initial time step size must divide"
-                        " tfinal/nout exactly.\n");
-#endif
             fclaw_global_essentialf( "For fixed dt, initial time step size must divide" \
                                      " tfinal/nout exactly.\n");
             return -1;
@@ -407,6 +384,8 @@ void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity, int p4est_v
     sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", fclaw_verbosity,
                              "default", kv_verbosity, "Set verbosity level");
 
+#if 0
     /* This probably doesn't go here... */
     sc_package_set_verbosity (p4est_package_id,p4est_verbosity);
+#endif
 }
