@@ -60,12 +60,16 @@ main (int argc, char **argv)
   fclaw_app_t *app;
   p4est_connectivity_t     *conn = NULL;
   fclaw2d_domain_t	   *domain;
-
-  fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
   amr_options_t             samr_options, *gparms = &samr_options;
+
+  /* Clawpack options */
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
+
+  /* Mapping options */
+  fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
   fclaw2d_map_data_t        smap_data, *map_data = &smap_data;
 
+  /* Example options */
   int example, retval;
   double pi = M_PI;
 
@@ -92,7 +96,7 @@ main (int argc, char **argv)
 #endif
 
   /* -------------------------------------------------------------
-     - Register variables
+     - Register variables from [main]
      ------------------------------------------------------------- */
   sc_options_add_int (options, 0, "main:example", &example, 0,
                       "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
@@ -119,10 +123,11 @@ main (int argc, char **argv)
   fclaw2d_register_map_data(options,map_data);
 
   /* [clawpack46] Register solver options */
-  clawpack46_register_options(options,clawpack_parms);
+  clawpack46_options_register(options,clawpack_parms);
 
-  /* Set and register verbosity level */
+  /* Set verbosity options */
   fclaw_set_verbosity(options,&verbosity,FCLAW_VERBOSITY_SILENT);
+
 
   /* -------------------------------------------------------------
      - Read options from fclaw_options.ini
