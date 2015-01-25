@@ -2,8 +2,10 @@
 	path = sc
         url = https://github.com/cburstedde/libsc.git
 	# url = git@github.com:cburstedde/libsc.git
+	ignore = dirty
 
 [submodule "p4est"]
 	path = p4est
         url = https://github.com/cburstedde/p4est.git
 	# url = git@github.com:cburstedde/p4est.git
+	ignore = dirty
