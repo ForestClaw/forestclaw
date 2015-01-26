@@ -265,10 +265,8 @@ void regrid(fclaw2d_domain_t **domain)
         update_ghost_all_levels (*domain,FCLAW2D_TIMER_REGRID);
 
         // Print global minimum and maximum levels
-        if ((*domain)->mpirank == 0) {
-            printf ("Global minlevel %d maxlevel %d\n",
-                    (*domain)->global_minlevel, (*domain)->global_maxlevel);
-        }
+        fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
+                            (*domain)->global_minlevel, (*domain)->global_maxlevel);
     }
 
     // Stop timer

@@ -293,10 +293,8 @@ void cb_unpack_patches(fclaw2d_domain_t *domain,
 
 void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
 {
-    if (new_domain->mpirank == 0)
-    {
-        printf("Rebuilding domain\n");
-    }
+    fclaw_global_infof("Rebuilding domain\n");
+
     const amr_options_t *gparms = get_domain_parms(old_domain);
     double t = get_domain_time(old_domain);
 
@@ -322,42 +320,24 @@ void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
         set_block_data(block,gparms->mthbc);
     }
 
-    if (new_domain->mpirank == 0)
-    {
-        printf("  -- Rebuilding patches ... ");
-    }
+    fclaw_global_infof("  -- Rebuilding patches ... ");
+
     fclaw2d_domain_iterate_patches(new_domain, cb_build_patches,(void *) NULL);
-    if (new_domain->mpirank == 0)
-    {
-        printf("Done\n");
-    }
+
+    fclaw_global_infof("Done\n");
 
     // Set up the parallel ghost patch data structure.
-    if (new_domain->mpirank == 0)
-    {
-        printf("  -- Setting up parallel ghost exchange ... ");
-    }
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
+
     setup_parallel_ghost_exchange(new_domain);
-    if (new_domain->mpirank == 0)
-    {
-        // Done with parallel exchange
-        printf("Done\n");
-    }
 
-    if (new_domain->mpirank == 0)
-    {
-        // done with rebuild
-        printf("Done\n");
-    }
-
+    fclaw_global_infof("Done\n");
 }
 
 void build_initial_domain(fclaw2d_domain_t* domain)
 {
-    if (domain->mpirank == 0)
-    {
-        printf("Building initial domain\n");
-    }
+    fclaw_global_infof("Building initial domain\n");
+
     const amr_options_t *gparms = get_domain_parms(domain);
 
     // init_domain_data(*domain) is not called here, because it is
@@ -379,33 +359,19 @@ void build_initial_domain(fclaw2d_domain_t* domain)
     }
 
     // Construct new patches
-    if (domain->mpirank == 0)
-    {
-        printf("  -- Rebuilding patches ... ");
-    }
+    fclaw_global_infof("  -- Rebuilding patches ... ");
+
     fclaw2d_domain_iterate_patches(domain, cb_build_patches,(void *) NULL);
-    if (domain->mpirank == 0)
-    {
-        printf("Done\n");
-    }
+
+    fclaw_global_infof("Done\n");
 
     // Set up the parallel ghost patch data structure.
-    if (domain->mpirank == 0)
-    {
-        printf("  -- Setting up parallel ghost exchange ... ");
-    }
-    setup_parallel_ghost_exchange(domain);
-    if (domain->mpirank == 0)
-    {
-        // Done with parallel exchange
-        printf("Done\n");
-    }
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
 
-    if (domain->mpirank == 0)
-    {
-        // done with rebuild
-        printf("Done\n");
-    }
+    setup_parallel_ghost_exchange(domain);
+
+    fclaw_global_infof("Done\n");
+
 }
 
 
@@ -438,9 +404,9 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
     {
         fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
-        rebuild_domain(*domain, domain_partitioned);	
+        rebuild_domain(*domain, domain_partitioned);
 
-	/* Stop the timer in new since, since its state is now 1. We don't care about the 
+	/* Stop the timer in new since, since its state is now 1. We don't care about the
 	   timer in the old state.  */
         ddata = get_domain_data (domain_partitioned);
 	fclaw2d_timer_stop(&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
@@ -495,13 +461,13 @@ void cb_proc_info (fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
-    int mpirank = domain->mpirank;
     int level = this_patch->level;
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
         domain->global_num_patches_before +
         (int64_t) (this_block->num_patches_before + this_patch_idx);
-    printf("%5d %5d %5d %5d\n",mpirank, (int) patch_num,level,this_patch_idx);
+
+    fclaw_debugf("%5d %5d %5d\n",(int) patch_num,level,this_patch_idx);
 }
 
 

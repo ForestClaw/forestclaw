@@ -245,13 +245,7 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw_bool verbose = gparms->verbosity;
-
-    if (verbose)
-    {
-        cout << "Exchanging ghost patches across all levels " << endl;
-    }
+    fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
     int minlevel = domain->global_minlevel;
     int maxlevel = domain->global_maxlevel;
@@ -363,15 +357,12 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
 
     int time_interp_level = coarse_level - 1;
 
-    if (verbose)
+    fclaw_global_infof("Exchanging ghost patches from levels %d to %d\n",\
+                       coarse_level, fine_level);
+    if (!a_time_stepper->nosubcycle())
     {
-        cout << "Exchanging ghost patches from levels " <<
-            coarse_level << " to " << fine_level << endl;
-        if (!a_time_stepper->nosubcycle())
-        {
-            cout << "Time interpolated level is " <<
-                time_interp_level << endl;
-        }
+        fclaw_global_infof("Time interpolated level is %d\n",   \
+                           time_interp_level);
     }
 
     /* Make available patches from levels coarse to fine */

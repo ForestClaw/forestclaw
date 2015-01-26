@@ -193,19 +193,16 @@ static void outstyle_1(fclaw2d_domain_t **domain)
 
             if ((*domain)->mpirank == 0)
             {
-                printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
-                       "%8.3f; Final time = %12.4f\n", \
-                       time_stepper.minlevel(),n_inner,dt_minlevel,
-                       maxcfl_step, t_curr+dt_minlevel);
+                fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+                                         "%8.3f; Final time = %12.4f\n", \
+                                         time_stepper.minlevel(),n_inner,dt_minlevel,
+                                         maxcfl_step, t_curr+dt_minlevel);
             }
 
             if (maxcfl_step > gparms->max_cfl)
             {
-                if ((*domain)->mpirank == 0)
-                {
-                    printf("   WARNING : Maximum CFL exceeded; " \
-                           "retaking time step\n");
-                }
+                fclaw_global_infof("   WARNING : Maximum CFL exceeded; "    \
+                                   "retaking time step\n");
                 if (!gparms->use_fixed_dt)
                 {
                     restore_time_step(*domain);
@@ -223,23 +220,15 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             {
                 if (took_small_step)
                 {
-                    if ((*domain)->mpirank == 0)
-                    {
-                        printf("   WARNING : Took small time step which was " \
-                               "%6.1f%% of desired dt.\n",
-                               100.0*dt_minlevel/dt_minlevel_desired);
-
-                    }
+                    fclaw_global_infof("   WARNING : Took small time step which was " \
+                                       "%6.1f%% of desired dt.\n",
+                                       100.0*dt_minlevel/dt_minlevel_desired);
                 }
                 if (took_big_step)
                 {
-                    if ((*domain)->mpirank == 0)
-                    {
-                        printf("   WARNING : Took big time step which was "  \
-                               "%6.1f%% of desired dt.\n",
-                               100.0*dt_minlevel/dt_minlevel_desired);
-
-                    }
+                    fclaw_global_infof("   WARNING : Took big time step which was " \
+                                       "%6.1f%% of desired dt.\n",
+                                       100.0*dt_minlevel/dt_minlevel_desired);
                 }
 
 
@@ -263,10 +252,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             {
                 if (n_inner % gparms->regrid_interval == 0)
                 {
-                    if (verbosity == 1)
-                    {
-                        printf("regridding at step %d\n",n);
-                    }
+                    fclaw_global_infof("regridding at step %d\n",n);
                     regrid(domain);
                 }
             }
@@ -373,21 +359,15 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             /* This is a collective communication - everybody needs to wait here. */
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
-            if ((*domain)->mpirank == 0)
-            {
-                printf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
-                       "%8.3f; Final time = %12.4f\n",
-                       time_stepper.minlevel(),n+1,
-                       dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
-            }
-
+            fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+                                     "%8.3f; Final time = %12.4f\n",
+                                     time_stepper.minlevel(),n+1,
+                                     dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
 
             if (maxcfl_step > gparms->max_cfl)
             {
-                if ((*domain)->mpirank == 0)
-                {
-                    printf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                }
+                fclaw_global_infof("   WARNING : Maximum CFL exceeded; retaking time step\n");
+
                 if (!gparms->use_fixed_dt)
                 {
                     restore_time_step(*domain);
@@ -416,10 +396,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         {
             if (n % gparms->regrid_interval == 0)
             {
-                if (verbosity == 1)
-                {
-                    printf("regridding at step %d\n",n);
-                }
+                fclaw_global_infof("regridding at step %d\n",n);
                 regrid(domain);
             }
         }
@@ -486,11 +463,8 @@ static void outstyle_4(fclaw2d_domain_t **domain)
 
         advance_all_levels(*domain, &time_stepper);
 
-        if (verbosity > 0)
-        {
-            printf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
-                   time_stepper.minlevel(),n+1,dt_minlevel, t_curr+dt_minlevel);
-        }
+        fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
+                                 time_stepper.minlevel(),n+1,dt_minlevel, t_curr+dt_minlevel);
 
         t_curr += dt_minlevel;
         n++;
@@ -501,10 +475,8 @@ static void outstyle_4(fclaw2d_domain_t **domain)
         {
             if (n % gparms->regrid_interval == 0)
             {
-                if (verbosity == 1)
-                {
-                    printf("regridding at step %d\n",n);
-                }
+                fclaw_global_infof("regridding at step %d\n",n);
+
                 regrid(domain);
             }
         }
@@ -534,7 +506,7 @@ void amrrun(fclaw2d_domain_t **domain)
         outstyle_1(domain);
         break;
     case 2:
-        printf("Outstyle %d not implemented yet\n", gparms->outstyle);
+        fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);
         exit(0);
     case 3:
         outstyle_3(domain);
@@ -543,7 +515,7 @@ void amrrun(fclaw2d_domain_t **domain)
         outstyle_4(domain);
         break;
     default:
-        printf("Outstyle %d not implemented yet\n", gparms->outstyle);
+        fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);
         exit(0);
     }
 }

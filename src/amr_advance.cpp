@@ -81,20 +81,11 @@ double advance_level(fclaw2d_domain_t *domain,
                      double maxcfl,
                      subcycle_manager* a_time_stepper)
 {
-    fclaw_bool verbose = (fclaw_bool) a_time_stepper->verbosity();
     double t_level = a_time_stepper->level_time(a_level);
 
     int this_level = a_level;
     int coarser_level = a_level - 1;
 
-#if 0
-    if (verbose)
-    {
-        printf("\n");
-        printf("Advancing level %d from step %d at time %12.6e\n",
-               this_level,a_curr_fine_step,t_level);
-    }
-#endif
     fclaw_global_infof("Advancing level %d from step %d at time %12.6e\n",
                        this_level,a_curr_fine_step,t_level);
 
@@ -127,14 +118,6 @@ double advance_level(fclaw2d_domain_t *domain,
     double cfl_step = update_level_solution(domain,this_level,
                                             &time_data);
     maxcfl = max(maxcfl,cfl_step);
-
-#if 0
-    if (verbose)
-    {
-        printf("------ Max CFL on level %d is %12.4e " \
-               " (using dt = %12.4e)\n",this_level,cfl_step,time_data.dt);
-    }
-#endif
 
     fclaw_global_infof("------ Max CFL on level %d is %12.4e " \
                        " (using dt = %12.4e)\n",this_level,cfl_step,time_data.dt);
@@ -175,13 +158,7 @@ double advance_level(fclaw2d_domain_t *domain,
                     a_time_stepper->last_step(this_level);
                 double alpha =
                     double(new_curr_step % coarse_inc)/coarse_inc;
-#if 0
-                if (verbose)
-                {
-                    printf("Time interpolating level %d using alpha = %5.2f\n",
-                           coarser_level,alpha);
-                }
-#endif
+
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
@@ -190,15 +167,6 @@ double advance_level(fclaw2d_domain_t *domain,
         }
     }
 
-
-#if 0
-    if (verbose)
-    {
-        printf("\n");
-        printf("Advance on level %d done at time %12.6e\n\n",
-               a_level,a_time_stepper->level_time(a_level));
-    }
-#endif
     fclaw_global_infof("Advance on level %d done at time %12.6e\n\n",
                        a_level,a_time_stepper->level_time(a_level));
 
@@ -235,12 +203,8 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
 
     const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw_bool verbose = gparms->verbosity;
 
-    if (verbose)
-    {
-        cout << "Exchanging ghost patches across all levels " << endl;
-    }
+    fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
     /* Each level should exchange with other patches at that level */
     int minlevel = domain->global_minlevel;
@@ -307,30 +271,15 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw_bool verbose = gparms->verbosity;
-
     int time_interp_level = coarse_level - 1;
 
-#if 0
-    if (verbose)
-    {
-        cout << "Exchanging ghost patches from levels " <<
-            coarse_level << " to " << fine_level << endl;
-        if (!a_time_stepper->nosubcycle())
-        {
-            cout << "Time interpolated level is " <<
-                time_interp_level << endl;
-        }
-    }
-#endif
     fclaw_global_infof("Exchanging ghost patches from levels %d to %d\n",\
                        coarse_level, fine_level);
-        if (!a_time_stepper->nosubcycle())
-        {
-            fclaw_global_infof("Time interpolated level is %d\n",\
-                               time_interp_level);
-        }
+    if (!a_time_stepper->nosubcycle())
+    {
+        fclaw_global_infof("Time interpolated level is %d\n",   \
+                           time_interp_level);
+    }
 
 
     /* Make available patches from levels coarse to fine */
