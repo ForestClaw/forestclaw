@@ -48,27 +48,27 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
 {
 
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
-                        "[Options] Number of grid cells per patch in x [8]");
+                        "Number of grid cells per patch in x [8]");
 
     sc_options_add_int (opt, 0, "my", &amropt->my, 8,
-                        "[Options] Number of grid cells per patch in y [8]");
+                        "Number of grid cells per patch in y [8]");
 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
-                           "[Options] Initial time step size [0.1]");
+                           "Initial time step size [0.1]");
 
     sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 1,
-                        "[Options] Output style (1,2,3) [1]");
+                        "Output style (1,2,3) [1]");
 
     /* If outstyle == 1 */
     sc_options_add_double (opt, 0, "tfinal", &amropt->tfinal, 1.0,
-                           "[Options] Final time [1.0]");
+                           "Final time [1.0]");
 
     sc_options_add_int (opt, 0, "nout", &amropt->nout, 10,
-                        "[Options] Number of time steps, used with outstyle=3 [10]");
+                        "Number of time steps, used with outstyle=3 [10]");
 
     /* Only needed if outstyle == 3 */
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
-                        "[Options] Steps between output files, used with outstyle=3 [1]");
+                        "Steps between output files, used with outstyle=3 [1]");
 
 
     /* This is a hack to control the VTK output while still in development.
@@ -78,62 +78,62 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
      * 2 - output whenever amr_output() is called.
      */
     sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
-                        "[Options] VTK output method [F]");
+                        "VTK output method [F]");
     sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
-                           "[Options] VTK visual spacing [F]");
+                           "VTK visual spacing [F]");
     sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
-                        "[Options] VTK write variant [F]");
+                        "VTK write variant [F]");
 
     /* output options */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
-                        "[Options] Verbosity mode [0]");
+                        "Verbosity mode [0]");
     sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
-                            "[Options] Enable serial output [F]");
+                            "Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
-                           "[Options] Output file prefix [fort]");
+                           "Output file prefix [fort]");
 
     /* more clawpack options */
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
-                           "[Options] Maximum CFL allowed [1]");
+                           "Maximum CFL allowed [1]");
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                           "[Options] Maximum CFL allowed [0.9]");
+                           "Maximum CFL allowed [0.9]");
 
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "[Options] Number of equations [1]");
+                        "Number of equations [1]");
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
-                        "[Options] Number of ghost cells [2]");
+                        "Number of ghost cells [2]");
 
     /* Array of NumFaces many values */
     fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, "1 1 1 1",
         &amropt->mthbc, fclaw2d_NumFaces,
-        "[Options] Physical boundary condition type [1 1 1 1]");
+        "Physical boundary condition type [1 1 1 1]");
 
 
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
-                        "[Options] Refinement ratio (fixed) [2]");
+                        "Refinement ratio (fixed) [2]");
 
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
-                        "[Options] Minimum refinement level [0]");
+                        "Minimum refinement level [0]");
 
     sc_options_add_int (opt, 0, "maxlevel", &amropt->maxlevel, 0,
-                        "[Options] Maximum refinement level[0]");
+                        "Maximum refinement level[0]");
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
-                        1, "[Options] Regridding frequency [1]");
+                        1, "Regridding frequency [1]");
 
 
-    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "[Options] xlower " \
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower " \
                            "(used only with manifold=0) [0]");
-    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "[Options] xupper " \
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper " \
                            "(used only with manifold=0)[1]");
-    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "[Options] ylower " \
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower " \
                            "(used only with manifold=0)[0]");
-    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "[Options] yupper " \
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
                            "(used only with manifold=0)[1]");
 
     /* -------------------------------------------------------------------
@@ -144,45 +144,45 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
        DC : Cool - thanks!
      */
     sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
-                           "[Options] Solution is on manifold [F]");
+                           "Solution is on manifold [F]");
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
-                           "[Options] Use fixed coarse grid time step [F]");
+                           "Use fixed coarse grid time step [F]");
     sc_options_add_bool (opt, 0, "run_diagnostics",
                          &amropt->run_diagnostics,0,
-                         "[Options] Run diagnostics [F]");
+                         "Run diagnostics [F]");
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
-                           "[Options] Use subcycling in time [F]");
+                           "Use subcycling in time [F]");
     sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
-                           "[Options] No weighting when subcycling [F]");
+                           "No weighting when subcycling [F]");
 
     /* ---------------------- Usage information -------------------------- */
     sc_options_add_bool (opt, 0, "help", &amropt->help, 0,
-                           "[Options] Print usage information (same as --usage) [F]");
+                           "Print usage information (same as --usage) [F]");
     sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
-                           "[Options] Print usage information (same as --help) [F]");
+                           "Print usage information (same as --help) [F]");
 
     sc_options_add_bool (opt, 0, "print_options", &amropt->print_options, 0,
-                         "[Options] Print current option settings [F]");
+                         "Print current option settings [F]");
 
     /* ---------------------- Control execution -------------------------- */
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
-                         "[Options] Trap floating point exceptions [1]");
+                         "Trap floating point exceptions [1]");
 
     sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug, 0,
-                        "[Options] Start MPI debug session (for attaching processes in gdb) [0]");
+                        "Start MPI debug session (for attaching processes in gdb) [0]");
 
 
     sc_options_add_int (opt, 0, "mi", &amropt->mi, 1,
-                        "[Options] Number of blocks in x direction [1]");
+                        "Number of blocks in x direction [1]");
 
     sc_options_add_int (opt, 0, "mj", &amropt->mj, 1,
-                        "[Options] Number of blocks in y direction  [1]");
+                        "Number of blocks in y direction  [1]");
 
-    sc_options_add_int (opt, 0, "periodic_x", &amropt->periodic_x, 0,
-                        "[Options] Periodic in x direction [0]");
+    sc_options_add_bool (opt, 0, "periodic_x", &amropt->periodic_x, 0,
+                        "Periodic in x direction [F]");
 
-    sc_options_add_int (opt, 0, "periodic_y", &amropt->periodic_y, 0,
-                        "[Options] Periodic in y direction  [0]");
+    sc_options_add_bool (opt, 0, "periodic_y", &amropt->periodic_y, 0,
+                        "Periodic in y direction  [F]");
 
     /* --------------------------------------------------------------------
        Scale
@@ -190,7 +190,7 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
     fclaw_options_add_double_array (opt,0, "scale",
                                     &amropt->scale_string, "1 1 1",
                                     &amropt->scale, 3,
-                                    "[Options] Scale factor [1 1 1]");
+                                    "Scale factor [1 1 1]");
 
     /* --------------------------------------------------------------------
        Shift
@@ -198,16 +198,16 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
     fclaw_options_add_double_array (opt,0, "shift",
                                     &amropt->shift_string, "0 0 0",
                                     &amropt->shift, 3,
-                                    "[Options] Shift array [0 0 0]");
+                                    "Shift array [0 0 0]");
 
     /* --------------------------------------------------------------------
        Rotate
        --------------------------------------------------------------------*/
     sc_options_add_double (opt, 0, "phi", &amropt->phi, 0,
-                           "[Options] Rotation angle about x axis (degrees) [0]");
+                           "Rotation angle about x axis (degrees) [0]");
 
     sc_options_add_double (opt, 0, "theta", &amropt->theta, 0,
-                           "[Options] Rotation angle about z axis (degrees) [0]");
+                           "Rotation angle about z axis (degrees) [0]");
 
 
     /* -----------------------------------------------------------------------
@@ -215,7 +215,7 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
        line.  Use this file for local modifications that are not tracked by Git.
        ----------------------------------------------------------------------- */
     sc_options_add_inifile (opt, 'F', "inifile",
-                            "[Options] File used to override one or more options " \
+                            "File used to override one or more options " \
                             "in fclaw_options.ini [empty]");
 
 }
@@ -392,16 +392,19 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
     /* Check for user help argument */
     if (gparms->help || gparms->print_options)
     {
-        fclaw_options_print_usage(options);
+        /* Both help and current settings can be printed */
+        if (gparms->help)
+        {
+            /* This prints the help message for each options */
+            fclaw_options_print_usage(options);
+        }
+        if (gparms->print_options)
+        {
+            /* This prints the current values of the parameters */
+            fclaw_options_print_summary(options);
+        }
         return -1;
     }
-#if 0
-    if (gparms->print_options)
-    {
-        fclaw_options_print_usage(options);
-        return -1;
-    }
-#endif
 
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
@@ -437,6 +440,6 @@ void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity)
 
     sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", fclaw_verbosity,
                              "default", kv_verbosity,
-                             "[Options] Verbosity level (silent, essential, production, " \
+                             "Verbosity level (silent, essential, production, " \
                              "info, debug)");
 }
