@@ -125,7 +125,7 @@ main (int argc, char **argv)
   clawpack46_options_register(options,clawpack_parms);
 
   /* Set verbosity options */
-  fclaw_set_verbosity(options,&verbosity,FCLAW_VERBOSITY_SILENT);
+  fclaw_set_verbosity(options,&verbosity);
 
 
   /* -------------------------------------------------------------
