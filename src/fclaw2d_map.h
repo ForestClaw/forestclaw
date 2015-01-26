@@ -98,29 +98,6 @@ struct fclaw2d_map_context
 };
 
 
-struct fclaw2d_map_data
-{
-    int mi;
-    int mj;
-    int periodic_x;
-    int periodic_y;
-
-    const char *scale_string;
-    double *scale;
-
-    const char *shift_string;
-    double *shift;
-
-    double theta;
-    double phi;
-};
-
-void fclaw2d_register_map_data(sc_options_t* opt, fclaw2d_map_data_t* map_data);
-
-void fclaw2d_map_destroy_arrays(fclaw2d_map_data_t* map_data);
-void fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data);
-
-
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
 void set_shift(fclaw2d_map_context_t* cont, const double shift[]);
 void set_rotate(fclaw2d_map_context_t* cont, const double rotate[]);

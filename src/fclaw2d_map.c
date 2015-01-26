@@ -410,6 +410,7 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 }
 #endif
 
+#if 0
 void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_data)
 {
     sc_options_add_int (options, 0, "mapping:mi", &map_data->mi, 1,
@@ -450,19 +451,24 @@ void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_da
                            "[mapping] Rotation angle about z axis (degrees) [0]");
 
 }
+#endif
 
+#if 0
 void fclaw2d_map_destroy_arrays(fclaw2d_map_data_t* map_data)
 {
     FCLAW_FREE (map_data->scale);
     FCLAW_FREE (map_data->shift);
 }
+#endif
 
+#if 0
 void
 fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 {
     fclaw_options_convert_double_array (map_data->scale_string, &map_data->scale,3);
     fclaw_options_convert_double_array (map_data->shift_string, &map_data->shift,3);
 }
+#endif
 
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[])
