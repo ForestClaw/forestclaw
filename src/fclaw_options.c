@@ -283,6 +283,15 @@ void fclaw_options_print_summary(sc_options_t *opt)
     sc_options_print_summary (fclaw_package_id, FCLAW_VERBOSITY_INFO,opt);
 }
 
+void fclaw_options_print_usage(sc_options_t *opt)
+{
+    int fclaw_package_id;
+    fclaw_package_id = fclaw_get_package_id();
+    /* This is printed assuming vebosity level 'INFO' */
+    sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,opt,NULL);
+}
+
+
 void
 fclaw_options_add_int_array (sc_options_t * opt,
                              int opt_char, const char *opt_name,
@@ -381,16 +390,18 @@ void fclaw_options_postprocess (amr_options_t * amropt)
 int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
 {
     /* Check for user help argument */
-    if (gparms->help)
+    if (gparms->help || gparms->print_options)
     {
-        fclaw_options_print_summary(options);
+        fclaw_options_print_usage(options);
         return -1;
     }
+#if 0
     if (gparms->print_options)
     {
-        fclaw_options_print_summary(options);
+        fclaw_options_print_usage(options);
         return -1;
     }
+#endif
 
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
@@ -412,7 +423,7 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
     return 0;
 }
 
-void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity, int p4est_verbosity)
+void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity)
 {
     sc_keyvalue_t *kv_verbosity;
     kv_verbosity = sc_keyvalue_new ();
@@ -425,10 +436,7 @@ void fclaw_set_verbosity(sc_options_t* options,int *fclaw_verbosity, int p4est_v
     sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
 
     sc_options_add_keyvalue (options, 'V', "fclaw-verbosity", fclaw_verbosity,
-                             "default", kv_verbosity, "Set verbosity level");
-
-#if 0
-    /* This probably doesn't go here... */
-    sc_package_set_verbosity (p4est_package_id,p4est_verbosity);
-#endif
+                             "default", kv_verbosity,
+                             "[Options] Verbosity level (silent, essential, production, " \
+                             "info, debug)");
 }

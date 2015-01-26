@@ -79,6 +79,8 @@ int  fclaw_options_check (sc_options_t * options, amr_options_t * gparms);
 
 void fclaw_options_print_summary(sc_options_t *opt);
 
+void fclaw_options_print_usage(sc_options_t *opt);
+
 /** Add a string option and prepare using it for an integer array.
  * \param [in,out] opt          Option container (see sc/sc_options.h).
  * \param [in] opt_char         Option character for command line (or 0).
@@ -122,7 +124,7 @@ void fclaw_options_convert_double_array (const char *array_string,
 
 void fclaw_options_destroy_array(void* array);
 
-void fclaw_set_verbosity(sc_options_t* options,int *verbosity, int p4est_verbosity);
+void fclaw_set_verbosity(sc_options_t* options,int *verbosity);
 
 
 
