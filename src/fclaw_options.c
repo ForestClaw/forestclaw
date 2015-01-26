@@ -171,6 +171,45 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug, 0,
                         "[Options] Start MPI debug session (for attaching processes in gdb) [0]");
 
+
+    sc_options_add_int (opt, 0, "mi", &amropt->mi, 1,
+                        "[Options] Number of blocks in x direction [1]");
+
+    sc_options_add_int (opt, 0, "mj", &amropt->mj, 1,
+                        "[Options] Number of blocks in y direction  [1]");
+
+    sc_options_add_int (opt, 0, "periodic_x", &amropt->periodic_x, 0,
+                        "[Options] Periodic in x direction [0]");
+
+    sc_options_add_int (opt, 0, "periodic_y", &amropt->periodic_y, 0,
+                        "[Options] Periodic in y direction  [0]");
+
+    /* --------------------------------------------------------------------
+       Scale
+       --------------------------------------------------------------------*/
+    fclaw_options_add_double_array (opt,0, "scale",
+                                    &amropt->scale_string, "1 1 1",
+                                    &amropt->scale, 3,
+                                    "[Options] Scale factor [1 1 1]");
+
+    /* --------------------------------------------------------------------
+       Shift
+       --------------------------------------------------------------------*/
+    fclaw_options_add_double_array (opt,0, "shift",
+                                    &amropt->shift_string, "0 0 0",
+                                    &amropt->shift, 3,
+                                    "[Options] Shift array [0 0 0]");
+
+    /* --------------------------------------------------------------------
+       Rotate
+       --------------------------------------------------------------------*/
+    sc_options_add_double (opt, 0, "phi", &amropt->phi, 0,
+                           "[Options] Rotation angle about x axis (degrees) [0]");
+
+    sc_options_add_double (opt, 0, "theta", &amropt->theta, 0,
+                           "[Options] Rotation angle about z axis (degrees) [0]");
+
+
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -184,6 +223,8 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
 void fclaw_options_destroy_arrays (amr_options_t * amropt)
 {
     fclaw_options_destroy_array((void*) amropt->mthbc);
+    fclaw_options_destroy_array((void*) amropt->scale);
+    fclaw_options_destroy_array((void*) amropt->shift);
 }
 
 
@@ -327,8 +368,10 @@ void fclaw_options_destroy_array(void* array)
 
 void fclaw_options_postprocess (amr_options_t * amropt)
 {
-      fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                         fclaw2d_NumFaces);
+    fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                     fclaw2d_NumFaces);
+    fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale,3);
+    fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift,3);
 }
 
 

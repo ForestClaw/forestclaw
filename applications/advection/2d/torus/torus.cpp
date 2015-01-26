@@ -62,23 +62,24 @@ main (int argc, char **argv)
   fclaw2d_domain_t	   *domain;
   amr_options_t             samr_options, *gparms = &samr_options;
 
+  /* Constants */
+  double pi = M_PI;
+
   /* Clawpack options */
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
 
   /* Mapping options */
   fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-  fclaw2d_map_data_t        smap_data, *map_data = &smap_data;
+  /* fclaw2d_map_data_t        smap_data, *map_data = &smap_data; */
 
-  /* Example options */
-  int example, retval;
-  double pi = M_PI;
-
-  /* Mapping variables */
+  /* Example and mapping variables */
   double rotate[2];
   double alpha, beta;  /* Ratio of torus inner radius to outer radius */
   const char* latitude_string, *longitude_string;
   double *latitude, *longitude;
   int mi, mj, a,b;
+  int example, retval;
+
   int verbosity;
 
   /* initialize application */
@@ -119,8 +120,10 @@ main (int argc, char **argv)
   /* [Options] Register general ForestClaw options */
   fclaw_options_register(options,gparms);
 
+#if 0
   /* [mapping] Register general mapping data */
   fclaw2d_register_map_data(options,map_data);
+#endif
 
   /* [clawpack46] Register solver options */
   clawpack46_options_register(options,clawpack_parms);
@@ -140,7 +143,9 @@ main (int argc, char **argv)
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
+#if 0
   fclaw2d_options_postprocess_map_data(map_data);
+#endif
 
   if (example == 3)
   {
@@ -178,37 +183,37 @@ main (int argc, char **argv)
       /* ---------------------------------------------------------------
          Mapping geometry
          --------------------------------------------------------------- */
-      mi = map_data->mi;
-      mj = map_data->mj;
-      rotate[0] = pi*map_data->theta/180.0;
-      rotate[1] = pi*map_data->phi/180.0;
-      a = map_data->periodic_x;
-      b = map_data->periodic_y;
+      mi = gparms->mi;
+      mj = gparms->mj;
+      rotate[0] = pi*gparms->theta/180.0;
+      rotate[1] = pi*gparms->phi/180.0;
+      a = gparms->periodic_x;
+      b = gparms->periodic_y;
 
       switch (example)
       {
       case 1:
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_cart(brick,map_data->scale,map_data->shift,rotate);
+          cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift,rotate);
           break;
       case 2:
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_torus(brick,map_data->scale,map_data->shift,rotate,alpha);
+          cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,alpha);
           break;
       case 3:
           /* Lat-long example */
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_latlong(brick,map_data->scale,map_data->shift,
+          cont = fclaw2d_map_new_latlong(brick,gparms->scale,gparms->shift,
                                          rotate,latitude,longitude,a,b);
           break;
       case 4:
           /* Annulus */
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_annulus(brick,map_data->scale,map_data->shift,
+          cont = fclaw2d_map_new_annulus(brick,gparms->scale,gparms->shift,
                                          rotate,beta);
           break;
 
@@ -258,7 +263,7 @@ main (int argc, char **argv)
       fclaw_options_destroy_array((void*) longitude);
   }
 
-  fclaw2d_map_destroy_arrays(map_data);
+  /* fclaw2d_map_destroy_arrays(map_data); */
   fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 

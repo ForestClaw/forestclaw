@@ -132,18 +132,63 @@ void fclaw_set_verbosity(sc_options_t* options,int *verbosity, int p4est_verbosi
 struct amr_options
 {
     /* Fixed grid size for each grid */
-    int mx;  /**< Number of cells in x direction (fixed for all grids) */
-    int my;  /**< Number of cells in y direction (fixed for all grids) */
+    int mx;      /**< Number of cells in x direction (fixed for all grids) */
+    int my;      /**< Number of cells in y direction (fixed for all grids) */
+    int mbc;     /**< Number of ghost cells in each grid */
 
     /* Time stepping */
-    double initial_dt;
-    double tfinal;
-    int outstyle;
+    double initial_dt;  /**< Initial time step size */
+    double tfinal;      /**< Final time */
+    int outstyle;       /**< Outstyle */
     int nout;
-    double *tout;
     int nstep;
+    int subcycle;               /**< Only relevant when subcycling. */
+    int use_fixed_dt;
+    double max_cfl;
+    double desired_cfl;
+    double *tout;
 
-    /* more output control */
+    /* Number of equations in the system of PDEs */
+    int meqn;
+
+    const char *mthbc_string;
+    int *mthbc;
+
+    /* Refinement parameters */
+    int refratio;
+    int minlevel;
+    int maxlevel;
+    int regrid_interval;
+
+    /* Mapping functions */
+    int manifold;
+    int mi;
+    int mj;
+    int periodic_x;
+    int periodic_y;
+
+    const char *scale_string;
+    double *scale;
+
+    const char *shift_string;
+    double *shift;
+
+    double theta;
+    double phi;
+
+    double ax;   /**< Only for the single block, unmapped case */
+    double bx;   /**< Only for the single block, unmapped case */
+    double ay;   /**< Only for the single block, unmapped case */
+    double by;   /**< Only for the single block, unmapped case */
+
+    /* Diagnostics */
+    int run_diagnostics;
+    int trapfpe;
+    int mpi_debug;
+    int print_options;
+    int help;
+
+    /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:
                                      Will kill all parallel performance. */
@@ -155,47 +200,8 @@ struct amr_options
     double vtkspace; /**< between 0. and 1. to separate patches visually */
     int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
 
-    /* wave prop parameters */
-    double max_cfl;
-    double desired_cfl;
+    int noweightedp;            /**< Don't use weighted partition. */
 
-    /* Number of equations in the system of PDEs */
-    int meqn;
-
-    /* Boundary condition information */
-    int mbc;
-
-    const char *mthbc_string;
-    int *mthbc;
-
-    /* Refinement parameters */
-    int refratio;
-    int minlevel;
-    int maxlevel;
-    int regrid_interval;
-
-    /* Boolean values (switches) */
-    int manifold;
-    int subcycle;
-    int noweightedp;            /**< Don't use weighted partition.
-                                     Only relevant when subcycling. */
-    int run_diagnostics;
-    int use_fixed_dt;
-
-    /* xlower,xupper,ylower,yupper for block.
-       This is only useful in the single block case  */
-    double ax;
-    double bx;
-    double ay;
-    double by;
-
-    /* These are only used in main, but I put them here for convenience */
-    int trapfpe;
-    int mpi_debug;
-
-    /** This switch variable is set to nonzero by --help and --usage. */
-    int print_options;
-    int help;
 };
 
 
