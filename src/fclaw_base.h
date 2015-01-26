@@ -98,6 +98,9 @@ extern "C"
  *              A good example would be the numerical error at the
  *              end of the program, timings, printing important parameters.
  * * ESSENTIAL messages must only cause a few lines for the whole run, if at all.
+ * * DEFAULT depends on the configure options `--enable-debug` and `--enable_logging=...`
+ *              With `--enable-debug`, this will be a very chatty at level DEBUG.
+ *              Otherwise it is INFO, if not overridden with `--enable-logging=...`
  *
  * This is copied from \b sc.h for reference:
  *
@@ -126,8 +129,64 @@ typedef enum fclaw_verbosity
 }
 fclaw_verbosity_t;
 
+/** This enumeration defines values to be returned from option checking.
+ * The order of these constants is important; we rely on it internally.
+ * */
+typedef enum fclaw_exit_type
+{
+    FCLAW_NOEXIT,               /**< We are completely clean and may continue.
+                                     By the C standard, this constant has value 0. */
+    FCLAW_EXIT_QUIET,           /**< We decided to to terminate quietly. */
+    FCLAW_EXIT_USAGE,           /**< We are to do an informative job and then quit.
+                                     ForestClaw will print a usage message. */
+    FCLAW_EXIT_ERROR            /**< We have encountered an error and quit noisily. */
+}
+fclaw_exit_type_t;
+
+/** This function turns an exit type into a value suitable for ending main ().
+ * \param [in] vexit    Exit type from enumeration.
+ * \return              A value suitable for returning from main () or
+ *                      as an argument to exit ().
+ */
+int fclaw_app_exit_type_to_status (fclaw_exit_type_t vexit);
+
 /** An application container whose use is optional. */
 typedef struct fclaw_app fclaw_app_t;
+
+/** Callback function type for registering options per-package. */
+typedef void *(*fclaw_app_options_register_t) (fclaw_app_t * a,
+                                               void *package,
+                                               sc_options_t * options);
+
+/** Callback function type for postprocessing options per-package.
+ * This function as called after option parsing.
+ * Its return value can be used to report an error in option processing. */
+typedef fclaw_exit_type_t
+    (*fclaw_app_options_postprocess_t) (fclaw_app_t * a,
+                                        void *package, void *registered);
+
+/** Callback function type for checking for option errors per-package.
+ * This function as called after option parsing and postprocessing.
+ * Its return value is used to report an error in option processing. */
+typedef fclaw_exit_type_t
+    (*fclaw_app_options_check_t) (fclaw_app_t * a,
+                                  void *package, void *registered);
+
+/** Virtual function to destroy any memory created on registration.
+ * This is called at the end of the program and reverses any allocation
+ * that has been done on option registration. */
+typedef void (*fclaw_app_options_destroy_t) (fclaw_app_t * a, void *package,
+                                             void *registered);
+
+/** An extended table of virtual functions for package-wise option parsing. */
+typedef struct fclaw_app_options_vtable
+{
+    fclaw_app_options_register_t options_register;       /**< Calls sc_options_add_*. */
+    fclaw_app_options_postprocess_t options_postprocess; /**< Called after parsing. */
+    fclaw_app_options_check_t options_check;     /**< Reports on validity of option values. */
+    fclaw_app_options_destroy_t options_destroy;     /**< Called at end of program. */
+}
+fclaw_app_options_vtable_t;
 
 /* macros for memory allocation, will abort if out of memory */
 
@@ -251,10 +310,10 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  * level is set as well and depends on the configure option `--enable-debug`.
  * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
  * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
- * This can be influenced at compile time with --enable-logging=SC_LP_DEBUG
+ * This can be influenced at compile time with `--enable-logging=SC_LP_DEBUG`
  * for example, but this is somewhat clumsy and usually unnecessary since this
  * option does not differentiate between the forestclaw and its submodules.
- * It is possible and encouraged to change the levels with sc_package_set_verbosity.
+ * It is possible and encouraged to change the levels with \b sc_package_set_verbosity.
  * Attempts to reduce them (i.e., to cause more verbosity) at runtime are ignored.
  * \param [in,out] argc         Command line argument count.
  * \param [in,out] argv         Command line arguments.
@@ -267,6 +326,70 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  */
 void fclaw_app_destroy (fclaw_app_t * a);
+
+/** Register an options package with an application.
+ * This function calls the virtual function for registering its options.
+ * \param [in,out] a            A valid application object from \ref fclaw_app_new.
+ *                              The callback functions from \b vt may access its
+ *                              user data, or work with \b package, or both.
+ * \param [in] section          This variable decides about the options being
+ *                              under the default "Options" section in a possible
+ *                              configuration file, or under its own section.
+ *                              If this is NULL, the options will be used with 
+ *                              the names they are added to the options structure.
+ *                              If not NULL, we will use \b sc_options_add_suboptions:
+ *                              The true option name will be prefixed with \b section,
+ *                              and they will appear under [section] in a .ini file.
+ * \param [in] configfile       IF not NULL, the name of a configuration file without
+ *                              the path or its ending .ini.  The file is read before
+ *                              option parsing occurs, so the command line overrides.
+ *                              TODO: this feature is not yet active.
+ * \param [in] vt               Functions for options processing.  At least the
+ *                              member \b options_register must be non-NULL.
+ *                              If any of the virtual function produce console output,
+ *                              they shall use the fclaw_global_* logging functions,
+ *                              or custom functions that only print on rank zero.
+ * \param [in] package          Any kind of context, or NULL, as a convenience for
+ *                              the caller.  Is passed to all options callbacks in
+ *                              \b vt.  This can be used in addition, or instead of,
+ *                              accessing the user pointer from the application object.
+ *                              The application may define that package is owned by
+ *                              the internal options processing and free it in the
+ *                              options_destroy callback, or impose other conventions.
+ */
+void fclaw_app_options_register (fclaw_app_t * a,
+                                 const char *section, const char *configfile,
+                                 const fclaw_app_options_vtable_t * vt,
+                                 void *package);
+
+/** Register a central convenience options package with default behavior.
+ * It is just an example and completely fine not to use this function.
+ * This is not a replacement for calling fclaw_app_options_register,
+ * which may be used any number of times for other custom options packages.
+ * It merely calls fclaw_app_options_register with predefined operations.
+ * This options package provides the following options:
+ *   -?, --help                 Print a usages message for all options and exit.
+ *   -v, --version              Print a version string and exit.
+ *   -V, --verbosity=...        Set the verbosity for ForestClaw; a string in
+ *                              lowercase (!) letters without the prefix FCLAW_VERBOSITY_.
+ *   --lib-verbosity=...        Like verbosity, but for the libraries p4est and sc.
+ * \param [in,out] a            A valid application object.
+ * \param [in] configfile       If not NULL, an .ini configuration file is read before
+ *                              option parsing.  This is its name without path and suffix.
+ */
+void fclaw_app_options_register_core (fclaw_app_t * a,
+                                      const char *configfile);
+
+/** Parse the command line options.
+ * This function will loop through all registered packages and call the functions
+ * for postprocessing and checking options, and will abort the program if any
+ * error occurs.
+ * TODO: This function shall read default configuration files before parsing.
+ * \param [in] a         Initialized forestclaw application.
+ * \param [out] first_arg       If not NULL, position of first non-option argument.
+ * \return               Whether to continue, exit gracefully, or exit with error.
+ */
+fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg);
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.

@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
-static int fclaw_package_id;
-
 static void
 run_program (fclaw_app_t * a)
 {
@@ -36,8 +34,7 @@ run_program (fclaw_app_t * a)
     (void) fclaw_app_get_mpi_size_rank (a, &debug_size, &debug_rank);
 
     /* this is where we would do some numerics */
-    fclaw_debugf ("Debug message (rank %d/%d)\n",
-                  debug_rank, debug_size);
+    fclaw_debugf ("Debug message (rank %d/%d)\n", debug_rank, debug_size);
     fclaw_infof ("Info message (individual)\n");
     fclaw_global_infof ("Info message\n");
     fclaw_global_productionf ("Production message\n");
@@ -49,63 +46,32 @@ run_program (fclaw_app_t * a)
 int
 main (int argc, char **argv)
 {
+#if 0
     int dummyvar;
-    int verbosity;
+#endif
     int first_arg;
-    sc_keyvalue_t *kv_verbosity;
-    sc_options_t *opt;
+    fclaw_exit_type_t vexit;
     fclaw_app_t *a;
 
     /* initialize application */
     a = fclaw_app_new (&argc, &argv, NULL);
-    opt = fclaw_app_get_options (a);
-    fclaw_package_id = fclaw_get_package_id ();
+    fclaw_app_options_register_core (a, NULL);
+    /* TODO: register more options packages here */
+    vexit = fclaw_app_options_parse (a, &first_arg);
 
+#if 0
     /* THIS WILL BE DONE PER-PACKAGE IN AN INTERFACE YET TO BE DEVELOPED */
     /* register options */
     sc_options_add_int (opt, '\0', "dummy", &dummyvar, 5, "Dummy integer");
-    kv_verbosity = sc_keyvalue_new ();
-    sc_keyvalue_set_int (kv_verbosity, "default", FCLAW_VERBOSITY_DEFAULT);
-    sc_keyvalue_set_int (kv_verbosity, "debug", FCLAW_VERBOSITY_DEBUG);
-    sc_keyvalue_set_int (kv_verbosity, "info", FCLAW_VERBOSITY_INFO);
-    sc_keyvalue_set_int (kv_verbosity, "production",
-                         FCLAW_VERBOSITY_PRODUCTION);
-    sc_keyvalue_set_int (kv_verbosity, "essential",
-                         FCLAW_VERBOSITY_ESSENTIAL);
-    sc_keyvalue_set_int (kv_verbosity, "silent", FCLAW_VERBOSITY_SILENT);
-    sc_options_add_keyvalue (opt, 'V', "fclaw-verbosity", &verbosity,
-                             "default", kv_verbosity, "Set verbosity level");
+#endif
 
-    /* THIS BLOCK WILL BE ENCAPSULATED -- NOT FOR APPLICATION EXAMPLES */
-    /* we're still missing to load/save .ini files */
-    /* parse command line options */
-    first_arg = sc_options_parse (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL,
-                                  opt, argc, argv);
-    if (first_arg < 0)
+    if (!vexit)
     {
-        fclaw_global_essentialf ("Option parsing failed\n");
-        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,
-                                opt, NULL);
-        fclaw_global_essentialf ("Terminating program\n");
-    }
-    else
-    {
-        fclaw_global_infof ("Option parsing successful\n");
-        sc_options_print_summary (fclaw_package_id,
-                                  FCLAW_VERBOSITY_PRODUCTION, opt);
-
-        /* set verbosity levels */
-        sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
-        sc_package_set_verbosity (p4est_package_id,
-                                  FCLAW_VERBOSITY_ESSENTIAL);
-        sc_package_set_verbosity (fclaw_package_id, verbosity);
-
-        /* go to work */
+        /* parameters are clean */
         run_program (a);
     }
 
     /* cleanup application */
     fclaw_app_destroy (a);
-
-    return 0;
+    return fclaw_app_exit_type_to_status (vexit);
 }
