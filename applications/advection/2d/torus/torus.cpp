@@ -48,29 +48,30 @@ torus_checkparms (int example)
         fclaw_global_essentialf ("Option --example must be 1, 2, 3 or 4\n");
         return -1;
     }
-
     return 0;
 }
 
 int
 main (int argc, char **argv)
 {
+  fclaw_app_t *app;
+
   sc_MPI_Comm              mpicomm;
   sc_options_t             *options;
-  fclaw_app_t *app;
   p4est_connectivity_t     *conn = NULL;
   fclaw2d_domain_t	   *domain;
+
+  /* ForestClaw options */
   amr_options_t             samr_options, *gparms = &samr_options;
 
   /* Constants */
   double pi = M_PI;
 
+  /* Mapping  */
+  fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+
   /* Clawpack options */
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
-
-  /* Mapping options */
-  fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-  /* fclaw2d_map_data_t        smap_data, *map_data = &smap_data; */
 
   /* Example and mapping variables */
   double rotate[2];
@@ -120,11 +121,6 @@ main (int argc, char **argv)
   /* [Options] Register general ForestClaw options */
   fclaw_options_register(options,gparms);
 
-#if 0
-  /* [mapping] Register general mapping data */
-  fclaw2d_register_map_data(options,map_data);
-#endif
-
   /* [clawpack46] Register solver options */
   clawpack46_options_register(options,clawpack_parms);
 
@@ -143,9 +139,6 @@ main (int argc, char **argv)
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
-#if 0
-  fclaw2d_options_postprocess_map_data(map_data);
-#endif
 
   if (example == 3)
   {
@@ -263,7 +256,6 @@ main (int argc, char **argv)
       fclaw_options_destroy_array((void*) longitude);
   }
 
-  /* fclaw2d_map_destroy_arrays(map_data); */
   fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
