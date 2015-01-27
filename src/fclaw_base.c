@@ -394,8 +394,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg)
     FCLAW_ASSERT (a != NULL);
 
     /* TODO: read configuration files */
-    sc_options_load (sc_package_id, SC_LP_ALWAYS, a->opt,
-                     "fclaw_options.ini");
 
     /* parse command line options with given priority for errors */
     a->first_arg =
