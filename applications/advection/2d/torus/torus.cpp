@@ -39,10 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.H"
 
-#if 0
-static int fclaw_package_id;
-#endif
-
 static int
 torus_checkparms (int example)
 {
@@ -93,36 +89,35 @@ main (int argc, char **argv)
   /* Clawpack options */
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
 
-  /* Example and mapping variables */
+  /* User variables */
   user_options_t suser_options, *user = &suser_options;
 
   double rotate[2];
   int mi, mj, a,b;
   int retval;
 
-  /* initialize application */
+  /* -------------------------------------------------------------
+     - Initialize application
+     ------------------------------------------------------------- */
   app = fclaw_app_new (&argc, &argv, user);
-  fclaw_app_options_register_core (app, "fclaw_options.ini");
-
   options = fclaw_app_get_options (app);
-
-#if 0
-  fclaw_package_id = fclaw_get_package_id ();
-#endif
-
   mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-#if 0
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
-
-  options = sc_options_new (argv[0]);
-#endif
 
   /* -------------------------------------------------------------
-     - Register variables from [main]
+     - Add options to be read later, either from a .ini file or
+     from the command line.
+     - Order in which options are added is the order in which they
+     will be printed out in help message.
      ------------------------------------------------------------- */
+
+  /* [Options] Add general ForestClaw options.  */
+  fclaw_options_add_general(options,gparms);
+
+  /* [clawpack46] Add solver options */
+  clawpack46_options_add(options,clawpack_parms);
+
+  /* [main] User options in */
   sc_options_add_int (options, 0, "main:example", &user->example, 0,
                       "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
@@ -141,31 +136,22 @@ main (int argc, char **argv)
   sc_options_add_double (options, 0, "main:beta", &user->beta, 0.4,
                          "[main] Inner radius of annulus [0.4]");
 
-  /* [Options] Register general ForestClaw options */
-  fclaw_options_register(options,gparms);
-
-  /* [clawpack46] Register solver options */
-  clawpack46_options_register(options,clawpack_parms);
-
-#if 0
-  /* Set verbosity options */
-  fclaw_set_verbosity(options,&verbosity);
-#endif
-
-
   /* -------------------------------------------------------------
      - Read options from fclaw_options.ini
+     - Register core options (?)
      - Parse command line
      - postprocess array input
      - checkparms
      ------------------------------------------------------------- */
-#if 0
-  retval = retval || fclaw_options_parse_command_line (options,argc, argv);
-#endif
-  /* This reads to options file.  But for some reason, the options are getting read in */
+
+  /* Read fclaw_options.ini */
   retval = fclaw_options_read_from_file(options);
+
+  /*  Register core options, including verbosity level. */
+  fclaw_app_options_register_core (app, NULL);
+
+  /* Should I be using 'vexit' instead of retval? */
   vexit = fclaw_app_options_parse (app, &first_arg);
-  retval = 0;
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
@@ -184,13 +170,6 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
   if (!retval)
   {
-#if 0
-      /* set verbosity levels */
-      sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
-      sc_package_set_verbosity (p4est_package_id, FCLAW_VERBOSITY_ESSENTIAL);
-      sc_package_set_verbosity (fclaw_package_id, verbosity);
-#endif
-
       /* Only print options if verbosity >= info */
       fclaw_options_print_summary(options);
 
@@ -252,6 +231,7 @@ main (int argc, char **argv)
       /* ---------------------------------------------------------- */
 #if 0
       /* TODO : Replace this with an updated version? */
+      /* How do I set lp?  Using macros? */
       if (gparms->verbosity > 0)
       {
           fclaw2d_domain_list_levels(domain, lp);
@@ -288,13 +268,9 @@ main (int argc, char **argv)
       fclaw_options_destroy_array((void*) user->longitude);
   }
 
+  /* Which of these do I still need? */
   fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
-
-#if 0
-  sc_options_destroy (options);
-  fclaw_mpi_finalize ();
-#endif
 
   fclaw_app_destroy (app);
 

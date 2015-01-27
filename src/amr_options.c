@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 amr_options_t * amr_options_new (sc_options_t * opt)
 {
     amr_options_t *amropt = fclaw_options_new();
-    fclaw_options_register(opt,amropt);
+    fclaw_options_add_general(opt,amropt);
     sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
                      "fclaw_options.ini");
     return amropt;

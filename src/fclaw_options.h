@@ -66,7 +66,7 @@ void fclaw_options_destroy(amr_options_t* amropt);
 
 void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
-void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt);
+void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
 
 int  fclaw_options_read_from_file(sc_options_t* opt);
 

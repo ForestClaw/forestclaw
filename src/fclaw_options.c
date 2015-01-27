@@ -44,7 +44,7 @@ void fclaw_options_destroy(amr_options_t* amropt)
 }
 
 
-void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
+void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 {
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "Number of grid cells per patch in x [8]");
@@ -222,7 +222,10 @@ void fclaw_options_destroy_arrays (amr_options_t * amropt)
 int fclaw_options_read_from_file(sc_options_t* opt)
 {
     int retval;
-    retval = sc_options_load (sc_package_id, SC_LP_ALWAYS, opt,
+
+    int fclaw_package_id;
+    fclaw_package_id = fclaw_get_package_id ();
+    retval = sc_options_load (fclaw_package_id, SC_LP_ALWAYS, opt,
                               "fclaw_options.ini");
     if (retval < 0)
     {

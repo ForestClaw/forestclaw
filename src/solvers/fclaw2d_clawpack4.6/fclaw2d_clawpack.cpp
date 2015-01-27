@@ -488,7 +488,7 @@ void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
 fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
 {
     fclaw2d_clawpack_parms_t* clawpack_parms = clawpack46_new_options();
-    clawpack46_options_register(opt,clawpack_parms);
+    clawpack46_options_add(opt,clawpack_parms);
     clawpack46_read_options_from_file(opt);
     return clawpack_parms;
 }
@@ -518,7 +518,7 @@ int clawpack46_options_read_from_file(sc_options_t* opt, int log_priority)
 }
 
 
-void clawpack46_options_register (sc_options_t* opt,fclaw2d_clawpack_parms_t* clawpack_parms)
+void clawpack46_options_add (sc_options_t* opt,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
     /* This is a good example of a place where a [Section] would be nice.
        Something like [clawpack].  See fclaw_defaults.ini */
