@@ -53,6 +53,22 @@ torus_checkparms (int example)
     return 0;
 }
 
+typedef struct user_options
+{
+    int example;
+    double alpha;
+
+    const char* latitude_string;
+    double *latitude;
+
+    const char* longitude_string;
+    double *longitude;
+
+    double beta;
+} user_options_t;
+
+
+
 int
 main (int argc, char **argv)
 {
@@ -78,20 +94,15 @@ main (int argc, char **argv)
   fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
 
   /* Example and mapping variables */
-  double rotate[2];
-  double alpha, beta;  /* Ratio of torus inner radius to outer radius */
-  const char* latitude_string, *longitude_string;
-  double *latitude, *longitude;
-  int mi, mj, a,b;
-  int example, retval;
+  user_options_t suser_options, *user = &suser_options;
 
-#if 0
-  int verbosity;
-#endif
+  double rotate[2];
+  int mi, mj, a,b;
+  int retval;
 
   /* initialize application */
-  app = fclaw_app_new (&argc, &argv, NULL);
-  fclaw_app_options_register_core (app, NULL);
+  app = fclaw_app_new (&argc, &argv, user);
+  fclaw_app_options_register_core (app, "fclaw_options.ini");
 
   options = fclaw_app_get_options (app);
 
@@ -112,22 +123,22 @@ main (int argc, char **argv)
   /* -------------------------------------------------------------
      - Register variables from [main]
      ------------------------------------------------------------- */
-  sc_options_add_int (options, 0, "main:example", &example, 0,
+  sc_options_add_int (options, 0, "main:example", &user->example, 0,
                       "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
-  sc_options_add_double (options, 0, "main:alpha", &alpha, 0.4,
+  sc_options_add_double (options, 0, "main:alpha", &user->alpha, 0.4,
                          "[main] Ratio r/R, r=outer radius, R=inner radius " \
                          "(used for torus) [0.4]");
 
-  fclaw_options_add_double_array(options, 0, "main:latitude", &latitude_string,
-                                 "-50 50", &latitude, 2,
+  fclaw_options_add_double_array(options, 0, "main:latitude", &user->latitude_string,
+                                 "-50 50", &user->latitude, 2,
                                  "[main] Latitude range (degrees) [-50 50]");
 
-  fclaw_options_add_double_array(options, 0, "main:longitude", &longitude_string,
-                                 "0 360", &longitude, 2,
+  fclaw_options_add_double_array(options, 0, "main:longitude", &user->longitude_string,
+                                 "0 360", &user->longitude, 2,
                                  "[main] Longitude range (degrees) [0 360]");
 
-  sc_options_add_double (options, 0, "main:beta", &beta, 0.4,
+  sc_options_add_double (options, 0, "main:beta", &user->beta, 0.4,
                          "[main] Inner radius of annulus [0.4]");
 
   /* [Options] Register general ForestClaw options */
@@ -149,25 +160,25 @@ main (int argc, char **argv)
      - checkparms
      ------------------------------------------------------------- */
 #if 0
-  retval = fclaw_options_read_from_file(options);
   retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 #endif
   /* This reads to options file.  But for some reason, the options are getting read in */
+  retval = fclaw_options_read_from_file(options);
   vexit = fclaw_app_options_parse (app, &first_arg);
   retval = 0;
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
 
-  if (example == 3)
+  if (user->example == 3)
   {
-      fclaw_options_convert_double_array (latitude_string, &latitude,2);
-      fclaw_options_convert_double_array (longitude_string, &longitude,2);
+      fclaw_options_convert_double_array (user->latitude_string, &user->latitude,2);
+      fclaw_options_convert_double_array (user->longitude_string, &user->longitude,2);
   }
 
   retval = retval || fclaw_options_check (options, gparms);
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
-  retval = retval || torus_checkparms (example);  /* Nothing more to check here */
+  retval = retval || torus_checkparms (user->example);  /* Nothing more to check here */
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
@@ -204,7 +215,7 @@ main (int argc, char **argv)
       a = gparms->periodic_x;
       b = gparms->periodic_y;
 
-      switch (example)
+      switch (user->example)
       {
       case 1:
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
@@ -214,21 +225,21 @@ main (int argc, char **argv)
       case 2:
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,alpha);
+          cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,user->alpha);
           break;
       case 3:
           /* Lat-long example */
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_latlong(brick,gparms->scale,gparms->shift,
-                                         rotate,latitude,longitude,a,b);
+                                         rotate,user->latitude,user->longitude,a,b);
           break;
       case 4:
           /* Annulus */
           conn = p4est_connectivity_new_brick(mi,mj,a,b);
           brick = fclaw2d_map_new_brick(conn,mi,mj);
           cont = fclaw2d_map_new_annulus(brick,gparms->scale,gparms->shift,
-                                         rotate,beta);
+                                         rotate,user->beta);
           break;
 
       default:
@@ -271,10 +282,10 @@ main (int argc, char **argv)
   }
 
   /* Destroy arrays used in options  */
-  if (example == 3)
+  if (user->example == 3)
   {
-      fclaw_options_destroy_array((void*) latitude);
-      fclaw_options_destroy_array((void*) longitude);
+      fclaw_options_destroy_array((void*) user->latitude);
+      fclaw_options_destroy_array((void*) user->longitude);
   }
 
   fclaw_options_destroy_arrays (gparms);
