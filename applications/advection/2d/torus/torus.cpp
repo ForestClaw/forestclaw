@@ -146,11 +146,13 @@ main (int argc, char **argv)
      - postprocess array input
      - checkparms
      ------------------------------------------------------------- */
-  retval = fclaw_options_read_from_file(options);
-  fclaw_app_options_parse (app, &first_arg);
 #if 0
+  retval = fclaw_options_read_from_file(options);
   retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 #endif
+  /* This reads to options file.  But for some reason, the options are getting read in */
+  fclaw_app_options_parse (app, &first_arg);
+  retval = 0;
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
