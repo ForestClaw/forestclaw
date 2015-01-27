@@ -24,6 +24,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 #ifdef FCLAW_ENABLE_MPI
 
 #include <mpi.h>
@@ -71,5 +80,12 @@ void fclaw2d_mpi_debug()
 #else
 void fclaw2d_mpi_debug()
 {
+}
+#endif
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
 }
 #endif
