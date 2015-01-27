@@ -49,51 +49,68 @@ static int
 
 int main (int argc, char **argv)
 {
-    int			    lp;
+    fclaw_app_t *app;
+
     sc_MPI_Comm             mpicomm;
     sc_options_t            *options;
     p4est_connectivity_t    *conn = NULL;
-    fclaw2d_map_context_t   *cont = NULL;
-
     fclaw2d_domain_t	    *domain = NULL;
 
+    /* ForestClaw options */
     amr_options_t            samr_options, *gparms = &samr_options;
+
+    /* Constants */
+    double pi = M_PI;
+
+    /* Mapping  */
+    fclaw2d_map_context_t   *cont = NULL;
+
+    /* Clawpack options */
     fclaw2d_clawpack_parms_t sclawpack_parms, *clawpack_parms = &sclawpack_parms;
 
     /* double theta, phi; */
-    fclaw2d_map_data_t smap_data, *map_data = &smap_data;
-    double pi = M_PI;
     double rotate[2];
 
-    int example, retval;
+    int example, retval, verbosity;
 
+    /* initialize application */
+    app = fclaw_app_new (&argc, &argv, NULL);
+    options = fclaw_app_get_options (app);
+    fclaw_package_id = fclaw_get_package_id ();
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+#if 0
     lp = SC_LP_PRODUCTION;
     mpicomm = sc_MPI_COMM_WORLD;
     fclaw_mpi_init (&argc, &argv, mpicomm, lp);
-
-    /* ---------------------------------------------------------------
-       Read in parameters and options
-       --------------------------------------------------------------- */
     options = sc_options_new (argv[0]);
+#endif
 
-    /* [main] options */
+    /* -------------------------------------------------------------
+       - Register variables from [main]
+       ------------------------------------------------------------- */
     sc_options_add_int (options, 0, "main:example", &example, 0,
-                        "[main] 1 for pillow grid, "\
+                        "[main] 1 for pillow grid, "    \
                         "2 for cubed sphere ");
 
     /* [Options] General mapping functions */
     fclaw_options_register (options,gparms);
 
-    /* [mapping] General mapping functions */
-    fclaw2d_register_map_data(options,map_data); /* sets default values */
-
     /* [clawpack46] Clawpack solver options */
-    clawpack46_register_options(options,clawpack_parms);
+    clawpack46_options_register(options,clawpack_parms);
 
-    retval = clawpack46_options_read_from_file(options,lp);
-    retval = retval || fclaw_options_read_from_file(options,lp);
+    /* Set verbosity options */
+    fclaw_set_verbosity(options,&verbosity);
 
-    retval = retval || fclaw_options_parse_command_line (options, argc, argv, lp);
+    /* -------------------------------------------------------------
+       - Read options from fclaw_options.ini
+       - Parse command line
+       - postprocess array input
+       - checkparms
+       ------------------------------------------------------------- */
+
+    retval = fclaw_options_read_from_file(options);
+    retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 
     /* Post-process any array input */
     fclaw_options_postprocess (gparms);
@@ -105,6 +122,11 @@ int main (int argc, char **argv)
 
     if (!retval)
     {
+        /* set verbosity levels */
+        sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
+        sc_package_set_verbosity (p4est_package_id, FCLAW_VERBOSITY_ESSENTIAL);
+        sc_package_set_verbosity (fclaw_package_id, verbosity);
+
         fclaw_options_print_summary(options,lp);
 
         if (gparms->trapfpe == 1)
