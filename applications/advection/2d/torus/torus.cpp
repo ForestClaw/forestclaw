@@ -39,7 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.H"
 
+#if 0
 static int fclaw_package_id;
+#endif
 
 static int
 torus_checkparms (int example)
@@ -151,7 +153,7 @@ main (int argc, char **argv)
   retval = retval || fclaw_options_parse_command_line (options,argc, argv);
 #endif
   /* This reads to options file.  But for some reason, the options are getting read in */
-  fclaw_app_options_parse (app, &first_arg);
+  vexit = fclaw_app_options_parse (app, &first_arg);
   retval = 0;
 
   fclaw_options_postprocess(gparms);
