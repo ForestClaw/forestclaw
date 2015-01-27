@@ -55,6 +55,8 @@ int
 main (int argc, char **argv)
 {
   fclaw_app_t *app;
+  int first_arg;
+  fclaw_exit_type_t vexit;
 
   sc_MPI_Comm              mpicomm;
   sc_options_t             *options;
@@ -81,12 +83,20 @@ main (int argc, char **argv)
   int mi, mj, a,b;
   int example, retval;
 
+#if 0
   int verbosity;
+#endif
 
   /* initialize application */
   app = fclaw_app_new (&argc, &argv, NULL);
+  fclaw_app_options_register_core (app, NULL);
+
   options = fclaw_app_get_options (app);
+
+#if 0
   fclaw_package_id = fclaw_get_package_id ();
+#endif
+
   mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
 #if 0
@@ -124,8 +134,10 @@ main (int argc, char **argv)
   /* [clawpack46] Register solver options */
   clawpack46_options_register(options,clawpack_parms);
 
+#if 0
   /* Set verbosity options */
   fclaw_set_verbosity(options,&verbosity);
+#endif
 
 
   /* -------------------------------------------------------------
@@ -135,7 +147,10 @@ main (int argc, char **argv)
      - checkparms
      ------------------------------------------------------------- */
   retval = fclaw_options_read_from_file(options);
+  fclaw_app_options_parse (app, &first_arg);
+#if 0
   retval = retval || fclaw_options_parse_command_line (options,argc, argv);
+#endif
 
   fclaw_options_postprocess(gparms);
   clawpack46_postprocess_parms(clawpack_parms);
@@ -154,10 +169,12 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
   if (!retval)
   {
+#if 0
       /* set verbosity levels */
       sc_package_set_verbosity (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL);
       sc_package_set_verbosity (p4est_package_id, FCLAW_VERBOSITY_ESSENTIAL);
       sc_package_set_verbosity (fclaw_package_id, verbosity);
+#endif
 
       /* Only print options if verbosity >= info */
       fclaw_options_print_summary(options);

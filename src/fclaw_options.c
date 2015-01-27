@@ -46,7 +46,6 @@ void fclaw_options_destroy(amr_options_t* amropt)
 
 void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
 {
-
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "Number of grid cells per patch in x [8]");
 
@@ -136,13 +135,6 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
                            "(used only with manifold=0)[1]");
 
-    /* -------------------------------------------------------------------
-       CB: sc now has a new type of option, the bool.  While switch
-       increments the value of the variable on each call, the bool
-       can be initialized to either true or false and changed both ways.
-
-       DC : Cool - thanks!
-     */
     sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
                            "Solution is on manifold [F]");
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
@@ -208,7 +200,6 @@ void fclaw_options_register (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_double (opt, 0, "theta", &amropt->theta, 0,
                            "Rotation angle about z axis (degrees) [0]");
-
 
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
