@@ -213,6 +213,8 @@ fclaw_app_destroy (fclaw_app_t * a)
         {
             ao->vt.options_destroy (a, ao->package, ao->registered);
         }
+        FCLAW_FREE (ao->section);
+        FCLAW_FREE (ao->configfile);
     }
     sc_array_destroy (a->opt_pkg);
 
@@ -300,6 +302,8 @@ options_register_core (fclaw_app_t * a, void *package, sc_options_t * opt)
                              "default", kv, "Set ForestClaw verbosity");
     sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
                              "essential", kv, "Set verbosity for libraries");
+    sc_options_add_inifile (opt, 'F', "configfile",
+                            "Optional configuration file");
 
     /* we do not need to work with the return value */
     core->is_registered = 1;

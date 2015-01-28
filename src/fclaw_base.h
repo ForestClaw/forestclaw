@@ -339,9 +339,9 @@ void fclaw_app_destroy (fclaw_app_t * a);
  *                              the names they are added to the options structure.
  *                              If not NULL, we will use \b sc_options_add_suboptions:
  *                              The true option name will be prefixed with \b section,
- *                              and they will appear under [section] in a .ini file.
+ *                              and appear under [section] in a .ini-style file.
  * \param [in] configfile       IF not NULL, the name of a configuration file without
- *                              the path or its ending .ini.  The file is read before
+ *                              the path (but with the ending).  The file is read before
  *                              option parsing occurs, so the command line overrides.
  *                              TODO: this feature is not yet active.
  * \param [in] vt               Functions for options processing.  At least the
@@ -364,18 +364,26 @@ void fclaw_app_options_register (fclaw_app_t * a,
 
 /** Register a central convenience options package with default behavior.
  * It is just an example and completely fine not to use this function.
- * This is not a replacement for calling fclaw_app_options_register,
+ * This is not a replacement for calling \ref fclaw_app_options_register,
  * which may be used any number of times for other custom options packages.
- * It merely calls fclaw_app_options_register with predefined operations.
+ * It merely calls \ref fclaw_app_options_register with predefined operations.
  * This options package provides the following options:
- *   -?, --help                 Print a usages message for all options and exit.
- *   -v, --version              Print a version string and exit.
- *   -V, --verbosity=...        Set the verbosity for ForestClaw; a string in
- *                              lowercase (!) letters without the prefix FCLAW_VERBOSITY_.
- *   --lib-verbosity=...        Like verbosity, but for the libraries p4est and sc.
+ *
+ *     -?, --help               Print a usages message for all options and exit.
+ *     -v, --version            Print a version string and exit.
+ *     -V, --verbosity=...      Set the verbosity for ForestClaw; a string in
+ *                              \a lowercase letters without the prefix FCLAW_VERBOSITY_.
+ *     --lib-verbosity=...      Like verbosity, but for the libraries p4est and sc.
+ *     -F, --configfile=...     The name/path to a configuration file that is read
+ *                              while parsing the options from the command line.
+ *                              Handling is different from the configfile argument
+ *                              to fclaw_app_options_register in that it must exist
+ *                              if asked for, that no default paths are tried for
+ *                              its location, and that it is read during option
+ *                              parsing, possibly modifying values set only recently.
  * \param [in,out] a            A valid application object.
- * \param [in] configfile       If not NULL, an .ini configuration file is read before
- *                              option parsing.  This is its name without path and suffix.
+ * \param [in] configfile       If not NULL, an .ini-style configuration file is read
+ *                              before option parsing.  This is its name without path.
  */
 void fclaw_app_options_register_core (fclaw_app_t * a,
                                       const char *configfile);
