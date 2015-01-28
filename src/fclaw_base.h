@@ -336,10 +336,12 @@ void fclaw_app_destroy (fclaw_app_t * a);
  *                              under the default "Options" section in a possible
  *                              configuration file, or under its own section.
  *                              If this is NULL, the options will be used with 
- *                              the names they are added to the options structure.
+ *                              the names used to add them to the options structure.
  *                              If not NULL, we will use \b sc_options_add_suboptions:
  *                              The true option name will be prefixed with \b section,
  *                              and appear under [section] in a .ini-style file.
+ *                              Furthermore, its short options will be disabled
+ *                              and long options prefixed with section:.
  * \param [in] configfile       IF not NULL, the name of a configuration file without
  *                              the path (but with the ending).  The file is read before
  *                              option parsing occurs, so the command line overrides.
