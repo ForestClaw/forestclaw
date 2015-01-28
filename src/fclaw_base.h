@@ -418,7 +418,7 @@ MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
                                       int *mpisize, int *mpirank);
 
 /** Return a pointer to the options structure.
- * TODO: aiming to provide an encapsulation that will not need this function.
+ * \deprecated TODO: We shall provide an interface that will not need this function.
  */
 sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
 
