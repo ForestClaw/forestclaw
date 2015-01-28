@@ -35,7 +35,7 @@ typedef struct fclaw_dummy_options
     int options_int;            /**< Some integer. */
     double options_double;      /**< Some double. */
     const char *dummy_string;   /**< Some string. */
-    char *dummy_storage;        /**< We demonstrate memory for an options package. */
+    char *dummy_storage;        /**< We demonstrate memory in an options package. */
 }
 fclaw_dummy_options_t;
 
@@ -113,7 +113,7 @@ static const fclaw_app_options_vtable_t dummy_vt = {
 };
 
 /** Whatever the program would really do in an application.
- * \param [in,out] a            Opaque appliaction object.  We might access it to
+ * \param [in,out] a            Opaque application object.  We might access it to
  *                              grab its MPI communicator or user data.
  * \param [in] dumo             The configuration values we keep for this program.
  */
