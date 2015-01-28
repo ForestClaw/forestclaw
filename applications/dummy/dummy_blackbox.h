@@ -31,36 +31,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 
 /** The blackbox multiplicator is an paque object.
- * Right now it is setup to call its constructor, register its options,
- * and eventually destroy the object.  Care must be taken to destroy
- * this object after calling \ref fclaw_app_destroy.
- *
- * We might also change this interface to hide the new and destroy functions
- * altogether and handle them through the options virtual table.
- * This would shorten the main program by two lines and make the workings
- * of this blackbox object even more obscure.  On the plus side, above
- * requirements on the order of \ref dummy_blackbox_destroy would vanish.
+ * It comes with its own option section "Blackbox"
+ * containing the integer option "factor".
  */
 typedef struct dummy_blackbox dummy_blackbox_t;
 
-/** This virtual table can be used in registering options.
- * This will add an integer parameter -f / --factor to selecet a multiplier.
- * We only consider multipliers in 0 and 10 inclusive valid values.
- */
-extern const fclaw_app_options_vtable_t *dummy_blackbox_vt;
-
-/** Create a now blackbox multiplicator object.
+/** Create a new blackbox multiplicator object.
+ * \param [in] a                Allocated application whose options
+ *                              may NOT have been parsed yet.
  * \param [in] factor           The initial value for the multiplier.
  *                              We only consider multipliers in 0 and 10
- *                              inclusive valid values.
+ *                              inclusive valid values, even though this
+ *                              function does not check it.  It is only
+ *                              checked during option parsing.
  * \return                      Valid blackbox object.
  */
-dummy_blackbox_t *dummy_blackbox_new (int factor);
+dummy_blackbox_t *dummy_blackbox_new_register (fclaw_app_t * a, int factor);
 
 /** Destroy a blackbox object.
- * \note It is important to call this after \ref fclaw_app_destroy,
- *       since that function activates the options destructors that
- *       might access this blackbox object.
+ * It must only be destroyed whene there will be NO MORE option parsing.
  * \param [in,out] bbox         The object is deallocated.
  */
 void dummy_blackbox_destroy (dummy_blackbox_t * bbox);

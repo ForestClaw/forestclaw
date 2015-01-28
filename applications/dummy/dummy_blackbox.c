@@ -63,19 +63,21 @@ dummy_blackbox_check (fclaw_app_t * a, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
-static fclaw_app_options_vtable_t vt = {
+static const fclaw_app_options_vtable_t dummy_blackbox_vt = {
     dummy_blackbox_register, NULL,
-    dummy_blackbox_check, NULL
+    dummy_blackbox_check,
+    /** Destroy must be NULL since bbox may be destroyed before the options */
+    NULL
 };
 
-const fclaw_app_options_vtable_t *dummy_blackbox_vt = &vt;
-
 dummy_blackbox_t *
-dummy_blackbox_new (int factor)
+dummy_blackbox_new_register (fclaw_app_t * a, int factor)
 {
     dummy_blackbox_t *bbox = FCLAW_ALLOC (dummy_blackbox_t, 1);
 
     bbox->factor = factor;
+    fclaw_app_options_register (a, "Blackbox", NULL, &dummy_blackbox_vt,
+                                bbox);
 
     return bbox;
 }

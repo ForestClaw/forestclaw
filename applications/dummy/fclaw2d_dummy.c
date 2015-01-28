@@ -161,14 +161,15 @@ main (int argc, char **argv)
     /* initialize application */
     a = fclaw_app_new (&argc, &argv, NULL);
 
-    /* initialize a package that multiplies integers with a factor */
-    bbox = dummy_blackbox_new (4);
-
     /* this application registers the core package and two of its own. */
     fclaw_app_options_register_core (a, NULL);
     fclaw_app_options_register (a, NULL, NULL, &options_vt, dumo);
     fclaw_app_options_register (a, "Dummy", NULL, &dummy_vt, dumo);
-    fclaw_app_options_register (a, "Blackbox", NULL, dummy_blackbox_vt, bbox);
+
+    /* initialize a package that registers its own options package */
+    bbox = dummy_blackbox_new_register (a, 4);
+
+    /* process command line options and configuration files */
     vexit = fclaw_app_options_parse (a, &first_arg, "dummy_config.ini");
 
     if (!vexit)
@@ -177,8 +178,9 @@ main (int argc, char **argv)
         run_program (a, dumo, bbox);
     }
 
-    /* cleanup application */
-    fclaw_app_destroy (a);
+    /* cleanup packages and application */
     dummy_blackbox_destroy (bbox);
+    fclaw_app_destroy (a);
+
     return fclaw_app_exit_type_to_status (vexit);
 }
