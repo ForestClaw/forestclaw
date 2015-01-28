@@ -23,10 +23,102 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file fclaw2d_dummy.c
+ * This file is a dummy application to showcase option and configuration handling.
+ */
+
 #include <fclaw_base.h>
 
+/** This object stores configuration variables specific to this application. */
+typedef struct fclaw_dummy_options
+{
+    int options_int;            /**< Some integer. */
+    double options_double;      /**< Some double. */
+    const char *dummy_string;   /**< Some string. */
+    char *dummy_storage;        /**< We demonstrate memory for an options package. */
+}
+fclaw_dummy_options_t;
+
+/** Callback for registering options.
+ * In this application we are using two options packages with different sections.
+ * \param [in,out] a            Opaque application object.
+ * \param [in,out] package      Provided to \ref fclaw_app_options_register in \ref main.
+ * \param [in,out] options      We are free to add our own options to this structure.
+ * \return                      What we return is available to other callbacks for
+ *                              this options package.  Here we do not use the feature.
+ */
+static void *
+fclaw_options_register (fclaw_app_t * a, void *package,
+                        sc_options_t * options)
+{
+    fclaw_dummy_options_t *dumo = (fclaw_dummy_options_t *) package;
+
+    sc_options_add_int (options, 'i', "integer", &dumo->options_int,
+                        5, "Option integer");
+    sc_options_add_double (options, 'd', "double", &dumo->options_double,
+                           3., "Option double");
+
+    return NULL;
+}
+
+/** Another callback for registering options.
+ * In this application we are using two options packages with different sections.
+ * This one is registered with its own section "Dummy" in a configuration file.
+ * \param [in,out] a            Opaque application object.
+ * \param [in,out] package      Provided to \ref fclaw_app_options_register in \ref main.
+ * \param [in,out] options      We are free to add our own options to this structure.
+ * \return                      We return the \b dummy_storage member of
+ *                              the \ref fclaw_dummy_options structure, just for fun.
+ */
+static void *
+fclaw_dummy_register (fclaw_app_t * a, void *package, sc_options_t * options)
+{
+    fclaw_dummy_options_t *dumo = (fclaw_dummy_options_t *) package;
+
+    sc_options_add_string (options, 's', "string", &dumo->dummy_string,
+                           "Dummy string value", "Dummy string");
+
+    dumo->dummy_storage = FCLAW_STRDUP ("wonderful");
+
+    /* We're returning this just for verification purposes */
+    return dumo->dummy_storage;
+}
+
+/** Callback for cleaning up memory that we allocated in options registration.
+ * This one pertains to the one registered with its own section "Dummy".
+ * \param [in,out] a            Opaque application object.
+ * \param [in,out] package      Provided to \ref fclaw_app_options_register in \ref main.
+ * \param [in,out] registered   This is the return value to \ref fclaw_dummy_register.
+ */
 static void
-run_program (fclaw_app_t * a)
+fclaw_dummy_destroy (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_dummy_options_t *dumo = (fclaw_dummy_options_t *) package;
+
+    FCLAW_ASSERT (registered != NULL &&
+                  !strcmp ((const char *) registered, "wonderful"));
+
+    FCLAW_FREE (dumo->dummy_storage);
+}
+
+/** Virtual table for the first options package in this program. */
+static const fclaw_app_options_vtable_t options_vt = {
+    fclaw_options_register, NULL, NULL, NULL
+};
+
+/** Virtual table for the second options package in this program. */
+static const fclaw_app_options_vtable_t dummy_vt = {
+    fclaw_dummy_register, NULL, NULL,
+    fclaw_dummy_destroy
+};
+
+/** Whatever the program would really do in an application.
+ * \param [in,out] a            Opaque appliaction object.  We might access it to
+ *                              grab its MPI communicator or user data.
+ * \param [in] dumo             The configuration values we keep for this program.
+ */
+static void
+run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo)
 {
     int debug_size, debug_rank;
 
@@ -36,39 +128,38 @@ run_program (fclaw_app_t * a)
     /* this is where we would do some numerics */
     fclaw_debugf ("Debug message (rank %d/%d)\n", debug_rank, debug_size);
     fclaw_infof ("Info message (individual)\n");
-    fclaw_global_infof ("Info message\n");
-    fclaw_global_productionf ("Production message\n");
-    fclaw_global_essentialf ("Essential message\n");
+    fclaw_global_infof ("Info message double is %g\n", dumo->options_double);
+    fclaw_global_productionf ("Production message integer is %d\n",
+                              dumo->options_int);
+    fclaw_global_essentialf ("Essential message string is \"%s\"\n",
+                             dumo->dummy_string);
 
-    fclaw_global_essentialf ("And this is the end of the program\n");
+    fclaw_global_essentialf ("And this is the end of the %s program\n",
+                             dumo->dummy_storage);
 }
 
+/** Main function for the dummy application. */
 int
 main (int argc, char **argv)
 {
-#if 0
-    int dummyvar;
-#endif
     int first_arg;
     fclaw_exit_type_t vexit;
     fclaw_app_t *a;
+    fclaw_dummy_options_t dummy_options, *dumo = &dummy_options;
 
     /* initialize application */
     a = fclaw_app_new (&argc, &argv, NULL);
-    fclaw_app_options_register_core (a, NULL);
-    /* TODO: register more options packages here */
-    vexit = fclaw_app_options_parse (a, &first_arg);
 
-#if 0
-    /* THIS WILL BE DONE PER-PACKAGE IN AN INTERFACE YET TO BE DEVELOPED */
-    /* register options */
-    sc_options_add_int (opt, '\0', "dummy", &dummyvar, 5, "Dummy integer");
-#endif
+    /* this application registers the core package and two of its own. */
+    fclaw_app_options_register_core (a, NULL);
+    fclaw_app_options_register (a, NULL, NULL, &options_vt, dumo);
+    fclaw_app_options_register (a, "Dummy", NULL, &dummy_vt, dumo);
+    vexit = fclaw_app_options_parse (a, &first_arg);
 
     if (!vexit)
     {
         /* parameters are clean */
-        run_program (a);
+        run_program (a, dumo);
     }
 
     /* cleanup application */
