@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <fclaw_base.h>
+#include "dummy_blackbox.h"
 
 /** This object stores configuration variables specific to this application. */
 typedef struct fclaw_dummy_options
@@ -116,9 +117,11 @@ static const fclaw_app_options_vtable_t dummy_vt = {
  * \param [in,out] a            Opaque application object.  We might access it to
  *                              grab its MPI communicator or user data.
  * \param [in] dumo             The configuration values we keep for this program.
+ * \param [in,out] bbox         The blackbox object.
  */
 static void
-run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo)
+run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo,
+             dummy_blackbox_t * bbox)
 {
     int debug_size, debug_rank;
 
@@ -134,6 +137,13 @@ run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo)
     fclaw_global_essentialf ("Essential message string is \"%s\"\n",
                              dumo->dummy_string);
 
+    /* demonstrate the blackbox package */
+    fclaw_global_productionf ("We have multiplied %d into %d\n",
+                              dumo->options_int,
+                              dummy_blackbox_multiply
+                              (bbox, dumo->options_int));
+
+    /* this is the end of the official work of the program */
     fclaw_global_essentialf ("And this is the end of the %s program\n",
                              dumo->dummy_storage);
 }
@@ -146,23 +156,29 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
     fclaw_app_t *a;
     fclaw_dummy_options_t dummy_options, *dumo = &dummy_options;
+    dummy_blackbox_t *bbox;
 
     /* initialize application */
     a = fclaw_app_new (&argc, &argv, NULL);
+
+    /* initialize a package that multiplies integers with a factor */
+    bbox = dummy_blackbox_new (4);
 
     /* this application registers the core package and two of its own. */
     fclaw_app_options_register_core (a, NULL);
     fclaw_app_options_register (a, NULL, NULL, &options_vt, dumo);
     fclaw_app_options_register (a, "Dummy", NULL, &dummy_vt, dumo);
-    vexit = fclaw_app_options_parse (a, &first_arg, "dummy_config");
+    fclaw_app_options_register (a, "Blackbox", NULL, dummy_blackbox_vt, bbox);
+    vexit = fclaw_app_options_parse (a, &first_arg, "dummy_config.ini");
 
     if (!vexit)
     {
         /* parameters are clean */
-        run_program (a, dumo);
+        run_program (a, dumo, bbox);
     }
 
     /* cleanup application */
     fclaw_app_destroy (a);
+    dummy_blackbox_destroy (bbox);
     return fclaw_app_exit_type_to_status (vexit);
 }
