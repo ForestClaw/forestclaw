@@ -36,9 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 typedef struct dummy_blackbox dummy_blackbox_t;
 
-/** Create a new blackbox multiplicator object.
- * \param [in] a                Allocated application whose options
- *                              may NOT have been parsed yet.
+/** Create a new blackbox multiplicator object and register its options.
+ * It will be deallocated when \ref fclaw_app_destroy is called.
+ * \param [in] a                Allocated application that will deallocate
+ *                              this object when it is destroyed.
  * \param [in] factor           The initial value for the multiplier.
  *                              We only consider multipliers in 0 and 10
  *                              inclusive valid values, even though this
@@ -47,12 +48,6 @@ typedef struct dummy_blackbox dummy_blackbox_t;
  * \return                      Valid blackbox object.
  */
 dummy_blackbox_t *dummy_blackbox_new_register (fclaw_app_t * a, int factor);
-
-/** Destroy a blackbox object.
- * It must only be destroyed whene there will be NO MORE option parsing.
- * \param [in,out] bbox         The object is deallocated.
- */
-void dummy_blackbox_destroy (dummy_blackbox_t * bbox);
 
 /** Perform the main operation of this object, integer multiplication.
  * \param [in] bbox             The blackbox multiplicator object.

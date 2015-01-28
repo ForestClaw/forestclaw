@@ -179,7 +179,6 @@ main (int argc, char **argv)
     }
 
     /* cleanup packages and application */
-    dummy_blackbox_destroy (bbox);
     fclaw_app_destroy (a);
 
     return fclaw_app_exit_type_to_status (vexit);
