@@ -205,9 +205,9 @@ fclaw_app_destroy (fclaw_app_t * a)
     FCLAW_ASSERT (a->opt != NULL);
 
     /* let the options packages clean up their memory */
-    for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    for (zz = a->opt_pkg->elem_count; zz > 0; --zz)
     {
-        ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz - 1);
         FCLAW_ASSERT (ao != NULL);
         if (ao->vt.options_destroy != NULL)
         {
