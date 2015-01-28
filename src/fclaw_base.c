@@ -389,8 +389,10 @@ fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
 }
 
 fclaw_exit_type_t
-fclaw_app_options_parse (fclaw_app_t * a, int *first_arg)
+fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
+                         const char *savefile)
 {
+    int retval;
     size_t zz;
     fclaw_exit_type_t vexit;
     fclaw_app_options_t *ao;
@@ -466,6 +468,19 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg)
         break;
     default:
         SC_ABORT_NOT_REACHED ();
+    }
+
+    /* print configuration if so desired */
+    if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
+    {
+        retval = sc_options_save (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
+                                  a->opt, savefile);
+        if (retval)
+        {
+            vexit = FCLAW_EXIT_ERROR;
+            fclaw_global_infof ("Unable to save options to \"%s\"\n",
+                                savefile);
+        }
     }
 
     /* we are done */

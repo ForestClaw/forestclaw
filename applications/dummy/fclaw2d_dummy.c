@@ -154,7 +154,7 @@ main (int argc, char **argv)
     fclaw_app_options_register_core (a, NULL);
     fclaw_app_options_register (a, NULL, NULL, &options_vt, dumo);
     fclaw_app_options_register (a, "Dummy", NULL, &dummy_vt, dumo);
-    vexit = fclaw_app_options_parse (a, &first_arg);
+    vexit = fclaw_app_options_parse (a, &first_arg, "dummy_config");
 
     if (!vexit)
     {

@@ -395,9 +395,12 @@ void fclaw_app_options_register_core (fclaw_app_t * a,
  * TODO: This function shall read default configuration files before parsing.
  * \param [in] a         Initialized forestclaw application.
  * \param [out] first_arg       If not NULL, position of first non-option argument.
+ * \param [in] savefile         If not NULL, write options to this file after parsing,
+ *                              but only if the exit type is not an error.
  * \return               Whether to continue, exit gracefully, or exit with error.
  */
-fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg);
+fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
+                                           const char *savefile);
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.
