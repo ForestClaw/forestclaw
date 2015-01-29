@@ -78,7 +78,7 @@ main (int argc, char **argv)
   fclaw2d_domain_t	   *domain;
 
   /* ForestClaw options */
-  amr_options_t sparms_options, *gparms = &sparms_options;
+  amr_options_t *gparms;
 
   /* Constants */
   double pi = M_PI;
@@ -112,7 +112,7 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
 
   /*  Register core options, including verbosity level. */
-  fclaw_app_options_register_general (app, NULL);
+  fclaw_app_options_register_general (app, NULL, &gparms);
 
   /* [clawpack46] Add solver options */
   clawpack46_options_add(options,clawpack_parms);
@@ -148,9 +148,7 @@ main (int argc, char **argv)
   retval = fclaw_options_read_from_file(options);
 
   /* Parse command line and post-process */
-  vexit = fclaw_app_options_parse (app, &first_arg);
-
-  gparms = (amr_options_t*) fclaw_get_amr_options(app);
+  vexit = fclaw_app_options_parse (app, &first_arg,NULL);
 
   clawpack46_postprocess_parms(clawpack_parms);
 
