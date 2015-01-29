@@ -83,6 +83,26 @@ fclaw_logf (int category, int priority, const char *fmt, ...)
 }
 
 void
+fclaw_global_errorf (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_GLOBAL, SC_LP_ERROR, fmt, ap);
+    va_end (ap);
+}
+
+void
+fclaw_errorf (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_NORMAL, SC_LP_ERROR, fmt, ap);
+    va_end (ap);
+}
+
+void
 fclaw_global_essentialf (const char *fmt, ...)
 {
     va_list ap;
@@ -291,6 +311,7 @@ options_register_core (fclaw_app_t * a, void *package, sc_options_t * opt)
     sc_keyvalue_set_int (kv, "info", FCLAW_VERBOSITY_INFO);
     sc_keyvalue_set_int (kv, "production", FCLAW_VERBOSITY_PRODUCTION);
     sc_keyvalue_set_int (kv, "essential", FCLAW_VERBOSITY_ESSENTIAL);
+    sc_keyvalue_set_int (kv, "error", FCLAW_VERBOSITY_ERROR);
     sc_keyvalue_set_int (kv, "silent", FCLAW_VERBOSITY_SILENT);
 
     /* set the options for the core package */
@@ -403,7 +424,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     /* parse command line options with given priority for errors */
     a->first_arg =
-        sc_options_parse (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
+        sc_options_parse (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
                           a->opt, *a->argc, *a->argv);
 
     /* check for option and parameter errors */
@@ -461,7 +482,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
         break;
     case FCLAW_EXIT_ERROR:
         /* some error has been encountered */
-        fclaw_global_essentialf ("Configuration / option parsing failed\n");
+        fclaw_global_errorf ("Configuration / option parsing failed\n");
         sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_PRODUCTION,
                                 a->opt, NULL);
         fclaw_global_infof ("Terminating program\n");
@@ -473,7 +494,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     /* print configuration if so desired */
     if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
     {
-        retval = sc_options_save (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
+        retval = sc_options_save (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
                                   a->opt, savefile);
         if (retval)
         {

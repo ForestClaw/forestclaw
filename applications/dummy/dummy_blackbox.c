@@ -55,7 +55,7 @@ dummy_blackbox_check (fclaw_app_t * a, void *package, void *registered)
 
     if (bbox->factor < 0 || bbox->factor > 10)
     {
-        fclaw_global_essentialf
+        fclaw_global_errorf
             ("The value for the blackbox factor must be between 0 and 10\n");
         return FCLAW_EXIT_ERROR;
     }

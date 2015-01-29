@@ -76,8 +76,8 @@ extern "C"
  * 1. Each logging function is suffixed with its priority.
  *    This means that FCLAW_VERBOSITY_ESSENTIAL should only be used
  *    for very important messages, such as a version number on startup,
- *    or unexpected error conditions.  Conversely, log messages that
- *    help in debugging and clutter the output a lot can use
+ *    and FCLAW_VERBOSITY_ERROR for unexpected error conditions.  Conversely,
+ *    log messages that help in debugging and clutter the output a lot can use
  *    the FCLAW_VERBOSITY_DEBUG priority.
  * 2. The function \b sc_package_set_verbosity
  *    accepts a priority level below which all messages will be ignored.
@@ -91,13 +91,15 @@ extern "C"
  * For production runs, try to set the verbosity to PRODUCTION or ESSENTIAL.
  *
  * Valid ForestClaw settings:
- *     FCLAW_VERBOSITY_DEFAULT, DEBUG, INFO, PRODUCTION, ESSENTIAL, SILENT
+ *     FCLAW_VERBOSITY_DEFAULT, DEBUG, INFO, PRODUCTION, ESSENTIAL, ERROR, SILENT
  * (although I suppose we could use others; see below for the list of SC_LP_ values).
  *
  * * PRODUCTION messages should log a few lines for a major api function.
  *              A good example would be the numerical error at the
  *              end of the program, timings, printing important parameters.
  * * ESSENTIAL messages must only cause a few lines for the whole run, if at all.
+ * * ERROR messages should only be printed when something goes wrong.  Setting the
+ *              verbosity to ERROR omits even essential messages and prints errors only.
  * * DEFAULT depends on the configure options `--enable-debug` and `--enable_logging=...`
  *              With `--enable-debug`, this will be a very chatty at level DEBUG.
  *              Otherwise it is INFO, if not overridden with `--enable-logging=...`
@@ -121,6 +123,7 @@ extern "C"
 typedef enum fclaw_verbosity
 {
     FCLAW_VERBOSITY_SILENT = SC_LP_SILENT,
+    FCLAW_VERBOSITY_ERROR = SC_LP_ERROR,
     FCLAW_VERBOSITY_ESSENTIAL = SC_LP_ESSENTIAL,
     FCLAW_VERBOSITY_PRODUCTION = SC_LP_PRODUCTION,
     FCLAW_VERBOSITY_INFO = SC_LP_INFO,
@@ -240,7 +243,7 @@ int fclaw_get_package_id (void);
  *                          ranks prints output, which is generally undesired
  *                          in production runs (that is, without
  *                          --enable-debug).
- * \param [in] priority     The log level can be FCLAW_VERBOSITY_ESSENTIAL,
+ * \param [in] priority     The log level can be FCLAW_VERBOSITY_ERROR, _ESSENTIAL,
  *                          _PRODUCTION, _INFO, and _DEBUG, (see SC_LP_*).
  * \param [in] fmt          Format string as in printf.
  */
@@ -249,9 +252,31 @@ void fclaw_logf (int category, int priority, const char *fmt, ...)
     __attribute__ ((format (printf, 3, 4)))
 #endif
     ;
+/** Print a message only on the root processor with priority FCLAW_VERBOSITY_ERROR.
+ * This priority must only used for unexpected error conditions that threaten
+ * the successful completion of the program.
+ * \param [in] fmt      A printf-style format string.
+ */
+void fclaw_global_errorf (const char *fmt, ...)
+#ifndef FCLAW_DOXYGEN
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+    ;
+/** Print a message on the calling processor with priority FCLAW_VERBOSITY_ERROR.
+ * For errors that likely occur similarly on all processors, please use \ref
+ * fclaw_global_errorf instead to avoid flooding the output.  This function
+ * must only used for unexpected individual-processor error conditions that
+ * threaten the successful completion of the program.
+ * \param [in] fmt      A printf-style format string.
+ */
+void fclaw_errorf (const char *fmt, ...)
+#ifndef FCLAW_DOXYGEN
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+    ;
 /** Print a message only on the root processor with priority FCLAW_VERBOSITY_ESSENTIAL.
- * This priority must be used \a very sparingly, such as for a version number,
- * package registration, and error messages.
+ * This priority must be used \a very sparingly, such as for a version number
+ * or a confirmation of package registration.
  * \param [in] fmt      A printf-style format string.
  */
 void fclaw_global_essentialf (const char *fmt, ...)
