@@ -64,6 +64,11 @@ void fclaw_options_destroy(amr_options_t* amropt);
  * \param [out] fclawopt        Option container for ForestClaw
  */
 
+void fclaw_app_options_register_general (fclaw_app_t * a,
+                                         const char *configfile,
+                                         amr_options_t **gparms_ptr);
+
+
 void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
@@ -124,7 +129,9 @@ void fclaw_options_convert_double_array (const char *array_string,
 
 void fclaw_options_destroy_array(void* array);
 
-void fclaw_set_verbosity(sc_options_t* options,int *verbosity);
+#if 0
+amr_options_t* fclaw_get_amr_options(fclaw_app_t* app);
+#endif
 
 
 
@@ -194,6 +201,7 @@ struct amr_options
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:
                                      Will kill all parallel performance. */
+
     const char *prefix;         /**< This is prepended to output files */
 
     /* VTK output control */
@@ -204,6 +212,7 @@ struct amr_options
 
     int noweightedp;            /**< Don't use weighted partition. */
 
+    int is_registered;     /**< Internal variable to double-check the flow */
 };
 
 

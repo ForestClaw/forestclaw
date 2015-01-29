@@ -78,7 +78,7 @@ main (int argc, char **argv)
   fclaw2d_domain_t	   *domain;
 
   /* ForestClaw options */
-  amr_options_t             samr_options, *gparms = &samr_options;
+  amr_options_t sparms_options, *gparms = &sparms_options;
 
   /* Constants */
   double pi = M_PI;
@@ -111,8 +111,8 @@ main (int argc, char **argv)
      will be printed out in help message.
      ------------------------------------------------------------- */
 
-  /* [Options] Add general ForestClaw options.  */
-  fclaw_options_add_general(options,gparms);
+  /*  Register core options, including verbosity level. */
+  fclaw_app_options_register_general (app, NULL);
 
   /* [clawpack46] Add solver options */
   clawpack46_options_add(options,clawpack_parms);
@@ -147,13 +147,11 @@ main (int argc, char **argv)
   /* Read fclaw_options.ini */
   retval = fclaw_options_read_from_file(options);
 
-  /*  Register core options, including verbosity level. */
-  fclaw_app_options_register_core (app, NULL);
-
-  /* Should I be using 'vexit' instead of retval? */
+  /* Parse command line and post-process */
   vexit = fclaw_app_options_parse (app, &first_arg);
 
-  fclaw_options_postprocess(gparms);
+  gparms = (amr_options_t*) fclaw_get_amr_options(app);
+
   clawpack46_postprocess_parms(clawpack_parms);
 
   if (user->example == 3)
@@ -162,7 +160,7 @@ main (int argc, char **argv)
       fclaw_options_convert_double_array (user->longitude_string, &user->longitude,2);
   }
 
-  retval = retval || fclaw_options_check (options, gparms);
+  /* retval = retval || fclaw_options_check (options, gparms); */
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
   retval = retval || torus_checkparms (user->example);  /* Nothing more to check here */
   /* -------------------------------------------------------------
@@ -269,7 +267,6 @@ main (int argc, char **argv)
   }
 
   /* Which of these do I still need? */
-  fclaw_options_destroy_arrays (gparms);
   fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_app_destroy (app);
