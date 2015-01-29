@@ -66,7 +66,7 @@ void fclaw_options_destroy(amr_options_t* amropt);
 
 void fclaw_app_options_register_general (fclaw_app_t * a,
                                          const char *configfile,
-                                         amr_options_t **gparms_ptr);
+                                         amr_options_t *gparms);
 
 
 void fclaw_options_destroy_arrays (amr_options_t * fclawopt);

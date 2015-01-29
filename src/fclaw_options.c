@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
-#include <fclaw_base.h>
 
 /** This is the internal state of an options structure for core variables. */
 
@@ -77,11 +76,6 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
     sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
                              "essential", kv, "Set verbosity for libraries");
 
-
-#if 0
-    /* This is now done in the new_registration process */
-    core->amropt = fclaw_options_new(); /* Forestclaw parms  */
-#endif
     fclaw_options_add_general (opt, core->amropt);
 
     /* we do not need to work with the return value */
@@ -145,7 +139,9 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
     sc_keyvalue_destroy (core->kv_verbosity);
 
     fclaw_options_destroy_arrays (core->amropt);
+#if 0
     FCLAW_FREE(core->amropt);
+#endif
 
     FCLAW_FREE (core);
 }
@@ -158,7 +154,7 @@ static const fclaw_app_options_vtable_t options_vtable_general = {
 };
 
 void fclaw_app_options_register_general (fclaw_app_t * a, const char *configfile,
-                                         amr_options_t** gparms_ptr)
+                                         amr_options_t* gparms)
 {
     fclaw_options_general_t *core;
 
@@ -167,8 +163,12 @@ void fclaw_app_options_register_general (fclaw_app_t * a, const char *configfile
     /* allocate storage for core's option values */
     /* we will free it in the options_destroy callback */
     core = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
-    *gparms_ptr = fclaw_options_new();
-    core->amropt = *gparms_ptr;
+#if 0
+    /* Allocate in calling program?  Or here? In any case, we allocate/
+       deallocate option arrays here */
+    *gparms = fclaw_options_new();  /* Requires amr_options_t** as input */
+#endif
+    core->amropt = gparms;
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */

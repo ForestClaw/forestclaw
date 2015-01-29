@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
-#include <fclaw_base.h>
 
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
@@ -78,7 +77,7 @@ main (int argc, char **argv)
   fclaw2d_domain_t	   *domain;
 
   /* ForestClaw options */
-  amr_options_t *gparms;
+  amr_options_t            samr_options, *gparms = &samr_options;
 
   /* Constants */
   double pi = M_PI;
@@ -112,7 +111,7 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
 
   /*  Register core options, including verbosity level. */
-  fclaw_app_options_register_general (app, "fclaw_options.ini", &gparms);
+  fclaw_app_options_register_general (app, "fclaw_options.ini", gparms);
 
   /* [clawpack46] Add solver options */
   clawpack46_options_add(options,clawpack_parms);
