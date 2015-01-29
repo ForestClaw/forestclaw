@@ -336,12 +336,14 @@ void fclaw_app_destroy (fclaw_app_t * a);
  *                              under the default "Options" section in a possible
  *                              configuration file, or under its own section.
  *                              If this is NULL, the options will be used with 
- *                              the names they are added to the options structure.
+ *                              the names used to add them to the options structure.
  *                              If not NULL, we will use \b sc_options_add_suboptions:
  *                              The true option name will be prefixed with \b section,
- *                              and they will appear under [section] in a .ini file.
+ *                              and appear under [section] in a .ini-style file.
+ *                              Furthermore, its short options will be disabled
+ *                              and long options prefixed with section:.
  * \param [in] configfile       IF not NULL, the name of a configuration file without
- *                              the path or its ending .ini.  The file is read before
+ *                              the path (but with the ending).  The file is read before
  *                              option parsing occurs, so the command line overrides.
  *                              TODO: this feature is not yet active.
  * \param [in] vt               Functions for options processing.  At least the
@@ -364,18 +366,26 @@ void fclaw_app_options_register (fclaw_app_t * a,
 
 /** Register a central convenience options package with default behavior.
  * It is just an example and completely fine not to use this function.
- * This is not a replacement for calling fclaw_app_options_register,
+ * This is not a replacement for calling \ref fclaw_app_options_register,
  * which may be used any number of times for other custom options packages.
- * It merely calls fclaw_app_options_register with predefined operations.
+ * It merely calls \ref fclaw_app_options_register with predefined operations.
  * This options package provides the following options:
- *   -?, --help                 Print a usages message for all options and exit.
- *   -v, --version              Print a version string and exit.
- *   -V, --verbosity=...        Set the verbosity for ForestClaw; a string in
- *                              lowercase (!) letters without the prefix FCLAW_VERBOSITY_.
- *   --lib-verbosity=...        Like verbosity, but for the libraries p4est and sc.
+ *
+ *     -?, --help               Print a usages message for all options and exit.
+ *     -v, --version            Print a version string and exit.
+ *     -V, --verbosity=...      Set the verbosity for ForestClaw; a string in
+ *                              \a lowercase letters without the prefix FCLAW_VERBOSITY_.
+ *     --lib-verbosity=...      Like verbosity, but for the libraries p4est and sc.
+ *     -F, --configfile=...     The name/path to a configuration file that is read
+ *                              while parsing the options from the command line.
+ *                              Handling is different from the configfile argument
+ *                              to fclaw_app_options_register in that it must exist
+ *                              if asked for, that no default paths are tried for
+ *                              its location, and that it is read during option
+ *                              parsing, possibly modifying values set only recently.
  * \param [in,out] a            A valid application object.
- * \param [in] configfile       If not NULL, an .ini configuration file is read before
- *                              option parsing.  This is its name without path and suffix.
+ * \param [in] configfile       If not NULL, an .ini-style configuration file is read
+ *                              before option parsing.  This is its name without path.
  */
 void fclaw_app_options_register_core (fclaw_app_t * a,
                                       const char *configfile);
@@ -387,9 +397,12 @@ void fclaw_app_options_register_core (fclaw_app_t * a,
  * TODO: This function shall read default configuration files before parsing.
  * \param [in] a         Initialized forestclaw application.
  * \param [out] first_arg       If not NULL, position of first non-option argument.
+ * \param [in] savefile         If not NULL, write options to this file after parsing,
+ *                              but only if the exit type is not an error.
  * \return               Whether to continue, exit gracefully, or exit with error.
  */
-fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg);
+fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
+                                           const char *savefile);
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.
@@ -407,7 +420,7 @@ MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
                                       int *mpisize, int *mpirank);
 
 /** Return a pointer to the options structure.
- * TODO: aiming to provide an encapsulation that will not need this function.
+ * \deprecated TODO: We shall provide an interface that will not need this function.
  */
 sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
 
