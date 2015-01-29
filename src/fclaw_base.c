@@ -349,7 +349,7 @@ options_postprocess_core (fclaw_app_t * a, void *package, void *registered)
     /* go through this packages options */
     sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
     sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
-    sc_package_set_verbosity (fclaw_package_id, core->fclaw_verbosity);
+    sc_package_set_verbosity (fclaw_get_package_id (), core->fclaw_verbosity);
 
     /* print help and/or version information and exit gracefully */
     if (core->print_help)
@@ -424,7 +424,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     /* parse command line options with given priority for errors */
     a->first_arg =
-        sc_options_parse (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
+        sc_options_parse (fclaw_get_package_id (), FCLAW_VERBOSITY_ERROR,
                           a->opt, *a->argc, *a->argv);
 
     /* check for option and parameter errors */
@@ -467,7 +467,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     {
     case FCLAW_NOEXIT:
         fclaw_global_infof ("Option parsing successful\n");
-        sc_options_print_summary (fclaw_package_id,
+        sc_options_print_summary (fclaw_get_package_id (),
                                   FCLAW_VERBOSITY_PRODUCTION, a->opt);
         break;
     case FCLAW_EXIT_QUIET:
@@ -476,15 +476,15 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     case FCLAW_EXIT_USAGE:
         /* we assume that the application has or will print something */
         /* but it has been specifically requested to print usage information */
-        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
-                                a->opt, NULL);
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_ESSENTIAL, a->opt, NULL);
         fclaw_global_infof ("Terminating program\n");
         break;
     case FCLAW_EXIT_ERROR:
         /* some error has been encountered */
         fclaw_global_errorf ("Configuration / option parsing failed\n");
-        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_PRODUCTION,
-                                a->opt, NULL);
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_PRODUCTION, a->opt, NULL);
         fclaw_global_infof ("Terminating program\n");
         break;
     default:
@@ -494,8 +494,8 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     /* print configuration if so desired */
     if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
     {
-        retval = sc_options_save (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
-                                  a->opt, savefile);
+        retval = sc_options_save (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ERROR, a->opt, savefile);
         if (retval)
         {
             vexit = FCLAW_EXIT_ERROR;
