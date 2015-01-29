@@ -441,8 +441,8 @@ void *fclaw_app_get_user (fclaw_app_t * a);
  * \param [out] mpirank Will be set to the size of the world communicator.
  * \return              The communicator that was used to setup \b a.
  */
-MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
-                                      int *mpisize, int *mpirank);
+sc_MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
+                                         int *mpisize, int *mpirank);
 
 /** Return a pointer to the options structure.
  * \deprecated TODO: We shall provide an interface that will not need this function.

@@ -184,7 +184,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
-    MPI_Comm mpicomm;
+    sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
     mpiret = sc_MPI_Init (argc, argv);
@@ -512,7 +512,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     return vexit;
 }
 
-MPI_Comm
+sc_MPI_Comm
 fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
 {
     FCLAW_ASSERT (a != NULL);
