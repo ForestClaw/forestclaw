@@ -117,7 +117,7 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
     }
     else
     {
-        printf("cb_adapt_domain : newsize not recognized\n");
+        fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
         exit(1);
     }
 }
@@ -249,10 +249,8 @@ void amrinit (fclaw2d_domain_t **domain)
     }
 
     // Print global minimum and maximum levels
-    if ((*domain)->mpirank == 0) {
-        printf ("Global minlevel %d maxlevel %d\n",
+    fclaw_global_infof("Global minlevel %d maxlevel %d\n",
                 (*domain)->global_minlevel, (*domain)->global_maxlevel);
-    }
 
     // Stop timer
     ddata = get_domain_data(*domain);
