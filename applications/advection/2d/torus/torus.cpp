@@ -112,7 +112,7 @@ main (int argc, char **argv)
      ------------------------------------------------------------- */
 
   /*  Register core options, including verbosity level. */
-  fclaw_app_options_register_general (app, NULL, &gparms);
+  fclaw_app_options_register_general (app, "fclaw_options.ini", &gparms);
 
   /* [clawpack46] Add solver options */
   clawpack46_options_add(options,clawpack_parms);
@@ -148,7 +148,7 @@ main (int argc, char **argv)
   retval = fclaw_options_read_from_file(options);
 
   /* Parse command line and post-process */
-  vexit = fclaw_app_options_parse (app, &first_arg,NULL);
+  vexit = fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
   clawpack46_postprocess_parms(clawpack_parms);
 
