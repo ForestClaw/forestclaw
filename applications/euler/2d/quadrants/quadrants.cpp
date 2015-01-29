@@ -39,7 +39,7 @@ main (int argc, char **argv)
 {
   int		        lp;
   int                   example;
-  MPI_Comm              mpicomm;
+  sc_MPI_Comm           mpicomm;
   sc_options_t          *options;
   p4est_connectivity_t  *conn = NULL;
   fclaw2d_map_context_t *cont = NULL;
@@ -48,7 +48,7 @@ main (int argc, char **argv)
   fclaw2d_clawpack_parms_t  *clawpack_parms;
 
   lp = SC_LP_PRODUCTION;
-  mpicomm = MPI_COMM_WORLD;
+  mpicomm = sc_MPI_COMM_WORLD;
   fclaw_mpi_init (&argc, &argv, mpicomm, lp);
 
 #ifdef MPI_DEBUG

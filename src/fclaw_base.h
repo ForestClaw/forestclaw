@@ -352,6 +352,27 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
  */
 void fclaw_app_destroy (fclaw_app_t * a);
 
+/** Change the user's configuration directory.
+ * This is understood relative to the user's home directory.
+ * After \ref fclaw_app_new, it is set to ".forestclaw".
+ * \param [in,out] app          Valid application object.
+ * \param [in] configdir        New value for the per-user configuration directory.
+ *                              This string is passed, not copied, so it must not
+ *                              go out of scope.  String constants are fine.
+ *                              It may be NULL to deactivate the feature.
+ */
+void fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir);
+
+/** Change the environment variable used to find another configuration directory.
+ * After \ref fclaw_app_new, it is set to "FCLAW_INI_DIR".
+ * \param [in,out] app          Valid application object.
+ * \param [in] env_configdir    New value for the environment variable.
+ *                              This string is passed, not copied, so it must not
+ *                              go out of scope.  String constants are fine.
+ *                              It may be NULL to deactivate the feature.
+ */
+void fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir);
+
 /** Register an options package with an application.
  * This function calls the virtual function for registering its options.
  * \param [in,out] a            A valid application object from \ref fclaw_app_new.
@@ -441,8 +462,8 @@ void *fclaw_app_get_user (fclaw_app_t * a);
  * \param [out] mpirank Will be set to the size of the world communicator.
  * \return              The communicator that was used to setup \b a.
  */
-MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
-                                      int *mpisize, int *mpirank);
+sc_MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
+                                         int *mpisize, int *mpirank);
 
 /** Return a pointer to the options structure.
  * \deprecated TODO: We shall provide an interface that will not need this function.

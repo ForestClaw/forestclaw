@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+static const char *fclaw_configdir = ".forestclaw";
+static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
 static int fclaw_package_id = -1;
 
 int
@@ -55,6 +57,13 @@ struct fclaw_app
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+
+    /* paths and configuration files */
+    const char * configdir;   /**< Defaults to fclaw_configdir under $HOME, may
+                                   be changed with \ref fclaw_app_set_configdir. */
+    const char * env_configdir;         /**< Name of environment variable for a
+                                             directory to find configuration files.
+                                             Defaults to fclaw_env_configdir. */
 
     /* options packages */
     sc_array_t *opt_pkg;      /**< An array of fclaw_app_options types. */
@@ -184,7 +193,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
-    MPI_Comm mpicomm;
+    sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
     mpiret = sc_MPI_Init (argc, argv);
@@ -209,6 +218,9 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
+
+    a->configdir = fclaw_configdir;
+    a->env_configdir = fclaw_env_configdir;
 
     return a;
 }
@@ -246,6 +258,22 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->configdir = configdir;
+}
+
+void
+fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->env_configdir = env_configdir;
 }
 
 void
@@ -349,7 +377,7 @@ options_postprocess_core (fclaw_app_t * a, void *package, void *registered)
     /* go through this packages options */
     sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
     sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
-    sc_package_set_verbosity (fclaw_package_id, core->fclaw_verbosity);
+    sc_package_set_verbosity (fclaw_get_package_id (), core->fclaw_verbosity);
 
     /* print help and/or version information and exit gracefully */
     if (core->print_help)
@@ -424,7 +452,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     /* parse command line options with given priority for errors */
     a->first_arg =
-        sc_options_parse (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
+        sc_options_parse (fclaw_get_package_id (), FCLAW_VERBOSITY_ERROR,
                           a->opt, *a->argc, *a->argv);
 
     /* check for option and parameter errors */
@@ -467,7 +495,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     {
     case FCLAW_NOEXIT:
         fclaw_global_infof ("Option parsing successful\n");
-        sc_options_print_summary (fclaw_package_id,
+        sc_options_print_summary (fclaw_get_package_id (),
                                   FCLAW_VERBOSITY_PRODUCTION, a->opt);
         break;
     case FCLAW_EXIT_QUIET:
@@ -476,15 +504,15 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     case FCLAW_EXIT_USAGE:
         /* we assume that the application has or will print something */
         /* but it has been specifically requested to print usage information */
-        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
-                                a->opt, NULL);
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_ESSENTIAL, a->opt, NULL);
         fclaw_global_infof ("Terminating program\n");
         break;
     case FCLAW_EXIT_ERROR:
         /* some error has been encountered */
         fclaw_global_errorf ("Configuration / option parsing failed\n");
-        sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_PRODUCTION,
-                                a->opt, NULL);
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_PRODUCTION, a->opt, NULL);
         fclaw_global_infof ("Terminating program\n");
         break;
     default:
@@ -494,8 +522,8 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     /* print configuration if so desired */
     if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
     {
-        retval = sc_options_save (fclaw_package_id, FCLAW_VERBOSITY_ERROR,
-                                  a->opt, savefile);
+        retval = sc_options_save (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ERROR, a->opt, savefile);
         if (retval)
         {
             vexit = FCLAW_EXIT_ERROR;
@@ -512,7 +540,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     return vexit;
 }
 
-MPI_Comm
+sc_MPI_Comm
 fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
 {
     FCLAW_ASSERT (a != NULL);
