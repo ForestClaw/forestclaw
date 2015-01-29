@@ -136,6 +136,7 @@ run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo,
                               dumo->options_int);
     fclaw_global_essentialf ("Essential message string is \"%s\"\n",
                              dumo->dummy_string);
+    fclaw_global_errorf ("We demonstrate an error message\n");
 
     /* demonstrate the blackbox package */
     fclaw_global_productionf ("We have multiplied %d into %d\n",
