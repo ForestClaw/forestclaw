@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct fclaw_options_general
 {
     amr_options_t *amropt;
-    amr_options_t **amropt_ptr;
 
     int print_help;        /**< Option variable to activate help message */
     int print_version;     /**< Option variable to print the version */
@@ -78,7 +77,11 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
     sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
                              "essential", kv, "Set verbosity for libraries");
 
-    /* core->amropt = fclaw_options_new(); */ /* Forestclaw parms  */
+
+#if 0
+    /* This is now done in the new_registration process */
+    core->amropt = fclaw_options_new(); /* Forestclaw parms  */
+#endif
     fclaw_options_add_general (opt, core->amropt);
 
     /* we do not need to work with the return value */
@@ -147,7 +150,7 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
     FCLAW_FREE (core);
 }
 
-static const fclaw_app_options_vtable_t options_vtable_core = {
+static const fclaw_app_options_vtable_t options_vtable_general = {
     options_register_general,
     options_postprocess_general,
     NULL,
@@ -169,7 +172,7 @@ void fclaw_app_options_register_general (fclaw_app_t * a, const char *configfile
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */
-    fclaw_app_options_register (a,NULL, configfile, &options_vtable_core,
+    fclaw_app_options_register (a,NULL, configfile, &options_vtable_general,
                                 core);
 }
 
