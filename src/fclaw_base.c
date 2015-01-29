@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+static const char *fclaw_configdir = ".forestclaw";
+static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
 static int fclaw_package_id = -1;
 
 int
@@ -55,6 +57,13 @@ struct fclaw_app
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+
+    /* paths and configuration files */
+    const char * configdir;   /**< Defaults to fclaw_configdir under $HOME, may
+                                   be changed with \ref fclaw_app_set_configdir. */
+    const char * env_configdir;         /**< Name of environment variable for a
+                                             directory to find configuration files.
+                                             Defaults to fclaw_env_configdir. */
 
     /* options packages */
     sc_array_t *opt_pkg;      /**< An array of fclaw_app_options types. */
@@ -210,6 +219,9 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->opt = sc_options_new ((*argv)[0]);
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 
+    a->configdir = fclaw_configdir;
+    a->env_configdir = fclaw_env_configdir;
+
     return a;
 }
 
@@ -246,6 +258,22 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->configdir = configdir;
+}
+
+void
+fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->env_configdir = env_configdir;
 }
 
 void
