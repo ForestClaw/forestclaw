@@ -163,7 +163,7 @@ main (int argc, char **argv)
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
-  if (!retval)
+  if (!retval & !vexit)
   {
       /* Only print options if verbosity >= info */
       fclaw_options_print_summary(options);
