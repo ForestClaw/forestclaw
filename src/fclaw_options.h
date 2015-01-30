@@ -192,9 +192,12 @@ struct amr_options
 
     /* Diagnostics */
     int run_diagnostics;
+    int conservation_check;
     int trapfpe;
     int mpi_debug;
+#if 0
     int print_options;
+#endif
     int help;
 
     /* Output and console IO */

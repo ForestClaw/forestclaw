@@ -34,6 +34,7 @@ typedef struct fclaw_options_general
 
     int print_help;        /**< Option variable to activate help message */
     int print_version;     /**< Option variable to print the version */
+    int print_options;     /**< Print current option settings and exit */
     int fclaw_verbosity;   /**< Option variable for ForestClaw verbosity */
     int lib_verbosity;     /**< Option variable for p4est, sc, and others */
     sc_keyvalue_t *kv_verbosity;      /**< Holds key-values for log levels */
@@ -68,13 +69,24 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 
     /* set the options for the core package */
     sc_options_add_switch (opt, 'h', "help", &core->print_help,
-                           "Print usage information");
+                           "Print usage information (same as --usage)");
+
+    sc_options_add_switch (opt, 'u', "usage", &core->print_help,
+                           "Print usage information (same as --help)");
+
     sc_options_add_switch (opt, 'v', "version", &core->print_version,
                            "Print ForestClaw version");
+
+    sc_options_add_switch (opt, 'o', "print_options", &core->print_options,
+                         "Print current option settings and exit");
+
     sc_options_add_keyvalue (opt, 'V', "verbosity", &core->fclaw_verbosity,
-                             "default", kv, "Set ForestClaw verbosity");
+                             "default", kv, "Set ForestClaw verbosity " \
+                             "(silent,essential,production,info,debug)");
+
     sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
-                             "essential", kv, "Set verbosity for libraries");
+                             "essential", kv, "Set p4est verbosity "     \
+                             "(silent,essential,production,info,debug)");
 
     fclaw_options_add_general (opt, core->amropt);
 
@@ -86,7 +98,6 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 {
-    int fclaw_package_id;
     fclaw_options_general_t *core = (fclaw_options_general_t *) package;
 
     FCLAW_ASSERT (a != NULL);
@@ -100,10 +111,22 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (core->is_registered);
 
     /* go through this packages options */
-    fclaw_package_id = fclaw_get_package_id();
     sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
     sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
-    sc_package_set_verbosity (fclaw_package_id, core->fclaw_verbosity);
+    sc_package_set_verbosity (fclaw_get_package_id(), core->fclaw_verbosity);
+
+    fclaw_options_postprocess(core->amropt);
+
+    /* at this point there are no errors to report */
+    return FCLAW_NOEXIT;
+}
+
+fclaw_exit_type_t
+options_check_general (fclaw_app_t * app, void *package, void *registered)
+{
+    fclaw_options_general_t *core = (fclaw_options_general_t *) package;
+    int retval;
+    sc_options_t *options;
 
     /* print help and/or version information and exit gracefully */
     if (core->print_help)
@@ -117,11 +140,25 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
         return FCLAW_EXIT_QUIET;
     }
 
-    fclaw_options_postprocess(core->amropt);
-
-    /* at this point there are no errors to report */
-    return FCLAW_NOEXIT;
+    options = fclaw_app_get_options (app);
+    retval =  fclaw_options_check (options, core->amropt);
+    if (retval != 0)
+    {
+        return FCLAW_EXIT_ERROR;
+    }
+    else
+        if (core->print_options)
+        {
+            sc_options_print_summary (fclaw_get_package_id(),
+                                      FCLAW_VERBOSITY_ESSENTIAL,options);
+            return FCLAW_EXIT_QUIET;
+        }
+        else
+        {
+            return FCLAW_NOEXIT;
+        }
 }
+
 
 static void
 options_destroy_general (fclaw_app_t * a, void *package, void *registered)
@@ -149,7 +186,7 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
 static const fclaw_app_options_vtable_t options_vtable_general = {
     options_register_general,
     options_postprocess_general,
-    NULL,
+    options_check_general,
     options_destroy_general
 };
 
@@ -278,41 +315,54 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower " \
                            "(used only with manifold=0) [0]");
     sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper " \
-                           "(used only with manifold=0)[1]");
+                           "(used only with manifold=0) [1]");
     sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower " \
-                           "(used only with manifold=0)[0]");
+                           "(used only with manifold=0) [0]");
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
-                           "(used only with manifold=0)[1]");
+                           "(used only with manifold=0) [1]");
 
     sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
-                           "Solution is on manifold [F]");
+                         "Solution is on manifold [F]");
+
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
-                           "Use fixed coarse grid time step [F]");
+                         "Use fixed coarse grid time step [F]");
+
     sc_options_add_bool (opt, 0, "run_diagnostics",
                          &amropt->run_diagnostics,0,
                          "Run diagnostics [F]");
+
+    sc_options_add_bool (opt, 0, "conservation_check",
+                         &amropt->conservation_check,0,
+                         "Conservation check [F]");
+
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
-                           "Use subcycling in time [F]");
+                         "Use subcycling in time [F]");
+
     sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
                            "No weighting when subcycling [F]");
 
     /* ---------------------- Usage information -------------------------- */
-    sc_options_add_bool (opt, 0, "help", &amropt->help, 0,
-                           "Print usage information (same as --usage) [F]");
-    sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
-                           "Print usage information (same as --help) [F]");
+    sc_options_add_switch (opt, 0, "help", &amropt->help,
+                         "Print usage information (same as --usage) [F]");
 
-    sc_options_add_bool (opt, 0, "print_options", &amropt->print_options, 0,
-                         "Print current option settings [F]");
+#if 0
+    sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
+                         "Print usage information (same as --help) [F]");
+
+    sc_options_add_switch (opt, 0, "print_options", &amropt->print_options, 0,
+                         "Print current option settings");
+#endif
+
 
     /* ---------------------- Control execution -------------------------- */
-    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe, 1,
+    sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,
                          "Trap floating point exceptions [1]");
 
-    sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug, 0,
+    sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug,0,
                         "Start MPI debug session (for attaching processes in gdb) [0]");
 
 
+    /* ---------------------- Mapping options -------------------------- */
     sc_options_add_int (opt, 0, "mi", &amropt->mi, 1,
                         "Number of blocks in x direction [1]");
 
@@ -325,25 +375,16 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "periodic_y", &amropt->periodic_y, 0,
                         "Periodic in y direction  [F]");
 
-    /* --------------------------------------------------------------------
-       Scale
-       --------------------------------------------------------------------*/
     fclaw_options_add_double_array (opt,0, "scale",
                                     &amropt->scale_string, "1 1 1",
                                     &amropt->scale, 3,
                                     "Scale factor [1 1 1]");
 
-    /* --------------------------------------------------------------------
-       Shift
-       --------------------------------------------------------------------*/
     fclaw_options_add_double_array (opt,0, "shift",
                                     &amropt->shift_string, "0 0 0",
                                     &amropt->shift, 3,
                                     "Shift array [0 0 0]");
 
-    /* --------------------------------------------------------------------
-       Rotate
-       --------------------------------------------------------------------*/
     sc_options_add_double (opt, 0, "phi", &amropt->phi, 0,
                            "Rotation angle about x axis (degrees) [0]");
 
@@ -423,7 +464,7 @@ void fclaw_options_print_summary(sc_options_t *opt)
     int fclaw_package_id;
     fclaw_package_id = fclaw_get_package_id();
     /* This is printed assuming vebosity level 'INFO' */
-    sc_options_print_summary (fclaw_package_id, FCLAW_VERBOSITY_INFO,opt);
+    sc_options_print_summary (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,opt);
 }
 
 void fclaw_options_print_usage(sc_options_t *opt)
@@ -532,22 +573,24 @@ void fclaw_options_postprocess (amr_options_t * amropt)
    ----------------------------------------------------------------- */
 int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
 {
+#if 0
     /* Check for user help argument */
-    if (gparms->help || gparms->print_options)
+    if (core->print_help || core->print_options)
     {
         /* Both help and current settings can be printed */
-        if (gparms->help)
+        if (core->print_help)
         {
             /* This prints the help message for each options */
             fclaw_options_print_usage(options);
         }
-        if (gparms->print_options)
+        if (core->print_options)
         {
             /* This prints the current values of the parameters */
             fclaw_options_print_summary(options);
         }
-        return -1;
+        return FCLAW_EXIT_QUIET;
     }
+#endif
 
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
