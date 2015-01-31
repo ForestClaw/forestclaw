@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_OPTIONS_H
 
 #include <fclaw_base.h>
-#include <fclaw_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -73,7 +72,7 @@ void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
 
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
 
-int  fclaw_options_read_from_file(sc_options_t* opt);
+int fclaw_options_read_from_file(sc_options_t* opt);
 
 int  fclaw_options_parse_command_line (sc_options_t * opt, int argc,
                                        char **argv);

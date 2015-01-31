@@ -23,8 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_capi.h"
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
+
+#include "fp_exception_glibc_extension.h"
+
 
 /** This is the internal state of an options structure for core variables. */
 
@@ -125,8 +129,13 @@ fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
     fclaw_options_general_t *core = (fclaw_options_general_t *) package;
-    int retval;
     sc_options_t *options;
+    amr_options_t* gparms;
+
+    int retval;
+
+    options = fclaw_app_get_options (app);
+    gparms = core->amropt;
 
     /* print help and/or version information and exit gracefully */
     if (core->print_help)
@@ -140,23 +149,35 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
         return FCLAW_EXIT_QUIET;
     }
 
-    options = fclaw_app_get_options (app);
     retval =  fclaw_options_check (options, core->amropt);
     if (retval != 0)
     {
         return FCLAW_EXIT_ERROR;
     }
+
+    if (gparms->mpi_debug)
+    {
+        fclaw_global_infof("Entering mpi_debug session");
+          fclaw2d_mpi_debug();
+    }
+
+    if (gparms->trapfpe)
+    {
+        fclaw_global_infof("Enabling floating point traps\n");
+        feenableexcept(FE_INVALID);
+    }
+
+
+    if (core->print_options)
+    {
+        sc_options_print_summary (fclaw_get_package_id(),
+                                  FCLAW_VERBOSITY_ESSENTIAL,options);
+        return FCLAW_EXIT_QUIET;
+    }
     else
-        if (core->print_options)
-        {
-            sc_options_print_summary (fclaw_get_package_id(),
-                                      FCLAW_VERBOSITY_ESSENTIAL,options);
-            return FCLAW_EXIT_QUIET;
-        }
-        else
-        {
-            return FCLAW_NOEXIT;
-        }
+    {
+        return FCLAW_NOEXIT;
+    }
 }
 
 
