@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <clawpack_fort.H>
 #include <amr_forestclaw.H>
 
+#include "clawpack46_options.h"
 
 extern "C"
 {
@@ -146,6 +147,10 @@ void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
 int clawpack46_checkparms(sc_options_t *opt,
                            fclaw2d_clawpack_parms_t *clawpack_parms,
                           amr_options_t* gparms);
+
+void set_clawpack46_options(fclaw2d_domain_t* domain,
+                            clawpack46_options_t* clawopt);
+
 
 
 /* Linking solvers */

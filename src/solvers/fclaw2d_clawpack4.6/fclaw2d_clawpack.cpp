@@ -649,6 +649,16 @@ void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t* clawpack_parms)
 #endif
 }
 
+void set_clawpack46_options(fclaw2d_domain_t* domain,
+                            clawpack46_options_t* clawopt)
+{
+    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    ddata->clawpack_parms = (void*) clawopt;
+}
+
+
+
+
 static
 void fclaw2d_clawpack_patch_data_new(void** wp)
 {
