@@ -60,7 +60,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
-    /* [user] User options in */
+    /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
@@ -100,8 +100,8 @@ fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 1, 2, 3 or 4\n");
+    if (user->example < 0 || user->example > 4) {
+        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
@@ -131,15 +131,12 @@ void fclaw_app_options_register_user (fclaw_app_t * app,
                                       const char *configfile,
                                       user_options_t* user)
 {
-
-
     FCLAW_ASSERT (app != NULL);
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
-
 }
 
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
@@ -147,10 +144,10 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
                  user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
-    p4est_connectivity_t   *conn = NULL;
-    fclaw2d_domain_t	   *domain;
 
-    /* Mapping  */
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     /* Used locally */
@@ -173,11 +170,13 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     switch (user->example)
     {
     case 1:
+        /* Cartesian [-1,1]x[-1,1] */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift,rotate);
+        cont = fclaw2d_map_new_cart(brick, gparms->scale, gparms->shift, rotate);
         break;
     case 2:
+        /* torus */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,user->alpha);
@@ -198,7 +197,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
         break;
 
     default:
-        SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+        SC_ABORT_NOT_REACHED ();
     }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
@@ -238,15 +237,13 @@ main (int argc, char **argv)
 
   /* Options */
   sc_options_t             *options;
-  amr_options_t         samr_options, *gparms = &samr_options;
-  clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
-  user_options_t        suser_options, *user = &suser_options;
+  amr_options_t            samr_options,      *gparms = &samr_options;
+  clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+  user_options_t           suser_options,     *user = &suser_options;
 
   int retval;
 
-  /* -------------------------------------------------------------
-     - Initialize application
-     ------------------------------------------------------------- */
+  /* Initialize application */
   app = fclaw_app_new (&argc, &argv, user);
   options = fclaw_app_get_options (app);
 
@@ -255,33 +252,17 @@ main (int argc, char **argv)
   clawpack46_app_options_register (app, "fclaw_options.ini", clawpack_options);
   fclaw_app_options_register_user (app, "fclaw_options.ini", user);
 
-#if 0
-  /* [clawpack46] Add solver options */
-  clawpack46_options_add(options,clawpack_parms);
-#endif
-
-  /* Read configuration file(s) */
+  /* Read configuration file(s) and command line, and process options */
   retval = fclaw_options_read_from_file(options);
-
-  /* Parse command line, post-process and check parameter values */
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
-#if 0
-  clawpack46_postprocess_parms(clawpack_parms);
-  retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
-#endif
 
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
   if (!retval & !vexit)
   {
-      run_program(app, gparms, clawpack_options,user);
+      run_program(app, gparms, clawpack_options, user);
   }
-
-#if 0
-  fclaw2d_clawpack_parms_delete(clawpack_options);
-#endif
 
   fclaw_app_destroy (app);
 
