@@ -202,8 +202,8 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_PRODUCTION);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_PRODUCTION);
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     /* ---------------------------------------------------------------
        Set domain data.
