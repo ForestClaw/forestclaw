@@ -33,8 +33,9 @@ extern "C"
 #endif
 #endif
 
-static void *
-clawpack46_options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+static void *clawpack46_options_register (fclaw_app_t * app,
+                                          void *package,
+                                          sc_options_t * opt)
 {
     clawpack46_options_t* clawopt = (clawpack46_options_t*) package;
 
@@ -62,14 +63,13 @@ clawpack46_options_register (fclaw_app_t * app, void *package, sc_options_t * op
     sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
                         "[clawpack46] Number of waves [1]");
 
-    /* Array of mwaves many values */
     fclaw_options_add_int_array (opt, 0, "mthlim", &clawopt->mthlim_string, NULL,
-                               &clawopt->mthlim, clawopt->mwaves,
-                  "[clawpack46] Waves limiters (one entry per wave; values 0-4) [NULL]");
+                                 &clawopt->mthlim, clawopt->mwaves,
+                                 "[clawpack46] Waves limiters (one entry per wave; " \
+                                 "values 0-4) [NULL]");
 
     clawopt->is_registered = 1;
     return NULL;
-
 }
 
 static fclaw_exit_type_t
