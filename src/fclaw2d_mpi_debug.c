@@ -33,6 +33,8 @@ extern "C"
 #endif
 #endif
 
+#include "fclaw_base.h"
+
 #ifdef FCLAW_ENABLE_MPI
 
 #include <mpi.h>
@@ -80,6 +82,7 @@ void fclaw2d_mpi_debug()
 #else
 void fclaw2d_mpi_debug()
 {
+    fclaw_global_infof("Option --mpi_debug is set, but code is not compiled for MPI");
 }
 #endif
 
