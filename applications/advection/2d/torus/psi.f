@@ -19,14 +19,15 @@
      &      blockno,xc,yc,xc1,yc1,zc1)
 
       call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
+     &      blockno,xc1,yc1,xp,yp,zp)
 
       revs_per_s = 0.5d0
 
       alpha = 0.4d0
       pi2 = 2*pi
       if (iscart()) then
-         psi = revs_per_s*(xc1 + pi*yc1/2.d0);
+c         psi = revs_per_s*(xc + pi*yc/2.d0);
+         psi = revs_per_s*(-xp + yp)
       elseif (issphere()) then
          psi = pi2*revs_per_s*zp
       elseif (isflat()) then
