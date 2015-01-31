@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
 
+#include <clawpack46_options.h>
 #include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
@@ -57,29 +58,26 @@ typedef struct user_options
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    sc_options_t* options;
     user_options_t* user = (user_options_t*) package;
 
-    options = fclaw_app_get_options (app);
+    /* [user] User options in */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "[user] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
-    /* [main] User options in */
-    sc_options_add_int (options, 0, "main:example", &user->example, 0,
-                        "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
-
-    sc_options_add_double (options, 0, "main:alpha", &user->alpha, 0.4,
-                           "[main] Ratio r/R, r=outer radius, R=inner radius " \
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
 
-    fclaw_options_add_double_array(options, 0, "main:latitude", &user->latitude_string,
+    fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
                                    "-50 50", &user->latitude, 2,
-                                   "[main] Latitude range (degrees) [-50 50]");
+                                   "[user] Latitude range (degrees) [-50 50]");
 
-    fclaw_options_add_double_array(options, 0, "main:longitude", &user->longitude_string,
+    fclaw_options_add_double_array(opt, 0, "longitude", &user->longitude_string,
                                    "0 360", &user->longitude, 2,
-                                   "[main] Longitude range (degrees) [0 360]");
+                                   "[user] Longitude range (degrees) [0 360]");
 
-    sc_options_add_double (options, 0, "main:beta", &user->beta, 0.4,
-                           "[main] Inner radius of annulus [0.4]");
+    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
+                           "[user] Inner radius of annulus [0.4]");
 
     user->is_registered = 1;
     return NULL;
@@ -103,7 +101,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
     if (user->example < 1 || user->example > 4) {
-        fclaw_global_essentialf ("Option --main:example must be 1, 2, 3 or 4\n");
+        fclaw_global_essentialf ("Option --user:example must be 1, 2, 3 or 4\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
@@ -139,13 +137,13 @@ void fclaw_app_options_register_user (fclaw_app_t * app,
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */
-    fclaw_app_options_register (app,"main", configfile, &options_vtable_user,
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 
 }
 
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 fclaw2d_clawpack_parms_t* clawpack_parms,
+                 clawpack46_options_t* clawpack_options,
                  user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
@@ -214,7 +212,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     init_domain_data(domain);
 
     set_domain_parms(domain,gparms);
-    set_clawpack_parms(domain,clawpack_parms);
+    set_clawpack46_options(domain,clawpack_options);
 
     link_problem_setup(domain,torus_problem_setup);
 
@@ -238,12 +236,11 @@ main (int argc, char **argv)
   int first_arg;
   fclaw_exit_type_t vexit;
 
-  sc_options_t             *options;
-
   /* Options */
-  amr_options_t             samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
-  user_options_t            suser_options, *user = &suser_options;
+  sc_options_t             *options;
+  amr_options_t         samr_options, *gparms = &samr_options;
+  clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
+  user_options_t        suser_options, *user = &suser_options;
 
   int retval;
 
@@ -255,10 +252,13 @@ main (int argc, char **argv)
 
   /*  Register options for each package */
   fclaw_app_options_register_general (app, "fclaw_options.ini", gparms);
+  clawpack46_app_options_register (app, "fclaw_options.ini", clawpack_options);
   fclaw_app_options_register_user (app, "fclaw_options.ini", user);
 
+#if 0
   /* [clawpack46] Add solver options */
   clawpack46_options_add(options,clawpack_parms);
+#endif
 
   /* Read configuration file(s) */
   retval = fclaw_options_read_from_file(options);
@@ -266,20 +266,22 @@ main (int argc, char **argv)
   /* Parse command line, post-process and check parameter values */
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+#if 0
   clawpack46_postprocess_parms(clawpack_parms);
-
-  /* retval = retval || fclaw_options_check (options, gparms); */
   retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
+#endif
+
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
   if (!retval & !vexit)
   {
-      run_program(app, gparms, clawpack_parms,user);
+      run_program(app, gparms, clawpack_options,user);
   }
 
-  /* Which of these do I still need? */
-  fclaw2d_clawpack_parms_delete(clawpack_parms);
+#if 0
+  fclaw2d_clawpack_parms_delete(clawpack_options);
+#endif
 
   fclaw_app_destroy (app);
 
