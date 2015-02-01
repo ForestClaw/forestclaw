@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_clawpack46_options.h"
+#include "fc2d_clawpack46_options.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -126,9 +126,9 @@ static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-void fc2d_clawpack46_app_options_register (fclaw_app_t * app,
-                                      const char *configfile,
-                                      fc2d_clawpack46_options_t* clawopt)
+void fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                       const char *configfile,
+                                       fc2d_clawpack46_options_t* clawopt)
 {
     FCLAW_ASSERT (app != NULL);
 

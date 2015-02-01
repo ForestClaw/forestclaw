@@ -57,7 +57,7 @@ typedef struct fc2d_clawpack46_options
     int is_registered;
 } fc2d_clawpack46_options_t;
 
-void fc2d_clawpack46_app_options_register (fclaw_app_t * app,
+void fc2d_clawpack46_options_register (fclaw_app_t * app,
                                            const char *configfile,
                                            fc2d_clawpack46_options_t* clawopt);
 

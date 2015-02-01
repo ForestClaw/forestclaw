@@ -27,12 +27,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
-#include "clawpack_fort.H"
-#include "fclaw2d_solvers.H"
-#include "fclaw2d_clawpack46.H"
 #include "fclaw_options.h"
+#include "clawpack_fort.H"
 
+#include "fc2d_clawpack46_options.h"
+#include "fc2d_clawpack46.H"
 
+/* Patch data is stored in each ClawPatch */
+struct patch_aux_data
+{
+    FArrayBox auxarray;
+    int maux;
+};
 
 static fc2d_clawpack46_options_t*
 get_options(fclaw2d_domain_t* domain)
@@ -43,13 +49,30 @@ get_options(fclaw2d_domain_t* domain)
     return clawpack_options;
 }
 
-static fc2d_clawpack46_patch_data_t*
+static patch_aux_data*
 get_patch_data(ClawPatch *cp)
 {
-    fc2d_clawpack46_patch_data_t *wp =
-        (fc2d_clawpack46_patch_data_t*) cp->clawpack_patch_data();
+    patch_aux_data *wp =
+        (patch_aux_data*) cp->clawpack_patch_data();
     return wp;
 }
+
+static
+void patch_data_new(void** wp)
+{
+    patch_aux_data* patch_data;
+    patch_data = new patch_aux_data;
+    *wp = (void*) patch_data;
+}
+
+static
+void patch_data_delete(void **wp)
+{
+    patch_aux_data *patch_data = (patch_aux_data*) *wp;
+    delete patch_data;
+    *wp = (void*) NULL;
+}
+
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
@@ -79,7 +102,7 @@ void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
     ur[1] = my + mbc;    Box box(ll,ur);
 
     // get solver specific data stored on this patch
-    fc2d_clawpack46_patch_data_t *clawpack_patch_data = get_patch_data(cp);
+    patch_aux_data *clawpack_patch_data = get_patch_data(cp);
     clawpack_patch_data->auxarray.define(box,maux);
     clawpack_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
 }
@@ -90,7 +113,7 @@ void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
     fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
     *maux = clawpack_options->maux;
 
-    fc2d_clawpack46_patch_data_t *clawpack_patch_data = get_patch_data(cp);
+    patch_aux_data *clawpack_patch_data = get_patch_data(cp);
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
 
@@ -444,30 +467,6 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
-}
-
-
-static
-void patch_data_new(void** wp)
-{
-    fc2d_clawpack46_patch_data_t* clawpack_patch_data;
-    clawpack_patch_data = new fc2d_clawpack46_patch_data_t;
-    *wp = (void*) clawpack_patch_data;
-
-    // or?
-    // *wp = (void*) FC2D_ALLOC_ZERO (fc2d_clawpack_patch_data_t, 1);
-}
-
-static
-void patch_data_delete(void **wp)
-{
-    fc2d_clawpack46_patch_data_t *clawpack_patch_data = (fc2d_clawpack46_patch_data_t*) *wp;
-    delete clawpack_patch_data;
-
-    // or?
-    // FC2D_FREE(clawpack_patch_data);
-
-    *wp = (void*) NULL;
 }
 
 

@@ -21,8 +21,8 @@ libclawpack4_6_internal_headers = src/solvers/fclaw2d_clawpack4.6/fortran_source
 
 ## TODO: remove dependencies of this library on any sources under applications
 libclawpack4_6_compiled_sources = \
-	src/solvers/fclaw2d_clawpack4.6/fclaw2d_clawpack46.cpp \
-	src/solvers/fclaw2d_clawpack4.6/fclaw2d_clawpack46_options.c \
+	src/solvers/fclaw2d_clawpack4.6/fc2d_clawpack46.cpp \
+	src/solvers/fclaw2d_clawpack4.6/fc2d_clawpack46_options.c \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/limiter.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/qinit.f \
 	src/solvers/fclaw2d_clawpack4.6/fortran_source/b4step2.f \
