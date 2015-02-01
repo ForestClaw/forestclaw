@@ -238,6 +238,7 @@ main (int argc, char **argv)
   fclaw_exit_type_t vexit;
 
   /* Options */
+  sc_options_t              *options;
   amr_options_t             samr_options, *gparms = &samr_options;
   fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
   user_options_t                suser_options, *user = &suser_options;
