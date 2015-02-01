@@ -30,7 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_clawpack.H"
-#include "fclaw_options.h"
 
 void set_clawpack_parms(fclaw2d_domain_t* domain,fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -485,6 +484,7 @@ void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno)
 
 }
 
+#if 0
 fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
 {
     fclaw2d_clawpack_parms_t* clawpack_parms = clawpack46_new_options();
@@ -492,7 +492,9 @@ fclaw2d_clawpack_parms_t*  fclaw2d_clawpack_parms_new(sc_options_t *opt)
     clawpack46_read_options_from_file(opt);
     return clawpack_parms;
 }
+#endif
 
+#if 0
 fclaw2d_clawpack_parms_t*  clawpack46_new_options()
 {
     fclaw2d_clawpack_parms_t *clawpack_parms;
@@ -545,6 +547,7 @@ void clawpack46_options_add (sc_options_t* opt,fclaw2d_clawpack_parms_t* clawpac
                                &clawpack_parms->mthlim, clawpack_parms->mwaves,
                   "[clawpack46] Waves limiters (one entry per wave; values 0-4) [NULL]");
 }
+#endif
 
 void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t* clawpack_parms,
                                  amr_options_t* gparms)
@@ -580,6 +583,7 @@ int fclaw2d_clawpack_checkparms2(sc_options_t* options,
     return clawpack46_checkparms(options, clawpack_parms, gparms);
 }
 
+#if 0
 int clawpack46_checkparms(sc_options_t* options,
                           fclaw2d_clawpack_parms_t* clawpack_parms,
                           amr_options_t* gparms)
@@ -587,9 +591,7 @@ int clawpack46_checkparms(sc_options_t* options,
     /* Check for user help argument */
     if (gparms->help)
     {
-#if 0
         sc_options_print_usage (sc_package_id, lp, options, NULL);
-#endif
         fclaw_options_print_summary(options);
         return -1;
     }
@@ -618,6 +620,7 @@ int clawpack46_checkparms(sc_options_t* options,
     return 0;    /* Nothing can go wrong here! */
 
 }
+#endif
 
 void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -625,6 +628,7 @@ void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms
 }
 
 
+#if 0
 void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
     /* -----------------------------------------------------------------------
@@ -637,7 +641,7 @@ void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms)
     fclaw_options_convert_int_array (clawpack_parms->order_string, &clawpack_parms->order,
                                    SpaceDim);
 }
-
+#endif
 
 void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t* clawpack_parms)
 {
@@ -649,12 +653,14 @@ void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t* clawpack_parms)
 #endif
 }
 
+#if 0
 void set_clawpack46_options(fclaw2d_domain_t* domain,
                             clawpack46_options_t* clawopt)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
     ddata->clawpack_parms = (void*) clawopt;
 }
+#endif
 
 
 
