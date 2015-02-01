@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
 
-#include <fclaw2d_clawpack.H>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
 
@@ -35,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 
 #include <p4est_connectivity.h>
+
+#include <fc2d_clawpack46.H>
 
 #include "torus_user.H"
 
@@ -95,7 +96,7 @@ options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
-fclaw_exit_type_t
+static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
@@ -119,16 +120,18 @@ options_destroy_user (fclaw_app_t * a, void *package, void *registered)
 }
 
 
-static const fclaw_app_options_vtable_t options_vtable_user = {
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
     options_register_user,
     options_postprocess_user,
     options_check_user,
     options_destroy_user
 };
 
-void fclaw_app_options_register_user (fclaw_app_t * app,
-                                      const char *configfile,
-                                      user_options_t* user)
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
 {
 
 
@@ -142,7 +145,7 @@ void fclaw_app_options_register_user (fclaw_app_t * app,
 }
 
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 fclaw2d_clawpack_parms_t* clawpack_parms,
+                 fc2d_clawpack46_options_t* clawpack_options,
                  user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
@@ -211,7 +214,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     init_domain_data(domain);
 
     set_domain_parms(domain,gparms);
-    set_clawpack_parms(domain,clawpack_parms);
+    fc2d_clawpack46_set_options(domain,clawpack_options);
 
     link_problem_setup(domain,torus_problem_setup);
 
@@ -239,8 +242,8 @@ main (int argc, char **argv)
 
   /* Options */
   amr_options_t             samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t  sclawpack_parms, *clawpack_parms = &sclawpack_parms;
-  user_options_t            suser_options, *user = &suser_options;
+  fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
+  user_options_t                suser_options, *user = &suser_options;
 
   int retval;
 
@@ -251,11 +254,12 @@ main (int argc, char **argv)
   options = fclaw_app_get_options (app);
 
   /*  Register options for each package */
-  fclaw_app_options_register_general (app, "fclaw_options.ini", gparms);
-  fclaw_app_options_register_user (app, "fclaw_options.ini", user);
+  fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+  fc2d_clawpack46_options_register(app,NULL,clawpack_options);
 
-  /* [clawpack46] Add solver options */
-  clawpack46_options_add(options,clawpack_parms);
+  /* User defined options (defined above) */
+  register_user_options (app, "fclaw_options.ini", user);
+
 
   /* Read configuration file(s) */
   retval = fclaw_options_read_from_file(options);
@@ -263,20 +267,13 @@ main (int argc, char **argv)
   /* Parse command line, post-process and check parameter values */
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  clawpack46_postprocess_parms(clawpack_parms);
-
-  /* retval = retval || fclaw_options_check (options, gparms); */
-  retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms);
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
   if (!retval & !vexit)
   {
-      run_program(app, gparms, clawpack_parms,user);
+      run_program(app, gparms, clawpack_options,user);
   }
-
-  /* Which of these do I still need? */
-  fclaw2d_clawpack_parms_delete(clawpack_parms);
 
   fclaw_app_destroy (app);
 
