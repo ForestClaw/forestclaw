@@ -27,7 +27,7 @@
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
 
-#include <fclaw2d_clawpack.H>
+#include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
 
@@ -38,7 +38,7 @@
 #include "swirl_user.H"
 
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 clawpack46_options_t* clawpack_options)
+                 fc2d_clawpack46_options_t* clawpack_options)
 {
     sc_MPI_Comm            mpicomm;
 
@@ -68,7 +68,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     init_domain_data(domain);
 
     set_domain_parms(domain,gparms);
-    set_clawpack46_options(domain,clawpack_options);
+    fc2d_clawpack46_set_options(domain,clawpack_options);
 
     /* ---------------------------------------------------------------
        Define the solver and link in other problem/user specific
@@ -101,9 +101,9 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t             *options;
-    amr_options_t            samr_options,      *gparms = &samr_options;
-    clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+    sc_options_t                *options;
+    amr_options_t               samr_options,      *gparms = &samr_options;
+    fc2d_clawpack46_options_t   sclawpack_options, *clawpack_options = &sclawpack_options;
 
     int retval;
 
@@ -112,8 +112,8 @@ main (int argc, char **argv)
     options = fclaw_app_get_options (app);
 
     /*  Register options for each package */
-    fclaw_app_options_register_general (app, "fclaw_options.ini", gparms);
-    clawpack46_app_options_register (app, "fclaw_options.ini", clawpack_options);
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
 
     /* Read configuration file(s) and command line, and process options */
     retval = fclaw_options_read_from_file(options);
