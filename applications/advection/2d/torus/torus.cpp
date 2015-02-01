@@ -57,28 +57,25 @@ typedef struct user_options
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    sc_options_t* options;
     user_options_t* user = (user_options_t*) package;
 
-    options = fclaw_app_get_options (app);
-
     /* [main] User options in */
-    sc_options_add_int (options, 0, "main:example", &user->example, 0,
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[main] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
 
-    sc_options_add_double (options, 0, "main:alpha", &user->alpha, 0.4,
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "[main] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
 
-    fclaw_options_add_double_array(options, 0, "main:latitude", &user->latitude_string,
+    fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
                                    "-50 50", &user->latitude, 2,
                                    "[main] Latitude range (degrees) [-50 50]");
 
-    fclaw_options_add_double_array(options, 0, "main:longitude", &user->longitude_string,
+    fclaw_options_add_double_array(opt, 0, "longitude", &user->longitude_string,
                                    "0 360", &user->longitude, 2,
                                    "[main] Longitude range (degrees) [0 360]");
 
-    sc_options_add_double (options, 0, "main:beta", &user->beta, 0.4,
+    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
                            "[main] Inner radius of annulus [0.4]");
 
     user->is_registered = 1;
@@ -139,7 +136,7 @@ void fclaw_app_options_register_user (fclaw_app_t * app,
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */
-    fclaw_app_options_register (app,"main", configfile, &options_vtable_user,
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 
 }
