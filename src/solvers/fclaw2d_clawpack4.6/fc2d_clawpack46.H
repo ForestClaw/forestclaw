@@ -23,13 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK_H
-#define FCLAW2D_CLAWPACK_H
+#ifndef FC2D_CLAWPACK46_H
+#define FC2D_CLAWPACK46_H
 
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
 #include <clawpack_fort.H>
 #include <amr_forestclaw.H>
+
+#include "fc2d_clawpack46_options.h"
+
 
 extern "C"
 {
@@ -96,143 +99,94 @@ void CLAWPACK_SET_BLOCK(int* blockno);
 #define CLAWPACK_GET_BLOCK FCLAW_F77_FUNC(clawpack_get_block, CLAWPACK_GET_BLOCK)
 int CLAWPACK_GET_BLOCK();
 
-typedef struct fclaw2d_clawpack_parms fclaw2d_clawpack_parms_t;
-typedef struct fclaw2d_clawpack_patch_data fclaw2d_clawpack_patch_data_t;
 
-/* Only one copy of fclaw2d_clawpack_parms for each run */
-struct fclaw2d_clawpack_parms
-{
-    int mwaves;
-    int maux;
+void
+fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain,
+                                ClawPatch *cp);
 
-    const char *order_string;
-    int *order;   /* order[2] */
+void
+fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
+                             ClawPatch *cp, double **aux, int* maux);
 
-    const char *mthlim_string;
-    int *mthlim;  /* mthlim[mwaves] */
+void
+fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
+                            fc2d_clawpack46_options_t* clawpack_options);
 
-    int method[7];  /* method[7] */
-    int mcapa;
-    int src_term;
-    void *user;
+void
+fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
 
-};
+void
+fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
 
-
-/* ----------------------------------------------------------------------
-   Routines that get called once when setting up the problem and solvers.
-   ---------------------------------------------------------------------- */
-/* clawpack specific arguments */
-void fclaw2d_clawpack_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
-void fclaw2d_clawpack_get_auxarray(fclaw2d_domain_t* domain,
-                               ClawPatch *cp, double **aux, int* maux);
-
-/* Reading in parameters */
-void set_clawpack_parms(fclaw2d_domain_t* domain,fclaw2d_clawpack_parms_t* clawpack_parms);
-fclaw2d_clawpack_parms_t* fclaw2d_clawpack_parms_new(sc_options_t *opt);
-void fclaw2d_clawpack_checkparms(fclaw2d_clawpack_parms_t *clawpack_parms,
-                                 amr_options_t* gparms);
-
-void fclaw2d_clawpack_parms_delete(fclaw2d_clawpack_parms_t *clawpack_parms);
-void fclaw2d_clawpack_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
-
-#if 0
-fclaw2d_clawpack_parms_t*  clawpack46_new_options();
-void clawpack46_read_options_from_file(sc_options_t* opt);
-int clawpack46_options_read_from_file(sc_options_t* opt,int log_priority);
-
-void clawpack46_options_add (sc_options_t* opt, fclaw2d_clawpack_parms_t* clawpack_parms);
-void clawpack46_postprocess_parms(fclaw2d_clawpack_parms_t* clawpack_parms);
-int clawpack46_checkparms(sc_options_t *opt,
-                           fclaw2d_clawpack_parms_t *clawpack_parms,
-                          amr_options_t* gparms);
-
-void set_clawpack46_options(fclaw2d_domain_t* domain,
-                            clawpack46_options_t* clawopt);
-#endif
+void
+fc2d_clawpack46_link_to_clawpatch();
 
 
+void
+fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
 
-/* Linking solvers */
-void fclaw2d_clawpack_link_solvers(fclaw2d_domain_t* domain);
+void
+fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx);
 
-/* Problem setup - user defined */
-void fclaw2d_clawpack_setprob(fclaw2d_domain_t* domain);
-
-/* ----------------------------------------------------------------------
-   Patch related parms
-   ---------------------------------------------------------------------- */
-
-/* Patch data is stored in each ClawPatch */
-struct fclaw2d_clawpack_patch_data
-{
-    FArrayBox auxarray;
-    int maux;
-};
-
-
-void fclaw2d_clawpack_link_to_clawpatch();
-
-
-void fclaw2d_clawpack_setaux(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx);
-
-void fclaw2d_clawpack_qinit(fclaw2d_domain_t *domain,
+void
+fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
-                        int this_patch_idx);
+                        int this_patch_idx,
+                        double t,
+                        double dt);
 
-void fclaw2d_clawpack_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
+void
+fc2d_clawpack46_bc2(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    double t,
+                    double dt,
+                    fclaw_bool intersects_bc[],
+                    fclaw_bool time_interp);
 
-void fclaw2d_clawpack_bc2(fclaw2d_domain_t *domain,
+void
+fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
+                     fclaw2d_patch_t *this_patch,
+                     int this_block_idx,
+                     int this_patch_idx,
+                     double t,
+                     double dt);
+
+
+/* A single step method that advances the solution a single step on a single grid
+   using a time step dt determined by the subcycle manager */
+double
+fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                       fclaw2d_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx,
                       double t,
-                      double dt,
-                      fclaw_bool intersects_bc[],
-                      fclaw_bool time_interp);
+                      double dt);
 
-void fclaw2d_clawpack_src2(fclaw2d_domain_t *domain,
+/* Use this ro return only the right hand side of the clawpack algorithm */
+double
+fc2d_clawpack46_step2_rhs(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double *rhs);
+
+double
+fc2d_clawpack46_update(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        double t,
                        double dt);
-
-
-/* A single step method that advances the solution a single step on a single grid
-   using a time step dt determined by the subcycle manager */
-double fclaw2d_clawpack_step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
-
-/* Use this ro return only the right hand side of the clawpack algorithm */
-double fclaw2d_clawpack_step2_rhs(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx,
-                              double t,
-                              double *rhs);
-
-double fclaw2d_clawpack_update(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           double t,
-                           double dt);
-
-void dump_auxarray(fclaw2d_domain_t *domain, int dump_patchno);
 
 #ifdef __cplusplus
 #if 0

@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "clawpack46_options.h"
+#include "fc2d_clawpack46_options.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -33,11 +33,12 @@ extern "C"
 #endif
 #endif
 
-static void *clawpack46_options_register (fclaw_app_t * app,
-                                          void *package,
-                                          sc_options_t * opt)
+static void*
+options_register (fclaw_app_t * app,
+                  void *package,
+                  sc_options_t * opt)
 {
-    clawpack46_options_t* clawopt = (clawpack46_options_t*) package;
+    fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) package;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -73,9 +74,9 @@ static void *clawpack46_options_register (fclaw_app_t * app,
 }
 
 static fclaw_exit_type_t
-clawpack46_options_postprocess (fclaw_app_t * a, void *package, void *registered)
+options_postprocess (fclaw_app_t * a, void *package, void *registered)
 {
-    clawpack46_options_t* clawopt = (clawpack46_options_t*) package;
+    fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) package;
 
     fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
                                      clawopt->mwaves);
@@ -85,10 +86,10 @@ clawpack46_options_postprocess (fclaw_app_t * a, void *package, void *registered
     return FCLAW_NOEXIT;
 }
 
-fclaw_exit_type_t
-clawpack46_options_check (fclaw_app_t * app, void *package, void *registered)
+static fclaw_exit_type_t
+options_check (fclaw_app_t * app, void *package, void *registered)
 {
-    clawpack46_options_t* clawopt = (clawpack46_options_t*) package;
+    fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) package;
 
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -105,9 +106,9 @@ clawpack46_options_check (fclaw_app_t * app, void *package, void *registered)
 }
 
 static void
-clawpack46_options_destroy (fclaw_app_t * a, void *package, void *registered)
+options_destroy (fclaw_app_t * a, void *package, void *registered)
 {
-    clawpack46_options_t* clawopt = (clawpack46_options_t*) package;
+    fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) package;
 
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
@@ -115,15 +116,19 @@ clawpack46_options_destroy (fclaw_app_t * a, void *package, void *registered)
 
 
 static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
-    clawpack46_options_register,
-    clawpack46_options_postprocess,
-    clawpack46_options_check,
-    clawpack46_options_destroy,
+    options_register,
+    options_postprocess,
+    options_check,
+    options_destroy,
 };
 
-void clawpack46_app_options_register (fclaw_app_t * app,
-                                      const char *configfile,
-                                      clawpack46_options_t* clawopt)
+
+/* ----------------------------------------------------------
+   Public interface to clawpack options
+   ---------------------------------------------------------- */
+void fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                       const char *configfile,
+                                       fc2d_clawpack46_options_t* clawopt)
 {
     FCLAW_ASSERT (app != NULL);
 

@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK46_OPTIONS_H
-#define CLAWPACK46_OPTIONS_H
+#ifndef FCLAW2D_CLAWPACK46_OPTIONS_H
+#define FCLAW2D_CLAWPACK46_OPTIONS_H
 
 #include <fclaw_options.h>
 
@@ -36,10 +36,8 @@ extern "C"
 #endif
 #endif
 
-typedef struct clawpack46_options clawpack46_options_t;
-
 /* Only one copy of clawpack46_options for each run */
-struct clawpack46_options
+typedef struct fc2d_clawpack46_options
 {
     int mwaves;
     int maux;
@@ -57,11 +55,11 @@ struct clawpack46_options
     int src_term;
 
     int is_registered;
-};
+} fc2d_clawpack46_options_t;
 
-void clawpack46_app_options_register (fclaw_app_t * app,
-                                      const char *configfile,
-                                      clawpack46_options_t* clawopt);
+void fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                           const char *configfile,
+                                           fc2d_clawpack46_options_t* clawopt);
 
 
 
