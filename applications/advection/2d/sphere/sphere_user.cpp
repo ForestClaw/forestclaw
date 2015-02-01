@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "sphere_user.H"
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_output = &sphere_parallel_write_output;
 
     /* This is needed to get constructors for user data */
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void sphere_problem_setup(fclaw2d_domain_t* domain)
@@ -62,7 +62,7 @@ void sphere_problem_setup(fclaw2d_domain_t* domain)
     // This calls setprob_, which might be null.  This is used
     // mostly for setting up things related to Fortran.
 
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 void sphere_patch_setup(fclaw2d_domain_t *domain,
@@ -87,14 +87,14 @@ void sphere_patch_setup(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* ----------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
@@ -112,7 +112,7 @@ void sphere_qinit(fclaw2d_domain_t *domain,
                   int this_block_idx,
                   int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 void sphere_patch_physical_bc(fclaw2d_domain *domain,
@@ -150,7 +150,7 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
     /* ------------------------------------------------------- */
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     double *xd = cp->xd();
     double *yd = cp->yd();
@@ -171,7 +171,7 @@ double sphere_update(fclaw2d_domain_t *domain,
 {
     sphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     return maxcfl;
 }

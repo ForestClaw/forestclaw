@@ -33,8 +33,7 @@
 
 #include <fclaw2d_map_query.h>
 
-#include <fclaw2d_clawpack.H>
-#include <clawpack46_options.h>
+#include <fc2d_clawpack46.H>
 
 #include "sphere_user.H"
 
@@ -57,7 +56,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     return NULL;
 }
 
-fclaw_exit_type_t
+static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
@@ -76,9 +75,10 @@ static const fclaw_app_options_vtable_t options_vtable_user = {
     NULL       /* options_destroy_user */
 };
 
-void fclaw_app_options_register_user (fclaw_app_t * app,
-                                      const char *configfile,
-                                      user_options_t* user)
+void static
+register_user_options (fclaw_app_t * app,
+                       const char *configfile,
+                       user_options_t* user)
 {
     FCLAW_ASSERT (app != NULL);
 
@@ -88,7 +88,7 @@ void fclaw_app_options_register_user (fclaw_app_t * app,
 
 static
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 clawpack46_options_t* clawpack_options,
+                 fc2d_clawpack46_options_t* clawpack_options,
                  user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
@@ -132,7 +132,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
 
     /* Store parameters */
     set_domain_parms(domain,gparms);
-    set_clawpack46_options (domain,clawpack_options);
+    fc2d_clawpack46_set_options (domain,clawpack_options);
 
     /* Link solvers to the domain */
     link_problem_setup(domain,sphere_problem_setup);
@@ -162,7 +162,7 @@ int main (int argc, char **argv)
   /* Options */
   sc_options_t             *options;
   amr_options_t            samr_options,      *gparms = &samr_options;
-  clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+  fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
   user_options_t           suser_options,     *user = &suser_options;
 
   int retval;
@@ -172,9 +172,10 @@ int main (int argc, char **argv)
   options = fclaw_app_get_options (app);
 
   /*  Register options for each package */
-  fclaw_app_options_register_general (app, "fclaw_options.ini", gparms);
-  clawpack46_app_options_register (app, "fclaw_options.ini", clawpack_options);
-  fclaw_app_options_register_user (app, "fclaw_options.ini", user);
+  fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+  fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
+
+  register_user_options (app, "fclaw_options.ini", user);
 
   /* Read configuration file(s) and command line, and process options */
   retval = fclaw_options_read_from_file(options);
