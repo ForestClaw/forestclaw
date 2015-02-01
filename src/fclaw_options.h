@@ -63,7 +63,7 @@ void fclaw_options_destroy(amr_options_t* amropt);
  * \param [out] fclawopt        Option container for ForestClaw
  */
 
-void fclaw_app_options_register_general (fclaw_app_t * a,
+void fclaw_options_register_general (fclaw_app_t * a,
                                          const char *configfile,
                                          amr_options_t *gparms);
 

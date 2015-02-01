@@ -211,7 +211,7 @@ static const fclaw_app_options_vtable_t options_vtable_general = {
     options_destroy_general
 };
 
-void fclaw_app_options_register_general (fclaw_app_t * a, const char *configfile,
+void fclaw_options_register_general (fclaw_app_t * a, const char *configfile,
                                          amr_options_t* gparms)
 {
     fclaw_options_general_t *core;
@@ -632,12 +632,3 @@ int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
     /* Everything is good */
     return 0;
 }
-
-#if 0
-amr_options_t* fclaw_get_amr_options(fclaw_app_t *app)
-{
-    void* pkg = fclaw_app_get_options_package(app);
-    fclaw_options_general_t* opt = (fclaw_options_general_t*) pkg;
-    return opt->amropt;
-}
-#endif
