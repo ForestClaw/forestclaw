@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <amr_includes.H>
-#include <fclaw2d_clawpack.H>
+#include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include "filament_user.H"
 
@@ -44,7 +44,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &filament_parallel_write_header;
     of->f_patch_write_output = &filament_parallel_write_output;
 
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void filament_problem_setup(fclaw2d_domain_t* domain)
@@ -52,7 +52,7 @@ void filament_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 
@@ -78,14 +78,14 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     if (gparms->manifold)
     {
@@ -117,7 +117,7 @@ void filament_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -130,8 +130,8 @@ void filament_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc,time_interp);
+    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+                        t,dt,intersects_bc,time_interp);
 }
 
 
@@ -143,11 +143,11 @@ double filament_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double dt)
 {
     /*
-    fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    fc2d_clawpack46_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
     */
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
-                                       this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
+                                          this_patch_idx,t,dt);
     return maxcfl;
 }
 
@@ -187,9 +187,9 @@ fclaw_bool filament_patch_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 fclaw_bool filament_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
+                                         fclaw2d_patch_t *this_patch,
+                                         int blockno,
+                                         int patchno)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -221,7 +221,7 @@ void filament_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ng
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
     int mfields = gparms->meqn;

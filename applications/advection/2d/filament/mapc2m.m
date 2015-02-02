@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 % map = 'nomap';
-map = 'cart';
+% map = 'cart';
 % map = 'pillowdisk';
 map = 'squareddisk';
 % map = 'pillowdisk5';
@@ -16,26 +16,16 @@ switch map
         yp = yc;
     case 'cart'
         % (xc,yc) in [0,1]x[0,1]
-        [xc1,yc1,~] = mapc2m_brick(xc,yc);
+        s = 0;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
-        
-        brick_data = load('brick.dat');
-        mi = brick_data(1,1);
-        mj = brick_data(1,2);
-        xv = brick_data(2:end,1);
-        yv = brick_data(2:end,2);
-
-        blockno = getblocknumber();
-        s = 0.0;
-        xs = (xv(blockno+1)+1-mi/2)*s;
-        ys = (yv(blockno+1)+1-mj/2)*s;
-        xp = xp + xs;
-        yp = yp + ys;
-        
-        xp = xp + shift(1);
-        yp = yp + shift(2);
+                
+        xp = xp + 1;
+        yp = yp + 1;
     case 'pillowdisk'
         [xp,yp,zp] = mapc2m_pillowdisk(xc,yc);
+        xp = xp + 1;
+        yp = yp + 1;
         % (xp,yp) in [-1,1]x[-1,1]
     case 'squareddisk'
         [xp,yp,zp] = mapc2m_squareddisk(xc,yc);
