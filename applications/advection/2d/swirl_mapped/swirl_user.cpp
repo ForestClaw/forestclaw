@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "swirl_user.H"
 
 #ifdef __cplusplus
@@ -53,7 +53,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &swirl_parallel_write_header;
     of->f_patch_write_output = &swirl_parallel_write_output;
 
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
@@ -61,14 +61,14 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -87,14 +87,14 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* ----------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
@@ -139,7 +139,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     int blockno = this_block_idx;
 
@@ -157,7 +157,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
 
@@ -191,15 +191,15 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* Update the velocity field */
     b4step2_manifold_(mbc,mx,my,meqn,q,dx,dy,blockno,
                      xd,yd,zd,t, dt,maux,aux);
 
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
-                                       this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
+                                          this_patch_idx,t,dt);
     return maxcfl;
 }
 
@@ -272,7 +272,7 @@ void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
     int mfields = gparms->meqn;
