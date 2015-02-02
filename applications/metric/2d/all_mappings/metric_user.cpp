@@ -164,7 +164,7 @@ void metric_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrid
 {
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     /* Write out header file containing global information for 'iframe' */
     int mfields = 3;  // Write out an extra fields
