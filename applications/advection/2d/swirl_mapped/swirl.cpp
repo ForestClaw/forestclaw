@@ -51,8 +51,8 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-  sc_options_add_int (opt, 0, "example", &user->example, 0,
-                      "1 id (brick); 2 cart (brick); 3 5-patch square");
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "1 id (brick); 2 cart (brick); 3 5-patch square");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "Ratio of outer square to inner square [0.4]");
