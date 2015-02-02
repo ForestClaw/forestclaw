@@ -52,15 +52,8 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "0 for no mapping, "           \
-                        "1 for Cartesian (with brick), "        \
-                        "2 for pillow disk, "                   \
-                        "3 for squared disk, "                  \
-                        "4 for pillow five patch");
-
-    sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = nomap; 1 = cart; 2 = squared-disk; " \
-                        "3 = annulus; 4 = pillow-disk [2]");
+                        "[user] 0 = nomap; 1 = cart; 2 = pillowdisk; " \
+                        "3 = squareddisk; 4 = pillowdisk5 [2]");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
                            "[user] Ratio used for squared- and pillow-disk [0.5]");
