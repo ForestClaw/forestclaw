@@ -18,7 +18,7 @@ include src/solvers/fclaw2d_clawpack4.6/Makefile.am
 # Scalar advection examples
 include applications/advection/2d/swirl_mapped/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
-# include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/hemisphere/Makefile.am
 include applications/advection/2d/sphere/Makefile.am
 include applications/advection/2d/filament/Makefile.am
 
