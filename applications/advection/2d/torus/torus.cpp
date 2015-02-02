@@ -233,42 +233,42 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
 int
 main (int argc, char **argv)
 {
-  fclaw_app_t *app;
-  int first_arg;
-  fclaw_exit_type_t vexit;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-  /* Options */
-  sc_options_t              *options;
-  amr_options_t             samr_options, *gparms = &samr_options;
-  fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
-  user_options_t                suser_options, *user = &suser_options;
+    /* Options */
+    sc_options_t              *options;
+    amr_options_t             samr_options, *gparms = &samr_options;
+    fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t                suser_options, *user = &suser_options;
 
-  int retval;
+    int retval;
 
-  /* Initialize application */
-  app = fclaw_app_new (&argc, &argv, user);
-  options = fclaw_app_get_options (app);
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
 
-  fclaw_options_register_general (app, "fclaw_options.ini", gparms);
-  fc2d_clawpack46_options_register(app,NULL,clawpack_options);
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register(app,NULL,clawpack_options);
 
-  /* User defined options (defined above) */
-  register_user_options (app, "fclaw_options.ini", user);
+    /* User defined options (defined above) */
+    register_user_options (app, "fclaw_options.ini", user);
 
 
-  /* Read configuration file(s) */
-  retval = fclaw_options_read_from_file(options);
-  vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    /* Read configuration file(s) */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  /* -------------------------------------------------------------
-     - Run program
-     ------------------------------------------------------------- */
-  if (!retval & !vexit)
-  {
-      run_program(app, gparms, clawpack_options,user);
-  }
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
+    {
+        run_program(app, gparms, clawpack_options,user);
+    }
 
-  fclaw_app_destroy (app);
+    fclaw_app_destroy (app);
 
-  return 0;
+    return 0;
 }

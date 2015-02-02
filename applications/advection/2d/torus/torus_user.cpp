@@ -222,7 +222,7 @@ void torus_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    fclaw_global_productionf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     /* Increase the number of fields by 1 so we can printout the mpi rank */
     int mfields = gparms->meqn;
