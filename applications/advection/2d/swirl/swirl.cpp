@@ -37,8 +37,49 @@
 
 #include "swirl_user.H"
 
+typedef struct user_options
+{
+    double period;
+    int is_registered;
+
+} user_options_t;
+
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_double (opt, 0, "period", &user->period, 0,
+                           "Period of the flow field [4]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    NULL,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+
 void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 fc2d_clawpack46_options_t* clawpack_options)
+                 fc2d_clawpack46_options_t* clawpack_options,
+                 user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
 
@@ -104,17 +145,19 @@ main (int argc, char **argv)
     sc_options_t                *options;
     amr_options_t               samr_options,      *gparms = &samr_options;
     fc2d_clawpack46_options_t   sclawpack_options, *clawpack_options = &sclawpack_options;
-
+    user_options_t              suser, *user = &suser;
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    app = fclaw_app_new (&argc, &argv, user);
     options = fclaw_app_get_options (app);
 
     /*  Register options for each package */
     fclaw_options_register_general (app, "fclaw_options.ini", gparms);
     fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
 
+    /* User options */
+    register_user_options(app,"fclaw_options.ini",user);
     /* Read configuration file(s) and command line, and process options */
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
@@ -122,7 +165,7 @@ main (int argc, char **argv)
     /* Run the program */
     if (!retval & !vexit)
     {
-        run_program(app, gparms, clawpack_options);
+        run_program(app, gparms, clawpack_options, user);
     }
 
     fclaw_app_destroy (app);
