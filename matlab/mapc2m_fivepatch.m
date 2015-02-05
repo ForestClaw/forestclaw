@@ -3,7 +3,7 @@ blockno = getblocknumber();
 
 [m,n] = size(xc);
 
-alpha = 0.5;
+alpha = 0.4;
 
 if (blockno == 2)
     xp = (2*xc - 1)*alpha;
