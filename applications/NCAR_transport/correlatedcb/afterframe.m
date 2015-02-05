@@ -10,7 +10,7 @@ showpatchborders(1:8);
 setpatchborderprops(1:8,'linewidth',1);
 view([-51.5,0]);
 
-showgridlines(3);
+% showgridlines(3);
 
 setviews;
 NoQuery = 0;

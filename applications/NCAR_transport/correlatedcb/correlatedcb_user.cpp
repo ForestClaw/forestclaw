@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "correlatedcb_user.H"
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ void correlatedcb_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_output = &correlatedcb_parallel_write_output;
 
     /* This is needed to get constructors for user data */
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void correlatedcb_setprob(fclaw2d_domain_t* domain)
@@ -86,14 +86,14 @@ void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
 
     /* -------------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* -------------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* -------------------------------------------------------------- */
     // Modified clawpack setaux routine that passes in mapping terms
@@ -133,7 +133,7 @@ void correlatedcb_qinit(fclaw2d_domain_t *domain,
 
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     double *xp = cp->xp();
     double *yp = cp->yp();
@@ -179,7 +179,7 @@ void correlatedcb_b4step2(fclaw2d_domain_t *domain,
     /* -------------------------------------------------------------- */
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
 
     double *xd = cp->xd();
@@ -200,7 +200,7 @@ double correlatedcb_update(fclaw2d_domain_t *domain,
     correlatedcb_b4step2(domain,this_patch,this_block_idx,
                          this_patch_idx,t,dt);
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
                                            this_patch_idx,t,dt);
 
     return maxcfl;
