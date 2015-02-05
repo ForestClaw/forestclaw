@@ -11,7 +11,7 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_pillowfivepatch (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_pillowdisk5 (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -56,7 +56,7 @@ fclaw2d_map_query_pillowfivepatch (fclaw2d_map_context_t * cont, int query_ident
 
 
 static void
-fclaw2d_map_c2m_pillowfivepatch(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_pillowdisk5 (fclaw2d_map_context_t * cont, int blockno,
                                 double xc, double yc,
                                 double *xp, double *yp, double *zp)
 {
@@ -72,16 +72,16 @@ fclaw2d_map_c2m_pillowfivepatch(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowfivepatch(const double scale[],
-                                                       const double shift[],
-                                                       const double rotate[],
-                                                       const double alpha)
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha)
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_pillowfivepatch;
-    cont->mapc2m = fclaw2d_map_c2m_pillowfivepatch;
+    cont->query = fclaw2d_map_query_pillowdisk5;
+    cont->mapc2m = fclaw2d_map_c2m_pillowdisk5;
 
     cont->user_double[0] = alpha;
     /* This stores rotate/scale parameters in common blocks for later

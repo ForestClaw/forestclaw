@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include <amr_includes.H>
 #include "no_solver_user.H"
 
 #ifdef __cplusplus
@@ -178,7 +178,7 @@ void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngri
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     // Write out header file containing global information for 'iframe'
     int meqn = gparms->meqn;
