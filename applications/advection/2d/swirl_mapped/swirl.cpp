@@ -39,6 +39,7 @@ typedef struct user_options
     int example;
     double alpha;
 
+
     amr_options_t* gparms;
 
     int is_registered;
