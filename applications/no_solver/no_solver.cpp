@@ -118,7 +118,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     case 1:
         /* Map unit square to disk using mapc2m_disk.f */
         conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_cart (gparms->scale, gparms->shift,x
+        cont = fclaw2d_map_new_cart (gparms->scale, gparms->shift,
                                      rotate);
         break;
     case 2:
