@@ -23,128 +23,191 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_clawpack.H>
+#include <fc2d_clawpack46.H>
+#include <fclaw_base.h>
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
+
+#include <amr_forestclaw.H>
+#include <amr_utils.H>
 #include <fclaw_options.h>
 
-static int
-    test_parms_checkparms (int example, int lp)
+
+
+
+typedef struct user_options
 {
-    if (example < 1 || example > 2) {
-        fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
-        return -1;
+    int example;
+
+    const char* frames_string;
+    int *frames;
+    const char* density_string;
+    double *density;
+
+    amr_options_t* gparms;
+
+    int is_registered;
+
+} user_options_t;
+
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "[user] 0 (simple); 1 (simulation)");
+
+    fclaw_options_add_int_array(opt,0,"frames",&user->frames_string,
+                                NULL, &user->frames,0,
+                                "[user] Frames these frames [NULL]");
+
+    fclaw_options_add_double_array(opt,0,"density",&user->density_string,
+                                   NULL,&user->density, 0,
+                                   "[user] Density [NULL]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    if (user->example == 2)
+    {
+        fclaw_options_convert_int_array (user->frames_string, &user->frames,
+                                         user->gparms->nout);
+
+        fclaw_options_convert_double_array (user->density_string, &user->density,
+                                            user->gparms->nout);
     }
-    return 0;
+    return FCLAW_NOEXIT;
+}
+
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->example < 1 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
+
+static void
+options_destroy_user (fclaw_app_t * a, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    /* Destroy arrays used in options  */
+
+    if (user->example == 2)
+    {
+        fclaw_options_destroy_array((void*) user->frames);
+        fclaw_options_destroy_array((void*) user->density);
+    }
+}
+
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    options_postprocess_user,
+    options_check_user,
+    options_destroy_user
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 fc2d_clawpack46_options_t* clawpack_options,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
+
+    /* Local variables */
+    double test_fpe;
+    int i;
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+    switch (user->example)
+    {
+    case 1:
+        fclaw_global_infof("Running example 1 ... Done\n");
+        break;
+    case 2:
+        fclaw_global_infof("Running example 2 ... \n");
+        for(i = 0; i < gparms->nout; i++)
+        {
+            fclaw_global_productionf("Density in frame %2d : %12.4f\n",
+                                     user->frames[i],user->density[i]);
+        }
+        fclaw_debugf("Now let's trap a floating point error \n");
+        test_fpe = sqrt(-1.0);
+        fclaw_debugf("Done!\n");
+        break;
+    default:
+        SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+    }
 }
 
 
 int main (int argc, char **argv)
 {
-    int		              lp;
-    sc_MPI_Comm               mpicomm;
-    sc_options_t             *options;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-    fclaw2d_clawpack_parms_t  sclawparms,  *clawpack_parms = &sclawparms;
-    amr_options_t             sparms, *gparms = &sparms;
-    fclaw2d_map_data_t        smap_data, *map_data=&smap_data;
+    /* Options */
+    sc_options_t                  *options;
+    amr_options_t                 samr_options, *gparms = &samr_options;
+    fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t                suser_options, *user = &suser_options;
 
-    int example, retval;
-    const char* frames_string, *density_string;
-    int *frames;
-    double *density;
-    double test_fpe;
+    int retval;
 
-    lp = SC_LP_PRODUCTION;
-    mpicomm = sc_MPI_COMM_WORLD;
-    fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
 
-    /* Dictionary to store options */
-    options = sc_options_new (argv[0]);
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register(app,NULL,clawpack_options);
 
-    /* [main] Register example option */
-    sc_options_add_int (options, 0, "main:example", &example, 1,
-                        "[main] Example = 1 or 2 [1]");
+    /* User defined options (defined above) */
+    user->gparms = gparms;
+    register_user_options (app, "fclaw_options.ini", user);
 
-    fclaw_options_add_int_array(options,0,"main:frames",&frames_string,
-                                "1 2", &frames,2,
-                                "[main] Frames these frames [1 2]");
 
-    fclaw_options_add_double_array(options,0,"main:density",&density_string,
-                                   "1000.01 900.45",&density, 2,
-                                   "[main] Density [1000.01 900.45]");
+    /* Read configuration file(s) */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* [Options] General ForestClaw options */
-    fclaw_options_register(options,gparms);
-
-    /* [mapping] General mapping options (mi,mj,scale,shift,phi,theta) */
-    fclaw2d_register_map_data(options,map_data); /* sets default values */
-
-    /* [clawpack46] Options from Clawpack solver */
-    clawpack46_register_options(options,clawpack_parms);
-
-    /* Read from fclaw_options.ini */
-    fclaw_options_read_from_file(options,lp);
-
-    /* Override any values with command line values or from --inifile */
-    retval = fclaw_options_parse_command_line(options,argc,argv,lp);
-
-    /* convert array inputs */
-    fclaw_options_postprocess(gparms);
-    clawpack46_postprocess_parms(clawpack_parms);
-    fclaw2d_options_postprocess_map_data(map_data);
-
-    /* Post-process arrays created in [main] */
-    fclaw_options_convert_int_array(frames_string,&frames,2);
-    fclaw_options_convert_double_array(density_string,&density,2);
-
-    /* Final check on options */
-    retval = retval || fclaw_options_check(options,gparms,lp);
-    retval = retval || test_parms_checkparms(example,lp);
-    retval = retval || clawpack46_checkparms(options,clawpack_parms,gparms,lp);
-
-    if (!retval)
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
     {
-        fclaw_options_print_summary(options,lp);
-
-        if (gparms->mpi_debug == 1)
-        {
-            /* This doesn't work yet, since I don't have FCLAW_ENABLE_MPI defined */
-            fclaw2d_mpi_debug();
-        }
-
-        if (gparms->trapfpe == 1)
-        {
-            feenableexcept(FE_INVALID);
-        }
-
-        printf("\n");
-        switch (example)
-        {
-        case 1:
-            printf("Running example 1 ... Done!\n");
-            break;
-        case 2:
-            printf("Running example 2 ... \n");
-            for(int i = 0; i < 2; i++)
-            {
-                printf("Density in frame %d : %f\n",frames[i],density[i]);
-            }
-            printf("Now let's trap a floating point error (this is not a bug!)\n");
-            test_fpe = sqrt(-1.0);
-            printf("Done!\n");
-            break;
-        default:
-            SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
-        }
-        printf("\n");
+        run_program(app, gparms, clawpack_options,user);
     }
-    fclaw_options_destroy_array((void*) frames);
-    fclaw_options_destroy_array((void*) density);
-    fclaw2d_map_destroy_arrays(map_data);
-    fclaw2d_clawpack_parms_delete(clawpack_parms);
-    fclaw_options_destroy_arrays(gparms);
-    sc_options_destroy (options);
 
-    fclaw_mpi_finalize ();
+    fclaw_app_destroy (app);
 
     return 0;
 }
