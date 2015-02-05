@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_forestclaw.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "quadrants_user.H"
 
 #ifdef __cplusplus
@@ -42,16 +42,16 @@ void quadrants_link_solvers(fclaw2d_domain_t *domain)
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
 
-    //    sf->f_patch_setup              = &quadrants_patch_setup;
-    sf->f_patch_initialize         = &quadrants_patch_initialize;
-    sf->f_patch_physical_bc        = &quadrants_patch_physical_bc;
-    sf->f_patch_single_step_update = &quadrants_patch_single_step_update;
+    // sf->f_patch_setup              = &fc2d_clawpack46_setaux;  /* Not needed for quadrants */
+    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
+    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
+    sf->f_patch_single_step_update = &fc2d_clawpack46_step2;
 
     fclaw2d_output_functions_t* of = get_output_functions(domain);
     of->f_patch_write_header = &quadrants_parallel_write_header;
     of->f_patch_write_output = &quadrants_parallel_write_output;
 
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void quadrants_problem_setup(fclaw2d_domain_t* domain)
@@ -59,22 +59,24 @@ void quadrants_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 
 
 
-
+#if 0
 void quadrants_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
+#endif
 
 
+#if 0
 void quadrants_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
@@ -84,11 +86,12 @@ void quadrants_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                          t,dt,intersects_bc, time_interp);
 }
+#endif
 
-
+#if 0
 double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
@@ -96,10 +99,11 @@ double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
                                            this_patch_idx,t,dt);
     return maxcfl;
 }
+#endif
 
 
 /* -----------------------------------------------------------------

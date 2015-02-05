@@ -10,7 +10,6 @@ extern "C"
 #endif
 #endif
 
-
 static int
 fclaw2d_map_query_nomap (fclaw2d_map_context_t * cont, int query_identifier)
 {

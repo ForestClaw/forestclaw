@@ -11,7 +11,7 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_identity (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -58,42 +58,24 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
-                     double xc, double yc,
-                     double *xp, double *yp, double *zp)
+    fclaw2d_map_c2m_identity(fclaw2d_map_context_t * cont, int blockno,
+                             double xc, double yc,
+                             double *xp, double *yp, double *zp)
 {
-    double xc1,yc1,zc1;
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
-
-    /* Map [0,1]x[0,1] to unit square in [-1,1]x[-1,1] */
-    MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
-
-    /* Scale and shift to [0,1]x[0,1] */
-    scale_map(cont, xp,yp,zp);
-    shift_map(cont, xp,yp,zp);
+    /* xp = xc; yp = yc; zp = 0; */
+    MAPC2M_IDENTITY(&blockno,&xc,&yc,xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
-                                            const double scale[],
-                                            const double shift[],
-                                            const double rotate[])
+fclaw2d_map_context_t* fclaw2d_map_new_identity()
 {
     fclaw2d_map_context_t *cont;
-
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_cart;
-    cont->mapc2m = fclaw2d_map_c2m_cart;
-
-    set_scale(cont,scale);
-    set_shift(cont,shift);
-    set_rotate(cont,rotate);
-
-    cont->brick = brick;
+    cont->query = fclaw2d_map_query_identity;
+    cont->mapc2m = fclaw2d_map_c2m_identity;
 
     return cont;
 }
-
 #ifdef __cplusplus
 #if 0
 {
