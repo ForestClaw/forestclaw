@@ -5,16 +5,19 @@ global map isflat;
 alpha = 0.4;
 s = 1e-2;    
 if strcmp(map,'nomap')
-    alim = [0 1];
-elseif strcmp(map,'cart')    
-    alim = [-1 1];
+    axis([-1 2 -1 1]);
 else
-    alim = [-1-alpha,1+alpha];
+    if strcmp(map,'cart')
+        alim = [-1 1];
+    elseif strcmp(map,'latlong')
+        alim = [-1 1];
+    else
+        alim = [-1-alpha,1+alpha];
+    end
+    alim = alim + [-s s];
+    axis([alim alim]);
+    daspect([1 1 1]);
 end
-alim = alim + [-s s];
-axis([alim alim]);
-daspect([1 1 1]);
-axis off;
 
 yrbcolormap;
 showpatchborders(1:10);
@@ -38,8 +41,8 @@ if (isflat)
 else
     view(3);    
     zoom(1.5);
-    % hidepatchborders;
-    % camlight;
+    hidepatchborders;
+    camlight;
 end
 
 

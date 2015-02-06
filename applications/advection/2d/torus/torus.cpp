@@ -171,6 +171,11 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
 
     switch (user->example)
     {
+    case 0:
+        FCLAW_ASSERT(mi == 1 && mj == 1);  /* assumes square domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        cont = fclaw2d_map_new_nomap();
+        break;
     case 1:
         /* Cartesian [-1,1]x[-1,1] */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);

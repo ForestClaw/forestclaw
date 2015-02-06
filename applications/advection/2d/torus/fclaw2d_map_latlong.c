@@ -64,7 +64,7 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
                        double *xp, double *yp, double *zp)
 {
     double lat[2], longitude[2];
-    double xc1,yc1,zc1;
+    double xc1,yc1,zc1,xc2,yc2;
 
     /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
 
@@ -76,15 +76,17 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
     lat[1] = cont->user_double[1];
     longitude[0] = cont->user_double[2];
     longitude[1] = cont->user_double[3];
-    xc = longitude[0] + (longitude[1]-longitude[0])*xc1;
-    yc = lat[0] + (lat[1]-lat[0])*yc1;
+    xc2 = longitude[0] + (longitude[1]-longitude[0])*xc1;
+    yc2 = lat[0] + (lat[1]-lat[0])*yc1;
 
     /* blockno is ignored in the current latlong mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
-    MAPC2M_LATLONG(&blockno,&xc,&yc,xp,yp,zp);
+    MAPC2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
 
+#if 0
     scale_map(cont,xp,yp,zp);
     rotate_map(cont,xp,yp,zp);
+#endif
 }
 
 fclaw2d_map_context_t *
