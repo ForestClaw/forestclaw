@@ -35,6 +35,16 @@ extern "C"
 #endif
 #endif
 
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,        /* bc2 */
+    qinit_,      /* qinit */
+    NULL,        /* Setaux */
+    NULL,        /* b4step2 */
+    NULL         /* src2 */
+};
+
 
 void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -53,6 +63,8 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &sphere_parallel_write_header;
     of->f_patch_write_output = &sphere_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     /* This is needed to get constructors for user data */
     fc2d_clawpack46_link_to_clawpatch();
 }
@@ -62,7 +74,7 @@ void sphere_problem_setup(fclaw2d_domain_t* domain)
     // This calls setprob_, which might be null.  This is used
     // mostly for setting up things related to Fortran.
 
-    fc2d_clawpack46_setprob(domain);
+    fc2d_clawpack46_setprob();
 }
 
 void sphere_patch_setup(fclaw2d_domain_t *domain,
