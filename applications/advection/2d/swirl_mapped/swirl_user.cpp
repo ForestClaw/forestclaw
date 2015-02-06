@@ -36,6 +36,17 @@ extern "C"
 #endif
 
 
+/* Most of these do not use the "classic" signature. */
+
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,   /* bc2 */
+    NULL,   /* qinit */
+    NULL,   /* Setaux */
+    NULL,   /* b4step2 */
+    NULL    /* src2 */
+};
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -53,6 +64,8 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &swirl_parallel_write_header;
     of->f_patch_write_output = &swirl_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     fc2d_clawpack46_link_to_clawpatch();
 }
 
@@ -61,7 +74,7 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    fc2d_clawpack46_setprob(domain);
+    fc2d_clawpack46_setprob();
 }
 
 
