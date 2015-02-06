@@ -1,6 +1,7 @@
       subroutine clawpatch2(maxm, meqn, maux, mbc, method, mthlim,
      &      mcapa, mwaves, mx, my, qold, aux, dx, dy, dt, cfl,
-     &      work, mwork,xlower,ylower,level,t, fp,fm, gp, gm)
+     &      work, mwork,xlower,ylower,level,t, fp,fm, gp, gm,
+     &      rpn2, rpt2)
 
       implicit none
 

@@ -364,6 +364,9 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                              double t,
                              double dt)
 {
+    FCLAW_ASSERT(classic_vt.rpn2 != NULL);
+    FCLAW_ASSERT(classic_vt.rpt2 != NULL);
+
     const amr_options_t* gparms                 = get_domain_parms(domain);
     ClawPatch *cp                               = get_clawpatch(this_patch);
     fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
@@ -413,7 +416,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                 clawpack_options->mthlim, clawpack_options->mcapa, mwaves,
                 mx, my, qold,
                 aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,
-                level,t, fp, fm, gp, gm);
+                level,t, fp, fm, gp, gm, classic_vt.rpn2, classic_vt.rpt2);
 
     delete [] fp;
     delete [] fm;

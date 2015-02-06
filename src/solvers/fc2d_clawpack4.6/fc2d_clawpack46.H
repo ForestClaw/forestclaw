@@ -73,6 +73,19 @@ typedef void (*fc2d_clawpack46_src2_t)(const int& maxmx, const int& maxmy, const
                                        const int& maux, double aux[], const double& t,
                                        const double& dt);
 
+typedef void (*fc2d_clawpack46_rpn2_t)(const int& ixy,const int& maxm, const int& meqn,
+                                       const int& mwaves, const int& mbc,const int& mx,
+                                       double ql[], double qr[], double auxl[], double auxr[],
+                                       double wave[], double s[],double amdq[], double apdq[]);
+
+
+typedef void (*fc2d_clawpack46_rpt2_t)(const int& ixy, const int& maxm, const int& meqn,
+                                       const int& mwaves, const int& mbc,const int& mx,
+                                       double ql[], double qr[], double aux1[], double aux2[],
+                                       double aux3[], const int& imp, double dsdq[],
+                                       double bmasdq[], double bpasdq[]);
+
+
 typedef struct fc2d_clawpack46_vtable
 {
     fc2d_clawpack46_setprob_t setprob;
@@ -81,6 +94,8 @@ typedef struct fc2d_clawpack46_vtable
     fc2d_clawpack46_setaux_t setaux;
     fc2d_clawpack46_b4step2_t b4step2;
     fc2d_clawpack46_src2_t src2;
+    fc2d_clawpack46_rpn2_t rpn2;
+    fc2d_clawpack46_rpt2_t rpt2;
 } fc2d_clawpack46_vtable_t;
 
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
@@ -137,6 +152,20 @@ extern "C"
                const double& dt);
 
     /* --------------------------------------------------------------------
+       Riemann solvers
+       -------------------------------------------------------------------- */
+    void rpn2_(const int& ixy,const int& maxm, const int& meqn,const int& mwaves,
+               const int& mbc,const int& mx, double ql[], double qr[],
+               double auxl[], double auxr[], double wave[],
+               double s[], double amdq[], double apdq[]);
+
+    void rpt2_(const int& ixy, const int& maxm, const int& meqn, const int& mwaves,
+               const int& mbc, const int& mx, double ql[], double qr[],
+               double aux1[], double aux2[], double aux3[], const int& imp,
+               double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+    /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
     void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc,
@@ -145,7 +174,9 @@ extern "C"
                      double auxold[], const double& dx, const double& dy, const double& dt,
                      const double& cfl, double work[], const int& mwork, const double& xlower,
                      const double& ylower, const int& level, const double& t, double fp[],
-                     double fm[], double gp[], double gm[]);
+                     double fm[], double gp[], double gm[],
+                     fc2d_clawpack46_rpn2_t rpn2,
+                     fc2d_clawpack46_rpt2_t rpt2);
 
 }
 #ifdef __cplusplus
