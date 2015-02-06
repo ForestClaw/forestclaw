@@ -28,6 +28,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map.h>
 #include "filament_user.H"
 
+
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,              /* bc2 */
+    qinit_,            /* qinit */
+    setaux_nomap_,     /* Setaux */
+    NULL,              /* b4step2 */
+    NULL               /* src2 */
+};
+
 void filament_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -44,15 +55,14 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &filament_parallel_write_header;
     of->f_patch_write_output = &filament_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     fc2d_clawpack46_link_to_clawpatch();
 }
 
 void filament_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
-    fc2d_clawpack46_setprob(domain);
+    fc2d_clawpack46_setprob();
 }
 
 
@@ -61,36 +71,30 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
                           int this_block_idx,
                           int this_patch_idx)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ----------------------------------------------------------- */
-    // allocate space for the aux array
-    fc2d_clawpack46_define_auxarray(domain,cp);
-
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
-    double *aux;
-    int maux;
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
-
-    if (gparms->manifold)
+    if (!gparms->manifold)
     {
-        /* ----------------------------------------------------------- */
-        /* Modified clawpack setaux routine that passes in mapping terms */
+        /* This will call setaux_nomap, using classic signature */
+        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+    else
+    {
+        int mx = gparms->mx;
+        int my = gparms->my;
+        int mbc = gparms->mbc;
+
+        ClawPatch *cp = get_clawpatch(this_patch);
+        double xlower = cp->xlower();
+        double ylower = cp->ylower();
+        double dx = cp->dx();
+        double dy = cp->dy();
+
+        fc2d_clawpack46_define_auxarray(domain,cp);
+
+        double *aux;
+        int maux;
+        fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
+
         double *xp = cp->xp();
         double *yp = cp->yp();
         double *zp = cp->zp();
@@ -99,18 +103,11 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
         double *zd = cp->zd();
         double *area = cp->area();
 
+        /* Call a customized version that takes additional arguments */
         setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,maux,aux,
                          this_block_idx, xp,yp,zp,xd,yd,zd,area);
     }
-    else
-    {
-        setaux_nomap_(mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
-    }
 }
-
-
-
-
 
 void filament_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,

@@ -57,5 +57,4 @@ c     #     0.1  otherwise
       r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 
       fdisc = r-0.25d0
-c      fdisc = xp - 1
       end
