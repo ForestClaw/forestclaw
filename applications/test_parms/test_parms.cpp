@@ -159,9 +159,9 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
             fclaw_global_productionf("Density in frame %2d : %12.4f\n",
                                      user->frames[i],user->density[i]);
         }
-        fclaw_debugf("Now let's trap a floating point error \n");
+        fclaw_global_productionf("Trap a floating point error ... sqrt(-1.0) \n");
         test_fpe = sqrt(-1.0);
-        fclaw_debugf("Done!\n");
+        fclaw_global_productionf(" ... Done!\n");
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

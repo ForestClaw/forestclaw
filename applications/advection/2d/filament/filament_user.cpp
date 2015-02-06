@@ -36,7 +36,9 @@ static const fc2d_clawpack46_vtable_t classic_user =
     qinit_,            /* qinit */
     setaux_nomap_,     /* Setaux */
     NULL,              /* b4step2 */
-    NULL               /* src2 */
+    NULL,               /* src2 */
+    rpn2_,
+    rpt2_
 };
 
 void filament_link_solvers(fclaw2d_domain_t *domain)

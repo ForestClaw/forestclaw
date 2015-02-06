@@ -42,7 +42,9 @@ static const fc2d_clawpack46_vtable_t classic_user =
     qinit_,      /* qinit */
     setaux_,     /* Setaux */
     NULL,        /* b4step2 */
-    NULL         /* src2 */
+    NULL,         /* src2 */
+    rpn2_,
+    rpt2_
 };
 
 
