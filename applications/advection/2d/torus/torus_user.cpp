@@ -35,6 +35,16 @@ extern "C"
 #endif
 #endif
 
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,        /* bc2 */
+    qinit_,      /* qinit */
+    setaux_,     /* Setaux */
+    NULL,        /* b4step2 */
+    NULL         /* src2 */
+};
+
 
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -57,13 +67,15 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &torus_parallel_write_header;
     of->f_patch_write_output = &torus_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     /* This is needed to get constructors for user data */
     fc2d_clawpack46_link_to_clawpatch();
 }
 
 void torus_problem_setup(fclaw2d_domain_t* domain)
 {
-    fc2d_clawpack46_setprob(domain);
+    fc2d_clawpack46_setprob();
 }
 
 void torus_patch_setup(fclaw2d_domain_t *domain,
@@ -74,46 +86,43 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
+    if (!gparms->manifold)
+    {
+        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+    else
+    {
+        int mx = gparms->mx;
+        int my = gparms->my;
+        int mbc = gparms->mbc;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
+        ClawPatch *cp = get_clawpatch(this_patch);
+        double xlower = cp->xlower();
+        double ylower = cp->ylower();
+        double dx = cp->dx();
+        double dy = cp->dy();
 
-    /* ----------------------------------------------------------- */
-    // allocate space for the aux array
-    fc2d_clawpack46_define_auxarray(domain,cp);
+        fc2d_clawpack46_define_auxarray(domain,cp);
 
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
-    double *aux;
-    int maux;
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
+        double *aux;
+        int maux;
+        fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    /* ----------------------------------------------------------- */
-    /* Modified clawpack setaux routine that passes in mapping terms */
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-    double *xnormals = cp->xface_normals();
-    double *ynormals = cp->yface_normals();
-    double *edge_lengths = cp->edge_lengths();
-    double *area = cp->area();
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+        double *xnormals = cp->xface_normals();
+        double *ynormals = cp->yface_normals();
+        double *edge_lengths = cp->edge_lengths();
+        double *area = cp->area();
 
-
-    setaux_manifold_(mbc,mx,my,this_block_idx,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
-                     edge_lengths,area);
+        setaux_manifold_(mbc,mx,my,this_block_idx,xlower,ylower,dx,dy,
+                         maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
+                         edge_lengths,area);
+    }
 }
 
 void torus_qinit(fclaw2d_domain_t *domain,
