@@ -60,30 +60,6 @@ extern "C"
                             double q[], const int& iframe,const int& patch_num,
                             const int& level,const int& blockno,
                             const int& mpirank);
-#if 0
-    void setaux_manifold_(const int& mbc,const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          const int& blockno,
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],
-                          double area[]);
-
-    void setaux_nomap_(const int& mbc,const int& mx,const int& my,
-                       const double& xlower,const double& ylower,
-                       const double& dx,const double& dy,
-                       const int& maux,double aux[]);
-
-    void b4step2_manifold_(const int& mbc,const int& mx,const int& my,
-                           const int& meqn, double q[],
-                           const double& dx,const double& dy,
-                           const int& blockno, const double& time,
-                           double xd[], double yd[], double zd[],
-                           const double dt, const int& maux, double aux[]);
-#endif
-
-
 }
 
 
