@@ -28,5 +28,5 @@ applications_metric_2d_all_mappings_metric_CPPFLAGS = \
 
 # This isn't used;  it is just included here to make sure that we are not
 # relying on any clawpack features that are not available.
-applications_advection_2d_swirl_swirl_LDADD = \
+applications_metric_2d_all_mappings_metric_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
