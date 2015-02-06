@@ -95,6 +95,11 @@ extern "C"
                          const int& maux, const double aux[], const double& t,
                          const double& dt, const int mthbc[]);
 
+    /* --------------------------------------------------------------------
+       Classic routines
+       - These are provided only for convenience;  these files are not
+         compiled into the library.
+       -------------------------------------------------------------------- */
     void setprob_();
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn,

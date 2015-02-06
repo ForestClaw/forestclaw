@@ -1,5 +1,5 @@
-      subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &               dx,dy,q,maux,aux,t,dt,mthbc)
+      subroutine fc2d_clawpack46_bc2(maxmx,maxmy,meqn,mbc,
+     &      mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc)
       implicit none
 
       integer maxmx, maxmy, meqn, mbc, mx, my, maux, mthbc(4)
