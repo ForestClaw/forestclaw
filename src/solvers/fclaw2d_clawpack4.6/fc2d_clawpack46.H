@@ -33,15 +33,69 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_clawpack46_options.h"
 
+typedef void (*fc2d_clawpack46_setprob_t)();
+
+typedef void (*fc2d_clawpack46_bc2_t)(const int& maxmx, const int& maxmy,
+                                      const int& meqn, const int& mbc,
+                                      const int& mx, const int& my,
+                                      const double& xlower, const double& ylower,
+                                      const double& dx, const double& dy,
+                                      const double q[], const int& maux,
+                                      const double aux[], const double& t,
+                                      const double& dt, const int mthbc[]);
+
+typedef  void (*fc2d_clawpack46_qinit_t)(const int& maxmx, const int& maxmy,
+                                         const int& meqn,const int& mbc,
+                                         const int& mx, const int& my,
+                                         const double& xlower, const double& ylower,
+                                         const double& dx, const double& dy,
+                                         double q[], const int& maux, double aux[]);
+
+typedef void (*fc2d_clawpack46_setaux_t)(const int& maxmx, const int& maxmy, const int& mbc,
+                                         const int& mx, const int& my,
+                                         const double& xlower, const double& ylower,
+                                         const double& dx, const double& dy,
+                                         const int& maux, double aux[]);
+
+typedef void (*fc2d_clawpack46_b4step2_t)(const int& maxmx, const int& maxmy,
+                                          const int& mbc,
+                                          const int& mx, const int& my, const int& meqn,
+                                          double q[], const double& xlower,
+                                          const double& ylower,
+                                          const double& dx, const double& dy,
+                                          const double& t, const double& dt,
+                                          const int& maux, double aux[]);
+
+typedef void (*fc2d_clawpack46_src2_t)(const int& maxmx, const int& maxmy, const int& meqn,
+                                       const int& mbc, const int& mx,const int& my,
+                                       const double& xlower, const double& ylower,
+                                       const double& dx, const double& dy, double q[],
+                                       const int& maux, double aux[], const double& t,
+                                       const double& dt);
+
+typedef struct fc2d_clawpack46_vtable
+{
+    fc2d_clawpack46_setprob_t setprob;
+    fc2d_clawpack46_bc2_t bc2;
+    fc2d_clawpack46_qinit_t qinit;
+    fc2d_clawpack46_setaux_t setaux;
+    fc2d_clawpack46_b4step2_t b4step2;
+    fc2d_clawpack46_src2_t src2;
+} fc2d_clawpack46_vtable_t;
+
+void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
+
 
 extern "C"
 {
-    void setprob_();
+    void clawpack46_bc2_(const int& maxmx, const int& maxmy, const int& meqn,
+                         const int& mbc, const int& mx, const int& my,
+                         const double& xlower, const double& ylower,
+                         const double& dx, const double& dy, const double q[],
+                         const int& maux, const double aux[], const double& t,
+                         const double& dt, const int mthbc[]);
 
-    void bc2_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-              const int& mx, const int& my, const double& xlower, const double& ylower,
-              const double& dx, const double& dy, const double q[], const int& maux,
-              const double aux[], const double& t, const double& dt, const int mthbc[]);
+    void setprob_();
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
                 const int& mbc, const int& mx, const int& my,
@@ -68,7 +122,6 @@ extern "C"
                const double& dx, const double& dy, double q[],
                const int& maux, double aux[], const double& t,
                const double& dt);
-
 
     /* --------------------------------------------------------------------
        Time stepping
@@ -116,7 +169,7 @@ void
 fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
 
 void
-fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
+fc2d_clawpack46_setprob();
 
 void
 fc2d_clawpack46_link_to_clawpatch();

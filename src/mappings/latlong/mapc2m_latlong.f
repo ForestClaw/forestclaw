@@ -1,3 +1,4 @@
+c     # [xc,yc] are in [-180,180]x[0,360]
       subroutine mapc2m_latlong(blockno,xc,yc,xp,yp,zp)
       implicit none
 

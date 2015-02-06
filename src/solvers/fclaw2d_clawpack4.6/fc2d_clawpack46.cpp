@@ -33,6 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46_options.h"
 #include "fc2d_clawpack46.H"
 
+
+static fc2d_clawpack46_vtable_t classic_vt;
+
+void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
+{
+    classic_vt = *user_vt;
+
+    /* Only the boundary condition routine has a default version that does
+       something.  All the others (qinit,setprob,setaux,src2,b4step2) are
+       no ops in the default case */
+    classic_vt.bc2 = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
+}
+
+
 /* Patch data is stored in each ClawPatch */
 struct patch_aux_data
 {
@@ -72,6 +86,7 @@ void patch_data_delete(void **wp)
     delete patch_data;
     *wp = (void*) NULL;
 }
+
 
 
 /* -----------------------------------------------------------
@@ -117,9 +132,12 @@ void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
 
-void fc2d_clawpack46_setprob(fclaw2d_domain_t* domain)
+void fc2d_clawpack46_setprob()
 {
-    setprob_();
+    /* Assume that if we are here, then the user has a valid setprob */
+    FCLAW_ASSERT(classic_vt.setprob != NULL);
+
+    classic_vt.setprob();
 }
 
 
@@ -129,27 +147,21 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
+    FCLAW_ASSERT(classic_vt.setaux != NULL);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ----------------------------------------------------------- */
     fc2d_clawpack46_define_auxarray(domain,cp);
 
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
     double *aux;
     int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
@@ -157,9 +169,8 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    /* ----------------------------------------------------------- */
-    // Classic setaux call
-    setaux_(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
+    CLAWPACK_SET_BLOCK(&this_block_idx);
+    classic_vt.setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
 }
 
 void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
@@ -167,38 +178,32 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
+    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
     double* q = cp->q();
 
     double *aux;
     int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    // Other input arguments
     int maxmx = mx;
     int maxmy = my;
 
-    /* ------------------------------------------------------- */
-    // Call to classic Clawpack 'qinit' routine.
+    /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK_SET_BLOCK(&this_block_idx);
-    qinit_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
+    classic_vt.qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
 void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
@@ -208,38 +213,32 @@ void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
                              double t,
                              double dt)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
+    FCLAW_ASSERT(classic_vt.b4step2 != NULL);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
     double* q = cp->q();
 
     double *aux;
     int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    // Other input arguments
     int maxmx = mx;
     int maxmy = my;
 
-    /* ------------------------------------------------------- */
-    // Classic call to b4step2(..)
     CLAWPACK_SET_BLOCK(&this_block_idx);
-    b4step2_(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux);
+    classic_vt.b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
+                       t,dt,maux,aux);
 }
 
 void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
@@ -249,38 +248,31 @@ void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
+    FCLAW_ASSERT(classic_vt.src2 != NULL);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ------------------------------------------------------- */
-    // Pointers needed to pass to Fortran
     double* q = cp->q();
 
     double *aux;
     int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    // Other input arguments
     int maxmx = mx;
     int maxmy = my;
 
-    /* ------------------------------------------------------- */
-    // Classic call to src2(..)
     CLAWPACK_SET_BLOCK(&this_block_idx);
-    src2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
+    classic_vt.src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
 }
 
 
@@ -309,24 +301,20 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
                          fclaw_bool intersects_phys_bdry[],
                          fclaw_bool time_interp)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
+    FCLAW_ASSERT(classic_vt.bc2 != NULL);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    /* ------------------------------------------------------ */
-    // Set up boundary conditions
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = get_block_data(this_block);
     int *block_mthbc = bdata->mthbc;
@@ -359,14 +347,12 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    // Other input arguments
     int maxmx = mx;
     int maxmy = my;
 
-    /* ------------------------------------------------------- */
-    // Classic call to bc2(..)
     CLAWPACK_SET_BLOCK(&this_block_idx);
-    bc2_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc);
+    classic_vt.bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+                   dx,dy,q,maux,aux,t,dt,mthbc);
 }
 
 
