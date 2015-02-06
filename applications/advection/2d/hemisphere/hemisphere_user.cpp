@@ -36,6 +36,17 @@ extern "C"
 #endif
 #endif
 
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,        /* bc2 */
+    qinit_,      /* qinit */
+    NULL,        /* Setaux */
+    NULL,        /* b4step2 */
+    NULL         /* src2 */
+};
+
+
 void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -52,15 +63,13 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &hemisphere_parallel_write_header;
     of->f_patch_write_output = &hemisphere_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
 
     fc2d_clawpack46_link_to_clawpatch();
 }
 
 void hemisphere_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
     setprob_();
 }
 
