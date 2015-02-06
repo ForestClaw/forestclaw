@@ -1,10 +1,12 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'nomap';
+map = 'nomap';
 % map = 'cart';
 % map = 'pillowdisk';
-map = 'squareddisk';
+% map = 'squareddisk';
 % map = 'pillowdisk5';
+
+% This domain should be in [0,2],[0,2]
 
 shift = [1,1,0];
 
@@ -20,12 +22,12 @@ switch map
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
                 
-        xp = xp + 1;
-        yp = yp + 1;
+        xp = xp + shift(1);
+        yp = yp + shift(2);
     case 'pillowdisk'
         [xp,yp,zp] = mapc2m_pillowdisk(xc,yc);
-        xp = xp + 1;
-        yp = yp + 1;
+        xp = xp + shift(1);
+        yp = yp + shift(2);
         % (xp,yp) in [-1,1]x[-1,1]
     case 'squareddisk'
         [xp,yp,zp] = mapc2m_squareddisk(xc,yc);
@@ -41,13 +43,10 @@ switch map
             case 4
                 yp = yp + s;
         end
-        xp = xp + 1;
-        yp = yp + 1;
+        xp = xp + shift(1);
+        yp = yp + shift(2);
     case 'pillowdisk5'
-        [xp1,yp1,zp] = mapc2m_fivepatch(xc,yc);
-        xp1 = (xp1 + 1)/2;
-        yp1 = (yp1 + 1)/2;
-        [xp,yp,zp] = mapc2m_pillowdisk(xp1,yp1);
+        [xp,yp,zp] = mapc2m_pillowdisk5(xc,yc);
         s = 0.0;
         b = getblocknumber();
         switch b
@@ -60,8 +59,8 @@ switch map
             case 4
                 yp = yp + s;
         end
-        xp = xp + 1;
-        yp = yp + 1;
+        xp = xp + shift(1);
+        yp = yp + shift(2);
 end
 zp = 0*xp;
 
