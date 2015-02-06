@@ -160,18 +160,6 @@ c                 # with capa array.
          enddo
       enddo
 
-
-      if (method(5).eq.1) then
-c        # with source term:   use Godunov splitting
-c        # In AMRClaw, a function called 'src1d' is called from
-c        # from qad.  But we don't do that here.
-c
-c        # Not clear where this should fit in now.
-         call src2(maxmx,maxmy,meqn,mbc,mx,my,
-     &         xlower,ylower,dx,dy,
-     &         qold,maux,aux,t,dt)
-      endif
-
       end
 
 
