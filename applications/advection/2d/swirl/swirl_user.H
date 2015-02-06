@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SWIRL_USER_H
 
 #include "amr_forestclaw.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -60,7 +60,7 @@ extern "C"
                             double q[], const int& iframe,const int& patch_num,
                             const int& level,const int& blockno,
                             const int& mpirank);
-
+#if 0
     void setaux_manifold_(const int& mbc,const int& mx, const int& my,
                           const double& xlower, const double& ylower,
                           const double& dx, const double& dy,
@@ -81,6 +81,7 @@ extern "C"
                            const int& blockno, const double& time,
                            double xd[], double yd[], double zd[],
                            const double dt, const int& maux, double aux[]);
+#endif
 
 
 }

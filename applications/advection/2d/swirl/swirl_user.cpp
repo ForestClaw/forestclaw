@@ -38,7 +38,7 @@ extern "C"
 static const fc2d_clawpack46_vtable_t classic_user =
 {
     setprob_,
-    NULL,  /* bc2 */
+    bc2_,  /* bc2 - added here just as a compiler check */
     qinit_,
     setaux_,
     b4step2_,
@@ -100,6 +100,8 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
+    /* This calls bc2 in swirl/user_4.6;  that file isn't changed but just included as a
+       compile check */
     fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
