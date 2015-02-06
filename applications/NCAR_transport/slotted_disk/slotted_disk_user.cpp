@@ -35,6 +35,16 @@ extern "C"
 #endif
 #endif
 
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    NULL,
+    NULL,        /* bc2 */
+    NULL,        /* qinit */
+    NULL,        /* Setaux */
+    NULL,        /* b4step2 */
+    NULL         /* src2 */
+};
+
 
 void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -52,6 +62,8 @@ void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_output_functions_t *of = get_output_functions(domain);
     of->f_patch_write_header = &slotted_disk_parallel_write_header;
     of->f_patch_write_output = &slotted_disk_parallel_write_output;
+
+    fc2d_clawpack46_set_vtable(&classic_user);
 
     /* This is needed to get constructors for user data */
     fc2d_clawpack46_link_to_clawpatch();
