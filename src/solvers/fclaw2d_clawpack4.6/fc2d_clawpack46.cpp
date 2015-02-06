@@ -43,7 +43,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     /* Only the boundary condition routine has a default version that does
        something.  All the others (qinit,setprob,setaux,src2,b4step2) are
        no ops in the default case */
-    classic_vt.bc2 = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
+    classic_vt.bc2 = user_vt->bc2 == NULL ? fort_clawpack46_bc2_ : user_vt->bc2;
 }
 
 

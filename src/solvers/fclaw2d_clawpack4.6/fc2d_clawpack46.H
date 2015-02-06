@@ -88,12 +88,12 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
 
 extern "C"
 {
-    void clawpack46_bc2_(const int& maxmx, const int& maxmy, const int& meqn,
-                         const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy, const double q[],
-                         const int& maux, const double aux[], const double& t,
-                         const double& dt, const int mthbc[]);
+    void fort_clawpack46_bc2_(const int& maxmx, const int& maxmy, const int& meqn,
+                              const int& mbc, const int& mx, const int& my,
+                              const double& xlower, const double& ylower,
+                              const double& dx, const double& dy, const double q[],
+                              const int& maux, const double aux[], const double& t,
+                              const double& dt, const int mthbc[]);
 
     /* --------------------------------------------------------------------
        Classic routines
@@ -113,6 +113,14 @@ extern "C"
                  const double& xlower, const double& ylower,
                  const double& dx, const double& dy,
                  const int& maux, double aux[]);
+
+    void bc2_(const int& maxmx, const int& maxmy, const int& meqn,
+              const int& mbc, const int& mx, const int& my,
+              const double& xlower, const double& ylower,
+              const double& dx, const double& dy, const double q[],
+              const int& maux, const double aux[], const double& t,
+              const double& dt, const int mthbc[]);
+
 
     void b4step2_(const int& maxmx, const int& maxmy, const int& mbc,
                   const int& mx, const int& my, const int& meqn,
