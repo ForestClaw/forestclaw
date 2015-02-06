@@ -19,4 +19,8 @@ applications_no_solver_no_solver_SOURCES = \
 applications_no_solver_no_solver_CPPFLAGS = \
 	       $(AM_CPPFLAGS)
 
-applications_no_solver_no_solver_LDADD = $(LDADD) $(FLIBS)
+# applications_no_solver_no_solver_LDADD = $(LDADD) $(FLIBS)
+
+# Not needed, but included to check compile
+applications_no_solver_no_solver_LDADD = \
+        $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
