@@ -13,8 +13,8 @@ applications_amrclaw_acoustics_2d_radial_radial_SOURCES = \
 	applications/amrclaw/acoustics/2d/radial/user_4.x/setprob.f \
 	applications/amrclaw/acoustics/2d/radial/user_4.x/tag4refinement.f \
 	applications/amrclaw/acoustics/2d/radial/user_4.x/radial_output.f \
-	applications/amrclaw/acoustics/2d/radial/user_4.x/rpn2ac.f \
-	applications/amrclaw/acoustics/2d/radial/user_4.x/rpt2ac.f \
+	applications/amrclaw/acoustics/2d/rp/rpn2ac.f \
+	applications/amrclaw/acoustics/2d/rp/rpt2ac.f \
 	applications/amrclaw/acoustics/2d/radial/user_4.x/qinit.f
 
 
