@@ -6,7 +6,7 @@ c     ==========================================================
      &      mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
      &      faddm,faddp,gaddm,gaddp,q1d,dtdx1d,dtdy1d,
      &      aux1,aux2,aux3,work,mwork,rpn2,rpt2,flux2,
-     &      mwaves,mcapa,method,mthlim, ierror)
+     &      mwaves,mcapa,method,mthlim, block_corner_count, ierror)
 c     ==========================================================
       implicit none
 
@@ -15,6 +15,7 @@ c     ==========================================================
       integer maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
       double precision dx, dy, dt, cflgrid
       integer mwaves, mcapa, method(7), mthlim(mwaves)
+      integer block_corner_count(0:3)
       integer ierror
 
 
@@ -37,7 +38,6 @@ c     ==========================================================
       double precision work(mwork)
 
       integer ibc,jbc
-      integer block_corner_count(0:3)
 
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
@@ -57,8 +57,6 @@ c     # passed in...
       dycom = dy
       dtcom = dt
 
-      call clawpack46_get_corners(block_corner_count)
-c
 c     # partition work array into pieces needed for local storage in
 c     # flux2 routine.  Find starting index of each piece:
 c

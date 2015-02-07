@@ -1,7 +1,7 @@
       subroutine clawpack46_update(maxm, meqn, maux, mbc, method,
      &      mthlim, mcapa, mwaves, mx, my, qold, aux, dx, dy, dt,
      &      cfl, work, mwork,xlower,ylower,level, t, fp,fm, gp, gm,
-     &      rpn2, rpt2,flux2,ierror)
+     &      rpn2, rpt2,flux2,block_corner_count,ierror)
 
       implicit none
 
@@ -10,6 +10,7 @@
       integer maxm,meqn,maux,mbc,mcapa,mwaves,mx,my, mwork
       integer maxmx, maxmy, level, ierror
       integer method(7), mthlim(mwaves)
+      integer block_corner_count(0:3)
 
       double precision dx,dy,dt,cfl, xlower, ylower, t
       double precision dtdx, dtdy
@@ -88,7 +89,7 @@ c     # global array
      &      work(i0q1d),work(i0dtdx1),work(i0dtdy1),
      &      work(i0aux1),work(i0aux2),work(i0aux3),
      &      work(i0next),mwork1,rpn2,rpt2,flux2,
-     &      mwaves,mcapa,method,mthlim,ierror)
+     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 
 c     # update q
       dtdx = dt/dx

@@ -193,7 +193,7 @@ extern "C"
                             fc2d_clawpack46_rpn2_t rpn2,
                             fc2d_clawpack46_rpt2_t rpt2,
                             fc2d_clawpack46_flux2_t flux2,
-                            int& ierror);
+                            int block_corner_count[],int& ierror);
 
       void clawpack46_flux2_(const int& ixy,const int& maxm, const int& meqn,
                              const int& maux,const int& mbc,const int& mx,
@@ -228,10 +228,6 @@ extern "C"
 }
 #endif
 #endif
-
-#define CLAWPACK46_SET_CORNERS FCLAW_F77_FUNC(clawpack46_set_corners, \
-                                              CLAWPACK46_SET_CORNERS)
-void CLAWPACK46_SET_CORNERS(int block_corners_count[]);
 
 #define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block, \
                                             CLAWPACK46_SET_BLOCK)

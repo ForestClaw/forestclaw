@@ -371,9 +371,6 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     ClawPatch *cp                               = get_clawpatch(this_patch);
     fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
 
-    CLAWPACK46_SET_BLOCK(&this_block_idx);
-    CLAWPACK46_SET_CORNERS(cp->block_corner_count());
-
     int level = this_patch->level;
 
     double* qold = cp->q();
@@ -413,12 +410,12 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     clawpack46_flux2fw_ : clawpack46_flux2_;
 
-
     clawpack46_update_(maxm, meqn, maux, mbc, clawpack_options->method,
                        clawpack_options->mthlim, clawpack_options->mcapa,
                        mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
                        work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
-                       classic_vt.rpn2, classic_vt.rpt2,flux2,ierror);
+                       classic_vt.rpn2, classic_vt.rpt2,flux2,
+                       cp->block_corner_count(), ierror);
 
     FCLAW_ASSERT(ierror == 0);
 
