@@ -1,7 +1,8 @@
-      subroutine clawpack46_update(maxm, meqn, maux, mbc, method,
-     &      mthlim, mcapa, mwaves, mx, my, qold, aux, dx, dy, dt,
-     &      cfl, work, mwork,xlower,ylower,level, t, fp,fm, gp, gm,
-     &      rpn2, rpt2,flux2,block_corner_count,ierror)
+      subroutine clawpack46_step2_wrap(maxm, meqn, maux, mbc,
+     &      method, mthlim, mcapa, mwaves, mx, my, qold, aux,
+     &      dx, dy, dt,cfl, work, mwork,xlower,ylower,level,
+     &      t, fp,fm, gp, gm, rpn2, rpt2,flux2,
+     &      block_corner_count,ierror)
 
       implicit none
 
@@ -41,10 +42,8 @@ c     for a Riemann solver.
       integer icom, jcom
       common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
 
-c -----------------------------------------------------------------------
       ierror = 0
 
-c -----------------------------------------------------------------------
 c     This should be set to actual time, in case the user wants it
 c     it for some reason in the Riemann solver.
       tcom = t
@@ -54,8 +53,7 @@ c     it for some reason in the Riemann solver.
       maxmx = mx
       maxmy = my
 
-c -----------------------------------------------------------------------
-c     # take one step on the conservation law:
+c     # Set up work arrays
 
       i0faddm = 1
       i0faddp = i0faddm +   (maxm+2*mbc)*meqn

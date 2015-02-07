@@ -177,7 +177,6 @@ extern "C"
                double aux1[], double aux2[], double aux3[], const int& imp,
                double dsdq[], double bmasdq[], double bpasdq[]);
 
-
     /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
