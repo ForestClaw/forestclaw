@@ -9,10 +9,10 @@
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       integer i,j
-      integer blockno, clawpack_get_block
+      integer blockno, clawpack46_get_block
       double precision x,y,z, xlow, ylow, w
 
-      blockno = clawpack_get_block()
+      blockno = clawpack46_get_block()
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc

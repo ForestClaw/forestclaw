@@ -10,9 +10,9 @@
 
       integer i,j
       double precision x,y,z, xlow, ylow, w
-      integer blockno, clawpack_get_block
+      integer blockno, clawpack46_get_block
 
-      blockno = clawpack_get_block()
+      blockno = clawpack46_get_block()
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
