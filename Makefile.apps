@@ -30,3 +30,6 @@ include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # Euler example
 include applications/euler/2d/quadrants/Makefile.am
+
+# AMRClaw examples from clawpack4.x
+include applications/amrclaw/acoustics/2d/radial/Makefile.am
