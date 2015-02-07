@@ -3,8 +3,6 @@ libclawpack4_6_generated_headers =
 libclawpack4_6_installed_headers = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.H
 
-libclawpack4_6_internal_headers = src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_claw.i
-
 libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.cpp \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.c \
