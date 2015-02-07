@@ -89,16 +89,6 @@ static void outstyle_1(fclaw2d_domain_t **domain)
     int nout = gparms->nout;
     double initial_dt = gparms->initial_dt;
 
-    int verbosity;
-    if ((*domain)->mpirank == 0)
-    {
-        verbosity = gparms->verbosity;
-    }
-    else
-    {
-        verbosity = 0;
-    }
-
     double t0 = 0;
 
     double dt_outer = (final_time-t0)/double(nout);
@@ -191,13 +181,10 @@ static void outstyle_1(fclaw2d_domain_t **domain)
 
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
-            if ((*domain)->mpirank == 0)
-            {
-                fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
-                                         "%8.3f; Final time = %12.4f\n", \
-                                         time_stepper.minlevel(),n_inner,dt_minlevel,
-                                         maxcfl_step, t_curr+dt_minlevel);
-            }
+            fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+                                     "%8.3f; Final time = %12.4f\n",    \
+                                     time_stepper.minlevel(),n_inner,dt_minlevel,
+                                     maxcfl_step, t_curr+dt_minlevel);
 
             if (maxcfl_step > gparms->max_cfl)
             {
@@ -286,16 +273,6 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
-
-    int verbosity;
-    if ((*domain)->mpirank)
-    {
-        verbosity = gparms->verbosity;
-    }
-    else
-    {
-        verbosity = 0;
-    }
 
     double t0 = 0;
     /* The user dt_initial is the appropriate value for minlevel
@@ -423,16 +400,6 @@ static void outstyle_4(fclaw2d_domain_t **domain)
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
-
-    int verbosity;
-    if ((*domain)->mpirank == 0)
-    {
-        verbosity = gparms->verbosity;
-    }
-    else
-    {
-        verbosity = 0;
-    }
 
     // assume fixed dt that is stable for all grids.
 
