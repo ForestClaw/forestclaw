@@ -55,7 +55,7 @@ c        where A^* represents either A^- or A^+.
 c
 c
       implicit none
-      include "claw.i"
+      include "clawpack46_claw.i"
 
       integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
       integer my, maux

@@ -1,4 +1,4 @@
-      subroutine fort_clawpack46_bc2(maxmx,maxmy,meqn,mbc,
+      subroutine clawpack46_bc2(maxmx,maxmy,meqn,mbc,
      &      mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc)
       implicit none
 

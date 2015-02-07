@@ -22,7 +22,7 @@ c
       implicit none
 
 c     # include call.i   !! included in AMRClaw
-      include  "claw.i"  !! use this for ChomboClaw
+      include  "clawpack46_claw.i"  !! use this for ChomboClaw
 
       external rpn2, rpt2
       integer maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
