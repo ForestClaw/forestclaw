@@ -1,4 +1,4 @@
-      subroutine set_corners(block_corner_count)
+      subroutine clawpack46_set_corners(block_corner_count)
       implicit none
 
       integer block_corner_count(0:3)
@@ -13,7 +13,7 @@
 
       end
 
-      subroutine get_corners(block_corner_count)
+      subroutine clawpack46_get_corners(block_corner_count)
       implicit none
 
       integer block_corner_count(0:3)

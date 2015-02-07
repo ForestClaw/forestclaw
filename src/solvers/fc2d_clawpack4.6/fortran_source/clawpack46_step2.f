@@ -1,32 +1,21 @@
 c
-c
+c     # Basic clawpack routine - with 4 additional arguments
+c     # mwaves, mcapa, method, mthlim + ierror
 c     ==========================================================
-      subroutine step2(maxm,maxmx,maxmy,meqn,maux,mbc,mx,my,
-     &                 qold,aux,dx,dy,dt,cflgrid,
-     &                 fm,fp,gm,gp,
-     &                 faddm,faddp,gaddm,gaddp,q1d,dtdx1d,dtdy1d,
-     &                 aux1,aux2,aux3,work,mwork,rpn2,rpt2)
+      subroutine clawpack46_step2(maxm,maxmx,maxmy,meqn,maux,mbc,
+     &      mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
+     &      faddm,faddp,gaddm,gaddp,q1d,dtdx1d,dtdy1d,
+     &      aux1,aux2,aux3,work,mwork,rpn2,rpt2,
+     &      mwaves,mcapa,method,mthlim, ierror)
 c     ==========================================================
-c
-c     # clawpack routine ...  modified for AMRCLAW
-c
-c     # Take one time step, updating q.
-c     # On entry, qold gives
-c     #    initial data for this step
-c     #    and is unchanged in this version.
-c
-c     # fm, fp are fluxes to left and right of single cell edge
-c     # See the flux2 documentation for more information.
-c
-c
       implicit none
 
-c     # include call.i   !! included in AMRClaw
-      include  "clawpack46_claw.i"  !! use this for ChomboClaw
-
       external rpn2, rpt2
+
       integer maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
       double precision dx, dy, dt, cflgrid
+      integer mwaves, mcapa, method(7), mthlim(mwaves)
+      integer ierror
 
 
       double precision qold(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
@@ -46,7 +35,6 @@ c     # include call.i   !! included in AMRClaw
       double precision dtdx1d(1-mbc:maxm+mbc)
       double precision dtdy1d(1-mbc:maxm+mbc)
       double precision work(mwork)
-      logical debug
 
       integer ibc,jbc
       integer block_corner_count(0:3)
@@ -60,6 +48,8 @@ c     # include call.i   !! included in AMRClaw
       integer m,i,j, ma
 
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+
+      ierror = 0
 c
 c     # store mesh parameters that may be needed in Riemann solver but not
 c     # passed in...
@@ -67,8 +57,7 @@ c     # passed in...
       dycom = dy
       dtcom = dt
 
-
-      call get_corners(block_corner_count)
+      call clawpack46_get_corners(block_corner_count)
 c
 c     # partition work array into pieces needed for local storage in
 c     # flux2 routine.  Find starting index of each piece:
@@ -83,9 +72,8 @@ c
       iused = i0bpadq + (maxm+2*mbc)*meqn - 1
 c
       if (iused.gt.mwork) then
-c        # This shouldn't happen due to checks in claw2
-         write(*,*) 'not enough work space in step2'
-         stop
+         ierror = 1
+         return
       endif
 c
 c
@@ -173,11 +161,13 @@ c        # variable coefficient problems)
          jcom = j
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
-         call flux2(1,maxm,meqn,maux,mbc,mx,
-     &              q1d,dtdx1d,aux1,aux2,aux3,
-     &              faddm,faddp,gaddm,gaddp,cfl1d,
-     &              work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
-     &              work(i0cqxx),work(i0bmadq),work(i0bpadq),rpn2,rpt2)
+         call clawpack46_flux2(1,maxm,meqn,maux,mbc,mx,
+     &         q1d,dtdx1d,aux1,aux2,aux3,
+     &         faddm,faddp,gaddm,gaddp,cfl1d,
+     &         work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
+     &         work(i0cqxx),work(i0bmadq),work(i0bpadq),rpn2,rpt2,
+     &         mwaves,mcapa,method,mthlim)
+
          cflgrid = dmax1(cflgrid,cfl1d)
 c
 c        # update fluxes for use in AMR:
@@ -259,12 +249,13 @@ c        # variable coefficient problems)
          icom = i
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
-         call flux2(2,maxm,meqn,maux,mbc,my,
-     &              q1d,dtdy1d,aux1,aux2,aux3,
-     &              faddm,faddp,gaddm,gaddp,cfl1d,
-     &              work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
-     &              work(i0cqxx),work(i0bmadq),work(i0bpadq),rpn2,rpt2)
-c
+         call clawpack46_flux2(2,maxm,meqn,maux,mbc,my,
+     &         q1d,dtdy1d,aux1,aux2,aux3,
+     &         faddm,faddp,gaddm,gaddp,cfl1d,
+     &         work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
+     &         work(i0cqxx),work(i0bmadq),work(i0bpadq),rpn2,rpt2,
+     &         mwaves,mcapa,method,mthlim)
+
          cflgrid = dmax1(cflgrid,cfl1d)
 c
 c        #

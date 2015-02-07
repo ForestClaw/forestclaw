@@ -168,17 +168,17 @@ extern "C"
     /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
-    void clawpatch2_(const int& maxm, const int& meqn, const int& maux,
-                     const int& mbc, const int method[], const int mthlim[],
-                     const int& mcapa, const int& mwaves, const int& mx,
-                     const int& my, double qold[], double auxold[],
-                     const double& dx, const double& dy, const double& dt,
-                     const double& cfl, double work[], const int& mwork,
-                     const double& xlower, const double& ylower, const int& level,
-                     const double& t, double fp[], double fm[], double gp[],
-                     double gm[],
-                     fc2d_clawpack46_rpn2_t rpn2,
-                     fc2d_clawpack46_rpt2_t rpt2);
+    void clawpack46_update_(const int& maxm, const int& meqn, const int& maux,
+                            const int& mbc, const int method[], const int mthlim[],
+                            const int& mcapa, const int& mwaves, const int& mx,
+                            const int& my, double qold[], double auxold[],
+                            const double& dx, const double& dy, const double& dt,
+                            const double& cfl, double work[], const int& mwork,
+                            const double& xlower, const double& ylower, const int& level,
+                            const double& t, double fp[], double fm[], double gp[],
+                            double gm[],
+                            fc2d_clawpack46_rpn2_t rpn2,
+                            fc2d_clawpack46_rpt2_t rpt2,const int& ierror);
 
 }
 #ifdef __cplusplus
@@ -189,14 +189,17 @@ extern "C"
 #endif
 #endif
 
-#define SET_CORNERS FCLAW_F77_FUNC(set_corners, SET_CORNERS)
-void SET_CORNERS(int block_corners_count[]);
+#define CLAWPACK46_SET_CORNERS FCLAW_F77_FUNC(clawpack46_set_corners, \
+                                              CLAWPACK46_SET_CORNERS)
+void CLAWPACK46_SET_CORNERS(int block_corners_count[]);
 
-#define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block, CLAWPACK46_SET_BLOCK)
+#define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block, \
+                                            CLAWPACK46_SET_BLOCK)
 void CLAWPACK46_SET_BLOCK(int* blockno);
 
-#define CLAWPACK46_GET_BLOCK FCLAW_F77_FUNC(clawpack46_get_block, CLAWPACK46_GET_BLOCK)
-int CLAWPACK46_GET_BLOCK();
+#define FC2D_CLAWPACK46_GET_BLOCK FCLAW_F77_FUNC(fc2d_clawpack46_get_block, \
+                                  FC2D_CLAWPACK46_GET_BLOCK)
+int FC2D_CLAWPACK46_GET_BLOCK();
 
 
 void

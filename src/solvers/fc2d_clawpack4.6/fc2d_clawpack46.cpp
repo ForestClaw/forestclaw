@@ -372,7 +372,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    SET_CORNERS(cp->block_corner_count());
+    CLAWPACK46_SET_CORNERS(cp->block_corner_count());
 
     int level = this_patch->level;
 
@@ -409,12 +409,14 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    // Replace this with a call to "step2" at some point...
-    clawpatch2_(maxm, meqn, maux, mbc, clawpack_options->method,
-                clawpack_options->mthlim, clawpack_options->mcapa, mwaves,
-                mx, my, qold,
-                aux, dx, dy, dt, cflgrid, work, mwork, xlower, ylower,
-                level,t, fp, fm, gp, gm, classic_vt.rpn2, classic_vt.rpt2);
+    int ierror = 0;
+    clawpack46_update_(maxm, meqn, maux, mbc, clawpack_options->method,
+                       clawpack_options->mthlim, clawpack_options->mcapa,
+                       mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
+                       work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
+                       classic_vt.rpn2, classic_vt.rpt2,ierror);
+
+    FCLAW_ASSERT(ierror == 0);
 
     delete [] fp;
     delete [] fm;

@@ -1,10 +1,11 @@
 c
 c
 c     =====================================================
-      subroutine flux2(ixy,maxm,meqn,maux,mbc,mx,
-     &                 q1d,dtdx1d,aux1,aux2,aux3,
-     &                 faddm,faddp,gaddm,gaddp,cfl1d,wave,s,
-     &                 amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2)
+      subroutine clawpack46_flux2(ixy,maxm,meqn,maux,mbc,mx,
+     &      q1d,dtdx1d,aux1,aux2,aux3,
+     &      faddm,faddp,gaddm,gaddp,cfl1d,wave,s,
+     &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
+     &      mwaves,mcapa,method,mthlim)
 c     =====================================================
 c
 c     # clawpack routine ...  modified for AMRCLAW
@@ -55,10 +56,11 @@ c        where A^* represents either A^- or A^+.
 c
 c
       implicit none
-      include "clawpack46_claw.i"
+c      include "clawpack46_claw.i"
 
       integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
       integer my, maux
+      integer mwaves, mcapa, method(7), mthlim(mwaves)
 
       external rpn2, rpt2
       double precision    q1d(1-mbc:maxm+mbc, meqn)
