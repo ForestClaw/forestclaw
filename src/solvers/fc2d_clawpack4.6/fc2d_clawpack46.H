@@ -86,6 +86,19 @@ typedef void (*fc2d_clawpack46_rpt2_t)(const int& ixy, const int& maxm, const in
                                        double bmasdq[], double bpasdq[]);
 
 
+typedef void (*fc2d_clawpack46_flux2_t)(const int& ixy,const int& maxm, const int& meqn,
+                                        const int& maux,const int& mbc,const int& mx,
+                                        double q1d[], double dtdx1d[],
+                                        double aux1[], double aux2[], double aux3[],
+                                        double faddm[],double faddp[], double gaddm[],
+                                        double gaddp[],double cfl1d[], double fwave[],
+                                        double s[], double amdq[],double apdq[],double cqxx[],
+                                        double bmasdq[], double bpasdq[],
+                                        fc2d_clawpack46_rpn2_t rpn2,
+                                        fc2d_clawpack46_rpt2_t rpt2,
+                                        const int& mwaves, const int& mcapa,
+                                        int method[], int mthlim[]);
+
 typedef struct fc2d_clawpack46_vtable
 {
     fc2d_clawpack46_setprob_t setprob;
@@ -178,7 +191,34 @@ extern "C"
                             const double& t, double fp[], double fm[], double gp[],
                             double gm[],
                             fc2d_clawpack46_rpn2_t rpn2,
-                            fc2d_clawpack46_rpt2_t rpt2,const int& ierror);
+                            fc2d_clawpack46_rpt2_t rpt2,
+                            fc2d_clawpack46_flux2_t flux2,
+                            int& ierror);
+
+      void clawpack46_flux2_(const int& ixy,const int& maxm, const int& meqn,
+                             const int& maux,const int& mbc,const int& mx,
+                             double q1d[], double dtdx1d[],
+                             double aux1[], double aux2[], double aux3[],
+                             double faddm[],double faddp[], double gaddm[],
+                             double gaddp[],double cfl1d[], double fwave[],
+                             double s[], double amdq[],double apdq[],double cqxx[],
+                             double bmasdq[], double bpasdq[],
+                             fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
+                             const int& mwaves, const int& mcapa,
+                             int method[], int mthlim[]);
+
+      void clawpack46_flux2fw_(const int& ixy,const int& maxm, const int& meqn,
+                               const int& maux,const int& mbc,const int& mx,
+                               double q1d[], double dtdx1d[],
+                               double aux1[], double aux2[], double aux3[],
+                               double faddm[],double faddp[], double gaddm[],
+                               double gaddp[],double cfl1d[], double fwave[],
+                               double s[], double amdq[],double apdq[],double cqxx[],
+                               double bmasdq[], double bpasdq[],
+                               fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
+                               const int& mwaves, const int& mcapa,
+                               int method[], int mthlim[]);
+
 
 }
 #ifdef __cplusplus

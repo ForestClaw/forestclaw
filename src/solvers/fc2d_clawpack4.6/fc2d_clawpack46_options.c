@@ -61,6 +61,10 @@ options_register (fclaw_app_t * app,
     sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
                          "[clawpack46] Source term option [F]");
 
+    sc_options_add_bool (opt, 0, "use_fwaves", &clawopt->use_fwaves, 0,
+                         "[clawpack46] Use fwaves flux-form [F]");
+
+
     sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
                         "[clawpack46] Number of waves [1]");
 
@@ -99,6 +103,12 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawopt->maux;
+
+    if (clawopt->use_fwaves)
+    {
+        fclaw_global_essentialf("clawpack46 : fwaves not yet implemented\n");
+        return FCLAW_EXIT_QUIET;
+    }
 
     /* Should also check mthbc, mthlim, etc. */
 

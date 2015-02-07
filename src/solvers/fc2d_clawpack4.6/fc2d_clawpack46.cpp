@@ -410,11 +410,15 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     int ierror = 0;
+    fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
+                                    clawpack46_flux2fw_ : clawpack46_flux2_;
+
+
     clawpack46_update_(maxm, meqn, maux, mbc, clawpack_options->method,
                        clawpack_options->mthlim, clawpack_options->mcapa,
                        mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
                        work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
-                       classic_vt.rpn2, classic_vt.rpt2,ierror);
+                       classic_vt.rpn2, classic_vt.rpt2,flux2,ierror);
 
     FCLAW_ASSERT(ierror == 0);
 

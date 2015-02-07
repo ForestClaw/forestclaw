@@ -9,10 +9,12 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.cpp \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.c \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_limiter.f \
+	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_inlinelimiter.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_block.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_corner_info.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_bc2.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_flux2.f \
+	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_flux2fw.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_update.f
 

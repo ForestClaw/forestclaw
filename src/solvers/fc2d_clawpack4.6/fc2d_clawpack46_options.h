@@ -45,14 +45,16 @@ typedef struct fc2d_clawpack46_options
     int claw_verbosity;
 
     const char *order_string;
-    int *order;   /* order[2] */
+    int *order;
 
-    int *mthlim;  /* mthlim[mwaves] */
+    int *mthlim;
     const char *mthlim_string;
 
-    int method[7];  /* method[7] */
+    int method[7];
     int mcapa;
     int src_term;
+    int use_fwaves;
+
 
     int is_registered;
 } fc2d_clawpack46_options_t;
