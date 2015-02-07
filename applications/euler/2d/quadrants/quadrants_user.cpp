@@ -74,7 +74,7 @@ void quadrants_problem_setup(fclaw2d_domain_t* domain)
     /* Setup any fortran common blocks for general problem
        and any other general problem specific things that only needs
        to be done once. */
-    fc2d_clawpack46_setprob();
+    fc2d_clawpack46_setprob(domain);
 }
 
 

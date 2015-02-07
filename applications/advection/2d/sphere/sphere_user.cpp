@@ -76,7 +76,7 @@ void sphere_problem_setup(fclaw2d_domain_t* domain)
     // This calls setprob_, which might be null.  This is used
     // mostly for setting up things related to Fortran.
 
-    fc2d_clawpack46_setprob();
+    fc2d_clawpack46_setprob(domain);
 }
 
 void sphere_patch_setup(fclaw2d_domain_t *domain,

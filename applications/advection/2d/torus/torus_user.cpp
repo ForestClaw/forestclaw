@@ -77,7 +77,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
 void torus_problem_setup(fclaw2d_domain_t* domain)
 {
-    fc2d_clawpack46_setprob();
+    fc2d_clawpack46_setprob(domain);
 }
 
 void torus_patch_setup(fclaw2d_domain_t *domain,

@@ -253,7 +253,7 @@ void
 fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
 
 void
-fc2d_clawpack46_setprob();
+fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
 
 void
 fc2d_clawpack46_link_to_clawpatch();

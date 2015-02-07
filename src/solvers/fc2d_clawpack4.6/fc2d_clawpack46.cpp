@@ -43,7 +43,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     /* Only the boundary condition routine has a default version that does
        something.  All the others (qinit,setprob,setaux,src2,b4step2) are
        no ops in the default case */
-    classic_vt.bc2     = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
+    classic_vt.bc2  = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
 }
 
 
@@ -132,7 +132,7 @@ void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
 
-void fc2d_clawpack46_setprob()
+void fc2d_clawpack46_setprob(fclaw2d_domain_t *domain)
 {
     /* Assume that if we are here, then the user has a valid setprob */
     FCLAW_ASSERT(classic_vt.setprob != NULL);
