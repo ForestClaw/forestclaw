@@ -43,7 +43,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     /* Only the boundary condition routine has a default version that does
        something.  All the others (qinit,setprob,setaux,src2,b4step2) are
        no ops in the default case */
-    classic_vt.bc2 = user_vt->bc2 == NULL ? fort_clawpack46_bc2_ : user_vt->bc2;
+    classic_vt.bc2 = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
 }
 
 
@@ -169,7 +169,7 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    CLAWPACK_SET_BLOCK(&this_block_idx);
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
 }
 
@@ -202,7 +202,7 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
     int maxmy = my;
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-    CLAWPACK_SET_BLOCK(&this_block_idx);
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
 }
 
@@ -236,7 +236,7 @@ void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    CLAWPACK_SET_BLOCK(&this_block_idx);
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
                        t,dt,maux,aux);
 }
@@ -271,7 +271,7 @@ void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    CLAWPACK_SET_BLOCK(&this_block_idx);
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
 }
 
@@ -350,7 +350,7 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     int maxmx = mx;
     int maxmy = my;
 
-    CLAWPACK_SET_BLOCK(&this_block_idx);
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
                    dx,dy,q,maux,aux,t,dt,mthbc);
 }
@@ -371,6 +371,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     ClawPatch *cp                               = get_clawpatch(this_patch);
     fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
 
+    CLAWPACK46_SET_BLOCK(&this_block_idx);
     SET_CORNERS(cp->block_corner_count());
 
     int level = this_patch->level;
@@ -383,19 +384,16 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     cp->save_current_step();  // Save for time interpolation
 
-    // Global to all patches
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
 
-    // Specific to the patch
     double xlower = cp->xlower();
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
 
-    // Specific to solver
     int mwaves = clawpack_options->mwaves;
 
     int maxm = max(mx,my);

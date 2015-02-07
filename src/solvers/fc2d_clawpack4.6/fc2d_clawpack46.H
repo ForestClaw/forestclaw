@@ -103,17 +103,17 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
 
 extern "C"
 {
-    void fort_clawpack46_bc2_(const int& maxmx, const int& maxmy, const int& meqn,
-                              const int& mbc, const int& mx, const int& my,
-                              const double& xlower, const double& ylower,
-                              const double& dx, const double& dy, const double q[],
-                              const int& maux, const double aux[], const double& t,
-                              const double& dt, const int mthbc[]);
+    void clawpack46_bc2_(const int& maxmx, const int& maxmy, const int& meqn,
+                         const int& mbc, const int& mx, const int& my,
+                         const double& xlower, const double& ylower,
+                         const double& dx, const double& dy, const double q[],
+                         const int& maux, const double aux[], const double& t,
+                         const double& dt, const int mthbc[]);
 
     /* --------------------------------------------------------------------
        Classic routines
        - These are provided only for convenience;  these files are not
-         compiled into the library.
+         compiled into the library, but will be provided by the user.
        -------------------------------------------------------------------- */
     void setprob_();
 
@@ -154,7 +154,7 @@ extern "C"
     /* --------------------------------------------------------------------
        Riemann solvers
        -------------------------------------------------------------------- */
-    void rpn2_(const int& ixy,const int& maxm, const int& meqn,const int& mwaves,
+    void rpn2_(const int& ixy,const int& maxm, const int& meqn, const int& mwaves,
                const int& mbc,const int& mx, double ql[], double qr[],
                double auxl[], double auxr[], double wave[],
                double s[], double amdq[], double apdq[]);
@@ -168,13 +168,15 @@ extern "C"
     /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
-    void clawpatch2_(const int& maxm, const int& meqn, const int& maux, const int& mbc,
-                     const int method[], const int mthlim[], const int& mcapa,
-                     const int& mwaves, const int& mx, const int& my, double qold[],
-                     double auxold[], const double& dx, const double& dy, const double& dt,
-                     const double& cfl, double work[], const int& mwork, const double& xlower,
-                     const double& ylower, const int& level, const double& t, double fp[],
-                     double fm[], double gp[], double gm[],
+    void clawpatch2_(const int& maxm, const int& meqn, const int& maux,
+                     const int& mbc, const int method[], const int mthlim[],
+                     const int& mcapa, const int& mwaves, const int& mx,
+                     const int& my, double qold[], double auxold[],
+                     const double& dx, const double& dy, const double& dt,
+                     const double& cfl, double work[], const int& mwork,
+                     const double& xlower, const double& ylower, const int& level,
+                     const double& t, double fp[], double fm[], double gp[],
+                     double gm[],
                      fc2d_clawpack46_rpn2_t rpn2,
                      fc2d_clawpack46_rpt2_t rpt2);
 
@@ -190,11 +192,11 @@ extern "C"
 #define SET_CORNERS FCLAW_F77_FUNC(set_corners, SET_CORNERS)
 void SET_CORNERS(int block_corners_count[]);
 
-#define CLAWPACK_SET_BLOCK FCLAW_F77_FUNC(clawpack_set_block, CLAWPACK_SET_BLOCK)
-void CLAWPACK_SET_BLOCK(int* blockno);
+#define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block, CLAWPACK46_SET_BLOCK)
+void CLAWPACK46_SET_BLOCK(int* blockno);
 
-#define CLAWPACK_GET_BLOCK FCLAW_F77_FUNC(clawpack_get_block, CLAWPACK_GET_BLOCK)
-int CLAWPACK_GET_BLOCK();
+#define CLAWPACK46_GET_BLOCK FCLAW_F77_FUNC(clawpack46_get_block, CLAWPACK46_GET_BLOCK)
+int CLAWPACK46_GET_BLOCK();
 
 
 void
