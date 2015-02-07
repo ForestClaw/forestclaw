@@ -5,7 +5,7 @@ global map isflat;
 alpha = 0.4;
 s = 1e-2;    
 if strcmp(map,'nomap')
-    axis([-1 2 -1 1]);
+    axis([-1 1 -1 1]);
 else
     if strcmp(map,'cart')
         alim = [-1 1];

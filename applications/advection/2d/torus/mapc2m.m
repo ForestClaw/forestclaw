@@ -2,11 +2,11 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 global map isflat;
 
-% map = 'nomap';
+map = 'nomap';
 % map = 'cart';
 % map = 'torus';
 % map = 'latlong';
-map = 'annulus';
+% map = 'annulus';
 
 R = 1;
 r = 0.4;
