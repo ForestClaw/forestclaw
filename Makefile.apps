@@ -34,3 +34,4 @@ include applications/euler/2d/quadrants/Makefile.am
 # AMRClaw examples from clawpack4.x
 include applications/amrclaw/acoustics/2d/radial/Makefile.am
 include applications/amrclaw/acoustics/2d/interface/Makefile.am
+include applications/amrclaw/burgers/2d/pwconst/Makefile.am
