@@ -181,19 +181,19 @@ extern "C"
     /* --------------------------------------------------------------------
        Time stepping
        -------------------------------------------------------------------- */
-    void clawpack46_update_(const int& maxm, const int& meqn, const int& maux,
-                            const int& mbc, const int method[], const int mthlim[],
-                            const int& mcapa, const int& mwaves, const int& mx,
-                            const int& my, double qold[], double auxold[],
-                            const double& dx, const double& dy, const double& dt,
-                            const double& cfl, double work[], const int& mwork,
-                            const double& xlower, const double& ylower, const int& level,
-                            const double& t, double fp[], double fm[], double gp[],
-                            double gm[],
-                            fc2d_clawpack46_rpn2_t rpn2,
-                            fc2d_clawpack46_rpt2_t rpt2,
-                            fc2d_clawpack46_flux2_t flux2,
-                            int block_corner_count[],int& ierror);
+    void clawpack46_step2_wrap_(const int& maxm, const int& meqn, const int& maux,
+                                const int& mbc, const int method[], const int mthlim[],
+                                const int& mcapa, const int& mwaves, const int& mx,
+                                const int& my, double qold[], double auxold[],
+                                const double& dx, const double& dy, const double& dt,
+                                const double& cfl, double work[], const int& mwork,
+                                const double& xlower, const double& ylower, const int& level,
+                                const double& t, double fp[], double fm[], double gp[],
+                                double gm[],
+                                fc2d_clawpack46_rpn2_t rpn2,
+                                fc2d_clawpack46_rpt2_t rpt2,
+                                fc2d_clawpack46_flux2_t flux2,
+                                int block_corner_count[],int& ierror);
 
       void clawpack46_flux2_(const int& ixy,const int& maxm, const int& meqn,
                              const int& maux,const int& mbc,const int& mx,

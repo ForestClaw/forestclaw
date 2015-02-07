@@ -43,7 +43,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     /* Only the boundary condition routine has a default version that does
        something.  All the others (qinit,setprob,setaux,src2,b4step2) are
        no ops in the default case */
-    classic_vt.bc2 = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
+    classic_vt.bc2     = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
 }
 
 
@@ -410,12 +410,12 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     clawpack46_flux2fw_ : clawpack46_flux2_;
 
-    clawpack46_update_(maxm, meqn, maux, mbc, clawpack_options->method,
-                       clawpack_options->mthlim, clawpack_options->mcapa,
-                       mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
-                       work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
-                       classic_vt.rpn2, classic_vt.rpt2,flux2,
-                       cp->block_corner_count(), ierror);
+    clawpack46_step2_wrap_(maxm, meqn, maux, mbc, clawpack_options->method,
+                           clawpack_options->mthlim, clawpack_options->mcapa,
+                           mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
+                           work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
+                           classic_vt.rpn2, classic_vt.rpt2,flux2,
+                           cp->block_corner_count(), ierror);
 
     FCLAW_ASSERT(ierror == 0);
 
@@ -436,13 +436,15 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
                               double t,
                               double dt)
 {
-    const fc2d_clawpack46_options_t* clawpack_options =
-        get_options(domain);
+    const fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
 
-    fc2d_clawpack46_b4step2(domain,
-                            this_patch,
-                            this_block_idx,
-                            this_patch_idx,t,dt);
+    if (classic_vt.b4step2 != NULL)
+    {
+        fc2d_clawpack46_b4step2(domain,
+                                this_patch,
+                                this_block_idx,
+                                this_patch_idx,t,dt);
+    }
 
     double maxcfl = fc2d_clawpack46_step2(domain,
                                           this_patch,
@@ -458,7 +460,6 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
     }
     return maxcfl;
 }
-
 
 void fc2d_clawpack46_link_to_clawpatch()
 {
