@@ -59,7 +59,7 @@ ReadBlockNumber = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;
 PlotData =  ones(1,MaxLevels);   % Data on refinement level k is plotted only if
-			     % k'th component is nonzero
+			                     % k'th component is nonzero
 PlotGrid =  zeros(1,MaxLevels);   % Plot grid lines on each level?
 
 PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
@@ -73,4 +73,4 @@ ContourValues = [];
 %---------------------------------
 
 
-ShowUnderOverShoots = 1;
+ShowUnderOverShoots = 0;
