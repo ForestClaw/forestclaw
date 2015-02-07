@@ -56,7 +56,6 @@ c        where A^* represents either A^- or A^+.
 c
 c
       implicit none
-c      include "clawpack46_claw.i"
 
       integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
       integer my, maux
@@ -137,7 +136,8 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to waves:
-      if (limit) call limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
+      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
+     &      wave,s,mthlim)
 c
       do 120 i = 1, mx+1
 c

@@ -1,4 +1,4 @@
-      subroutine clawpack46_setprob
+      subroutine setprob
       implicit none
 
 c     # Copy this file to your directory and modify to set up problem

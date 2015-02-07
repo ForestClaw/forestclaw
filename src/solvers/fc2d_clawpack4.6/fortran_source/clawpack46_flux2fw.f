@@ -1,10 +1,11 @@
 c
 c
 c     =====================================================
-      subroutine flux2(ixy,maxm,meqn,maux,mbc,mx,
-     &                 q1d,dtdx1d,aux1,aux2,aux3,
-     &                 faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
-     &                 amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2)
+      subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
+     &      q1d,dtdx1d,aux1,aux2,aux3,
+     &      faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
+     &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
+     &      mwaves,mcapa,method,mthlim)
 c     =====================================================
 c
 c     # clawpack routine ...  modified for AMRCLAW
@@ -68,10 +69,12 @@ c        where A^* represents either A^- or A^+.
 c
 c
       implicit none
-c      include "call.i"
-      include "claw.i"
+
       external rpn2, rpt2
+
       integer ixy,mbc,maxm,meqn,maux,mx
+      integer mwaves, mcapa, method(7), mthlim(mwaves)
+
       double precision cfl1d
       double precision    q1d(1-mbc:maxm+mbc, meqn)
       double precision   amdq(1-mbc:maxm+mbc, meqn)
@@ -148,7 +151,8 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
-      if (limit) call limiter(maxm,meqn,mwaves,mbc,mx,fwave,s,mthlim)
+      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
+     &      fwave,s,mthlim)
 c
       do 120 i = 1, mx+1
 c

@@ -5,12 +5,12 @@ c     ==========================================================
       subroutine clawpack46_step2(maxm,maxmx,maxmy,meqn,maux,mbc,
      &      mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
      &      faddm,faddp,gaddm,gaddp,q1d,dtdx1d,dtdy1d,
-     &      aux1,aux2,aux3,work,mwork,rpn2,rpt2,
+     &      aux1,aux2,aux3,work,mwork,rpn2,rpt2,flux2,
      &      mwaves,mcapa,method,mthlim, ierror)
 c     ==========================================================
       implicit none
 
-      external rpn2, rpt2
+      external rpn2, rpt2, flux2
 
       integer maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
       double precision dx, dy, dt, cflgrid
@@ -161,7 +161,7 @@ c        # variable coefficient problems)
          jcom = j
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
-         call clawpack46_flux2(1,maxm,meqn,maux,mbc,mx,
+         call flux2(1,maxm,meqn,maux,mbc,mx,
      &         q1d,dtdx1d,aux1,aux2,aux3,
      &         faddm,faddp,gaddm,gaddp,cfl1d,
      &         work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
@@ -249,7 +249,7 @@ c        # variable coefficient problems)
          icom = i
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
-         call clawpack46_flux2(2,maxm,meqn,maux,mbc,my,
+         call flux2(2,maxm,meqn,maux,mbc,my,
      &         q1d,dtdy1d,aux1,aux2,aux3,
      &         faddm,faddp,gaddm,gaddp,cfl1d,
      &         work(i0wave),work(i0s),work(i0amdq),work(i0apdq),
