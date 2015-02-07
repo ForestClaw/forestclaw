@@ -1,4 +1,4 @@
-opeForestClaw = 1;
+ForestClaw = 1;
 
 OutputFlag = 'forestclaw'         % default value.
 

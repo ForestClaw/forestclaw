@@ -43,7 +43,7 @@ static const fc2d_clawpack46_vtable_t classic_user =
     NULL,
     NULL,
     NULL,  /* src2 */
-    rpn2_,
+    rpn2eu3_,
     rpt2_
 };
 
@@ -58,7 +58,7 @@ void quadrants_link_solvers(fclaw2d_domain_t *domain)
     // sf->f_patch_setup              = &fc2d_clawpack46_setaux;  /* Not needed for quadrants */
     sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
     sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_step2;
+    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
 
     fclaw2d_output_functions_t* of = get_output_functions(domain);
     of->f_patch_write_header = &quadrants_parallel_write_header;
@@ -76,49 +76,6 @@ void quadrants_problem_setup(fclaw2d_domain_t* domain)
        to be done once. */
     fc2d_clawpack46_setprob();
 }
-
-
-
-
-#if 0
-void quadrants_patch_initialize(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
-{
-    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
-}
-#endif
-
-
-#if 0
-void quadrants_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp)
-{
-    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                         t,dt,intersects_bc, time_interp);
-}
-#endif
-
-#if 0
-double quadrants_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt)
-{
-    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
-                                           this_patch_idx,t,dt);
-    return maxcfl;
-}
-#endif
 
 
 /* -----------------------------------------------------------------
