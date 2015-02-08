@@ -38,6 +38,25 @@ extern "C"
 #endif
 #endif
 
+/* Use as an alternate to GNU feenableexcept */
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
+#include <fp_exception_glibc_extension.h>
+#endif
+
+#include <fenv.h>
+#include <signal.h>
+
+#ifdef FCLAW_HAVE_UNISTD_H
+#include <unistd.h>    /* To get process ids */
+#endif
+
+/* -----------------------------------------------------------------
+  Debug routines
+   ---------------------------------------------------------------- */
+void fclaw2d_mpi_debug();
+
+
+
 /* -----------------------------------------------------------
    Data needed for time stepping
    ----------------------------------------------------------- */

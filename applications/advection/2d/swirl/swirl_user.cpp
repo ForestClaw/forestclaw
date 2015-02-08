@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "swirl_user.H"
 
 #ifdef __cplusplus
@@ -34,6 +34,19 @@ extern "C"
 }
 #endif
 #endif
+
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    bc2_,  /* bc2 - added here just as a compiler check */
+    qinit_,
+    setaux_,
+    b4step2_,
+    NULL,  /* src2 */
+    rpn2_,
+    rpt2_
+};
+
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -51,12 +64,14 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &swirl_parallel_write_header;
     of->f_patch_write_output = &swirl_parallel_write_output;
 
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_set_vtable(&classic_user);
+
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 
@@ -65,7 +80,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                           int this_block_idx,
                           int this_patch_idx)
 {
-    fclaw2d_clawpack_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -75,9 +90,8 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
-
 
 void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
@@ -88,7 +102,9 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    fclaw2d_clawpack_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+    /* This calls bc2 in swirl/user_4.6;  that file isn't changed but just included as a
+       compile check */
+    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
 
@@ -100,9 +116,9 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt)
 {
-    fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    fc2d_clawpack46_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);
     return maxcfl;
 }

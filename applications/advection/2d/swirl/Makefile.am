@@ -11,6 +11,7 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/fclaw2d_map_nomap.c \
 	applications/advection/2d/swirl/psi.f \
 	applications/advection/2d/swirl/user_4.6/tag4refinement.f \
+	applications/advection/2d/swirl/user_4.6/bc2.f \
 	applications/advection/2d/swirl/user_4.6/rpn2ad1.f \
 	applications/advection/2d/swirl/user_4.6/rpt2ad1.f \
 	applications/advection/2d/swirl/user_4.6/qinit.f \
@@ -21,8 +22,6 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 
 applications_advection_2d_swirl_swirl_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
-
-# applications_advection_2d_swirl_swirl_CPPFLAGS += -D MPI_DEBUG
 
 applications_advection_2d_swirl_swirl_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

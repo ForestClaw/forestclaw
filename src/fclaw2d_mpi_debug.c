@@ -24,6 +24,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+#include "fclaw_base.h"
+
 #ifdef FCLAW_ENABLE_MPI
 
 #include <mpi.h>
@@ -71,5 +82,13 @@ void fclaw2d_mpi_debug()
 #else
 void fclaw2d_mpi_debug()
 {
+    fclaw_global_infof("Option --mpi_debug is set, but code is not compiled for MPI");
+}
+#endif
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
 }
 #endif

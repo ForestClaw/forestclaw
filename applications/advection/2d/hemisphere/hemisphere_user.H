@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HEMISPHERE_USER_H
 
 #include "amr_forestclaw.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -50,12 +50,6 @@ extern "C"
                                     const double& ylower, const double& dx,
                                     const double& dy,
                                     double qcoarsened[], int& tag_patch);
-
-    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
-                const int& mbc, const int& mx, const int& my,
-                const double& xlower, const double& ylower,
-                const double& dx, const double& dy,
-                double q[], const int& maux, double aux[]);
 
     void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,

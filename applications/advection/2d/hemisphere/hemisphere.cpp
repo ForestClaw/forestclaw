@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <amr_single_step.h>
-#include <fclaw2d_clawpack.H>
+#include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 
@@ -34,139 +34,174 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hemisphere_user.H"
 
-int
-main (int argc, char **argv)
+typedef struct user_options
 {
-  int			lp;
-  sc_MPI_Comm           mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t* clawpack_parms;
+    int example;
+    double alpha;
+    int is_registered;
 
-  double theta;
+} user_options_t;
 
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
 
-#ifdef MPI_DEBUG
-  /* this has to go after MPI has been initialized */
-  fclaw2d_mpi_debug();
-#endif
+    sc_options_add_int (opt, 0, "example", &user->example, 2,
+                        "[user] 1 for pillow grid, "    \
+                        "2 for five-patch hemisphere [2]");
 
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "Ratio of outer square to inner square [0.4]");
 
-  /* ----------------------------------------------------------
-     Read in command line options
-     ---------------------------------------------------------- */
-  int example;
-  options = sc_options_new (argv[0]);
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for Cartesian, " \
-                      "2 for five patch square");
+    user->is_registered = 1;
+    return NULL;
+}
 
-  sc_options_add_double (options, 0, "theta", &theta, 0,
-                         "Rotation angle theta (degrees) about z axis [0]");
-
-  /* ----------------------------------------------------------
-     Read in values from .ini files.  These are overwritten by
-     command line options read above.
-     ---------------------------------------------------------- */
-  gparms = amr_options_new (options);
-  clawpack_parms = fclaw2d_clawpack_parms_new(options);
-
-  /* Parse command line for any modifications */
-  amr_options_parse (options, argc, argv, lp);  // Reads options from a file
-
-  /* Postprocess array inputs */
-  amr_postprocess_parms(gparms);
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
-
-  /* Verify inputs */
-  amr_checkparms(gparms);
-  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
-
-  /* ---------------------------------------------------------------
-     Floating point traps
-     -------------------------------------------------------------- */
-  if (gparms->trapfpe == 1)
-  {
-      printf("Enabling floating point traps\n");
-      feenableexcept(FE_INVALID);
-  }
-
-  /* ---------------------------------------------------------------
-     Set up the domain geometry
-     --------------------------------------------------------------- */
-  double alpha = 0.5;
-  double scale[3];
-  double shift[3];
-  double rotate[2];
-  set_default_transform(scale,shift,rotate);
-  rotate[0] = theta;
-  rotate[1] = 0;
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->example < 1 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+        return FCLAW_EXIT_ERROR;
+    }
+    return FCLAW_NOEXIT;
+}
 
 
-  switch (example) {
-  case 1:
-      /* Map unit square to disk using mapc2m_disk.f */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_pillowsphere(scale,shift,rotate);
-      break;
-  case 2:
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_pillowsphere5(scale,shift,rotate,alpha);
-      break;
-  default:
-      sc_abort_collective ("Parameter example must be 1 or 2");
-  }
+static const fclaw_app_options_vtable_t options_vtable_user = {
+    options_register_user,
+    NULL,      /* options_postprocess_user */
+    options_check_user,
+    NULL       /* options_destroy_user */
+};
 
-  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+void static
+register_user_options (fclaw_app_t * app,
+                       const char *configfile,
+                       user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
 
-  /* ---------------------------------------------------------------
-     Print out domain info
-     --------------------------------------------------------------- */
-  if (gparms->verbosity > 0)
-  {
-      fclaw2d_domain_list_levels(domain, lp);
-      fclaw2d_domain_list_neighbors(domain, lp);
-  }
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
 
-  /* ---------------------------------------------------------------
-     Set domain data.
-     --------------------------------------------------------------- */
-  init_domain_data(domain);
+static
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 fc2d_clawpack46_options_t* clawpack_options,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
 
-  /* Store domain parameters */
-  set_domain_parms(domain,gparms);
-  set_clawpack_parms(domain,clawpack_parms);
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
+    fclaw2d_map_context_t    *cont = NULL;
 
-/* ---------------------------------------------
-   Define the solver
-   --------------------------------------------- */
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
 
-  /* Link waveprop solvers to domain */
-  link_problem_setup(domain,hemisphere_problem_setup);
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-  hemisphere_link_solvers(domain);
-  link_regrid_functions(domain,hemisphere_patch_tag4refinement,
-                        hemisphere_patch_tag4coarsening);
+    rotate[0] = pi*gparms->theta/180.0;
+    rotate[1] = 0;
 
-  /* --------------------------------------------------
-     Initialize and run the simulation
-     -------------------------------------------------- */
-  amrinit(&domain);
-  amrrun(&domain);
-  amrreset(&domain);
 
-  fclaw2d_map_destroy(cont);
-  sc_options_destroy (options);
-  amr_options_destroy(gparms);
-  fclaw2d_clawpack_parms_delete(clawpack_parms);
+    switch (user->example) {
+    case 1:
+        /* Map unit square to disk using mapc2m_disk.f */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,
+                                            rotate);
+        break;
+    case 2:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_pillowsphere5(gparms->scale,gparms->shift,
+                                             rotate,user->alpha);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+    }
 
-  fclaw_mpi_finalize ();
+    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-  return 0;
+    /* ---------------------------------------------------------------
+       Print out domain info
+       --------------------------------------------------------------- */
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+    /* ---------------------------------------------------------------
+       Set domain data.
+       --------------------------------------------------------------- */
+    init_domain_data(domain);
+
+    /* Store domain parameters */
+    set_domain_parms(domain,gparms);
+    fc2d_clawpack46_set_options(domain,clawpack_options);
+
+    /* ---------------------------------------------
+       Define the solver
+       --------------------------------------------- */
+
+    /* Link waveprop solvers to domain */
+    link_problem_setup(domain,hemisphere_problem_setup);
+
+    hemisphere_link_solvers(domain);
+    link_regrid_functions(domain,hemisphere_patch_tag4refinement,
+                          hemisphere_patch_tag4coarsening);
+
+    /* --------------------------------------------------
+       Initialize and run the simulation
+       -------------------------------------------------- */
+    amrinit(&domain);
+    amrrun(&domain);
+    amrreset(&domain);
+
+    fclaw2d_map_destroy(cont);
+}
+
+
+int main (int argc, char **argv)
+{
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
+
+    /* Options */
+    sc_options_t                *options;
+    amr_options_t               samr_options,      *gparms = &samr_options;
+    fc2d_clawpack46_options_t   sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t              suser_options,     *user = &suser_options;
+
+    int retval;
+
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
+
+    /*  Register options for each package */
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
+
+    register_user_options (app, "fclaw_options.ini", user);
+
+    /* Read configuration file(s) and command line, and process options */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
+    {
+        run_program(app, gparms, clawpack_options, user);
+    }
+
+    fclaw_app_destroy (app);
+
+    return 0;
 }

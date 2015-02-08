@@ -15,10 +15,10 @@ c     #     0.1  otherwise
        double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
        double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
-       integer i, j, mq, blockno, clawpack_get_block
+       integer i, j, mq, blockno, fc2d_clawpack46_get_block
        double precision xlow, ylow, w
 
-       blockno = clawpack_get_block()
+       blockno = fc2d_clawpack46_get_block()
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc
@@ -57,5 +57,4 @@ c     #     0.1  otherwise
       r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 
       fdisc = r-0.25d0
-c      fdisc = xp - 1
       end

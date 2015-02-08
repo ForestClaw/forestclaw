@@ -83,6 +83,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
     cont->mapc2m = fclaw2d_map_c2m_fivepatch;
 
     cont->user_double[0] = alpha;
+
     /*
     set_scale(cont,scale);
     set_shift(cont,shift);

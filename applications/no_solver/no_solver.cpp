@@ -23,140 +23,191 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_base.h>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_map_query.h>
 
+#include <amr_forestclaw.H>
+#include <amr_utils.H>
 
 #include "no_solver_user.H"
+
+typedef struct user_options
+{
+    int example;
+    double alpha;
+
+    int is_registered;
+
+} user_options_t;
+
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "0 nomap (use [ax,bx]x[ay,by]; "   \
+                        "1 cart; 2 5-patch square [0]");
+
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "Ratio of outer square to inner square [0.4]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->example < 0 || user->example > 4) {
+        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
+
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    options_check_user,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
+
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
+    fclaw2d_map_context_t    *cont = NULL;
+
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+    rotate[0] = pi*gparms->theta/180.0;
+    rotate[1] = pi*gparms->phi/180.0;
+
+    switch (user->example) {
+    case 0:
+        /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_nomap ();
+        break;
+    case 1:
+        /* Map unit square to disk using mapc2m_disk.f */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_cart (gparms->scale, gparms->shift,
+                                     rotate);
+        break;
+    case 2:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
+                                          rotate,user->alpha);
+        break;
+    case 3:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_pillowdisk (gparms->scale,gparms->shift,
+                                           rotate);
+        break;
+    case 4:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
+                                            rotate,user->alpha);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+    /* ---------------------------------------------------------- */
+
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+    /* ---------------------------------------------------------------
+       Set domain data.
+       --------------------------------------------------------------- */
+    init_domain_data(domain);
+    set_domain_parms(domain,gparms);
+
+    /* ---------------------------------------------------------------
+       Don't do any solve or run.  This is just to test that we can
+       compile without any solver routines.
+       --------------------------------------------------------------- */
+
+    no_solver_linker(domain);
+
+    /* ---------------------------------------------------------------
+       Initialize and run (but with out updating anything)
+       --------------------------------------------------------------- */
+    amrinit(&domain);
+    amrrun(&domain);  /* Nothing should happen */
+    amrreset(&domain);
+
+    fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
+}
+
 
 int
 main (int argc, char **argv)
 {
-  int		        lp;
-  int                   example;
-  sc_MPI_Comm           mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
+
+    /* Options */
+    sc_options_t                  *options;
+    amr_options_t                 samr_options, *gparms = &samr_options;
+    user_options_t                suser_options, *user = &suser_options;
+
+    int retval;
+
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
+
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+
+    /* User defined options (defined above) */
+    register_user_options (app, "fclaw_options.ini", user);
 
 
-#ifdef TRAPFPE
-  printf("Enabling floating point traps\n");
-  feenableexcept(FE_INVALID);
-#endif
+    /* Read configuration file(s) */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
+    {
+        run_program(app, gparms,user);
+    }
 
-#ifdef MPI_DEBUG
-  /* This has to come after MPI has been initialized */
-  fclaw2d_mpi_debug();
-#endif
+    fclaw_app_destroy (app);
 
-
-  /* ---------------------------------------------------------------
-     Read parameters from .ini file, parse command line, and
-     do parameter checking.
-     -------------------------------------------------------------- */
-  options = sc_options_new(argv[0]);
-
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "0 no mapping (use [ax,bx]x[ay,by], " \
-                      "1 for Cartesian," \
-                      "2 for five patch square");
-
-  /* Register default parameters and any solver parameters */
-  gparms = amr_options_new(options);
-
-  amr_options_parse(options,argc,argv,lp);
-
-  /* Any arrays are converted here */
-  amr_postprocess_parms(gparms);
-
-  /* Check final state of parameters */
-  amr_checkparms(gparms);
-
-  /* ---------------------------------------------------------------
-     Domain geometry
-     -------------------------------------------------------------- */
-
-  double alpha = 0.5;
-
-  double scale[3];
-  double shift[3];
-  double rotate[2];
-  set_default_transform(scale,shift,rotate);
-
-  switch (example) {
-  case 0:
-      /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
-      gparms->manifold = 0;
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_nomap ();
-      break;
-  case 1:
-      /* Map unit square to disk using mapc2m_disk.f */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart (scale, shift, rotate);
-      break;
-  case 2:
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_fivepatch (scale,shift,rotate,alpha);
-      break;
-  case 3:
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_pillowdisk (scale,shift,rotate);
-      break;
-  case 4:
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_pillowfivepatch (scale,shift,rotate,alpha);
-      break;
-  default:
-      sc_abort_collective ("Parameter example must be 1 or 2");
-  }
-
-  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
-  /* ---------------------------------------------------------- */
-
-  if (gparms->verbosity > 0)
-  {
-      fclaw2d_domain_list_levels(domain, lp);
-      fclaw2d_domain_list_neighbors(domain, lp);
-  }
-
-  /* ---------------------------------------------------------------
-     Set domain data.
-     --------------------------------------------------------------- */
-  init_domain_data(domain);
-  set_domain_parms(domain,gparms);
-
-  /* ---------------------------------------------------------------
-     Don't do any solve or run.  This is just to test that we can
-     compile without any solver routines.
-     --------------------------------------------------------------- */
-
-  no_solver_linker(domain);
-
-  /* ---------------------------------------------------------------
-     Initialize and run (but with out updating anything)
-     --------------------------------------------------------------- */
-  amrinit(&domain);
-  amrrun(&domain);  /* Nothing should happen */
-  amrreset(&domain);
-
-  /* ---------------------------------------------------------------
-     Clean up
-     --------------------------------------------------------------- */
-
-  sc_options_destroy(options);         /* this could be moved up */
-  amr_options_destroy(gparms);
-
-  fclaw_mpi_finalize ();
-
-  return 0;
+    return 0;
 }

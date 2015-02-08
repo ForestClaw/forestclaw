@@ -1,10 +1,10 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% assume that [xc,yc] in [0,mi], [0,mj]
+% assume that [xc,yc] in a lat/long box
 
-xp = cos(pi*(0.5-yc)).*cos(2*pi*xc);
-yp = cos(pi*(0.5-yc)).*sin(2*pi*xc);
-zp = sin(pi*(0.5-yc));
+xp = cosd(yc).*cosd(xc);
+yp = cosd(yc).*sind(xc);
+zp = sind(yc);
 
 end
 

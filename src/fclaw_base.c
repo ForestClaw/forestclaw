@@ -25,7 +25,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+static const char *fclaw_configdir = ".forestclaw";
+static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
 static int fclaw_package_id = -1;
+
+int
+fclaw_app_exit_type_to_status (fclaw_exit_type_t vexit)
+{
+    return vexit == FCLAW_EXIT_ERROR ? EXIT_FAILURE : EXIT_SUCCESS;
+}
+
+/** Each options packages lives in a structure like this. */
+typedef struct fclaw_app_options
+{
+    char *section;              /**< NULL or used in sc_options_add_suboptions. */
+    char *configfile;           /**< NULL or an .ini file's basename to read. */
+    fclaw_app_options_vtable_t vt;      /**< Virtual table for option processing. */
+    void *package;              /**< The package user data from options_register. */
+    void *registered;           /**< Whatever is returend by options_register. */
+}
+fclaw_app_options_t;
+
+/** An application container whose use is optional. */
+struct fclaw_app
+{
+    sc_MPI_Comm mpicomm;      /**< Communicator is set to MPI_COMM_WORLD. */
+    int mpisize;              /**< Size of communicator. */
+    int mpirank;              /**< Rank of this process in \b mpicomm. */
+    int first_arg;            /**< Location of first non-option argument after parsing. */
+    int *argc;                /**< Pointer to main function's argument count. */
+    char ***argv;             /**< Pointer to main function's argument list. */
+    sc_options_t *opt;        /**< Central options structure. */
+    void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+
+    /* paths and configuration files */
+    const char * configdir;   /**< Defaults to fclaw_configdir under $HOME, may
+                                   be changed with \ref fclaw_app_set_configdir. */
+    const char * env_configdir;         /**< Name of environment variable for a
+                                             directory to find configuration files.
+                                             Defaults to fclaw_env_configdir. */
+
+    /* options packages */
+    sc_array_t *opt_pkg;      /**< An array of fclaw_app_options types. */
+};
 
 int
 fclaw_get_package_id (void)
@@ -46,6 +88,26 @@ fclaw_logf (int category, int priority, const char *fmt, ...)
 
     va_start (ap, fmt);
     sc_logv ("unknown", -1, fclaw_package_id, category, priority, fmt, ap);
+    va_end (ap);
+}
+
+void
+fclaw_global_errorf (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_GLOBAL, SC_LP_ERROR, fmt, ap);
+    va_end (ap);
+}
+
+void
+fclaw_errorf (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_NORMAL, SC_LP_ERROR, fmt, ap);
     va_end (ap);
 }
 
@@ -80,6 +142,16 @@ fclaw_global_infof (const char *fmt, ...)
 }
 
 void
+fclaw_infof (const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_NORMAL, SC_LP_INFO, fmt, ap);
+    va_end (ap);
+}
+
+void
 fclaw_debugf (const char *fmt, ...)
 {
     va_list ap;
@@ -110,8 +182,8 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
     fclaw_global_productionf ("%-*s %s\n", w, "LIBS", FCLAW_LIBS);
 }
 
-void
-fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user)
+fclaw_app_t *
+fclaw_app_new (int *argc, char ***argv, void *user)
 {
 #ifdef FCLAW_ENABLE_DEBUG
     const int LP_lib = SC_LP_INFO;
@@ -121,37 +193,381 @@ fclaw_app_init (fclaw_app_t * a, int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
+    sc_MPI_Comm mpicomm;
+    fclaw_app_t *a;
 
     mpiret = sc_MPI_Init (argc, argv);
     SC_CHECK_MPI (mpiret);
+    mpicomm = sc_MPI_COMM_WORLD;
 
-    a->mpicomm = sc_MPI_COMM_WORLD;
+    sc_init (mpicomm, 1, 1, NULL, LP_lib);
+    p4est_init (NULL, LP_lib);
+    fclaw_init (NULL, LP_fclaw);
+
+    a = FCLAW_ALLOC (fclaw_app_t, 1);
+    a->mpicomm = mpicomm;
     mpiret = sc_MPI_Comm_size (a->mpicomm, &a->mpisize);
     SC_CHECK_MPI (mpiret);
     mpiret = sc_MPI_Comm_rank (a->mpicomm, &a->mpirank);
     SC_CHECK_MPI (mpiret);
 
     srand (a->mpirank);
+    a->first_arg = -1;
     a->argc = argc;
     a->argv = argv;
     a->user = user;
-
-    sc_init (a->mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
-
     a->opt = sc_options_new ((*argv)[0]);
+    a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
+
+    a->configdir = fclaw_configdir;
+    a->env_configdir = fclaw_env_configdir;
+
+    return a;
 }
 
 void
-fclaw_app_reset (fclaw_app_t * a)
+fclaw_app_destroy (fclaw_app_t * a)
 {
     int mpiret;
+    size_t zz;
+    fclaw_app_options_t *ao;
 
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (a->opt_pkg != NULL);
+    FCLAW_ASSERT (a->opt != NULL);
+
+    /* let the options packages clean up their memory */
+    for (zz = a->opt_pkg->elem_count; zz > 0; --zz)
+    {
+        ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz - 1);
+        FCLAW_ASSERT (ao != NULL);
+        if (ao->vt.options_destroy != NULL)
+        {
+            ao->vt.options_destroy (a, ao->package, ao->registered);
+        }
+        FCLAW_FREE (ao->section);
+        FCLAW_FREE (ao->configfile);
+    }
+    sc_array_destroy (a->opt_pkg);
+
+    /* free central structures */
     sc_options_destroy (a->opt);
+    FCLAW_FREE (a);
 
     sc_finalize ();
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->configdir = configdir;
+}
+
+void
+fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    a->env_configdir = env_configdir;
+}
+
+void
+fclaw_app_options_register (fclaw_app_t * a,
+                            const char *section, const char *configfile,
+                            const fclaw_app_options_vtable_t * vt,
+                            void *package)
+{
+    sc_options_t *popt;
+    fclaw_app_options_t *ao;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (vt != NULL && vt->options_register != NULL);
+
+    ao = (fclaw_app_options_t *) sc_array_push (a->opt_pkg);
+    ao->section = section == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->vt = *vt;
+    ao->package = package;
+
+    popt = section == NULL ? a->opt : sc_options_new (section);
+    ao->registered = vt->options_register (a, package, popt);
+    if (section != NULL)
+    {
+        FCLAW_ASSERT (popt != a->opt);
+        sc_options_add_suboptions (a->opt, popt, section);
+        sc_options_destroy (popt);
+    }
+}
+
+/** This is the internal state of an options structure for core variables. */
+typedef struct fclaw_options_core
+{
+    int print_help;        /**< Option variable to activate help message */
+    int print_version;     /**< Option variable to print the version */
+    int fclaw_verbosity;   /**< Option variable for ForestClaw verbosity */
+    int lib_verbosity;     /**< Option variable for p4est, sc, and others */
+    sc_keyvalue_t *kv_verbosity;      /**< Holds key-values for log levels */
+
+    /* this is just for ForestClaw debugging, no need to adopt elsewhere */
+    int is_registered;     /**< Internal variable to double-check the flow */
+}
+fclaw_options_core_t;
+
+static void *
+options_register_core (fclaw_app_t * a, void *package, sc_options_t * opt)
+{
+    sc_keyvalue_t *kv;
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
+
+    /* allocated storage for this package's option values */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (!core->is_registered);
+
+    /* this key-value pair understands the verbosity levels */
+    kv = core->kv_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "default", FCLAW_VERBOSITY_DEFAULT);
+    sc_keyvalue_set_int (kv, "debug", FCLAW_VERBOSITY_DEBUG);
+    sc_keyvalue_set_int (kv, "info", FCLAW_VERBOSITY_INFO);
+    sc_keyvalue_set_int (kv, "production", FCLAW_VERBOSITY_PRODUCTION);
+    sc_keyvalue_set_int (kv, "essential", FCLAW_VERBOSITY_ESSENTIAL);
+    sc_keyvalue_set_int (kv, "error", FCLAW_VERBOSITY_ERROR);
+    sc_keyvalue_set_int (kv, "silent", FCLAW_VERBOSITY_SILENT);
+
+    /* set the options for the core package */
+    sc_options_add_switch (opt, 'h', "help", &core->print_help,
+                           "Print usage information");
+    sc_options_add_switch (opt, 'v', "version", &core->print_version,
+                           "Print ForestClaw version");
+    sc_options_add_keyvalue (opt, 'V', "verbosity", &core->fclaw_verbosity,
+                             "default", kv, "Set ForestClaw verbosity");
+    sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
+                             "essential", kv, "Set verbosity for libraries");
+    sc_options_add_inifile (opt, 'F', "configfile",
+                            "Optional configuration file");
+
+    /* we do not need to work with the return value */
+    core->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_postprocess_core (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* errors from the key-value options would have showed up in parsing */
+
+    /* postprocess this package */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (core->is_registered);
+
+    /* go through this packages options */
+    sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
+    sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
+    sc_package_set_verbosity (fclaw_get_package_id (), core->fclaw_verbosity);
+
+    /* print help and/or version information and exit gracefully */
+    if (core->print_help)
+    {
+        return FCLAW_EXIT_USAGE;
+    }
+    if (core->print_version)
+    {
+        fclaw_global_essentialf ("ForestClaw version %s\n",
+                                 FCLAW_PACKAGE_VERSION);
+        return FCLAW_EXIT_QUIET;
+    }
+
+    /* at this point there are no errors to report */
+    return FCLAW_NOEXIT;
+}
+
+static void
+options_destroy_core (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_core_t *core = (fclaw_options_core_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* free this package */
+    FCLAW_ASSERT (core != NULL);
+    FCLAW_ASSERT (core->is_registered);
+    FCLAW_ASSERT (core->kv_verbosity != NULL);
+    sc_keyvalue_destroy (core->kv_verbosity);
+
+    FCLAW_FREE (core);
+}
+
+static const fclaw_app_options_vtable_t options_vtable_core = {
+    options_register_core,
+    options_postprocess_core,
+    NULL,
+    options_destroy_core
+};
+
+void
+fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
+{
+    fclaw_options_core_t *core;
+
+    FCLAW_ASSERT (a != NULL);
+
+    /* allocate storage for core's option values */
+    /* we will free it in the options_destroy callback */
+    core = FCLAW_ALLOC_ZERO (fclaw_options_core_t, 1);
+
+    /* sneaking the version string into the package pointer */
+    /* when there are more parameters to pass, create a structure to pass */
+    fclaw_app_options_register (a, NULL, configfile, &options_vtable_core,
+                                core);
+}
+
+fclaw_exit_type_t
+fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
+                         const char *savefile)
+{
+    int retval;
+    size_t zz;
+    fclaw_exit_type_t vexit;
+    fclaw_app_options_t *ao;
+
+    FCLAW_ASSERT (a != NULL);
+
+    /* TODO: read configuration files */
+
+    /* parse command line options with given priority for errors */
+    a->first_arg =
+        sc_options_parse (fclaw_get_package_id (), FCLAW_VERBOSITY_ERROR,
+                          a->opt, *a->argc, *a->argv);
+
+    /* check for option and parameter errors */
+    if (a->first_arg < 0)
+    {
+        /* option processing was not successful */
+        vexit = FCLAW_EXIT_ERROR;
+    }
+    else
+    {
+        /* go through options packages for further processing and verification */
+        vexit = FCLAW_NOEXIT;
+        for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+        {
+            fclaw_exit_type_t aoexit;
+
+            ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+            FCLAW_ASSERT (ao != NULL);
+            if (ao->vt.options_postprocess != NULL)
+            {
+                aoexit = ao->vt.options_postprocess (a, ao->package,
+                                                     ao->registered);
+                vexit = SC_MAX (aoexit, vexit);
+            }
+            if (ao->vt.options_check != NULL)
+            {
+                aoexit = ao->vt.options_check (a, ao->package,
+                                               ao->registered);
+                vexit = SC_MAX (aoexit, vexit);
+            }
+        }
+    }
+
+    /* let's see what we print */
+    /* rationale: only use ESSENTIAL for the primary purpose of an exit condition
+     *            only use PRODUCTION for really useful information
+     *            partially redundant output can go with INFO
+     */
+    switch (vexit)
+    {
+    case FCLAW_NOEXIT:
+        fclaw_global_infof ("Option parsing successful\n");
+        sc_options_print_summary (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_PRODUCTION, a->opt);
+        break;
+    case FCLAW_EXIT_QUIET:
+        /* we assume that the application has or will print something */
+        break;
+    case FCLAW_EXIT_USAGE:
+        /* we assume that the application has or will print something */
+        /* but it has been specifically requested to print usage information */
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_ESSENTIAL, a->opt, NULL);
+        fclaw_global_infof ("Terminating program\n");
+        break;
+    case FCLAW_EXIT_ERROR:
+        /* some error has been encountered */
+        fclaw_global_errorf ("Configuration / option parsing failed\n");
+        sc_options_print_usage (fclaw_get_package_id (),
+                                FCLAW_VERBOSITY_PRODUCTION, a->opt, NULL);
+        fclaw_global_infof ("Terminating program\n");
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    /* print configuration if so desired */
+    if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
+    {
+        retval = sc_options_save (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ERROR, a->opt, savefile);
+        if (retval)
+        {
+            vexit = FCLAW_EXIT_ERROR;
+            fclaw_global_infof ("Unable to save options to \"%s\"\n",
+                                savefile);
+        }
+    }
+
+    /* we are done */
+    if (first_arg != NULL)
+    {
+        *first_arg = a->first_arg;
+    }
+    return vexit;
+}
+
+sc_MPI_Comm
+fclaw_app_get_mpi_size_rank (fclaw_app_t * a, int *mpisize, int *mpirank)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    if (mpisize != NULL)
+    {
+        *mpisize = a->mpisize;
+    }
+    if (mpirank != NULL)
+    {
+        *mpirank = a->mpirank;
+    }
+    return a->mpicomm;
+}
+
+void *
+fclaw_app_get_user (fclaw_app_t * a)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    return a->user;
+}
+
+sc_options_t *
+fclaw_app_get_options (fclaw_app_t * a)
+{
+    FCLAW_ASSERT (a != NULL);
+
+    return a->opt;
 }

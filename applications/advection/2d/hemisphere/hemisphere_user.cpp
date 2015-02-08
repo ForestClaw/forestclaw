@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 #include "amr_forestclaw.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "hemisphere_user.H"
 
 #ifdef __cplusplus
@@ -36,6 +36,19 @@ extern "C"
 #endif
 #endif
 
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,        /* bc2 */
+    qinit_,      /* qinit */
+    NULL,        /* Setaux */
+    NULL,        /* b4step2 */
+    NULL,         /* src2 */
+    rpn2_,
+    rpt2_
+};
+
+
 void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -45,22 +58,20 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 
     sf->f_patch_setup              = &hemisphere_patch_setup;
     sf->f_patch_initialize         = &hemisphere_qinit;
-    sf->f_patch_physical_bc        = &fclaw2d_clawpack_bc2;
     sf->f_patch_single_step_update = &hemisphere_update;
+    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
 
     fclaw2d_output_functions_t *of = get_output_functions(domain);
     of->f_patch_write_header = &hemisphere_parallel_write_header;
     of->f_patch_write_output = &hemisphere_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
 
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void hemisphere_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
     setprob_();
 }
 
@@ -86,14 +97,14 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* ----------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* ----------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
@@ -111,7 +122,7 @@ void hemisphere_qinit(fclaw2d_domain_t *domain,
                       int this_block_idx,
                       int this_patch_idx)
 {
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 void hemisphere_b4step2(fclaw2d_domain_t *domain,
@@ -121,7 +132,7 @@ void hemisphere_b4step2(fclaw2d_domain_t *domain,
                         double t,
                         double dt)
 {
-    fclaw2d_clawpack_b4step2(domain,this_patch,this_block_idx,
+    fc2d_clawpack46_b4step2(domain,this_patch,this_block_idx,
                              this_patch_idx,t,dt);
 
 }
@@ -133,7 +144,7 @@ double hemisphere_update(fclaw2d_domain_t *domain,
                          double t,
                          double dt)
 {
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
     return maxcfl;
 }

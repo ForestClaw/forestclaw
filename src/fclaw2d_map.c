@@ -410,6 +410,67 @@ fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
 }
 #endif
 
+#if 0
+void fclaw2d_register_map_data(sc_options_t* options, fclaw2d_map_data_t* map_data)
+{
+    sc_options_add_int (options, 0, "mapping:mi", &map_data->mi, 1,
+                        "[mapping] Number of blocks in x direction [1]");
+
+    sc_options_add_int (options, 0, "mapping:mj", &map_data->mj, 1,
+                        "[mapping] Number of blocks in y direction  [1]");
+
+    sc_options_add_int (options, 0, "mapping:periodic_x", &map_data->periodic_x, 0,
+                        "[mapping] Periodic in x direction [0]");
+
+    sc_options_add_int (options, 0, "mapping:periodic_y", &map_data->periodic_y, 0,
+                        "[mapping] Periodic in y direction  [0]");
+
+    /* --------------------------------------------------------------------
+       Scale
+       --------------------------------------------------------------------*/
+    fclaw_options_add_double_array (options,0, "mapping:scale",
+                                    &map_data->scale_string, "1 1 1",
+                                    &map_data->scale, 3,
+                                    "[mapping] Scale factor [1 1 1]");
+
+    /* --------------------------------------------------------------------
+       Shift
+       --------------------------------------------------------------------*/
+    fclaw_options_add_double_array (options,0, "mapping:shift",
+                                    &map_data->shift_string, "0 0 0",
+                                    &map_data->shift, 3,
+                                    "[mapping] Shift array [0 0 0]");
+
+    /* --------------------------------------------------------------------
+       Rotate
+       --------------------------------------------------------------------*/
+    sc_options_add_double (options, 0, "mapping:phi", &map_data->phi, 0,
+                           "[mapping] Rotation angle about x axis (degrees) [0]");
+
+    sc_options_add_double (options, 0, "mapping:theta", &map_data->theta, 0,
+                           "[mapping] Rotation angle about z axis (degrees) [0]");
+
+}
+#endif
+
+#if 0
+void fclaw2d_map_destroy_arrays(fclaw2d_map_data_t* map_data)
+{
+    FCLAW_FREE (map_data->scale);
+    FCLAW_FREE (map_data->shift);
+}
+#endif
+
+#if 0
+void
+fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
+{
+    fclaw_options_convert_double_array (map_data->scale_string, &map_data->scale,3);
+    fclaw_options_convert_double_array (map_data->shift_string, &map_data->shift,3);
+}
+#endif
+
+
 void set_scale(fclaw2d_map_context_t* cont, const double scale[])
 {
     memcpy(cont->scale,scale,3*sizeof(double));
@@ -431,7 +492,6 @@ void set_default_transform(double scale[],double shift[],double rotate[])
   rotate[0] = 0;
   rotate[1] = 0;
 }
-
 
 
 void set_rotate(fclaw2d_map_context_t* cont, const double rotate[])
@@ -476,7 +536,6 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *yp = vrot[1];
     *zp = vrot[2];
 }
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

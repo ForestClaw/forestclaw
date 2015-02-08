@@ -4,7 +4,7 @@
       double precision xc, yc, t,r
       integer blockno
       double precision pi, r2, phi, pi2, alpha
-      logical iscart, issphere
+      logical iscart, issphere, isflat
       double precision revs_per_s
       integer*8 cont, get_context
 
@@ -26,9 +26,14 @@
       alpha = 0.4d0
       pi2 = 2*pi
       if (iscart()) then
-         psi = revs_per_s*(xc1 + pi*yc1/2.d0);
+c         psi = revs_per_s*(xc + pi*yc/2.d0);
+         psi = revs_per_s*(-xp + yp)
       elseif (issphere()) then
          psi = pi2*revs_per_s*zp
+      elseif (isflat()) then
+c        # annulus (this is just dumb; I need to fix the queries so they are useful)
+         r2 = xp**2 + yp**2
+         psi = 0.5d0*pi2*revs_per_s*r2
       else
 c        # torus
          psi = revs_per_s*pi2*alpha*(pi2*yc1 + alpha*sin(pi2*yc1))

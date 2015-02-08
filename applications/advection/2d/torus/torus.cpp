@@ -23,235 +23,257 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_clawpack.H>
+#include <forestclaw2d.h>
+#include <fclaw_options.h>
+
 #include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
-#include <fclaw2d_map_query.h>
+#include <fclaw_options.h>
+
+#include <p4est_connectivity.h>
+
+#include <fc2d_clawpack46.H>
 
 #include "torus_user.H"
 
-static int
-torus_checkparms (int example, int lp)
+typedef struct user_options
 {
-    if (example < 1 || example > 4) {
-        fclaw2d_global_log (lp, "Option --example must be 1 or 2\n");
-        return -1;
+    int example;
+    double alpha;
+    double beta;
+
+    const char* latitude_string;
+    double *latitude;
+
+    const char* longitude_string;
+    double *longitude;
+
+    int is_registered;
+
+} user_options_t;
+
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "[user] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
+
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "[user] Ratio r/R, r=outer radius, R=inner radius " \
+                           "(used for torus) [0.4]");
+
+    fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
+                                   "-50 50", &user->latitude, 2,
+                                   "[user] Latitude range (degrees) [-50 50]");
+
+    fclaw_options_add_double_array(opt, 0, "longitude", &user->longitude_string,
+                                   "0 360", &user->longitude, 2,
+                                   "[user] Longitude range (degrees) [0 360]");
+
+    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
+                           "[user] Inner radius of annulus [0.4]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    if (user->example == 3)
+    {
+        fclaw_options_convert_double_array (user->latitude_string, &user->latitude,2);
+        fclaw_options_convert_double_array (user->longitude_string, &user->longitude,2);
+    }
+    return FCLAW_NOEXIT;
+}
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->example < 0 || user->example > 4) {
+        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
+
+static void
+options_destroy_user (fclaw_app_t * a, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    /* Destroy arrays used in options  */
+    if (user->example == 3)
+    {
+        fclaw_options_destroy_array((void*) user->latitude);
+        fclaw_options_destroy_array((void*) user->longitude);
+    }
+}
+
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    options_postprocess_user,
+    options_check_user,
+    options_destroy_user
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    /* sneaking the version string into the package pointer */
+    /* when there are more parameters to pass, create a structure to pass */
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 fc2d_clawpack46_options_t* clawpack_options,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
+
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
+    int mi, mj, a,b;
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+    /* ---------------------------------------------------------------
+       Mapping geometry
+       --------------------------------------------------------------- */
+    mi = gparms->mi;
+    mj = gparms->mj;
+    rotate[0] = pi*gparms->theta/180.0;
+    rotate[1] = pi*gparms->phi/180.0;
+    a = gparms->periodic_x;
+    b = gparms->periodic_y;
+
+    switch (user->example)
+    {
+    case 0:
+        FCLAW_ASSERT(mi == 1 && mj == 1);  /* assumes square domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        cont = fclaw2d_map_new_nomap();
+        break;
+    case 1:
+        /* Cartesian [-1,1]x[-1,1] */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_cart(brick, gparms->scale, gparms->shift, rotate);
+        break;
+    case 2:
+        /* torus */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,user->alpha);
+        break;
+    case 3:
+        /* Lat-long example */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_latlong(brick,gparms->scale,gparms->shift,
+                                       rotate,user->latitude,user->longitude,a,b);
+        break;
+    case 4:
+        /* Annulus */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_annulus(brick,gparms->scale,gparms->shift,
+                                       rotate,user->beta);
+        break;
+
+    default:
+        SC_ABORT_NOT_REACHED ();
     }
 
-    return 0;
+    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+    /* ---------------------------------------------------------------
+       Set domain data.
+       --------------------------------------------------------------- */
+    init_domain_data(domain);
+
+    set_domain_parms(domain,gparms);
+    fc2d_clawpack46_set_options(domain,clawpack_options);
+
+    link_problem_setup(domain,torus_problem_setup);
+
+    torus_link_solvers(domain);
+
+    link_regrid_functions(domain,
+                          torus_patch_tag4refinement,
+                          torus_patch_tag4coarsening);
+    amrinit(&domain);
+    amrrun(&domain);
+    amrreset(&domain);
+
+    fclaw2d_map_destroy(cont);
 }
+
 
 int
 main (int argc, char **argv)
 {
-  int                   lp;
-  int                   retval;
-  sc_MPI_Comm           mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL, *brick = NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t* clawpack_parms;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-  double pi, theta, phi;
-  double rotate[2];
-  double scale[3];
-  double shift[3];
-  double alpha;
-  int example;
-  int mi, mj, a,b;
-  double lat[2];
-  double longitude[2];
+    /* Options */
+    sc_options_t              *options;
+    amr_options_t             samr_options, *gparms = &samr_options;
+    fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t                suser_options, *user = &suser_options;
 
+    int retval;
 
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
 
-#ifdef MPI_DEBUG
-  /* TODO: What is this for? Should be absorbed into fclaw_mpi_init. */
-  /* This is code that suspends processing (with an infinite loop) so that
-     multiple processes can be attached and debugged with GDB.  I am happy to
-     move it.  Didn't know where... */
-  fclaw2d_mpi_debug();
-#endif
-  /* ---------------------------------------------------------------
-     Read parameters from .ini file, parse command line, and
-     do parameter checking.
-     -------------------------------------------------------------- */
-  options = sc_options_new (argv[0]);
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register(app,NULL,clawpack_options);
 
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 = cart; 2 = torus; 3 = lat-long; 4 = annulus");
-
-  sc_options_add_double (options, 0, "theta", &theta, 0,
-                         "Rotation angle theta (degrees) about z axis [0]");
-
-  sc_options_add_double (options, 0, "phi", &phi, 0,
-                         "Rotation angle phi (degrees) about x axis [0]");
-
-  sc_options_add_int (options, 0, "mi", &mi, 1,
-                         "Number of blocks in x direction [1]");
-
-  sc_options_add_int (options, 0, "mj", &mj, 0,
-                         "Number of blocks in y direction  [1]");
+    /* User defined options (defined above) */
+    register_user_options (app, "fclaw_options.ini", user);
 
 
-  gparms = amr_options_new (options);
-  clawpack_parms = fclaw2d_clawpack_parms_new(options);
+    /* Read configuration file(s) */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  /* TODO: would it make sense to provide this code up to and excluding
-   *       torus_checkparms into a reusable function? */
-  /* parse command line; these values take precedence */
-  amr_options_parse (options,argc, argv, lp);
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
+    {
+        run_program(app, gparms, clawpack_options,user);
+    }
 
-  /* Any arrays are converted here */
-  amr_postprocess_parms(gparms);
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
+    fclaw_app_destroy (app);
 
-  /* Check final state of parameters.
-   * The call to amr_checkparms2 also checks for a --help message.
-   * We are exploiting C short-circuit boolean evaluation.
-   */
-  retval = amr_checkparms2 (options, gparms, lp);
-  /* TODO: Convert this similarly to amr_checkparms2 */
-  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
-  /* TODO: example, phi, theta should live in a struct that can be passed */
-  retval = retval || torus_checkparms (example, lp);
-  if (!retval) {
-     /* the do-the-work block. TODO: put everything below into a function */
-
-      /* ---------------------------------------------------------------
-         Floating point traps
-         -------------------------------------------------------------- */
-      if (gparms->trapfpe == 1)
-      {
-          printf("Enabling floating point traps\n");
-          feenableexcept(FE_INVALID);
-      }
-
-      /* ---------------------------------------------------------------
-         Domain geometry
-         --------------------------------------------------------------- */
-      pi = M_PI;
-      set_default_transform(scale,shift,rotate);
-
-      rotate[0] = pi*theta/180.0;
-      rotate[1] = pi*phi/180.0;
-
-      /* default torus has outer radius 1 and inner radius alpha */
-      switch (example)
-      {
-      case 1:
-          a = 1;
-          b = 1;
-          rotate[0] = 0;
-          rotate[1] = 0;
-          set_default_transform(scale,shift,rotate);
-          conn = p4est_connectivity_new_brick(mi,mj,a,b);
-          brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_cart(brick,scale,shift,rotate);
-          break;
-      case 2:
-          /* Generally, we should have mj \approx \alpha*mi */
-          /* where alpha is the ratio of inner radius to outer radius */
-          a = 1;
-          b = 1;
-          alpha = 0.4;
-          mj = alpha*mi;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
-          conn = p4est_connectivity_new_brick(mi,mj,a,b);
-          brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_torus(brick,scale,shift,rotate,alpha);
-          break;
-      case 3:
-          /* Lat-long example */
-          a = 1;
-          b = 0;
-          longitude[0] = 0; /* x-coordinate */
-          longitude[1] = 360;  /* if a == 1, long[1] will be computed as [0] + 180 */
-          lat[0] = -50;  /* y-coordinate */
-          lat[1] = 50;
-          set_default_transform(scale,shift,rotate);
-          alpha = (lat[1]-lat[0])/180;
-          mj = alpha*mi/2.0;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
-          conn = p4est_connectivity_new_brick(mi,mj,a,b);
-          brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_latlong(brick,scale,shift,rotate,lat,longitude,a,b);
-          break;
-      case 4:
-          /* Annulus */
-          a = 1;
-          b = 0;
-          alpha = 0.4;  /* Inner radius */
-          mj = (1-alpha)/(1+alpha)*mi/pi;
-          if (mj == 0)
-          {
-              mi = 1;
-              mj = 1;
-          }
-          conn = p4est_connectivity_new_brick(mi,mj,a,b);
-          brick = fclaw2d_map_new_brick(conn,mi,mj);
-          cont = fclaw2d_map_new_annulus(brick,scale,shift,rotate,alpha);
-          break;
-
-      default:
-          SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
-      }
-
-      domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
-
-      /* ---------------------------------------------------------- */
-      if (gparms->verbosity > 0)
-      {
-          fclaw2d_domain_list_levels(domain, lp);
-          fclaw2d_domain_list_neighbors(domain, lp);
-      }
-
-      /* ---------------------------------------------------------------
-         Set domain data.
-         --------------------------------------------------------------- */
-      init_domain_data(domain);
-
-      set_domain_parms(domain,gparms);
-      set_clawpack_parms(domain,clawpack_parms);
-
-      link_problem_setup(domain,torus_problem_setup);
-
-      torus_link_solvers(domain);
-
-      link_regrid_functions(domain,
-                            torus_patch_tag4refinement,
-                            torus_patch_tag4coarsening);
-
-
-      amrinit(&domain);
-      amrrun(&domain);
-      amrreset(&domain);
-
-      /* Destroy mapping functions */
-      fclaw2d_map_destroy(cont);
-  } /* this bracket ends the do_the_work block */
-
-  sc_options_destroy (options);         /* this could be moved up */
-  amr_options_destroy (gparms);
-  fclaw2d_clawpack_parms_delete(clawpack_parms);
-
-  fclaw_mpi_finalize ();
-
-  return 0;
+    return 0;
 }

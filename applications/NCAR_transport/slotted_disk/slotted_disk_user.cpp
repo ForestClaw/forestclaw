@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "slotted_disk_user.H"
 
 #ifdef __cplusplus
@@ -34,6 +34,18 @@ extern "C"
 }
 #endif
 #endif
+
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    NULL,
+    NULL,        /* bc2 */
+    NULL,        /* qinit */
+    NULL,        /* Setaux */
+    NULL,        /* b4step2 */
+    NULL,         /* src2 */
+    rpn2_,
+    rpt2_
+};
 
 
 void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
@@ -53,8 +65,10 @@ void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &slotted_disk_parallel_write_header;
     of->f_patch_write_output = &slotted_disk_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     /* This is needed to get constructors for user data */
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void slotted_disk_setprob(fclaw2d_domain_t* domain)
@@ -86,14 +100,14 @@ void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
 
     /* -------------------------------------------------------------- */
     // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+    fc2d_clawpack46_define_auxarray(domain,cp);
 
     /* -------------------------------------------------------------- */
     // Pointers needed to pass to class setaux call, and other setaux
     // specific arguments
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     /* -------------------------------------------------------------- */
     /* Modified clawpack setaux routine that passes in mapping terms */
@@ -133,7 +147,7 @@ void slotted_disk_qinit(fclaw2d_domain_t *domain,
 
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     double *xp = cp->xp();
     double *yp = cp->yp();
@@ -180,7 +194,7 @@ void slotted_disk_b4step2(fclaw2d_domain_t *domain,
     /* -------------------------------------------------------------- */
     double *aux;
     int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
 
     double *xd = cp->xd();
@@ -201,7 +215,7 @@ double slotted_disk_update(fclaw2d_domain_t *domain,
     slotted_disk_b4step2(domain,this_patch,this_block_idx,
                          this_patch_idx,t,dt);
 
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
                                        this_patch_idx,t,dt);
 
     return maxcfl;

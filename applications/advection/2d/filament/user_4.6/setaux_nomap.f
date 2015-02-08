@@ -1,7 +1,9 @@
-      subroutine setaux_nomap(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
+c     # This is the "classic" call to setaux.
+      subroutine setaux_nomap(maxmx,maxmy,mbc,mx,my,xlower,ylower,
+     &      dx,dy,maux,aux)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, meqn, maux, maxmx, maxmy
       double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 

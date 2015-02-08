@@ -24,7 +24,7 @@ c     #     0.1  otherwise
              do j = 1-mbc,my+mbc
                 ylow = ylower + (j-1d0)*dy
                 call cellave2(blockno,xlow,ylow,dx,dy,w)
-                q(i,j,1) = w
+                q(i,j,mq) = w
              enddo
           enddo
        enddo

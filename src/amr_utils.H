@@ -82,11 +82,6 @@ fclaw2d_patch_data_t *get_patch_data (fclaw2d_patch_t * patch);
 fclaw2d_map_context_t *get_map_context(fclaw2d_domain_t * domain);
 
 /* -----------------------------------------------------------------
-  Debug routines
-   ---------------------------------------------------------------- */
-void fclaw2d_mpi_debug();
-
-/* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
 void set_block_data (fclaw2d_block_t * block, const int mthbc[]);

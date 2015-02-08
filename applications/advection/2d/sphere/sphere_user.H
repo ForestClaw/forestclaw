@@ -54,14 +54,6 @@ extern "C"
                                 const double& ylower, const double& dx, const double& dy,
                                 double qcoarsened[], int& tag_patch);
 
-#if 0
-    void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
-                const int& mbc, const int& mx, const int& my,
-                const double& xlower, const double& ylower,
-                const double& dx, const double& dy,
-                double q[], const int& maux, double aux[]);
-#endif
-
     void setaux_manifold_(const int& mbc,
                           const int& mx, const int& my,
                           const double& xlower, const double& ylower,

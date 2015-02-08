@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 #include "torus_user.H"
 
 #ifdef __cplusplus
@@ -34,6 +34,18 @@ extern "C"
 }
 #endif
 #endif
+
+static const fc2d_clawpack46_vtable_t classic_user =
+{
+    setprob_,
+    NULL,        /* bc2 */
+    qinit_,      /* qinit */
+    setaux_,     /* Setaux */
+    NULL,        /* b4step2 */
+    NULL,         /* src2 */
+    rpn2_,
+    rpt2_
+};
 
 
 void torus_link_solvers(fclaw2d_domain_t *domain)
@@ -46,7 +58,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_single_step_update = &torus_update;
 
     /* Boundary conditions */
-    sf->f_patch_physical_bc        = &fclaw2d_clawpack_bc2;
+    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
 
 
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
@@ -57,13 +69,15 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header = &torus_parallel_write_header;
     of->f_patch_write_output = &torus_parallel_write_output;
 
+    fc2d_clawpack46_set_vtable(&classic_user);
+
     /* This is needed to get constructors for user data */
-    fclaw2d_clawpack_link_to_clawpatch();
+    fc2d_clawpack46_link_to_clawpatch();
 }
 
 void torus_problem_setup(fclaw2d_domain_t* domain)
 {
-    fclaw2d_clawpack_setprob(domain);
+    fc2d_clawpack46_setprob(domain);
 }
 
 void torus_patch_setup(fclaw2d_domain_t *domain,
@@ -74,46 +88,43 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
     /* ----------------------------------------------------------- */
     // Global parameters
     const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
+    if (!gparms->manifold)
+    {
+        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+    else
+    {
+        int mx = gparms->mx;
+        int my = gparms->my;
+        int mbc = gparms->mbc;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
+        ClawPatch *cp = get_clawpatch(this_patch);
+        double xlower = cp->xlower();
+        double ylower = cp->ylower();
+        double dx = cp->dx();
+        double dy = cp->dy();
 
-    /* ----------------------------------------------------------- */
-    // allocate space for the aux array
-    fclaw2d_clawpack_define_auxarray(domain,cp);
+        fc2d_clawpack46_define_auxarray(domain,cp);
 
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
-    double *aux;
-    int maux;
-    fclaw2d_clawpack_get_auxarray(domain,cp,&aux,&maux);
+        double *aux;
+        int maux;
+        fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    /* ----------------------------------------------------------- */
-    /* Modified clawpack setaux routine that passes in mapping terms */
-    double *xp = cp->xp();
-    double *yp = cp->yp();
-    double *zp = cp->zp();
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-    double *xnormals = cp->xface_normals();
-    double *ynormals = cp->yface_normals();
-    double *edge_lengths = cp->edge_lengths();
-    double *area = cp->area();
+        double *xp = cp->xp();
+        double *yp = cp->yp();
+        double *zp = cp->zp();
+        double *xd = cp->xd();
+        double *yd = cp->yd();
+        double *zd = cp->zd();
+        double *xnormals = cp->xface_normals();
+        double *ynormals = cp->yface_normals();
+        double *edge_lengths = cp->edge_lengths();
+        double *area = cp->area();
 
-
-    setaux_manifold_(mbc,mx,my,this_block_idx,xlower,ylower,dx,dy,
-                     maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
-                     edge_lengths,area);
+        setaux_manifold_(mbc,mx,my,this_block_idx,xlower,ylower,dx,dy,
+                         maux,aux,xp,yp,zp,xd,yd,zd,xnormals,ynormals,
+                         edge_lengths,area);
+    }
 }
 
 void torus_qinit(fclaw2d_domain_t *domain,
@@ -122,7 +133,7 @@ void torus_qinit(fclaw2d_domain_t *domain,
                  int this_patch_idx)
 {
 
-    fclaw2d_clawpack_qinit(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 void torus_patch_physical_bc(fclaw2d_domain *domain,
@@ -145,7 +156,9 @@ double torus_update(fclaw2d_domain_t *domain,
                          double t,
                          double dt)
 {
-    double maxcfl = fclaw2d_clawpack_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,
+                                          this_block_idx,
+                                          this_patch_idx,t,dt);
 
     return maxcfl;
 }
@@ -154,9 +167,9 @@ double torus_update(fclaw2d_domain_t *domain,
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
 fclaw_bool torus_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int this_block_idx, int this_patch_idx,
-                                             int initflag)
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx, int this_patch_idx,
+                                      int initflag)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
@@ -220,7 +233,7 @@ void torus_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
     const amr_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
     /* Increase the number of fields by 1 so we can printout the mpi rank */
     int mfields = gparms->meqn;

@@ -23,6 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file
+ * Average, coarsen and copy between grids at faces.
+ **/
+
 #include "amr_includes.H"
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
@@ -161,7 +165,9 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     }
 }
 
-
+/**
+ * \ingroup Averaging
+ **/
 void cb_face_fill(fclaw2d_domain_t *domain,
                   fclaw2d_patch_t *this_patch,
                   int this_block_idx,

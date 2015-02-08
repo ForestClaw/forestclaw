@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILAMENT_USER_H
 
 #include "amr_forestclaw.H"
-#include "fclaw2d_clawpack.H"
+#include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -59,17 +59,11 @@ extern "C"
                           double xd[], double yd[], double zd[],
                           double area[]);
 
-    void setaux_nomap_(const int& mbc,const int& mx,const int& my,
+    void setaux_nomap_(const int& maxmx, const int& maxmy,
+                       const int& mbc,const int& mx,const int& my,
                        const double& xlower,const double& ylower,
                        const double& dx,const double& dy,
                        const int& maux,double aux[]);
-
-
-    void qinit_filament_(const int& meqn, const int& mbc, const int& mx, const int& my,
-                         const double& xlower, const double& ylower, const double& dx,
-                         const double& dy,double [], const int& maux, double aux[],
-                         const int& ismanifold);
-
 
     void filament_write_tfile_(const int& iframe,const double& time,
                             const int& mfields,const int& ngrids,

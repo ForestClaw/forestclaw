@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
 #include <p4est_connectivity.h>
+#include <fclaw_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,9 +38,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-
-
 
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
@@ -51,6 +49,7 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
+typedef struct fclaw2d_map_data fclaw2d_map_data_t;
 
 /** This function is used to query the map for general properties.
  * \param [in] cont     Matching mapping context.
@@ -89,6 +88,7 @@ struct fclaw2d_map_context
     int user_int[16];
     double user_double[16];
 
+    /* This will be deprecated soon ... */
     double scale[3];
     double shift[3];
     double rotate[9];
@@ -96,6 +96,7 @@ struct fclaw2d_map_context
     fclaw2d_map_context_t *brick;
     void *user_data;
 };
+
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
 void set_shift(fclaw2d_map_context_t* cont, const double shift[]);

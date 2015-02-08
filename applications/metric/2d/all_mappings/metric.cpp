@@ -29,124 +29,144 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "metric_user.H"
 
-int
-main (int argc, char **argv)
+typedef struct user_options
 {
-  int			lp;
-  int                   example;
-  sc_MPI_Comm		mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
+    int example;
+    double alpha;
 
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+    int is_registered;
 
-#ifdef MPI_DEBUG
-  /* This has to come after MPI has been initialized */
-  fclaw2d_mpi_debug();
-#endif
+} user_options_t;
 
-  /* ---------------------------------------------------------------
-     Read in parameters and options
-     --------------------------------------------------------------- */
-  options = sc_options_new (argv[0]);
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
 
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for Cartesian, " \
-                      "2 for five patch square, " \
-                      "3 for squared disk, " \
-                      "4 for pillow disk, " \
-                      "5 for pillow/five patch disk, " \
-                      "6 for pillow sphere, " \
-                      "7 for cubed sphere, "\
-                      "8 for torus");
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "1 cart; 2 5-patch square; 3 squared-disk; "    \
+                        "4 pillow disk; 5 pillowdisk5; 6 pillow sphere " \
+                        "7 cubed sphere; 8 torus");
 
-  /* Read parameters from .ini file */
-  gparms = amr_options_new (options);   /* Sets default values */
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
+                           "[user] Ratio used for squared- and pillow-disk [0.5]");
 
-  /* Parse command line */
-  amr_options_parse (options, argc, argv, lp);  /* Reads options from a file */
+    user->is_registered = 1;
+    return NULL;
+}
 
-  /* Postprocess arrays */
-  amr_postprocess_parms(gparms);
-  amr_checkparms(gparms);
 
-  /* ---------------------------------------------------------------
-     Floating point traps
-     -------------------------------------------------------------- */
-  if (gparms->trapfpe == 1)
-  {
-      printf("Enabling floating point traps\n");
-      feenableexcept(FE_INVALID);
-  }
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
 
-  /* ---------------------------------------------------------------
-     Domain geometry
-     --------------------------------------------------------------- */
-  double alpha = 0.4;
-  double scale[3];
-  double shift[3];
-  double rotate[2];
-  set_default_transform(scale,shift,rotate);
+    if (user->example < 1 || user->example > 8) {
+        fclaw_global_essentialf ("Option --user:example must be 1-8\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
 
-  switch (example) {
-  case 1:
-      /* Map [0,1]x[0,1] to [-1,1],[-1,1] */
-      conn = p4est_connectivity_new_unitsquare();
-      cont = fclaw2d_map_new_cart (scale, shift,rotate);
-      break;
-  case 2:
-      /* Map [0,1],[0,1] to five patch square [-1,1]x[-1,1] */
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_fivepatch (scale,shift,rotate, alpha);
-      break;
-  case 3:
-      /* Map [0,1],[0,1] to squared disk (radius 1, centered at the origin) */
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_squareddisk (scale,shift,rotate,alpha);
-      break;
-  case 4:
-      /* Map [0,1],[0,1] to pillow disk */
-      conn = p4est_connectivity_new_unitsquare ();
-      cont = fclaw2d_map_new_pillowdisk (scale,shift,rotate);
-      break;
-  case 5:
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    options_check_user,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
+
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
+    fclaw2d_map_context_t    *cont = NULL;
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+
+    /* ---------------------------------------------------------------
+       Domain geometry
+       -------------------------------------------------------------- */
+    double pi = M_PI;
+    double rotate[2];
+
+    rotate[0] = pi*gparms->phi/180.0;
+    rotate[1] = pi*gparms->theta/180.0;
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+    switch (user->example) {
+    case 1:
+        /* Map [0,1]x[0,1] to [-1,1],[-1,1] */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_cart (gparms->scale, gparms->shift,rotate);
+        break;
+    case 2:
+        /* Map [0,1],[0,1] to five patch square [-1,1]x[-1,1] */
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
+                                          rotate, user->alpha);
+        break;
+    case 3:
+        /* Map [0,1],[0,1] to squared disk (radius 1, centered at the origin) */
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_squareddisk (gparms->scale,gparms->shift,
+                                            rotate,user->alpha);
+        break;
+    case 4:
+        /* Map [0,1],[0,1] to pillow disk */
+        conn = p4est_connectivity_new_unitsquare ();
+        cont = fclaw2d_map_new_pillowdisk (gparms->scale,gparms->shift,rotate);
+        break;
+    case 5:
+        /* Map [0,1]x[0,1] to five patch --> pillow disk */
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
+                                            rotate,user->alpha);
+        break;
+    case 6:
+        /* Map [0,1]x[0,1] to five patch --> pillow disk */
+        conn = p4est_connectivity_new_pillow ();
+        cont = fclaw2d_map_new_pillowsphere (gparms->scale,gparms->shift,rotate);
+        break;
+    case 7:
       /* Map [0,1]x[0,1] to five patch --> pillow disk */
-      conn = p4est_connectivity_new_disk ();
-      cont = fclaw2d_map_new_pillowdisk5 (scale,shift,rotate,alpha);
-      break;
-  case 6:
-      /* Map [0,1]x[0,1] to five patch --> pillow disk */
-      conn = p4est_connectivity_new_pillow ();
-      cont = fclaw2d_map_new_pillowsphere (scale,shift,rotate);
-      break;
-  case 7:
-      /* Map [0,1]x[0,1] to five patch --> pillow disk */
-      conn = p4est_connectivity_new_cubed ();
-      cont = fclaw2d_map_new_cubedsphere (scale,shift,rotate);
-      break;
-  case 8:
-      /* Map [0,1]x[0,1] to five patch --> pillow disk */
-      conn = p4est_connectivity_new_periodic ();
-      cont = fclaw2d_map_new_torus (scale,shift,rotate,alpha);
-      break;
-  default:
-      sc_abort_collective ("Parameter example must be 1 or 2");
+        conn = p4est_connectivity_new_cubed ();
+        cont = fclaw2d_map_new_cubedsphere (gparms->scale,gparms->shift,rotate);
+        break;
+    case 8:
+        /* Map [0,1]x[0,1] to five patch --> pillow disk */
+        conn = p4est_connectivity_new_periodic ();
+        cont = fclaw2d_map_new_torus (gparms->scale,gparms->shift,
+                                      rotate,user->alpha);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
   }
 
   domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
   /* ---------------------------------------------------------- */
 
-  if (gparms->verbosity > 0)
-  {
-      fclaw2d_domain_list_levels(domain, lp);
-      fclaw2d_domain_list_neighbors(domain, lp);
-  }
+  fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
+  fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
 
   /* ---------------------------------------------------------------
@@ -186,10 +206,45 @@ main (int argc, char **argv)
      Clean up.
      -------------------------------------------------- */
   fclaw2d_map_destroy(cont);
-  amr_options_destroy(gparms);
-  sc_options_destroy(options);
+}
 
-  fclaw_mpi_finalize ();
+int
+main (int argc, char **argv)
+{
+  fclaw_app_t *app;
+  int first_arg;
+  fclaw_exit_type_t vexit;
+
+  /* Options */
+  sc_options_t              *options;
+  amr_options_t             samr_options, *gparms = &samr_options;
+  user_options_t                suser_options, *user = &suser_options;
+
+  int retval;
+
+  /* Initialize application */
+  app = fclaw_app_new (&argc, &argv, user);
+  options = fclaw_app_get_options (app);
+
+  fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+
+  /* User defined options (defined above) */
+  register_user_options (app, "fclaw_options.ini", user);
+
+
+  /* Read configuration file(s) */
+  retval = fclaw_options_read_from_file(options);
+  vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+
+  /* -------------------------------------------------------------
+     - Run program
+     ------------------------------------------------------------- */
+  if (!retval & !vexit)
+  {
+      run_program(app, gparms,user);
+  }
+
+  fclaw_app_destroy (app);
 
   return 0;
 }

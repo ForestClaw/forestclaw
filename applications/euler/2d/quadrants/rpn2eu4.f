@@ -1,4 +1,4 @@
-      subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
+      subroutine rpn2eu4(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
      &                  wave,s,amdq,apdq)
       implicit double precision (a-h,o-z)
 c

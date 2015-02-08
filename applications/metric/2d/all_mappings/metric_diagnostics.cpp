@@ -131,16 +131,14 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     double sum = 0;
     fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
     sum = fclaw2d_domain_global_sum (domain, sum);
-    if (domain->mpirank ==0)
-    {
-        fclaw2d_map_context_t* cont = get_map_context(domain);
-        double exact_area = metric_surface_area(cont);
 
-        printf("%30s %24.16f\n","Total area",sum);
-        printf("%30s %24.16f\n","Exact area",exact_area);
-        printf("%30s %24.4e\n","Error ",fabs(exact_area-sum));
-        printf("\n");
-    }
+    fclaw2d_map_context_t* cont = get_map_context(domain);
+    double exact_area = metric_surface_area(cont);
+
+    fclaw_global_productionf("%30s %24.16f\n","Total area",sum);
+    fclaw_global_productionf("%30s %24.16f\n","Exact area",exact_area);
+    fclaw_global_productionf("%30s %24.4e\n","Error ",fabs(exact_area-sum));
+    fclaw_global_productionf("\n");
 
     const amr_options_t *gparms = get_domain_parms(domain);
     if (gparms->minlevel == gparms->maxlevel)
@@ -156,13 +154,11 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
         fclaw2d_domain_iterate_patches(domain,cb_max_cell_area,(void *) &maxvalue);
         maxvalue = fclaw2d_domain_global_maximum (domain, maxvalue);
 
-        if (domain->mpirank == 0)
-        {
-            printf("%30s %24.8e\n","Minimum value (kappa)",minvalue);
-            printf("%30s %24.8e\n","Maximum value (kappa)",maxvalue);
-            printf("%30s %24.8f\n","Ratio of largest to smallest",maxvalue/minvalue);
-            printf("\n\n");
-        }
+        fclaw_global_productionf("%30s %24.8e\n","Minimum value (kappa)",minvalue);
+        fclaw_global_productionf("%30s %24.8e\n","Maximum value (kappa)",maxvalue);
+        fclaw_global_productionf("%30s %24.8f\n","Ratio of largest to smallest",
+                                 maxvalue/minvalue);
+        fclaw_global_productionf("\n\n");
     }
 }
 
