@@ -43,7 +43,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     /* Only the boundary condition routine has a default version that does
        something.  All the others (qinit,setprob,setaux,src2,b4step2) are
        no ops in the default case */
-    classic_vt.bc2  = user_vt->bc2 == NULL ? clawpack46_bc2_ : user_vt->bc2;
+    classic_vt.bc2  = user_vt->bc2 == NULL ? CLAWPACK46_BC2 : user_vt->bc2;
 }
 
 
@@ -171,6 +171,7 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
+    CLAWPACK46_UNSET_BLOCK();
 }
 
 void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
@@ -204,6 +205,7 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
+    CLAWPACK46_UNSET_BLOCK();
 }
 
 void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
@@ -239,6 +241,7 @@ void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,xlower,ylower,dx,dy,
                        t,dt,maux,aux);
+    CLAWPACK46_UNSET_BLOCK();
 }
 
 void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
@@ -273,6 +276,7 @@ void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt);
+    CLAWPACK46_UNSET_BLOCK();
 }
 
 
@@ -353,6 +357,7 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
                    dx,dy,q,maux,aux,t,dt,mthbc);
+    CLAWPACK46_UNSET_BLOCK();
 }
 
 
@@ -410,12 +415,12 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     clawpack46_flux2fw_ : clawpack46_flux2_;
 
-    clawpack46_step2_wrap_(maxm, meqn, maux, mbc, clawpack_options->method,
-                           clawpack_options->mthlim, clawpack_options->mcapa,
-                           mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
-                           work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
-                           classic_vt.rpn2, classic_vt.rpt2,flux2,
-                           cp->block_corner_count(), ierror);
+    CLAWPACK46_STEP2_WRAP(maxm, meqn, maux, mbc, clawpack_options->method,
+                          clawpack_options->mthlim, clawpack_options->mcapa,
+                          mwaves,mx, my, qold, aux, dx, dy, dt, cflgrid,
+                          work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
+                          classic_vt.rpn2, classic_vt.rpt2,flux2,
+                          cp->block_corner_count(), ierror);
 
     FCLAW_ASSERT(ierror == 0);
 

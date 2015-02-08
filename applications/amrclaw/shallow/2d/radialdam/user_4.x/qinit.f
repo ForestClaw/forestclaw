@@ -18,7 +18,7 @@ c
 
        common /comic/ hin,hout
 
-       blockno = clawpack46_get_block()
+       blockno = fc2d_clawpack46_get_block()
 
        do 20 i=1-mbc,mx+mbc
           xlow = xlower + (i-1.d0)*dx

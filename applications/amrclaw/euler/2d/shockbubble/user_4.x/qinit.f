@@ -12,7 +12,7 @@ c
        implicit double precision (a-h,o-z)
        dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
 
-       integer blockno, clawpack46_get_block
+       integer blockno, fc2d_clawpack46_get_block
 
        integer*8 cont, get_context
 
@@ -20,7 +20,7 @@ c
        common /cominf/ rinf,vinf,einf
 c
 c
-       blockno = clawpack46_get_block()
+       blockno = fc2d_clawpack46_get_block()
        cont = get_context()
 
        do 50 i=1-mbc,mx+mbc
