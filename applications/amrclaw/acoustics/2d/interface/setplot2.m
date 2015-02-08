@@ -1,3 +1,8 @@
+OutputFlag = 'ForestClaw';         % default value.
+OutputDir = './';            % Default (reassign them here anyway)
+
+ForestClaw = 1;     % Plot using ForestClaw preferences.
+
 
 %  setplot2.m
 %  called in plotclaw1 before plotting to set various parameters
