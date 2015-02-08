@@ -1,0 +1,21 @@
+
+Riemann solvers for the Euler equations:
+
+Use one of the following pairs of Riemann solvers 
+   (only rpn2 is needed if dimensional splitting is used, method(2) < 0)
+
+rpn2eu4.f    Roe solver with mwaves=4
+rpt2eu.f    
+
+
+rpn2eu3.f    Roe solver with mwaves=3  (shear and entropy waves together)
+rpt2eu.f    
+             
+
+rpn2eu5.f    Roe solver with meqn=mwaves=5, with 5'th equation for 
+rpt2eu5.f        passive tracer advected at fluid velocity
+
+
+rpn2euq3.f    Roe solver with mwaves=3 on quadrilateral grid
+rpt2euq.f        
+
