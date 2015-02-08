@@ -12,7 +12,7 @@ caxis([0.1 2.81]);
 showpatchborders
 % hidepatchborders;
 
-prt = true;
+prt = false;
 if (prt)
     fname = sprintf('sbmesh%2.2d.png',Frame);
     disp(fname);
