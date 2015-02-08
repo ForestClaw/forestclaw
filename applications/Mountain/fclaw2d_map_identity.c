@@ -68,7 +68,6 @@ static void
     /* xp = xc; yp = yc; zp = 0; */
     MAPC2M_IDENTITY(&blockno,&xc1,&yc1,xp,yp,zp);
 
-    /* Scale and shift to [0,1]x[0,1] */
     scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
@@ -76,8 +75,7 @@ static void
 
 fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t* brick,
                                                 const double scale[],
-                                                const double shift[],
-                                                const double rotate[])
+                                                const double shift[])
 {
     fclaw2d_map_context_t *cont;
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
@@ -86,7 +84,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t* brick,
 
     set_scale(cont,scale);
     set_shift(cont,shift);
-    set_rotate(cont,rotate);
 
     cont->brick = brick;
 

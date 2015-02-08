@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_map.h>
-#include <fclaw2d_clawpack.H>
 #include <p4est_connectivity.h>
 
 #include <amr_forestclaw.H>
@@ -33,156 +32,155 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mountain_user.H"
 
+
+typedef struct user_options
+{
+    int example;
+    int is_registered;
+
+} user_options_t;
+
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 1,
+                        "[user] 1 - cut cell; 2 - terrain following [1]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->example < 1 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
+
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    options_check_user,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
+
+void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                 fc2d_clawpack46_options_t* clawpack_options,
+                 user_options_t* user)
+{
+    sc_MPI_Comm            mpicomm;
+
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t	     *domain;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+
+    int mi,mj,a,b;
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+    a = gparms->periodic_x;
+    b = gparms->periodic_y;
+    mi = gparms->mi;
+    mj = gparms->mj;
+
+    conn = p4est_connectivity_new_brick(mi,mj,a,b);
+    brick = fclaw2d_map_new_brick(conn,mi,mj);
+
+    switch (user->example) {
+    case 1:
+        /* A cut cell mesh */
+        cont = fclaw2d_map_new_identity (brick,gparms->scale,gparms->shift);
+        break;
+    case 2:
+        /* A terrain following grid */
+        cont = fclaw2d_map_new_mountain (brick,gparms->scale,gparms->shift);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+    init_domain_data(domain);
+
+    set_domain_parms(domain,gparms);
+    fc2d_clawpack46_set_options(domain,clawpack_options);
+
+    link_problem_setup(domain,fc2d_clawpack46_setprob);
+
+    mountain_link_solvers(domain);
+
+    link_regrid_functions(domain,mountain_patch_tag4refinement,
+                          mountain_patch_tag4coarsening);
+
+    amrinit(&domain);
+    amrrun(&domain);
+    amrreset(&domain);
+
+    fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
+}
+
 int
 main (int argc, char **argv)
 {
-  int		        lp;
-  int                   example;
-  sc_MPI_Comm           mpicomm;
-  sc_options_t          *options;
-  p4est_connectivity_t  *conn = NULL;
-  fclaw2d_map_context_t *cont = NULL, *brick=NULL;
-  fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
-  fclaw2d_clawpack_parms_t  *clawpack_parms;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-  int mi,mj,a,b;
-  double rotate[2];
-  double shift[3];
-  double scale[3];
+    /* Options */
+    sc_options_t                  *options;
+    amr_options_t                 samr_options, *gparms = &samr_options;
+    fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t                suser_options, *user = &suser_options;
 
-  lp = SC_LP_PRODUCTION;
-  mpicomm = sc_MPI_COMM_WORLD;
-  fclaw_mpi_init (&argc, &argv, mpicomm, lp);
+    int retval;
 
-#ifdef MPI_DEBUG
-  /* this has to go after MPI has been initialized */
-  fclaw2d_mpi_debug();
-#endif
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
+
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register (app,"fclaw_options.ini", clawpack_options);
+    register_user_options (app, "fclaw_options.ini", user);
 
 
+    /* Read configuration file(s) */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,NULL);
 
-  /* ---------------------------------------------------------------
-     Read parameters from .ini file, parse command line, and
-     do parameter checking.
-     -------------------------------------------------------------- */
-  options = sc_options_new(argv[0]);
+    /* -------------------------------------------------------------
+       - Run program
+       ------------------------------------------------------------- */
+    if (!retval & !vexit)
+    {
+        run_program(app, gparms, clawpack_options, user);
+    }
 
-  sc_options_add_int (options, 0, "example", &example, 0,
-                      "1 for identity mapping [0,1]x[0,1]" \
-                      "2 for Cartesian brick mapping" \
-                      "3 for five patch square");
+    fclaw_app_destroy (app);
 
-  sc_options_add_int (options, 0, "mi", &mi, 5,
-                         "mi : Number of bricks in the x direction [5]");
-
-  sc_options_add_int (options, 0, "mj", &mj, 2,
-                         "mj : Number of bricks in the y direction [2]");
-
-  /* Register default parameters and any solver parameters */
-  gparms = amr_options_new(options);
-  clawpack_parms = fclaw2d_clawpack_parms_new(options);
-
-  /* Parse any command line arguments.  Argument gparms is no longer needed
-     as an input since the array conversion is now done in 'postprocess' */
-
-  amr_options_parse(options,argc,argv,lp);
-
-  /* Any arrays are converted here */
-  amr_postprocess_parms(gparms);
-  fclaw2d_clawpack_postprocess_parms(clawpack_parms);
-
-  /* Check final state of parameters */
-  amr_checkparms(gparms);
-  fclaw2d_clawpack_checkparms(clawpack_parms,gparms);
-
-  /* ---------------------------------------------------------------
-     Floating point traps
-     -------------------------------------------------------------- */
-  if (gparms->trapfpe == 1)
-  {
-      printf("Enabling floating point traps\n");
-      feenableexcept(FE_INVALID);
-  }
-
-  /* ---------------------------------------------------------------
-     Domain geometry
-     -------------------------------------------------------------- */
-
-  scale[0] = 5000;
-  scale[1] = 2000;
-  scale[2] = 1;
-
-  shift[0] = 0;
-  shift[1] = 0;
-  shift[2]  = 0;
-
-  rotate[0] = 0;
-  rotate[1] = 0;
-
-  a = 0;   /* periodic in x */
-  b = 0;   /* periodic in y */
-
-  conn = p4est_connectivity_new_brick(mi,mj,a,b);
-  brick = fclaw2d_map_new_brick(conn,mi,mj);
-
-  switch (example) {
-  case 1:
-      /* A cut cell mesh */
-      cont = fclaw2d_map_new_identity (brick,scale,shift,rotate);
-      break;
-  case 2:
-      /* A terrain following grid */
-      cont = fclaw2d_map_new_mountain (brick,scale,shift,rotate);
-      break;
-  default:
-      sc_abort_collective ("Parameter example must be 1");
-  }
-
-  domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
-  /* ---------------------------------------------------------- */
-  if (gparms->verbosity > 0)
-  {
-      fclaw2d_domain_list_levels(domain, lp);
-      fclaw2d_domain_list_neighbors(domain, lp);
-  }
-
-  /* ---------------------------------------------------------------
-     Set domain data.
-     --------------------------------------------------------------- */
-  init_domain_data(domain);
-
-  set_domain_parms(domain,gparms);
-  set_clawpack_parms(domain,clawpack_parms);
-
-  /* ---------------------------------------------------------------
-     Define the solver and link in other problem/user specific
-     routines
-     --------------------------------------------------------------- */
-
-  /* Using user defined functions just to demonstrate how one might setup
-     something that depends on more than one solver (although only one is used
-     here) */
-  link_problem_setup(domain,mountain_problem_setup);
-
-  mountain_link_solvers(domain);
-
-  link_regrid_functions(domain,mountain_patch_tag4refinement,mountain_patch_tag4coarsening);
-
-  /* ---------------------------------------------------------------
-     Run
-     --------------------------------------------------------------- */
-  amrinit(&domain);
-  amrrun(&domain);
-  amrreset(&domain);
-
-  fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
-  sc_options_destroy(options);         /* this could be moved up */
-  amr_options_destroy(gparms);
-  fclaw2d_clawpack_parms_delete(clawpack_parms);
-
-  fclaw_mpi_finalize ();
-
-  return 0;
+    return 0;
 }

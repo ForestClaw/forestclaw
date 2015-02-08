@@ -118,8 +118,7 @@ fclaw2d_map_c2m_mountain(fclaw2d_map_context_t * cont, int blockno,
 
 fclaw2d_map_context_t* fclaw2d_map_new_mountain(fclaw2d_map_context_t* brick,
                                                 const double scale[],
-                                                const double shift[],
-                                                const double rotate[])
+                                                const double shift[])
 {
     fclaw2d_map_context_t *cont;
 
@@ -129,7 +128,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_mountain(fclaw2d_map_context_t* brick,
 
     set_scale(cont,scale);
     set_shift(cont,shift);
-    set_rotate(cont,rotate);
 
     cont->brick = brick;
 
