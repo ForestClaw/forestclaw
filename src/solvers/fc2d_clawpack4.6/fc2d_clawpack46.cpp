@@ -71,16 +71,16 @@ get_patch_data(ClawPatch *cp)
     return wp;
 }
 
-static
-void patch_data_new(void** wp)
+static void
+patch_data_new(void** wp)
 {
     patch_aux_data* patch_data;
     patch_data = new patch_aux_data;
     *wp = (void*) patch_data;
 }
 
-static
-void patch_data_delete(void **wp)
+static void
+patch_data_delete(void **wp)
 {
     patch_aux_data *patch_data = (patch_aux_data*) *wp;
     delete patch_data;
@@ -413,7 +413,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     int ierror = 0;
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
-                                    clawpack46_flux2fw_ : clawpack46_flux2_;
+                                    CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
 
     CLAWPACK46_STEP2_WRAP(maxm, meqn, maux, mbc, clawpack_options->method,
                           clawpack_options->mthlim, clawpack_options->mcapa,

@@ -228,17 +228,17 @@ void CLAWPACK46_FLUX2(const int& ixy,const int& maxm, const int& meqn,
                       int method[], int mthlim[]);
 
 #define CLAWPACK46_FLUX2FW FCLAW_F77_FUNC(clawpack46_flux2fw,CLAWPACK46_FLUX2FW)
-void clawpack46_flux2fw_(const int& ixy,const int& maxm, const int& meqn,
-                         const int& maux,const int& mbc,const int& mx,
-                         double q1d[], double dtdx1d[],
-                         double aux1[], double aux2[], double aux3[],
-                         double faddm[],double faddp[], double gaddm[],
-                         double gaddp[],double cfl1d[], double fwave[],
-                         double s[], double amdq[],double apdq[],double cqxx[],
-                         double bmasdq[], double bpasdq[],
-                         fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
-                         const int& mwaves, const int& mcapa,
-                         int method[], int mthlim[]);
+void CLAWPACK46_FLUX2FW(const int& ixy,const int& maxm, const int& meqn, //
+                        const int& maux,const int& mbc,const int& mx,
+                        double q1d[], double dtdx1d[],
+                        double aux1[], double aux2[], double aux3[],
+                        double faddm[],double faddp[], double gaddm[],
+                        double gaddp[],double cfl1d[], double fwave[],
+                        double s[], double amdq[],double apdq[],double cqxx[],
+                        double bmasdq[], double bpasdq[],
+                        fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
+                        const int& mwaves, const int& mcapa,
+                        int method[], int mthlim[]);
 
 
 #define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block,CLAWPACK46_SET_BLOCK)
@@ -332,12 +332,12 @@ double
                               double *rhs);
 
 double
-    fc2d_clawpack46_update(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           double t,
-                           double dt);
+fc2d_clawpack46_update(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
 
 #ifdef __cplusplus
 #if 0
