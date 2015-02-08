@@ -128,6 +128,13 @@ extern "C"
        - These are provided only for convenience;  these files are not
          compiled into the library, but will be provided by the user.
        -------------------------------------------------------------------- */
+#define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
+#define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
+#define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
+#define B4STEP2 FCLAW_F77_FUNC(b4step2,B4STEP2)
+#define SRC2    FCLAW_F77_FUNC(src2,SRC2)
+#define BC2     FCLAW_F77_FUNC(bc2,BC2)
+
     void setprob_();
 
     void qinit_(const int& maxmx, const int& maxmy, const int& meqn,

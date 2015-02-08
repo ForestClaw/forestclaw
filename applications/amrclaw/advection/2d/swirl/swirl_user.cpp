@@ -37,11 +37,11 @@ extern "C"
 
 static const fc2d_clawpack46_vtable_t classic_user =
 {
-    setprob_,
+    SETPROB,
     NULL,        /* bc2 */
-    qinit_,
-    setaux_,
-    b4step2_,
+    QINIT,
+    SETAUX,
+    B4STEP2,
     NULL,        /* src2 */
     rpn2_,
     rpt2_
@@ -73,61 +73,6 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
     fc2d_clawpack46_setprob(domain);
 }
-
-#if 0
-void swirl_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
-{
-    fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-}
-#endif
-
-
-#if 0
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
-{
-    fc2d_clawpack46_qinit(domain,this_patch,this_block_idx,this_patch_idx);
-}
-#endif
-
-#if 0
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp)
-{
-    /* This calls bc2 in swirl/user_4.6;  that file isn't changed but just included as a
-       compile check */
-    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
-                     t,dt,intersects_bc,time_interp);
-}
-#endif
-
-
-#if 0
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt)
-{
-    fc2d_clawpack46_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
-
-    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
-                                       this_patch_idx,t,dt);
-    return maxcfl;
-}
-#endif
 
 
 /* -----------------------------------------------------------------
