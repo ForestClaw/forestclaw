@@ -9,25 +9,6 @@
 
 #include <fclaw_package.h>
 
-class ClawPatch;
-
-typedef void (*fclaw2d_solver_patch_data_new_t)(void **solverdata);
-typedef void (*fclaw2d_solver_patch_data_delete_t)(void **solverdata);
-
-void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-                   int blockno, int patchno);
-
-void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
-
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-
-
-size_t pack_size(fclaw2d_domain_t* domain);
-void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data);
-void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata,
-                      fclaw_bool time_interp);
-
 class ClawPatch
 {
 public :
@@ -214,19 +195,8 @@ public :
 
     int* block_corner_count();
 
-    /* ---------------------------------------------------------------
-       This isn't very object oriented, and I will think about a better
-       way to do this without deriving classes
-    */
-
-    /* ----------------------------------------------------------------
-       Wave propagation routines
-       Only defined if we are really using the wave prop algorithm.
-       The new/delete functions are static because we want to define them
-       ---------------------------------------------------------------- */
     void* clawpack_patch_data(int id);
     static fclaw_package_container_t package_container;
-
 
 protected :
 
@@ -298,6 +268,46 @@ protected :
 
 };
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
 
+void link_to_packages(fclaw_package_container_t* pkgs);
+
+void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+                   int blockno, int patchno);
+
+void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
+
+ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
+
+
+size_t pack_size(fclaw2d_domain_t* domain);
+void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data);
+void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                      int this_block_idx, int this_patch_idx, double *qdata,
+                      fclaw_bool time_interp);
+
+void fclaw2d_get_clawpatch_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                int* mx, int* my, int* mbc, int* meqn,
+                                double* xlower, double* ylower,
+                                double* dx, double* dy);
+
+void fclaw2d_get_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                             double **xp, double **yp, double **zp,
+                             double **xd, double **yd, double **zd, double **area);
+
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif
