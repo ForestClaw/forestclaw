@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <clawpack_fort.H>
+#include <amr_utils.H>
 #include "fc2d_dummy.H"
 
 static int dummy_package_id = -1;
@@ -31,10 +33,9 @@ static int dummy_package_id = -1;
 /* Patch data is stored in each ClawPatch */
 struct patch_data
 {
-    int value;
+    FArrayBox data;
 };
 
-#if 0
 static patch_data*
 get_patch_data(ClawPatch *cp)
 {
@@ -42,13 +43,15 @@ get_patch_data(ClawPatch *cp)
         (patch_data*) cp->clawpack_patch_data(dummy_package_id);
     return wp;
 }
-#endif
 
 static void*
 patch_data_new()
 {
     patch_data* data;
     data = new patch_data;
+#if 0
+    data = FCLAW_ALLOC(patch_data,1);
+#endif
     return (void*) data;
 }
 
@@ -57,6 +60,9 @@ patch_data_delete(void *data)
 {
     patch_data *pd = (patch_data*) data;
     FCLAW_ASSERT(pd != NULL);
+#if 0
+    FCLAW_FREE(pd);
+#endif
     delete pd;
 }
 
@@ -82,4 +88,32 @@ int fc2d_dummy_package_register(fclaw_package_container_t *pkg_container,
                                           &dummy_patch_vtable);
     dummy_package_id = id;
     return id;
+}
+
+void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    fc2d_dummy_define_data(domain,cp);
+}
+
+
+void fc2d_dummy_define_data(fclaw2d_domain_t* domain, ClawPatch *cp)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    patch_data* pd = get_patch_data(cp);
+
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+
+    int ll[2], ur[2];
+    ll[0] = 1-mbc;
+    ll[1] = 1-mbc;
+    ur[0] = mx + mbc;
+    ur[1] = my + mbc;    Box box(ll,ur);
+
+    pd->data.define(box,1);
 }

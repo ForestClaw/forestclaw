@@ -26,6 +26,7 @@
 #ifndef FC2D_DUMMY_H
 #define FC2D_DUMMY_H
 
+#include <ClawPatch.H>
 #include <fclaw_package.h>
 
 #ifdef __cplusplus
@@ -39,6 +40,13 @@ extern "C"
 int fc2d_dummy_package_register(fclaw_package_container_t *pkg_container,
                                 void* opt);
 
+
+void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx);
+
+void fc2d_dummy_define_data(fclaw2d_domain_t* domain, ClawPatch *cp);
 
 #ifdef __cplusplus
 #if 0
