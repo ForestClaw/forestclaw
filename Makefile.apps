@@ -4,6 +4,7 @@
 # Solver libraries
 # ----------------------------------
 include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_dummy/Makefile.am
 
 # ----------------------------------
 # Applications
