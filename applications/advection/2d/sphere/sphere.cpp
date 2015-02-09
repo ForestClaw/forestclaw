@@ -33,6 +33,7 @@
 
 #include <fclaw2d_map_query.h>
 
+#include <fclaw_package.h>
 #include <fc2d_clawpack46.H>
 
 #include "sphere_user.H"
@@ -165,6 +166,9 @@ int main (int argc, char **argv)
   fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
   user_options_t           suser_options,     *user = &suser_options;
 
+  int clawpack46_id;
+  fclaw_package_container_t* pkgs;
+
   int retval;
 
   /* Initialize application */
@@ -181,6 +185,12 @@ int main (int argc, char **argv)
   retval = fclaw_options_read_from_file(options);
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+  pkgs = fclaw_package_collection_init();
+  clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
+
+  ClawPatch::package_container = *pkgs;
+
+
   /* -------------------------------------------------------------
      - Run program
      ------------------------------------------------------------- */
@@ -189,6 +199,7 @@ int main (int argc, char **argv)
         run_program(app, gparms, clawpack_options, user);
     }
 
+    fclaw_package_collection_destroy(pkgs);
     fclaw_app_destroy (app);
 
     return 0;
