@@ -248,6 +248,9 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
     user_options_t                suser_options, *user = &suser_options;
 
+    int clawpack46_id;
+    fclaw_package_container_t* pkgs;
+
     int retval;
 
     /* Initialize application */
@@ -265,14 +268,17 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* -------------------------------------------------------------
-       - Run program
-       ------------------------------------------------------------- */
+    /* Link packages to patches */
+    pkgs = fclaw_package_collection_init();
+    clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
+    link_to_packages(pkgs);
+
     if (!retval & !vexit)
     {
         run_program(app, gparms, clawpack_options,user);
     }
 
+    fclaw_package_collection_destroy(pkgs);
     fclaw_app_destroy (app);
 
     return 0;

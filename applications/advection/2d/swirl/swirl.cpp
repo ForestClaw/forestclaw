@@ -172,7 +172,7 @@ main (int argc, char **argv)
     clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
     dummy_id = fc2d_dummy_package_register(pkgs,NULL);
 
-    ClawPatch::package_container = *pkgs;
+    link_to_packages(pkgs);
 
     /* Run the program */
     if (!retval & !vexit)

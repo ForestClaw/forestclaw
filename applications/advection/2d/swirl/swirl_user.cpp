@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 #include "fc2d_clawpack46.H"
+#include "fc2d_dummy.H"
 #include "swirl_user.H"
 
 #ifdef __cplusplus
@@ -81,6 +82,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                           int this_patch_idx)
 {
     fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
+
 }
 
 

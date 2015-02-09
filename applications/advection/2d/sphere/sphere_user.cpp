@@ -84,40 +84,22 @@ void sphere_patch_setup(fclaw2d_domain_t *domain,
                               int this_block_idx,
                               int this_patch_idx)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
 
-    /* ----------------------------------------------------------- */
-    // allocate space for the aux array
+    int mx,my,mbc,maux, meqn;
+    double xlower,ylower,dx,dy;
+    double *aux,*xd,*yd,*zd,*area;
+    double *xp,*yp,*zp;
+
+    fclaw2d_get_clawpatch_data(domain,this_patch,&mx,&my,&mbc,&meqn,
+                               &xlower,&ylower,&dx,&dy);
+
     fc2d_clawpack46_define_auxarray(domain,cp);
-
-    /* ----------------------------------------------------------- */
-    // Pointers needed to pass to class setaux call, and other setaux
-    // specific arguments
-    double *aux;
-    int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    /* ----------------------------------------------------------- */
-    /* Modified clawpack setaux routine that passes in mapping terms */
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-    double *area = cp->area();
+    fclaw2d_get_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    setaux_manifold_(mbc,mx,my,xlower,ylower,dx,dy,
+    SETAUX_MANIFOLD(mbc,mx,my,xlower,ylower,dx,dy,
                      maux,aux,this_block_idx,xd,yd,zd,area);
 }
 
@@ -148,32 +130,18 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
                     double t,
                     double dt)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
     ClawPatch *cp = get_clawpatch(this_patch);
-    double dx = cp->dx();
-    double dy = cp->dy();
+    int mx,my,mbc,maux, meqn;
+    double xlower,ylower,dx,dy;
+    double *aux,*xd,*yd,*zd,*area;
+    double *xp,*yp,*zp;
 
-    /* ------------------------------------------------------- */
-    double *aux;
-    int maux;
+    fclaw2d_get_clawpatch_data(domain,this_patch,&mx,&my,&mbc,&meqn,
+                       &xlower,&ylower,&dx,&dy);
+    fclaw2d_get_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
-    double *xd = cp->xd();
-    double *yd = cp->yd();
-    double *zd = cp->zd();
-
-    /* ------------------------------------------------------- */
-    // Classic call to b4step2(..)
-    b4step2_manifold_(mbc,mx,my,dx,dy,t,maux,aux,
-                      this_block_idx,xd,yd,zd);
+    b4step2_manifold_(mbc,mx,my,dx,dy,t,maux,aux, this_block_idx,xd,yd,zd);
 }
 
 double sphere_update(fclaw2d_domain_t *domain,

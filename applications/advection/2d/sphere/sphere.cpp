@@ -46,7 +46,7 @@ typedef struct user_options
 } user_options_t;
 
 static void *
-options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+    options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
@@ -58,7 +58,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
+    options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
     if (user->example < 1 || user->example > 2) {
@@ -77,9 +77,9 @@ static const fclaw_app_options_vtable_t options_vtable_user = {
 };
 
 void static
-register_user_options (fclaw_app_t * app,
-                       const char *configfile,
-                       user_options_t* user)
+    register_user_options (fclaw_app_t * app,
+                           const char *configfile,
+                           user_options_t* user)
 {
     FCLAW_ASSERT (app != NULL);
 
@@ -88,112 +88,109 @@ register_user_options (fclaw_app_t * app,
 }
 
 static
-void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 fc2d_clawpack46_options_t* clawpack_options,
-                 user_options_t* user)
-{
-    sc_MPI_Comm            mpicomm;
+    void run_program(fclaw_app_t* app, amr_options_t* gparms,
+                     fc2d_clawpack46_options_t* clawpack_options,
+                     user_options_t* user)
+    {
+        sc_MPI_Comm            mpicomm;
 
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t	     *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+        /* Mapped, multi-block domain */
+        p4est_connectivity_t     *conn = NULL;
+        fclaw2d_domain_t	     *domain;
+        fclaw2d_map_context_t    *cont = NULL;
 
-    /* Used locally */
-    double pi = M_PI;
-    double rotate[2];
+        /* Used locally */
+        double pi = M_PI;
+        double rotate[2];
 
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-    rotate[0] = pi*gparms->theta/180.0;
-    rotate[1] = pi*gparms->phi/180.0;
+        rotate[0] = pi*gparms->theta/180.0;
+        rotate[1] = pi*gparms->phi/180.0;
 
-    switch (user->example) {
-    case 1:
-        conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
-        break;
-    case 2:
-        conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
-        break;
-    default:
-        SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+        switch (user->example) {
+        case 1:
+            conn = p4est_connectivity_new_pillow();
+            cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
+            break;
+        case 2:
+            conn = p4est_connectivity_new_cubed();
+            cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
+            break;
+        default:
+            SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+        }
+
+        domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+
+        fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+        fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+        /* ---------------------------------------------------------------
+           Set domain data.
+           --------------------------------------------------------------- */
+        init_domain_data(domain);
+
+        /* Store parameters */
+        set_domain_parms(domain,gparms);
+        fc2d_clawpack46_set_options (domain,clawpack_options);
+
+        /* Link solvers to the domain */
+        link_problem_setup(domain,sphere_problem_setup);
+
+        sphere_link_solvers(domain);
+
+        /* --------------------------------------------------
+           Initialize and run the simulation
+           -------------------------------------------------- */
+        amrinit(&domain);
+        amrrun(&domain);
+        amrreset(&domain);
+
+        /* --------------------------------------------------
+           Clean up the mapping context.
+           -------------------------------------------------- */
+        fclaw2d_map_destroy (cont);
     }
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    init_domain_data(domain);
-
-    /* Store parameters */
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options (domain,clawpack_options);
-
-    /* Link solvers to the domain */
-    link_problem_setup(domain,sphere_problem_setup);
-
-    sphere_link_solvers(domain);
-
-    /* --------------------------------------------------
-       Initialize and run the simulation
-       -------------------------------------------------- */
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
-
-    /* --------------------------------------------------
-       Clean up the mapping context.
-       -------------------------------------------------- */
-    fclaw2d_map_destroy (cont);
-}
 
 
 int main (int argc, char **argv)
 {
-  fclaw_app_t *app;
-  int first_arg;
-  fclaw_exit_type_t vexit;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-  /* Options */
-  sc_options_t             *options;
-  amr_options_t            samr_options,      *gparms = &samr_options;
-  fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
-  user_options_t           suser_options,     *user = &suser_options;
+    /* Options */
+    sc_options_t             *options;
+    amr_options_t            samr_options,      *gparms = &samr_options;
+    fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
+    user_options_t           suser_options,     *user = &suser_options;
 
-  int clawpack46_id;
-  fclaw_package_container_t* pkgs;
+    int clawpack46_id;
+    fclaw_package_container_t* pkgs;
 
-  int retval;
+    int retval;
 
-  /* Initialize application */
-  app = fclaw_app_new (&argc, &argv, user);
-  options = fclaw_app_get_options (app);
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, user);
+    options = fclaw_app_get_options (app);
+    pkgs = fclaw_package_collection_init();
 
-  /*  Register options for each package */
-  fclaw_options_register_general (app, "fclaw_options.ini", gparms);
-  fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
+    /*  Register options for each package */
+    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
 
-  register_user_options (app, "fclaw_options.ini", user);
+    register_user_options (app, "fclaw_options.ini", user);
 
-  /* Read configuration file(s) and command line, and process options */
-  retval = fclaw_options_read_from_file(options);
-  vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    /* Read configuration file(s) and command line, and process options */
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  pkgs = fclaw_package_collection_init();
-  clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
+    /* Register packages */
+    clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
+    link_to_packages(pkgs);
 
-  ClawPatch::package_container = *pkgs;
-
-
-  /* -------------------------------------------------------------
-     - Run program
-     ------------------------------------------------------------- */
+    /* Run program */
     if (!retval & !vexit)
     {
         run_program(app, gparms, clawpack_options, user);
