@@ -32,6 +32,7 @@
 #include <amr_forestclaw.H>
 
 #include "fc2d_clawpack46_options.h"
+#include <fclaw_package.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -262,6 +263,10 @@ void
 void
     fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
                                 fc2d_clawpack46_options_t* clawpack_options);
+
+int fc2d_clawpack46_package_register(fclaw_package_container_t *pkg_container,
+                                      void *clawopt);
+
 
 void
     fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
