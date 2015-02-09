@@ -4,30 +4,7 @@
 #include "amr_utils.H"
 
 
-static void solver_default(void** solverdata)
-{
-    *solverdata = (void*) NULL;
-}
-
-/* -----------------------------------------------------
-   Solver new/delete functions.  This really needs to be
-   made more general (via some kind of registration?)
-   ----------------------------------------------------- */
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_clawpack_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_clawpack_patch_data_delete = &solver_default;
-
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_manyclaw_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_manyclaw_patch_data_delete = &solver_default;
-
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_user_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_user_patch_data_delete = &solver_default;
-
+fclaw_package_container_t ClawPatch::package_container;
 
 /* -----------------------------------------------------
    Some external functions that work with ClawPatches.
@@ -107,11 +84,8 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
-    ClawPatch::f_clawpack_patch_data_delete(&m_clawpack_patch_data);
-    ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
-    ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
-    // All other data arrays get deleted automatically by the FArrayBox
-    // destructor
+    fclaw_package_patch_data_destroy(&ClawPatch::package_container,
+                                     &m_package_data);
 }
 
 
@@ -174,9 +148,9 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms);
     }
 
-    ClawPatch::f_clawpack_patch_data_new(&m_clawpack_patch_data);
-    ClawPatch::f_manyclaw_patch_data_new(&m_manyclaw_patch_data);
-    ClawPatch::f_user_patch_data_new(&m_user_patch_data);
+    fclaw_package_patch_data_new(&ClawPatch::package_container,
+                                 &m_package_data);
+
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -348,27 +322,12 @@ int* ClawPatch::block_corner_count()
    Solver data and functions
    ---------------------------------------------------*/
 // Wave propagation algorithms
-void* ClawPatch::clawpack_patch_data()
-{
-    return m_clawpack_patch_data;
-}
 
-void ClawPatch::set_clawpack_patch_data(void* solverdata)
+void* ClawPatch::clawpack_patch_data(int id)
 {
-    m_clawpack_patch_data = solverdata;
+    return fclaw_package_get_data(&m_package_data,id);
+    // return m_clawpack_patch_data;
 }
-
-// Wave propagation algorithms
-void* ClawPatch::manyclaw_patch_data()
-{
-    return m_manyclaw_patch_data;
-}
-
-void ClawPatch::set_manyclaw_patch_data(void* solverdata)
-{
-    m_manyclaw_patch_data = solverdata;
-}
-
 
 /* ----------------------------------------------------------------
    Time stepping routines
@@ -719,67 +678,3 @@ int ClawPatch::size()
     /* Use this to create new data */
     return m_griddata.size();
 }
-
-#if 0
-void ClawPatch::write_patch_data(const int& a_iframe,
-                                 const int& a_patch_num, const int& a_level)
-{
-    double *q = m_griddata.dataPtr();
-    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,
-                 a_iframe,a_patch_num,a_level,m_blockno);
-}
-
-double ClawPatch::compute_sum()
-{
-    double *q = m_griddata.dataPtr();
-    double sum;
-    double *area = m_area.dataPtr();
-    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,area,sum);
-    return sum;
-}
-#endif
-
-#if 0
-void ClawPatch::dump(int mq)
-{
-    double *q;
-    q = m_griddata.dataPtr();
-    dump_patch_(m_mx,m_my,m_mbc,m_meqn,mq,q);
-}
-#endif
-
-#if 0
-void ClawPatch::dump_last()
-{
-    double *q;
-    q = m_griddata_last.dataPtr();
-    int k = 0;
-    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-    {
-        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-        {
-            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
-            k++;
-        }
-        printf("\n");
-    }
-}
-#endif
-
-#if 0
-void ClawPatch::dump_time_interp()
-{
-    double *q;
-    q = m_griddata_time_interp.dataPtr();
-    int k = 0;
-    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-    {
-        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-        {
-            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
-            k++;
-        }
-        printf("\n");
-    }
-}
-#endif

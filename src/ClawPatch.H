@@ -7,6 +7,7 @@
 #include "amr_options.h"
 #include "clawpack_fort.H"
 
+#include <fclaw_package.h>
 
 class ClawPatch;
 
@@ -223,28 +224,8 @@ public :
        Only defined if we are really using the wave prop algorithm.
        The new/delete functions are static because we want to define them
        ---------------------------------------------------------------- */
-    void* clawpack_patch_data();
-    void set_clawpack_patch_data(void* solver_data);
-    static fclaw2d_solver_patch_data_new_t f_clawpack_patch_data_new;
-    static fclaw2d_solver_patch_data_delete_t f_clawpack_patch_data_delete;
-
-    // ----------------------------------------------------------------
-    // Wave propagation used for ManyClaw
-    // Only defined if we are really using ManyClaw
-    // The new/delete functions are static because we want to define them
-    // ----------------------------------------------------------------
-    void* manyclaw_patch_data();
-    void set_manyclaw_patch_data(void* solver_data);
-    static fclaw2d_solver_patch_data_new_t f_manyclaw_patch_data_new;
-    static fclaw2d_solver_patch_data_delete_t f_manyclaw_patch_data_delete;
-
-    // ----------------------------------------------------------------
-    // User data
-    // ----------------------------------------------------------------
-    void* user_patch_data();
-    void set_user_patch_data(void* user_data);
-    static fclaw2d_solver_patch_data_new_t f_user_patch_data_new;
-    static fclaw2d_solver_patch_data_delete_t f_user_patch_data_delete;
+    void* clawpack_patch_data(int id);
+    static fclaw_package_container_t package_container;
 
 
 protected :
@@ -313,14 +294,10 @@ protected :
 
     int m_block_corner_count[4];
 
-    /* Data associated with the wave propagation algorithm (ClawPack) */
-    void *m_clawpack_patch_data;
+    fclaw_package_data_t m_package_data;
 
-    /* Data associated with the wave propagation algorithm (ClawPack) */
-    void *m_manyclaw_patch_data;
+};
 
-    // Add user data (for coefficients, for example)
-    void * m_user_patch_data;
-}; // End class ClawPatch
+
 
 #endif

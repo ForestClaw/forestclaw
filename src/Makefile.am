@@ -13,6 +13,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map.h \
 	src/clawpack_fort.H \
 	src/fclaw2d_transform.h \
+	src/fclaw_package.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
@@ -36,6 +37,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
+	src/fclaw_package.c \
 	src/fclaw2d_map_query.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_map_brick.c \
