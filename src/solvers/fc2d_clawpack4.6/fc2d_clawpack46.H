@@ -265,7 +265,7 @@ void
                                 fc2d_clawpack46_options_t* clawpack_options);
 
 int fc2d_clawpack46_package_register(fclaw_package_container_t *pkg_container,
-                                      void *clawopt);
+                                     fc2d_clawpack46_options_t* clawopt);
 
 
 void
