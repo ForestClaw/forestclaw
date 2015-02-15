@@ -269,7 +269,7 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Link packages to patches */
-    pkgs = fclaw_package_collection_init();
+    pkgs = fclaw_package_container_init();
     clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
     link_to_packages(pkgs);
 
@@ -278,7 +278,7 @@ main (int argc, char **argv)
         run_program(app, gparms, clawpack_options,user);
     }
 
-    fclaw_package_collection_destroy(pkgs);
+    fclaw_package_container_destroy(pkgs);
     fclaw_app_destroy (app);
 
     return 0;
