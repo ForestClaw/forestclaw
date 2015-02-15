@@ -4,21 +4,19 @@
 #include "amr_utils.H"
 
 
-fclaw_package_container_t ClawPatch::package_container;
-
-// -----------------------------------------------------
-// User data new/delete
-// -----------------------------------------------------
+fclaw_package_container_t* ClawPatch::package_container;
 
 ClawPatch::ClawPatch()
 {
-    /* Nothing to build by default */
+    m_package_data_ptr = fclaw_package_data_new();
 }
 
 ClawPatch::~ClawPatch()
 {
-    fclaw_package_patch_data_destroy(&ClawPatch::package_container,
-                                     &m_package_data);
+    fclaw_package_patch_data_destroy(ClawPatch::package_container,
+                                     m_package_data_ptr);
+
+    fclaw_package_data_destroy(m_package_data_ptr);
 }
 
 
@@ -81,8 +79,8 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms);
     }
 
-    fclaw_package_patch_data_new(&ClawPatch::package_container,
-                                 &m_package_data);
+    fclaw_package_patch_data_new(ClawPatch::package_container,
+                                 m_package_data_ptr);
 
 }
 
@@ -257,7 +255,7 @@ int* ClawPatch::block_corner_count()
 
 void* ClawPatch::clawpack_patch_data(int id)
 {
-    return fclaw_package_get_data(&m_package_data,id);
+    return fclaw_package_get_data(m_package_data_ptr,id);
     // return m_clawpack_patch_data;
 }
 
@@ -618,7 +616,7 @@ int ClawPatch::size()
 
 void link_to_packages(fclaw_package_container_t* pkgs)
 {
-    ClawPatch::package_container = *pkgs;
+    ClawPatch::package_container = pkgs;
 }
 
 void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
@@ -682,8 +680,8 @@ size_t pack_size(fclaw2d_domain_t* domain)
     return size*sizeof(double);
 }
 
-void fclaw2d_get_clawpatch_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                                int* mx, int* my, int* mbc, int* meqn,
+void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                int* mx, int* my, int* mbc,
                                 double* xlower, double* ylower,double* dx, double* dy)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
@@ -691,16 +689,15 @@ void fclaw2d_get_clawpatch_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_
     *mx = gparms->mx;
     *my = gparms->my;
     *mbc = gparms->mbc;
-    *meqn = gparms->meqn;
     *xlower = cp->xlower();
     *ylower = cp->ylower();
     *dx = cp->dx();
     *dy = cp->dy();
 }
 
-void fclaw2d_get_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                             double **xp, double **yp, double **zp,
-                             double **xd, double **yd, double **zd, double **area)
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                   double **xp, double **yp, double **zp,
+                                   double **xd, double **yd, double **zd, double **area)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
      *xp = cp->xp();
@@ -710,4 +707,13 @@ void fclaw2d_get_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_pat
      *yd = cp->yd();
      *zd = cp->zd();
      *area = cp->area();
+}
+
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                 double **q, int* meqn)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    *meqn = gparms->meqn;
+    *q = cp->q();
 }

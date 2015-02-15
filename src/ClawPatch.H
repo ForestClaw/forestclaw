@@ -196,7 +196,7 @@ public :
     int* block_corner_count();
 
     void* clawpack_patch_data(int id);
-    static fclaw_package_container_t package_container;
+    static fclaw_package_container_t* package_container;
 
 protected :
 
@@ -252,7 +252,6 @@ protected :
     FArrayBox m_yd;
     FArrayBox m_zd;
 
-    FArrayBox m_area;
     FArrayBox m_xface_normals;
     FArrayBox m_yface_normals;
     FArrayBox m_xface_tangents;
@@ -260,11 +259,13 @@ protected :
     FArrayBox m_surf_normals;
     FArrayBox m_edge_lengths;
 
+    FArrayBox m_area;
     FArrayBox m_curvature;  // ???
 
     int m_block_corner_count[4];
 
-    fclaw_package_data_t m_package_data;
+    /* This is an opaque pointer */
+    fclaw_package_data_t *m_package_data_ptr;
 
 };
 
@@ -292,15 +293,17 @@ void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                       int this_block_idx, int this_patch_idx, double *qdata,
                       fclaw_bool time_interp);
 
-void fclaw2d_get_clawpatch_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                                int* mx, int* my, int* mbc, int* meqn,
-                                double* xlower, double* ylower,
-                                double* dx, double* dy);
+void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                 int* mx, int* my, int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx, double* dy);
 
-void fclaw2d_get_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                              double **xp, double **yp, double **zp,
                              double **xd, double **yd, double **zd, double **area);
 
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                 double **q, int* meqn);
 
 
 #ifdef __cplusplus

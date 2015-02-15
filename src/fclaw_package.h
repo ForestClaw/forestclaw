@@ -38,22 +38,19 @@ extern "C"
 #endif
 
 
+#define FCLAW_MAX_PACKAGES 20
+
+
+/* Opaque pointers */
 typedef struct fclaw_package_container fclaw_package_container_t;
 typedef struct fclaw_package_data      fclaw_package_data_t;
-
-typedef struct fclaw_package_vtable fclaw_package_vtable_t;
-typedef struct fclaw_package        fclaw_package_t;
+typedef struct fclaw_package           fclaw_package_t;
 
 typedef void* (*fclaw_package_data_new_t)();
 typedef void (*fclaw_package_data_delete_t)(void *data);
 
-#define FCLAW_MAX_PACKAGES 20
-
-struct fclaw_package_container
-{
-    fclaw_package_t *pkgs[FCLAW_MAX_PACKAGES];  /* Make adding packages easy ... */
-    int count;
-};
+/* Needs to be completely defined here */
+typedef struct fclaw_package_vtable fclaw_package_vtable_t;
 
 struct fclaw_package_vtable
 {
@@ -62,41 +59,29 @@ struct fclaw_package_vtable
 };
 
 
-/* Data attached to a patch that is independent of  what would normally get
-   passed in through a parameter call */
-struct fclaw_package
-{
-    void* options;
-    fclaw_package_vtable_t vt;
-    int id;
-};
+/* Create, destroy and add packages */
+fclaw_package_container_t* fclaw_package_container_init();
+void fclaw_package_container_destroy(fclaw_package_container_t *pkg_container);
 
-/* Data associated with each new patch.  A new one of these things will
-   get created each time a new ClawPatch is created */
-struct fclaw_package_data
-{
-    void *data[FCLAW_MAX_PACKAGES];
-    int count;
-};
-
-void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
-
-
-fclaw_package_container_t* fclaw_package_collection_init();
-
-int fclaw_package_collection_add_pkg(fclaw_package_container_t* pkg_container,
+int fclaw_package_container_add_pkg(fclaw_package_container_t* pkg_container,
                                       void* opt,
                                       const fclaw_package_vtable_t *vtable);
 
-void fclaw_package_collection_destroy(fclaw_package_container_t *pkg_container);
+/* Storage in ClawPatch for data from each package */
+void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
+fclaw_package_data_t* fclaw_package_data_new();
 
 
+/* Create, destroy and add patch data for each package */
 void fclaw_package_patch_data_new(fclaw_package_container_t* pkg_container,
                                   fclaw_package_data_t *data_container);
 
 
 void fclaw_package_patch_data_destroy(fclaw_package_container_t* pkg_container,
                                       fclaw_package_data_t *data_container);
+
+void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
+
 
 
 #ifdef __cplusplus

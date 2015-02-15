@@ -25,8 +25,47 @@
 
 #include <fclaw_package.h>
 
+
+/* Data attached to a patch that is independent of  what would normally get
+   passed in through a parameter call */
+struct fclaw_package
+{
+    void* options;
+    fclaw_package_vtable_t vt;
+    int id;
+};
+
+/* Data associated with each new patch.  A new one of these things will
+   get created each time a new ClawPatch is created */
+struct fclaw_package_data
+{
+    void *data[FCLAW_MAX_PACKAGES];
+    int count;
+};
+
+struct fclaw_package_container
+{
+    fclaw_package_t *pkgs[FCLAW_MAX_PACKAGES];  /* Make adding packages easy ... */
+    int count;
+};
+
+
+fclaw_package_data_t* fclaw_package_data_new()
+{
+    fclaw_package_data_t* pkg_data = FCLAW_ALLOC(fclaw_package_data_t,1);
+    return pkg_data;
+}
+
+void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data)
+{
+    FCLAW_ASSERT(pkg_data != NULL);
+    FCLAW_FREE(pkg_data);
+    pkg_data = NULL;
+}
+
+
 fclaw_package_container_t*
-fclaw_package_collection_init()
+fclaw_package_container_init()
 {
     int i;
     fclaw_package_container_t* pkg_container;
@@ -41,7 +80,7 @@ fclaw_package_collection_init()
 };
 
 void
-fclaw_package_collection_destroy(fclaw_package_container_t *pkg_container)
+fclaw_package_container_destroy(fclaw_package_container_t *pkg_container)
 {
     int i;
     fclaw_package_t *pkg;
@@ -56,7 +95,7 @@ fclaw_package_collection_destroy(fclaw_package_container_t *pkg_container)
 }
 
 int
-fclaw_package_collection_add_pkg(fclaw_package_container_t* pkg_container,
+fclaw_package_container_add_pkg(fclaw_package_container_t* pkg_container,
                                  void* opt,
                                  const fclaw_package_vtable_t *vtable)
 {
