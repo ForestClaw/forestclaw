@@ -108,7 +108,7 @@ int fc2d_clawpack46_package_register(fclaw_package_container_t *pkg_container,
     FCLAW_ASSERT(clawpack46_package_id == -1);
 
     /* Register packages */
-    id = fclaw_package_collection_add_pkg(pkg_container,(void*)clawopt,
+    id = fclaw_package_container_add_pkg(pkg_container,(void*)clawopt,
                                           &clawpack46_patch_vtable);
     clawpack46_package_id = id;
     return id;

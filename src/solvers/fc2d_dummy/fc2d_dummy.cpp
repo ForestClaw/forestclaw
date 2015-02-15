@@ -84,8 +84,8 @@ int fc2d_dummy_package_register(fclaw_package_container_t *pkg_container,
     FCLAW_ASSERT(dummy_package_id == -1);
 
     /* Register packages */
-    id = fclaw_package_collection_add_pkg(pkg_container,opt,
-                                          &dummy_patch_vtable);
+    id = fclaw_package_container_add_pkg(pkg_container,opt,
+                                         &dummy_patch_vtable);
     dummy_package_id = id;
     return id;
 }
