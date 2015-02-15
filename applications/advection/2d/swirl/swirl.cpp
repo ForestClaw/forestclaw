@@ -118,7 +118,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
        routines
        --------------------------------------------------------------- */
 
-    link_problem_setup(domain,swirl_problem_setup);
+    link_problem_setup(domain,fc2d_clawpack46_setprob);
 
     swirl_link_solvers(domain);
 
@@ -168,7 +168,7 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    pkgs = fclaw_package_collection_init();
+    pkgs = fclaw_package_container_init();
     clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
     dummy_id = fc2d_dummy_package_register(pkgs,NULL);
 
@@ -180,7 +180,7 @@ main (int argc, char **argv)
         run_program(app, gparms, clawpack_options, user);
     }
 
-    fclaw_package_collection_destroy(pkgs);
+    fclaw_package_container_destroy(pkgs);
     fclaw_app_destroy (app);
 
     return 0;
