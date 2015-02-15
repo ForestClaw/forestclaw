@@ -76,6 +76,7 @@ static const fclaw_app_options_vtable_t options_vtable_user = {
     NULL       /* options_destroy_user */
 };
 
+
 void static
     register_user_options (fclaw_app_t * app,
                            const char *configfile,
@@ -174,7 +175,7 @@ int main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     options = fclaw_app_get_options (app);
-    pkgs = fclaw_package_collection_init();
+    pkgs = fclaw_package_container_init();
 
     /*  Register options for each package */
     fclaw_options_register_general (app, "fclaw_options.ini", gparms);
@@ -196,7 +197,7 @@ int main (int argc, char **argv)
         run_program(app, gparms, clawpack_options, user);
     }
 
-    fclaw_package_collection_destroy(pkgs);
+    fclaw_package_container_destroy(pkgs);
     fclaw_app_destroy (app);
 
     return 0;

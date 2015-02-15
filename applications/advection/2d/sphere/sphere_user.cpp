@@ -86,18 +86,19 @@ void sphere_patch_setup(fclaw2d_domain_t *domain,
 {
     ClawPatch *cp = get_clawpatch(this_patch);
 
-    int mx,my,mbc,maux, meqn;
+    int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
 
-    fclaw2d_get_clawpatch_data(domain,this_patch,&mx,&my,&mbc,&meqn,
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
+                                  &xd,&yd,&zd,&area);
 
     fc2d_clawpack46_define_auxarray(domain,cp);
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
-
-    fclaw2d_get_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     SETAUX_MANIFOLD(mbc,mx,my,xlower,ylower,dx,dy,
                      maux,aux,this_block_idx,xd,yd,zd,area);
@@ -131,14 +132,16 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
                     double dt)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    int mx,my,mbc,maux, meqn;
+    int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
 
-    fclaw2d_get_clawpatch_data(domain,this_patch,&mx,&my,&mbc,&meqn,
-                       &xlower,&ylower,&dx,&dy);
-    fclaw2d_get_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                          &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     b4step2_manifold_(mbc,mx,my,dx,dy,t,maux,aux, this_block_idx,xd,yd,zd);
@@ -153,7 +156,8 @@ double sphere_update(fclaw2d_domain_t *domain,
 {
     sphere_b4step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
 
-    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
+                                          this_patch_idx,t,dt);
 
     return maxcfl;
 }
