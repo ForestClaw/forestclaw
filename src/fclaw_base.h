@@ -349,29 +349,30 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
 
 /** Close down all systems that were setup in fclaw_init.
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
+ * \param [in,out] a            This application is cleaned up.
  */
 void fclaw_app_destroy (fclaw_app_t * a);
 
 /** Change the user's configuration directory.
  * This is understood relative to the user's home directory.
  * After \ref fclaw_app_new, it is set to ".forestclaw".
- * \param [in,out] app          Valid application object.
+ * \param [in,out] a            Valid application object.
  * \param [in] configdir        New value for the per-user configuration directory.
  *                              This string is passed, not copied, so it must not
  *                              go out of scope.  String constants are fine.
  *                              It may be NULL to deactivate the feature.
  */
-void fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir);
+void fclaw_app_set_configdir (fclaw_app_t * a, const char *configdir);
 
 /** Change the environment variable used to find another configuration directory.
  * After \ref fclaw_app_new, it is set to "FCLAW_INI_DIR".
- * \param [in,out] app          Valid application object.
+ * \param [in,out] a            Valid application object.
  * \param [in] env_configdir    New value for the environment variable.
  *                              This string is passed, not copied, so it must not
  *                              go out of scope.  String constants are fine.
  *                              It may be NULL to deactivate the feature.
  */
-void fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir);
+void fclaw_app_set_env_configdir (fclaw_app_t * a, const char *env_configdir);
 
 /** Register an options package with an application.
  * This function calls the virtual function for registering its options.

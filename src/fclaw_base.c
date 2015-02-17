@@ -59,9 +59,9 @@ struct fclaw_app
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
 
     /* paths and configuration files */
-    const char * configdir;   /**< Defaults to fclaw_configdir under $HOME, may
+    const char *configdir;    /**< Defaults to fclaw_configdir under $HOME, may
                                    be changed with \ref fclaw_app_set_configdir. */
-    const char * env_configdir;         /**< Name of environment variable for a
+    const char *env_configdir;          /**< Name of environment variable for a
                                              directory to find configuration files.
                                              Defaults to fclaw_env_configdir. */
 
@@ -217,6 +217,8 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->argv = argv;
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
+    sc_options_set_spacing (a->opt, 26, 42);
+
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 
     a->configdir = fclaw_configdir;
@@ -261,7 +263,7 @@ fclaw_app_destroy (fclaw_app_t * a)
 }
 
 void
-fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir)
+fclaw_app_set_configdir (fclaw_app_t * a, const char *configdir)
 {
     FCLAW_ASSERT (a != NULL);
 
@@ -269,7 +271,7 @@ fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir)
 }
 
 void
-fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir)
+fclaw_app_set_env_configdir (fclaw_app_t * a, const char *env_configdir)
 {
     FCLAW_ASSERT (a != NULL);
 
