@@ -311,6 +311,7 @@ typedef struct fclaw_options_core
 {
     int print_help;        /**< Option variable to activate help message */
     int print_version;     /**< Option variable to print the version */
+    int print_options;     /**< Opiton variable to print options and exit */
     int fclaw_verbosity;   /**< Option variable for ForestClaw verbosity */
     int lib_verbosity;     /**< Option variable for p4est, sc, and others */
     sc_keyvalue_t *kv_verbosity;      /**< Holds key-values for log levels */
@@ -349,6 +350,8 @@ options_register_core (fclaw_app_t * a, void *package, sc_options_t * opt)
                            "Print usage information");
     sc_options_add_switch (opt, 'v', "version", &core->print_version,
                            "Print ForestClaw version");
+    sc_options_add_switch (opt, 'P', "print-options", &core->print_options,
+                           "Print option values and exit");
     sc_options_add_keyvalue (opt, 'V', "verbosity", &core->fclaw_verbosity,
                              "default", kv, "Set ForestClaw verbosity");
     sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
@@ -382,15 +385,19 @@ options_postprocess_core (fclaw_app_t * a, void *package, void *registered)
     sc_package_set_verbosity (fclaw_get_package_id (), core->fclaw_verbosity);
 
     /* print help and/or version information and exit gracefully */
-    if (core->print_help)
-    {
-        return FCLAW_EXIT_USAGE;
-    }
     if (core->print_version)
     {
         fclaw_global_essentialf ("ForestClaw version %s\n",
                                  FCLAW_PACKAGE_VERSION);
         return FCLAW_EXIT_QUIET;
+    }
+    if (core->print_options)
+    {
+        return FCLAW_EXIT_PRINT;
+    }
+    if (core->print_help)
+    {
+        return FCLAW_EXIT_USAGE;
     }
 
     /* at this point there are no errors to report */
@@ -501,21 +508,27 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                                   FCLAW_VERBOSITY_PRODUCTION, a->opt);
         break;
     case FCLAW_EXIT_QUIET:
-        /* we assume that the application has or will print something */
+        /* we assume that the application has printed or will print something */
+        break;
+    case FCLAW_EXIT_PRINT:
+        /* it has been requested to print values of all options and then exit */
+        sc_options_print_summary (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ESSENTIAL, a->opt);
+        fclaw_global_infof ("Terminating after printing option values\n");
         break;
     case FCLAW_EXIT_USAGE:
-        /* we assume that the application has or will print something */
+        /* we assume that the application has printed or will print something */
         /* but it has been specifically requested to print usage information */
         sc_options_print_usage (fclaw_get_package_id (),
                                 FCLAW_VERBOSITY_ESSENTIAL, a->opt, NULL);
-        fclaw_global_infof ("Terminating program\n");
+        fclaw_global_infof ("Terminating program by request\n");
         break;
     case FCLAW_EXIT_ERROR:
         /* some error has been encountered */
-        fclaw_global_errorf ("Configuration / option parsing failed\n");
+        fclaw_global_infof ("Configuration / option parsing failed\n");
         sc_options_print_usage (fclaw_get_package_id (),
                                 FCLAW_VERBOSITY_PRODUCTION, a->opt, NULL);
-        fclaw_global_infof ("Terminating program\n");
+        fclaw_global_errorf ("Terminating program on option error\n");
         break;
     default:
         SC_ABORT_NOT_REACHED ();

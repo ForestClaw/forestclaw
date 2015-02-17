@@ -140,6 +140,7 @@ typedef enum fclaw_exit_type
     FCLAW_NOEXIT,               /**< We are completely clean and may continue.
                                      By the C standard, this constant has value 0. */
     FCLAW_EXIT_QUIET,           /**< We decided to to terminate quietly. */
+    FCLAW_EXIT_PRINT,           /**< We will print all option values and then quit. */
     FCLAW_EXIT_USAGE,           /**< We are to do an informative job and then quit.
                                      ForestClaw will print a usage message. */
     FCLAW_EXIT_ERROR            /**< We have encountered an error and quit noisily. */
