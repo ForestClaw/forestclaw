@@ -120,10 +120,14 @@ static const fclaw_app_options_vtable_t dummy_vt = {
  * \param [in,out] bbox         The blackbox object.
  */
 static void
-run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo,
-             dummy_blackbox_t * bbox)
+run_program (fclaw_app_t * a, fclaw_dummy_options_t * dumo)
 {
     int debug_size, debug_rank;
+    dummy_blackbox_t * bbox;
+
+    /* try out the application-attribute feature */
+    bbox = (dummy_blackbox_t *) fclaw_app_get_attribute (a, "blackbox", NULL);
+    FCLAW_ASSERT (bbox != NULL);
 
     fclaw_global_essentialf ("So this is the beginning of the program\n");
     (void) fclaw_app_get_mpi_size_rank (a, &debug_size, &debug_rank);
@@ -169,6 +173,7 @@ main (int argc, char **argv)
 
     /* initialize a package that registers its own options package */
     bbox = dummy_blackbox_new_register (a, 4);
+    fclaw_app_set_attribute (a, "blackbox", bbox);
 
     /* process command line options and configuration files */
     vexit = fclaw_app_options_parse (a, &first_arg, "dummy_config.ini");
@@ -176,7 +181,7 @@ main (int argc, char **argv)
     if (!vexit)
     {
         /* parameters are clean */
-        run_program (a, dumo, bbox);
+        run_program (a, dumo);
     }
 
     /* cleanup packages and application */

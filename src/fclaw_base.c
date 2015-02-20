@@ -67,6 +67,9 @@ struct fclaw_app
 
     /* options packages */
     sc_array_t *opt_pkg;      /**< An array of fclaw_app_options types. */
+
+    /* attributes */
+    sc_keyvalue_t *attributes;  /**< The storage for application attributes. */
 };
 
 int
@@ -224,6 +227,8 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->configdir = fclaw_configdir;
     a->env_configdir = fclaw_env_configdir;
 
+    a->attributes = sc_keyvalue_new ();
+
     return a;
 }
 
@@ -253,6 +258,7 @@ fclaw_app_destroy (fclaw_app_t * a)
     sc_array_destroy (a->opt_pkg);
 
     /* free central structures */
+    sc_keyvalue_destroy (a->attributes);
     sc_options_destroy (a->opt);
     FCLAW_FREE (a);
 
@@ -260,6 +266,34 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void *
+fclaw_app_set_attribute (fclaw_app_t * a, const char *name, void *attribute)
+{
+    void *previous;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (a->attributes != NULL);
+    FCLAW_ASSERT (name != NULL);
+
+    /* This is ugly and twice as expensive as a good solution.
+     * Currently the sc_keyvalue API is not optimized in this regard. */
+    previous = sc_keyvalue_get_pointer (a->attributes, name, NULL);
+    sc_keyvalue_set_pointer (a->attributes, name, attribute);
+
+    return previous;
+}
+
+void *
+fclaw_app_get_attribute (fclaw_app_t * a,
+                         const char *name, void *default_return)
+{
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (a->attributes != NULL);
+    FCLAW_ASSERT (name != NULL);
+
+    return sc_keyvalue_get_pointer (a->attributes, name, default_return);
 }
 
 void
