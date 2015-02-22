@@ -210,6 +210,26 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
+fclaw2d_patch_t *
+fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
+{
+    fclaw2d_block_t *block;
+
+    /* remote patch */
+    if (blockno == -1)
+    {
+        FCLAW_ASSERT (0 <= patchno && patchno < domain->num_ghost_patches);
+        return domain->ghost_patches + patchno;
+    }
+
+    /* local patch */
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    block = domain->blocks + blockno;
+
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+    return block->patches + patchno;
+}
+
 void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)
@@ -1003,25 +1023,57 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 }
 
 void
-fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
-                           int patchno)
+fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
+                               int smooth_refine, int coarsen_delay)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
-    p4est_wrap_mark_refine (wrap,
-                            (p4est_locidx_t) blockno,
-                            (p4est_locidx_t) patchno);
+    FCLAW_ASSERT (coarsen_delay >= 0);
+
+    domain->smooth_refine = smooth_refine;
+    p4est_wrap_set_coarsen_delay (wrap, coarsen_delay, 0);
+}
+
+void
+fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
+                           int patchno)
+{
+    fclaw2d_patch_t *patch;
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    /* bump target level up */
+    patch = fclaw2d_domain_get_patch (domain, blockno, patchno);
+    patch->target_level = patch->level + 1;
+    patch->target_level = SC_MIN (patch->target_level, P4EST_QMAXLEVEL);
+
+    /* if we do smooth refinement, all marking is done inside adapt */
+    if (!domain->smooth_refine)
+    {
+        p4est_wrap_mark_refine (wrap,
+                                (p4est_locidx_t) blockno,
+                                (p4est_locidx_t) patchno);
+    }
 }
 
 void
 fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
                             int patchno)
 {
+    fclaw2d_patch_t *patch;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
-    p4est_wrap_mark_coarsen (wrap,
-                             (p4est_locidx_t) blockno,
-                             (p4est_locidx_t) patchno);
+    /* bump target level down */
+    patch = fclaw2d_domain_get_patch (domain, blockno, patchno);
+    patch->target_level = patch->level - 1;
+    patch->target_level = SC_MAX (patch->target_level, 0);
+
+    /* if we do smooth refinement, all marking is done inside adapt */
+    if (!domain->smooth_refine)
+    {
+        p4est_wrap_mark_coarsen (wrap,
+                                 (p4est_locidx_t) blockno,
+                                 (p4est_locidx_t) patchno);
+    }
 }
 
 void

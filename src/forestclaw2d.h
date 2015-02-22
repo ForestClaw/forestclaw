@@ -73,6 +73,7 @@ extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 struct fclaw2d_patch
 {
     int level;                  /* 0 is root, increases if refined */
+    int target_level;           /* level desired after adaptation */
     int flags;                  /* flags that encode tree information */
     double xlower, xupper;
     double ylower, yupper;
@@ -108,6 +109,9 @@ struct fclaw2d_domain
     int mpisize, mpirank;       /* MPI variables */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
 
+    int smooth_refine;          /**< Boolean tells us whether to communicate
+                                     the desired refinement level to neighbors. */
+
     int local_num_patches;      /* sum of patches over all blocks on this proc */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
                                            store any patches at all, we set
@@ -124,6 +128,9 @@ struct fclaw2d_domain
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     int num_ghost_patches;      /* # off-proc patches relevant to this proc */
     fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
+
+    void **mirror_target_levels;  /**< Points to target level of each mirror. */
+    int *ghost_target_levels;   /**< Contains target level for each ghost. */
 
     void *pp;                   /* opaque backend data */
     int pp_owned;               /* The pp member is owned by this domain */
@@ -193,6 +200,19 @@ void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 
 /*************************** PATCH FUNCTIONS ******************************/
+
+/** Access a local or off-processor patch by its block and patch number.
+ * \param [in] domain   Valid domain.
+ * \param [in] blockno  For a local patch the number of the block.
+ *                      To request a remote patch set this number to -1.
+ * \param [in] patchno  For a local patch the number of the patch
+ *                      relative to its block.  Otherwise the number
+ *                      of the remote patch as returned by
+ *                      \ref fclaw2d_patch_face_neighbors and friends.
+ * \return              The patch that was requested.
+ */
+fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
+                                           int blockno, int patchno);
 
 /** Return the dimension of a corner.
  * \param [in] patch    A patch with properly set member variables.
@@ -490,6 +510,21 @@ void fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
                                       int i[], int j[]);
 
 /************************** ADAPT *****************************************/
+
+/** Set parameters of refinement strategy in a domain.
+ * This function only needs to be called once, and only for the first domain
+ * created in the program.  The values of the parameters are automatically
+ * transferred on adaptation and partitioning.
+ * \param [in,out] domain       This domain's refinement strategy is set.
+ * \param [in] smooth_refine    Activate or deactivete refinement smoothing.
+ *                              A newly created domain has this set to false.
+ * \param [in] coarsen_delay    Non-negative number to set the delay for
+ *                              coarsening after a patch has been last refined.
+ *                              This number is a global threshold that is compared
+ *                              against each patch's individual counter.
+ */
+void fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
+                                    int smooth_refine, int coarsen_delay);
 
 /** Mark a patch for refinement.
  * It is safe to call this function from an iterator callback except
