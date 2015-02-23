@@ -783,13 +783,6 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                     *(int8_t *) sc_array_index_int (mesh->corner_corner,
                                                     (int) cstart);
                 FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
-#if 0           /* return any kind of rotated/flipped corner  */
-                if (cornerno + *rcorner != P4EST_CHILDREN - 1)
-                {
-                    /* This corner is not diagonally opposite and ignored */
-                    qid = -1;
-                }
-#endif
             }
         }
         else
@@ -844,7 +837,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             SC_ABORT_NOT_REACHED ();
         }
 
-/* *INDENT-OFF* */
+        /* *INDENT-OFF* */
         FCLAW_ASSERT (*rproc == domain->mpirank
                       || (*rpatchno >= 0
                           && *rpatchno < mesh->ghost_num_quadrants));
@@ -853,7 +846,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                           && *rpatchno >= 0
                           && *rpatchno <
                              domain->blocks[*rblockno].num_patches));
-/* *INDENT-ON* */
+        /* *INDENT-ON* */
     }
 
     return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
@@ -1196,7 +1189,7 @@ fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (!e->inside_async);
 
     fclaw2d_domain_ghost_exchange_begin
-      (domain, e, exchange_minlevel, exchange_maxlevel);
+        (domain, e, exchange_minlevel, exchange_maxlevel);
     fclaw2d_domain_ghost_exchange_end (domain, e);
 }
 
@@ -1246,7 +1239,7 @@ void
 fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
                                    fclaw2d_domain_exchange_t * e)
 {
-    p4est_ghost_exchange_t * exc = (p4est_ghost_exchange_t *) e->async_state;
+    p4est_ghost_exchange_t *exc = (p4est_ghost_exchange_t *) e->async_state;
 
     FCLAW_ASSERT (exc != NULL);
     FCLAW_ASSERT (e->inside_async);
@@ -1255,7 +1248,8 @@ fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
     {
         p4est_ghost_exchange_custom_end (exc);
     }
-    else {
+    else
+    {
         p4est_ghost_exchange_custom_levels_end (exc);
     }
 

@@ -411,8 +411,9 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
+ * We only return corner neighbors that are not already face neighbors.
  * Inter-tree corners are only returned if the number of meeting corners is
- * exactly four, and if the neighbor's coordinate system is not rotated.
+ * exactly four.  Five or more are currently not supported.
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
