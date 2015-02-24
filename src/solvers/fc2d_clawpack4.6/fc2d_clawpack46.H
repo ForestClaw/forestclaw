@@ -255,10 +255,16 @@ int FC2D_CLAWPACK46_GET_BLOCK();
 void CLAWPACK46_UNSET_BLOCK();
 
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
+void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
 
-void
-    fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
+void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
                                  ClawPatch *cp, double **aux, int* maux);
+
+void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              double **aux, int* maux);
+
+void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
 
 void
     fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,

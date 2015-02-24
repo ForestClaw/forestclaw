@@ -122,6 +122,27 @@ void fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
     ddata->clawpack_parms = (void*) clawopt;
 }
 
+void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    fc2d_clawpack46_define_auxarray(domain,cp);
+}
+
+void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              double **aux, int* maux)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    fc2d_clawpack46_get_auxarray(domain,cp,aux,maux);
+}
+
+void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux)
+{
+    fc2d_clawpack46_options_t *clawpack_options = get_options(domain);
+    *maux = clawpack_options->maux;
+}
+
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
