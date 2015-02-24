@@ -222,12 +222,10 @@ main (int argc, char **argv)
   user_options_t                suser_options, *user = &suser_options;
 
   int retval;
-  fclaw_package_container_t* pkgs;
 
   /* Initialize application */
   app = fclaw_app_new (&argc, &argv, user);
   options = fclaw_app_get_options (app);
-  pkgs = fclaw_package_container_init();
 
   fclaw_options_register_general (app, "fclaw_options.ini", gparms);
 
@@ -240,7 +238,7 @@ main (int argc, char **argv)
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
   /* No packages to register */
-  link_to_packages(pkgs);
+  link_app_to_clawpatch(app);
 
 
   if (!retval & !vexit)
@@ -248,7 +246,6 @@ main (int argc, char **argv)
       run_program(app, gparms,user);
   }
 
-  fclaw_package_container_destroy(pkgs);
   fclaw_app_destroy (app);
 
   return 0;
