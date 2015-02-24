@@ -38,14 +38,14 @@ extern "C"
 
 static const fc2d_clawpack46_vtable_t classic_user =
 {
-    setprob_,
-    bc2_,  /* bc2 - added here just as a compiler check */
-    qinit_,
-    setaux_,
-    b4step2_,
+    SETPROB,
+    BC2,  /* bc2 - added here just as a compiler check */
+    QINIT,
+    SETAUX,
+    B4STEP2,
     NULL,  /* src2 */
-    rpn2_,
-    rpt2_
+    RPN2,
+    RPT2
 };
 
 
@@ -146,17 +146,16 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int maux, mfields;
+    int maux, meqn;
     double time;
 
-    mfields = gparms->meqn;
     time = get_domain_time(domain);
+    fc2d_clawpack46_maux(domain,&maux);
+    fclaw2d_clawpatch_meqn(domain,&meqn);
 
-    fclaw_global_productionf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
 
-    maux = 0;
-    swirl_write_tfile_(iframe,time,mfields,ngrids,maux);
+    swirl_write_tfile_(iframe,time,meqn,ngrids,maux);
 
     /* This opens file 'fort.qXXXX' for replace and closes the file. */
     new_qfile_(iframe);
