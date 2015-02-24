@@ -167,3 +167,14 @@ void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id)
     FCLAW_ASSERT(0 <= id  && id < data_container->count);
     return data_container->data[id];
 }
+
+void* fclaw_package_get_options(fclaw_app_t* app, int id)
+{
+    fclaw_package_t *pkg;
+    fclaw_package_container_t* pkg_container;
+    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
+    FCLAW_ASSERT(pkg_container != NULL);
+    fclaw_assert(0 <= id  && id < data_container->count);
+    pkg = pkg_container[i];
+    return pkg->options;
+}

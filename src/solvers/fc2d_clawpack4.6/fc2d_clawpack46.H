@@ -254,11 +254,27 @@ int FC2D_CLAWPACK46_GET_BLOCK();
                                               CLAWPACK46_UNSET_BLOCK)
 void CLAWPACK46_UNSET_BLOCK();
 
+/* -------------------------------------------------------------------------
+   Old routines (that need to be replaced)
+   ------------------------------------------------------------------------- */
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
-void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
-
 void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
                                  ClawPatch *cp, double **aux, int* maux);
+
+void
+    fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
+                                fc2d_clawpack46_options_t* clawpack_options);
+
+void
+    fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
+
+void
+    fc2d_clawpack46_link_to_clawpatch();
+
+/* -------------------------------------------------------------------------
+   New routines
+   ------------------------------------------------------------------------- */
+void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
 
 void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
@@ -266,24 +282,19 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
 
 void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
 
-void
-    fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
-                                fc2d_clawpack46_options_t* clawpack_options);
-
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                  fc2d_clawpack46_options_t* clawopt);
 
 int fc2d_clawpack46_get_package_id();
 
-void
-    fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
+fc2d_clawpack46_options_t* fc2d_clawpack46_options(fclaw_app_t* app)
 
+
+/* -------------------------------------------------------------------------
+   Routines that won't change
+   ------------------------------------------------------------------------- */
 void
     fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
-
-void
-    fc2d_clawpack46_link_to_clawpatch();
-
 
 void
     fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,

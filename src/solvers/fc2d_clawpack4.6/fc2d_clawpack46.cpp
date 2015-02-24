@@ -57,6 +57,13 @@ struct patch_aux_data
     int maux;
 };
 
+fc2d_clawpack46_options_t* fc2d_clawpack46_options(fclaw_app_t* app)
+{
+    int id;
+    id = fc2d_clawpack46_get_package_id();
+    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
+}
+
 static fc2d_clawpack46_options_t*
 get_options(fclaw2d_domain_t* domain)
 {

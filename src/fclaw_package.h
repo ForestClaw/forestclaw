@@ -82,6 +82,7 @@ void fclaw_package_patch_data_destroy(fclaw_app_t* app,
 
 void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
 
+void* fclaw_package_get_options(fclaw_app_t* app, int id);
 
 
 #ifdef __cplusplus
