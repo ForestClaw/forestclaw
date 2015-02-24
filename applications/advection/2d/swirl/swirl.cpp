@@ -149,14 +149,12 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   sclawpack_options, *clawpack_options = &sclawpack_options;
     user_options_t              suser, *user = &suser;
 
-    int clawpack46_id, dummy_id;
-    fclaw_package_container_t* pkgs;
-
     int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     options = fclaw_app_get_options (app);
+    fclaw_package_container_new(app);
 
     /*  Register options for each package */
     fclaw_options_register_general (app, "fclaw_options.ini", gparms);
@@ -164,15 +162,15 @@ main (int argc, char **argv)
 
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);
+
     /* Read configuration file(s) and command line, and process options */
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    pkgs = fclaw_package_container_init();
-    clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
-    dummy_id = fc2d_dummy_package_register(pkgs,NULL);
+    fc2d_clawpack46_package_register(app,clawpack_options);
+    fc2d_dummy_package_register(app,NULL);
 
-    link_to_packages(pkgs);
+    link_app_to_clawpatch(app);
 
     /* Run the program */
     if (!retval & !vexit)
@@ -180,7 +178,7 @@ main (int argc, char **argv)
         run_program(app, gparms, clawpack_options, user);
     }
 
-    fclaw_package_container_destroy(pkgs);
+    fclaw_package_container_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;
