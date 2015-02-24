@@ -124,7 +124,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 };
 
 static
-void register_user_options (fclaw_app_t * app,
+void user_options_register (fclaw_app_t * app,
                             const char *configfile,
                             user_options_t* user)
 {
@@ -192,7 +192,7 @@ int main (int argc, char **argv)
 
     /* User defined options (defined above) */
     user->gparms = gparms;
-    register_user_options (app, "fclaw_options.ini", user);
+    user_options_register (app, "fclaw_options.ini", user);
 
 
     /* Read configuration file(s) */
