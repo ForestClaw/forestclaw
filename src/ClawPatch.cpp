@@ -3,8 +3,7 @@
 #include "amr_includes.H"
 #include "amr_utils.H"
 
-
-fclaw_package_container_t* ClawPatch::package_container;
+fclaw_app_t* ClawPatch::app;
 
 ClawPatch::ClawPatch()
 {
@@ -13,7 +12,7 @@ ClawPatch::ClawPatch()
 
 ClawPatch::~ClawPatch()
 {
-    fclaw_package_patch_data_destroy(ClawPatch::package_container,
+    fclaw_package_patch_data_destroy(ClawPatch::app,
                                      m_package_data_ptr);
 
     fclaw_package_data_destroy(m_package_data_ptr);
@@ -79,8 +78,7 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms);
     }
 
-    fclaw_package_patch_data_new(ClawPatch::package_container,
-                                 m_package_data_ptr);
+    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
 
 }
 
@@ -616,8 +614,15 @@ int ClawPatch::size()
 
 void link_to_packages(fclaw_package_container_t* pkgs)
 {
-    ClawPatch::package_container = pkgs;
+    fclaw_global_essentialf("link_to_packages : obsolete\n");
+    exit(0);
 }
+
+void link_app_to_clawpatch(fclaw_app_t* app)
+{
+    ClawPatch::app = app;
+}
+
 
 void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
                    int blockno, int patchno)

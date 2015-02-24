@@ -196,7 +196,8 @@ public :
     int* block_corner_count();
 
     void* clawpack_patch_data(int id);
-    static fclaw_package_container_t* package_container;
+
+    static fclaw_app_t* app;
 
 protected :
 
@@ -278,6 +279,9 @@ extern "C"
 #endif
 
 void link_to_packages(fclaw_package_container_t* pkgs);
+
+void link_app_to_clawpatch(fclaw_app_t* app);
+
 
 void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
                    int blockno, int patchno);
