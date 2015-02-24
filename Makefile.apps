@@ -11,12 +11,12 @@ include src/solvers/fc2d_dummy/Makefile.am
 # ----------------------------------
 
 # Simple examples that don't do anything
-# include applications/dummy/Makefile.am
-# include applications/no_solver/Makefile.am
-# include applications/test_parms/Makefile.am
+include applications/dummy/Makefile.am
+include applications/no_solver/Makefile.am
+include applications/test_parms/Makefile.am
 
 # Test metric terms (curvature, for example)
-# include applications/metric/2d/all_mappings/Makefile.am
+include applications/metric/2d/all_mappings/Makefile.am
 
 # Scalar advection on manifolds
 # include applications/advection/2d/swirl_mapped/Makefile.am

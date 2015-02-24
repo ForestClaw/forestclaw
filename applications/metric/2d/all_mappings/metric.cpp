@@ -98,6 +98,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
+
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
 
@@ -221,10 +222,12 @@ main (int argc, char **argv)
   user_options_t                suser_options, *user = &suser_options;
 
   int retval;
+  fclaw_package_container_t* pkgs;
 
   /* Initialize application */
   app = fclaw_app_new (&argc, &argv, user);
   options = fclaw_app_get_options (app);
+  pkgs = fclaw_package_container_init();
 
   fclaw_options_register_general (app, "fclaw_options.ini", gparms);
 
@@ -236,14 +239,16 @@ main (int argc, char **argv)
   retval = fclaw_options_read_from_file(options);
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  /* -------------------------------------------------------------
-     - Run program
-     ------------------------------------------------------------- */
+  /* No packages to register */
+  link_to_packages(pkgs);
+
+
   if (!retval & !vexit)
   {
       run_program(app, gparms,user);
   }
 
+  fclaw_package_container_destroy(pkgs);
   fclaw_app_destroy (app);
 
   return 0;
