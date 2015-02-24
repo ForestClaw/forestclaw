@@ -113,7 +113,7 @@ void fc2d_clawpack46_package_register(fclaw_app_t* app,
     clawpack46_package_id = id;
 }
 
-int fc2d_clawpack46_package_id()
+int fc2d_clawpack46_get_package_id()
 {
     return clawpack46_package_id;
 }

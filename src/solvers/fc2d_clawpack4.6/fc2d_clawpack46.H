@@ -273,7 +273,7 @@ void
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                  fc2d_clawpack46_options_t* clawopt);
 
-int fc2d_clawpack46_package_id();
+int fc2d_clawpack46_get_package_id();
 
 void
     fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
