@@ -148,7 +148,7 @@ void CLAWPACK46_BC2(const int& maxmx, const int& maxmy, const int& meqn,
 #define RPN2    FCLAW_F77_FUNC(rpn2,RPN2)
 #define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
 
-/* These will be convert to MACROS slowly ... */
+/* These will be converted to MACROS slowly ... */
 
 void setprob_();
 
@@ -270,9 +270,10 @@ void
     fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
                                 fc2d_clawpack46_options_t* clawpack_options);
 
-int fc2d_clawpack46_package_register(fclaw_package_container_t *pkg_container,
-                                     fc2d_clawpack46_options_t* clawopt);
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                 fc2d_clawpack46_options_t* clawopt);
 
+int fc2d_clawpack46_package_id();
 
 void
     fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);

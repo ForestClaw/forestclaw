@@ -75,8 +75,7 @@ static const fclaw_package_vtable_t dummy_patch_vtable = {
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-int fc2d_dummy_package_register(fclaw_package_container_t *pkg_container,
-                                      void* opt)
+void fc2d_dummy_package_register(fclaw_app_t *app, void* opt)
 {
     int id;
 
@@ -84,10 +83,14 @@ int fc2d_dummy_package_register(fclaw_package_container_t *pkg_container,
     FCLAW_ASSERT(dummy_package_id == -1);
 
     /* Register packages */
-    id = fclaw_package_container_add_pkg(pkg_container,opt,
+    id = fclaw_package_container_add_pkg(app,opt,
                                          &dummy_patch_vtable);
     dummy_package_id = id;
-    return id;
+}
+
+int fc2d_dummy_package_id()
+{
+    return dummy_package_id;
 }
 
 void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
