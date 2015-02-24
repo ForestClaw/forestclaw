@@ -680,9 +680,11 @@ size_t pack_size(fclaw2d_domain_t* domain)
     return size*sizeof(double);
 }
 
-void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                                int* mx, int* my, int* mbc,
-                                double* xlower, double* ylower,double* dx, double* dy)
+void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 int* mx, int* my, int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx, double* dy)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -695,9 +697,11 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this
     *dy = cp->dy();
 }
 
-void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch,
                                    double **xp, double **yp, double **zp,
-                                   double **xd, double **yd, double **zd, double **area)
+                                   double **xd, double **yd, double **zd,
+                                   double **area)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
      *xp = cp->xp();
@@ -709,11 +713,34 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* th
      *area = cp->area();
 }
 
-void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                    double **xnormals, double **ynormals,
+                                    double **xtangents, double **ytangents,
+                                    double **surfnormals,
+                                    double ** edgelengths, double **curvature)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    *xnormals = cp->xface_normals();
+    *ynormals = cp->yface_normals();
+    *xtangents = cp->xface_tangents();
+    *ytangents = cp->yface_tangents();
+    *surfnormals = cp->surf_normals();
+    *curvature = cp->curvature();
+    *edgelengths = cp->edge_lengths();
+}
+
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
+    *q = cp->q();
+
+    fclaw2d_clawpatch_meqn(domain,meqn);
+}
+
+void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain, int* meqn)
+{
     const amr_options_t *gparms = get_domain_parms(domain);
     *meqn = gparms->meqn;
-    *q = cp->q();
 }
