@@ -63,11 +63,6 @@ void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data)
     pkg_data = NULL;
 }
 
-#if 0
-pkgs = fclaw_package_container_init();
-fclaw_app_set_attribute (app, "packages", pkgs);
-#endif
-
 void fclaw_package_container_new(fclaw_app_t* app)
 {
     int i;
@@ -174,7 +169,7 @@ void* fclaw_package_get_options(fclaw_app_t* app, int id)
     fclaw_package_container_t* pkg_container;
     pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
     FCLAW_ASSERT(pkg_container != NULL);
-    fclaw_assert(0 <= id  && id < data_container->count);
-    pkg = pkg_container[i];
+    FCLAW_ASSERT(0 <= id  && id < pkg_container->count);
+    pkg = pkg_container->pkgs[id];
     return pkg->options;
 }
