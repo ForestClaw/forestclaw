@@ -97,7 +97,7 @@ static
 
         /* Mapped, multi-block domain */
         p4est_connectivity_t     *conn = NULL;
-        fclaw2d_domain_t	     *domain;
+        fclaw2d_domain_t	 *domain;
         fclaw2d_map_context_t    *cont = NULL;
 
         /* Used locally */
@@ -167,15 +167,12 @@ int main (int argc, char **argv)
     fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
     user_options_t           suser_options,     *user = &suser_options;
 
-    int clawpack46_id;
-    fclaw_package_container_t* pkgs;
-
     int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     options = fclaw_app_get_options (app);
-    pkgs = fclaw_package_container_init();
+    fclaw_package_container_new(app);
 
     /*  Register options for each package */
     fclaw_options_register_general (app, "fclaw_options.ini", gparms);
@@ -188,8 +185,9 @@ int main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Register packages */
-    clawpack46_id = fc2d_clawpack46_package_register(pkgs,clawpack_options);
-    link_to_packages(pkgs);
+    fc2d_clawpack46_package_register(app,clawpack_options);
+
+    link_app_to_clawpatch(app);
 
     /* Run program */
     if (!retval & !vexit)
@@ -197,7 +195,7 @@ int main (int argc, char **argv)
         run_program(app, gparms, clawpack_options, user);
     }
 
-    fclaw_package_container_destroy(pkgs);
+    fclaw_package_container_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;
