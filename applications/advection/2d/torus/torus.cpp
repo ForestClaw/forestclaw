@@ -220,7 +220,7 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     set_domain_parms(domain,gparms);
     fc2d_clawpack46_set_options(domain,clawpack_options);
 
-    link_problem_setup(domain,torus_problem_setup);
+    link_problem_setup(domain,fc2d_clawpack46_setprob);
 
     torus_link_solvers(domain);
 
