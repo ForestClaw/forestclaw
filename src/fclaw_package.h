@@ -46,10 +46,10 @@ typedef struct fclaw_package_container fclaw_package_container_t;
 typedef struct fclaw_package_data      fclaw_package_data_t;
 typedef struct fclaw_package           fclaw_package_t;
 
+/* Needs to be completely defined here */
 typedef void* (*fclaw_package_data_new_t)();
 typedef void (*fclaw_package_data_delete_t)(void *data);
 
-/* Needs to be completely defined here */
 typedef struct fclaw_package_vtable fclaw_package_vtable_t;
 
 struct fclaw_package_vtable
@@ -60,12 +60,12 @@ struct fclaw_package_vtable
 
 
 /* Create, destroy and add packages */
-fclaw_package_container_t* fclaw_package_container_init();
-void fclaw_package_container_destroy(fclaw_package_container_t *pkg_container);
+void fclaw_package_container_new(fclaw_app_t *app);
+void fclaw_package_container_destroy(fclaw_app_t *app);
 
-int fclaw_package_container_add_pkg(fclaw_package_container_t* pkg_container,
-                                      void* opt,
-                                      const fclaw_package_vtable_t *vtable);
+int fclaw_package_container_add_pkg(fclaw_app_t* app,
+                                    void* opt,
+                                    const fclaw_package_vtable_t *vtable);
 
 /* Storage in ClawPatch for data from each package */
 void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
@@ -73,11 +73,11 @@ fclaw_package_data_t* fclaw_package_data_new();
 
 
 /* Create, destroy and add patch data for each package */
-void fclaw_package_patch_data_new(fclaw_package_container_t* pkg_container,
+void fclaw_package_patch_data_new(fclaw_app_t* app,
                                   fclaw_package_data_t *data_container);
 
 
-void fclaw_package_patch_data_destroy(fclaw_package_container_t* pkg_container,
+void fclaw_package_patch_data_destroy(fclaw_app_t* app,
                                       fclaw_package_data_t *data_container);
 
 void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
