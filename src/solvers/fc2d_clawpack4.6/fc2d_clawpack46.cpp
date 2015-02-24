@@ -57,7 +57,7 @@ struct patch_aux_data
     int maux;
 };
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_options(fclaw_app_t* app)
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_app_t* app)
 {
     int id;
     id = fc2d_clawpack46_get_package_id();
@@ -106,6 +106,26 @@ static const fclaw_package_vtable_t clawpack46_patch_vtable = {
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
+void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
+{
+    fc2d_clawpack46_options_t* clawopt;
+
+    /* Register the options */
+    clawopt = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
+    fc2d_clawpack46_package_register(app,clawopt);
+
+    /* And the package */
+    fc2d_clawpack46_options_register (app, configfile, clawopt);
+}
+
+void fc2d_clawpack46_destroy(fclaw_app_t* app)
+{
+    fc2d_clawpack46_options_t* clawopt;
+    clawopt = fc2d_clawpack46_get_options(app);
+    FCLAW_FREE (clawopt);
+}
+
+
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t *clawopt)
 {
