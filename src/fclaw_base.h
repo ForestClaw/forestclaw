@@ -140,6 +140,7 @@ typedef enum fclaw_exit_type
     FCLAW_NOEXIT,               /**< We are completely clean and may continue.
                                      By the C standard, this constant has value 0. */
     FCLAW_EXIT_QUIET,           /**< We decided to to terminate quietly. */
+    FCLAW_EXIT_PRINT,           /**< We will print all option values and then quit. */
     FCLAW_EXIT_USAGE,           /**< We are to do an informative job and then quit.
                                      ForestClaw will print a usage message. */
     FCLAW_EXIT_ERROR            /**< We have encountered an error and quit noisily. */
@@ -349,29 +350,60 @@ fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
 
 /** Close down all systems that were setup in fclaw_init.
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
+ * \param [in,out] a            This application is cleaned up.
  */
 void fclaw_app_destroy (fclaw_app_t * a);
+
+/** Set or replace a named attribute in an application.
+ * If there is already an attribute stored under the given name,
+ * return the old content and overwrite it.
+ * The application object does no interpretation of the content.
+ * The content can be accessed again with \ref fclaw_app_get_attribute.
+ * All attributes are removed automatically by \ref fclaw_app_destroy.
+ * \param [in,out] a            Valid application object.
+ * \param [in] name             The name, or lookup key, for an attribute.
+ *                              It must not go out of scope while in use.
+ * \param [in] attribute        The new content, or value, of an attribute.
+ *                              Setting this to NULL does save NULL as value
+ *                              and the attribute still continues to exist.
+ * \return                      The value previously stored under this name,
+ *                              or NULL if the attribute does not exist yet.
+ */
+void *fclaw_app_set_attribute (fclaw_app_t * a,
+                               const char *name, void *attribute);
+
+/** Retrieve a named attribute stored in an application.
+ * If the attribute does not exist, return the specified default value.
+ * \param [in] a                Valid application object.
+ * \param [in] name             The name, or lookup key, for an attribute.
+ *                              It must not go out of scope while in use.
+ * \param [in] default_return   This value is return if name does not exist.
+ * \return                      The value previously stored under this name,
+ *                              or \b default_return if it does not exist.
+ */
+void *fclaw_app_get_attribute (fclaw_app_t * a,
+                               const char *name, void *default_return);
 
 /** Change the user's configuration directory.
  * This is understood relative to the user's home directory.
  * After \ref fclaw_app_new, it is set to ".forestclaw".
- * \param [in,out] app          Valid application object.
+ * \param [in,out] a            Valid application object.
  * \param [in] configdir        New value for the per-user configuration directory.
  *                              This string is passed, not copied, so it must not
  *                              go out of scope.  String constants are fine.
  *                              It may be NULL to deactivate the feature.
  */
-void fclaw_app_set_configdir (fclaw_app_t * a, const char * configdir);
+void fclaw_app_set_configdir (fclaw_app_t * a, const char *configdir);
 
 /** Change the environment variable used to find another configuration directory.
  * After \ref fclaw_app_new, it is set to "FCLAW_INI_DIR".
- * \param [in,out] app          Valid application object.
+ * \param [in,out] a            Valid application object.
  * \param [in] env_configdir    New value for the environment variable.
  *                              This string is passed, not copied, so it must not
  *                              go out of scope.  String constants are fine.
  *                              It may be NULL to deactivate the feature.
  */
-void fclaw_app_set_env_configdir (fclaw_app_t * a, const char * env_configdir);
+void fclaw_app_set_env_configdir (fclaw_app_t * a, const char *env_configdir);
 
 /** Register an options package with an application.
  * This function calls the virtual function for registering its options.
