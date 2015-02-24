@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_package.h>
 
-static int clawpack46_package_id = -1;
+static int s_clawpack46_package_id = -1;
 
 static fc2d_clawpack46_vtable_t classic_vt;
 
@@ -77,7 +77,7 @@ static patch_aux_data*
 get_patch_data(ClawPatch *cp)
 {
     patch_aux_data *wp =
-        (patch_aux_data*) cp->clawpack_patch_data(clawpack46_package_id);
+        (patch_aux_data*) cp->clawpack_patch_data(s_clawpack46_package_id);
     return wp;
 }
 
@@ -106,16 +106,41 @@ static const fclaw_package_vtable_t clawpack46_patch_vtable = {
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
+#if 0
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack46_options_t *clawopt)
+{
+    int id;
+
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    /* Register packages */
+    id = fclaw_package_container_add_pkg(app,clawopt,
+                                         &clawpack46_patch_vtable);
+    s_clawpack46_package_id = id;
+}
+#endif
+
+
 void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
 {
     fc2d_clawpack46_options_t* clawopt;
+    int id;
 
     /* Register the options */
     clawopt = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
     fc2d_clawpack46_package_register(app,clawopt);
 
     /* And the package */
-    fc2d_clawpack46_options_register (app, configfile, clawopt);
+
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    id = fclaw_package_container_add_pkg(app,clawopt,
+                                         &clawpack46_patch_vtable);
+
+    s_clawpack46_package_id = id;
 }
 
 void fc2d_clawpack46_destroy(fclaw_app_t* app)
@@ -126,23 +151,9 @@ void fc2d_clawpack46_destroy(fclaw_app_t* app)
 }
 
 
-void fc2d_clawpack46_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack46_options_t *clawopt)
-{
-    int id;
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(clawpack46_package_id == -1);
-
-    /* Register packages */
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack46_patch_vtable);
-    clawpack46_package_id = id;
-}
-
 int fc2d_clawpack46_get_package_id()
 {
-    return clawpack46_package_id;
+    return s_clawpack46_package_id;
 }
 
 
