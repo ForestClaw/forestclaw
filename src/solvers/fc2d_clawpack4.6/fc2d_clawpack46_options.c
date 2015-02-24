@@ -45,9 +45,6 @@ options_register (fclaw_app_t * app,
     FCLAW_ASSERT (clawopt != NULL);
     FCLAW_ASSERT (!clawopt->is_registered);
 
-    sc_options_add_int (opt, 0, "verbosity", &clawopt->verbosity,0,
-        "[clawpack46] Set clawpack verbosity [0]");
-
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
                                "[clawpack46] Normal and transverse orders [2 2]");
@@ -99,7 +96,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
 
     clawopt->method[1] = clawopt->order[0];
     clawopt->method[2] = clawopt->order[1];
-    clawopt->method[3] = clawopt->verbosity;
+    clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawopt->maux;

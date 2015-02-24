@@ -42,8 +42,6 @@ typedef struct fc2d_clawpack46_options
     int mwaves;
     int maux;
 
-    int verbosity;
-
     const char *order_string;
     int *order;
 
