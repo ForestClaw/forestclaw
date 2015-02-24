@@ -137,7 +137,7 @@ static
         fc2d_clawpack46_set_options (domain,clawpack_options);
 
         /* Link solvers to the domain */
-        link_problem_setup(domain,sphere_problem_setup);
+        link_problem_setup(domain,fc2d_clawpack46_setprob);
 
         sphere_link_solvers(domain);
 
