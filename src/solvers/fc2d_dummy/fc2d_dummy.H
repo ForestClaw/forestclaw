@@ -37,7 +37,7 @@ extern "C"
 #endif
 #endif
 
-void fc2d_dummy_package_register(fclaw_app_t *app, void *opt);
+void fc2d_dummy_register(fclaw_app_t *app);
 
 int fc2d_dummy_package_id();
 

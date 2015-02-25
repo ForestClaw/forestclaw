@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include "fc2d_dummy.H"
 
-static int dummy_package_id = -1;
+static int s_dummy_package_id = -1;
 
 
 /* Patch data is stored in each ClawPatch */
@@ -40,7 +40,7 @@ static patch_data*
 get_patch_data(ClawPatch *cp)
 {
     patch_data *wp =
-        (patch_data*) cp->clawpack_patch_data(dummy_package_id);
+        (patch_data*) cp->clawpack_patch_data(s_dummy_package_id);
     return wp;
 }
 
@@ -60,9 +60,6 @@ patch_data_delete(void *data)
 {
     patch_data *pd = (patch_data*) data;
     FCLAW_ASSERT(pd != NULL);
-#if 0
-    FCLAW_FREE(pd);
-#endif
     delete pd;
 }
 
@@ -75,22 +72,24 @@ static const fclaw_package_vtable_t dummy_patch_vtable = {
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-void fc2d_dummy_package_register(fclaw_app_t *app, void* opt)
+void fc2d_dummy_register(fclaw_app_t *app)
 {
     int id;
 
+    /* No options to register */
+
     /* Don't register a package more than once */
-    FCLAW_ASSERT(dummy_package_id == -1);
+    FCLAW_ASSERT(s_dummy_package_id == -1);
 
     /* Register packages */
-    id = fclaw_package_container_add_pkg(app,opt,
+    id = fclaw_package_container_add_pkg(app,NULL,
                                          &dummy_patch_vtable);
-    dummy_package_id = id;
+    s_dummy_package_id = id;
 }
 
 int fc2d_dummy_package_id()
 {
-    return dummy_package_id;
+    return s_dummy_package_id;
 }
 
 void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
