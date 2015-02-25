@@ -343,7 +343,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
 
             if (maxcfl_step > gparms->max_cfl)
             {
-                fclaw_global_infof("   WARNING : Maximum CFL exceeded; retaking time step\n");
+                fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
 
                 if (!gparms->use_fixed_dt)
                 {
