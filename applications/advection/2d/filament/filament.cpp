@@ -116,6 +116,7 @@ void run_program(fclaw_app_t* app)
     p4est_connectivity_t       *conn = NULL;
     fclaw2d_domain_t	       *domain;
     fclaw2d_map_context_t      *cont = NULL, *brick = NULL;
+
     fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
     user_options_t             *user;
