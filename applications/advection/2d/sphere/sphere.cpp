@@ -69,29 +69,39 @@ static fclaw_exit_type_t
     return FCLAW_NOEXIT;
 }
 
+static void
+    options_destroy_user(fclaw_app_t* app, void* package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    FCLAW_ASSERT(user != NULL);
+    FCLAW_FREE(user);
+};
 
 static const fclaw_app_options_vtable_t options_vtable_user = {
     options_register_user,
     NULL,      /* options_postprocess_user */
     options_check_user,
-    NULL       /* options_destroy_user */
+    options_destroy_user       /* options_destroy_user */
 };
 
 
 void static
     register_user_options (fclaw_app_t * app,
-                           const char *configfile,
-                           user_options_t* user)
+                           const char *configfile)
 {
+    user_options_t* user;
+
     FCLAW_ASSERT (app != NULL);
+
+    user = FCLAW_ALLOC(user_options_t,1);
 
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+    fclaw_app_set_attribute(app,"user",user);
 }
 
 static
-    void run_program(fclaw_app_t* app,
-                     user_options_t* user)
+    void run_program(fclaw_app_t* app)
     {
         sc_MPI_Comm            mpicomm;
 
@@ -100,8 +110,9 @@ static
         fclaw2d_domain_t	 *domain;
         fclaw2d_map_context_t    *cont = NULL;
 
-        amr_options_t            *gparms;
-        fc2d_clawpack46_options_t    *clawpack_options;
+        amr_options_t              *gparms;
+        fc2d_clawpack46_options_t  *clawpack_options;
+        user_options_t             *user;
 
         /* Used locally */
         double pi = M_PI;
@@ -109,6 +120,7 @@ static
 
         gparms = fclaw_forestclaw_get_options(app);
         clawpack_options = fc2d_clawpack46_get_options(app);
+        user = (user_options_t*) fclaw_app_get_attribute(app,"user",NULL);
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
@@ -166,20 +178,18 @@ int main (int argc, char **argv)
     fclaw_app_t *app;
     int first_arg;
     fclaw_exit_type_t vexit;
-
-    /* Options */
     sc_options_t             *options;
-    user_options_t           suser_options,     *user = &suser_options;
-
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, user);
+    app = fclaw_app_new (&argc, &argv, NULL);
 
+    /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
 
-    register_user_options (app, "fclaw_options.ini", user);
+    /* User options */
+    register_user_options (app, "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -191,11 +201,10 @@ int main (int argc, char **argv)
     /* Run program */
     if (!retval & !vexit)
     {
-        run_program(app, user);
+        run_program(app);
     }
 
     fclaw_forestclaw_destroy(app);
-    fc2d_clawpack46_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;
