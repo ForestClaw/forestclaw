@@ -167,23 +167,6 @@ amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *conf
     return gparms;
 }
 
-
-/* Use this with 'fclaw_options_destroy' */
-amr_options_t* fclaw_options_new ()
-{
-    amr_options_t* amropt;
-    amropt = FCLAW_ALLOC_ZERO (amr_options_t, 1);
-
-    return amropt;
-}
-
-/* Use this with 'fclaw_options_new' */
-void fclaw_options_destroy(amr_options_t* amropt)
-{
-    FCLAW_FREE (amropt);
-}
-
-
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 {
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
@@ -298,19 +281,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
                            "No weighting when subcycling [F]");
-
-    /* ---------------------- Usage information -------------------------- */
-    sc_options_add_switch (opt, 0, "help", &amropt->help,
-                         "Print usage information (same as --usage) [F]");
-
-#if 0
-    sc_options_add_bool (opt, 0, "usage", &amropt->help, 0,
-                         "Print usage information (same as --help) [F]");
-
-    sc_options_add_switch (opt, 0, "print_options", &amropt->print_options, 0,
-                         "Print current option settings");
-#endif
-
 
     /* ---------------------- Control execution -------------------------- */
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,

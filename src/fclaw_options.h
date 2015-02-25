@@ -193,10 +193,6 @@ struct amr_options
     int conservation_check;
     int trapfpe;
     int mpi_debug;
-#if 0
-    int print_options;
-#endif
-    int help;
 
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
