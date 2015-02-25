@@ -6,7 +6,6 @@
 libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_base.h \
-	src/amr_options.h \
 	src/fclaw2d_base.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
@@ -30,7 +29,6 @@ libforestclaw_internal_headers = \
 
 libforestclaw_compiled_sources = \
 	src/fclaw_base.c \
-	src/amr_options.c \
 	src/fclaw_options.c \
 	src/fclaw2d_base.c \
 	src/forestclaw2d.c \
