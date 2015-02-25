@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* this header file must come first */
 #include "fclaw2d_defs.H"
 
-#include "amr_options.h"
+#include "fclaw_options.h"
 #include "forestclaw2d.h"
 #include "fclaw2d_solvers.H"
 #include "amr_regrid.H"

@@ -27,7 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CAPI_H
 
 /* amr_options.h pulls in sc_{options,obstack,containers}.h and sc.h. */
+#if 0
 #include "amr_options.h"
+#endif
+#include "fclaw_options.h"
 #include "forestclaw2d.h"
 
 #ifdef __cplusplus

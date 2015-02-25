@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_capi.h"
 #include "forestclaw2d.h"
-#include "amr_options.h"
+#include "fclaw_options.h"
 
 /* Needed to avoid circular typedef refs.  This struct is defined in
    'fclaw_typedefs.h', which includes this file. */

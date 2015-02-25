@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_convenience.h"
 #include "forestclaw2d.h"
-#include "amr_options.h"
+#include "fclaw_options.h"
 #include "fclaw2d_transform.h"
 
 #include <iostream>
