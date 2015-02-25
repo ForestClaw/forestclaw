@@ -34,14 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct fclaw_options_general
 {
+    /* This will eventually be replaced with particular members of amropt, but
+       we leave thsi here for backwards compatibility */
     amr_options_t *amropt;
-
-    int print_help;        /**< Option variable to activate help message */
-    int print_version;     /**< Option variable to print the version */
-    int print_options;     /**< Print current option settings and exit */
-    int fclaw_verbosity;   /**< Option variable for ForestClaw verbosity */
-    int lib_verbosity;     /**< Option variable for p4est, sc, and others */
-    sc_keyvalue_t *kv_verbosity;      /**< Holds key-values for log levels */
 
     /* this is just for ForestClaw debugging, no need to adopt elsewhere */
     int is_registered;     /**< Internal variable to double-check the flow */
@@ -51,58 +46,27 @@ fclaw_options_general_t;
 static void *
 options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 {
-    sc_keyvalue_t *kv;
-    fclaw_options_general_t *core = (fclaw_options_general_t *) package;
+    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (opt != NULL);
 
     /* allocated storage for this package's option values */
-    FCLAW_ASSERT (core != NULL);
-    FCLAW_ASSERT (!core->is_registered);
+    FCLAW_ASSERT (general != NULL);
+    FCLAW_ASSERT (!general->is_registered);
 
-    /* this key-value pair understands the verbosity levels */
-    kv = core->kv_verbosity = sc_keyvalue_new ();
-    sc_keyvalue_set_int (kv, "default", FCLAW_VERBOSITY_DEFAULT);
-    sc_keyvalue_set_int (kv, "debug", FCLAW_VERBOSITY_DEBUG);
-    sc_keyvalue_set_int (kv, "info", FCLAW_VERBOSITY_INFO);
-    sc_keyvalue_set_int (kv, "production", FCLAW_VERBOSITY_PRODUCTION);
-    sc_keyvalue_set_int (kv, "essential", FCLAW_VERBOSITY_ESSENTIAL);
-    sc_keyvalue_set_int (kv, "silent", FCLAW_VERBOSITY_SILENT);
-
-    /* set the options for the core package */
-    sc_options_add_switch (opt, 'h', "help", &core->print_help,
-                           "Print usage information (same as --usage)");
-
-    sc_options_add_switch (opt, 'u', "usage", &core->print_help,
-                           "Print usage information (same as --help)");
-
-    sc_options_add_switch (opt, 'v', "version", &core->print_version,
-                           "Print ForestClaw version");
-
-    sc_options_add_switch (opt, 'o', "print_options", &core->print_options,
-                         "Print current option settings and exit");
-
-    sc_options_add_keyvalue (opt, 'V', "verbosity", &core->fclaw_verbosity,
-                             "default", kv, "Set ForestClaw verbosity " \
-                             "(silent,essential,production,info,debug)");
-
-    sc_options_add_keyvalue (opt, '\0', "lib-verbosity", &core->lib_verbosity,
-                             "essential", kv, "Set p4est verbosity "     \
-                             "(silent,essential,production,info,debug)");
-
-    fclaw_options_add_general (opt, core->amropt);
+    fclaw_options_add_general (opt, general->amropt);
 
     /* we do not need to work with the return value */
-    core->is_registered = 1;
+    general->is_registered = 1;
     return NULL;
 }
 
 static fclaw_exit_type_t
 options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 {
-    fclaw_options_general_t *core = (fclaw_options_general_t *) package;
+    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -111,15 +75,10 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
     /* errors from the key-value options would have showed up in parsing */
 
     /* postprocess this package */
-    FCLAW_ASSERT (core != NULL);
-    FCLAW_ASSERT (core->is_registered);
+    FCLAW_ASSERT (general != NULL);
+    FCLAW_ASSERT (general->is_registered);
 
-    /* go through this packages options */
-    sc_package_set_verbosity (sc_package_id, core->lib_verbosity);
-    sc_package_set_verbosity (p4est_package_id, core->lib_verbosity);
-    sc_package_set_verbosity (fclaw_get_package_id(), core->fclaw_verbosity);
-
-    fclaw_options_postprocess(core->amropt);
+    fclaw_options_postprocess(general->amropt);
 
     /* at this point there are no errors to report */
     return FCLAW_NOEXIT;
@@ -128,28 +87,16 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
-    fclaw_options_general_t *core = (fclaw_options_general_t *) package;
+    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
     sc_options_t *options;
     amr_options_t* gparms;
 
     int retval;
 
     options = fclaw_app_get_options (app);
-    gparms = core->amropt;
+    gparms = general->amropt;
 
-    /* print help and/or version information and exit gracefully */
-    if (core->print_help)
-    {
-        return FCLAW_EXIT_USAGE;
-    }
-    if (core->print_version)
-    {
-        fclaw_global_essentialf ("ForestClaw version %s\n",
-                                 FCLAW_PACKAGE_VERSION);
-        return FCLAW_EXIT_QUIET;
-    }
-
-    retval =  fclaw_options_check (options, core->amropt);
+    retval =  fclaw_options_check (options, general->amropt);
     if (retval != 0)
     {
         return FCLAW_EXIT_ERROR;
@@ -167,41 +114,27 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
         feenableexcept(FE_INVALID);
     }
 
-
-    if (core->print_options)
-    {
-        sc_options_print_summary (fclaw_get_package_id(),
-                                  FCLAW_VERBOSITY_ESSENTIAL,options);
-        return FCLAW_EXIT_QUIET;
-    }
-    else
-    {
-        return FCLAW_NOEXIT;
-    }
+    return FCLAW_NOEXIT;
 }
 
 
 static void
 options_destroy_general (fclaw_app_t * a, void *package, void *registered)
 {
-    fclaw_options_general_t *core = (fclaw_options_general_t *) package;
+    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
     /* free this package */
-    FCLAW_ASSERT (core != NULL);
-    FCLAW_ASSERT (core->is_registered);
-    FCLAW_ASSERT (core->kv_verbosity != NULL);
-    sc_keyvalue_destroy (core->kv_verbosity);
+    FCLAW_ASSERT (general != NULL);
+    FCLAW_ASSERT (general->is_registered);
 
-    fclaw_options_destroy_arrays (core->amropt);
-#if 0
-    FCLAW_FREE(core->amropt);
-#endif
+    fclaw_options_destroy_arrays (general->amropt);
 
-    FCLAW_FREE (core);
+    FCLAW_FREE(general->amropt);
+    FCLAW_FREE (general);
 }
 
 static const fclaw_app_options_vtable_t options_vtable_general = {
@@ -211,27 +144,27 @@ static const fclaw_app_options_vtable_t options_vtable_general = {
     options_destroy_general
 };
 
-void fclaw_options_register_general (fclaw_app_t * a, const char *configfile,
-                                         amr_options_t* gparms)
+amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *configfile)
 {
-    fclaw_options_general_t *core;
-
+    fclaw_options_general_t* general;
+    amr_options_t* gparms;
     FCLAW_ASSERT (a != NULL);
+
+    /* Basic options for print out help message, current options, etc */
+    fclaw_app_options_register_core (a, configfile);
 
     /* allocate storage for core's option values */
     /* we will free it in the options_destroy callback */
-    core = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
-#if 0
-    /* Allocate in calling program?  Or here? In any case, we allocate/
-       deallocate option arrays here */
-    *gparms = fclaw_options_new();  /* Requires amr_options_t** as input */
-#endif
-    core->amropt = gparms;
+    gparms = FCLAW_ALLOC(amr_options_t,1);
+    general = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
+
+    general->amropt = gparms;
 
     /* sneaking the version string into the package pointer */
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (a,NULL, configfile, &options_vtable_general,
-                                core);
+                                general);
+    return gparms;
 }
 
 
@@ -291,8 +224,13 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                         "VTK write variant [F]");
 
     /* output options */
+
+    /* This here for backwards compatibility */
+#if 0
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
+#endif
+
     sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
                             "Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
@@ -304,7 +242,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
                            "Maximum CFL allowed [0.9]");
-
 
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations [1]");

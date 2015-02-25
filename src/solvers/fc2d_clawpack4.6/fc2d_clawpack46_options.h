@@ -42,8 +42,6 @@ typedef struct fc2d_clawpack46_options
     int mwaves;
     int maux;
 
-    int claw_verbosity;
-
     const char *order_string;
     int *order;
 
@@ -59,9 +57,8 @@ typedef struct fc2d_clawpack46_options
     int is_registered;
 } fc2d_clawpack46_options_t;
 
-void fc2d_clawpack46_options_register (fclaw_app_t * app,
-                                           const char *configfile,
-                                           fc2d_clawpack46_options_t* clawopt);
+fc2d_clawpack46_options_t* fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                             const char *configfile);
 
 
 

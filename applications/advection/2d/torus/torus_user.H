@@ -37,77 +37,42 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_map_composition fclaw2d_map_composition_t;
+void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
+                           const int& meqn, const double& xlower,
+                           const double& ylower, const double& dx, const double& dy,
+                           double q[], const int& init_flag, const int& blockno,
+                           int& tag_patch);
 
+void torus_tag4coarsening_(const int& mx,const int& my,const int& mbc,
+                           const int& meqn,const double& xlower,
+                           const double& ylower, const double& dx, const double& dy,
+                           double qcoarsened[], int& tag_patch);
 
-extern "C"
-{
-    void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                const int& meqn, const double& xlower,
-                                const double& ylower, const double& dx, const double& dy,
-                                double q[], const int& init_flag, const int& blockno,
-                                int& tag_patch);
+void setaux_manifold_(const int& mbc,
+                      const int& mx, const int& my,
+                      const int& blockno,
+                      const double& xlower, const double& ylower,
+                      const double& dx, const double& dy,
+                      const int& maux, double aux[], double area[]);
 
-    void torus_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                                const int& meqn,const double& xlower,
-                                const double& ylower, const double& dx, const double& dy,
-                                double qcoarsened[], int& tag_patch);
+void torus_write_tfile_(const int& iframe,const double& time,
+                        const int& mfields,const int& ngrids,
+                        const int& maux);
 
-    void setaux_manifold_(const int& mbc,
-                          const int& mx, const int& my,
-                          const int& blockno,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          const double xp[], const double yp[], const double zp[],
-                          const double xd[], const double yd[], const double zd[],
-                          const double xnormals[], const double ynormals[],
-                          const double egde_lengths[], const double area[]);
-
-    void torus_write_tfile_(const int& iframe,const double& time,
-                            const int& mfields,const int& ngrids,
-                            const int& maux);
-
-    void torus_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
-                            const int& mbc, const int& mx,const int& my,
-                            const double& xlower,const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& iframe,const int& patch_num,
-                            const int& level,const int& blockno,
-                            const int& mpirank);
-
-}
+void torus_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
+                        const int& mbc, const int& mx,const int& my,
+                        const double& xlower,const double& ylower,
+                        const double& dx, const double& dy,
+                        double q[], const int& iframe,const int& patch_num,
+                        const int& level,const int& blockno,
+                        const int& mpirank);
 
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
-void torus_problem_setup(fclaw2d_domain_t* domain);
-
-
-void torus_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
-
-void torus_qinit(fclaw2d_domain_t *domain,
-                 fclaw2d_patch_t *this_patch,
-                 int this_block_idx,
-                 int this_patch_idx);
-
-void torus_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[]);
-
-
-double torus_update(fclaw2d_domain_t *domain,
-                     fclaw2d_patch_t *this_patch,
-                     int this_block_idx,
-                     int this_patch_idx,
-                     double t,
-                     double dt);
+void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx);
 
 fclaw_bool torus_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,

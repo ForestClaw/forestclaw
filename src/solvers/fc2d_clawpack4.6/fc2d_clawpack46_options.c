@@ -45,9 +45,6 @@ options_register (fclaw_app_t * app,
     FCLAW_ASSERT (clawopt != NULL);
     FCLAW_ASSERT (!clawopt->is_registered);
 
-    sc_options_add_int (opt, 0, "claw_verbosity", &clawopt->claw_verbosity,0,
-        "[clawpack46] Set clawpack verbosity [0]");
-
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
                                "[clawpack46] Normal and transverse orders [2 2]");
@@ -99,7 +96,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
 
     clawopt->method[1] = clawopt->order[0];
     clawopt->method[2] = clawopt->order[1];
-    clawopt->method[3] = clawopt->claw_verbosity;
+    clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawopt->maux;
@@ -122,6 +119,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+    FCLAW_FREE(clawopt);
 }
 
 
@@ -136,16 +134,18 @@ static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-void fc2d_clawpack46_options_register (fclaw_app_t * app,
-                                       const char *configfile,
-                                       fc2d_clawpack46_options_t* clawopt)
+fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *configfile)
 {
+    fc2d_clawpack46_options_t* clawopt;
+
     FCLAW_ASSERT (app != NULL);
 
+    clawopt = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
     fclaw_app_options_register (app,"clawpack46", configfile,
                                 &clawpack46_options_vtable,
                                 clawopt);
-
+    return clawopt;
 }
 
 #ifdef __cplusplus

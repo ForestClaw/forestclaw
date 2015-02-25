@@ -32,6 +32,7 @@
 #include <amr_forestclaw.H>
 
 #include "fc2d_clawpack46_options.h"
+#include <fclaw_package.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -147,7 +148,7 @@ void CLAWPACK46_BC2(const int& maxmx, const int& maxmy, const int& meqn,
 #define RPN2    FCLAW_F77_FUNC(rpn2,RPN2)
 #define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
 
-/* These will be convert to MACROS slowly ... */
+/* These will be converted to MACROS slowly ... */
 
 void setprob_();
 
@@ -253,10 +254,11 @@ int FC2D_CLAWPACK46_GET_BLOCK();
                                               CLAWPACK46_UNSET_BLOCK)
 void CLAWPACK46_UNSET_BLOCK();
 
+/* -------------------------------------------------------------------------
+   Old routines (that need to be replaced)
+   ------------------------------------------------------------------------- */
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
-
-void
-    fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
+void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
                                  ClawPatch *cp, double **aux, int* maux);
 
 void
@@ -267,11 +269,34 @@ void
     fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
 
 void
-    fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
-
-void
     fc2d_clawpack46_link_to_clawpatch();
 
+/* -------------------------------------------------------------------------
+   New routines
+   ------------------------------------------------------------------------- */
+void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
+
+void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              double **aux, int* maux);
+
+void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
+
+void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile);
+
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack46_options_t* clawopt);
+
+int fc2d_clawpack46_get_package_id();
+
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_app_t* app);
+
+
+/* -------------------------------------------------------------------------
+   Routines that won't change
+   ------------------------------------------------------------------------- */
+void
+    fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
 
 void
     fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,

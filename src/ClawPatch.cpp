@@ -3,115 +3,19 @@
 #include "amr_includes.H"
 #include "amr_utils.H"
 
+fclaw_app_t* ClawPatch::app;
 
-static void solver_default(void** solverdata)
-{
-    *solverdata = (void*) NULL;
-}
-
-/* -----------------------------------------------------
-   Solver new/delete functions.  This really needs to be
-   made more general (via some kind of registration?)
-   ----------------------------------------------------- */
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_clawpack_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_clawpack_patch_data_delete = &solver_default;
-
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_manyclaw_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_manyclaw_patch_data_delete = &solver_default;
-
-fclaw2d_solver_patch_data_new_t
-    ClawPatch::f_user_patch_data_new = &solver_default;
-fclaw2d_solver_patch_data_delete_t
-    ClawPatch::f_user_patch_data_delete = &solver_default;
-
-
-/* -----------------------------------------------------
-   Some external functions that work with ClawPatches.
-   ----------------------------------------------------- */
-
-void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-                   int blockno, int patchno)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int level = this_patch->level;
-
-    ClawPatch *cp = new ClawPatch();
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms);
-
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    pdata->cp = cp;
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_set_clawpatch;
-}
-
-void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
-{
-    // We expect this ClawPatch to exist.
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    delete pdata->cp;
-    pdata->cp = NULL;
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_delete_clawpatch;
-}
-
-void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
-{
-    ClawPatch *cp = get_clawpatch(this_patch);
-    cp->pack_griddata(qdata);
-}
-
-void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata,
-                      fclaw_bool time_interp)
-{
-    ClawPatch *cp = get_clawpatch(this_patch);
-    if (time_interp)
-        cp->unpack_griddata_time_interpolated(qdata);
-    else
-        cp->unpack_griddata(qdata);
-}
-
-size_t pack_size(fclaw2d_domain_t* domain)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
-    return size*sizeof(double);
-}
-
-
-// -----------------------------------------------------
-// User data new/delete
-// -----------------------------------------------------
-
-// This constructors includes all of parameters that are patch independent.
-// All of this could also be in some sort of "set_params" function...
 ClawPatch::ClawPatch()
 {
+    m_package_data_ptr = fclaw_package_data_new();
 }
 
 ClawPatch::~ClawPatch()
 {
-    ClawPatch::f_clawpack_patch_data_delete(&m_clawpack_patch_data);
-    ClawPatch::f_manyclaw_patch_data_delete(&m_manyclaw_patch_data);
-    ClawPatch::f_user_patch_data_delete(&m_user_patch_data);
-    // All other data arrays get deleted automatically by the FArrayBox
-    // destructor
+    fclaw_package_patch_data_destroy(ClawPatch::app,
+                                     m_package_data_ptr);
+
+    fclaw_package_data_destroy(m_package_data_ptr);
 }
 
 
@@ -174,9 +78,8 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms);
     }
 
-    ClawPatch::f_clawpack_patch_data_new(&m_clawpack_patch_data);
-    ClawPatch::f_manyclaw_patch_data_new(&m_manyclaw_patch_data);
-    ClawPatch::f_user_patch_data_new(&m_user_patch_data);
+    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
+
 }
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
@@ -239,7 +142,6 @@ void ClawPatch::save_current_step()
 {
     m_griddata_last = m_griddata; // Copy for time interpolation
 }
-
 
 
 double ClawPatch::dx()
@@ -348,27 +250,12 @@ int* ClawPatch::block_corner_count()
    Solver data and functions
    ---------------------------------------------------*/
 // Wave propagation algorithms
-void* ClawPatch::clawpack_patch_data()
-{
-    return m_clawpack_patch_data;
-}
 
-void ClawPatch::set_clawpack_patch_data(void* solverdata)
+void* ClawPatch::clawpack_patch_data(int id)
 {
-    m_clawpack_patch_data = solverdata;
+    return fclaw_package_get_data(m_package_data_ptr,id);
+    // return m_clawpack_patch_data;
 }
-
-// Wave propagation algorithms
-void* ClawPatch::manyclaw_patch_data()
-{
-    return m_manyclaw_patch_data;
-}
-
-void ClawPatch::set_manyclaw_patch_data(void* solverdata)
-{
-    m_manyclaw_patch_data = solverdata;
-}
-
 
 /* ----------------------------------------------------------------
    Time stepping routines
@@ -720,66 +607,145 @@ int ClawPatch::size()
     return m_griddata.size();
 }
 
-#if 0
-void ClawPatch::write_patch_data(const int& a_iframe,
-                                 const int& a_patch_num, const int& a_level)
+
+/* -----------------------------------------------------
+   Some external functions that work with ClawPatches.
+   ----------------------------------------------------- */
+
+void link_to_packages(fclaw_package_container_t* pkgs)
 {
-    double *q = m_griddata.dataPtr();
-    write_qfile_(m_mx,m_my,m_meqn,m_mbc,m_mx,m_my,m_xlower,m_ylower,m_dx,m_dy,q,
-                 a_iframe,a_patch_num,a_level,m_blockno);
+    fclaw_global_essentialf("link_to_packages : obsolete\n");
+    exit(0);
 }
 
-double ClawPatch::compute_sum()
+void link_app_to_clawpatch(fclaw_app_t* app)
 {
-    double *q = m_griddata.dataPtr();
-    double sum;
-    double *area = m_area.dataPtr();
-    compute_sum_(m_mx,m_my,m_mbc,m_meqn,m_dx, m_dy, q,area,sum);
-    return sum;
+    ClawPatch::app = app;
 }
-#endif
 
-#if 0
-void ClawPatch::dump(int mq)
-{
-    double *q;
-    q = m_griddata.dataPtr();
-    dump_patch_(m_mx,m_my,m_mbc,m_meqn,mq,q);
-}
-#endif
 
-#if 0
-void ClawPatch::dump_last()
+void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
+                   int blockno, int patchno)
 {
-    double *q;
-    q = m_griddata_last.dataPtr();
-    int k = 0;
-    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-    {
-        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-        {
-            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
-            k++;
-        }
-        printf("\n");
-    }
-}
-#endif
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int level = this_patch->level;
 
-#if 0
-void ClawPatch::dump_time_interp()
-{
-    double *q;
-    q = m_griddata_time_interp.dataPtr();
-    int k = 0;
-    for(int j = 1-m_mbc; j <= m_my+m_mbc; j++)
-    {
-        for(int i = 1-m_mbc; i <= m_mx+m_mbc; i++)
-        {
-            printf("q[%2d,%2d] = %24.16e\n",i,j,q[k]);
-            k++;
-        }
-        printf("\n");
-    }
+    ClawPatch *cp = new ClawPatch();
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               blockno,
+               level,
+               gparms);
+
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    pdata->cp = cp;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_set_clawpatch;
 }
-#endif
+
+void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
+{
+    // We expect this ClawPatch to exist.
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    delete pdata->cp;
+    pdata->cp = NULL;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_delete_clawpatch;
+}
+
+void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    cp->pack_griddata(qdata);
+}
+
+void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                      int this_block_idx, int this_patch_idx, double *qdata,
+                      fclaw_bool time_interp)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    if (time_interp)
+        cp->unpack_griddata_time_interpolated(qdata);
+    else
+        cp->unpack_griddata(qdata);
+}
+
+size_t pack_size(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
+    return size*sizeof(double);
+}
+
+void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 int* mx, int* my, int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx, double* dy)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    const amr_options_t *gparms = get_domain_parms(domain);
+    *mx = gparms->mx;
+    *my = gparms->my;
+    *mbc = gparms->mbc;
+    *xlower = cp->xlower();
+    *ylower = cp->ylower();
+    *dx = cp->dx();
+    *dy = cp->dy();
+}
+
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch,
+                                   double **xp, double **yp, double **zp,
+                                   double **xd, double **yd, double **zd,
+                                   double **area)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+     *xp = cp->xp();
+     *yp = cp->yp();
+     *zp = cp->zp();
+     *xd = cp->xd();
+     *yd = cp->yd();
+     *zd = cp->zd();
+     *area = cp->area();
+}
+
+void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                    double **xnormals, double **ynormals,
+                                    double **xtangents, double **ytangents,
+                                    double **surfnormals,
+                                    double ** edgelengths, double **curvature)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    *xnormals = cp->xface_normals();
+    *ynormals = cp->yface_normals();
+    *xtangents = cp->xface_tangents();
+    *ytangents = cp->yface_tangents();
+    *surfnormals = cp->surf_normals();
+    *curvature = cp->curvature();
+    *edgelengths = cp->edge_lengths();
+}
+
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **q, int* meqn)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    *q = cp->q();
+
+    fclaw2d_clawpatch_meqn(domain,meqn);
+}
+
+void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain, int* meqn)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    *meqn = gparms->meqn;
+}

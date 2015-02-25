@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46_options.h"
 #include "fc2d_clawpack46.H"
 
+#include <fclaw_package.h>
+
+static int s_clawpack46_package_id = -1;
 
 static fc2d_clawpack46_vtable_t classic_vt;
 
@@ -54,6 +57,13 @@ struct patch_aux_data
     int maux;
 };
 
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_app_t* app)
+{
+    int id;
+    id = fc2d_clawpack46_get_package_id();
+    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
+}
+
 static fc2d_clawpack46_options_t*
 get_options(fclaw2d_domain_t* domain)
 {
@@ -67,36 +77,103 @@ static patch_aux_data*
 get_patch_data(ClawPatch *cp)
 {
     patch_aux_data *wp =
-        (patch_aux_data*) cp->clawpack_patch_data();
+        (patch_aux_data*) cp->clawpack_patch_data(s_clawpack46_package_id);
     return wp;
 }
 
-static void
-patch_data_new(void** wp)
+static void*
+patch_data_new()
 {
-    patch_aux_data* patch_data;
-    patch_data = new patch_aux_data;
-    *wp = (void*) patch_data;
+    patch_aux_data* data;
+    data = new patch_aux_data;
+    return (void*) data;
 }
 
 static void
-patch_data_delete(void **wp)
+patch_data_delete(void *data)
 {
-    patch_aux_data *patch_data = (patch_aux_data*) *wp;
-    delete patch_data;
-    *wp = (void*) NULL;
+    patch_aux_data *pd = (patch_aux_data*) data;
+    FCLAW_ASSERT(pd != NULL);
+    delete pd;
 }
 
+static const fclaw_package_vtable_t clawpack46_patch_vtable = {
+    patch_data_new,
+    patch_data_delete
+};
 
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
+#if 0
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack46_options_t *clawopt)
+{
+    int id;
+
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    /* Register packages */
+    id = fclaw_package_container_add_pkg(app,clawopt,
+                                         &clawpack46_patch_vtable);
+    s_clawpack46_package_id = id;
+}
+#endif
+
+
+void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
+{
+    fc2d_clawpack46_options_t* clawopt;
+    int id;
+
+    /* Register the options */
+    clawopt = fc2d_clawpack46_options_register(app,configfile);
+
+    /* And the package */
+
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    id = fclaw_package_container_add_pkg(app,clawopt,
+                                         &clawpack46_patch_vtable);
+
+    s_clawpack46_package_id = id;
+}
+
+int fc2d_clawpack46_get_package_id()
+{
+    return s_clawpack46_package_id;
+}
+
+
 void fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
                                  fc2d_clawpack46_options_t* clawopt)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
     ddata->clawpack_parms = (void*) clawopt;
+}
+
+void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    fc2d_clawpack46_define_auxarray(domain,cp);
+}
+
+void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              double **aux, int* maux)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    fc2d_clawpack46_get_auxarray(domain,cp,aux,maux);
+}
+
+void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux)
+{
+    fc2d_clawpack46_options_t *clawpack_options = get_options(domain);
+    *maux = clawpack_options->maux;
 }
 
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
@@ -468,9 +545,7 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
 
 void fc2d_clawpack46_link_to_clawpatch()
 {
-    /* These are called whenever a new ClawPatch is created. */
-    ClawPatch::f_clawpack_patch_data_new    = &patch_data_new;
-    ClawPatch::f_clawpack_patch_data_delete = &patch_data_delete;
+    /* This routine is on its way out */
 }
 
 void  fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain)

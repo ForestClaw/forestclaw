@@ -1,7 +1,6 @@
       subroutine setaux_manifold(mbc,mx,my,
      &      blockno,xlower,ylower,dx,dy,
-     &      maux,aux,xp,yp,zp,xd,yd,zd,
-     &      xnormals,ynormals,edge_lengths,area)
+     &      maux,aux, area)
       implicit none
 
       integer mbc, mx,my, meqn, maux, blockno

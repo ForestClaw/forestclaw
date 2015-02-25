@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
 
+#include <fclaw_register.h>
+
 #include "no_solver_user.H"
 
 typedef struct user_options
@@ -90,7 +92,7 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-void run_program(fclaw_app_t* app, amr_options_t* gparms,
+void run_program(fclaw_app_t* app,
                  user_options_t* user)
 {
     sc_MPI_Comm            mpicomm;
@@ -100,11 +102,14 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
+    amr_options_t            *gparms;
+
     /* Used locally */
     double pi = M_PI;
     double rotate[2];
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+    gparms = fclaw_forestclaw_get_options(app);
 
     rotate[0] = pi*gparms->theta/180.0;
     rotate[1] = pi*gparms->phi/180.0;
@@ -180,33 +185,32 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                  *options;
-    amr_options_t                 samr_options, *gparms = &samr_options;
     user_options_t                suser_options, *user = &suser_options;
 
     int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    options = fclaw_app_get_options (app);
 
-    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
+    /* Register forestclaw */
+    fclaw_forestclaw_register (app, "fclaw_options.ini");
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);
 
-
     /* Read configuration file(s) */
+    options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* -------------------------------------------------------------
-       - Run program
-       ------------------------------------------------------------- */
+    link_app_to_clawpatch(app);
+
     if (!retval & !vexit)
     {
-        run_program(app, gparms,user);
+        run_program(app, user);
     }
 
+    fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;
