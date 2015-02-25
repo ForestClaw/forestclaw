@@ -46,24 +46,6 @@ extern "C"
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
 
-#if 0
-/** Create storage for option values specific to ForestClaw.
- * \return     New options container (values undefined).
- */
-amr_options_t* fclaw_options_new ();
-
-/** Clean up option storage.  Use fclaw_options_destroy_arrays to deallocate
- * storage for array options.
- * \param [in,out] amropt  Option storage will be deallocated.
- */
-
-void fclaw_options_destroy(amr_options_t* amropt);
-#endif
-
-/** Free option arrays defined in ForestClaw container amr_options_t
- * \param [out] fclawopt        Option container for ForestClaw
- */
-
 amr_options_t* fclaw_options_register_general (fclaw_app_t * a,
                                      const char *configfile);
 
@@ -71,22 +53,6 @@ amr_options_t* fclaw_options_register_general (fclaw_app_t * a,
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
 
 int fclaw_options_read_from_file(sc_options_t* opt);
-
-#if 0
-
-void fclaw_options_destroy_arrays (amr_options_t * fclawopt);
-
-int  fclaw_options_parse_command_line (sc_options_t * opt, int argc,
-                                       char **argv);
-
-void fclaw_options_postprocess (amr_options_t * amropt);
-
-int  fclaw_options_check (sc_options_t * options, amr_options_t * gparms);
-
-void fclaw_options_print_summary(sc_options_t *opt);
-
-void fclaw_options_print_usage(sc_options_t *opt);
-#endif
 
 /** Add a string option and prepare using it for an integer array.
  * \param [in,out] opt          Option container (see sc/sc_options.h).
@@ -130,11 +96,6 @@ void fclaw_options_convert_double_array (const char *array_string,
 
 
 void fclaw_options_destroy_array(void* array);
-
-#if 0
-amr_options_t* fclaw_get_amr_options(fclaw_app_t* app);
-#endif
-
 
 
 /* Plan is to replace amr_options_t with fclaw_options_t.
