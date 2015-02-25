@@ -283,7 +283,6 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
 void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
 
 void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile);
-void fc2d_clawpack46_destroy(fclaw_app_t* app);
 
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t* clawopt);

@@ -119,6 +119,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+    FCLAW_FREE(clawopt);
 }
 
 
@@ -133,16 +134,18 @@ static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-void fc2d_clawpack46_options_register (fclaw_app_t * app,
-                                       const char *configfile,
-                                       fc2d_clawpack46_options_t* clawopt)
+fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *configfile)
 {
+    fc2d_clawpack46_options_t* clawopt;
+
     FCLAW_ASSERT (app != NULL);
 
+    clawopt = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
     fclaw_app_options_register (app,"clawpack46", configfile,
                                 &clawpack46_options_vtable,
                                 clawopt);
-
+    return clawopt;
 }
 
 #ifdef __cplusplus

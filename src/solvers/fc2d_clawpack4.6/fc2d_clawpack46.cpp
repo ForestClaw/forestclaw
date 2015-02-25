@@ -129,8 +129,7 @@ void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
     int id;
 
     /* Register the options */
-    clawopt = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
-    fc2d_clawpack46_package_register(app,clawopt);
+    clawopt = fc2d_clawpack46_options_register(app,configfile);
 
     /* And the package */
 
@@ -142,14 +141,6 @@ void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
 
     s_clawpack46_package_id = id;
 }
-
-void fc2d_clawpack46_destroy(fclaw_app_t* app)
-{
-    fc2d_clawpack46_options_t* clawopt;
-    clawopt = fc2d_clawpack46_get_options(app);
-    FCLAW_FREE (clawopt);
-}
-
 
 int fc2d_clawpack46_get_package_id()
 {
