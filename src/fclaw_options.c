@@ -133,6 +133,7 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
 
     fclaw_options_destroy_arrays (general->amropt);
 
+    FCLAW_FREE(general->amropt);
     FCLAW_FREE (general);
 }
 
@@ -143,10 +144,10 @@ static const fclaw_app_options_vtable_t options_vtable_general = {
     options_destroy_general
 };
 
-void fclaw_options_register_general (fclaw_app_t * a, const char *configfile,
-                                         amr_options_t* gparms)
+amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *configfile)
 {
     fclaw_options_general_t* general;
+    amr_options_t* gparms;
     FCLAW_ASSERT (a != NULL);
 
     /* Basic options for print out help message, current options, etc */
@@ -154,6 +155,7 @@ void fclaw_options_register_general (fclaw_app_t * a, const char *configfile,
 
     /* allocate storage for core's option values */
     /* we will free it in the options_destroy callback */
+    gparms = FCLAW_ALLOC(amr_options_t,1);
     general = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
 
     general->amropt = gparms;
@@ -162,6 +164,7 @@ void fclaw_options_register_general (fclaw_app_t * a, const char *configfile,
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (a,NULL, configfile, &options_vtable_general,
                                 general);
+    return gparms;
 }
 
 

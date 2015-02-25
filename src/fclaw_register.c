@@ -40,8 +40,7 @@ extern "C"
 void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
 {
     amr_options_t* gparms;
-    gparms = FCLAW_ALLOC(amr_options_t,1);
-    fclaw_options_register_general (app, configfile, gparms);
+    gparms = fclaw_options_register_general (app, configfile);
 
     fclaw_app_set_attribute(app,"fclaw-options",gparms);
 
@@ -51,10 +50,6 @@ void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
 
 void fclaw_forestclaw_destroy(fclaw_app_t* app)
 {
-    amr_options_t* gparms;
-    gparms = fclaw_forestclaw_get_options(app);
-    FCLAW_FREE (gparms);
-
     fclaw_package_container_destroy(app);
 }
 
