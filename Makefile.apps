@@ -21,8 +21,8 @@ include applications/metric/2d/all_mappings/Makefile.am
 # Scalar advection on manifolds
 include applications/advection/2d/swirl_mapped/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
-# include applications/advection/2d/hemisphere/Makefile.am
-# include applications/advection/2d/filament/Makefile.am
+include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/filament/Makefile.am
 include applications/advection/2d/sphere/Makefile.am
 include applications/advection/2d/torus/Makefile.am
 
