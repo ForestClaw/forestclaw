@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include <fclaw2d_map_query.h>
 
+#include <fclaw_register.h>
+
 #include "hemisphere_user.H"
 
 typedef struct user_options
@@ -69,7 +71,6 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
-
 static const fclaw_app_options_vtable_t options_vtable_user = {
     options_register_user,
     NULL,      /* options_postprocess_user */
@@ -89,9 +90,7 @@ register_user_options (fclaw_app_t * app,
 }
 
 static
-void run_program(fclaw_app_t* app, amr_options_t* gparms,
-                 fc2d_clawpack46_options_t* clawpack_options,
-                 user_options_t* user)
+    void run_program(fclaw_app_t* app)
 {
     sc_MPI_Comm            mpicomm;
 
@@ -100,11 +99,20 @@ void run_program(fclaw_app_t* app, amr_options_t* gparms,
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
+    amr_options_t *gparms;
+    fc2d_clawpack46_options_t* clawpack_options;
+    user_options_t* user;
+
+
     /* Used locally */
     double pi = M_PI;
     double rotate[2];
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+    gparms = fclaw_forestclaw_get_options(app);
+    clawpack_options = fc2d_clawpack46_get_options(app);
+
+    user = (user_options_t*) fclaw_app_get_user(app);
 
     rotate[0] = pi*gparms->theta/180.0;
     rotate[1] = 0;
@@ -173,34 +181,31 @@ int main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    amr_options_t               samr_options,      *gparms = &samr_options;
-    fc2d_clawpack46_options_t   sclawpack_options, *clawpack_options = &sclawpack_options;
-    user_options_t              suser_options,     *user = &suser_options;
+    user_options_t suser_options, *user = &suser_options;
 
     int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    options = fclaw_app_get_options (app);
 
-    /*  Register options for each package */
-    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
-    fc2d_clawpack46_options_register (app, "fclaw_options.ini", clawpack_options);
+    fclaw_forestclaw_register(app,"fclaw_options.ini");
+    fc2d_clawpack46_register(app,"fclaw_options.ini");
 
     register_user_options (app, "fclaw_options.ini", user);
 
     /* Read configuration file(s) and command line, and process options */
+    options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* -------------------------------------------------------------
-       - Run program
-       ------------------------------------------------------------- */
+    link_app_to_clawpatch(app);
+
     if (!retval & !vexit)
     {
-        run_program(app, gparms, clawpack_options, user);
+        run_program(app);
     }
 
+    fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;
