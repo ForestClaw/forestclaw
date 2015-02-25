@@ -27,7 +27,7 @@ include applications/advection/2d/sphere/Makefile.am
 include applications/advection/2d/torus/Makefile.am
 
 # NCAR Transport problems on the sphere
-# include applications/NCAR_transport/slotted_disk/Makefile.am
+include applications/NCAR_transport/slotted_disk/Makefile.am
 # include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # Euler example
