@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fp_exception_glibc_extension.h"
 
 
-/** This is the internal state of an options structure for core variables. */
-
 typedef struct fclaw_options_general
 {
     /* This will eventually be replaced with particular members of amropt, but
@@ -66,7 +64,9 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 {
+
     fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+    amr_options_t *amropt;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -78,7 +78,12 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (general != NULL);
     FCLAW_ASSERT (general->is_registered);
 
-    fclaw_options_postprocess(general->amropt);
+    /* Convert strings to arrays */
+    amropt = general->amropt;
+    fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                     fclaw2d_NumFaces);
+    fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale,3);
+    fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift,3);
 
     /* at this point there are no errors to report */
     return FCLAW_NOEXIT;
@@ -91,16 +96,24 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
     sc_options_t *options;
     amr_options_t* gparms;
 
-    int retval;
-
     options = fclaw_app_get_options (app);
     gparms = general->amropt;
 
-    retval =  fclaw_options_check (options, general->amropt);
-    if (retval != 0)
+    /* Check outstyle. */
+    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
     {
-        return FCLAW_EXIT_ERROR;
+        double dT_outer = gparms->tfinal / gparms->nout;
+        double dT_inner = gparms->initial_dt;
+        int nsteps = (int) floor (dT_outer / dT_inner + .5);
+        if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
+        {
+            fclaw_global_essentialf( "For fixed dt, initial time step size must divide" \
+                                     " tfinal/nout exactly.\n");
+            return FCLAW_EXIT_ERROR;
+        }
     }
+
+    /* Could also do basic sanity checks on mx,my,... */
 
     if (gparms->mpi_debug)
     {
@@ -122,6 +135,7 @@ static void
 options_destroy_general (fclaw_app_t * a, void *package, void *registered)
 {
     fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+    amr_options_t *amropt;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -131,9 +145,14 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (general != NULL);
     FCLAW_ASSERT (general->is_registered);
 
-    fclaw_options_destroy_arrays (general->amropt);
+    /* Destroy option arrays created in postprocess */
+    amropt = general->amropt;
 
-    FCLAW_FREE(general->amropt);
+    FCLAW_FREE(amropt->mthbc);
+    FCLAW_FREE(amropt->scale);
+    FCLAW_FREE(amropt->shift);
+
+    FCLAW_FREE(amropt);
     FCLAW_FREE (general);
 }
 
@@ -153,16 +172,17 @@ amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *conf
     /* Basic options for print out help message, current options, etc */
     fclaw_app_options_register_core (a, configfile);
 
-    /* allocate storage for core's option values */
+    /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
     gparms = FCLAW_ALLOC(amr_options_t,1);
     general = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
 
     general->amropt = gparms;
 
-    /* sneaking the version string into the package pointer */
-    /* when there are more parameters to pass, create a structure to pass */
-    fclaw_app_options_register (a,NULL, configfile, &options_vtable_general,
+    /* Could also pass in a section header (set to NULL for now) */
+    fclaw_app_options_register (a,NULL,
+                                configfile,
+                                &options_vtable_general,
                                 general);
     return gparms;
 }
@@ -208,8 +228,8 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     /* output options */
 
-    /* This here for backwards compatibility */
 #if 0
+    /* This is handled now by core options (fclaw_base.c) */
     sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
                         "Verbosity mode [0]");
 #endif
@@ -329,14 +349,7 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
 }
 
-void fclaw_options_destroy_arrays (amr_options_t * amropt)
-{
-    fclaw_options_destroy_array((void*) amropt->mthbc);
-    fclaw_options_destroy_array((void*) amropt->scale);
-    fclaw_options_destroy_array((void*) amropt->shift);
-}
-
-
+/* This is still needed as long as the config file option in app isn't yet implemented */
 int fclaw_options_read_from_file(sc_options_t* opt)
 {
     int retval;
@@ -355,52 +368,6 @@ int fclaw_options_read_from_file(sc_options_t* opt)
         fclaw_global_infof ("Reading file fclaw_options.ini.\n");
     }
     return retval;
-}
-
-
-int fclaw_options_parse_command_line(sc_options_t * opt,
-                                     int argc, char **argv)
-{
-    int retval;
-
-    retval = sc_options_parse (sc_package_id, FCLAW_VERBOSITY_ESSENTIAL, opt, argc, argv);
-    if (retval < 0)
-    {
-        fclaw_global_essentialf ("Command line option parsing failed.  " \
-                                 "Use --help option to see valid option settings.\n");
-        return retval;
-    }
-    else
-    {
-        fclaw_global_infof ("Reading command line.\n");
-    }
-    if (sc_is_root ())
-    {
-        retval = sc_options_save (sc_package_id, SC_LP_ERROR, opt,
-                                  "fclaw_options.ini.used");
-        if (retval < 0)
-        {
-            fclaw_global_essentialf("Cannot save fclaw_options.ini.used.  ");
-            return retval;
-        }
-    }
-    return retval;
-}
-
-void fclaw_options_print_summary(sc_options_t *opt)
-{
-    int fclaw_package_id;
-    fclaw_package_id = fclaw_get_package_id();
-    /* This is printed assuming vebosity level 'INFO' */
-    sc_options_print_summary (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,opt);
-}
-
-void fclaw_options_print_usage(sc_options_t *opt)
-{
-    int fclaw_package_id;
-    fclaw_package_id = fclaw_get_package_id();
-    /* This is printed assuming vebosity level 'INFO' */
-    sc_options_print_usage (fclaw_package_id, FCLAW_VERBOSITY_INFO,opt,NULL);
 }
 
 
@@ -482,60 +449,8 @@ void fclaw_options_convert_double_array (const char *array_string,
     }
 }
 
+/* This is here to complement the array conversion routines above */
 void fclaw_options_destroy_array(void* array)
 {
     FCLAW_FREE (array);
-}
-
-void fclaw_options_postprocess (amr_options_t * amropt)
-{
-    fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                     fclaw2d_NumFaces);
-    fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale,3);
-    fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift,3);
-}
-
-
-/* -----------------------------------------------------------------
-   Check input parms
-   ----------------------------------------------------------------- */
-int fclaw_options_check (sc_options_t * options, amr_options_t * gparms)
-{
-#if 0
-    /* Check for user help argument */
-    if (core->print_help || core->print_options)
-    {
-        /* Both help and current settings can be printed */
-        if (core->print_help)
-        {
-            /* This prints the help message for each options */
-            fclaw_options_print_usage(options);
-        }
-        if (core->print_options)
-        {
-            /* This prints the current values of the parameters */
-            fclaw_options_print_summary(options);
-        }
-        return FCLAW_EXIT_QUIET;
-    }
-#endif
-
-    /* Check outstyle. */
-    if (gparms->outstyle == 1 && gparms->use_fixed_dt)
-    {
-        double dT_outer = gparms->tfinal / gparms->nout;
-        double dT_inner = gparms->initial_dt;
-        int nsteps = (int) floor (dT_outer / dT_inner + .5);
-        if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
-        {
-            fclaw_global_essentialf( "For fixed dt, initial time step size must divide" \
-                                     " tfinal/nout exactly.\n");
-            return -1;
-        }
-    }
-
-    /* Could also do basic sanity checks on mx,my,... */
-
-    /* Everything is good */
-    return 0;
 }
