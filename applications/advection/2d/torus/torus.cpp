@@ -223,7 +223,9 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
     init_domain_data(domain);
 
+#if 0
     link_problem_setup(domain,fc2d_clawpack46_setprob);
+#endif
 
     torus_link_solvers(domain);
 

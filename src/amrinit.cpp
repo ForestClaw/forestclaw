@@ -72,8 +72,8 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     void *user)
 {
     fclaw2d_vtable_t vt;
-    vt = *fclaw2d_get_vtable(domain);
-    vt.initialize(domain,this_patch,this_block_idx,this_patch_idx);
+    vt = fclaw2d_get_vtable(domain);
+    vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 static
@@ -87,7 +87,7 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
                            void *user)
 {
     fclaw2d_vtable_t vt;
-    vt = *fclaw2d_get_vtable(new_domain);
+    vt = fclaw2d_get_vtable(new_domain);
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
@@ -107,13 +107,9 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
 
-#if 0
-            fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-#endif
-
             // This is only used here, since only in the initial grid layout do we
             // create fine grids from coarser grids.
-            vt.initialize(new_domain,fine_patch,blockno,fine_patchno);
+            vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
         }
     }
 
@@ -134,6 +130,8 @@ void amrinit (fclaw2d_domain_t **domain)
 {
     int i;
     char basename[BUFSIZ];
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(*domain);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
@@ -152,7 +150,10 @@ void amrinit (fclaw2d_domain_t **domain)
 
     /* Set problem dependent parameters for Riemann solvers, etc.
        This has to be called after the mapping context has been set */
+#if 0
     (ddata->f_problem_setup)(*domain);
+#endif
+    vt.problem_setup(*domain);
 
     double t = 0;
 

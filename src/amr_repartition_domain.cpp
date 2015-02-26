@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
+#include "fclaw2d_vtable.h"
+
 static
 void build_ghost_patches(fclaw2d_domain_t* domain)
 {
@@ -251,11 +253,13 @@ void cb_build_patches(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     set_clawpatch(domain,this_patch,this_block_idx,this_patch_idx);
 
     // Setup new patch using solver specific routine
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-    (sf->f_patch_setup)(domain,this_patch,this_block_idx,this_patch_idx);
+    vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 

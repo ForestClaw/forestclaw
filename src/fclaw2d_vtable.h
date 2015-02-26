@@ -39,6 +39,9 @@ extern "C"
 #endif
 #endif
 
+
+typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
+
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
@@ -67,15 +70,16 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
 
 typedef struct fclaw2d_vtable
 {
-    fclaw2d_patch_setup_t              setup;
-    fclaw2d_patch_initialize_t         initialize;
-    fclaw2d_patch_physical_bc_t        physical_bc;
-    fclaw2d_patch_single_step_update_t single_step_update;
+    fclaw2d_problem_setup_t              problem_setup;
+    fclaw2d_patch_setup_t              patch_setup;
+    fclaw2d_patch_initialize_t         patch_initialize;
+    fclaw2d_patch_physical_bc_t        patch_physical_bc;
+    fclaw2d_patch_single_step_update_t patch_single_step_update;
 } fclaw2d_vtable_t;
 
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver);
 
-fclaw2d_vtable_t* fclaw2d_get_vtable(fclaw2d_domain_t *domain);
+fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t *domain);
 
 
 #ifdef __cplusplus

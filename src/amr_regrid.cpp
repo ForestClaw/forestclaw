@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_typedefs.h"
 #include "amr_regrid.H"
 
+#include "fclaw2d_vtable.h"
+
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
@@ -69,6 +71,9 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                        int fine0_patchno,
                        void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int minlevel = gparms->minlevel;
 
@@ -94,8 +99,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         set_clawpatch(domain,temp_coarse_patch,blockno,coarse_patchno);
 
         // One-time setup of patch
-        fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-        (sf->f_patch_setup)(domain,temp_coarse_patch,blockno,coarse_patchno);
+        vt.patch_setup(domain,temp_coarse_patch,blockno,coarse_patchno);
 
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
         (rf->f_patch_average2coarse)(domain,fine_patches,temp_coarse_patch,

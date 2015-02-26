@@ -54,10 +54,11 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     int m;
 
     m = gparms->manifold;
-    vt.setup = m ? &torus_patch_manifold_setup : &fc2d_clawpack46_setaux;
-    vt.initialize         = &fc2d_clawpack46_qinit;
-    vt.physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
-    vt.single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
+    vt.problem_setup = &fc2d_clawpack46_setprob;
+    vt.patch_setup = m ? &torus_patch_manifold_setup : &fc2d_clawpack46_setaux;
+    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
+    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
 #if 0
     amr.tag4refinement     = &torus_patch_tag4refinement;
@@ -72,6 +73,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
 
+#if 0
     if (!gparms->manifold)
     {
         sf->f_patch_setup              = &fc2d_clawpack46_setaux;
@@ -82,6 +84,8 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     }
 
     sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
+#endif
+
     sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
     sf->f_patch_single_step_update = &fc2d_clawpack46_update;
 

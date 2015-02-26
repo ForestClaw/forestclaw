@@ -39,12 +39,12 @@ void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver)
     fclaw2d_domain_attribute_add (domain,"vtable",solver);
 }
 
-fclaw2d_vtable_t* fclaw2d_get_vtable(fclaw2d_domain_t* domain)
+fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)
 {
     fclaw2d_vtable_t *vt;
     vt = fclaw2d_domain_attribute_access(domain,"vtable",NULL);
     FCLAW_ASSERT(vt != NULL);
-    return vt;
+    return *vt;
 }
 
 
