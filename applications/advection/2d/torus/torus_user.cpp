@@ -42,38 +42,37 @@ static fc2d_clawpack46_vtable_t classic_user;
 
 static fclaw2d_vtable_t vt;
 
-#if 0
-static fclaw_amr_vtable_t amr;
-static fclaw_output_vtable_t output;
-#endif
-
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw_app_t *app = fclaw2d_domain_get_app(domain);
     const amr_options_t *gparms = fclaw_forestclaw_get_options(app);
     int m;
-
     m = gparms->manifold;
-    vt.problem_setup = &fc2d_clawpack46_setprob;
+
+    vt.problem_setup            = &fc2d_clawpack46_setprob;
+
     vt.patch_setup = m ? &torus_patch_manifold_setup : &fc2d_clawpack46_setaux;
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
-#if 0
-    amr.tag4refinement     = &torus_patch_tag4refinement;
-    amr.tag4coarsening     = &torus_patch_tag4coarsening;
-    output.write_output       = &torus_parallel_write_output;
-#endif
+    vt.patch_tag4refinement     = &torus_patch_tag4refinement;
+    vt.patch_tag4coarsening     = &torus_patch_tag4coarsening;
+
+    vt.write_header             = &torus_write_header;
+    vt.patch_write_output       = &torus_patch_write_output;
 
     fclaw2d_set_vtable(domain,&vt);
 
     /* Original code */
+
+#if 0
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
 
-#if 0
+
     if (!gparms->manifold)
     {
         sf->f_patch_setup              = &fc2d_clawpack46_setaux;
@@ -88,15 +87,17 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
 
     sf->f_patch_single_step_update = &fc2d_clawpack46_update;
-#endif
 
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
     rf->f_patch_tag4refinement     = &torus_patch_tag4refinement;
     rf->f_patch_tag4coarsening     = &torus_patch_tag4coarsening;
 
+
     fclaw2d_output_functions_t *of = get_output_functions(domain);
     of->f_patch_write_header       = &torus_parallel_write_header;
     of->f_patch_write_output       = &torus_parallel_write_output;
+
+#endif
 
     /* Needed for the clawpack46 package */
     classic_user.qinit = &QINIT;
@@ -178,7 +179,7 @@ fclaw_bool torus_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
-void torus_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+void torus_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
 {
     int meqn, maux;
     double time;
@@ -196,9 +197,9 @@ void torus_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrid
 }
 
 
-void torus_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level)
+void torus_patch_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+                              int this_block_idx, int this_patch_idx,
+                              int iframe,int num,int level)
 {
     int mx,my,mbc,meqn,maxmx,maxmy;
     double xlower,ylower,dx,dy;

@@ -42,6 +42,9 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     const amr_options_t *gparms = get_domain_parms(domain);
 
     int maxlevel = gparms->maxlevel;
@@ -49,12 +52,17 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 
     if (level < maxlevel)
     {
+#if 0
         fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
 
-        int initflag = 0;
         fclaw_bool refine_patch =
             (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
                                          this_patch_idx,initflag);
+#endif
+        int initflag = 0;
+        fclaw_bool refine_patch  =
+            vt.patch_tag4refinement(domain,this_patch,this_block_idx,
+                                    this_patch_idx,initflag);
         if (refine_patch)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
@@ -109,9 +117,14 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
            Test to see if temporary patch needs refining.  If so, then we
            shouldn't coarsen it.
           ----------------------------------------------------------------- */
+#if 0
         fclaw_bool patch_coarsened =
             (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
                                          coarse_patchno);
+#endif
+        fclaw_bool patch_coarsened =
+            vt.patch_tag4coarsening(domain, temp_coarse_patch, blockno,
+                                    coarse_patchno);
 
         delete_clawpatch(domain, temp_coarse_patch);
         delete_patch_data(temp_coarse_patch);

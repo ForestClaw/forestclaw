@@ -42,6 +42,9 @@ void cb_tag4refinement_init(fclaw2d_domain_t *domain,
                             int this_patch_idx,
                             void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     const amr_options_t *gparms = get_domain_parms(domain);
 
     int maxlevel = gparms->maxlevel;
@@ -50,10 +53,16 @@ void cb_tag4refinement_init(fclaw2d_domain_t *domain,
 
     if (level < maxlevel)
     {
+#if 0
         fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
         fclaw_bool refine_patch =
             (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
                                          this_patch_idx,initflag);
+#endif
+        fclaw_bool refine_patch  =
+            vt.patch_tag4refinement(domain,this_patch,this_block_idx,
+                                    this_patch_idx,initflag);
+
         if (refine_patch)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);

@@ -84,12 +84,12 @@ fclaw_bool torus_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       int blockno,
                                       int patchno);
 
-void torus_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+void torus_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
-void torus_parallel_write_output(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx, int this_patch_idx,
-                                 int iframe,int num,int level);
+void torus_patch_write_output(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx, int this_patch_idx,
+                              int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

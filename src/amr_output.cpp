@@ -30,11 +30,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_output.H"
 #include <fclaw2d_vtk.h>
 
+#include "fclaw2d_vtable.h"
+
 static void
 cb_amrout (fclaw2d_domain_t * domain,
            fclaw2d_patch_t * this_patch,
            int this_block_idx, int this_patch_idx, void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
@@ -47,16 +52,24 @@ cb_amrout (fclaw2d_domain_t * domain,
        to have access? */
     int level = this_patch->level;
 
+#if 0
     fclaw2d_output_functions_t *of = get_output_functions (domain);
     (of->f_patch_write_output) (domain, this_patch, this_block_idx,
                                 this_patch_idx, iframe, (int) patch_num,
                                 level);
+#endif
+    vt.patch_write_output(domain, this_patch, this_block_idx,
+                          this_patch_idx, iframe, (int) patch_num,
+                          level);
 }
 
 
 void
 amrout (fclaw2d_domain_t * domain, int iframe)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     // Record output time
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -83,8 +96,11 @@ amrout (fclaw2d_domain_t * domain, int iframe)
 
         if (domain->mpirank == 0)
         {
+#if 0
             /* the header needs to be written by the first processor */
             (of->f_patch_write_header) (domain, iframe, ngrids);
+#endif
+            vt.write_header(domain,iframe,ngrids);
         }
 
         fclaw2d_domain_iterate_patches (domain, cb_amrout, (void *) &iframe);

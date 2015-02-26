@@ -221,17 +221,19 @@ void run_program(fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
+
     init_domain_data(domain);
 
 #if 0
     link_problem_setup(domain,fc2d_clawpack46_setprob);
-#endif
-
-    torus_link_solvers(domain);
 
     link_regrid_functions(domain,
                           torus_patch_tag4refinement,
                           torus_patch_tag4coarsening);
+#endif
+
+    torus_link_solvers(domain);
+
     amrinit(&domain);
     amrrun(&domain);
     amrreset(&domain);

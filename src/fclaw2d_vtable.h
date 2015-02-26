@@ -68,13 +68,37 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      double t,
                                                      double dt);
 
+typedef fclaw_bool (*fclaw2d_patch_tag4refinement_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *this_patch,
+                                                     int this_block_idx, int this_patch_idx,
+                                                     int initflag);
+
+typedef fclaw_bool (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *this_patch,
+                                                     int this_blockno,
+                                                     int this_patchno);
+
+typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
+                                             int iframe, int ngrids);
+
+typedef void (*fclaw2d_patch_write_output_t)(fclaw2d_domain_t *domain,
+                                             fclaw2d_patch_t *this_patch,
+                                             int this_block_idx,
+                                             int this_patch_idx,
+                                             int iframe,int patch_num,
+                                             int level);
+
 typedef struct fclaw2d_vtable
 {
-    fclaw2d_problem_setup_t              problem_setup;
+    fclaw2d_problem_setup_t            problem_setup;
     fclaw2d_patch_setup_t              patch_setup;
     fclaw2d_patch_initialize_t         patch_initialize;
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;
+    fclaw2d_patch_tag4refinement_t     patch_tag4refinement;
+    fclaw2d_patch_tag4coarsening_t     patch_tag4coarsening;
+    fclaw2d_patch_write_header_t       write_header;
+    fclaw2d_patch_write_output_t       patch_write_output;
 } fclaw2d_vtable_t;
 
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver);
