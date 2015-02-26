@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 
 #include <amr_forestclaw.H>
-#include <amr_mol.H>
-#include <fclaw2d_solvers.H>
+
+#include <amr_single_step.H>
 
 
 /* ----------------------------------------------------------
@@ -50,20 +50,7 @@ double update_level_solution(fclaw2d_domain_t *domain,
     double dt = time_data->dt;
     double cfl;
 
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-
-    /* Idea here is that the user may want to apply a single
-       step routine, an MOL routine, or possibly both. */
-
-    cfl = (sf->f_level_single_step)(domain,a_level,t,dt);
-
-#if 0
-    if (sf->use_mol_update)
-    {
-        cfl = fclaw2d_level_mol_step(domain,a_level,time_data,
-                                     sf->f_level_ode_solver);
-    }
-#endif
+    cfl = amr_level_single_step_update(domain,a_level,t,dt);
 
     /* This needs to be cleaned up a bit */
     time_data->maxcfl = max(time_data->maxcfl,cfl);
