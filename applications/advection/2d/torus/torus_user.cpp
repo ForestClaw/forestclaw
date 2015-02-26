@@ -37,10 +37,34 @@ extern "C"
 
 static fc2d_clawpack46_vtable_t classic_user;
 
+static fclaw_solver_vtable_t solver;
+
+#if 0
+static fclaw_amr_vtable_t amr;
+static fclaw_output_vtable_t output;
+#endif
+
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw_app_t *app = fclaw2d_domain_get_app(domain);
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(app);
+    int m;
 
+    m = gparms->manifold;
+    solver.setup = m : &torus_patch_manifold_setup ? &fc2d_clawpack46_setaux;
+    solver.initialize         = &fc2d_clawpack46_qinit;
+    solver.physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
+    solver.single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
+
+#if 0
+    amr.tag4refinement     = &torus_patch_tag4refinement;
+    amr.tag4coarsening     = &torus_patch_tag4coarsening;
+    output.write_output       = &torus_parallel_write_output;
+#endif
+
+    fclaw_forestclaw_set_vtable(&solver);
+
+    /* Original code */
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
     sf->use_single_step_update = fclaw_true;
     sf->use_mol_update = fclaw_false;
@@ -58,7 +82,6 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
     sf->f_patch_single_step_update = &fc2d_clawpack46_update;
 
-
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
     rf->f_patch_tag4refinement     = &torus_patch_tag4refinement;
     rf->f_patch_tag4coarsening     = &torus_patch_tag4coarsening;
@@ -67,9 +90,10 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     of->f_patch_write_header       = &torus_parallel_write_header;
     of->f_patch_write_output       = &torus_parallel_write_output;
 
-    classic_user.setprob = &SETPROB;
+    /* Needed for the clawpack46 package */
     classic_user.qinit = &QINIT;
     classic_user.setaux = &SETAUX;
+    classic_user.setprob = &SETPROB;
     classic_user.rpn2 = &RPN2;
     classic_user.rpt2 = &RPT2;
 

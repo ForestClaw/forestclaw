@@ -142,8 +142,7 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-void run_program(fclaw_app_t* app,
-                 user_options_t* user)
+void run_program(fclaw_app_t* app)
 {
     sc_MPI_Comm            mpicomm;
 
@@ -152,8 +151,8 @@ void run_program(fclaw_app_t* app,
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    amr_options_t             *gparms;
-    fc2d_clawpack46_options_t  *clawpack_options;
+    amr_options_t   *gparms;
+    user_options_t  *user;
 
     /* Used locally */
     double pi = M_PI;
@@ -163,7 +162,7 @@ void run_program(fclaw_app_t* app,
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* ---------------------------------------------------------------
        Mapping geometry
@@ -221,10 +220,8 @@ void run_program(fclaw_app_t* app,
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
+    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
 
     link_problem_setup(domain,fc2d_clawpack46_setprob);
 
@@ -250,10 +247,6 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t              *options;
-#if 0
-    amr_options_t             samr_options, *gparms = &samr_options;
-    fc2d_clawpack46_options_t  sclawpack_options, *clawpack_options = &sclawpack_options;
-#endif
     user_options_t                suser_options, *user = &suser_options;
 
     int retval;
@@ -279,7 +272,7 @@ main (int argc, char **argv)
 
     if (!retval & !vexit)
     {
-        run_program(app,user);
+        run_program(app);
     }
 
     fclaw_forestclaw_destroy(app);
