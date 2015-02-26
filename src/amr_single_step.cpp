@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_single_step.h"
 #include "amr_includes.H"
+#include "fclaw2d_vtable.h"
 
 static
     void cb_single_step(fclaw2d_domain_t *domain,
@@ -33,15 +34,20 @@ static
                         int this_patch_idx,
                         void *user)
 {
+    fclaw2d_vtable_t vt;
+    double maxcfl;
+
+    vt = fclaw2d_get_vtable(domain);
+
     single_step_data_t *ss_data = (single_step_data_t *) user;
 
     double dt = ss_data->dt;
     double t = ss_data->t;
 
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-    double maxcfl = (sf->f_patch_single_step_update)(domain,this_patch,
-                                                     this_block_idx,
-                                                     this_patch_idx,t,dt);
+    maxcfl = vt.patch_single_step_update(domain,this_patch,
+                                         this_block_idx,
+                                         this_patch_idx,t,dt);
+
     ss_data->maxcfl = max(maxcfl,ss_data->maxcfl);
 }
 

@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "fclaw2d_solvers.H"
+#include "fclaw2d_vtable.h"
 
 static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,
@@ -33,6 +34,9 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    int this_patch_idx,
                    void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     struct time_info_t {double level_time; fclaw_bool time_interp; } *t_info;
     t_info = (time_info_t*) user;
 
@@ -40,8 +44,7 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
     double dt = 1e20;
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-    (sf->f_patch_physical_bc)(domain,
+    vt.patch_physical_bc(domain,
                               this_patch,
                               this_block_idx,
                               this_patch_idx,

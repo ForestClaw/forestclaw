@@ -84,10 +84,11 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     }
 
     sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-#endif
 
     sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
+
     sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+#endif
 
     fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
     rf->f_patch_tag4refinement     = &torus_patch_tag4refinement;
