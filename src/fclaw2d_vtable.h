@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_PATCH_FUNCTIONS_H
-#define FCLAW2D_PATCH_FUNCTIONS_H
+#ifndef FCLAW2D_VTABLE_H
+#define FCLAW2D_VTABLE_H
 
 #include "forestclaw2d.H"
 #include "fclaw_base.h"
@@ -65,15 +65,18 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      double t,
                                                      double dt);
 
-typedef struct fclaw2d_solver_vtable
+typedef struct fclaw2d_vtable
 {
     fclaw2d_patch_setup_t              setup;
     fclaw2d_patch_initialize_t         initialize;
     fclaw2d_patch_physical_bc_t        physical_bc;
     fclaw2d_patch_single_step_update_t single_step_update;
-} fclaw2d_solver_vtable_t;
+} fclaw2d_vtable_t;
 
-void fclaw2d_forestclaw_set_vtable(fclaw_app_t* app, fclaw2d_solver_vtable_t *solver);
+void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver);
+
+fclaw2d_vtable_t* fclaw2d_get_vtable(fclaw2d_domain_t *domain);
+
 
 #ifdef __cplusplus
 #if 0

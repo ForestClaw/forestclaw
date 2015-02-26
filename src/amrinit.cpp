@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "clawpack_fort.H"
 #include "fclaw2d_solvers.H"
 
+#include "fclaw2d_vtable.h"
+
 // Put this here so that I don't have to include "ClawPatch.H"
 // void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
 //                    int blockno, int patchno);
@@ -69,10 +71,9 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    fclaw2d_solver_functions_t *sf = get_solver_functions(domain);
-
-    // Set initial values on patch
-    (sf->f_patch_initialize)(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_vtable_t vt;
+    vt = *fclaw2d_get_vtable(domain);
+    vt.initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 static
@@ -85,6 +86,9 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
                            int old_patchno, int new_patchno,
                            void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = *fclaw2d_get_vtable(new_domain);
+
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
         // Need a copy function in regrid_functions
@@ -103,11 +107,13 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
 
+#if 0
             fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
+#endif
 
             // This is only used here, since only in the initial grid layout do we
             // create fine grids from coarser grids.
-            (sf->f_patch_initialize)(new_domain,fine_patch,blockno,fine_patchno);
+            vt.initialize(new_domain,fine_patch,blockno,fine_patchno);
         }
     }
 
