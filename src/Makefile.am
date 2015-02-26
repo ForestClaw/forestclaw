@@ -7,6 +7,7 @@ libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw2d_base.h \
+	src/fclaw2d_patch_functions.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map.h \
@@ -38,6 +39,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_transform.c \
 	src/fclaw_package.c \
 	src/fclaw_register.c \
+	src/fclaw2d_patch_functions.c \
 	src/fclaw2d_map_query.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_map_brick.c \

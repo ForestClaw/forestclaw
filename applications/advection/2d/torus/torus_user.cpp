@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46.H"
 #include "torus_user.H"
 
+#include <fclaw2d_patch_functions.h>
+#include <fclaw_register.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,7 +40,7 @@ extern "C"
 
 static fc2d_clawpack46_vtable_t classic_user;
 
-static fclaw_solver_vtable_t solver;
+static fclaw2d_solver_vtable_t solver;
 
 #if 0
 static fclaw_amr_vtable_t amr;
@@ -51,7 +54,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     int m;
 
     m = gparms->manifold;
-    solver.setup = m : &torus_patch_manifold_setup ? &fc2d_clawpack46_setaux;
+    solver.setup = m ? &torus_patch_manifold_setup : &fc2d_clawpack46_setaux;
     solver.initialize         = &fc2d_clawpack46_qinit;
     solver.physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
     solver.single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
@@ -62,7 +65,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     output.write_output       = &torus_parallel_write_output;
 #endif
 
-    fclaw_forestclaw_set_vtable(&solver);
+    fclaw2d_forestclaw_set_vtable(app,&solver);
 
     /* Original code */
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
