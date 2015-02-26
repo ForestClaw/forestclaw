@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_diagnostics.H"
 
+#include <fclaw_register.h>
+
 int pow_int(int a, int n)
 {
     int b = 1;
@@ -65,7 +67,6 @@ void init_domain_data(fclaw2d_domain_t *domain)
 
     ddata->domain_exchange = NULL;
 
-    ddata->amropts = NULL;
     ddata->curr_time = 0;
 
     /* I put this here because somehow it is not part of a 'solver' */
@@ -235,10 +236,6 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     */
 
     /* Copy data members */
-    ddata_new->amropts = ddata_old->amropts;
-    ddata_new->clawpack_parms = ddata_old->clawpack_parms;
-    ddata_new->manyclaw_parms = ddata_old->manyclaw_parms;
-
     ddata_new->curr_time = ddata_old->curr_time;
 
     ddata_new->f_problem_setup = ddata_old->f_problem_setup;
@@ -297,16 +294,25 @@ void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_prob
     ddata->f_problem_setup = f_problem_setup;
 }
 
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
+fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    return ddata->amropts;
+    fclaw_app_t *app;
+
+    app = (fclaw_app_t*)
+          fclaw2d_domain_attribute_access(domain,"fclaw_app",NULL);
+
+    FCLAW_ASSERT(app != NULL);
+    return app;
 }
 
-void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t* gparms)
+const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->amropts = gparms;
+    amr_options_t *gparms;
+    fclaw_app_t *app;
+
+    app = fclaw2d_domain_get_app(domain);
+    gparms = fclaw_forestclaw_get_options(app);
+    return gparms;
 }
 
 void set_domain_time(fclaw2d_domain_t *domain, double time)

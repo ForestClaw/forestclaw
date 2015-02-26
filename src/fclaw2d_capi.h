@@ -117,8 +117,13 @@ typedef void (*fclaw_mol_solver_t)(int neqn,double q[],
  * ---------------------------------------------------------------*/
 void allocate_user_data(fclaw2d_domain_t *domain);
 
+#if 0
 void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t *gparms);
+#endif
+
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
+
+fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
 
 void set_domain_time(fclaw2d_domain_t *domain, double time);
 double get_domain_time(fclaw2d_domain_t *domain);

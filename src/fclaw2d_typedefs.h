@@ -74,13 +74,6 @@ typedef struct fclaw2d_domain_data
     int is_latest_domain;
     fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
-    /* Our run time parameters live here */
-    const amr_options_t *amropts;
-
-    /* Some solver parms */
-    void *clawpack_parms;
-    void *manyclaw_parms;
-
     /* Time at start of each subcycled time step */
     double curr_time;
 

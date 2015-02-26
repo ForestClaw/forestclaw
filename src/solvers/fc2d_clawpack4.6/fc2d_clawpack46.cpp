@@ -67,9 +67,11 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_app_t* app)
 static fc2d_clawpack46_options_t*
 get_options(fclaw2d_domain_t* domain)
 {
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    fc2d_clawpack46_options_t *clawpack_options =
-        (fc2d_clawpack46_options_t*) ddata->clawpack_parms;
+    fc2d_clawpack46_options_t *clawpack_options;
+    fclaw_app_t *app;
+
+    app = fclaw2d_domain_get_app(domain);
+    clawpack_options = fc2d_clawpack46_get_options(app);
     return clawpack_options;
 }
 
@@ -148,12 +150,14 @@ int fc2d_clawpack46_get_package_id()
 }
 
 
+#if 0
 void fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
                                  fc2d_clawpack46_options_t* clawopt)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(domain);
     ddata->clawpack_parms = (void*) clawopt;
 }
+#endif
 
 void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch)
@@ -172,7 +176,10 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
 
 void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux)
 {
-    fc2d_clawpack46_options_t *clawpack_options = get_options(domain);
+    fclaw_app_t *app;
+    fc2d_clawpack46_options_t *clawpack_options;
+    app = fclaw2d_domain_get_app(domain);
+    clawpack_options = fc2d_clawpack46_get_options(app);
     *maux = clawpack_options->maux;
 }
 
@@ -543,10 +550,12 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
     return maxcfl;
 }
 
+#if 0
 void fc2d_clawpack46_link_to_clawpatch()
 {
     /* This routine is on its way out */
 }
+#endif
 
 void  fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain)
 {
