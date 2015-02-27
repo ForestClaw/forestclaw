@@ -100,9 +100,13 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
+#if 0
         // Need a copy function in regrid_functions
         fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
         (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
+                                    new_patchno);
+#endif
+        vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,old_patchno,
                                     new_patchno);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
@@ -159,10 +163,10 @@ void amrinit (fclaw2d_domain_t **domain)
 
     /* Set problem dependent parameters for Riemann solvers, etc.
        This has to be called after the mapping context has been set */
-#if 0
-    (ddata->f_problem_setup)(*domain);
-#endif
-    vt.problem_setup(*domain);
+    if (vt.problem_setup != NULL)
+    {
+        vt.problem_setup(*domain);
+    }
 
     double t = 0;
 
@@ -189,7 +193,7 @@ void amrinit (fclaw2d_domain_t **domain)
         // output
         snprintf (basename, BUFSIZ, "%s_init_level_%02d",
                   gparms->prefix, minlevel);
-        amr_output_write_vtk (*domain, basename);
+        fclaw2d_output_write_vtk (*domain, basename);
 
         // out of timer
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -245,7 +249,7 @@ void amrinit (fclaw2d_domain_t **domain)
                 // output
                 snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
                           gparms->prefix, level);
-                amr_output_write_vtk (*domain, basename);
+                fclaw2d_output_write_vtk (*domain, basename);
 
                 // out of timer
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);

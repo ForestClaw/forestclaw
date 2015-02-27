@@ -34,19 +34,12 @@ extern "C"
 #endif
 #endif
 
+/* Keep theses out of files requiring C++ linkage */
 
-
+/* Header files for serial output */
 typedef void (*fclaw2d_output_write_tfile_t)(const int* iframe,
                                              const double* t, const int* meqn,
-                                             const int* ngrids);
-
-typedef void (*fclaw2d_output_write_qfile_t)(const int* mx, const int* my,
-                                             const int* meqn, const int* mbc,
-                                             const double* xlower, const double* ylower,
-                                             const double* dx, const double* dy,
-                                             double q[], const int* iframe,
-                                             const int* patch_idx,const int* level,
-                                             const int* blockno, const int* mpirank);
+                                             const int *ngrids);
 
 #define FCLAW2D_OUTPUT_WRITE_TFILE FCLAW_F77_FUNC(fclaw2d_output_write_tfile, \
                                                   FCLAW2D_OUTPUT_WRITE_TFILE)
@@ -54,10 +47,16 @@ typedef void (*fclaw2d_output_write_qfile_t)(const int* mx, const int* my,
 void FCLAW2D_OUTPUT_WRITE_TFILE(const int *iframe, const double *time,
                                 const int *meqn, const int *ngrids);
 
-#define FCLAW2D_OUTPUT_NEW_QFILE FCLAW_F77_FUNC(fclaw2d_output_new_qfile, \
-                                                FCLAW2D_OUTPUT_NEW_QFILE)
-void FCLAW2D_OUTPUT_NEW_QFILE(const int *iframe);
+/* Actual file that does the writing  (for serial output) */
+typedef void (*fclaw2d_output_write_qfile_t)(const int* mx,        const int* my,
+                                             const int* meqn,      const int* mbc,
+                                             const double* xlower, const double* ylower,
+                                             const double* dx,     const double* dy,
+                                             double q[],           const int* iframe,
+                                             const int* patch_idx, const int* level,
+                                             const int* blockno,   const int* mpirank);
 
+/* File that does the writing */
 #define FCLAW2D_OUTPUT_WRITE_QFILE FCLAW_F77_FUNC(fclaw2d_output_write_qfile, \
                                                   FCLAW2D_OUTPUT_WRITE_QFILE)
 void FCLAW2D_OUTPUT_WRITE_QFILE(const int* mx,        const int* my,
@@ -67,6 +66,12 @@ void FCLAW2D_OUTPUT_WRITE_QFILE(const int* mx,        const int* my,
                                 double q[],           const int* iframe,
                                 const int* patch_idx, const int* level,
                                 const int* blockno,   const int* mpirank);
+
+/* Create new frame file */
+#define FCLAW2D_OUTPUT_NEW_QFILE FCLAW_F77_FUNC(fclaw2d_output_new_qfile, \
+                                                FCLAW2D_OUTPUT_NEW_QFILE)
+void FCLAW2D_OUTPUT_NEW_QFILE(const int *iframe);
+
 
 #ifdef __cplusplus
 #if 0

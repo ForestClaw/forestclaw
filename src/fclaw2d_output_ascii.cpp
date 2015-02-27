@@ -23,11 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_H
-#define FCLAW2D_OUTPUT_H
-
+#include <amr_utils.H>
+#include <forestclaw2d.h>
+#include <fclaw2d_output.h>
+#include <fclaw2d_output_fort.h>
+#include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_vtable.H>
+
+#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,31 +40,50 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_clawpatch_ascii_header(fclaw2d_domain_t* domain,
-                                    int iframe);
+void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
+                                 int iframe)
+{
+    fclaw2d_vtable_t vt;
+    int meqn,ngrids;
+    double time;
 
-void fclaw2d_clawpatch_ascii_output(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
+    time = get_domain_time(domain);
+    ngrids = fclaw2d_domain_get_num_patches(domain);
 
-void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
+    meqn = fclaw2d_clawpatch_get_meqn(domain);
 
-/* --------------------------------------------------------------------
- * Write a one-stop function that creates a big VTK file in parallel.
- * The file extension is basename.vtu.  It contains per-patch data for
- * mpirank, blockno, and global patchno, and the meqn-vector data.
- * Function will be refactored into our callback structure eventually.
- * -------------------------------------------------------------------- */
+    vt = fclaw2d_get_vtable(domain);
+    vt.write_tfile(&iframe,&time,&meqn,&ngrids);
 
-void fclaw2d_output_write_vtk (fclaw2d_domain_t *domain, const char *basename);
+    /* Is this really necessary? */
+    /* FCLAW2D_OUTPUT_NEW_QFILE(&iframe); */
+}
 
+
+void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx, int this_patch_idx,
+                               int iframe,int patch_num,int level)
+{
+    fclaw2d_vtable_t vt;
+    int mx,my,mbc,meqn;
+    double xlower,ylower,dx,dy;
+    double *q;
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+
+    vt.patch_write_qfile(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+                         &iframe,&patch_num,&level,&this_block_idx,
+                         &domain->mpirank);
+}
 
 #ifdef __cplusplus
 #if 0
 {
 #endif
 }
-#endif
-
 #endif

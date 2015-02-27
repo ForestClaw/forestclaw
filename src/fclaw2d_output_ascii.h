@@ -23,10 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_H
-#define FCLAW2D_OUTPUT_H
+#ifndef FCLAW2D_OUTPUT_ASCII_H
+#define FCLAW2D_OUTPUT_ASCII_H
 
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.H>
 
 #ifdef __cplusplus
@@ -37,25 +36,13 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_clawpatch_ascii_header(fclaw2d_domain_t* domain,
-                                    int iframe);
+void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
+                                 int iframe);
 
-void fclaw2d_clawpatch_ascii_output(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
-
-void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
-
-/* --------------------------------------------------------------------
- * Write a one-stop function that creates a big VTK file in parallel.
- * The file extension is basename.vtu.  It contains per-patch data for
- * mpirank, blockno, and global patchno, and the meqn-vector data.
- * Function will be refactored into our callback structure eventually.
- * -------------------------------------------------------------------- */
-
-void fclaw2d_output_write_vtk (fclaw2d_domain_t *domain, const char *basename);
-
+void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                int iframe,int num,int level);
 
 #ifdef __cplusplus
 #if 0

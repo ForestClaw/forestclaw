@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* this header file must come first */
 #include "fclaw2d_vtable.h"
+#include "amr_regrid.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -34,15 +34,20 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver)
+void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)
 {
-    fclaw2d_domain_attribute_add (domain,"vtable",solver);
+    /* Set up some default functions for now ... */
+    vt->patch_copy2samesize = &patch_copy2samesize;
+    vt->patch_average2coarse = &patch_average2coarse;
+    vt->patch_interpolate2fine = &patch_interpolate2fine;
+
+    fclaw2d_domain_attribute_add (domain,"vtable",vt);
 }
 
 fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)
 {
     fclaw2d_vtable_t *vt;
-    vt = fclaw2d_domain_attribute_access(domain,"vtable",NULL);
+    vt = (fclaw2d_vtable_t*) fclaw2d_domain_attribute_access(domain,"vtable",NULL);
     FCLAW_ASSERT(vt != NULL);
     return *vt;
 }

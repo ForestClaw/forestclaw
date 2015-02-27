@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amr_includes.H"
+#include <fclaw2d_output.h>
 
 
 /*  -----------------------------------------------------------------
@@ -81,7 +82,7 @@ void save_time_step(fclaw2d_domain_t *domain)
 static void outstyle_1(fclaw2d_domain_t **domain)
 {
     int iframe = 0;
-    amrout(*domain,iframe);
+    fclaw2d_output_frame(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
 
@@ -252,7 +253,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
         /* Output file at every outer loop iteration */
         set_domain_time(*domain,t_curr);
         iframe++;
-        amrout(*domain,iframe);
+        fclaw2d_output_frame(*domain,iframe);
     }
 }
 
@@ -267,7 +268,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
 {
     /* Write out an initial time file */
     int iframe = 0;
-    amrout(*domain,iframe);
+    fclaw2d_output_frame(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -385,7 +386,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
         if (n % nstep_inner == 0)
         {
             iframe++;
-            amrout(*domain,iframe);
+            fclaw2d_output_frame(*domain,iframe);
         }
     }
 }
@@ -394,7 +395,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
 {
     /* Write out an initial time file */
     int iframe = 0;
-    amrout(*domain,iframe);
+    fclaw2d_output_frame(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -455,7 +456,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
         if (n % nstep_inner == 0)
         {
             iframe++;
-            amrout(*domain,iframe);
+            fclaw2d_output_frame(*domain,iframe);
         }
     }
 }

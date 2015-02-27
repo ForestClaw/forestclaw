@@ -26,10 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include "forestclaw2d.H"
+#include "forestclaw2d.h"
 #include "fclaw_base.h"
-#include "stdbool.h"
 #include "fclaw2d_defs.H"
+#include <fclaw2d_output.h>
+#include <fclaw2d_output_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -79,26 +80,55 @@ typedef fclaw_bool (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
                                                      int this_patchno);
 
 typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
-                                             int iframe, int ngrids);
+                                             int iframe);
 
-typedef void (*fclaw2d_patch_write_output_t)(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int this_block_idx,
-                                             int this_patch_idx,
-                                             int iframe,int patch_num,
-                                             int level);
+typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           int iframe,int patch_num,
+                                           int level);
+
+typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_domain_t* domain,
+                                                 fclaw2d_patch_t *coarse_patch,
+                                                 fclaw2d_patch_t* fine_patch,
+                                                 int this_blockno, int coarse_patchno,
+                                                 int fine_patchno, int igrid);
+
+typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *fine_siblings,
+                                               fclaw2d_patch_t *coarse_patch,
+                                               int blockno, int fine_patchno,
+                                               int coarse_patchno);
+
+typedef void (*fclaw2d_patch_copy2samesize_t)(fclaw2d_domain_t* domain,
+                                              fclaw2d_patch_t *old_patch,
+                                              fclaw2d_patch_t* new_patch,
+                                              int blockno, int old_patchno,
+                                              int new_patchno);
+
+
 
 typedef struct fclaw2d_vtable
 {
     fclaw2d_problem_setup_t            problem_setup;
+
     fclaw2d_patch_setup_t              patch_setup;
     fclaw2d_patch_initialize_t         patch_initialize;
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;
     fclaw2d_patch_tag4refinement_t     patch_tag4refinement;
     fclaw2d_patch_tag4coarsening_t     patch_tag4coarsening;
+    fclaw2d_patch_copy2samesize_t      patch_copy2samesize;
+    fclaw2d_patch_average2coarse_t     patch_average2coarse;
+    fclaw2d_patch_interpolate2fine_t   patch_interpolate2fine;
+
     fclaw2d_patch_write_header_t       write_header;
-    fclaw2d_patch_write_output_t       patch_write_output;
+    fclaw2d_output_write_tfile_t       write_tfile;
+
+    fclaw2d_patch_write_file_t       patch_write_file;
+    fclaw2d_output_write_qfile_t       patch_write_qfile;
+
 } fclaw2d_vtable_t;
 
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *solver);

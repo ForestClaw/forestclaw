@@ -8,6 +8,8 @@ libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw2d_base.h \
 	src/fclaw2d_vtable.h \
+	src/fclaw2d_output.h \
+	src/fclaw2d_output_ascii.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map.h \
@@ -31,18 +33,25 @@ libforestclaw_internal_headers = \
 libforestclaw_compiled_sources = \
 	src/fclaw_base.c \
 	src/fclaw_options.c \
+	src/fclaw_package.c \
+	src/fclaw_register.c \
 	src/fclaw2d_base.c \
-	src/forestclaw2d.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
-	src/fclaw_package.c \
-	src/fclaw_register.c \
+	src/fclaw2d_output.cpp \
+	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map_query.c \
-	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_map_brick.c \
+	src/fclaw2d_diagnostics.cpp \
+	src/fclaw2d_corner_neighbors.cpp \
+	src/fclaw2d_face_neighbors.cpp \
+	src/fclaw2d_mpi_debug.c \
+	src/fclaw2d_fill_ghost.cpp \
+	src/forestclaw2d.c \
+	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -59,7 +68,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
-	src/fclaw2d_diagnostics.cpp \
 	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \
@@ -68,22 +76,14 @@ libforestclaw_compiled_sources = \
 	src/subcycle_manager.cpp \
 	src/amr_advance.cpp \
 	src/amr_regrid.cpp \
-	src/amr_output.cpp \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
-	src/fclaw2d_corner_neighbors.cpp \
-	src/fclaw2d_face_neighbors.cpp \
-	src/fclaw2d_mpi_debug.c \
-	src/fclaw2d_fill_ghost.cpp \
-	src/amr_mol.cpp \
 	src/amr_single_step.cpp \
 	src/amr_timeinterp.cpp \
 	src/amr_physbc.cpp \
 	src/amr_utils.cpp \
 	src/regrid_functions.cpp \
-	src/output_functions.cpp \
-	src/fclaw2d_solvers.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
@@ -91,7 +91,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/phys_corner.f \
 	src/fortran_source2d/setup_mesh.f \
-	src/fortran_source2d/claw_out2.f \
+	src/fortran_source2d/fclaw2d_output_fort.f \
 	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \
