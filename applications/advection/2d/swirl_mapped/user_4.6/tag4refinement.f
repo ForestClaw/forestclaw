@@ -75,7 +75,7 @@ c     # we would coarsen an initial grid.
          do j = 1,my
             qmin = min(qcoarsened(i,j,mq),qmin)
             qmax = max(qcoarsened(i,j,mq),qmax)
-            if (qmax - qmin .gt. 0.5d0) then
+            if (qmax - qmin .gt. 0.05d0) then
                tag_patch = 1
                return
             endif

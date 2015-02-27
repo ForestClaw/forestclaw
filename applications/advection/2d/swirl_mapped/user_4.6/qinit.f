@@ -1,6 +1,6 @@
 c     =====================================================
-       subroutine qinit_manifold(meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,blockno,q,maux,aux)
+       subroutine qinit(maxmx, maxmy, meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
 c     =====================================================
 
 c     # Set initial conditions for q.
@@ -10,13 +10,16 @@ c     #     0.1  otherwise
 
        implicit none
 
-       integer meqn, mbc, mx, my, maux, blockno
+       integer maxmx, maxmy, meqn, mbc, mx, my, maux
        double precision xlower, ylower, dx, dy
        double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
        double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
+       integer blockno, fc2d_clawpack46_get_block;
 
        integer i, j, mq
        double precision xlow,ylow,w
+
+       blockno = fc2d_clawpack46_get_block();
 
        do mq = 1,meqn
           do i = 1-mbc,mx+mbc

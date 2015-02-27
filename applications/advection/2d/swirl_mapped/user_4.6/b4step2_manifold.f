@@ -1,16 +1,14 @@
-      subroutine b4step2_manifold(mbc,mx,my,meqn,q,
-     &            dx,dy,blockno,xd,yd,zd,t, dt,maux,aux)
+      subroutine b4step2_manifold(mbc,mx,my,dx,dy,blockno,
+     &      xd,yd,zd,t, dt,maux,aux)
       implicit none
 
-      integer mbc, mx, my, meqn, maux
+      integer mbc, mx, my, maux
       integer blockno
       double precision xlower, ylower, dx, dy, dt, t
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc, meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       integer i, j
       double precision tperiod, pi2, vt, xll,yll, psi
-
 
       common /comvt/ tperiod,pi2
 

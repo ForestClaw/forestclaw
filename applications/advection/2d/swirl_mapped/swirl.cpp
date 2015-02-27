@@ -23,15 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_single_step.h>
 #include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 
-#include <amr_forestclaw.H>
+#include <forestclaw2d.H>
 #include <amr_utils.H>
-#include <fclaw2d_map_query.h>
 
+#include <fclaw2d_map_query.h>
 #include <fclaw_register.h>
 
 #include "swirl_user.H"
@@ -40,7 +39,6 @@ typedef struct user_options
 {
     int example;
     double alpha;
-
 
     amr_options_t* gparms;
 
@@ -156,20 +154,9 @@ void run_program(fclaw_app_t* app,
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    /* ---------------------------------------------------------------
-       Define the solver and link in other problem/user specific
-       routines
-       --------------------------------------------------------------- */
-
-    link_problem_setup(domain,swirl_problem_setup);
+    fclaw2d_domain_set_app (domain,app);
 
     swirl_link_solvers(domain);
-
-    link_regrid_functions(domain,swirl_patch_tag4refinement,swirl_patch_tag4coarsening);
 
     amrinit(&domain);
     amrrun(&domain);
