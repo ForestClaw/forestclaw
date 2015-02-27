@@ -52,13 +52,6 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
 
     if (level < maxlevel)
     {
-#if 0
-        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
-
-        fclaw_bool refine_patch =
-            (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
-                                         this_patch_idx,initflag);
-#endif
         int initflag = 0;
         fclaw_bool refine_patch  =
             vt.patch_tag4refinement(domain,this_patch,this_block_idx,
@@ -107,21 +100,18 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
         set_clawpatch(domain,temp_coarse_patch,blockno,coarse_patchno);
 
         // One-time setup of patch
-        vt.patch_setup(domain,temp_coarse_patch,blockno,coarse_patchno);
+        if (vt.patch_setup != NULL)
+        {
+            vt.patch_setup(domain,temp_coarse_patch,blockno,coarse_patchno);
+        }
 
-        fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
-        (rf->f_patch_average2coarse)(domain,fine_patches,temp_coarse_patch,
+        vt.patch_average2coarse(domain,fine_patches,temp_coarse_patch,
                                      blockno,coarse_patchno, fine0_patchno);
 
         /* --------------------------------------------------------------
            Test to see if temporary patch needs refining.  If so, then we
            shouldn't coarsen it.
           ----------------------------------------------------------------- */
-#if 0
-        fclaw_bool patch_coarsened =
-            (rf->f_patch_tag4coarsening)(domain, temp_coarse_patch, blockno,
-                                         coarse_patchno);
-#endif
         fclaw_bool patch_coarsened =
             vt.patch_tag4coarsening(domain, temp_coarse_patch, blockno,
                                     coarse_patchno);
@@ -152,19 +142,13 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
                      int old_patchno, int new_patchno,
                      void *user)
 {
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(new_domain);
+
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        // Grid doesn't change
-        // set_clawpatch(new_domain,new_patch,blockno,new_patchno);
-
-        // Setup new patch using solver specific routine
-        // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        // (sf->f_patch_setup)(new_domain,new_patch,blockno,new_patchno);
-
-        // Need a copy function in regrid_functions
-        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
-        (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
-                                    new_patchno);
+        vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,old_patchno,
+                               new_patchno);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -180,18 +164,7 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
-
-            // Create new ClawPatch and assign patch pointer to it.
-            // set_clawpatch(new_domain, fine_patch, blockno, fine_patchno);
-
-            // Do one-time setup on new patch
-            // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-            // (sf->f_patch_setup)(new_domain,fine_patch,blockno,fine_patchno);
-
-            // Initialize new fine patch by either calling an init function or
-            // by interpolating from coarser grid.
-            fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
-            (rf->f_patch_interpolate2fine)(new_domain,coarse_patch,fine_patch,
+            vt.patch_interpolate2fine(new_domain,coarse_patch,fine_patch,
                                            blockno,coarse_patchno,fine_patchno,igrid);
         }
     }
@@ -204,14 +177,8 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
 
-        // set_clawpatch(new_domain,coarse_patch,blockno,coarse_patchno);
-
-        // fclaw2d_solver_functions_t *sf = get_solver_functions(old_domain);
-        // (sf->f_patch_setup)(new_domain,coarse_patch,blockno,coarse_patchno);
-
-        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
-        (rf->f_patch_average2coarse)(new_domain,fine_siblings,coarse_patch,
-                                     blockno,coarse_patchno, fine_patchno);
+        vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
+                                blockno,coarse_patchno, fine_patchno);
     }
     else
     {
@@ -223,11 +190,6 @@ void cb_domain_adapt(fclaw2d_domain_t * old_domain,
 
 void regrid(fclaw2d_domain_t **domain)
 {
-#if 0
-    const amr_options_t *gparms = get_domain_parms(*domain);
-    // double t = get_domain_time(*domain);
-#endif
-
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 
