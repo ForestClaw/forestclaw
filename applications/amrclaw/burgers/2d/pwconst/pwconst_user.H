@@ -47,21 +47,19 @@ void pwconst_tag4coarsening_(const int& mx,const int& my,const int& mbc,
                             const double& ylower, const double& dx, const double& dy,
                             double qcoarsened[], int& tag_patch);
 
-void pwconst_write_tfile_(const int& iframe,const double& time,
-                         const int& mfields,const int& ngrids,
-                         const int& maux);
+/* These are here in case the user wants to change the output */
+void pwconst_write_tfile_(const int* iframe,const double* time,
+                          const int* mfields,const int* ngrids);
 
-void pwconst_write_qfile_(const int& meqn,
-                         const int& mbc, const int& mx,const int& my,
-                         const double& xlower,const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& iframe,const int& patch_num,
-                         const int& level,const int& blockno,
-                         const int& mpirank);
+void pwconst_write_qfile_(const int* mx,        const int* my,
+                          const int* meqn,      const int* mbc,
+                          const double* xlower, const double* ylower,
+                          const double* dx,     const double* dy,
+                          double q[],           const int* iframe,
+                          const int* patch_num, const int* level,
+                          const int* blockno,   const int* mpirank);
 
 void pwconst_link_solvers(fclaw2d_domain_t *domain);
-
-void pwconst_problem_setup(fclaw2d_domain_t* domain);
 
 fclaw_bool pwconst_patch_tag4refinement(fclaw2d_domain_t *domain,
                                           fclaw2d_patch_t *this_patch,
@@ -72,18 +70,8 @@ fclaw_bool pwconst_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                           fclaw2d_patch_t *this_patch,
                                           int blockno,
                                           int patchno);
-void pwconst_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
-
-void pwconst_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                     int this_block_idx, int this_patch_idx,
-                                     int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
 
 #ifdef __cplusplus
 #if 0

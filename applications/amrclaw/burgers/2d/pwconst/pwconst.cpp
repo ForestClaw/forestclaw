@@ -64,15 +64,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     init_domain_data(domain);
-    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
-
-#if 0
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_regrid_functions(domain,pwconst_patch_tag4refinement,
-                          pwconst_patch_tag4coarsening);
-#endif
+    fclaw2d_domain_set_app(domain,app);
 
     pwconst_link_solvers(domain);
 

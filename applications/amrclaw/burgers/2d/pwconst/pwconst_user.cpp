@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
+#include "forestclaw2d.H"
 #include "fc2d_clawpack46.H"
 #include "pwconst_user.H"
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -47,11 +48,14 @@ void pwconst_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc          = &fc2d_clawpack46_bc2;
     vt.patch_single_step_update   = &fc2d_clawpack46_update;
 
-    vt.write_header               = &pwconst_parallel_write_header;
-    vt.patch_write_output         = &pwconst_parallel_write_output;
-
     vt.patch_tag4refinement       = &pwconst_patch_tag4refinement;
     vt.patch_tag4coarsening       = &pwconst_patch_tag4coarsening;
+
+    vt.write_header             = &fclaw2d_output_header_ascii;
+    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+
+    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt.patch_write_qfile        = &FCLAW2D_OUTPUT_WRITE_QFILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
@@ -124,53 +128,6 @@ fclaw_bool pwconst_patch_tag4coarsening(fclaw2d_domain_t *domain,
     int tag_patch = 1;  // == 0 or 1
     pwconst_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
     return tag_patch == 0;
-}
-
-
-void pwconst_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
-    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    int mfields = gparms->meqn;
-    int maux = 0;
-    pwconst_write_tfile_(iframe,time,mfields,ngrids,maux);
-
-    new_qfile_(iframe);
-}
-
-
-void pwconst_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                     int this_block_idx, int this_patch_idx,
-                                     int iframe,int num,int level)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    /* ------------------------------------------------------------- */
-
-    int mpirank = domain->mpirank;
-    pwconst_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                           iframe,num,level,this_block_idx,mpirank);
 }
 
 
