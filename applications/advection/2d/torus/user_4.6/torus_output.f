@@ -1,8 +1,7 @@
-      subroutine torus_write_tfile(iframe,time,
-     &      mfields,ngrids,maux)
+      subroutine torus_write_tfile(iframe,time,meqn,ngrids)
       implicit none
 
-      integer iframe,mfields,ngrids,maux
+      integer iframe,meqn,ngrids
 
       character*10 matname1
       character*10 matname2
@@ -22,11 +21,10 @@
       enddo
 
       open(unit=matunit2,file=matname2)
-      write(matunit2,1000) time,mfields,ngrids,maux
+      write(matunit2,1000) time,meqn,ngrids
  1000 format(e18.8,'    time', /,
      &      i5,'                 mfields'/,
-     &      i5,'                 ngrids'/,
-     &      i5,'                 maux'/,/)
+     &      i5,'                 ngrids')
 
       close(matunit2)
 
@@ -35,17 +33,17 @@
 
       end
 
-      subroutine torus_write_qfile(maxmx,maxmy,meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,q,iframe,patch_num,level,blockno,
-     &      mpirank)
+      subroutine torus_write_qfile(mx,my,meqn,mbc,
+     &      xlower, ylower,dx,dy,q,iframe,patch_num,
+     &      level, blockno, mpirank)
 
       implicit none
 
-      integer maxmx, maxmy,meqn,mbc,mx,my, mpirank
+      integer meqn,mbc,mx,my, mpirank
       integer iframe,patch_num, level, blockno
       double precision xlower, ylower,dx,dy
 
-      double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,meqn)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       character*10 matname1
       integer matunit1
