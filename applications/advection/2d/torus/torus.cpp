@@ -220,17 +220,9 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
+    fclaw2d_domain_set_app (domain,app);
 
     init_domain_data(domain);
-
-#if 0
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
-
-    link_regrid_functions(domain,
-                          torus_patch_tag4refinement,
-                          torus_patch_tag4coarsening);
-#endif
 
     torus_link_solvers(domain);
 
@@ -250,8 +242,8 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t              *options;
-    user_options_t                suser_options, *user = &suser_options;
+    sc_options_t     *options;
+    user_options_t    suser_options, *user = &suser_options;
 
     int retval;
 

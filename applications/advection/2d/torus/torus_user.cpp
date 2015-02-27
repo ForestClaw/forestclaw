@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_vtable.h>
 #include <fclaw_register.h>
+#include <fclaw2d_output.h>
+#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -59,45 +61,13 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_tag4refinement     = &torus_patch_tag4refinement;
     vt.patch_tag4coarsening     = &torus_patch_tag4coarsening;
 
-    vt.write_header             = &torus_write_header;
-    vt.patch_write_output       = &torus_patch_write_output;
+    vt.write_header             = &fclaw2d_output_header_ascii;
+    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+
+    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt.patch_write_qfile        = &torus_write_qfile_;
 
     fclaw2d_set_vtable(domain,&vt);
-
-    /* Original code */
-
-#if 0
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
-
-
-    if (!gparms->manifold)
-    {
-        sf->f_patch_setup              = &fc2d_clawpack46_setaux;
-    }
-    else
-    {
-        sf->f_patch_setup              = &torus_patch_manifold_setup;
-    }
-
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;  /* Needed for lat-long grid */
-
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
-
-    fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
-    rf->f_patch_tag4refinement     = &torus_patch_tag4refinement;
-    rf->f_patch_tag4coarsening     = &torus_patch_tag4coarsening;
-
-
-    fclaw2d_output_functions_t *of = get_output_functions(domain);
-    of->f_patch_write_header       = &torus_parallel_write_header;
-    of->f_patch_write_output       = &torus_parallel_write_output;
-
-#endif
 
     /* Needed for the clawpack46 package */
     classic_user.qinit = &QINIT;
@@ -115,7 +85,6 @@ void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
-
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *xd,*yd,*zd,*area;
@@ -178,46 +147,6 @@ fclaw_bool torus_patch_tag4coarsening(fclaw2d_domain_t *domain,
     torus_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
     return tag_patch == 0;
 }
-
-void torus_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    int meqn, maux;
-    double time;
-
-    time = get_domain_time(domain);
-
-    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    fclaw2d_clawpatch_meqn(domain, &meqn);
-    fc2d_clawpack46_maux(domain, &maux);
-
-    torus_write_tfile_(iframe,time,meqn,ngrids,maux);
-
-    new_qfile_(iframe);
-}
-
-
-void torus_patch_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                              int this_block_idx, int this_patch_idx,
-                              int iframe,int num,int level)
-{
-    int mx,my,mbc,meqn,maxmx,maxmy;
-    double xlower,ylower,dx,dy;
-    double *q;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    maxmx = mx;
-    maxmy = my;
-    /* This opens a file for append and writes in the 'clawout' style. */
-    torus_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                        iframe,num,level,this_block_idx,domain->mpirank);
-}
-
-
 
 #ifdef __cplusplus
 #if 0
