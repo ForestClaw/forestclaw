@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "fclaw_options.h"
 #include "forestclaw2d.h"
+#include "fclaw_base.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -123,6 +124,7 @@ void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t *gparms);
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
 
+void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app);
 fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
 
 void set_domain_time(fclaw2d_domain_t *domain, double time);
