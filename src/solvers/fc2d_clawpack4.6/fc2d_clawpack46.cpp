@@ -174,13 +174,18 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
     fc2d_clawpack46_get_auxarray(domain,cp,aux,maux);
 }
 
-void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux)
+void fc2d_clawpack46_maux(fclaw2d_domain_t* domain,int* maux)
+{
+    *maux = fc2d_clawpack46_get_maux(domain);
+}
+
+int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain)
 {
     fclaw_app_t *app;
     fc2d_clawpack46_options_t *clawpack_options;
     app = fclaw2d_domain_get_app(domain);
     clawpack_options = fc2d_clawpack46_get_options(app);
-    *maux = clawpack_options->maux;
+    return clawpack_options->maux;
 }
 
 void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp)
@@ -548,37 +553,4 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
-}
-
-void fc2d_clawpack46_link_to_clawpatch()
-{
-    /* This routine is on its way out */
-}
-
-void  fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain)
-{
-    const fc2d_clawpack46_options_t* clawpack_options = get_options(domain);
-
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
-
-    if (clawpack_options->maux > 0)
-    {
-        sf->f_patch_setup          = &fc2d_clawpack46_setaux;
-    }
-    else
-    {
-        sf->f_patch_setup          = &amr_dummy_patch_setup;
-    }
-
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-
-    /* Calls b4step2, step2 and src2 */
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
-
-    /* This is needed so that a ClawPatch knows how to create data for a clawpack solver */
-    fc2d_clawpack46_link_to_clawpatch();
 }

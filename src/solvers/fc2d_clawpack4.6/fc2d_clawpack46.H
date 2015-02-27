@@ -280,6 +280,7 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
 
+int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain);
 void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
 
 void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile);
