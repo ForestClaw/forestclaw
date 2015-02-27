@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_DEFS_H
 
 /* Not nice for namespace cleanliness, but necessary to include mpi.h */
+#include <stdbool.h>
 #include <sc.h>
 
 /* Some convenient preprocessor directives *
