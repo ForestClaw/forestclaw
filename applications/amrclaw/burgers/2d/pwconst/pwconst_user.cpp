@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "fc2d_clawpack46.H"
 #include "pwconst_user.H"
+#include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,38 +36,31 @@ extern "C"
 #endif
 #endif
 
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    NULL,      /* setprob */
-    NULL,      /* bc2 */
-    qinit_,
-    NULL,      /* b4step2 */
-    NULL,      /* setaux */
-    NULL,      /* src2 */
-    rpn2_,
-    rpt2_
-};
-
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_user;
 
 void pwconst_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    vt.problem_setup              = NULL;
+    vt.patch_setup                = NULL;
+    vt.patch_initialize           = &fc2d_clawpack46_qinit;
+    vt.patch_physical_bc          = &fc2d_clawpack46_bc2;
+    vt.patch_single_step_update   = &fc2d_clawpack46_update;
 
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    vt.write_header               = &pwconst_parallel_write_header;
+    vt.patch_write_output         = &pwconst_parallel_write_output;
 
-    // sf->f_patch_setup              = &fc2d_clawpack46_setaux;  /* Not needed for pwconst */
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+    vt.patch_tag4refinement       = &pwconst_patch_tag4refinement;
+    vt.patch_tag4coarsening       = &pwconst_patch_tag4coarsening;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &pwconst_parallel_write_header;
-    of->f_patch_write_output = &pwconst_parallel_write_output;
+    fclaw2d_set_vtable(domain,&vt);
+
+    classic_user.qinit = &QINIT;
+    classic_user.rpn2 = &RPN2;
+    classic_user.rpt2 = &RPT2;
 
     fc2d_clawpack46_set_vtable(&classic_user);
 
-    fc2d_clawpack46_link_to_clawpatch();
 }
 
 /* -----------------------------------------------------------------

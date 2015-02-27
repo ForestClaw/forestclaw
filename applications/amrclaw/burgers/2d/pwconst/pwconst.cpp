@@ -64,14 +64,17 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     init_domain_data(domain);
+    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
 
+#if 0
     set_domain_parms(domain,gparms);
     fc2d_clawpack46_set_options(domain,clawpack_options);
 
-    pwconst_link_solvers(domain);
-
     link_regrid_functions(domain,pwconst_patch_tag4refinement,
                           pwconst_patch_tag4coarsening);
+#endif
+
+    pwconst_link_solvers(domain);
 
     amrinit(&domain);
     amrrun(&domain);
@@ -86,9 +89,7 @@ main (int argc, char **argv)
     fclaw_app_t *app;
     int first_arg;
     fclaw_exit_type_t vexit;
-
-    /* Options */
-    sc_options_t                  *options;
+    sc_options_t  *options;
 
     int retval;
 
