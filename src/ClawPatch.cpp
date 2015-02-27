@@ -2,6 +2,7 @@
 #include "fclaw2d_typedefs.h"
 #include "amr_includes.H"
 #include "amr_utils.H"
+#include <fclaw2d_clawpatch.h>
 
 fclaw_app_t* ClawPatch::app;
 
@@ -744,8 +745,14 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
     fclaw2d_clawpatch_meqn(domain,meqn);
 }
 
-void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain, int* meqn)
+void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain,
+                            int* meqn)
+{
+    *meqn = fclaw2d_clawpatch_get_meqn(domain);
+}
+
+int fclaw2d_clawpatch_get_meqn(fclaw2d_domain_t* domain)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    *meqn = gparms->meqn;
+    return gparms->meqn;
 }
