@@ -23,10 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include "forestclaw2d.h"
 #include "fc2d_clawpack46.H"
 #include "fc2d_dummy.H"
 #include "swirl_user.H"
+#include "fclaw2d_vtable.h"
+#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,34 +38,37 @@ extern "C"
 #endif
 #endif
 
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    SETPROB,
-    BC2,  /* bc2 - added here just as a compiler check */
-    QINIT,
-    SETAUX,
-    B4STEP2,
-    NULL,  /* src2 */
-    RPN2,
-    RPT2
-};
-
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_user;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    vt.problem_setup            = &fc2d_clawpack46_setprob;
 
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    vt.patch_setup              = &swirl_patch_setup;
+    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    vt.patch_physical_bc        = &swirl_patch_physical_bc;
+    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
-    sf->f_patch_setup              = &swirl_patch_setup;
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &swirl_patch_physical_bc;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+    vt.patch_tag4refinement     = &swirl_patch_tag4refinement;
+    vt.patch_tag4coarsening     = &swirl_patch_tag4coarsening;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &swirl_parallel_write_header;
-    of->f_patch_write_output = &swirl_parallel_write_output;
+    vt.write_header             = &fclaw2d_output_header_ascii;
+    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+
+    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt.patch_write_qfile        = &FCLAW2D_OUTPUT_WRITE_QFILE;
+
+    fclaw2d_set_vtable(domain,&vt);
+
+    /* Needed for the clawpack46 package */
+    classic_user.qinit = &QINIT;
+    classic_user.bc2 = &BC2;
+    classic_user.setaux = &SETAUX;
+    classic_user.setprob = &SETPROB;
+    classic_user.b4step2 = &B4STEP2;
+    classic_user.rpn2 = &RPN2;
+    classic_user.rpt2 = &RPT2;
 
     fc2d_clawpack46_set_vtable(&classic_user);
 
@@ -78,7 +83,6 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     /* Dummy setup - use multiple libraries */
     fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
-
 }
 
 
@@ -100,9 +104,6 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
 }
 
 
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
 fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
@@ -144,25 +145,23 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
-void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
+void swirl_write_header(fclaw2d_domain_t* domain, int iframe)
 {
-    int maux, meqn;
+    int maux, meqn, ngrids;
     double time;
 
     time = get_domain_time(domain);
-    fc2d_clawpack46_maux(domain,&maux);
-    fclaw2d_clawpatch_meqn(domain,&meqn);
+    maux = fc2d_clawpack46_get_maux(domain);
+    meqn = fclaw2d_clawpatch_get_meqn(domain);
+    ngrids = fclaw2d_domain_get_num_patches(domain);
 
-    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
+    swirl_write_tfile_(&iframe,&time,&meqn,&ngrids);
 
-    swirl_write_tfile_(iframe,time,meqn,ngrids,maux);
-
-    /* This opens file 'fort.qXXXX' for replace and closes the file. */
-    new_qfile_(iframe);
+    FCLAW2D_OUTPUT_NEW_QFILE(&iframe);
 }
 
 
-void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
+void swirl_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   int iframe,int global_patch_num,int level)
 {
@@ -175,9 +174,9 @@ void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                       iframe,global_patch_num,level,this_block_idx,
-                       domain->mpirank);
+    swirl_write_qfile_(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+                       &iframe,&global_patch_num,&level,&this_block_idx,
+                       &domain->mpirank);
 }
 
 #ifdef __cplusplus

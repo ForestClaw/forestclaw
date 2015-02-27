@@ -113,16 +113,9 @@ void run_program(fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
+    fclaw2d_domain_set_app (domain,app);
 
     swirl_link_solvers(domain);
-
-    link_regrid_functions(domain,swirl_patch_tag4refinement,
-                          swirl_patch_tag4coarsening);
 
     /* ---------------------------------------------------------------
        Run

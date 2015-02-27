@@ -1,7 +1,7 @@
-      subroutine swirl_write_tfile(iframe,time,mfields,ngrids,maux)
+      subroutine swirl_write_tfile(iframe,time,mfields,ngrids)
       implicit none
 
-      integer iframe,mfields,ngrids,maux, mpirank
+      integer iframe,mfields,ngrids, mpirank
 
       character*10 matname1
       character*10 matname2
@@ -21,11 +21,10 @@
       enddo
 
       open(unit=matunit2,file=matname2)
-      write(matunit2,1000) time,mfields,ngrids,maux
+      write(matunit2,1000) time,mfields,ngrids
  1000 format(e18.8,'    time', /,
      &      i5,'                 mfields'/,
-     &      i5,'                 ngrids'/,
-     &      i5,'                 maux'/,/)
+     &      i5,'                 ngrids')
 
       close(matunit2)
 
@@ -34,7 +33,7 @@
 
       end
 
-      subroutine swirl_write_qfile(meqn,mbc,mx,my,
+      subroutine swirl_write_qfile(mx,my,meqn,mbc,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,
      &      level,blockno,mpirank)
 
