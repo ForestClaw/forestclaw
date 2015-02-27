@@ -258,8 +258,10 @@ void cb_build_patches(fclaw2d_domain_t *domain,
 
     set_clawpatch(domain,this_patch,this_block_idx,this_patch_idx);
 
-    // Setup new patch using solver specific routine
-    vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
+    if (vt.patch_setup != NULL)
+    {
+        vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
+    }
 }
 
 
@@ -438,7 +440,7 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
             // output
             snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
                       gparms->prefix, mode);
-            amr_output_write_vtk (*domain, basename);
+            fclaw2d_output_write_vtk (*domain, basename);
 
             // out of timer
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);

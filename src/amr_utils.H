@@ -81,6 +81,9 @@ fclaw2d_block_data_t *get_block_data (fclaw2d_block_t * block);
 fclaw2d_patch_data_t *get_patch_data (fclaw2d_patch_t * patch);
 fclaw2d_map_context_t *get_map_context(fclaw2d_domain_t * domain);
 
+int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
+
+
 /* -----------------------------------------------------------------
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
@@ -95,23 +98,6 @@ void copy_domain_data (fclaw2d_domain_t * old_domain,
    ----------------------------------------------------------------- */
 void link_problem_setup (fclaw2d_domain_t * domain,
                          fclaw2d_problem_setup_t f_problem_setup);
-
-#if 0                           /* moved into fclaw2d_capi.h */
-
-/* -----------------------------------------------------------------
-   Some helper functions that really do make things easier..
-   ----------------------------------------------------------------- */
-const amr_options_t *get_domain_parms (fclaw2d_domain_t * domain);
-void set_domain_time (fclaw2d_domain_t * domain, double time);
-double get_domain_time (fclaw2d_domain_t * domain);
-
-
-
-// Misc. routines
-int num_patches (fclaw2d_domain_t * domain, int level, int include_shadow);
-int pow_int (int a, int n);
-
-#endif
 
 fclaw2d_domain_exchange_t *get_domain_exchange_data (fclaw2d_domain_t *
                                                      domain);

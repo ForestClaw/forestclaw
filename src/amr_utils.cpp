@@ -41,11 +41,13 @@ int pow_int(int a, int n)
     return b;
 }
 
+#if 0
 static
 void problem_setup_default(fclaw2d_domain_t* domain)
 {
     /* This is linked via "link_problem_setup", below */
 }
+#endif
 
 /* -----------------------------------------------------------------
    Initialize data
@@ -70,46 +72,13 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->curr_time = 0;
 
     /* I put this here because somehow it is not part of a 'solver' */
-    ddata->f_problem_setup = &problem_setup_default;
     ddata->f_run_diagnostics = &run_diagnostics_default;
 
-    fclaw2d_solver_functions_t* solver_functions = FCLAW2D_ALLOC(fclaw2d_solver_functions_t, 1);
-    initialize_solver_functions(solver_functions);
-    ddata->solver_functions = solver_functions;
-
-    fclaw2d_regrid_functions_t* regrid_functions = FCLAW2D_ALLOC(fclaw2d_regrid_functions_t, 1);
-    initialize_regrid_functions(regrid_functions);
-    ddata->regrid_functions = regrid_functions;
-
-    fclaw2d_output_functions_t* output_functions = FCLAW2D_ALLOC(fclaw2d_output_functions_t, 1);
-    initialize_output_functions(output_functions);
-    ddata->output_functions = output_functions;
 }
 
 void delete_domain_data(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
-
-    fclaw2d_solver_functions_t *sf = (fclaw2d_solver_functions_t*) ddata->solver_functions;
-    if (sf != NULL)
-    {
-        FCLAW2D_FREE(sf);
-        ddata->solver_functions = (fclaw2d_solver_functions_t*) NULL;
-    }
-
-    fclaw2d_regrid_functions_t *rf = (fclaw2d_regrid_functions_t*) ddata->regrid_functions;
-    if (rf != NULL)
-    {
-        FCLAW2D_FREE(rf);
-        ddata->regrid_functions = (fclaw2d_regrid_functions_t*) NULL;
-    }
-
-    fclaw2d_output_functions_t *of = (fclaw2d_output_functions_t*) ddata->output_functions;
-    if (of != NULL)
-    {
-        FCLAW2D_FREE(of);
-        ddata->output_functions = (fclaw2d_output_functions_t*) NULL;
-    }
 
     FCLAW2D_FREE (ddata);
     domain->user = NULL;
@@ -238,12 +207,8 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     /* Copy data members */
     ddata_new->curr_time = ddata_old->curr_time;
 
-    ddata_new->f_problem_setup = ddata_old->f_problem_setup;
     ddata_new->f_run_diagnostics = ddata_old->f_run_diagnostics;
 
-    copy_solver_functions(ddata_old->solver_functions,ddata_new->solver_functions);
-    copy_regrid_functions(ddata_old->regrid_functions,ddata_new->regrid_functions);
-    copy_output_functions(ddata_old->output_functions,ddata_new->output_functions);
 }
 
 
@@ -287,13 +252,6 @@ void init_block_and_patch_data(fclaw2d_domain_t *domain)
     }
 }
 
-
-void link_problem_setup(fclaw2d_domain_t* domain, fclaw2d_problem_setup_t f_problem_setup)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->f_problem_setup = f_problem_setup;
-}
-
 fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain)
 {
     fclaw_app_t *app;
@@ -304,6 +262,18 @@ fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain)
     FCLAW_ASSERT(app != NULL);
     return app;
 }
+
+void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app)
+{
+    FCLAW_ASSERT(app != NULL);
+    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
+}
+
+int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
+{
+    return domain->global_num_patches;
+}
+
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {

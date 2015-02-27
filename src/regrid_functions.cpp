@@ -31,35 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    User defined routines for linking in customized tagging and
    interpolation/averaging routines
    ----------------------------------------------------------------- */
-    void link_regrid_functions(fclaw2d_domain_t* domain,
-                               fclaw2d_patch_tag4refinement_t patch_tag4refinement,
-                               fclaw2d_patch_tag4coarsening_t patch_tag4coarsening)
-{
-    fclaw2d_regrid_functions_t *rf = get_regrid_functions(domain);
-
-    rf->f_patch_tag4refinement = patch_tag4refinement;
-    rf->f_patch_tag4coarsening = patch_tag4coarsening;
-    rf->f_patch_interpolate2fine = &patch_interpolate2fine;
-    rf->f_patch_average2coarse = &patch_average2coarse;
-    rf->f_patch_copy2samesize = &patch_copy2samesize;
-}
-
-fclaw_bool patch_tag4coarsening_dummy(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    return fclaw_true;  /* don't coarsen */
-}
-
-fclaw_bool patch_tag4refinement_dummy(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag)
-{
-    return fclaw_false;  /* don't refine */
-}
-
 
 void patch_copy2samesize(fclaw2d_domain_t* domain, fclaw2d_patch_t *old_patch,
                          fclaw2d_patch_t* new_patch, int blockno, int old_patchno,
@@ -137,52 +108,5 @@ void patch_average2coarse(fclaw2d_domain_t *domain,
                                  p4est_refineFactor,
                                  refratio, igrid,manifold);
 
-#if 0
-        if (gparms->manifold)
-        {
-            double *areacoarse = cp_coarse->area();
-            double *areafine = cp_fine->area();
-            average_to_coarse_mapped_(mx,my,mbc,meqn,qcoarse,qfine,
-                                      areacoarse, areafine,
-                                      p4est_refineFactor,
-                                      refratio, igrid);
-        }
-        else
-        {
-            average_to_coarse_patch_(mx,my,mbc,meqn,qcoarse,qfine,
-                                     p4est_refineFactor,refratio,igrid);
-        }
-#endif
     }
-}
-
-void initialize_regrid_functions(fclaw2d_regrid_functions_t* regrid_functions)
-{
-    fclaw2d_regrid_functions_t *rf = regrid_functions;
-
-    rf->f_patch_tag4refinement = &patch_tag4refinement_dummy;
-    rf->f_patch_tag4coarsening = &patch_tag4coarsening_dummy;
-    rf->f_patch_interpolate2fine = &patch_interpolate2fine;
-    rf->f_patch_average2coarse = &patch_average2coarse;
-    rf->f_patch_copy2samesize = &patch_copy2samesize;
-
-}
-
-void copy_regrid_functions(fclaw2d_regrid_functions_t* old_regrid_functions,
-                           fclaw2d_regrid_functions_t* new_regrid_functions)
-{
-    fclaw2d_regrid_functions_t* oldrf = old_regrid_functions;
-    fclaw2d_regrid_functions_t* newrf = new_regrid_functions;
-
-    newrf->f_patch_tag4refinement = oldrf->f_patch_tag4refinement;
-    newrf->f_patch_tag4coarsening = oldrf->f_patch_tag4coarsening;
-    newrf->f_patch_interpolate2fine = oldrf->f_patch_interpolate2fine;
-    newrf->f_patch_average2coarse = oldrf->f_patch_average2coarse;
-    newrf->f_patch_copy2samesize = oldrf->f_patch_copy2samesize;
-}
-
-fclaw2d_regrid_functions_t* get_regrid_functions(fclaw2d_domain_t *domain)
-{
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    return ddata->regrid_functions;
 }
