@@ -12,13 +12,11 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/fclaw2d_map_latlong.c \
 	applications/advection/2d/torus/setprob.f \
 	applications/advection/2d/torus/psi.f \
-	applications/advection/2d/torus/user_4.6/setaux.f \
-	applications/advection/2d/torus/user_4.6/tag4refinement.f \
 	applications/advection/2d/torus/user_4.6/rpn2noncons.f \
 	applications/advection/2d/torus/user_4.6/rpt2noncons.f \
-	applications/advection/2d/torus/user_4.6/qinit_manifold.f \
-	applications/advection/2d/torus/user_4.6/setaux_manifold.f \
-	applications/advection/2d/torus/user_4.6/torus_output.f
+	applications/advection/2d/torus/user_4.6/qinit.f \
+	applications/advection/2d/torus/user_4.6/setaux.f \
+	applications/advection/2d/torus/user_4.6/setaux_manifold.f
 
 applications_advection_2d_torus_torus_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)

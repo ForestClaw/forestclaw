@@ -40,6 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_register.h>
 #include "torus_user.H"
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 typedef struct user_options
 {
     int example;
@@ -276,3 +284,10 @@ main (int argc, char **argv)
 
     return 0;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

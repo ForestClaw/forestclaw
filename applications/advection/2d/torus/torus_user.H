@@ -37,34 +37,12 @@ extern "C"
 #endif
 #endif
 
-void torus_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn, const double& xlower,
-                           const double& ylower, const double& dx, const double& dy,
-                           double q[], const int& init_flag, const int& blockno,
-                           int& tag_patch);
+#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
 
-void torus_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn,const double& xlower,
-                           const double& ylower, const double& dx, const double& dy,
-                           double qcoarsened[], int& tag_patch);
-
-void setaux_manifold_(const int& mbc,
-                      const int& mx, const int& my,
-                      const int& blockno,
-                      const double& xlower, const double& ylower,
-                      const double& dx, const double& dy,
-                      const int& maux, double aux[], double area[]);
-
-void torus_write_tfile_(const int* iframe,const double* time,
-                        const int* mfields,const int* ngrids);
-
-void torus_write_qfile_(const int* mx,const int* my,
-                        const int*, const int*,
-                        const double*, const double*,
-                        const double* dx, const double* dy,
-                        double q[], const int* iframe, const int* patch_num,
-                        const int* level, const int* blockno,
-                        const int* mpirank);
+void SETAUX_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy, const int* blockno,
+                     const int* maux, double aux[], double area[]);
 
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
@@ -73,17 +51,6 @@ void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx);
 
-fclaw_bool torus_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
-
-fclaw_bool torus_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
-
-void torus_write_header(fclaw2d_domain_t* domain, int iframe);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -116,11 +83,13 @@ fclaw2d_map_context_t *
                              const int a, const int b);
 
 
+#if 0
 struct fclaw2d_map_composition
 {
     fclaw2d_map_context_t* brick;
     fclaw2d_map_context_t* torus;
 };
+#endif
 
 #ifdef __cplusplus
 #if 0
