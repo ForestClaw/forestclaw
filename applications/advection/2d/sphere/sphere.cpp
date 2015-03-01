@@ -111,7 +111,6 @@ static
         fclaw2d_map_context_t    *cont = NULL;
 
         amr_options_t              *gparms;
-        fc2d_clawpack46_options_t  *clawpack_options;
         user_options_t             *user;
 
         /* Used locally */
@@ -119,7 +118,6 @@ static
         double rotate[2];
 
         gparms = fclaw_forestclaw_get_options(app);
-        clawpack_options = fc2d_clawpack46_get_options(app);
         user = (user_options_t*) fclaw_app_get_attribute(app,"user",NULL);
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
@@ -149,13 +147,7 @@ static
            Set domain data.
            --------------------------------------------------------------- */
         init_domain_data(domain);
-
-        /* Store parameters */
-        set_domain_parms(domain,gparms);
-        fc2d_clawpack46_set_options (domain,clawpack_options);
-
-        /* Link solvers to the domain */
-        link_problem_setup(domain,fc2d_clawpack46_setprob);
+        fclaw2d_domain_set_app(domain,app);
 
         sphere_link_solvers(domain);
 

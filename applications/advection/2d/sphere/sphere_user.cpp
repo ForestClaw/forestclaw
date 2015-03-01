@@ -23,9 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include "forestclaw2d.H"
 #include "fc2d_clawpack46.H"
 #include "sphere_user.H"
+#include "fclaw2d_vtable.h"
+#include "fclaw2d_regrid_default.h"
+#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,35 +38,39 @@ extern "C"
 #endif
 #endif
 
-static fc2d_clawpack46_vtable_t classic_user;
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    fclaw2d_init_vtable(&vt);
 
+    vt.problem_setup            = &fc2d_clawpack46_setprob;
 
-    sf->f_patch_setup               = &sphere_patch_setup;
-    sf->f_patch_initialize          = &fc2d_clawpack46_qinit;
-    sf->f_patch_single_step_update  = &fc2d_clawpack46_update;
+    vt.patch_setup              = &sphere_patch_setup;
+    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
+    vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
+    vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
 
-    fclaw2d_regrid_functions_t *rf  = get_regrid_functions(domain);
-    rf->f_patch_tag4refinement      = &sphere_patch_tag4refinement;
-    rf->f_patch_tag4coarsening      = &sphere_patch_tag4coarsening;
+    vt.patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
+    vt.fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
 
+    vt.write_header             = &fclaw2d_output_header_ascii;
+    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
 
-    fclaw2d_output_functions_t *of  = get_output_functions(domain);
-    of->f_patch_write_header        = &sphere_parallel_write_header;
-    of->f_patch_write_output        = &sphere_parallel_write_output;
+    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
 
+    fclaw2d_set_vtable(domain,&vt);
 
-    classic_user.setprob = &SETPROB;
-    classic_user.qinit = &QINIT;
-    classic_user.rpn2 = &RPN2;
-    classic_user.rpt2 = &RPT2;
-    fc2d_clawpack46_set_vtable(&classic_user);
+    classic_claw.setprob = &SETPROB;
+    classic_claw.qinit = &QINIT;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
+    fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
 void sphere_patch_setup(fclaw2d_domain_t *domain,
@@ -111,88 +118,6 @@ void sphere_b4step2(fclaw2d_domain_t *domain,
 
     B4STEP2_MANIFOLD(mbc,mx,my,dx,dy,t,maux,aux, this_block_idx,xd,yd,zd);
 }
-
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
-fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx, int this_patch_idx,
-                                       int initflag)
-{
-    int mx,my,mbc, meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    int tag_patch;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q, &meqn);
-
-    tag_patch = 0;
-    sphere_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
-                           this_block_idx,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int blockno_idx,
-                                             int patchno)
-{
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    int tag_patch;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    sphere_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,tag_patch);
-    return tag_patch == 0;
-}
-
-void sphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    int meqn, maux;
-    double time;
-
-    time = get_domain_time(domain);
-
-    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    fc2d_clawpack46_maux(domain,&maux);
-    fclaw2d_clawpatch_meqn(domain,&meqn);
-
-    sphere_write_tfile_(iframe,time,meqn,ngrids,maux);
-
-    new_qfile_(iframe);
-}
-
-
-void sphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level)
-{
-    int mx,my,mbc,meqn, maxmx, maxmy;
-    double xlower,ylower,dx,dy;
-    double *q;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    maxmx = mx;
-    maxmy = my;
-
-    sphere_write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                        iframe,num,level,this_block_idx,domain->mpirank);
-}
-
 
 
 #ifdef __cplusplus
