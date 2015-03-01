@@ -27,6 +27,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_solvers.H"
 #include "fclaw2d_vtable.h"
 
+
+void fclaw2d_physbc_default(fclaw2d_domain *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double dt,
+                            fclaw_bool intersects_phys_bdry[],
+                            fclaw_bool time_interp)
+{
+    /* This can be used when no BCs are to be called */
+}
+
 static
 void cb_set_phys_bc(fclaw2d_domain_t *domain,
                    fclaw2d_patch_t *this_patch,
@@ -45,12 +58,12 @@ void cb_set_phys_bc(fclaw2d_domain_t *domain,
     get_phys_boundary(domain,this_block_idx,this_patch_idx,intersects_bc);
 
     vt.patch_physical_bc(domain,
-                              this_patch,
-                              this_block_idx,
-                              this_patch_idx,
-                              t_info->level_time,dt,
-                              intersects_bc,
-                              t_info->time_interp);
+                         this_patch,
+                         this_block_idx,
+                         this_patch_idx,
+                         t_info->level_time,dt,
+                         intersects_bc,
+                         t_info->time_interp);
 }
 
 /* This is needed by other routines, so we don't set it to static. */

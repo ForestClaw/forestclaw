@@ -31,6 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_register.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 int pow_int(int a, int n)
 {
     int b = 1;
@@ -70,9 +79,6 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->domain_exchange = NULL;
 
     ddata->curr_time = 0;
-
-    /* I put this here because somehow it is not part of a 'solver' */
-    ddata->f_run_diagnostics = &run_diagnostics_default;
 
 }
 
@@ -199,15 +205,7 @@ void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain
     ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
 
 
-    /*
-       We don't need to copy domain_exchange, since it is rebuilt whenever
-       we create a new domain.
-    */
-
-    /* Copy data members */
     ddata_new->curr_time = ddata_old->curr_time;
-
-    ddata_new->f_run_diagnostics = ddata_old->f_run_diagnostics;
 
 }
 
@@ -275,14 +273,20 @@ int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
 }
 
 
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
+const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
 {
-    amr_options_t *gparms;
+    const amr_options_t *gparms;
     fclaw_app_t *app;
 
     app = fclaw2d_domain_get_app(domain);
     gparms = fclaw_forestclaw_get_options(app);
     return gparms;
+}
+
+
+const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
+{
+    return fclaw2d_forestclaw_get_options(domain);
 }
 
 void set_domain_time(fclaw2d_domain_t *domain, double time)
@@ -378,3 +382,10 @@ fclaw_mpi_finalize (void)
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

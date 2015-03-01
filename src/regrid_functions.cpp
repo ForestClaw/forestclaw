@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    User defined routines for linking in customized tagging and
    interpolation/averaging routines
    ----------------------------------------------------------------- */
-
+#if 0
 void patch_copy2samesize(fclaw2d_domain_t* domain, fclaw2d_patch_t *old_patch,
                          fclaw2d_patch_t* new_patch, int blockno, int old_patchno,
                          int new_patchno)
@@ -110,3 +110,4 @@ void patch_average2coarse(fclaw2d_domain_t *domain,
 
     }
 }
+#endif

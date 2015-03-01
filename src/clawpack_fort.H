@@ -67,10 +67,12 @@ void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& refratio, const int& igrid,
                             fclaw2d_transform_data_t** transform_cptr);
 
+#if 0
 void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
                 double qcoarse[], double qfine[], double areacoarse[], double areafine[],
                 const int& p4est_refineFactor,
                 const int& refratio, const int& igrid);
+#endif
 
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
@@ -175,6 +177,7 @@ void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
 /* ----------------------------------------------------------------------------------
    Tagging for refinement/coarsening
    ---------------------------------------------------------------------------------- */
+#if 0
 void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
                                 const int& meqn, double qcoarse[], double qfine[],
                                 const int& p4est_refineFactor,
@@ -187,6 +190,7 @@ void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,
                               const int& p4est_refineFactor,
                               const int& refratio, const int& igrid,
                               const int& manifold);
+#endif
 
 #if 0
 void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,

@@ -24,8 +24,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amr_includes.H"
+#include <amr_includes.H>
 #include <fclaw2d_output.h>
+#include <fclaw2d_regrid.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+{
+#endif
+#endif
 
 
 /*  -----------------------------------------------------------------
@@ -122,7 +131,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-                run_diagnostics(*domain);
+                fclaw2d_run_diagnostics(*domain);
 
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
@@ -241,7 +250,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
                 if (n_inner % gparms->regrid_interval == 0)
                 {
                     fclaw_global_infof("regridding at step %d\n",n);
-                    regrid(domain);
+                    fclaw2d_regrid(domain);
                 }
             }
             else
@@ -306,7 +315,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
                 fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-                run_diagnostics(*domain);
+                fclaw2d_run_diagnostics(*domain);
 
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
@@ -375,7 +384,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             if (n % gparms->regrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
-                regrid(domain);
+                fclaw2d_regrid(domain);
             }
         }
         else
@@ -419,7 +428,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
             fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
-            run_diagnostics(*domain);
+            fclaw2d_run_diagnostics(*domain);
 
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
@@ -445,7 +454,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
 
-                regrid(domain);
+                fclaw2d_regrid(domain);
             }
         }
         else
@@ -487,3 +496,10 @@ void amrrun(fclaw2d_domain_t **domain)
         exit(0);
     }
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

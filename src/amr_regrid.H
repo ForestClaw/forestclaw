@@ -34,6 +34,7 @@ extern "C"
 #endif
 #endif
 
+#if 0
 typedef struct fclaw2d_regrid_functions fclaw2d_regrid_functions_t;
 
 /* ------------------------------------------------------------------------- */
@@ -51,6 +52,7 @@ void patch_interpolate2fine(fclaw2d_domain_t* domain, fclaw2d_patch_t *coarse_pa
 void patch_copy2samesize(fclaw2d_domain_t* domain, fclaw2d_patch_t *old_patch,
                          fclaw2d_patch_t* new_patch, int blockno, int old_patchno,
                          int new_patchno);
+#endif
 
 
 void build_initial_domain(fclaw2d_domain_t* domain);
