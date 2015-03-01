@@ -131,6 +131,8 @@ struct amr_options
     int minlevel;
     int maxlevel;
     int regrid_interval;
+    double refine_threshold;
+    double coarsen_threshold;
 
     /* Mapping functions */
     int manifold;

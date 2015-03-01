@@ -260,9 +260,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
-    sc_options_add_int (opt, 0, "refratio", &amropt->refratio, 2,
-                        "Refinement ratio (fixed) [2]");
-
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
                         "Minimum refinement level [0]");
 
@@ -271,6 +268,15 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_int (opt, 0, "regrid_interval", &amropt->regrid_interval,
                         1, "Regridding frequency [1]");
+
+    sc_options_add_int (opt, 0, "refratio", &amropt->refratio,
+                        2, "Refinement ratio [2]");
+
+    sc_options_add_double (opt, 0, "refine_threshold", &amropt->refine_threshold,
+                           0.5, "Refinement threshold [0.5]");
+
+    sc_options_add_double (opt, 0, "coarsen_threshold", &amropt->coarsen_threshold,
+                           0.1, "Coarsening threshold [0.1]");
 
 
     sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower " \

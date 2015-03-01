@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include <forestclaw2d.h>
 #include <fclaw2d_output.h>
-#include <fclaw2d_output_fort.h>
+
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -53,7 +52,7 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
     meqn = fclaw2d_clawpatch_get_meqn(domain);
 
     vt = fclaw2d_get_vtable(domain);
-    vt.write_tfile(&iframe,&time,&meqn,&ngrids);
+    vt.fort_write_header(&iframe,&time,&meqn,&ngrids);
 
     /* Is this really necessary? */
     /* FCLAW2D_OUTPUT_NEW_QFILE(&iframe); */
@@ -76,9 +75,9 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    vt.patch_write_qfile(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
-                         &iframe,&patch_num,&level,&this_block_idx,
-                         &domain->mpirank);
+    vt.fort_write_file(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+                       &iframe,&patch_num,&level,&this_block_idx,
+                       &domain->mpirank);
 }
 
 #ifdef __cplusplus

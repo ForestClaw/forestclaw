@@ -37,6 +37,7 @@ extern "C"
 #endif
 #endif
 
+#if 0
 void fclaw2d_clawpatch_ascii_header(fclaw2d_domain_t* domain,
                                     int iframe);
 
@@ -44,6 +45,7 @@ void fclaw2d_clawpatch_ascii_output(fclaw2d_domain_t *domain,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx, int this_patch_idx,
                                     int iframe,int num,int level);
+#endif
 
 void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
 

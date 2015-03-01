@@ -1,4 +1,4 @@
-      subroutine fclaw2d_output_write_tfile(iframe,time,
+      subroutine fclaw2d_fort_write_header(iframe,time,
      &      meqn,ngrids)
       implicit none
 
@@ -55,7 +55,7 @@
       end
 
 
-      subroutine fclaw2d_output_write_qfile(mx,my,meqn,mbc,
+      subroutine fclaw2d_fort_write_file(mx,my,meqn,mbc,
      &      xlower,ylower, dx,dy,q,iframe,patch_num,level,
      &      blockno,mpirank)
 
