@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_vtable.h"
-#include "amr_regrid.H"
+#include "fclaw2d_regrid_default.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -37,9 +37,13 @@ extern "C"
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)
 {
     /* Set up some default functions for now ... */
-    vt->patch_copy2samesize = &patch_copy2samesize;
-    vt->patch_average2coarse = &patch_average2coarse;
-    vt->patch_interpolate2fine = &patch_interpolate2fine;
+    vt->patch_copy2samesize = &fclaw2d_patch_copy2samesize;
+
+    vt->patch_average2coarse = &fclaw2d_patch_average2coarse;
+    vt->fort_average2coarse = &FCLAW2D_FORT_AVERAGE2COARSE;
+
+    vt->patch_interpolate2fine = &fclaw2d_patch_interpolate2fine;
+    vt->fort_interpolate2fine = &FCLAW2D_FORT_INTERPOLATE2FINE;
 
     fclaw2d_domain_attribute_add (domain,"vtable",vt);
 }
