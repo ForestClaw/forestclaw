@@ -290,7 +290,7 @@ void fc2d_clawpack46_package_register(fclaw_app_t* app,
 
 int fc2d_clawpack46_get_package_id();
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_app_t* app);
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain);
 
 
 /* -------------------------------------------------------------------------
