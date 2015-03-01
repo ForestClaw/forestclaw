@@ -10,9 +10,12 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
 	src/fclaw2d_output_ascii.h \
+	src/fclaw2d_output_ascii_fort.h \
+	src/fclaw2d_regrid_default.h \
+	src/fclaw2d_regrid_default_fort.h \
+	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
-	src/fclaw2d_map.h \
 	src/clawpack_fort.H \
 	src/fclaw2d_transform.h \
 	src/fclaw_package.h \
@@ -42,6 +45,8 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_transform.c \
 	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
+	src/fclaw2d_regrid_default.cpp \
+	src/fclaw2d_regrid.cpp \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
@@ -75,7 +80,6 @@ libforestclaw_compiled_sources = \
 	src/amrreset.cpp \
 	src/subcycle_manager.cpp \
 	src/amr_advance.cpp \
-	src/amr_regrid.cpp \
 	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
@@ -83,7 +87,6 @@ libforestclaw_compiled_sources = \
 	src/amr_timeinterp.cpp \
 	src/amr_physbc.cpp \
 	src/amr_utils.cpp \
-	src/regrid_functions.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
@@ -91,7 +94,8 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/phys_corner.f \
 	src/fortran_source2d/setup_mesh.f \
-	src/fortran_source2d/fclaw2d_output_fort.f \
+	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
+	src/fortran_source2d/fclaw2d_regrid_fort.f \
 	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \

@@ -31,10 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw_options.h"
 #include "forestclaw2d.h"
-#include "fclaw2d_solvers.H"
-#include "amr_regrid.H"
-#include "amr_output.H"
-#include "fclaw2d_diagnostics.H"
+
 
 class ClawPatch;
 
@@ -77,7 +74,6 @@ typedef struct fclaw2d_domain_data
     /* Time at start of each subcycled time step */
     double curr_time;
 
-    fclaw2d_run_diagnostics_t f_run_diagnostics;
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;
 

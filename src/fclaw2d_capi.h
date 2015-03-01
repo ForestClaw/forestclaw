@@ -123,6 +123,7 @@ void set_domain_parms(fclaw2d_domain_t *domain, const amr_options_t *gparms);
 #endif
 
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
+const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
 
 void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app);
 fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
