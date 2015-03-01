@@ -49,7 +49,7 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_setup              = &sphere_patch_setup;
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Doesn't do anything */
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
     vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
@@ -70,6 +70,7 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.qinit = &QINIT;
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
+
     fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
