@@ -3,6 +3,7 @@ c     # Exchange routines - (i,j,mq) ordering
 c     # ----------------------------------------------------------
 c     # exchange_face_ghost
 c     # exchange_corner_ghost
+c     # exchange_phys_corner_ghost
 c     # ----------------------------------------------------------
 
 
