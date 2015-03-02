@@ -68,14 +68,14 @@ typedef void (*fc2d_clawpack46_setaux_t)(const int* maxmx, const int* maxmy, con
                                          const double* dx, const double* dy,
                                          const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_b4step2_t)(const int& maxmx, const int& maxmy,
-                                          const int& mbc,
-                                          const int& mx, const int& my, const int& meqn,
-                                          double q[], const double& xlower,
-                                          const double& ylower,
-                                          const double& dx, const double& dy,
-                                          const double& t, const double& dt,
-                                          const int& maux, double aux[]);
+typedef void (*fc2d_clawpack46_b4step2_t)(const int* maxmx, const int* maxmy,
+                                          const int* mbc,
+                                          const int* mx, const int* my, const int* meqn,
+                                          double q[], const double* xlower,
+                                          const double* ylower,
+                                          const double* dx, const double* dy,
+                                          const double* t, const double* dt,
+                                          const int* maux, double aux[]);
 
 typedef void (*fc2d_clawpack46_src2_t)(const int& maxmx, const int& maxmy, const int& meqn,
                                        const int& mbc, const int& mx,const int& my,
@@ -172,12 +172,12 @@ void bc2_(const int* maxmx, const int* maxmy, const int* meqn,
           const double* dt, const int mthbc[]);
 
 
-void b4step2_(const int& maxmx, const int& maxmy, const int& mbc,
-              const int& mx, const int& my, const int& meqn,
-              double q[], const double& xlower, const double& ylower,
-              const double& dx, const double& dy,
-              const double& t, const double& dt,
-              const int& maux, double aux[]);
+void b4step2_(const int* maxmx, const int* maxmy, const int* mbc,
+              const int* mx, const int* my, const int* meqn,
+              double q[], const double* xlower, const double* ylower,
+              const double* dx, const double* dy,
+              const double* t, const double* dt,
+              const int* maux, double aux[]);
 
 void src2_(const int& maxmx, const int& maxmy, const int& meqn,
            const int& mbc, const int& mx,const int& my,
