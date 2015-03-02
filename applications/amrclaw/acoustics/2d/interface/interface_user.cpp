@@ -38,8 +38,6 @@ extern "C"
 #endif
 
 
-
-
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
 
@@ -65,7 +63,6 @@ void interface_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.rpt2 = &RPT2;
 
     fc2d_clawpack46_set_vtable(&classic_claw);
-
 };
 
 void interface_setup_problem(fclaw2d_domain_t* domain)
