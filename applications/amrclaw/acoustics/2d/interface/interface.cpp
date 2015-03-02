@@ -35,18 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "interface_user.H"
 
-typedef struct user_options
-{
-    int example;
-    double rhol;
-    double cl;
-    double rhor;
-    double cr;
-
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {

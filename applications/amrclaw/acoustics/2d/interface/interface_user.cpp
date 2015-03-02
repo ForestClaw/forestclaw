@@ -37,6 +37,9 @@ extern "C"
 #endif
 #endif
 
+
+
+
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
 
@@ -44,7 +47,8 @@ void interface_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
+    vt.problem_setup            = &interface_setup_problem;
+
     vt.patch_setup              = &fc2d_clawpack46_setaux;
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
@@ -54,7 +58,7 @@ void interface_link_solvers(fclaw2d_domain_t *domain)
 
     fclaw2d_set_vtable(domain,&vt);
 
-    classic_claw.setprob = &SETPROB;
+    /* classic_claw.setprob = &SETPROB; */
     classic_claw.qinit = &QINIT;
     classic_claw.setaux = &SETAUX;
     classic_claw.rpn2 = &RPN2;
@@ -63,6 +67,17 @@ void interface_link_solvers(fclaw2d_domain_t *domain)
     fc2d_clawpack46_set_vtable(&classic_claw);
 
 };
+
+void interface_setup_problem(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    user_options_t* user;
+
+    app = fclaw2d_domain_get_app(domain);
+    user = (user_options_t*) fclaw_app_get_user(app);
+    INTERFACE_SETPROB(&user->rhol,&user->cl,&user->rhor,&user->cr);
+}
+
 
 #ifdef __cplusplus
 #if 0

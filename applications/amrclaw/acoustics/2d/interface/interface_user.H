@@ -37,44 +37,26 @@ extern "C"
 #endif
 #endif
 
-void interface_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                            const int& meqn, const double& xlower,
-                            const double& ylower, const double& dx, const double& dy,
-                            double q[], const int& init_flag, int& tag_patch);
+typedef struct user_options
+{
+    int example;
+    double rhol;
+    double cl;
+    double rhor;
+    double cr;
 
-void interface_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                            const int& meqn,const double& xlower,
-                            const double& ylower, const double& dx, const double& dy,
-                            double qcoarsened[], int& tag_patch);
+    int is_registered;
 
-void interface_write_tfile_(const int& iframe,const double& time,
-                         const int& mfields,const int& ngrids,
-                         const int& maux);
+} user_options_t;
 
-void interface_write_qfile_(const int& meqn,
-                         const int& mbc, const int& mx,const int& my,
-                         const double& xlower,const double& ylower,
-                         const double& dx, const double& dy,
-                         double q[], const int& iframe,const int& patch_num,
-                         const int& level,const int& blockno,
-                         const int& mpirank);
+void interface_setup_problem(fclaw2d_domain_t* domain);
+
+
+#define INTERFACE_SETPROB FCLAW_F77_FUNC(interface_setprob,INTERFACE_SETPROB)
+
+void INTERFACE_SETPROB(double *rhol, double* cl, double* rhor,double *cr);
 
 void interface_link_solvers(fclaw2d_domain_t *domain);
-
-fclaw_bool interface_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag);
-
-fclaw_bool interface_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int blockno,
-                                          int patchno);
-void interface_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
-
-void interface_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                     int this_block_idx, int this_patch_idx,
-                                     int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
