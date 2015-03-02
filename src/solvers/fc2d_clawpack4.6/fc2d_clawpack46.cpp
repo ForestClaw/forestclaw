@@ -250,27 +250,18 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                            int this_patch_idx)
 {
     FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
+    int mx,my,mbc,meqn,maux,maxmx,maxmy;
+    double dx,dy,xlower,ylower;
+    double *q, *aux;
 
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    double* q = cp->q();
-
-    double *aux;
-    int maux;
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
-
-    int maxmx = mx;
-    int maxmy = my;
+    maxmx = mx;
+    maxmy = my;
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK46_SET_BLOCK(&this_block_idx);
