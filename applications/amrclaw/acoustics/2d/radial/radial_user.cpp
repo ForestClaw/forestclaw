@@ -52,6 +52,8 @@ void radial_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc = fc2d_clawpack46_bc2;
     vt.patch_single_step_update = &fc2d_clawpack46_update;
 
+    /* Refine if a patch contain values that exceed (in magnitude)
+       a refinement threshold (in fclaw_options.ini) */
     vt.fort_tag4refinement = &TAG4REFINEMENT;
 
     fclaw2d_set_vtable(domain,&vt);
