@@ -37,11 +37,17 @@ extern "C"
 /* Initialize any settings that can be set here */
 void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
 {
-    vt->problem_setup = NULL;
-    vt->patch_setup = NULL;
+    /* These must be redefined by the user */
+    vt->patch_initialize = NULL;
     vt->patch_physical_bc = NULL;
     vt->patch_single_step_update = NULL;
+
+    /* The user may redefine these, but they are not required */
+    vt->problem_setup = NULL;
+    vt->patch_setup = NULL;
     vt->run_diagnostics = NULL;
+
+    /* The default values below should work for most applications */
     vt->patch_copy2samesize      = &fclaw2d_patch_copy2samesize;
 
     vt->patch_average2coarse     = &fclaw2d_patch_average2coarse;
