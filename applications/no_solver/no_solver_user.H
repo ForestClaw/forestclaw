@@ -37,26 +37,12 @@ extern "C"
 #endif
 
 
-extern "C"
-{
-    void initialize_(const int& mx, const int& my, const int& meqn,
-                     const int& mbc,const int& blockno,
-                     const double& xlower, const double& ylower,
-                     const double& dx, const double& dy,
-                     double *q);
-
-    void no_solver_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                   const int& meqn, const double& xlower,
-                                   const double& ylower, const double& dx, const double& dy,
-                                   double q[], const int& init_flag, int& tag_patch);
-
-    void no_solver_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                                   const int& meqn,const double& xlower,
-                                   const double& ylower, const double& dx, const double& dy,
-                                   double qcoarsened[], int& tag_patch);
-}
-
-void no_solver_setprob(fclaw2d_domain_t* domain);
+#define INITIALIZE FCLAW_F77_FUNC(initialize,INITIALIZE)
+void INITIALIZE(const int* mx, const int* my, const int* meqn,
+                const int* mbc,const int* blockno,
+                const double* xlower, const double* ylower,
+                const double* dx, const double* dy,
+                double *q);
 
 void no_solver_linker(fclaw2d_domain_t* domain);
 
@@ -71,23 +57,6 @@ double no_solver_update(fclaw2d_domain_t *domain,
                         int this_patch_idx,
                         double t,
                         double dt);
-
-fclaw_bool no_solver_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag);
-
-
-fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int blockno,
-                                          int patchno);
-
-void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
-
-void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

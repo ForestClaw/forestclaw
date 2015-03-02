@@ -23,7 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_includes.H>
+#include <fclaw2d_vtable.h>
+#include <fclaw_register.h>
+#include <fclaw2d_output_ascii.h>
+#include <fclaw2d_regrid_default.h>
+
 #include "no_solver_user.H"
 
 #ifdef __cplusplus
@@ -34,53 +38,36 @@ extern "C"
 #endif
 #endif
 
+static fclaw2d_vtable_t vt;
+
+
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
-    link_problem_setup(domain,no_solver_setprob);
+    fclaw2d_init_vtable(&vt);
 
-    /* Initialize data but don't do anything */
+    vt.patch_initialize         = &no_solver_patch_initialize;
+    vt.patch_physical_bc        = &fclaw2d_physbc_default;  /* No BCs are imposed */
+    vt.patch_single_step_update = &no_solver_update;
 
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-    sf->f_patch_initialize = &no_solver_patch_initialize;
-    sf->f_patch_single_step_update = &no_solver_update;
-
-
-    fclaw2d_output_functions* of = get_output_functions(domain);
-    of->f_patch_write_header = &matlab_parallel_write_header;
-    of->f_patch_write_output = &matlab_parallel_write_output;
-
-    link_regrid_functions(domain,no_solver_patch_tag4refinement,
-                          no_solver_patch_tag4coarsening);
+    fclaw2d_set_vtable(domain,&vt);
 }
-
-void no_solver_setprob(fclaw2d_domain_t* domain)
-{
-    /* Call to setprob */
-}
-
 
 void no_solver_patch_initialize(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
-    /* Global parameters */
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    int mx,my,mbc,meqn;
+    double xlower,ylower,dx,dy;
+    double *q;
 
-    /* Parameters specific to this patch */
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-    double* q = cp->q();
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     int blockno = this_block_idx;
-    initialize_(mx,my,meqn,mbc,blockno,xlower,ylower,dx,dy,q);
+    INITIALIZE(&mx,&my,&meqn,&mbc,&blockno,&xlower,&ylower,&dx,&dy,q);
 }
 
 double no_solver_update(fclaw2d_domain_t *domain,
@@ -90,142 +77,17 @@ double no_solver_update(fclaw2d_domain_t *domain,
                         double t,
                         double dt)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms;
+    gparms = fclaw2d_forestclaw_get_options(domain);
+
+    /* This is needed to avoid a floating point errror */
     ClawPatch *cp = get_clawpatch(this_patch);
-
-    // save the current time step for time interpolation.  Otherwise, we get
-    // unitialized values.
     cp->save_current_step();  // Save for time interpolation
-
-    // Reinitialize with new proc data
-    /*
-    no_solver_patch_initialize(domain,this_patch, this_block_idx,this_patch_idx);
-    */
 
     return gparms->desired_cfl;
 }
 
 
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
-fclaw_bool no_solver_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch;  // == 0 or 1
-    no_solver_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool no_solver_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int blockno,
-                                          int patchno)
-{
-    // This might come in handy if we want to debug a coarsening routine without
-    // worrying about solvers.
-
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch;  // == 0 or 1
-    no_solver_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-
-
-void matlab_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
-    fclaw_global_essentialf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    // Write out header file containing global information for 'iframe'
-    int meqn = gparms->meqn;
-    int maux = 0;
-    write_tfile_(iframe,time,meqn,ngrids,maux);
-
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
-}
-
-
-void matlab_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    // Other input arguments
-    int maxmx = mx;
-    int maxmy = my;
-
-    /* ------------------------------------------------------------- */
-    // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level + 1;
-
-    write_qfile_(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                 iframe,num,matlab_level,this_block_idx);
-}
 
 #ifdef __cplusplus
 #if 0

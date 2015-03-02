@@ -23,17 +23,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <forestclaw2d.H>
 #include <fclaw_base.h>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_map_query.h>
 
-#include <amr_forestclaw.H>
 #include <amr_utils.H>
 
 #include <fclaw_register.h>
 
 #include "no_solver_user.H"
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
 
 typedef struct user_options
 {
@@ -156,18 +164,10 @@ void run_program(fclaw_app_t* app,
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-    set_domain_parms(domain,gparms);
-
-    /* ---------------------------------------------------------------
-       Don't do any solve or run.  This is just to test that we can
-       compile without any solver routines.
-       --------------------------------------------------------------- */
+    fclaw2d_domain_set_app(domain,app);
 
     no_solver_linker(domain);
 
-    /* ---------------------------------------------------------------
-       Initialize and run (but with out updating anything)
-       --------------------------------------------------------------- */
     amrinit(&domain);
     amrrun(&domain);  /* Nothing should happen */
     amrreset(&domain);
@@ -215,3 +215,10 @@ main (int argc, char **argv)
 
     return 0;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
