@@ -307,26 +307,18 @@ void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
 {
     FCLAW_ASSERT(classic_vt.src2 != NULL);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    double xlower,ylower,dx,dy;
+    double *aux,*q;
 
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
+    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
-    double* q = cp->q();
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    double *aux;
-    int maux;
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
-
-    int maxmx = mx;
-    int maxmy = my;
+    maxmx = mx;
+    maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.src2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
