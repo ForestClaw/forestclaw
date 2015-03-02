@@ -77,12 +77,12 @@ typedef void (*fc2d_clawpack46_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const double* t, const double* dt,
                                           const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_src2_t)(const int& maxmx, const int& maxmy, const int& meqn,
-                                       const int& mbc, const int& mx,const int& my,
-                                       const double& xlower, const double& ylower,
-                                       const double& dx, const double& dy, double q[],
-                                       const int& maux, double aux[], const double& t,
-                                       const double& dt);
+typedef void (*fc2d_clawpack46_src2_t)(const int* maxmx, const int* maxmy, const int* meqn,
+                                       const int* mbc, const int* mx,const int* my,
+                                       const double* xlower, const double* ylower,
+                                       const double* dx, const double* dy, double q[],
+                                       const int* maux, double aux[], const double* t,
+                                       const double* dt);
 
 typedef void (*fc2d_clawpack46_rpn2_t)(const int& ixy,const int& maxm, const int& meqn,
                                        const int& mwaves, const int& mbc,const int& mx,
@@ -179,12 +179,12 @@ void b4step2_(const int* maxmx, const int* maxmy, const int* mbc,
               const double* t, const double* dt,
               const int* maux, double aux[]);
 
-void src2_(const int& maxmx, const int& maxmy, const int& meqn,
-           const int& mbc, const int& mx,const int& my,
-           const double& xlower, const double& ylower,
-           const double& dx, const double& dy, double q[],
-           const int& maux, double aux[], const double& t,
-           const double& dt);
+void src2_(const int* maxmx, const int* maxmy, const int* meqn,
+           const int* mbc, const int* mx,const int* my,
+           const double* xlower, const double* ylower,
+           const double* dx, const double* dy, double q[],
+           const int* maux, double aux[], const double* t,
+           const double* dt);
 
 /* Riemann solvers */
 void rpn2_(const int& ixy,const int& maxm, const int& meqn, const int& mwaves,
