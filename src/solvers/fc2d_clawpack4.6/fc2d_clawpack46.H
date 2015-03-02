@@ -122,7 +122,10 @@ typedef struct fc2d_clawpack46_vtable
     fc2d_clawpack46_rpt2_t rpt2;
 } fc2d_clawpack46_vtable_t;
 
+
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
+
+void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt);
 
 #define CLAWPACK46_BC2 FCLAW_F77_FUNC(clawpack46_bc2,CLAWPACK46_BC2)
 void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
@@ -281,7 +284,6 @@ void fc2d_clawpack46_package_register(fclaw_app_t* app,
 int fc2d_clawpack46_get_package_id();
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain);
-
 
 /* -------------------------------------------------------------------------
    Routines that won't change

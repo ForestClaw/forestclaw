@@ -40,6 +40,8 @@ static int s_clawpack46_package_id = -1;
 
 static fc2d_clawpack46_vtable_t classic_vt;
 
+
+
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
 {
     classic_vt = *user_vt;
@@ -49,6 +51,21 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
        no ops in the default case */
     classic_vt.bc2  = user_vt->bc2 == NULL ? CLAWPACK46_BC2 : user_vt->bc2;
 }
+
+void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt)
+{
+    vt->setprob = NULL;
+    vt->bc2 = CLAWPACK46_BC2;
+    vt->qinit = NULL;
+    vt->setaux = NULL;
+    vt->b4step2 = NULL;
+    vt->src2 = NULL;
+    vt->rpn2 = NULL;
+    vt->rpt2 = NULL;
+}
+
+
+
 
 
 /* Patch data is stored in each ClawPatch */

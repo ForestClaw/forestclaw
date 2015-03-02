@@ -65,7 +65,6 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
 
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)
 {
-    /* Set up some default functions for now ... */
     fclaw2d_domain_attribute_add (domain,"vtable",vt);
 }
 
