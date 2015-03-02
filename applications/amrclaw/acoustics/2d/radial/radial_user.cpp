@@ -70,11 +70,8 @@ void radial_link_solvers(fclaw2d_domain_t *domain)
 
 void radial_problem_setup(fclaw2d_domain_t* domain)
 {
-    fclaw_app_t* app;
     user_options_t* user;
-
-    app = fclaw2d_domain_get_app(domain);
-    user = (user_options_t*) fclaw_app_get_user(app);
+    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
 
     /* rho, bulk are inputs; cc and zz are outputs.  Results are
        stored in a common block */

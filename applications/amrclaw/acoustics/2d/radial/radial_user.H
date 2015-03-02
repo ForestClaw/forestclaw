@@ -51,7 +51,8 @@ typedef struct user_options
 void radial_problem_setup(fclaw2d_domain_t* domain);
 
 #define RADIAL_SETPROB FCLAW_F77_FUNC(radial_setprob, RADIAL_SETPROB)
-void RADIAL_SETPROB(double* rho, double *bulk, double* cc, double*zz);
+void RADIAL_SETPROB(const double* rho, const double *bulk,
+                    double* cc, double*zz);
 
 void radial_link_solvers(fclaw2d_domain_t *domain);
 

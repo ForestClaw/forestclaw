@@ -166,8 +166,8 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                  *options;
-    user_options_t                suser_options, *user = &suser_options;
+    sc_options_t    *options;
+    user_options_t  suser_options, *user = &suser_options;
 
     int retval;
 
