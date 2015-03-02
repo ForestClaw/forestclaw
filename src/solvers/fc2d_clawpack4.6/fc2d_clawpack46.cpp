@@ -354,17 +354,20 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
 {
     FCLAW_ASSERT(classic_vt.bc2 != NULL);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    double xlower,ylower,dx,dy;
+    double *aux,*q;
 
     ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+
+    maxmx = mx;
+    maxmy = my;
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = get_block_data(this_block);
@@ -384,22 +387,13 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
         }
     }
 
-    /* ------------------------------------------------------- */
-
     /*
       We may be imposing boundary conditions on time-interpolated data;
       and is being done just to help with fine grid interpolation.
       In this case, this boundary condition won't be used to update
       anything
     */
-    double *q = cp->q_time_sync(time_interp);
-
-    double *aux;
-    int maux;
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
-
-    int maxmx = mx;
-    int maxmy = my;
+    q = cp->q_time_sync(time_interp);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
