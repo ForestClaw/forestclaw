@@ -50,14 +50,6 @@ int pow_int(int a, int n)
     return b;
 }
 
-#if 0
-static
-void problem_setup_default(fclaw2d_domain_t* domain)
-{
-    /* This is linked via "link_problem_setup", below */
-}
-#endif
-
 /* -----------------------------------------------------------------
    Initialize data
    ----------------------------------------------------------------- */
@@ -281,6 +273,14 @@ const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
     app = fclaw2d_domain_get_app(domain);
     gparms = fclaw_forestclaw_get_options(app);
     return gparms;
+}
+
+void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t *app;
+
+    app = fclaw2d_domain_get_app(domain);
+    return fclaw_app_get_user(app);
 }
 
 
