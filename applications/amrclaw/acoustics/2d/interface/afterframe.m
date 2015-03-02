@@ -4,7 +4,9 @@ if PlotType==1
   colorbar
 end
 
-showpatchborders;
+hidepatchborders;
+showgridlines(1:4);
+
 hold on
 plot([0.5 0.5],[0 1],'w','linewidth',3);
 hold off
