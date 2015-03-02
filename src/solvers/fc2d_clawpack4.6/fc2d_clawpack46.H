@@ -261,16 +261,6 @@ void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
 void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
                                  ClawPatch *cp, double **aux, int* maux);
 
-void
-    fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
-                                fc2d_clawpack46_options_t* clawpack_options);
-
-void
-    fc2d_clawpack46_link_solvers(fclaw2d_domain_t* domain);
-
-void
-    fc2d_clawpack46_link_to_clawpatch();
-
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */

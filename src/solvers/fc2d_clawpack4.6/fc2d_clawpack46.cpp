@@ -142,15 +142,6 @@ int fc2d_clawpack46_get_package_id()
 }
 
 
-#if 0
-void fc2d_clawpack46_set_options(fclaw2d_domain_t* domain,
-                                 fc2d_clawpack46_options_t* clawopt)
-{
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
-    ddata->clawpack_parms = (void*) clawopt;
-}
-#endif
-
 void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch)
 {
@@ -233,7 +224,11 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             int this_patch_idx)
 {
     FCLAW_ASSERT(classic_vt.setaux != NULL);
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux;
 
+#if 0
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
@@ -244,11 +239,18 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     double ylower = cp->ylower();
     double dx = cp->dx();
     double dy = cp->dy();
+#endif
 
+    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    ClawPatch *cp = get_clawpatch(this_patch);
+
+#if 0
     fc2d_clawpack46_define_auxarray(domain,cp);
+#endif
+    fc2d_clawpack46_define_auxarray2(domain,this_patch);
 
-    double *aux;
-    int maux;
     fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
 
     int maxmx = mx;
