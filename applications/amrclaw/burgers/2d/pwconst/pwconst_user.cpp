@@ -52,20 +52,6 @@ void pwconst_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc          = &fc2d_clawpack46_bc2;
     vt.patch_single_step_update   = &fc2d_clawpack46_update;
 
-#if 0
-    vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
-    vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
-
-    vt.patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
-    vt.fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
-
-    vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
-
-    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
-#endif
-
     fclaw2d_set_vtable(domain,&vt);
 
     classic_claw.qinit = &QINIT;
