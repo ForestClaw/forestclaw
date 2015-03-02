@@ -106,7 +106,6 @@ void run_program(fclaw_app_t* app,
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     amr_options_t                 *gparms;
-    fc2d_clawpack46_options_t     *clawpack_options;
 
     /* Used locally */
     double pi = M_PI;
@@ -116,7 +115,6 @@ void run_program(fclaw_app_t* app,
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
 
     mi = gparms->mi;
     mj = gparms->mj;

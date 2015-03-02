@@ -23,12 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.h"
 #include "forestclaw2d.h"
 #include "fc2d_clawpack46.H"
-#include "swirl_user.H"
 #include "fclaw2d_vtable.h"
 #include "fclaw2d_output_ascii.h"
+#include "fclaw2d_regrid_default.h"
+
+#include "swirl_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -39,13 +40,15 @@ extern "C"
 #endif
 
 
-/* Most of these do not use the "classic" signature. */
+/* Most of these do not use the "classic_claw" signature. */
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_user;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
+    fclaw2d_init_vtable(&vt);
+
     vt.problem_setup            = &fc2d_clawpack46_setprob;
 
     vt.patch_setup              = &swirl_patch_setup;
@@ -53,24 +56,28 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
     vt.patch_single_step_update = &swirl_patch_single_step_update;
 
-    vt.patch_tag4refinement     = &swirl_patch_tag4refinement;
-    vt.patch_tag4coarsening     = &swirl_patch_tag4coarsening;
+    vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
+    vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
+
+    vt.patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
+    vt.fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.patch_write_qfile        = &FCLAW2D_OUTPUT_WRITE_QFILE;
+    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
     /* Needed for the clawpack46 package */
-    classic_user.setprob = &SETPROB;
-    classic_user.qinit = &QINIT;
-    classic_user.rpn2 = &RPN2;
-    classic_user.rpt2 = &RPT2;
+    classic_claw.setprob = &SETPROB;
+    classic_claw.qinit = &QINIT;
+    classic_claw.bc2 = NULL;      /* Use clawpack46 library routine */
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
@@ -139,46 +146,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
 }
 
 
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno, int this_patch_idx,
-                                      int initflag)
-{
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    int tag_patch;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    tag_patch = 0;
-    swirl_tag4refinement_(mx,my,mbc,meqn,blockno,xlower,ylower,
-                          dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *qcoarse;
-    int tag_patch;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&qcoarse,&meqn);
-
-    tag_patch = 1;
-    swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
 
 #ifdef __cplusplus
 #if 0

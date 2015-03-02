@@ -37,16 +37,6 @@ extern "C"
 #endif
 #endif
 
-void swirl_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn, const int& blockno,
-                           const double& xlower, const double& ylower,
-                           const double& dx, const double& dy,
-                           double q[], const int& init_flag, int& tag_patch);
-
-void swirl_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn,const double& xlower,
-                           const double& ylower, const double& dx, const double& dy,
-                           double qcoarsened[], int& tag_patch);
 
 void swirl_write_tfile_(const int* iframe,const double* time,
                         const int* mfields,const int* ngrids);
@@ -56,7 +46,7 @@ void swirl_write_qfile_(const int* meqn,
                         const double* xlower, const double* ylower,
                         const double* dx, const double* dy,
                         double q[], const int* iframe,
-                        const int* patch_num, const int* level,
+                        const int* patch_num,const int* level,
                         const int* blockno, const int* mpirank);
 
 void qinit_manifold_(const int& meqn, const int& mbc,

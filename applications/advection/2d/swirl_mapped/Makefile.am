@@ -17,10 +17,8 @@ applications_advection_2d_swirl_mapped_swirl_SOURCES = \
 	applications/advection/2d/swirl_mapped/user_4.6/setaux_manifold.f \
 	applications/advection/2d/swirl_mapped/user_4.6/b4step2_manifold.f \
 	applications/advection/2d/swirl_mapped/user_4.6/qinit.f \
-	applications/advection/2d/swirl_mapped/user_4.6/tag4refinement.f \
 	applications/advection/2d/swirl_mapped/user_4.6/rpn2ad1.f \
-	applications/advection/2d/swirl_mapped/user_4.6/rpt2ad1.f \
-	applications/advection/2d/swirl_mapped/user_4.6/swirl_output.f
+	applications/advection/2d/swirl_mapped/user_4.6/rpt2ad1.f
 
 applications_advection_2d_swirl_mapped_swirl_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
