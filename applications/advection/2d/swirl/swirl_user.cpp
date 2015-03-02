@@ -28,7 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_dummy.H"
 #include "swirl_user.H"
 #include "fclaw2d_vtable.h"
+
 #include <fclaw2d_output_ascii.h>
+#include <fclaw2d_regrid_default.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,38 +41,43 @@ extern "C"
 #endif
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_user;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
+    fclaw2d_init_vtable(&vt);
+
     vt.problem_setup            = &fc2d_clawpack46_setprob;
 
     vt.patch_setup              = &swirl_patch_setup;
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    vt.patch_initialize         = &swirl_patch_initialize;
     vt.patch_physical_bc        = &swirl_patch_physical_bc;
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
     vt.patch_tag4refinement     = &swirl_patch_tag4refinement;
+    vt.fort_tag4refinement      = &TAG4REFINEMENT;
+
     vt.patch_tag4coarsening     = &swirl_patch_tag4coarsening;
+    vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.patch_write_qfile        = &FCLAW2D_OUTPUT_WRITE_QFILE;
+    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
     /* Needed for the clawpack46 package */
-    classic_user.qinit = &QINIT;
-    classic_user.bc2 = &BC2;
-    classic_user.setaux = &SETAUX;
-    classic_user.setprob = &SETPROB;
-    classic_user.b4step2 = &B4STEP2;
-    classic_user.rpn2 = &RPN2;
-    classic_user.rpt2 = &RPT2;
+    classic_claw.qinit = &QINIT;
+    classic_claw.bc2 = &BC2;
+    classic_claw.setaux = &SETAUX;
+    classic_claw.setprob = &SETPROB;
+    classic_claw.b4step2 = &B4STEP2;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
 
@@ -83,6 +90,38 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     /* Dummy setup - use multiple libraries */
     fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
+}
+
+void swirl_patch_initialize(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
+{
+    /* This is an example of how to call the initialization routines explicitly
+       This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
+       entry above, or by calling fclaw2d_clawpack46_qinit(...) from here. */
+
+    const amr_options_t *amropt;
+    int mx,my,mbc,meqn, maux, maxmx, maxmy;
+    double xlower,ylower,dx,dy;
+    double *q, *aux;
+
+    amropt = get_domain_parms(domain);
+
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+
+    /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
+       Header is in the Clawpack package
+    */
+    maxmx = mx;
+    maxmy = my;
+    QINIT(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 }
 
 
@@ -104,15 +143,24 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
 }
 
 
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag)
+int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno, int this_patch_idx,
+                               int initflag)
 {
+    fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
-    int tag_patch;
+    int tag_patch, level;
+    const amr_options_t *amropt;
+    double rt;
+
+    amropt = get_domain_parms(domain);
+    rt = amropt->refine_threshold;
+    level = this_patch->level;
+
+    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -120,64 +168,50 @@ fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    swirl_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,
-                          tag_patch);
-    return tag_patch == 1;
+    vt.fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
+                           &dx,&dy,&blockno, q,&rt,&initflag,
+                           &tag_patch);
+    return tag_patch;
 }
 
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
+int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *fine_patches,
+                               int blockno, int patchno)
+
 {
+    fclaw2d_vtable_t vt;
+
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
-    double *qcoarse;
-    int tag_patch;
+    double *q[4];
+    int tag_patch,igrid;
+    double coarsen_threshold;
+    fclaw2d_patch_t *patch0;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    patch0 = &fine_patches[0];
+
+    const amr_options_t *amropt;
+    amropt = get_domain_parms(domain);
+
+    coarsen_threshold = amropt->coarsen_threshold;
+
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_grid_data(domain,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&qcoarse,&meqn);
+    for (igrid = 0; igrid < 4; igrid++)
+    {
+        fclaw2d_clawpatch_soln_data(domain,&fine_patches[igrid],&q[igrid],&meqn);
+    }
+    tag_patch = 0;
+    vt.fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                           &blockno, q[0],q[1],q[2],q[3],
+                           &coarsen_threshold, &tag_patch);
+    return tag_patch;
 
-    tag_patch = 1;
-    swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
 }
 
-void swirl_write_header(fclaw2d_domain_t* domain, int iframe)
-{
-    int maux, meqn, ngrids;
-    double time;
-
-    time = get_domain_time(domain);
-    maux = fc2d_clawpack46_get_maux(domain);
-    meqn = fclaw2d_clawpatch_get_meqn(domain);
-    ngrids = fclaw2d_domain_get_num_patches(domain);
-
-    swirl_write_tfile_(&iframe,&time,&meqn,&ngrids);
-
-    FCLAW2D_OUTPUT_NEW_QFILE(&iframe);
-}
-
-
-void swirl_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int global_patch_num,int level)
-{
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    swirl_write_qfile_(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
-                       &iframe,&global_patch_num,&level,&this_block_idx,
-                       &domain->mpirank);
-}
 
 #ifdef __cplusplus
 #if 0

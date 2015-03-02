@@ -40,6 +40,15 @@
 
 #include "swirl_user.H"
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 typedef struct user_options
 {
     double period;
@@ -90,14 +99,10 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t               *gparms;
-    fc2d_clawpack46_options_t   *clawpack_options;
-    user_options_t *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
-    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
     gparms->manifold = 0;
@@ -170,3 +175,10 @@ main (int argc, char **argv)
 
     return 0;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

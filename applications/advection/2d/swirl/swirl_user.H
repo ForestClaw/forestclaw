@@ -37,26 +37,19 @@ extern "C"
 #endif
 #endif
 
-void swirl_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn, const double& xlower,
-                           const double& ylower, const double& dx, const double& dy,
-                           double q[], const int& init_flag, int& tag_patch);
+#define SWIRL_WRITE_HEADER FCLAW_F77_FUNC(swirl_write_header, SWIRL_WRITE_HEADER)
 
-void swirl_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                           const int& meqn,const double& xlower,
-                           const double& ylower, const double& dx, const double& dy,
-                           double qcoarsened[], int& tag_patch);
-
-void swirl_write_tfile_(const int* iframe, const double* time,
+void SWIRL_WRITE_HEADER(const int* iframe, const double* time,
                         const int* mfields, const int* ngrids);
 
-void swirl_write_qfile_(const int* mx,        const int* my,
-                        const int* meqn,      const int* mbc,
-                        const double* xlower, const double* ylower,
-                        const double* dx,     const double* dy,
-                        double q[],           const int* iframe,
-                        const int* patch_num, const int* level,
-                        const int* blockno,   const int* mpirank);
+#define SWIRL_WRITE_FILE FCLAW_F77_FUNC(swirl_write_file, SWIRL_WRITE_FILE)
+void SWIRL_WRITE_FILE(const int* mx,        const int* my,
+                      const int* meqn,      const int* mbc,
+                      const double* xlower, const double* ylower,
+                      const double* dx,     const double* dy,
+                      double q[],           const int* iframe,
+                      const int* patch_num, const int* level,
+                      const int* blockno,   const int* mpirank);
 
 void swirl_link_solvers(fclaw2d_domain_t *domain);
 
@@ -88,22 +81,15 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       double t,
                                       double dt);
 
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
                                       int initflag);
 
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno);
-
-
-void swirl_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                 int iframe,int num,int level);
-
-void swirl_write_header(fclaw2d_domain_t* domain, int iframe);
 
 
 /* Mappings */
