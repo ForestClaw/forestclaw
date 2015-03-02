@@ -289,7 +289,8 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux);
+    classic_vt.qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
+                     &maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 

@@ -55,12 +55,12 @@ typedef void (*fc2d_clawpack46_bc2_t)(const int& maxmx, const int& maxmy,
                                       const double aux[], const double& t,
                                       const double& dt, const int mthbc[]);
 
-typedef  void (*fc2d_clawpack46_qinit_t)(const int& maxmx, const int& maxmy,
-                                         const int& meqn,const int& mbc,
-                                         const int& mx, const int& my,
-                                         const double& xlower, const double& ylower,
-                                         const double& dx, const double& dy,
-                                         double q[], const int& maux, double aux[]);
+typedef  void (*fc2d_clawpack46_qinit_t)(const int* maxmx, const int* maxmy,
+                                         const int* meqn,const int* mbc,
+                                         const int* mx, const int* my,
+                                         const double* xlower, const double* ylower,
+                                         const double* dx, const double* dy,
+                                         double q[], const int* maux, double aux[]);
 
 typedef void (*fc2d_clawpack46_setaux_t)(const int& maxmx, const int& maxmy, const int& mbc,
                                          const int& mx, const int& my,
@@ -152,11 +152,11 @@ void CLAWPACK46_BC2(const int& maxmx, const int& maxmy, const int& meqn,
 
 void setprob_();
 
-void qinit_(const int& maxmx, const int& maxmy, const int& meqn,
-            const int& mbc, const int& mx, const int& my,
-            const double& xlower, const double& ylower,
-            const double& dx, const double& dy,
-            double q[], const int& maux, double aux[]);
+void qinit_(const int* maxmx, const int* maxmy, const int* meqn,
+            const int* mbc, const int* mx, const int* my,
+            const double* xlower, const double* ylower,
+            const double* dx, const double* dy,
+            double q[], const int* maux, double aux[]);
 
 void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
              const int& mx, const int& my,
