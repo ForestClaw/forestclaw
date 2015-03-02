@@ -110,10 +110,6 @@ void run_program(fclaw_app_t* app)
     amr_options_t              *gparms;
     user_options_t             *user;
 
-#if 0
-    fc2d_clawpack46_options_t  *clawpack_options;
-#endif
-
     /* Local variables */
     double rotate[2];
     double alpha = 0.4;
@@ -121,10 +117,6 @@ void run_program(fclaw_app_t* app)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
     user = (user_options_t*) fclaw_app_get_user(app);
-
-#if 0
-    clawpack_options = fc2d_clawpack46_get_options(app);
-#endif
 
     rotate[0] = gparms->phi;
     rotate[1] = gparms->theta;
@@ -155,16 +147,6 @@ void run_program(fclaw_app_t* app)
 
     init_domain_data(domain);
     fclaw2d_domain_set_app(domain,app);
-
-#if 0
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,radial_problem_setup);
-
-    link_regrid_functions(domain,radial_patch_tag4refinement,
-                          radial_patch_tag4coarsening);
-#endif
 
     radial_link_solvers(domain);
 
