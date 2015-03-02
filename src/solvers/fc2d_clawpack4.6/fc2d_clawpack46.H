@@ -84,21 +84,21 @@ typedef void (*fc2d_clawpack46_src2_t)(const int* maxmx, const int* maxmy, const
                                        const int* maux, double aux[], const double* t,
                                        const double* dt);
 
-typedef void (*fc2d_clawpack46_rpn2_t)(const int& ixy,const int& maxm, const int& meqn,
-                                       const int& mwaves, const int& mbc,const int& mx,
+typedef void (*fc2d_clawpack46_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
+                                       const int* mwaves, const int* mbc,const int* mx,
                                        double ql[], double qr[], double auxl[], double auxr[],
                                        double wave[], double s[],double amdq[], double apdq[]);
 
 
-typedef void (*fc2d_clawpack46_rpt2_t)(const int& ixy, const int& maxm, const int& meqn,
-                                       const int& mwaves, const int& mbc,const int& mx,
+typedef void (*fc2d_clawpack46_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
+                                       const int* mwaves, const int* mbc,const int* mx,
                                        double ql[], double qr[], double aux1[], double aux2[],
-                                       double aux3[], const int& imp, double dsdq[],
+                                       double aux3[], const int* imp, double dsdq[],
                                        double bmasdq[], double bpasdq[]);
 
 
-typedef void (*fc2d_clawpack46_flux2_t)(const int& ixy,const int& maxm, const int& meqn,
-                                        const int& maux,const int& mbc,const int& mx,
+typedef void (*fc2d_clawpack46_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
+                                        const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
                                         double aux1[], double aux2[], double aux3[],
                                         double faddm[],double faddp[], double gaddm[],
@@ -107,7 +107,7 @@ typedef void (*fc2d_clawpack46_flux2_t)(const int& ixy,const int& maxm, const in
                                         double bmasdq[], double bpasdq[],
                                         fc2d_clawpack46_rpn2_t rpn2,
                                         fc2d_clawpack46_rpt2_t rpt2,
-                                        const int& mwaves, const int& mcapa,
+                                        const int* mwaves, const int* mcapa,
                                         int method[], int mthlim[]);
 
 typedef struct fc2d_clawpack46_vtable
@@ -187,14 +187,14 @@ void src2_(const int* maxmx, const int* maxmy, const int* meqn,
            const double* dt);
 
 /* Riemann solvers */
-void rpn2_(const int& ixy,const int& maxm, const int& meqn, const int& mwaves,
-           const int& mbc,const int& mx, double ql[], double qr[],
+void rpn2_(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+           const int* mbc,const int* mx, double ql[], double qr[],
            double auxl[], double auxr[], double wave[],
            double s[], double amdq[], double apdq[]);
 
-void rpt2_(const int& ixy, const int& maxm, const int& meqn, const int& mwaves,
-           const int& mbc, const int& mx, double ql[], double qr[],
-           double aux1[], double aux2[], double aux3[], const int& imp,
+void rpt2_(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+           const int* mbc, const int* mx, double ql[], double qr[],
+           double aux1[], double aux2[], double aux3[], const int* imp,
            double dsdq[], double bmasdq[], double bpasdq[]);
 
 /* --------------------------------------------------------------------
@@ -216,8 +216,8 @@ void CLAWPACK46_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             int block_corner_count[],int* ierror);
 
 #define CLAWPACK46_FLUX2 FCLAW_F77_FUNC(clawpack46_flux2,CLAWPACK46_FLUX2)
-void CLAWPACK46_FLUX2(const int& ixy,const int& maxm, const int& meqn,
-                      const int& maux,const int& mbc,const int& mx,
+void CLAWPACK46_FLUX2(const int* ixy,const int* maxm, const int* meqn,
+                      const int* maux,const int* mbc,const int* mx,
                       double q1d[], double dtdx1d[],
                       double aux1[], double aux2[], double aux3[],
                       double faddm[],double faddp[], double gaddm[],
@@ -225,12 +225,12 @@ void CLAWPACK46_FLUX2(const int& ixy,const int& maxm, const int& meqn,
                       double s[], double amdq[],double apdq[],double cqxx[],
                       double bmasdq[], double bpasdq[],
                       fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
-                      const int& mwaves, const int& mcapa,
+                      const int* mwaves, const int* mcapa,
                       int method[], int mthlim[]);
 
 #define CLAWPACK46_FLUX2FW FCLAW_F77_FUNC(clawpack46_flux2fw,CLAWPACK46_FLUX2FW)
-void CLAWPACK46_FLUX2FW(const int& ixy,const int& maxm, const int& meqn, //
-                        const int& maux,const int& mbc,const int& mx,
+void CLAWPACK46_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
+                        const int* maux,const int* mbc,const int* mx,
                         double q1d[], double dtdx1d[],
                         double aux1[], double aux2[], double aux3[],
                         double faddm[],double faddp[], double gaddm[],
@@ -238,7 +238,7 @@ void CLAWPACK46_FLUX2FW(const int& ixy,const int& maxm, const int& meqn, //
                         double s[], double amdq[],double apdq[],double cqxx[],
                         double bmasdq[], double bpasdq[],
                         fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
-                        const int& mwaves, const int& mcapa,
+                        const int* mwaves, const int* mcapa,
                         int method[], int mthlim[]);
 
 
