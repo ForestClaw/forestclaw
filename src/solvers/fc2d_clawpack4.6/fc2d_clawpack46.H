@@ -201,19 +201,19 @@ void rpt2_(const int& ixy, const int& maxm, const int& meqn, const int& mwaves,
    Time stepping
    -------------------------------------------------------------------- */
 #define CLAWPACK46_STEP2_WRAP FCLAW_F77_FUNC(clawpack46_step2_wrap,CLAWPACK46_STEP2_WRAP)
-void CLAWPACK46_STEP2_WRAP(const int& maxm, const int& meqn, const int& maux,
-                            const int& mbc, const int method[], const int mthlim[],
-                            const int& mcapa, const int& mwaves, const int& mx,
-                            const int& my, double qold[], double auxold[],
-                            const double& dx, const double& dy, const double& dt,
-                            const double& cfl, double work[], const int& mwork,
-                            const double& xlower, const double& ylower, const int& level,
-                            const double& t, double fp[], double fm[], double gp[],
+void CLAWPACK46_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
+                            const int* mbc, const int method[], const int mthlim[],
+                            const int* mcapa, const int* mwaves, const int* mx,
+                            const int* my, double qold[], double auxold[],
+                            const double* dx, const double* dy, const double* dt,
+                            const double* cfl, double work[], const int* mwork,
+                            const double* xlower, const double* ylower, const int* level,
+                            const double* t, double fp[], double fm[], double gp[],
                             double gm[],
                             fc2d_clawpack46_rpn2_t rpn2,
                             fc2d_clawpack46_rpt2_t rpt2,
                             fc2d_clawpack46_flux2_t flux2,
-                            int block_corner_count[],int& ierror);
+                            int block_corner_count[],int* ierror);
 
 #define CLAWPACK46_FLUX2 FCLAW_F77_FUNC(clawpack46_flux2,CLAWPACK46_FLUX2)
 void CLAWPACK46_FLUX2(const int& ixy,const int& maxm, const int& meqn,
