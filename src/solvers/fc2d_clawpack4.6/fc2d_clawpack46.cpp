@@ -255,7 +255,7 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     int maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,maux,aux);
+    classic_vt.setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,&maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 

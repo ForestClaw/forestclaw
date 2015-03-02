@@ -62,11 +62,11 @@ typedef  void (*fc2d_clawpack46_qinit_t)(const int* maxmx, const int* maxmy,
                                          const double* dx, const double* dy,
                                          double q[], const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_setaux_t)(const int& maxmx, const int& maxmy, const int& mbc,
-                                         const int& mx, const int& my,
-                                         const double& xlower, const double& ylower,
-                                         const double& dx, const double& dy,
-                                         const int& maux, double aux[]);
+typedef void (*fc2d_clawpack46_setaux_t)(const int* maxmx, const int* maxmy, const int* mbc,
+                                         const int* mx, const int* my,
+                                         const double* xlower, const double* ylower,
+                                         const double* dx, const double* dy,
+                                         const int* maux, double aux[]);
 
 typedef void (*fc2d_clawpack46_b4step2_t)(const int& maxmx, const int& maxmy,
                                           const int& mbc,
@@ -158,11 +158,11 @@ void qinit_(const int* maxmx, const int* maxmy, const int* meqn,
             const double* dx, const double* dy,
             double q[], const int* maux, double aux[]);
 
-void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
-             const int& mx, const int& my,
-             const double& xlower, const double& ylower,
-             const double& dx, const double& dy,
-             const int& maux, double aux[]);
+void setaux_(const int* maxmx, const int* maxmy, const int* mbc,
+             const int* mx, const int* my,
+             const double* xlower, const double* ylower,
+             const double* dx, const double* dy,
+             const int* maux, double aux[]);
 
 void bc2_(const int* maxmx, const int* maxmy, const int* meqn,
           const int* mbc, const int* mx, const int* my,
