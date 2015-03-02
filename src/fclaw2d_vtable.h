@@ -146,6 +146,9 @@ typedef struct fclaw2d_vtable
 
 
 void
+    fclaw2d_init_vtable(fclaw2d_vtable_t *vt);
+
+void
 fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt);
 
 fclaw2d_vtable_t

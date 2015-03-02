@@ -34,17 +34,38 @@ extern "C"
 #endif
 #endif
 
+/* Initialize any settings that can be set here */
+void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
+{
+    vt->problem_setup = NULL;
+    vt->patch_setup = NULL;
+    vt->patch_physical_bc = NULL;
+    vt->patch_single_step_update = NULL;
+    vt->run_diagnostics = NULL;
+    vt->patch_copy2samesize      = &fclaw2d_patch_copy2samesize;
+
+    vt->patch_average2coarse     = &fclaw2d_patch_average2coarse;
+    vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
+
+    vt->patch_interpolate2fine   = &fclaw2d_patch_interpolate2fine;
+    vt->fort_interpolate2fine    = &FCLAW2D_FORT_INTERPOLATE2FINE;
+
+    vt->patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
+    vt->fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
+
+    vt->patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
+    vt->fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
+
+    vt->write_header             = &fclaw2d_output_header_ascii;
+    vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
+
+    vt->patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+}
+
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)
 {
     /* Set up some default functions for now ... */
-    vt->patch_copy2samesize = &fclaw2d_patch_copy2samesize;
-
-    vt->patch_average2coarse = &fclaw2d_patch_average2coarse;
-    vt->fort_average2coarse = &FCLAW2D_FORT_AVERAGE2COARSE;
-
-    vt->patch_interpolate2fine = &fclaw2d_patch_interpolate2fine;
-    vt->fort_interpolate2fine = &FCLAW2D_FORT_INTERPOLATE2FINE;
-
     fclaw2d_domain_attribute_add (domain,"vtable",vt);
 }
 

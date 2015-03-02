@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtk.h>
+#include <fclaw2d_map.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -95,8 +96,11 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
 {
     // Global parameters
     const amr_options_t *gparms = get_domain_parms (domain);
+    fclaw2d_map_context_t *cont;
     const int mx = gparms->mx;
     const int my = gparms->my;
+
+    cont = get_map_context(domain);
 
     // Patch specific parameters
     ClawPatch *cp = get_clawpatch (this_patch);
@@ -108,17 +112,30 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
     // Enumerate point coordinates in the patch
     double *d = (double *) a;
     int i, j;
+    double xp,yp,zp;
     for (j = 0; j <= my; ++j)
     {
         const double y = ylower + j * dy;
         for (i = 0; i <= mx; ++i)
         {
-            *d++ = xlower + i * dx;
-            *d++ = y;
-            *d++ = 0.;
+            const double x = xlower + i * dx;
+            if (gparms->manifold)
+            {
+                FCLAW2D_MAP_C2M(&cont,&this_block_idx,&x,&y,&xp,&yp,&zp);
+                *d++ = xp;
+                *d++ = yp;
+                *d++ = zp;
+            }
+            else
+            {
+                *d++ = x;
+                *d++ = y;
+                *d++ = 0;
+            }
         }
     }
 }
+
 
 static void
 fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
