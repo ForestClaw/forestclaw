@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "fc2d_clawpack46.H"
+#include "fclaw2d_vtable.h"
 #include "quadrants_user.H"
 
 #ifdef __cplusplus
@@ -35,150 +36,39 @@ extern "C"
 #endif
 #endif
 
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    setprob_,
-    NULL,  /* bc2 */
-    qinit_,
-    NULL,
-    NULL,
-    NULL,  /* src2 */
-    rpn2eu3_,
-    rpt2_
-};
-
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void quadrants_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    vt.problem_setup = &quadrants_problem_setup;
+    /* Don't explicitly set a "setprob" function unless it has the same
+       signature as the default (i.e. no arguments).  */
+    /* classic_claw.setprob = &SETPROB; */
 
-    // sf->f_patch_setup              = &fc2d_clawpack46_setaux;  /* Not needed for quadrants */
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+    vt.patch_initialize = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &quadrants_parallel_write_header;
-    of->f_patch_write_output = &quadrants_parallel_write_output;
+    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */x
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2EU3;  /* Signature is unchanged */
+    classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack46_link_to_clawpatch();
+    fclaw2d_set_vtable(domain,&vt);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
-fclaw_bool quadrants_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag)
+void quadrants_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    const user_options_t* user;
+    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch = 0;
-    quadrants_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
+    QUADRANTS_SETPROB(&user->gamma);
 }
-
-fclaw_bool quadrants_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch = 1;  // == 0 or 1
-    quadrants_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-
-
-void quadrants_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn;
-    int maux = 0;
-    quadrants_write_tfile_(iframe,time,mfields,ngrids,maux);
-
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
-}
-
-
-void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                     int this_block_idx, int this_patch_idx,
-                                     int iframe,int num,int level)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    /* ------------------------------------------------------------- */
-
-    int mpirank = domain->mpirank;
-    quadrants_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                           iframe,num,level,this_block_idx,mpirank);
-}
-
 
 #ifdef __cplusplus
 #if 0

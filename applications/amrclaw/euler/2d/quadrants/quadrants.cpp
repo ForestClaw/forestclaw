@@ -36,6 +36,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "quadrants_user.H"
 
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    NULL,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
 
 void run_program(fclaw_app_t* app)
 {
@@ -46,11 +76,9 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
 
     /* Use [ax,bx]x[ay,by] */
@@ -59,21 +87,13 @@ void run_program(fclaw_app_t* app)
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-    /* ---------------------------------------------------------- */
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
+    fclaw2d_domain_set_app(domain,app);
 
     quadrants_link_solvers(domain);
-
-    link_regrid_functions(domain,quadrants_patch_tag4refinement,
-                          quadrants_patch_tag4coarsening);
 
     amrinit(&domain);
     amrrun(&domain);
@@ -90,16 +110,20 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                  *options;
+    sc_options_t    *options;
+    user_options_t  suser_options, *user = &suser_options;
+
 
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    app = fclaw_app_new (&argc, &argv, user);
 
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+
+    register_user_options (app, "fclaw_options.ini", user);
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
