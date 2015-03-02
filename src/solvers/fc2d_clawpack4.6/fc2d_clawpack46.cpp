@@ -224,40 +224,23 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             int this_patch_idx)
 {
     FCLAW_ASSERT(classic_vt.setaux != NULL);
-    int mx,my,mbc,maux;
+    int mx,my,mbc,maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
     double *aux;
-
-#if 0
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-#endif
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    ClawPatch *cp = get_clawpatch(this_patch);
-
-#if 0
-    fc2d_clawpack46_define_auxarray(domain,cp);
-#endif
     fc2d_clawpack46_define_auxarray2(domain,this_patch);
 
-    fc2d_clawpack46_get_auxarray(domain,cp,&aux,&maux);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    int maxmx = mx;
-    int maxmy = my;
+    maxmx = mx;
+    maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,&maux,aux);
+    classic_vt.setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                      &maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 
