@@ -25,9 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.H"
 #include "fc2d_clawpack46.H"
-#include "pwconst_user.H"
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_output_ascii.h>
+#include <fclaw2d_regrid_default.h>
+
+#include "pwconst_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -38,98 +40,41 @@ extern "C"
 #endif
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_user;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void pwconst_link_solvers(fclaw2d_domain_t *domain)
 {
+    fclaw2d_init_vtable(&vt);
+
     vt.problem_setup              = NULL;
     vt.patch_setup                = NULL;
     vt.patch_initialize           = &fc2d_clawpack46_qinit;
     vt.patch_physical_bc          = &fc2d_clawpack46_bc2;
     vt.patch_single_step_update   = &fc2d_clawpack46_update;
 
-    vt.patch_tag4refinement       = &pwconst_patch_tag4refinement;
-    vt.patch_tag4coarsening       = &pwconst_patch_tag4coarsening;
+#if 0
+    vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
+    vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
+
+    vt.patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
+    vt.fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.write_tfile              = &FCLAW2D_OUTPUT_WRITE_TFILE;
+    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.patch_write_qfile        = &FCLAW2D_OUTPUT_WRITE_QFILE;
+    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
 
     fclaw2d_set_vtable(domain,&vt);
 
-    classic_user.qinit = &QINIT;
-    classic_user.rpn2 = &RPN2;
-    classic_user.rpt2 = &RPT2;
+    classic_claw.qinit = &QINIT;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
-
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
-fclaw_bool pwconst_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch = 0;
-    pwconst_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool pwconst_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch = 1;  // == 0 or 1
-    pwconst_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-
 
 #ifdef __cplusplus
 #if 0

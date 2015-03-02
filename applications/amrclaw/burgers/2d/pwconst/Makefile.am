@@ -9,8 +9,6 @@ applications_amrclaw_burgers_2d_pwconst_pwconst_SOURCES = \
 	applications/amrclaw/burgers/2d/pwconst/pwconst_user.cpp \
 	applications/amrclaw/burgers/2d/pwconst/pwconst.cpp \
 	applications/amrclaw/burgers/2d/pwconst/fclaw2d_map_nomap.c \
-	applications/amrclaw/burgers/2d/pwconst/user_4.x/tag4refinement.f \
-	applications/amrclaw/burgers/2d/pwconst/user_4.x/pwconst_output.f \
 	applications/amrclaw/burgers/2d/pwconst/user_4.x/qinit.f \
 	applications/amrclaw/burgers/2d/rp/rpn2bu.f \
 	applications/amrclaw/burgers/2d/rp/rpt2bu.f

@@ -45,12 +45,10 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
 
     /* Use [ax,bx]x[ay,by] */
