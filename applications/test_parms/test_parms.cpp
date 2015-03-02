@@ -136,13 +136,14 @@ void user_options_register (fclaw_app_t * app,
 }
 
 
-void run_program(fclaw_app_t* app,
-                 user_options_t* user)
+void run_program(fclaw_app_t* app)
 {
     sc_MPI_Comm            mpicomm;
 
     amr_options_t                 *gparms;
     fc2d_clawpack46_options_t     *clawpack_options;
+    user_options_t* user;
+    int id;
 
     /* Local variables */
     double test_fpe;
@@ -151,7 +152,12 @@ void run_program(fclaw_app_t* app,
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
+
+    /* Clawpack options are stored in domain, but we don't have a domain in
+       this example */
+    id = fc2d_clawpack46_get_package_id();
+    clawpack_options =  (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
 
     switch (user->example)
     {
@@ -183,10 +189,6 @@ int main (int argc, char **argv)
 
     /* Options */
     sc_options_t                  *options;
-#if 0
-    amr_options_t                 samr_options, *gparms = &samr_options;
-    fc2d_clawpack46_options_t     sclawpack_options, *clawpack_options = &sclawpack_options;
-#endif
     user_options_t                suser_options, *user = &suser_options;
 
     int retval;
@@ -194,17 +196,12 @@ int main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
 
-#if 0
-    fclaw_options_register_general (app, "fclaw_options.ini", gparms);
-    fc2d_clawpack46_options_register(app,NULL,clawpack_options);
-#endif
-
     fclaw_forestclaw_register(app,"fclaw_options.ini");
+    fc2d_clawpack46_register(app,"fclaw_options.ini");
 
     /* User defined options (defined above) */
     user->gparms = fclaw_forestclaw_get_options(app);
     user_options_register (app, "fclaw_options.ini", user);
-
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
@@ -216,7 +213,7 @@ int main (int argc, char **argv)
        ------------------------------------------------------------- */
     if (!retval & !vexit)
     {
-        run_program(app,user);
+        run_program(app);
     }
 
     fclaw_forestclaw_destroy(app);
