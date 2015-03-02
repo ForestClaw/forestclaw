@@ -441,8 +441,8 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     int maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-                   dx,dy,q,maux,aux,t,dt,mthbc);
+    classic_vt.bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
+                   &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CLAWPACK46_UNSET_BLOCK();
 }
 

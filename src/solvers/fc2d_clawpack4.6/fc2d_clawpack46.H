@@ -46,14 +46,14 @@ extern "C"
 
 typedef void (*fc2d_clawpack46_setprob_t)();
 
-typedef void (*fc2d_clawpack46_bc2_t)(const int& maxmx, const int& maxmy,
-                                      const int& meqn, const int& mbc,
-                                      const int& mx, const int& my,
-                                      const double& xlower, const double& ylower,
-                                      const double& dx, const double& dy,
-                                      const double q[], const int& maux,
-                                      const double aux[], const double& t,
-                                      const double& dt, const int mthbc[]);
+typedef void (*fc2d_clawpack46_bc2_t)(const int* maxmx, const int* maxmy,
+                                      const int* meqn, const int* mbc,
+                                      const int* mx, const int* my,
+                                      const double* xlower, const double* ylower,
+                                      const double* dx, const double* dy,
+                                      const double q[], const int* maux,
+                                      const double aux[], const double* t,
+                                      const double* dt, const int mthbc[]);
 
 typedef  void (*fc2d_clawpack46_qinit_t)(const int* maxmx, const int* maxmy,
                                          const int* meqn,const int* mbc,
@@ -125,12 +125,12 @@ typedef struct fc2d_clawpack46_vtable
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
 
 #define CLAWPACK46_BC2 FCLAW_F77_FUNC(clawpack46_bc2,CLAWPACK46_BC2)
-void CLAWPACK46_BC2(const int& maxmx, const int& maxmy, const int& meqn,
-                     const int& mbc, const int& mx, const int& my,
-                     const double& xlower, const double& ylower,
-                     const double& dx, const double& dy, const double q[],
-                     const int& maux, const double aux[], const double& t,
-                     const double& dt, const int mthbc[]);
+void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
+                     const int* mbc, const int* mx, const int* my,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy, const double q[],
+                     const int* maux, const double aux[], const double* t,
+                     const double* dt, const int mthbc[]);
 
 /* --------------------------------------------------------------------
    Classic routines
@@ -164,12 +164,12 @@ void setaux_(const int& maxmx, const int& maxmy, const int& mbc,
              const double& dx, const double& dy,
              const int& maux, double aux[]);
 
-void bc2_(const int& maxmx, const int& maxmy, const int& meqn,
-          const int& mbc, const int& mx, const int& my,
-          const double& xlower, const double& ylower,
-          const double& dx, const double& dy, const double q[],
-          const int& maux, const double aux[], const double& t,
-          const double& dt, const int mthbc[]);
+void bc2_(const int* maxmx, const int* maxmy, const int* meqn,
+          const int* mbc, const int* mx, const int* my,
+          const double* xlower, const double* ylower,
+          const double* dx, const double* dy, const double q[],
+          const int* maux, const double aux[], const double* t,
+          const double* dt, const int mthbc[]);
 
 
 void b4step2_(const int& maxmx, const int& maxmy, const int& mbc,
