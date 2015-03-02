@@ -92,18 +92,9 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t              *gparms;
-#if 0
-    fc2d_clawpack46_options_t  *clawpack_options;
-    user_options_t             *user;
-#endif
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
-
-#if 0
-    clawpack_options = fc2d_clawpack46_get_options(app);
-    user = (user_options_t*) fclaw_app_get_user(app);
-#endif
 
     /* ---------------------------------------------------------- */
     /* Use [ax,bx]x[ay,by] */
@@ -119,16 +110,6 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------- */
     init_domain_data(domain);
     fclaw2d_domain_set_app(domain,app);
-
-#if 0
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
-
-    link_regrid_functions(domain,interface_patch_tag4refinement,
-                          interface_patch_tag4coarsening);
-#endif
 
     interface_link_solvers(domain);
 
