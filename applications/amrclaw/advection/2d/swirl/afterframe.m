@@ -7,6 +7,9 @@ yrbcolormap;
 showpatchborders(1:10);
 caxis([0,1])
 
+hidepatchborders;
+showgridlines(1:5);
+
 view(2);
 
 NoQuery = 0;

@@ -39,20 +39,13 @@
 
 #include "swirl_user.H"
 
-typedef struct user_options
-{
-    double period;
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-    sc_options_add_double (opt, 0, "period", &user->period, 0,
+    sc_options_add_double (opt, 0, "tperiod", &user->tperiod, 0,
                            "Period of the flow field [4]");
 
     user->is_registered = 1;
@@ -87,15 +80,11 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
-    user_options_t             *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
-    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* ---------------------------------------------------------------
        Domain geometry
@@ -107,7 +96,6 @@ void run_program(fclaw_app_t* app)
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
@@ -115,21 +103,9 @@ void run_program(fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    /* ---------------------------------------------------------------
-       Define the solver and link in other problem/user specific
-       routines
-       --------------------------------------------------------------- */
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
+    fclaw2d_domain_set_app(domain,app);
 
     swirl_link_solvers(domain);
-
-    link_regrid_functions(domain,swirl_patch_tag4refinement,
-                          swirl_patch_tag4coarsening);
 
     /* ---------------------------------------------------------------
        Run

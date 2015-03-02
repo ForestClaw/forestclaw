@@ -24,8 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
+#include "fclaw2d_vtable.h"
+
 #include "fc2d_clawpack46.H"
 #include "swirl_user.H"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -35,159 +38,43 @@ extern "C"
 #endif
 #endif
 
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    SETPROB,
-    NULL,        /* bc2 */
-    QINIT,
-    SETAUX,
-    B4STEP2,
-    NULL,        /* src2 */
-    rpn2_,
-    rpt2_
-};
-
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    fclaw2d_init_vtable(&vt);
+    vt.problem_setup = &swirl_problem_setup;
+    vt.patch_setup = &fc2d_clawpack46_setaux;
+    vt.patch_initialize = &fc2d_clawpack46_qinit;
+    vt.patch_physical_bc = fc2d_clawpack46_bc2;
+    vt.patch_single_step_update = fc2d_clawpack46_update;
 
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    fclaw2d_set_vtable(domain,&vt);
 
-    sf->f_patch_setup              = &fc2d_clawpack46_setaux;
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &swirl_parallel_write_header;
-    of->f_patch_write_output = &swirl_parallel_write_output;
+    /* classic_claw.setprob = &SETPROB; */
+    classic_claw.qinit = &QINIT;
+    classic_claw.setaux = &SETAUX;
+    classic_claw.b4step2 = &B4STEP2;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 
-    fc2d_clawpack46_link_to_clawpatch();
 }
+
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    fc2d_clawpack46_setprob(domain);
-}
+    fclaw_app_t* app;
+    user_options_t* user;
 
+    app = fclaw2d_domain_get_app(domain);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
-fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch = 0;
-    swirl_tag4refinement_(mx,my,mbc,meqn,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch = 1;  // == 0 or 1
-    swirl_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-
-void swirl_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn;
-    int maux = 0;
-    swirl_write_tfile_(iframe,time,mfields,ngrids,maux);
-
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
-}
-
-
-void swirl_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    /* ------------------------------------------------------------- */
-    // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level;
-
-    int mpirank = domain->mpirank;
-    swirl_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                       iframe,num,matlab_level,this_block_idx,
-                       mpirank);
+    SWIRL_SETPROB(&user->tperiod);
 }
 
 #ifdef __cplusplus
