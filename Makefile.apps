@@ -43,4 +43,4 @@ include applications/amrclaw/burgers/2d/pwconst/Makefile.am
 include applications/amrclaw/advection/2d/swirl/Makefile.am
 include applications/amrclaw/euler/2d/quadrants/Makefile.am
 include applications/amrclaw/euler/2d/shockbubble/Makefile.am
-# include applications/amrclaw/shallow/2d/radialdam/Makefile.am
+include applications/amrclaw/shallow/2d/radialdam/Makefile.am

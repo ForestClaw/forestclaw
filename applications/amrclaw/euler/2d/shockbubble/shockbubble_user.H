@@ -26,7 +26,8 @@
 #ifndef SHOCKBUBBLE_USER_H
 #define SHOCKBUBBLE_USER_H
 
-#include "amr_forestclaw.H"
+#include "forestclaw2d.H"
+#include "fclaw2d_vtable.h"
 #include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus
@@ -58,10 +59,10 @@ void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0
 void shockbubble_problem_setup(fclaw2d_domain_t* domain);
 
 #define RPN2EU3 FCLAW_F77_FUNC(rpn2eu3,RPN2EU3)
-void RPN2EU3(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc,const int* mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
+void RPN2EU3(const int* ixy, const int* maxm, const int* meqn,
+             const int* mwaves, const int* mbc,const int* mx,
+             double ql[], double qr[], double auxl[], double auxr[],
+             double wave[], double s[], double amdq[], double apdq[]);
 
 #define RPN2EU4 FCLAW_F77_FUNC(rpn2eu4,RPN2EU3)
 void RPN2EU4(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,

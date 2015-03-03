@@ -44,11 +44,11 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     /* [user] User options */
     sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
 
-    sc_options_add_double (opt, 0, "x0",    &user->x0,    0.5, "[user] x0 [0.5]");
-    sc_options_add_double (opt, 0, "y0",    &user->y0,    0.0, "[user] y0 [0.0]");
-    sc_options_add_double (opt, 0, "r0",    &user->r0,    0.2, "[user] r0 [0.2]");
-    sc_options_add_double (opt, 0, "rhoin", &user->rhoin, 0.1, "[user] rhoin [0.1]");
-    sc_options_add_double (opt, 0, "pinf",  &user->pinf,  5.0, "[user] pinf [5.0x]");
+    sc_options_add_double (opt, 0, "user:x0",    &user->x0,    0.5, "[user] x0 [0.5]");
+    sc_options_add_double (opt, 0, "user:y0",    &user->y0,    0.0, "[user] y0 [0.0]");
+    sc_options_add_double (opt, 0, "user:r0",    &user->r0,    0.2, "[user] r0 [0.2]");
+    sc_options_add_double (opt, 0, "user:rhoin", &user->rhoin, 0.1, "[user] rhoin [0.1]");
+    sc_options_add_double (opt, 0, "user:pinf",  &user->pinf,  5.0, "[user] pinf [5.0x]");
 
     user->is_registered = 1;
     return NULL;
@@ -83,7 +83,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    amr_options_t              *gparms;
+    amr_options_t *gparms;
 
     int mi, mj, a,b;
     double rotate[3];
