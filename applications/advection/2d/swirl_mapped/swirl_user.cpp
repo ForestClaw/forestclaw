@@ -48,14 +48,23 @@ static fc2d_clawpack46_vtable_t classic_claw;
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
     vt.problem_setup            = &fc2d_clawpack46_setprob;
+    classic_claw.setprob = &SETPROB;
 
     vt.patch_setup              = &swirl_patch_setup;
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
-    vt.patch_single_step_update = &swirl_patch_single_step_update;
 
+    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
+
+    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+
+    vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
+
+#if 0
     vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
     vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
 
@@ -67,16 +76,9 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
     vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
 
     fclaw2d_set_vtable(domain,&vt);
-
-    /* Needed for the clawpack46 package */
-    classic_claw.setprob = &SETPROB;
-    classic_claw.qinit = &QINIT;
-    classic_claw.bc2 = NULL;      /* Use clawpack46 library routine */
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
-
     fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
@@ -130,6 +132,7 @@ void swirl_patch_b4step2(fclaw2d_domain_t *domain,
 }
 
 
+#if 0
 double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
@@ -144,6 +147,7 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                           this_patch_idx,t,dt);
     return maxcfl;
 }
+#endif
 
 
 
