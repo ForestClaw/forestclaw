@@ -52,7 +52,7 @@ void quadrants_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_initialize = &fc2d_clawpack46_qinit;
     classic_claw.qinit = &QINIT;
 
-    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */x
+    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
     classic_claw.rpn2 = &RPN2EU3;  /* Signature is unchanged */
