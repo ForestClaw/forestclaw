@@ -11,8 +11,6 @@ applications_amrclaw_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/amrclaw/shallow/2d/radialdam/fclaw2d_map_nomap.c \
 	applications/amrclaw/shallow/2d/radialdam/setprob.f \
 	applications/amrclaw/shallow/2d/radialdam/fdisc.f \
-	applications/amrclaw/shallow/2d/radialdam/user_4.x/tag4refinement.f \
-	applications/amrclaw/shallow/2d/radialdam/user_4.x/radialdam_output.f \
 	applications/amrclaw/shallow/2d/radialdam/user_4.x/qinit.f \
 	applications/amrclaw/shallow/2d/rp/rpn2sw.f \
 	applications/amrclaw/shallow/2d/rp/rpt2sw.f
