@@ -37,48 +37,21 @@ extern "C"
 #endif
 #endif
 
-extern "C"
-{
-    void filament_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                  const int& meqn, const double& xlower,
-                                  const double& ylower, const double& dx, const double& dy,
-                                  double q[], const int& init_flag, int &blockno,
-                                  int& tag_patch);
+#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
+void SETAUX_MANIFOLD(const int* mx, const int* my,const int* mbc,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     const int* maux, double aux[],
+                     const int* blockno,
+                     double xd[], double yd[], double zd[],
+                     double area[]);
 
-    void filament_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn,const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double qcoarsened[], int& tag_patch);
-
-    void setaux_manifold_(const int& mbc,const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          const int& blockno,
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],
-                          double area[]);
-
-    void setaux_nomap_(const int& maxmx, const int& maxmy,
-                       const int& mbc,const int& mx,const int& my,
-                       const double& xlower,const double& ylower,
-                       const double& dx,const double& dy,
-                       const int& maux,double aux[]);
-
-    void filament_write_tfile_(const int& iframe,const double& time,
-                            const int& mfields,const int& ngrids,
-                            const int& maux);
-
-    void filament_write_qfile_(const int& maxmx, const int& maxmy,const int& meqn,
-                            const int& mbc, const int& mx,const int& my,
-                            const double& xlower,const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& iframe,const int& patch_num,
-                            const int& level,const int& blockno,
-                            const int& mpirank);
-
-
-}
+#define SETAUX_NOMAP FCLAW_F77_FUNC(setaux_nomap,SETAUX_NOMAP)
+void SETAUX(const int* maxmx, const int* maxmy,
+            const int* mbc,const int* mx, const int* my,
+            const double* xlower,const double* ylower,
+            const double* dx,const double* dy,
+            const int* maux, double aux[]);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -103,49 +76,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 
 void filament_link_solvers(fclaw2d_domain_t *domain);
 
-void filament_problem_setup(fclaw2d_domain_t* domain);
-
 void filament_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx);
 
-void filament_patch_initialize(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx);
-
-void filament_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp);
-
-double filament_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt);
-
-fclaw_bool filament_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *this_patch,
-                                         int this_block_idx, int this_patch_idx,
-                                         int initflag);
-
-fclaw_bool filament_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *this_patch,
-                                         int blockno,
-                                         int patchno);
-
-void filament_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                 int iframe,int num,int level);
-
-void filament_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
 
 #ifdef __cplusplus
 #if 0

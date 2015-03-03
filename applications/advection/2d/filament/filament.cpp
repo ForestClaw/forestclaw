@@ -74,7 +74,15 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example == 3 || user->example == 4)
+    if (user->example == 2)
+    {
+        if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 16)
+        {
+            fclaw_global_essentialf("The pillowdisk requires mx*2^minlevel >= 16\n");
+            return FCLAW_EXIT_QUIET;
+        }
+    }
+    else if (user->example == 3 || user->example == 4)
     {
         if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
         {
@@ -117,13 +125,11 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	       *domain;
     fclaw2d_map_context_t      *cont = NULL, *brick = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
     user_options_t             *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
     user = (user_options_t*) fclaw_app_get_user(app);
 
@@ -186,17 +192,9 @@ void run_program(fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,filament_problem_setup);
+    fclaw2d_domain_set_app(domain,app);
 
     filament_link_solvers(domain);
-
-    link_regrid_functions(domain,
-                          filament_patch_tag4refinement,
-                          filament_patch_tag4coarsening);
 
     amrinit(&domain);
     amrrun(&domain);

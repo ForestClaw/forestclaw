@@ -1,5 +1,5 @@
 c     # This is the "classic" call to setaux.
-      subroutine setaux_nomap(maxmx,maxmy,mbc,mx,my,xlower,ylower,
+      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,
      &      dx,dy,maux,aux)
       implicit none
 

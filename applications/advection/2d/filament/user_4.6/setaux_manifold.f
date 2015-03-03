@@ -1,5 +1,5 @@
-      subroutine setaux_manifold(mbc,mx,my,xlower,ylower,dx,dy,
-     &      maux,aux,blockno,xp,yp,zp,xd,yd,zd,area)
+      subroutine setaux_manifold(mx,my,mbc,xlower,ylower,dx,dy,
+     &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
 
       integer mbc, mx,my, meqn, maux, blockno
@@ -18,12 +18,10 @@
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j
-      double precision dxdy, t, sum
+      double precision dxdy, t
 
-c     # keep debug false since only one mpirank should print output
       dxdy = dx*dy
 
-      sum = 0
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             aux(i,j,1) = area(i,j)/dxdy
