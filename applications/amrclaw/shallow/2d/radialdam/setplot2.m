@@ -13,7 +13,9 @@ PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
 PlotGridEdges = zeros(1,MaxLevels); 
 
-PlotType = 1;
+PlotType = 1;  % Pseudo-color plot
+% PlotType = 4;  % Scatter plot (compare with rad1d)
+
 MappedGrid = 0;
 
 % for contour plots (PlotType==2):
@@ -22,6 +24,6 @@ ContourValues = [];
 % for scatter plot (PlotType==4):
   x0 = 0;
   y0 = 0;
-  ScatterStyle = setplotstyle('ro','y*','ms','gp');
+  ScatterStyle = setplotstyle('ro','m*','cs','gp','ro','k*');
 
 

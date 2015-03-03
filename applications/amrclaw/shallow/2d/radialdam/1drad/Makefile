@@ -20,7 +20,7 @@ FFLAGS =  -O
 LFLAGS =  -O
 LINK	= gfortran
 
-CLAW = ./
+CLAW = .
 
 OBJECTS = \
   driver.o \
@@ -41,7 +41,7 @@ LIBOBJECTS = \
   $(CLAW)/lib/limiter.o \
   $(CLAW)/lib/philim.o
 
-xclaw: $(OBJECTS)
+xclaw: $(OBJECTS) $(LIBOBJECTS)
 	$(LINK) $(LFLAGS) $(OBJECTS) $(LIBOBJECTS) -o xclaw
 
 ### DO NOT remove this line - make depends on it ###
