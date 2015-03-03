@@ -10,11 +10,14 @@ fprintf('%10s : %12.4f\n','qmax',qmax);
 caxis([0.1 2.81]);
 
 showpatchborders
+setpatchborderprops('linewidth',1);
 % hidepatchborders;
 
 prt = false;
+NoQuery = 0;
 if (prt)
-    fname = sprintf('sbmesh%2.2d.png',Frame);
+    MaxFrames = 31;
+    fname = sprintf('sbamrmesh%2.2d.png',Frame);
     disp(fname);
     print('-dpng',fname);
 end
