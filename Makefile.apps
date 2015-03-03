@@ -10,7 +10,7 @@ include src/solvers/fc2d_dummy/Makefile.am
 # Applications
 # ----------------------------------
 
-# # Simple examples that don't do anything
+# # Simple examples to test options handling, etc, but no solvers.
 include applications/dummy/Makefile.am
 include applications/no_solver/Makefile.am
 include applications/test_parms/Makefile.am
@@ -22,9 +22,9 @@ include applications/test_parms/Makefile.am
 include applications/advection/2d/swirl_mapped/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
 include applications/advection/2d/torus/Makefile.am
-# include applications/advection/2d/hemisphere/Makefile.am
-# include applications/advection/2d/filament/Makefile.am
-# include applications/advection/2d/sphere/Makefile.am
+include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/filament/Makefile.am
+include applications/advection/2d/sphere/Makefile.am
 
 # # NCAR Transport problems on the sphere
 # include applications/NCAR_transport/slotted_disk/Makefile.am
