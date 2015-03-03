@@ -36,6 +36,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.H"
 
+static void *
+options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    /* [user] User options */
+    sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
+
+    sc_options_add_double (opt, 0, "x0",    &user->x0,    0.5, "[user] x0 [0.5]");
+    sc_options_add_double (opt, 0, "y0",    &user->y0,    0.0, "[user] y0 [0.0]");
+    sc_options_add_double (opt, 0, "r0",    &user->r0,    0.2, "[user] r0 [0.2]");
+    sc_options_add_double (opt, 0, "rhoin", &user->rhoin, 0.1, "[user] rhoin [0.1]");
+    sc_options_add_double (opt, 0, "pinf",  &user->pinf,  5.0, "[user] pinf [5.0x]");
+
+    user->is_registered = 1;
+    return NULL;
+}
+
+static const fclaw_app_options_vtable_t options_vtable_user =
+{
+    options_register_user,
+    NULL,
+    NULL,
+    NULL
+};
+
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
+{
+    FCLAW_ASSERT (app != NULL);
+
+    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
+                                user);
+}
+
 
 void run_program(fclaw_app_t* app)
 {
@@ -46,14 +83,12 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
     amr_options_t              *gparms;
 
     int mi, mj, a,b;
     double rotate[3];
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
 
     mi = gparms->mi;
@@ -76,16 +111,9 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
+    fclaw2d_domain_set_app(domain,app);
 
     shockbubble_link_solvers(domain);
-
-    link_regrid_functions(domain,shockbubble_patch_tag4refinement,
-                          shockbubble_patch_tag4coarsening);
 
     amrinit(&domain);
     amrrun(&domain);
@@ -103,15 +131,17 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                  *options;
+    user_options_t suser, *user = &suser;
 
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    app = fclaw_app_new (&argc, &argv, user);
 
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    register_user_options(app,"fclaw_options.ini",user);
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);

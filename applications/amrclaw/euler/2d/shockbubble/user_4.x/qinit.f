@@ -38,7 +38,7 @@ c            # win is now the fraction of the cell that lies inside the circle
           call fclaw2d_map_c2m(cont,blockno,xclow,yclow,xlow,ylow,zlow)
           if (xlow .lt. 0.2d0) then
 c            # behind shock:
-             do 30 j=1,my
+             do 30 j=1-mbc,my+mbc
                 q(i,j,1) = rinf
                 q(i,j,2) = rinf*vinf
                 q(i,j,3) = 0.d0
