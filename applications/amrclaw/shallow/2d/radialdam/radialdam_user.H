@@ -26,7 +26,7 @@
 #ifndef RADIALDAM_USER_H
 #define RADIALDAM_USER_H
 
-#include "amr_forestclaw.H"
+#include "forestclaw2d.H"
 #include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus
@@ -37,55 +37,39 @@ extern "C"
 #endif
 #endif
 
-void radialdam_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn, const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double q[], const int& init_flag, int& tag_patch);
+typedef struct user_options
+{
+    double g;
+    double x0;
+    double y0;
+    double r0;
+    double hin;
+    double hout;
 
-void radialdam_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn,const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double qcoarsened[], int& tag_patch);
-
-void radialdam_write_tfile_(const int& iframe,const double& time,
-                            const int& mfields,const int& ngrids,
-                            const int& maux);
-
-void radialdam_write_qfile_(const int& meqn,
-                            const int& mbc, const int& mx,const int& my,
-                            const double& xlower,const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& iframe,const int& patch_num,
-                            const int& level,const int& blockno,
-                            const int& mpirank);
+    int is_registered;
+} user_options_t;
 
 
-void rpn2sw_(const int& ixy,const int& maxm, const int& meqn, const int& mwaves,
-             const int& mbc,const int& mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
+#define RADIALDAM_SETPROB FCLAW_F77_FUNC(radialdam_setprob, RADIALDAM_SETPROB)
+void RADIALDAM_SETPROB(const double *gamma, const double* x0, const double* y0,
+                       const double* r0, const double* hin,
+                       const double* hinf);
 
-void rpt2sw_(const int& ixy, const int& maxm, const int& meqn, const int& mwaves,
-             const int& mbc, const int& mx, double ql[], double qr[],
-             double aux1[], double aux2[], double aux3[], const int& imp,
-             double dsdq[], double bmasdq[], double bpasdq[]);
-
+void radialdam_problem_setup(fclaw2d_domain_t* domain);
 void radialdam_link_solvers(fclaw2d_domain_t *domain);
 
-fclaw_bool radialdam_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          int initflag);
 
-fclaw_bool radialdam_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int blockno,
-                                          int patchno);
-void radialdam_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
+#define RPN2SW FCLAW_F77_FUNC(rpn2sw,RPN2SW)
+void RPN2SW(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+            const int* mbc,const int* mx, double ql[], double qr[],
+            double auxl[], double auxr[], double wave[],
+            double s[], double amdq[], double apdq[]);
 
-void radialdam_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                     int this_block_idx, int this_patch_idx,
-                                     int iframe,int num,int level);
+#define RPT2SW FCLAW_F77_FUNC(rpt2sw,RPT2SW)
+void RPT2SW(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+            const int* mbc, const int* mx, double ql[], double qr[],
+            double aux1[], double aux2[], double aux3[], const int* imp,
+            double dsdq[], double bmasdq[], double bpasdq[]);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

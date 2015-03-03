@@ -14,7 +14,7 @@ c
        implicit double precision (a-h,o-z)
        dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
 
-       integer blockno, clawpack46_get_block
+       integer blockno, fc2d_clawpack46_get_block
 
        common /comic/ hin,hout
 
