@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_single_step.h>
 #include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
@@ -100,19 +99,17 @@ static
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t *gparms;
-    fc2d_clawpack46_options_t* clawpack_options;
-    user_options_t* user;
-
+    user_options_t  *user;
 
     /* Used locally */
     double pi = M_PI;
     double rotate[2];
 
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
-
     user = (user_options_t*) fclaw_app_get_user(app);
+
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
 
     rotate[0] = pi*gparms->theta/180.0;
     rotate[1] = 0;
@@ -146,21 +143,9 @@ static
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    /* Store domain parameters */
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    /* ---------------------------------------------
-       Define the solver
-       --------------------------------------------- */
-
-    /* Link waveprop solvers to domain */
-    link_problem_setup(domain,hemisphere_problem_setup);
+    fclaw2d_domain_set_app(domain,app);
 
     hemisphere_link_solvers(domain);
-    link_regrid_functions(domain,hemisphere_patch_tag4refinement,
-                          hemisphere_patch_tag4coarsening);
 
     /* --------------------------------------------------
        Initialize and run the simulation

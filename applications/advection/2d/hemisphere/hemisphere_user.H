@@ -37,85 +37,22 @@ extern "C"
 #endif
 #endif
 
-extern "C"
-{
-    void hemisphere_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                    const int& meqn, const double& xlower,
-                                    const double& ylower, const double& dx,
-                                    const double& dy,
-                                    double q[], const int& init_flag, int& tag_patch);
+#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold, SETAUX_MANIFOLD)
+void SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     const int* maux, double aux[],
+                     const int* blockno,
+                     double xd[], double yd[], double zd[],
+                     double area[]);
 
-    void hemisphere_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                                    const int& meqn,const double& xlower,
-                                    const double& ylower, const double& dx,
-                                    const double& dy,
-                                    double qcoarsened[], int& tag_patch);
-
-    void setaux_manifold_(const int& mbc,
-                          const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          const int& blockno,
-                          double xd[], double yd[], double zd[],double area[]);
-
-    void hemisphere_write_tfile_(const int& iframe,const double& time,
-                                 const int& mfields,const int& ngrids,
-                                 const int& maux);
-
-    void hemisphere_write_qfile_(const int& meqn,
-                                 const int& mbc, const int& mx,const int& my,
-                                 const double& xlower,const double& ylower,
-                                 const double& dx, const double& dy,
-                                 double q[], const int& iframe,const int& patch_num,
-                                 const int& level,const int& blockno,
-                                 const int& mpirank);
-
-}
 
 void hemisphere_link_solvers(fclaw2d_domain_t *domain);
-
-void hemisphere_problem_setup(fclaw2d_domain_t *domain);
 
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
-
-void hemisphere_qinit(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx);
-
-void hemisphere_b4step2(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt);
-
-double hemisphere_update(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         double t,
-                         double dt);
-
-fclaw_bool hemisphere_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx, int this_patch_idx,
-                                           int initflag);
-
-fclaw_bool hemisphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int blockno,
-                                           int patchno);
-
-void hemisphere_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
-
-void hemisphere_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int iframe,int num,int level);
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
                                                     const double shift[],
