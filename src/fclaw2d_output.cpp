@@ -201,10 +201,10 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     const amr_options_t *gparms = get_domain_parms (domain);
     if (gparms->vtkout & 2)
         if (gparms->serialout)
-            fclaw_global_essentialf("Output Frame %d  at time %16.8e (vtk,ascii)\n\n",
+            fclaw_global_essentialf("Output Frame %4d  at time %16.8e (vtk,ascii)\n\n",
                                     iframe,time);
         else
-            fclaw_global_essentialf("Output Frame %d  at time %16.8e (vtk)\n\n",
+            fclaw_global_essentialf("Output Frame %4d  at time %16.8e (vtk)\n\n",
                                     iframe,time);
     else
         fclaw_global_essentialf("Output Frame %d  at time %16.8e (ascii)\n\n",
