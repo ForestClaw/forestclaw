@@ -110,8 +110,8 @@ static
         fclaw2d_domain_t	 *domain;
         fclaw2d_map_context_t    *cont = NULL;
 
-        amr_options_t              *gparms;
-        user_options_t             *user;
+        amr_options_t   *gparms;
+        user_options_t  *user;
 
         /* Used locally */
         double pi = M_PI;

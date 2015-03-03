@@ -1,4 +1,4 @@
-      subroutine setaux_manifold(mbc,mx,my,
+      subroutine setaux_manifold(mx,my,mbc,
      &      xlower,ylower,dx,dy,
      &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
