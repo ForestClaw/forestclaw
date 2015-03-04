@@ -35,17 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-typedef struct user_options
-{
-    int example;
-    double alpha;
-
-    amr_options_t* gparms;
-
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -53,10 +42,13 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "1 id (brick); 2 cart (brick); 3 5-patch square");
+                        "[user] 1 id (brick); 2 cart (brick); 3 5-patch square");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
-                           "Ratio of outer square to inner square [0.4]");
+                           "[user] Ratio of outer square to inner square [0.4]");
+
+    sc_options_add_double (opt, 0, "tperiod", &user->tperiod, 4.0,
+                           "[user] Period of the velocity field [4.0]");
 
     user->is_registered = 1;
     return NULL;
@@ -66,7 +58,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 3) {
+    if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 1, 2, or 3\n");
         return FCLAW_EXIT_QUIET;
     }
@@ -124,6 +116,11 @@ void run_program(fclaw_app_t* app,
     b = gparms->periodic_y;
 
     switch (user->example) {
+    case 0:
+        /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_nomap();
+        break;
     case 1:
         /* Map unit square in [0,1]x[0,1] to [0,1]x[0,1] */
         conn = p4est_connectivity_new_unitsquare();

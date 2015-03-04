@@ -47,26 +47,50 @@ static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
+    const amr_options_t *gparms;
     fclaw2d_init_vtable(&vt);
     fc2d_clawpack46_init_vtable(&classic_claw);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
-    classic_claw.setprob = &SETPROB;
+    gparms = fclaw2d_forestclaw_get_options(domain);
 
-    vt.patch_setup              = &swirl_patch_setup;
+    vt.problem_setup            = &swirl_problem_setup;
+    /* classic_claw.setprob = &SETPROB; */
+
+    if (gparms->manifold)
+    {
+        /* setaux_manifold has customized signature */
+        vt.patch_setup = &swirl_patch_setup;
+    }
+    else
+    {
+        vt.patch_setup = &fc2d_clawpack46_setaux;
+        classic_claw.setaux = &SETAUX; /* Uses classic signature */
+    }
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
     classic_claw.qinit = &QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
 
-    vt.patch_single_step_update = &fc2d_clawpack46_update;
+    vt.patch_single_step_update = &swirl_patch_update;
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
 }
+
+void swirl_problem_setup(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    user_options_t* user;
+
+    app = fclaw2d_domain_get_app(domain);
+    user = (user_options_t*) fclaw_app_get_user(app);
+
+    SWIRL_SETPROB(&user->tperiod);
+}
+
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -88,8 +112,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
 
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    SETAUX_MANIFOLD(mbc,mx,my,xlower,ylower,dx,dy,maux,
-                    aux,this_block_idx,xd,yd,zd,area);
+    SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&maux,
+                    aux,&this_block_idx,xd,yd,zd,area);
 }
 
 void swirl_patch_b4step2(fclaw2d_domain_t *domain,
@@ -113,18 +137,17 @@ void swirl_patch_b4step2(fclaw2d_domain_t *domain,
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     /* Update the velocity field */
-    B4STEP2_MANIFOLD(mbc,mx,my,dx,dy,this_block_idx,
-                     xd,yd,zd,t, dt,maux,aux);
+    B4STEP2_MANIFOLD(&mx,&my,&mbc, &dx,&dy,&this_block_idx,
+                     xd,yd,zd,&t, &dt,&maux,aux);
 }
 
 
-#if 0
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt)
+double swirl_patch_update(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt)
 {
     swirl_patch_b4step2(domain,this_patch,this_block_idx,
                         this_patch_idx,t,dt);
@@ -133,7 +156,6 @@ double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
                                           this_patch_idx,t,dt);
     return maxcfl;
 }
-#endif
 
 
 

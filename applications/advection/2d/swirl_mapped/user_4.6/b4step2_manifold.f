@@ -1,4 +1,4 @@
-      subroutine b4step2_manifold(mbc,mx,my,dx,dy,blockno,
+      subroutine b4step2_manifold(mx,my,mbc,dx,dy,blockno,
      &      xd,yd,zd,t, dt,maux,aux)
       implicit none
 

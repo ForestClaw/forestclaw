@@ -37,42 +37,40 @@ extern "C"
 #endif
 #endif
 
+typedef struct user_options
+{
+    int example;
+    double alpha;
+    double tperiod;
 
-void swirl_write_tfile_(const int* iframe,const double* time,
-                        const int* mfields,const int* ngrids);
+    amr_options_t* gparms;
 
-void swirl_write_qfile_(const int* meqn,
-                        const int* mbc, const int* mx,const int* my,
-                        const double* xlower, const double* ylower,
-                        const double* dx, const double* dy,
-                        double q[], const int* iframe,
-                        const int* patch_num,const int* level,
-                        const int* blockno, const int* mpirank);
+    int is_registered;
 
-void qinit_manifold_(const int& meqn, const int& mbc,
-                     const int& mx, const int& my,
-                     const double& xlower, const double& ylower,
-                     const double& dx, const double& dy,
-                     const int& blockno,double q[],
-                     const int& maux, double aux[]);
+} user_options_t;
+
+void swirl_problem_setup(fclaw2d_domain_t* domain);
+
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(double* tperiod);
 
 #define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold, SETAUX_MANIFOLD)
 
-void SETAUX_MANIFOLD(const int& mbc,const int& mx, const int& my,
-                     const double& xlower, const double& ylower,
-                     const double& dx, const double& dy,
-                     const int& maux, double aux[],
-                     const int& blockno,
+void SETAUX_MANIFOLD(const int* mbc,const int* mx, const int* my,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     const int* maux, double aux[],
+                     const int* blockno,
                      double xd[], double yd[], double zd[],
                      double area[]);
 
 #define B4STEP2_MANIFOLD FCLAW_F77_FUNC(b4step2_manifold,B4STEP2_MANIFOLD)
-void B4STEP2_MANIFOLD(const int& mbc,const int& mx,const int& my,
-                      const double& dx,const double& dy,
-                      const int& blockno,
+void B4STEP2_MANIFOLD(const int* mx,const int* my,const int* mbc,
+                      const double* dx,const double* dy,
+                      const int* blockno,
                       double xd[], double yd[], double zd[],
-                      const double& time,
-                      const double& dt, const int& maux, double aux[]);
+                      const double* time,
+                      const double* dt, const int* maux, double aux[]);
 
 void swirl_link_solvers(fclaw2d_domain_t *domain);
 
@@ -81,13 +79,14 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx);
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt);
+double swirl_patch_update(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt);
 
+#if 0
 fclaw_bool swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
@@ -97,6 +96,7 @@ fclaw_bool swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno);
+#endif
 
 void swirl_patch_b4step2(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
@@ -106,6 +106,8 @@ void swirl_patch_b4step2(fclaw2d_domain_t *domain,
                          double dt);
 
 /* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
 fclaw2d_map_context_t* fclaw2d_map_new_identity();
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,

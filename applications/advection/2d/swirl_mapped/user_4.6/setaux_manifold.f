@@ -1,4 +1,4 @@
-      subroutine setaux_manifold(mbc,mx,my,xlower,ylower,dx,dy,
+      subroutine setaux_manifold(mx,my,mbc,xlower,ylower,dx,dy,
      &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
 
@@ -11,7 +11,6 @@
 
       include 'metric_terms.i'
 
-c     # keep debug false since only one mpirank should print output
       dxdy = dx*dy
 
       do j = 1-mbc,my+mbc

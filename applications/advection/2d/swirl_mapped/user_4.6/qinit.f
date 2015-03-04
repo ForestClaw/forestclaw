@@ -39,13 +39,15 @@ c     #     0.1  otherwise
       implicit none
 
       double precision xc,yc, xp, yp, zp
-      integer blockno
+      integer blockno, fclaw2d_map_is_used
       integer*8 cont, get_context
 
       cont = get_context()
 
-      call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
-
+      if (fclaw2d_map_is_used(cont) .eq. 0) then
+         xp = xc
+      else
+         call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+      endif
       fdisc = xp-0.5d0
       end
