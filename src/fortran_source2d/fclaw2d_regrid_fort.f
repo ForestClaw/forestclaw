@@ -62,8 +62,8 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision qmin, qmax
 
       tag_patch = 0
-      qmin = 100.d0
-      qmax = -100.d0
+      qmin = q0(1,1,1)
+      qmax = q0(1,1,1)
       call fclaw2d_get_minmax(mx,my,mbc,meqn,q0,qmin,qmax)
       call fclaw2d_get_minmax(mx,my,mbc,meqn,q1,qmin,qmax)
       call fclaw2d_get_minmax(mx,my,mbc,meqn,q2,qmin,qmax)
