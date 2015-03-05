@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_vtable.h>
 #include <fclaw_register.h>
-#include <fclaw2d_output_ascii.h>
 #include <fclaw2d_regrid_default.h>
 
 #include "no_solver_user.H"
