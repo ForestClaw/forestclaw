@@ -107,6 +107,8 @@ options_check (fclaw_app_t * app, void *package, void *registered)
         return FCLAW_EXIT_QUIET;
     }
 
+    FCLAW_ASSERT(!(clawopt->maux == 0 && clawopt->mcapa > 0));
+
     /* Should also check mthbc, mthlim, etc. */
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
