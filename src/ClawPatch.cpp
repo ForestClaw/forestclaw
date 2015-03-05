@@ -719,6 +719,14 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
      *area = cp->area();
 }
 
+void fclaw2d_clawpatch_area_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **area)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    *area = cp->area();
+}
+
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,

@@ -63,6 +63,10 @@ void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain, int* meqn);
 
 int fclaw2d_clawpatch_get_meqn(fclaw2d_domain_t* domain);
 
+void fclaw2d_clawpatch_area_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **area);
+
 
 #ifdef __cplusplus
 #if 0
