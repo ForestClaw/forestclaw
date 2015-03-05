@@ -37,10 +37,25 @@ extern "C"
 #endif
 #endif
 
-extern "C"
+typedef struct user_options
 {
-    void mountain_setup_();
+    int example;
+    int is_registered;
 
+} user_options_t;
+
+void mountain_patch_setup(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_blockno,
+                          int this_patchno);
+
+
+#define SET_CAPACITY FCLAW_F77_FUNC(set_capacity,SET_CAPACITY)
+void SET_CAPACITY(int* mx, int *my, int *mbc, double *dx,double *dy,
+                  double area[],int* maux, double *aux);
+
+
+#if 0
     void mountain_tag4refinement_(const int& mx,const int& my,const int& mbc,
                                const int& meqn, const int& blockno,
                                const double& xlower, const double& ylower,
@@ -63,7 +78,9 @@ extern "C"
                             double q[], const int& iframe,const int& patch_num,
                             const int& level,const int& blockno,
                             const int& mpirank);
+#endif
 
+#if 0
     void qinit_manifold_(const int& meqn, const int& mbc,
                          const int& mx, const int& my,
                          const double& xlower, const double& ylower,
@@ -87,58 +104,18 @@ extern "C"
                            double xd[], double yd[], double zd[],
                            const double& time,
                            const double& dt, const int& maux, double aux[]);
-
-
-}
+#endif
 
 
 void mountain_link_solvers(fclaw2d_domain_t *domain);
 
-void mountain_problem_setup(fclaw2d_domain_t* domain);
 
-void mountain_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
-
-void mountain_patch_initialize(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx);
-
-void mountain_patch_physical_bc(fclaw2d_domain *domain,
+double mountain_patch_update(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp);
-
-double mountain_update(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt);
-
-fclaw_bool mountain_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
-
-fclaw_bool mountain_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
-
-void mountain_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                 int iframe,int num,int level);
-
-void mountain_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids);
-
-
+                             double dt);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_mountain(fclaw2d_map_context_t* brick,

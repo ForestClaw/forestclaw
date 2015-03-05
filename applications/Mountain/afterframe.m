@@ -24,7 +24,7 @@ if (mnt)
     set(hmount_fill,'visible','on','facecolor',[0 100/256 0]);
     hmount_line = line('xdata',xm,'ydata',ym,'linewidth',3);
     setpatchborderprops('linewidth',1);
-    colormap([0.6 0.7 0.9]);
+    % colormap([0.6 0.7 0.9]);
     hold off;
 end
 

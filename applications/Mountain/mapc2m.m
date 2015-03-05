@@ -1,6 +1,6 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'cutcell';
+map = 'cutcell';
 map = 'terrain';
 
 x_scale = 5000;
@@ -9,6 +9,7 @@ y_scale = 2000;
 s = 0.0;
 switch map
     case 'cutcell'
+        s = 0.025;
         [xp,yp,zp] = mapc2m_brick(xc,yc,s);
         xp = x_scale*xp;
         yp = y_scale*yp;

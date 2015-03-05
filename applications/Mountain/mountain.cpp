@@ -35,13 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mountain_user.H"
 
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -95,14 +88,12 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    fc2d_clawpack46_options_t  *clawpack_options;
-    amr_options_t              *gparms;
-    user_options_t             *user;
+    amr_options_t   *gparms;
+    user_options_t  *user;
 
     int mi,mj,a,b;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    clawpack_options = fc2d_clawpack46_get_options(app);
     gparms = fclaw_forestclaw_get_options(app);
     user = (user_options_t*) fclaw_app_get_user(app);
 
@@ -133,16 +124,9 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     init_domain_data(domain);
-
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-    link_problem_setup(domain,fc2d_clawpack46_setprob);
+    fclaw2d_domain_set_app(domain,app);
 
     mountain_link_solvers(domain);
-
-    link_regrid_functions(domain,mountain_patch_tag4refinement,
-                          mountain_patch_tag4coarsening);
 
     amrinit(&domain);
     amrrun(&domain);
@@ -169,6 +153,7 @@ main (int argc, char **argv)
 
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
+
     fc2d_clawpack46_register(app,"fclaw_options.ini");
 
     register_user_options (app, "fclaw_options.ini", user);

@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_includes.H>
 #include <fc2d_clawpack46.H>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_regrid.h>
 #include "mountain_user.H"
 
 #ifdef __cplusplus
@@ -35,44 +37,70 @@ extern "C"
 #endif
 #endif
 
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    setprob_,
-    NULL,     /* bc2 */
-    qinit_,
-    NULL,     /* setaux */
-    NULL,     /* b4step2 */
-    NULL,     /* src2 */
-    NULL,     /* rpn2 */
-    NULL      /* rpt2 */
-};
-
+static fc2d_clawpack46_vtable_t classic_claw;
+static fclaw2d_vtable_t vt;
 
 void mountain_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_single_step_update = &mountain_update; /* Don't do anything */
+    vt.problem_setup = &fc2d_clawpack46_setprob;
+    classic_claw.setprob = &SETPROB;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &mountain_parallel_write_header;
-    of->f_patch_write_output = &mountain_parallel_write_output;
+    vt.patch_setup = &mountain_patch_setup;
+    classic_claw.setaux = &SETAUX;  /* Called by fc2d_clawpack46_setaux */
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+    vt.patch_initialize = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
 
-    fc2d_clawpack46_link_to_clawpatch();
+    vt.patch_physical_bc = &fc2d_clawpack46_bc2;   /* This doesn't do anything */
+
+    /* Use this to refine near the terrain.  The default is to refine near
+       advection front */
+    vt.fort_tag4refinement = &TAG4REFINEMENT; /* Customized refinement criteria */
+    vt.fort_tag4coarsening = &TAG4COARSENING; /* Customized refinement criteria */
+
+    vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
+
+    fclaw2d_set_vtable(domain,&vt);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
+void mountain_patch_setup(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_blockno,
+                          int this_patchno)
+{
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux,*area;
 
-double mountain_update(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        double t,
-                        double dt)
+    /* This defines the aux array, and sets the block number */
+    fc2d_clawpack46_setaux(domain,this_patch,this_blockno,
+                           this_patchno);
+
+    /* Set the capacity */
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_area_data(domain,this_patch,&area);
+
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+
+    /* This sets the capacity, without requiring that we re-write the signature
+       for setaux */
+    SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&maux,aux);
+}
+
+double mountain_patch_update(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -81,120 +109,7 @@ double mountain_update(fclaw2d_domain_t *domain,
 }
 
 
-/* -----------------------------------------------------------------
-   Default routine for tagging patches for refinement and coarsening
-   ----------------------------------------------------------------- */
-fclaw_bool mountain_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno, int this_patch_idx,
-                                      int initflag)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
 
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    int tag_patch = 0;
-    mountain_tag4refinement_(mx,my,mbc,meqn,blockno,xlower,ylower,dx,dy,q,initflag,tag_patch);
-    return tag_patch == 1;
-}
-
-fclaw_bool mountain_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* qcoarse = cp->q();
-
-    int tag_patch = 1;  // == 0 or 1
-    mountain_tag4coarsening_(mx,my,mbc,meqn,xlower,ylower,dx,dy,qcoarse,tag_patch);
-    return tag_patch == 0;
-}
-
-void mountain_parallel_write_header(fclaw2d_domain_t* domain, int iframe, int ngrids)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    double time = get_domain_time(domain);
-
-    printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
-
-    // Write out header file containing global information for 'iframe'
-    int mfields = gparms->meqn;
-    int maux = 0;
-    mountain_write_tfile_(iframe,time,mfields,ngrids,maux);
-
-    // This opens file 'fort.qXXXX' for replace (where XXXX = <zero padding><iframe>, e.g. 0001,
-    // 0010, 0114), and closes the file.
-    new_qfile_(iframe);
-}
-
-
-void mountain_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int level)
-{
-    /* ----------------------------------------------------------- */
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    /* ----------------------------------------------------------- */
-    // Patch specific parameters
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-
-    /* ------------------------------------------------------------ */
-    // Pointers needed to pass to Fortran
-    double* q = cp->q();
-
-    /* ------------------------------------------------------------- */
-    // This opens a file for append.  Now, the style is in the 'clawout' style.
-    int matlab_level = level;
-
-    int mpirank = domain->mpirank;
-    mountain_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
-                       iframe,num,matlab_level,this_block_idx,
-                       mpirank);
-}
 
 #ifdef __cplusplus
 #if 0
