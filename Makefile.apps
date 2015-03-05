@@ -34,7 +34,7 @@ include applications/advection/2d/sphere/Makefile.am
 # include applications/euler/2d/quadrants/Makefile.am
 
 # # Mountain problem - SSE
-# include applications/Mountain/Makefile.am
+include applications/Mountain/Makefile.am
 
 # # AMRClaw examples from clawpack4.x
 include applications/amrclaw/acoustics/2d/interface/Makefile.am
