@@ -72,7 +72,14 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
 
-    vt.patch_single_step_update = &swirl_patch_update;
+    if (gparms->manifold)
+    {
+        vt.patch_single_step_update = &swirl_patch_update;
+    }
+    else
+    {
+        vt.patch_single_step_update = &fc2d_clawpack46_update;
+    }
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
