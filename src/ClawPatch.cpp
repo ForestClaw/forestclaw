@@ -764,3 +764,6 @@ int fclaw2d_clawpatch_get_meqn(fclaw2d_domain_t* domain)
     const amr_options_t *gparms = get_domain_parms(domain);
     return gparms->meqn;
 }
+
+ClawPatch* fclaw2d_clawpatch_cp(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t *this_patch);

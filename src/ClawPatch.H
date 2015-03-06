@@ -297,6 +297,10 @@ void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                       int this_block_idx, int this_patch_idx, double *qdata,
                       fclaw_bool time_interp);
 
+ClawPatch* fclaw2d_clawpatch_cp(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t *this_patch);
+
+
 #ifdef __cplusplus
 #if 0
 {
