@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "fclaw2d_typedefs.h"
-#include "amr_regrid.H"
+#include "fclaw2d_regrid.H"
 
 #include "fclaw2d_vtable.h"
 

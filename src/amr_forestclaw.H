@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 
 #include "subcycle_manager.H"
-#include "amr_regrid.H"
+#include "fclaw2d_regrid.H"
 #include "amr_utils.H"
 #include "ClawPatch.H"
 #include "fclaw2d_transform.h"

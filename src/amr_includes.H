@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "ClawPatch.H"
 #include "fclaw2d_physical_bc.h"
+#include "fclaw2d_regrid.H"
 
 #include <iostream>
 #include <cstdlib>
