@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map.h>
 
 #include <fclaw_register.h>
+#include "fclaw2d_vtable.h"
+
 #include "metric_user.H"
 
 typedef struct user_options
@@ -89,8 +91,7 @@ void register_user_options (fclaw_app_t * app,
 }
 
 
-void run_program(fclaw_app_t* app,
-                 user_options_t* user)
+void run_program(fclaw_app_t* app)
 {
     sc_MPI_Comm            mpicomm;
 
@@ -100,11 +101,12 @@ void run_program(fclaw_app_t* app,
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t* gparms;
-
+    user_options_t suser_options, *user = &suser_options;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* ---------------------------------------------------------------
        Domain geometry
@@ -178,13 +180,7 @@ void run_program(fclaw_app_t* app,
      Set domain data.
      --------------------------------------------------------------- */
   init_domain_data(domain);
-
-  /* Store parameters */
-  set_domain_parms(domain,gparms);
-
-  /* Link functions that are called for the whole domain */
-  link_problem_setup(domain,metric_setprob);
-  link_run_diagnostics(domain,metric_diagnostics);
+  fclaw2d_domain_set_app(domain,app);
 
   /* Link other routines that need to be included. */
   metric_link_patch(domain);
@@ -194,17 +190,7 @@ void run_program(fclaw_app_t* app,
      -------------------------------------------------- */
 
   amrinit(&domain);
-
-  if (gparms->run_diagnostics)
-  {
-      run_diagnostics(domain);
-  }
-
-  int iframe = 0;
-  amrout(domain,iframe);
-
-  /* amrrun(&domain); */
-
+  amrrun(&domain);
   amrreset(&domain);
 
   /* --------------------------------------------------
@@ -221,8 +207,8 @@ main (int argc, char **argv)
   fclaw_exit_type_t vexit;
 
   /* Options */
-  sc_options_t              *options;
-  user_options_t                suser_options, *user = &suser_options;
+  sc_options_t *options;
+  user_options_t suser_options, *user = &suser_options;
 
   int retval;
 
@@ -246,7 +232,7 @@ main (int argc, char **argv)
 
   if (!retval & !vexit)
   {
-      run_program(app,user);
+      run_program(app);
   }
 
   fclaw_forestclaw_destroy(app);

@@ -25,8 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "ClawPatch.H"
-#include "metric_user.H"
 #include "fclaw2d_map_query.h"
+#include "fclaw2d_clawpatch.h"
+#include "fclaw2d_vtable.h"
+
+#include "metric_user.H"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +39,30 @@ extern "C"
 #endif
 #endif
 
+static fclaw2d_vtable_t vt;
+
+void metric_link_patch(fclaw2d_domain_t *domain)
+{
+    fclaw2d_init_vtable(&vt);
+
+    vt.problem_setup = &metric_problem_setup;
+
+    vt.patch_initialize = &metric_patch_initialize;
+    vt.patch_physical_bc = &fclaw2d_physbc_default;
+
+    vt.run_diagnostics = &metric_diagnostics;
+
+    fclaw2d_set_vtable(domain,&vt);
+
+}
+
+void metric_problem_setup(fclaw2d_domain_t* domain)
+{
+    /* Any general problem set up here */
+    SETPROB();  /* Set value of pi */
+}
+
+#if 0
 void metric_link_patch(fclaw2d_domain_t *domain)
 {
     fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
@@ -48,46 +75,40 @@ void metric_link_patch(fclaw2d_domain_t *domain)
     fclaw2d_output_functions_t *of = get_output_functions(domain);
     of->f_patch_write_header = &metric_parallel_write_header;
     of->f_patch_write_output = &metric_parallel_write_output;
-
 }
-
-void metric_setprob(fclaw2d_domain_t* domain)
-{
-    /* Any general problem set up here */
-    setprob_();  /* Set value of pi */
-}
-
+#endif
 
 void metric_patch_initialize(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx)
 {
-    /* Global parameters */
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    int mx,my,mbc,meqn;
+    double xlower,ylower,dx,dy;
+    double *q, *area, *curvature, *error_ptr;
+    ClawPatch *cp;
+    int blockno;
 
-    /* Parameters specific to this patch */
-    ClawPatch *cp = get_clawpatch(this_patch);
-    double xlower = cp->xlower();
-    double ylower = cp->ylower();
-    double dx = cp->dx();
-    double dy = cp->dy();
-    double* q = cp->q();
+#if 0
+    cp = fclaw2d_clawpatch_cp(domain,this_patch);
+#endif
+    cp = get_clawpatch(this_patch);
 
-    double *area = cp->area();
-    double *curvature = cp->curvature();
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+
+    area = cp->area();
+    curvature = cp->curvature();
 
     /* Create an array with same dimensions as q, and one field */
     FArrayBox error;
     error.define(cp->dataBox(),1);
-    double* error_ptr = error.dataPtr();
+    error_ptr = error.dataPtr();
 
     fclaw2d_map_context_t* cont = get_map_context(domain);
-    int blockno = this_block_idx;
+    blockno = this_block_idx;
     compute_error(meqn,mbc,mx,my,&cont,blockno,xlower,ylower,dx,dy,
                   curvature,error_ptr);
     initialize(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,
@@ -95,7 +116,7 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
 }
 
 
-
+#if 0
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
@@ -205,6 +226,7 @@ void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *thi
     metric_output(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                   iframe,patch_num,level,blockno,mpirank);
 }
+#endif
 
 #ifdef __cplusplus
 #if 0

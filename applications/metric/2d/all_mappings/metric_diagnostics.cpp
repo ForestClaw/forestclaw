@@ -75,8 +75,10 @@ void cb_total_area(fclaw2d_domain_t *domain,
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
-
-    ClawPatch *cp = get_clawpatch(this_patch);
+#if 0
+    ClawPatch *cp = fclaw2d_clawpatch_cp(domain,this_patch);
+#endif
+    ClawPatch* cp = get_clawpatch(this_patch);
     double *area = cp->area();
 
     *sum += total_area_(mx,my,mbc,area);
