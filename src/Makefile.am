@@ -13,6 +13,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
+	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
@@ -55,6 +56,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_face_neighbors.cpp \
 	src/fclaw2d_mpi_debug.c \
 	src/fclaw2d_fill_ghost.cpp \
+	src/fclaw2d_physical_bc.cpp \
 	src/forestclaw2d.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
@@ -85,7 +87,6 @@ libforestclaw_compiled_sources = \
 	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \
 	src/amr_timeinterp.cpp \
-	src/amr_physbc.cpp \
 	src/amr_utils.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \

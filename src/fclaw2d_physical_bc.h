@@ -23,20 +23,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef AMR_INCLUDES_H
-#define AMR_INCLUDES_H
+#ifndef FCLAW2D_PHYSICAL_BC_H
+#define FCLAW2D_PHYSICAL_BC_H
 
-/* NOTE: This file is meant to be included by .cpp files only. */
+#include "fclaw2d_defs.H"
 
-#include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "ClawPatch.H"
-#include "fclaw2d_physical_bc.h"
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
+/* This is needed by other routines, so we don't set it to static. */
+void fclaw2d_get_physical_bc(fclaw2d_domain_t *domain,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             fclaw_bool *intersects_bdry);
 
-using namespace std;
+void fclaw2d_set_physical_bc(fclaw2d_domain_t *domain, int a_level,
+                             double a_level_time, fclaw_bool time_interp);
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif

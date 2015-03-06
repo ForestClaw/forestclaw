@@ -191,8 +191,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool intersects_phys_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
 
-    get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_phys_bdry);
+    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+                            intersects_phys_bdry);
 
     get_block_boundary(domain, this_patch, intersects_block);
 

@@ -303,8 +303,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_map_context_t *cont = get_map_context(domain);
     fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
-    get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bdry);
+    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+                            intersects_bdry);
 
     get_block_boundary(domain, this_patch, intersects_block);
 

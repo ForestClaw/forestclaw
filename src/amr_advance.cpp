@@ -217,7 +217,7 @@ void update_ghost_all_levels(fclaw2d_domain_t* domain,
 
     for(int level = maxlevel; level >= minlevel; level--)
     {
-        set_phys_bc(domain,level,t,time_interp);
+        fclaw2d_set_physical_bc(domain,level,t,time_interp);
     }
 
     // Stop timing
@@ -303,7 +303,7 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     fclaw_bool time_interp = fclaw_false;
     for (int level = fine_level; level >= coarse_level; level--)
     {
-        set_phys_bc(domain,level,t,time_interp);
+        fclaw2d_set_physical_bc(domain,level,t,time_interp);
     }
 
     // Stop timing

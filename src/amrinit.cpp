@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
+#include "fclaw2d_physical_bc.h"
 #include "fclaw2d_solvers.H"
 
 #include "fclaw2d_vtable.h"
@@ -182,7 +183,7 @@ void amrinit (fclaw2d_domain_t **domain)
                                  (void *) NULL);
 
     fclaw_bool time_interp = fclaw_false;
-    set_phys_bc(*domain,minlevel,t,time_interp);
+    fclaw2d_set_physical_bc(*domain,minlevel,t,time_interp);
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {
@@ -232,7 +233,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // for using at tagging criteria, if necessary.
             int new_level = level+1;
             time_interp = fclaw_false;
-            set_phys_bc(new_domain,new_level,t,time_interp);
+            fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain
             amrreset(domain);

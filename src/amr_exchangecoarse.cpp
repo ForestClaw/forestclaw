@@ -71,8 +71,8 @@ void cb_corner_average(fclaw2d_domain_t *domain,
     const int refratio = gparms->refratio;
     fclaw_bool intersects_bdry[NumFaces];
 
-    get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bdry);
+    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+                            intersects_bdry);
 
     fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
@@ -243,8 +243,8 @@ void cb_corner_interpolate(fclaw2d_domain_t *domain,
     const int refratio = gparms->refratio;
     fclaw_bool intersects_bdry[NumFaces];
 
-    get_phys_boundary(domain,this_block_idx,this_patch_idx,
-                      intersects_bdry);
+    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+                            intersects_bdry);
 
     fclaw_bool intersects_block[NumFaces];
     get_block_boundary(domain,this_block_idx,this_patch_idx,
@@ -730,7 +730,7 @@ void exchange_with_coarse(fclaw2d_domain_t *domain,
        't_level' is the time at the finer level, i.e.
        coarse_time + alpha*dt_coarse
        ----------------------------------------------------------- */
-    set_phys_bc(domain,coarser_level,t_level,time_interp);
+    fclaw2d_set_physical_bc(domain,coarser_level,t_level,time_interp);
 
     /* -----------------------------------------------------------
        Face interpolate
