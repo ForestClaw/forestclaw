@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_utils.H"
 #include "clawpack_fort.H"
 #include "fclaw2d_physical_bc.h"
-#include "fclaw2d_solvers.H"
 
 #include "fclaw2d_vtable.h"
 

@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_base.h>
 
 #include "amr_utils.H"
-#include "fclaw2d_solvers.H"
 #include "fclaw2d_diagnostics.H"
 
 #include <fclaw_register.h>
