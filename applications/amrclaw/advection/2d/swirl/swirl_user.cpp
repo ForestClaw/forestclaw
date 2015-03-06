@@ -44,23 +44,24 @@ static fc2d_clawpack46_vtable_t classic_claw;
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-    vt.problem_setup = &swirl_problem_setup;
-    vt.patch_setup = &fc2d_clawpack46_setaux;
-    vt.patch_initialize = &fc2d_clawpack46_qinit;
-    vt.patch_physical_bc = fc2d_clawpack46_bc2;
-    vt.patch_single_step_update = fc2d_clawpack46_update;
-
-    fclaw2d_set_vtable(domain,&vt);
-
     fc2d_clawpack46_init_vtable(&classic_claw);
 
-    /* classic_claw.setprob = &SETPROB; */
-    classic_claw.qinit = &QINIT;
+    vt.problem_setup = &swirl_problem_setup;
+
+    vt.patch_setup = &fc2d_clawpack46_setaux;
     classic_claw.setaux = &SETAUX;
+
+    vt.patch_initialize = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
+
+    vt.patch_physical_bc = fc2d_clawpack46_bc2;
+
+    vt.patch_single_step_update = fc2d_clawpack46_update;
     classic_claw.b4step2 = &B4STEP2;
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
+    fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
