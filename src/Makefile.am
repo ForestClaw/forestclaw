@@ -41,24 +41,25 @@ libforestclaw_compiled_sources = \
 	src/fclaw_register.c \
 	src/fclaw2d_base.c \
 	src/fclaw2d_convenience.c \
+	src/forestclaw2d.c \
+	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
+	src/fclaw2d_mpi_debug.c \
+	src/fclaw2d_map_query.c \
+	src/fclaw2d_map_brick.c \
+	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
 	src/fclaw2d_regrid.cpp \
-	src/fclaw2d_vtable.c \
-	src/fclaw2d_map_query.c \
-	src/fclaw2d_map_brick.c \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
-	src/fclaw2d_mpi_debug.c \
 	src/fclaw2d_fill_ghost.cpp \
 	src/fclaw2d_physical_bc.cpp \
-	src/forestclaw2d.c \
-	src/fp_exception_glibc_extension.c \
+	src/fclaw2d_timeinterp.cpp \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -86,7 +87,6 @@ libforestclaw_compiled_sources = \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \
-	src/amr_timeinterp.cpp \
 	src/amr_utils.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \

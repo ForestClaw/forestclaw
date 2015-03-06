@@ -116,8 +116,8 @@ void level_exchange (fclaw2d_domain_t * domain, int a_level);
 void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
                            double t_level, fclaw_bool time_interp);
 
-void timeinterp(fclaw2d_domain_t *domain,
-                int level, double alpha);
+void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
+                       int level, double alpha);
 
 #define TIMEINTERP_INTERIOR FCLAW_F77_FUNC (timeinterp_interior, TIMEINTERP_INTERIOR)
 void TIMEINTERP_INTERIOR(const int &mx, const int& my, const int& mbc,

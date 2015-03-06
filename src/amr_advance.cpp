@@ -146,7 +146,7 @@ double advance_level(fclaw2d_domain_t *domain,
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
-                timeinterp(domain,coarser_level,alpha);
+                fclaw2d_timeinterp(domain,coarser_level,alpha);
             }
         }
     }
