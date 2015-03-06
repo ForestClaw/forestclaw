@@ -54,12 +54,14 @@ void run_diagnostics_default(fclaw2d_domain_t* domain, const double t)
 }
 #endif
 
-
 void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain)
 {
     fclaw2d_vtable_t vt;
+    double t;
+
     vt = fclaw2d_get_vtable(domain);
-    double t = get_domain_time(domain);
+    t = get_domain_time(domain);
+
     FCLAW_ASSERT(vt.run_diagnostics != NULL);
     vt.run_diagnostics(domain,t);
 

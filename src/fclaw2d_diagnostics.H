@@ -35,6 +35,7 @@ extern "C"
 #endif
 
 #if 0
+/* Now stored in vtable */
 typedef void (*fclaw2d_run_diagnostics_t)(fclaw2d_domain_t *domain,
                                           const double t);
 #endif
