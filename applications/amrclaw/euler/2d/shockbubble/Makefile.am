@@ -11,8 +11,6 @@ applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/fclaw2d_map_cart.c \
 	applications/amrclaw/euler/2d/shockbubble/fdisc.f \
 	applications/amrclaw/euler/2d/shockbubble/setprob.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/tag4refinement.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/shockbubble_output.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/qinit.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/setaux.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/bc2.f \
