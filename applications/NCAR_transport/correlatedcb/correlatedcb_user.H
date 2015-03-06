@@ -28,58 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 
-extern "C"
-{
-    void setprob_transport_(const int& vflag, const int& ichoice);
-
-    void correlatedcb_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                      const int& meqn, const double& xlower,
-                                      const double& ylower, const double& dx,
-                                      const double& dy, double q[],
-                                      const int& init_flag, const int& blockno,
-                                      int& tag_patch);
-
-    void correlatedcb_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                                      const int& meqn,const double& xlower,
-                                      const double& ylower, const double& dx,
-                                      const double& dy,
-                                      double qcoarsened[], int& tag_patch);
-
-    void qinit_transport_(const int& mx, const int& my, const int& meqn,
-                          const int& mbc,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          double q[], const int& maux, double aux[],
-                          const int& blockno,
-                          double xp[], double yp[], double zp[]);
-
-    void setaux_transport_(const int& mx, const int& my, const int& mbc,
-                           const double& xlower, const double& ylower,
-                           const double& dx, const double& dy,
-                           const int& maux, double aux[],
-                           const int& blockno,
-                           double xd[], double yd[], double zd[],double area[]);
-
-    void b4step2_transport_(const int& mx, const int& my, const int& mbc,
-                            const double& dx, const double& dy,
-                            const double& t, const int& maux, double aux[],
-                            const int& blockno,
-                            double xd[], double yd[], double zd[]);
-
-    void correlatedcb_write_tfile_(const int& iframe,const double& time,
-                                   const int& mfields,const int& ngrids,
-                                   const int& maux);
-
-    void correlatedcb_write_qfile_(const int& mx, const int& my,const
-                                   int& meqn, const int& mbc,
-                                   const double& xlower,const double& ylower,
-                                   const double& dx, const double& dy,
-                                   double q[], const int& iframe,
-                                   const int& patch_num,
-                                   const int& level,const int& blockno,
-                                   const int& mpirank, double area[]);
-}
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -88,36 +36,47 @@ extern "C"
 #endif
 #endif
 
-void correlatedcb_link_solvers(fclaw2d_domain_t *domain);
 
+typedef struct user_options
+{
+    int example;
+    int vflag;       /* specify edge normal velocities */
+    int init_choice; /* for slotted disk */
+    int is_registered;
 
-void correlatedcb_setprob(fclaw2d_domain_t *domain);
+} user_options_t;
 
-void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx);
+void correlatedcb_problem_setup(fclaw2d_domain_t *domain);
+
+#define SETPROB_TRANSPORT FCLAW_F77_FUNC(setprob_transport,SETPROB_TRANSPORT)
+void SETPROB_TRANSPORT(const int* vflag, const int* ichoice);
 
 void correlatedcb_qinit(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx);
 
-void correlatedcb_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
+#define QINIT_TRANSPORT FCLAW_F77_FUNC(qinit_transport,QINIT_TRANSPORT)
+void QINIT_TRANSPORT(const int* mx, const int* my, const int* meqn,
+                     const int* mbc,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     double q[], const int* maux, double aux[],
+                     const int* blockno,
+                     double xp[], double yp[], double zp[]);
 
-void correlatedcb_patch_physical_bc(fclaw2d_domain *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double t,
-                                    double dt,
-                                    fclaw_bool intersects_bc[]);
+void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx);
 
+#define SETAUX_TRANSPORT FCLAW_F77_FUNC(setaux_transport,SETAUX_TRANSPORT)
+void setaux_transport_(const int* mx, const int* my, const int* mbc,
+                       const double* xlower, const double* ylower,
+                       const double* dx, const double* dy,
+                       const int* maux, double aux[],
+                       const int* blockno,
+                       double xd[], double yd[], double zd[],double area[]);
 
 double correlatedcb_update(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -126,24 +85,23 @@ double correlatedcb_update(fclaw2d_domain_t *domain,
                            double t,
                            double dt);
 
-fclaw_bool correlatedcb_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int this_block_idx,
-                                             int this_patch_idx,
-                                             int initflag);
+void correlatedcb_b4step2(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt);
 
-fclaw_bool correlatedcb_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int blockno,
-                                             int patchno);
+#define B4STEP2_TRANSPORT FCLAW_F77_FUNC(b4step2_transport,B4STEP2_TRANSPORT)
+void B4STEP2_TRANSPORT(const int* mx, const int* my, const int* mbc,
+                        const double* dx, const double* dy,
+                        const double* t, const int* maux, double aux[],
+                        const int* blockno,
+                        double xd[], double yd[], double zd[]);
 
-void correlatedcb_parallel_write_header(fclaw2d_domain_t* domain,
-                                        int iframe, int ngrids);
 
-void correlatedcb_parallel_write_output(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int this_block_idx, int this_patch_idx,
-                                        int iframe,int num,int level);
+void correlatedcb_link_solvers(fclaw2d_domain_t *domain);
+
 
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double shift[],

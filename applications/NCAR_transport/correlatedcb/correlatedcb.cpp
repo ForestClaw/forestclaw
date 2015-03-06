@@ -37,13 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "correlatedcb_user.H"
 
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -52,6 +45,10 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 1 for pillow grid, "    \
                         "2 for cubed sphere ");
+
+    sc_options_add_int (opt, 0, "vflag", &user->vflag, 1, "vflag [1]");
+    sc_options_add_int (opt, 0, "init_choice", &user->init_choice, 4, "init_choice [4]");
+
     user->is_registered = 1;
     return NULL;
 }
@@ -60,6 +57,18 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
+    const amr_options_t* amropt;
+    amropt = fclaw_forestclaw_get_options(app);
+
+    if (user->init_choice == 2)
+    {
+        FCLAW_ASSERT(user->init_choice == 2 && amropt->meqn == 1);
+    }
+    else if (user->init_choice == 3)
+    {
+        FCLAW_ASSERT(user->init_choice == 3 && amropt->meqn == 2);
+    }
+
     if (user->example < 1 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
         return FCLAW_EXIT_ERROR;
@@ -97,7 +106,6 @@ static
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t    *gparms;
-    fc2d_clawpack46_options_t   *clawpack_options;
     user_options_t  *user;
 
     /* Used locally */
@@ -107,7 +115,6 @@ static
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     user = (user_options_t*) fclaw_app_get_user(app);
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
 
     rotate[0] = pi*gparms->theta/180.0;
     rotate[1] = pi*gparms->phi/180.0;
@@ -134,19 +141,10 @@ static
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
-
-    /* Store parameters */
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options (domain,clawpack_options);
-
-    /* Link solvers to the domain */
-    link_problem_setup(domain,correlatedcb_setprob);
+    fclaw2d_domain_set_app(domain,app);
 
     correlatedcb_link_solvers(domain);
 
-    /* --------------------------------------------------
-       Initialize and run the simulation
-       -------------------------------------------------- */
     amrinit(&domain);
     amrrun(&domain);
     amrreset(&domain);
