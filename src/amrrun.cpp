@@ -88,6 +88,44 @@ void save_time_step(fclaw2d_domain_t *domain)
    Output style 1
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
+static void outstyle_0(fclaw2d_domain_t **domain)
+{
+    const amr_options_t *gparms;
+    int iframe;
+
+    gparms = get_domain_parms(*domain);
+
+
+    iframe = 0;
+    fclaw2d_output_frame(*domain,iframe);
+
+    if (gparms->run_diagnostics)
+    {
+        fclaw2d_run_diagnostics(*domain);
+    }
+
+    /* Here is where we might include a call to a static solver, for, say,
+       an elliptic solve. The initial grid might contain, for example, a
+       right hand side. */
+#if 0
+    vt.time_indepdent_solve(domain);
+
+    if (gparms->run_diagnostics)
+    {
+        fclaw2d_diagnostics_run(domain);
+    }
+
+    iframe++;
+    fclaw2d_output_frame(*domain,iframe);
+#endif
+
+}
+
+
+/* -------------------------------------------------------------------------------
+   Output style 1
+   Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
+   -------------------------------------------------------------------------------- */
 static void outstyle_1(fclaw2d_domain_t **domain)
 {
     int iframe = 0;
@@ -479,6 +517,9 @@ void amrrun(fclaw2d_domain_t **domain)
 
     switch (gparms->outstyle)
     {
+    case 0:
+        outstyle_0(domain);
+        break;
     case 1:
         outstyle_1(domain);
         break;
