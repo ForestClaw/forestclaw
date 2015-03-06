@@ -38,13 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "slotted_disk_user.H"
 
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -53,6 +46,10 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 1 for pillow grid, "    \
                         "2 for cubed sphere ");
+
+    sc_options_add_int (opt, 0, "vflag", &user->vflag, 1, "vflag [1]");
+    sc_options_add_int (opt, 0, "init_choice", &user->init_choice, 4, "init_choice [4]");
+
     user->is_registered = 1;
     return NULL;
 }
@@ -67,7 +64,6 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     }
     return FCLAW_NOEXIT;
 }
-
 
 static const fclaw_app_options_vtable_t options_vtable_user = {
     options_register_user,
@@ -99,7 +95,6 @@ static
 
     amr_options_t              *gparms;
     user_options_t             *user;
-    fc2d_clawpack46_options_t  *clawpack_options;
 
     /* Used locally */
     double pi = M_PI;
@@ -108,7 +103,6 @@ static
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
     user = (user_options_t*) fclaw_app_get_user(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
 
     rotate[0] = pi*gparms->theta/180.0;
     rotate[1] = pi*gparms->phi/180.0;
@@ -135,13 +129,16 @@ static
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
+    fclaw2d_domain_set_app(domain,app);
 
+#if 0
     /* Store parameters */
     set_domain_parms(domain,gparms);
     fc2d_clawpack46_set_options (domain,clawpack_options);
 
     /* Link solvers to the domain */
     link_problem_setup(domain,slotted_disk_setprob);
+#endif
 
     slotted_disk_link_solvers(domain);
 

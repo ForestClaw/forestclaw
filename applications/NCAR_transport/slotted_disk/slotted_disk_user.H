@@ -37,73 +37,47 @@ extern "C"
 #endif
 
 
-
-extern "C"
+typedef struct user_options
 {
-    void setprob_transport_(const int& vflag, const int& ichoice);
+    int example;
+    int vflag;       /* specify edge normal velocities */
+    int init_choice; /* for slotted disk */
+    int is_registered;
 
-    void slotted_disk_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                                      const int& meqn, const double& xlower,
-                                      const double& ylower, const double& dx,
-                                      const double& dy, double q[],
-                                      const int& init_flag, const int& blockno,
-                                      int& tag_patch);
+} user_options_t;
 
-    void slotted_disk_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                                      const int& meqn,const double& xlower,
-                                      const double& ylower, const double& dx,
-                                      const double& dy,
-                                      double qcoarsened[], int& tag_patch);
+void slotted_disk_problem_setup(fclaw2d_domain_t *domain);
 
-    void qinit_transport_(const int& mx, const int& my, const int& meqn,
-                          const int& mbc,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          double q[], const int& maux, double aux[],
-                          const int& blockno,
-                          double xp[], double yp[], double zp[]);
+#define SETPROB_TRANSPORT FCLAW_F77_FUNC(setprob_transport,SETPROB_TRANSPORT)
+void SETPROB_TRANSPORT(const int* vflag, const int* ichoice);
 
-    void setaux_transport_(const int& mx, const int& my, const int& mbc,
-                           const double& xlower, const double& ylower,
-                           const double& dx, const double& dy,
-                           const int& maux, double aux[],
-                           const int& blockno,
-                           double xd[], double yd[], double zd[],double area[]);
+/* Initialization */
+void slotted_disk_qinit(fclaw2d_domain_t *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx);
 
-    void b4step2_transport_(const int& mx, const int& my, const int& mbc,
-                            const double& dx, const double& dy,
-                            const double& t, const int& maux, double aux[],
-                            const int& blockno,
-                            double xd[], double yd[], double zd[]);
-
-    void slotted_disk_write_tfile_(const int& iframe,const double& time,
-                                   const int& mfields,const int& ngrids,
-                                   const int& maux);
-
-    void slotted_disk_write_qfile_(const int& mx, const int& my,const
-                                   int& meqn, const int& mbc,
-                                   const double& xlower,const double& ylower,
-                                   const double& dx, const double& dy,
-                                   double q[], const int& iframe,
-                                   const int& patch_num,
-                                   const int& level,const int& blockno,
-                                   const int& mpirank);
-}
-
-void slotted_disk_link_solvers(fclaw2d_domain_t *domain);
-
-
-void slotted_disk_setprob(fclaw2d_domain_t *domain);
+#define QINIT_TRANSPORT FCLAW_F77_FUNC(qinit_transport,QINIT_TRANSPORT)
+void QINIT_TRANSPORT(const int* mx, const int* my, const int* meqn,
+                     const int* mbc,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     double q[], const int* maux, double aux[],
+                     const int* blockno,
+                     double xp[], double yp[], double zp[]);
 
 void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx);
 
-void slotted_disk_qinit(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx);
+#define SETAUX_TRANSPORT FCLAW_F77_FUNC(setaux_transport,SETAUX_TRANSPORT)
+void SETAUX_TRANSPORT(const int* mx, const int* my, const int* mbc,
+                      const double* xlower, const double* ylower,
+                      const double* dx, const double* dy,
+                      const int* maux, double aux[],
+                      const int* blockno,
+                      double xd[], double yd[], double zd[],double area[]);
 
 void slotted_disk_b4step2(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -112,14 +86,12 @@ void slotted_disk_b4step2(fclaw2d_domain_t *domain,
                           double t,
                           double dt);
 
-void slotted_disk_patch_physical_bc(fclaw2d_domain *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double t,
-                                    double dt,
-                                    fclaw_bool intersects_bc[]);
-
+#define B4STEP2_TRANSPORT FCLAW_F77_FUNC(b4step2_transport,B4STEP2_TRANSPORT)
+void B4STEP2_TRANSPORT(const int* mx, const int* my, const int* mbc,
+                       const double* dx, const double* dy,
+                       const double* t, const int* maux, double aux[],
+                       const int* blockno,
+                       double xd[], double yd[], double zd[]);
 
 double slotted_disk_update(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -128,24 +100,8 @@ double slotted_disk_update(fclaw2d_domain_t *domain,
                            double t,
                            double dt);
 
-fclaw_bool slotted_disk_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int this_block_idx,
-                                             int this_patch_idx,
-                                             int initflag);
+void slotted_disk_link_solvers(fclaw2d_domain_t *domain);
 
-fclaw_bool slotted_disk_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int blockno,
-                                             int patchno);
-
-void slotted_disk_parallel_write_header(fclaw2d_domain_t* domain,
-                                        int iframe, int ngrids);
-
-void slotted_disk_parallel_write_output(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int this_block_idx, int this_patch_idx,
-                                        int iframe,int num,int level);
 
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double shift[],
