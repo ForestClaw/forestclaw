@@ -46,25 +46,26 @@ static fclaw2d_vtable_t vt;
 void radial_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
     vt.problem_setup = &radial_problem_setup;  /* setprob called from here */
+    /* classic_claw.setprob = &SETPROB; */
+
     vt.patch_initialize = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
+
     vt.patch_physical_bc = fc2d_clawpack46_bc2;
+
     vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
     /* Refine if a patch contain values that exceed (in magnitude)
        a refinement threshold (in fclaw_options.ini) */
     vt.fort_tag4refinement = &TAG4REFINEMENT;
 
+
     fclaw2d_set_vtable(domain,&vt);
-
-    fc2d_clawpack46_init_vtable(&classic_claw);
-    /* classic_claw.setprob = &SETPROB; */
-
-    classic_claw.qinit = &QINIT;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
-
     fc2d_clawpack46_set_vtable(&classic_claw);
 }
 

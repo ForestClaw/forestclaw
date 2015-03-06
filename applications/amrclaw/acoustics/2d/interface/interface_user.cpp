@@ -44,24 +44,27 @@ static fc2d_clawpack46_vtable_t classic_claw;
 void interface_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
+
 
     vt.problem_setup            = &interface_setup_problem;
+    /* classic_claw.setprob = &SETPROB; */
 
     vt.patch_setup              = &fc2d_clawpack46_setaux;
+    classic_claw.setaux = &SETAUX;
+
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
+
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+
     vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2;
+    classic_claw.rpt2 = &RPT2;
 
     vt.fort_tag4refinement      = &TAG4REFINEMENT;  /* User defined */
 
     fclaw2d_set_vtable(domain,&vt);
-
-    /* classic_claw.setprob = &SETPROB; */
-    classic_claw.qinit = &QINIT;
-    classic_claw.setaux = &SETAUX;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
-
     fc2d_clawpack46_set_vtable(&classic_claw);
 };
 
