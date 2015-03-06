@@ -8,8 +8,6 @@ bin_PROGRAMS += applications/euler/2d/quadrants/quadrants
 applications_euler_2d_quadrants_quadrants_SOURCES = \
 	applications/euler/2d/quadrants/quadrants.cpp \
 	applications/euler/2d/quadrants/quadrants_user.cpp \
-	applications/euler/2d/quadrants/tag4refinement.f \
-	applications/euler/2d/quadrants/quadrants_output.f \
 	applications/euler/2d/quadrants/fclaw2d_map_nomap.c \
 	applications/euler/2d/quadrants/fclaw2d_map_identity.c \
 	applications/euler/2d/quadrants/fclaw2d_map_cart.c \

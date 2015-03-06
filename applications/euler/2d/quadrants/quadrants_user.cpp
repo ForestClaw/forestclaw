@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_forestclaw.H"
 #include "fc2d_clawpack46.H"
+#include "fclaw2d_vtable.h"
 #include "quadrants_user.H"
 
 #ifdef __cplusplus
@@ -35,6 +36,34 @@ extern "C"
 #endif
 #endif
 
+
+static fclaw2d_vtable_t vt;
+static fc2d_clawpack46_vtable_t classic_claw;
+
+void quadrants_link_solvers(fclaw2d_domain_t *domain)
+{
+    fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
+
+    vt.problem_setup = &quadrants_problem_setup;
+    /* Don't explicitly set a "setprob" function unless it has the same
+       signature as the default (i.e. no arguments).  */
+    /* classic_claw.setprob = &SETPROB; */
+
+    vt.patch_initialize = &fc2d_clawpack46_qinit;
+    classic_claw.qinit = &QINIT;
+
+    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */
+
+    vt.patch_single_step_update = &fc2d_clawpack46_update;
+    classic_claw.rpn2 = &RPN2EU3;  /* Signature is unchanged */
+    classic_claw.rpt2 = &RPT2;
+
+    fclaw2d_set_vtable(domain,&vt);
+    fc2d_clawpack46_set_vtable(&classic_claw);
+}
+
+#if 0
 static const fc2d_clawpack46_vtable_t classic_user =
 {
     setprob_,
@@ -68,16 +97,18 @@ void quadrants_link_solvers(fclaw2d_domain_t *domain)
 
     fc2d_clawpack46_link_to_clawpatch();
 }
+#endif
 
 void quadrants_problem_setup(fclaw2d_domain_t* domain)
 {
-    /* Setup any fortran common blocks for general problem
-       and any other general problem specific things that only needs
-       to be done once. */
-    fc2d_clawpack46_setprob(domain);
+    const user_options_t* user;
+    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
+
+    QUADRANTS_SETPROB(&user->gamma);
 }
 
 
+#if 0
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
@@ -190,6 +221,7 @@ void quadrants_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *
     quadrants_write_qfile_(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,
                            iframe,num,level,this_block_idx,mpirank);
 }
+#endif
 
 
 #ifdef __cplusplus

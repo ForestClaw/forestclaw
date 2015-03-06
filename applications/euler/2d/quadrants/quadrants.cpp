@@ -36,15 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "quadrants_user.H"
 
-typedef struct user_options
-{
-    int example;
-    double alpha;
-
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -53,6 +44,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "0 no map; 1 id. map; 2 cart. map; 3 5-patch");
+
+    /* [user] User options */
+    sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "Ratio of outer square to inner square [0.4]");
@@ -120,7 +114,6 @@ void run_program(fclaw_app_t* app)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     user = (user_options_t*) fclaw_app_get_user(app);
     gparms = fclaw_forestclaw_get_options(app);
-    clawpack_options = fc2d_clawpack46_get_options(app);
 
 
     mi = gparms->mi;
@@ -165,24 +158,24 @@ void run_program(fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     init_domain_data(domain);
+    fclaw2d_domain_set_app(domain,app);
 
+#if 0
     set_domain_parms(domain,gparms);
     fc2d_clawpack46_set_options(domain,clawpack_options);
 
-    /* ---------------------------------------------------------------
-       Define the solver and link in other problem/user specific
-       routines
-       --------------------------------------------------------------- */
 
     /* Using user defined functions just to demonstrate how one might setup
        something that depends on more than one solver (although only one is used
        here) */
     link_problem_setup(domain,quadrants_problem_setup);
 
-    quadrants_link_solvers(domain);
-
     link_regrid_functions(domain,quadrants_patch_tag4refinement,
                           quadrants_patch_tag4coarsening);
+
+#endif
+
+    quadrants_link_solvers(domain);
 
     amrinit(&domain);
     amrrun(&domain);
