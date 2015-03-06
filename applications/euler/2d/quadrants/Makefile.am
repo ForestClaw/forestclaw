@@ -12,11 +12,11 @@ applications_euler_2d_quadrants_quadrants_SOURCES = \
 	applications/euler/2d/quadrants/fclaw2d_map_identity.c \
 	applications/euler/2d/quadrants/fclaw2d_map_cart.c \
 	applications/euler/2d/quadrants/fclaw2d_map_fivepatch.c \
-	applications/euler/2d/quadrants/rpn2eu3.f \
-	applications/euler/2d/quadrants/rpn2eu4.f \
-	applications/euler/2d/quadrants/rpt2eu.f \
-	applications/euler/2d/quadrants/qinit.f \
-	applications/euler/2d/quadrants/setprob.f
+	applications/euler/2d/quadrants/setprob.f \
+	applications/euler/2d/quadrants/user_4.x/rpn2eu3.f \
+	applications/euler/2d/quadrants/user_4.x/rpn2eu4.f \
+	applications/euler/2d/quadrants/user_4.x/rpt2eu.f \
+	applications/euler/2d/quadrants/user_4.x/qinit.f
 
 applications_euler_2d_quadrants_quadrants_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)

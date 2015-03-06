@@ -103,7 +103,6 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     amr_options_t              *gparms;
-    fc2d_clawpack46_options_t  *clawpack_options;
     user_options_t             *user;
 
 
@@ -159,21 +158,6 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     init_domain_data(domain);
     fclaw2d_domain_set_app(domain,app);
-
-#if 0
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options(domain,clawpack_options);
-
-
-    /* Using user defined functions just to demonstrate how one might setup
-       something that depends on more than one solver (although only one is used
-       here) */
-    link_problem_setup(domain,quadrants_problem_setup);
-
-    link_regrid_functions(domain,quadrants_patch_tag4refinement,
-                          quadrants_patch_tag4coarsening);
-
-#endif
 
     quadrants_link_solvers(domain);
 
