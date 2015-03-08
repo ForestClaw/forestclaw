@@ -28,14 +28,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_vtable.h"
 
 
-void fclaw2d_physbc_default(fclaw2d_domain *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double dt,
-                            fclaw_bool intersects_phys_bdry[],
-                            fclaw_bool time_interp)
+void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 double t,
+                                 double dt,
+                                 fclaw_bool intersects_phys_bdry[],
+                                 fclaw_bool time_interp)
 {
     /* This can be used when no BCs are to be called */
 }

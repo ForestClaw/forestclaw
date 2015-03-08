@@ -45,6 +45,16 @@ void fclaw2d_get_physical_bc(fclaw2d_domain_t *domain,
 void fclaw2d_set_physical_bc(fclaw2d_domain_t *domain, int a_level,
                              double a_level_time, fclaw_bool time_interp);
 
+void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 double t,
+                                 double dt,
+                                 fclaw_bool intersects_phys_bdry[],
+                                 fclaw_bool time_interp);
+
+
 
 #ifdef __cplusplus
 #if 0
