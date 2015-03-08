@@ -259,6 +259,31 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     CLAWPACK46_UNSET_BLOCK();
 }
 
+/* This should only be called when a new ClawPatch is created. */
+void fc2d_clawpack46_set_capacity(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx)
+{
+    int mx,my,mbc,maux,mcapa;
+    double dx,dy,xlower,ylower;
+    double *aux, *area;
+    fc2d_clawpack46_options_t *clawopt;
+
+    clawopt = fc2d_clawpack46_get_options(domain);
+    mcapa = clawopt->mcapa;
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+    fclaw2d_clawpatch_area_data(domain,this_patch,&area);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
+
+    CLAWPACK46_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
+                            &maux,aux);
+}
+
+
 void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,

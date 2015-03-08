@@ -244,6 +244,11 @@ void CLAWPACK46_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         const int* mwaves, const int* mcapa,
                         int method[], int mthlim[]);
 
+#define CLAWPACK46_SET_CAPACITY FCLAW_F77_FUNC(clawpack46_set_capacity,CLAWPACK46_SET_CAPACITY)
+void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
+                             const double *dx, const double* dy, double area[],
+                             const int *mcapa, const int* maux, double aux[]);
+
 
 #define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block,CLAWPACK46_SET_BLOCK)
 void CLAWPACK46_SET_BLOCK(int* blockno);
@@ -296,6 +301,12 @@ void
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
+
+void
+    fc2d_clawpack46_set_capacity(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx);
 
 void
     fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
