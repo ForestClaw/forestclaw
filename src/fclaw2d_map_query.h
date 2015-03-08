@@ -44,6 +44,9 @@ int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** cont);
 #define FCLAW2D_MAP_IS_CART FCLAW_F77_FUNC_(fclaw2d_map_is_cart,FCLAW2D_MAP_IS_CART)
 int FCLAW2D_MAP_IS_CART(fclaw2d_map_context_t** cont);
 
+#define FCLAW2D_MAP_IS_AFFINE FCLAW_F77_FUNC_(fclaw2d_map_is_affine,FCLAW2D_MAP_IS_AFFINE)
+int FCLAW2D_MAP_IS_AFFINE(fclaw2d_map_context_t** cont);
+
 #define FCLAW2D_MAP_IS_DISK FCLAW_F77_FUNC_(fclaw2d_map_is_disk,FCLAW2D_MAP_IS_DISK)
 int FCLAW2D_MAP_IS_DISK(fclaw2d_map_context_t** cont);
 

@@ -59,6 +59,34 @@ c              # Physical locations of cell centers
 
       integer mx,my,mbc,level, refratio,maxlevel, blockno
       double precision dx,dy, xlower, ylower
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer*8 cont, get_context
+      logical isaffine
+
+      cont = get_context()
+      if (isaffine()) then
+c        # We don't need to compute areas all the way to the
+c        # finest level.
+         call compute_area_affine(mx,my,mbc,dx,dy,
+     &         xlower, ylower, blockno,area, level,maxlevel,
+     &         refratio)
+      else
+         call compute_area_general(mx,my,mbc,dx,dy,
+     &         xlower, ylower, blockno,area, level,maxlevel,
+     &         refratio)
+      endif
+
+      end
+
+
+      subroutine compute_area_general(mx,my,mbc,dx,dy,
+     &      xlower, ylower, blockno,area, level,
+     &      maxlevel,refratio)
+      implicit none
+
+      integer mx,my,mbc,level, refratio,maxlevel, blockno
+      double precision dx,dy, xlower, ylower
 
 
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -117,6 +145,49 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
                enddo
             enddo
             area(i,j) = sum_area
+         enddo
+      enddo
+
+      end
+
+
+      subroutine compute_area_affine(mx,my,mbc,dx,dy,
+     &      xlower, ylower, blockno,area, level,
+     &      maxlevel,refratio)
+      implicit none
+
+      integer mx,my,mbc,level, refratio,maxlevel, blockno
+      double precision dx,dy, xlower, ylower
+
+
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j, icell, jcell
+      double precision xcorner, ycorner
+      double precision xe,ye, xp1,yp1,zp1
+      double precision quad(0:1,0:1,3)
+      double precision get_area_approx
+
+      integer*8 map_context_ptr, get_context
+
+      map_context_ptr = get_context()
+
+      do j = -mbc,my+mbc+1
+         do i = -mbc,mx+mbc+1
+            xe = xlower + (i-1)*dx
+            ye = ylower + (j-1)*dy
+            do icell = 0,1
+               do jcell = 0,1
+                  xcorner = xe + icell*dx
+                  ycorner = ye + jcell*dy
+                  call fclaw2d_map_c2m(map_context_ptr,
+     &                  blockno,xcorner,ycorner,xp1,yp1,zp1)
+                  quad(icell,jcell,1) = xp1
+                  quad(icell,jcell,2) = yp1
+                  quad(icell,jcell,3) = zp1
+               enddo
+            enddo
+            area(i,j) = get_area_approx(quad)
          enddo
       enddo
 

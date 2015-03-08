@@ -52,6 +52,15 @@ int FCLAW2D_MAP_IS_CART(fclaw2d_map_context_t** pcont)
     return iresult != 0;
 }
 
+int FCLAW2D_MAP_IS_AFFINE(fclaw2d_map_context_t** pcont)
+{
+    int iresult;
+    fclaw2d_map_context_t *cont = *pcont;
+    int id = FCLAW2D_MAP_QUERY_IS_AFFINE;
+    iresult = cont->query(cont,id);
+    return iresult != 0;
+}
+
 
 int FCLAW2D_MAP_IS_PILLOWDISK(fclaw2d_map_context_t** pcont)
 {
