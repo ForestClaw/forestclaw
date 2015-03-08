@@ -74,25 +74,10 @@ void mountain_patch_setup(fclaw2d_domain_t *domain,
                           int this_blockno,
                           int this_patchno)
 {
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*area;
-
-    /* This defines the aux array, and sets the block number */
     fc2d_clawpack46_setaux(domain,this_patch,this_blockno,
                            this_patchno);
-
-    /* Set the capacity */
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_area_data(domain,this_patch,&area);
-
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-
-    /* This sets the capacity, without requiring that we re-write the signature
-       for setaux */
-    SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&maux,aux);
+    fc2d_clawpack46_set_capacity(domain,this_patch,this_blockno,
+                                 this_patchno);
 }
 
 double mountain_patch_update(fclaw2d_domain_t *domain,
