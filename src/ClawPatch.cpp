@@ -161,8 +161,6 @@ double ClawPatch::meqn()
     return m_meqn;
 }
 
-
-
 double ClawPatch::dx()
 {
     return m_dx;
@@ -630,12 +628,6 @@ int ClawPatch::size()
 /* -----------------------------------------------------
    Some external functions that work with ClawPatches.
    ----------------------------------------------------- */
-
-void link_to_packages(fclaw_package_container_t* pkgs)
-{
-    fclaw_global_essentialf("link_to_packages : obsolete\n");
-    exit(0);
-}
 
 void link_app_to_clawpatch(fclaw_app_t* app)
 {

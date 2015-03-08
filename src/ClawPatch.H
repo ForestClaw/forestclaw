@@ -125,28 +125,6 @@ public :
                                          const int& a_iface, ClawPatch* cp);
 
     // ----------------------------------------------------------------
-    // Tagging, refining and coarsening
-    // ----------------------------------------------------------------
-    /*
-    fclaw_bool tag_for_refinement(fclaw_bool init_flag);
-    fclaw_bool tag_for_coarsening(ClawPatch *cp_siblings[],
-                            const int& refratio,
-                            const int& num_siblings,
-                            const int& p4est_refineFactor);
-    */
-
-    void interpolate_to_fine_patch(ClawPatch* a_fine,
-                                   const int& a_igrid,
-                                   const int& a_p4est_refineFactor,
-                                   const int& a_refratio);
-
-    void coarsen_from_fine_family(ClawPatch *a_cp_siblings[],
-                                  const int& a_refratio,
-                                  const int& a_num_siblings,
-                                  const int& a_p4est_refineFactor);
-
-
-    // ----------------------------------------------------------------
     // Mapped grids
     // ----------------------------------------------------------------
 
@@ -257,8 +235,6 @@ extern "C"
 }
 #endif
 #endif
-
-void link_to_packages(fclaw_package_container_t* pkgs);
 
 void link_app_to_clawpatch(fclaw_app_t* app);
 
