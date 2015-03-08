@@ -42,14 +42,17 @@ extern "C"
 void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
                                  int iframe)
 {
+    const amr_options_t *amropt;
     fclaw2d_vtable_t vt;
     int meqn,ngrids;
     double time;
 
+    amropt = fclaw2d_forestclaw_get_options(domain);
+
     time = get_domain_time(domain);
     ngrids = fclaw2d_domain_get_num_patches(domain);
 
-    meqn = fclaw2d_clawpatch_get_meqn(domain);
+    meqn = amropt->meqn;
 
     vt = fclaw2d_get_vtable(domain);
     vt.fort_write_header(&iframe,&time,&meqn,&ngrids);
