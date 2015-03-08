@@ -65,30 +65,6 @@ void initialize(const int& mx, const int& my,
                 double q[], const double error[],
                 const double curvature[], const double area[]);
 
-
-#if 0
-void metric_output(const int& meqn,
-                   const int& mbc, const int& mx, const int& my,
-                   const double& xlower, const double& ylower,
-                   const double& dx, const double& dy,
-                   const double q[],const int& iframe, const int& patch_num,
-                   const int& level, const int& blockno, const int& mpirank);
-
-void metric_tag4refinement_(const int& mx, const int& my, const int& mbc,
-                            const int& meqn,
-                            const double& xlower, const double& ylower,
-                            const double& dx, const double& dy,
-                            const double q[], const int& init_flag,
-                            const int& blockno, const int& tag_patch);
-
-void metric_tag4coarsening_(const int& mx, const int& my, const int& mbc,
-                            const int& meqn,
-                            const double& xlower, const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& tag_patch);
-
-#endif
-
 double total_area_(const int& mx, const int& my, const int& mbc,
                    const double area[]);
 
@@ -114,24 +90,6 @@ void metric_qinit(fclaw2d_domain_t *domain,
 
 void metric_diagnostics(fclaw2d_domain_t *domain, const double t);
 
-
-#if 0
-fclaw_bool metric_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx, int this_patch_idx,
-                                       int initflag);
-
-fclaw_bool metric_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int blockno,
-                                       int patchno);
-
-void metric_parallel_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
-                                  int this_block_idx, int this_patch_idx,
-                                  int iframe,int num,int matlab_level);
-
-void metric_parallel_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
-#endif
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
