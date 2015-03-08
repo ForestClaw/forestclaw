@@ -8,6 +8,7 @@
 #include "clawpack_fort.H"
 
 #include <fclaw_package.h>
+#include "fclaw2d_clawpatch.h"
 
 class ClawPatch
 {
@@ -162,12 +163,13 @@ public :
     // ----------------------------------------------------------------
     // Access functions
     // ----------------------------------------------------------------
+    double mx();
+    double my();
+    double mbc();
+    double meqn();
+
     double dx();
     double dy();
-
-#if FCLAW_SPACEDIM == 3
-    double dz();
-#endif
 
     double *xp();
     double *yp();
@@ -201,49 +203,27 @@ public :
 
 protected :
 
-    int  m_mx;
-    int  m_my;
-#if FCLAW_SPACEDIM == 3
-    int m_mz;
-#endif
+    /* Solution data */
+    int m_meqn;                    /* also in amr_options_t */
+    FArrayBox m_griddata;
+    FArrayBox m_griddata_last;
+    FArrayBox m_griddata_save;
+    FArrayBox m_griddata_time_interpolated;
 
-    double  m_dx;
-    double  m_dy;
-#if FCLAW_SPACEDIM == 3
-    double m_dz;
-#endif
+    /* Grid info */
+    int m_mx;           /* also in amr_options_t */
+    int m_my;           /* also in amr_options_t */
+    int m_mbc;          /* also in amr_options_t */
 
+    double m_dx;
+    double m_dy;
     double m_xlower;
     double m_ylower;
-#if FCLAW_SPACEDIM == 3
-    double m_zlower;
-#endif
-
     double m_xupper;
     double m_yupper;
-#if FCLAW_SPACEDIM == 3
-    double m_zupper;
-#endif
 
-    /* These are global variables, but are needed to dimensions the patch, so we keep
-       them here.*/
-    int m_meqn;
-    int m_mbc;
-
-    fclaw_bool m_manifold;
-    int m_blockno; /* This determines which mapping to use for this patch */
-
-    /* Current time step */
-    FArrayBox m_griddata;
-
-    /* Last time step, needed to get time interpolated data */
-    FArrayBox m_griddata_last;
-
-    /* Save last time step in case we need to retake a time step */
-    FArrayBox m_griddata_save;
-
-    /* Store time interpolated coarse grid data */
-    FArrayBox m_griddata_time_interpolated;
+    fclaw_bool m_manifold;    /* also in amr_options_t */
+    int m_blockno;
 
     FArrayBox m_xp;
     FArrayBox m_yp;

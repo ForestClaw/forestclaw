@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_defs.H"
 #include "fclaw_options.h"
 #include <fclaw_package.h>
-#include <amr_utils.H>
+#include <amr_utils.h>
 
 #include <fclaw2d_clawpatch.h>
 
@@ -41,10 +41,9 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  double* dx, double* dy)
 {
     ClawPatch *cp = get_clawpatch(this_patch);
-    const amr_options_t *gparms = get_domain_parms(domain);
-    *mx = gparms->mx;
-    *my = gparms->my;
-    *mbc = gparms->mbc;
+    *mx = cp->mx();
+    *my = cp->my();
+    *mbc = cp->mbc();
     *xlower = cp->xlower();
     *ylower = cp->ylower();
     *dx = cp->dx();
@@ -57,15 +56,24 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
                                    double **xd, double **yd, double **zd,
                                    double **area)
 {
+    /* Declared as a friend in ClawPatch.H */
     ClawPatch *cp = get_clawpatch(this_patch);
-     *xp = cp->xp();
-     *yp = cp->yp();
-     *zp = cp->zp();
-     *xd = cp->xd();
-     *yd = cp->yd();
-     *zd = cp->zd();
-     *area = cp->area();
+    *xp = cp->xp();
+    *yp = cp->yp();
+    *zp = cp->zp();
+    *xd = cp->xd();
+    *yd = cp->yd();
+    *zd = cp->zd();
+    *area = cp->area();
 }
+
+double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    return cp->area();
+}
+
 
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
@@ -73,13 +81,14 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* t
                                     double **surfnormals,
                                     double **edgelengths, double **curvature)
 {
+    /* or just call the member functions? */
     ClawPatch *cp = get_clawpatch(this_patch);
-    *xnormals = cp->xface_normals();
-    *ynormals = cp->yface_normals();
-    *xtangents = cp->xface_tangents();
-    *ytangents = cp->yface_tangents();
+    *xnormals    = cp->xface_normals();
+    *ynormals    = cp->yface_normals();
+    *xtangents   = cp->xface_tangents();
+    *ytangents   = cp->yface_tangents();
     *surfnormals = cp->surf_normals();
-    *curvature = cp->curvature();
+    *curvature   = cp->curvature();
     *edgelengths = cp->edge_lengths();
 }
 
@@ -89,20 +98,7 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     *q = cp->q();
-
-    fclaw2d_clawpatch_meqn(domain,meqn);
-}
-
-void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain,
-                            int* meqn)
-{
-    *meqn = fclaw2d_clawpatch_get_meqn(domain);
-}
-
-int fclaw2d_clawpatch_get_meqn(fclaw2d_domain_t* domain)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    return gparms->meqn;
+    *meqn = cp->meqn();
 }
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
@@ -112,7 +108,7 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
 {
     ClawPatch *cp = get_clawpatch(this_patch);
     *q = cp->q_time_sync(time_interp);
-    *meqn = fclaw2d_clawpatch_get_meqn(domain);
+    *meqn = cp->meqn();
 }
 
 

@@ -60,6 +60,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_fill_ghost.cpp \
 	src/fclaw2d_physical_bc.cpp \
 	src/fclaw2d_timeinterp.cpp \
+	src/fclaw2d_clawpatch.cpp \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \

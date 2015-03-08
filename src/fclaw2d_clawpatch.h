@@ -53,19 +53,14 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* th
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,
-                                    double **surfnormals,
-                                    double ** edgelengths, double **curvature);
+                                    double **surfnormals, double ** edgelengths,
+                                    double **curvature);
 
 void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn);
 
-void fclaw2d_clawpatch_meqn(fclaw2d_domain_t* domain, int* meqn);
-
-int fclaw2d_clawpatch_get_meqn(fclaw2d_domain_t* domain);
-
-void fclaw2d_clawpatch_area_data(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch,
-                                 double **area);
+double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch);
 
 
 #ifdef __cplusplus
