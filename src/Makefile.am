@@ -14,6 +14,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_physical_bc.h \
+	src/fclaw2d_ghost.h \
 	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
@@ -57,7 +58,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
-	src/fclaw2d_fill_ghost.cpp \
+	src/fclaw2d_ghost_fill.cpp \
 	src/fclaw2d_physical_bc.cpp \
 	src/fclaw2d_timeinterp.cpp \
 	src/fclaw2d_clawpatch.cpp \

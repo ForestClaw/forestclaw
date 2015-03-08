@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <amr_utils.H>
+#include "fclaw2d_ghost.h"
 #include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
@@ -207,7 +208,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         new_domain = NULL;
 
         repartition_domain(domain, -1);
-        update_ghost_all_levels (*domain,FCLAW2D_TIMER_REGRID);
+        fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID);
         fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
                             (*domain)->global_minlevel, (*domain)->global_maxlevel);
     }

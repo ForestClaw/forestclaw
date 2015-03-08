@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <amr_includes.H>
 #include <fclaw_base.h>
+#include <fclaw2d_ghost.h>
 
 #include <amr_forestclaw.H>
 
@@ -370,7 +371,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
        skip this update, and make it clear to the user that ghost cell
        values are not available for determining refinement critera.
     */
-    update_ghost_all_levels(domain,FCLAW2D_TIMER_ADVANCE);
+    fclaw2d_ghost_update_all_levels(domain,FCLAW2D_TIMER_ADVANCE);
 
     // Stop the timer
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);

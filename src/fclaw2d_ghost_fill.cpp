@@ -31,6 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amr_includes.H"
 
+#ifdef __cplusplus
+extern "C" {
+#if 0
+}
+#endif
+#endif
+
 static
 void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
                        fclaw_bool time_interp);
@@ -236,8 +243,8 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void update_ghost_all_levels(fclaw2d_domain_t* domain,
-                             fclaw2d_timer_names_t running)
+void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
+                                     fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     if (running != FCLAW2D_TIMER_NONE) {
@@ -410,5 +417,12 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_start (&ddata->timers[running]);
     }
+}
+#endif
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
 }
 #endif
