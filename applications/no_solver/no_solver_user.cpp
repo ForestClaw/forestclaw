@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw_register.h>
 #include <fclaw2d_regrid_default.h>
+#include <fclaw2d_physical_bc.h>
 
 #include "no_solver_user.H"
 
@@ -45,7 +46,7 @@ void no_solver_linker(fclaw2d_domain_t* domain)
     fclaw2d_init_vtable(&vt);
 
     vt.patch_initialize         = &no_solver_patch_initialize;
-    vt.patch_physical_bc        = &fclaw2d_physbc_default;  /* No BCs are imposed */
+    vt.patch_physical_bc        = &fclaw2d_physical_bc_default;  /* No BCs are imposed */
     vt.patch_single_step_update = &no_solver_update;
 
     fclaw2d_set_vtable(domain,&vt);
