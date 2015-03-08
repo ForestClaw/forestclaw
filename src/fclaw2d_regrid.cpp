@@ -75,10 +75,10 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
                        int blockno, int fine0_patchno,
                        void *user)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
     int minlevel = gparms->minlevel;
 
     int level = fine_patches[0].level;
@@ -206,13 +206,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
         new_domain = NULL;
 
-        /* Repartition for load balancing */
         repartition_domain(domain, -1);
-
-        /* Update all ghost patches and ghost cells */
         update_ghost_all_levels (*domain,FCLAW2D_TIMER_REGRID);
-
-        /* Print global minimum and maximum levels */
         fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
                             (*domain)->global_minlevel, (*domain)->global_maxlevel);
     }
