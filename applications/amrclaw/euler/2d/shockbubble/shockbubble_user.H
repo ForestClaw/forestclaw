@@ -58,6 +58,11 @@ void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0
 
 void shockbubble_problem_setup(fclaw2d_domain_t* domain);
 
+void shockbubble_patch_setup(fclaw2d_domain_t* domain,
+                             fclaw2d_patch_t* this_patch,
+                             int blockno,
+                             int patchno);
+
 #define RPN2EU3 FCLAW_F77_FUNC(rpn2eu3,RPN2EU3)
 void RPN2EU3(const int* ixy, const int* maxm, const int* meqn,
              const int* mwaves, const int* mbc,const int* mx,
@@ -86,8 +91,7 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain);
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double scale[],
-                                            const double shift[],
-                                            const double rotate[]);
+                                            const double shift[]);
 
 #ifdef __cplusplus
 #if 0

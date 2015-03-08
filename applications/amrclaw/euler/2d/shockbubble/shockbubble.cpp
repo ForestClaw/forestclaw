@@ -86,7 +86,6 @@ void run_program(fclaw_app_t* app)
     amr_options_t *gparms;
 
     int mi, mj, a,b;
-    double rotate[3];
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
@@ -95,14 +94,11 @@ void run_program(fclaw_app_t* app)
     mj = gparms->mj;
     a = gparms->periodic_x;
     b = gparms->periodic_y;
-    rotate[0] = 0;
-    rotate[1] = 0;
-    rotate[2] = 0;
 
     /* Use [ax,bx]x[ay,by] */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift,rotate);
+    cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 

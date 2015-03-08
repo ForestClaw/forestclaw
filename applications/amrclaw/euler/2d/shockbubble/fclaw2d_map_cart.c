@@ -72,6 +72,7 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* square in [-1,1] x [-1,1] */
+    /* We need this to scale and shift the map */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
     scale_map(cont, xp,yp,zp);
@@ -81,8 +82,7 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double scale[],
-                                            const double shift[],
-                                            const double rotate[])
+                                            const double shift[])
 {
     fclaw2d_map_context_t *cont;
 
@@ -92,7 +92,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
 
     set_scale(cont,scale);
     set_shift(cont,shift);
-    set_rotate(cont,rotate);
     cont->brick = brick;
 
     return cont;

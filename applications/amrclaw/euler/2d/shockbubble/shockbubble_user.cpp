@@ -74,6 +74,18 @@ void shockbubble_problem_setup(fclaw2d_domain_t* domain)
                         &user->rhoin, &user->pinf);
 }
 
+void shockbubble_patch_setup(fclaw2d_domain_t* domain,
+                             fclaw2d_patch_t* this_patch,
+                             int blockno,
+                             int patchno)
+{
+    /* I don't have the scaling right on this problem, and just setting
+       mcapa doesn't really fix the issue.   I need a way to set [ax,ay,bx,by]
+       inside of ClawPatch */
+    fc2d_clawpack46_setaux(domain,this_patch,blockno,patchno);
+    fc2d_clawpack46_set_capacity(domain,this_patch,blockno,patchno);
+}
+
 
 #ifdef __cplusplus
 #if 0
