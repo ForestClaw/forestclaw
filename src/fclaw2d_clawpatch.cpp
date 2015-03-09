@@ -234,7 +234,7 @@ void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
         cp->unpack_griddata(qdata);
 }
 
-size_t pack_size(fclaw2d_domain_t* domain)
+size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;

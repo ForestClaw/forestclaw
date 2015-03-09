@@ -109,13 +109,13 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 
 
 static
-void cb_set_new_data(fclaw2d_domain_t * old_domain,
-                     fclaw2d_patch_t * old_patch,
-                     fclaw2d_domain_t * new_domain,
-                     fclaw2d_patch_t * new_patch,
-                     fclaw2d_patch_relation_t newsize,
-                     int blockno, int old_patchno,
-                     int new_patchno,  void *user)
+void cb_repopulate(fclaw2d_domain_t * old_domain,
+                   fclaw2d_patch_t * old_patch,
+                   fclaw2d_domain_t * new_domain,
+                   fclaw2d_patch_t * new_patch,
+                   fclaw2d_patch_relation_t newsize,
+                   int blockno, int old_patchno,
+                   int new_patchno,  void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
@@ -156,8 +156,8 @@ void cb_set_new_data(fclaw2d_domain_t * old_domain,
     }
 }
 
-void fclaw2d_setup_new_domain(fclaw2d_domain_t* old_domain,
-                              fclaw2d_domain_t* new_domain)
+void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
+                                     fclaw2d_domain_t* new_domain)
 {
     const amr_options_t *gparms;
     double t;
@@ -165,6 +165,9 @@ void fclaw2d_setup_new_domain(fclaw2d_domain_t* old_domain,
     if (old_domain == NULL)
     {
         fclaw_global_infof("Building initial domain\n");
+        t = 0;
+        set_domain_time(new_domain,t);
+
     }
     else
     {
@@ -228,10 +231,10 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     {
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        fclaw2d_setup_new_domain(*domain, new_domain);
+        fclaw2d_regrid_new_domain_setup(*domain, new_domain);
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_set_new_data,
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_repopulate,
                                        (void *) NULL);
 
         /* TODO: can we use global min/maxlevels here? */
@@ -240,14 +243,6 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
            patches.  This could of course be fixed, but it doesn't
            seem necessary at this point.
         */
-        /* Do a level exchange to make sure all data is valid;
-           Coarse and fine grid exchanges will happen during time stepping
-           as needed. */
-#if 0
-        /* currently unused */
-        minlevel = new_domain->global_minlevel;
-        maxlevel = new_domain->global_maxlevel;
-#endif
 
         /* free memory associated with old domain */
         amrreset(domain);

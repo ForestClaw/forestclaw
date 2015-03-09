@@ -35,12 +35,8 @@ extern "C"
 #endif
 
 
-#if 0
-void build_initial_domain(fclaw2d_domain_t* domain);
-#endif
-
-void fclaw2d_setup_new_domain(fclaw2d_domain_t* old_domain,
-                              fclaw2d_domain_t* new_domain);
+void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
+                                     fclaw2d_domain_t* new_domain);
 
 void fclaw2d_rebuild_domain(fclaw2d_domain_t* old_domain,
                             fclaw2d_domain_t* new_domain);

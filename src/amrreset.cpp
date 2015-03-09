@@ -77,7 +77,7 @@ void amrreset(fclaw2d_domain_t **domain)
 
     // Free old parallel ghost patch data structure, must exist by construction.
     delete_ghost_patches(*domain);
-    fclaw2d_domain_exchange_t *e_old = get_domain_exchange_data(*domain);
+    fclaw2d_domain_exchange_t *e_old = fclaw2d_partition_get_exchange_data(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 
     // Output memory discrepancy for the ClawPatch

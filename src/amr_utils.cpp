@@ -300,22 +300,6 @@ double get_domain_time(fclaw2d_domain_t *domain)
     return ddata->curr_time;
 }
 
-fclaw2d_domain_exchange_t*
-    get_domain_exchange_data(fclaw2d_domain_t* domain)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    return ddata->domain_exchange;
-}
-
-void set_domain_exchange_data(fclaw2d_domain_t* domain,fclaw2d_domain_exchange_t *e)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->domain_exchange = e;
-}
-
-
-
-
 
 // Will change the name of this to 'get_clawpatch' eventually
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)

@@ -90,6 +90,8 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
                                  int this_patch_idx,
                                  void *user);
 
+size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
+
 
 #ifdef __cplusplus
 #if 0

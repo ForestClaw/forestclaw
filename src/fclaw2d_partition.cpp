@@ -33,6 +33,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_vtable.h"
 
+/* Also needed in amrreset */
+fclaw2d_domain_exchange_t*
+    fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    return ddata->domain_exchange;
+}
+
+static
+void set_exchange_data(fclaw2d_domain_t* domain,
+                                      fclaw2d_domain_exchange_t *e)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    ddata->domain_exchange = e;
+}
+
 static
 void build_ghost_patches(fclaw2d_domain_t* domain)
 {
@@ -54,7 +70,7 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
 /* This is called by rebuild_domain */
 void fclaw2d_partition_setup(fclaw2d_domain* domain)
 {
-    size_t data_size =  pack_size(domain);
+    size_t data_size =  fclaw2d_clawpatch_pack_size(domain);
     fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by amrinit or regrid and we now need to
@@ -63,7 +79,7 @@ void fclaw2d_partition_setup(fclaw2d_domain* domain)
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* Store e so we can retrieve it later */
-    set_domain_exchange_data(domain,e);
+    set_exchange_data(domain,e);
 
     /* Build patches that can be filled later with q data */
     build_ghost_patches(domain);
@@ -78,7 +94,7 @@ void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
                              int exchange_maxlevel)
 {
     // fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = fclaw2d_partition_get_exchange_data(domain);
 
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
@@ -143,7 +159,7 @@ void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
                                       int exchange_minlevel, int exchange_maxlevel)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = fclaw2d_partition_get_exchange_data(domain);
 
     /* Do exchange to update ghost patch data */
     fclaw2d_domain_ghost_exchange(domain, e,
@@ -184,7 +200,7 @@ unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
 void fclaw2d_partition_exchange_all(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = fclaw2d_partition_get_exchange_data(domain);
 
     /* Store pointers to local boundary data.  We do this here
        because we may be exchanging with time interpolated data. */
@@ -229,7 +245,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 
     // allocate memory for parallel transfor of patches
     // use data size (in bytes per patch) below.
-    size_t data_size = pack_size(*domain);
+    size_t data_size = fclaw2d_clawpatch_pack_size(*domain);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
@@ -249,7 +265,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     {
         fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
-        fclaw2d_setup_new_domain(*domain, domain_partitioned);
+        fclaw2d_regrid_new_domain_setup(*domain, domain_partitioned);
 
 	/* Stop the timer in new since, since its state is now 1. We don't care about the
 	   timer in the old state.  */

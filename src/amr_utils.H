@@ -99,10 +99,11 @@ void copy_domain_data (fclaw2d_domain_t * old_domain,
 void link_problem_setup (fclaw2d_domain_t * domain,
                          fclaw2d_problem_setup_t f_problem_setup);
 
-fclaw2d_domain_exchange_t *get_domain_exchange_data (fclaw2d_domain_t *
-                                                     domain);
-void set_domain_exchange_data (fclaw2d_domain_t * domain,
-                               fclaw2d_domain_exchange_t * e);
+fclaw2d_domain_exchange_t *fclaw2d_domain_get_exchange_data (fclaw2d_domain_t *
+                                                             domain);
+
+void fclaw2d_domain_set_exchange_data (fclaw2d_domain_t * domain,
+                                       fclaw2d_domain_exchange_t * e);
 
 
 

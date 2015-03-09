@@ -54,12 +54,6 @@ void cb_tag4refinement_init(fclaw2d_domain_t *domain,
 
     if (level < maxlevel)
     {
-#if 0
-        fclaw2d_regrid_functions_t* rf = get_regrid_functions(domain);
-        fclaw_bool refine_patch =
-            (rf->f_patch_tag4refinement)(domain,this_patch,this_block_idx,
-                                         this_patch_idx,initflag);
-#endif
         fclaw_bool refine_patch  =
             vt.patch_tag4refinement(domain,this_patch,this_block_idx,
                                     this_patch_idx,initflag);
@@ -88,13 +82,13 @@ void cb_initialize (fclaw2d_domain_t *domain,
 
 static
 void cb_domain_populate (fclaw2d_domain_t * old_domain,
-                           fclaw2d_patch_t * old_patch,
-                           fclaw2d_domain_t * new_domain,
-                           fclaw2d_patch_t * new_patch,
-                           fclaw2d_patch_relation_t newsize,
-                           int blockno,
-                           int old_patchno, int new_patchno,
-                           void *user)
+                         fclaw2d_patch_t * old_patch,
+                         fclaw2d_domain_t * new_domain,
+                         fclaw2d_patch_t * new_patch,
+                         fclaw2d_patch_relation_t newsize,
+                         int blockno, int old_patchno,
+                         int new_patchno, void *user)
+
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
@@ -106,17 +100,13 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
-        // Patch has been refined.
         fclaw2d_patch_t *fine_siblings = new_patch;
 
-        // Loop over four siblings (z-ordering) and initialize each one
         for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
 
-            // This is only used here, since only in the initial grid layout do we
-            // create fine grids from coarser grids.
             vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
         }
     }
@@ -132,48 +122,6 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
     }
 }
 
-#if 0
-static
-void build_initial_domain(fclaw2d_domain_t* domain)
-{
-    fclaw_global_infof("Building initial domain\n");
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    /* init_domain_data(*domain) is not called here, because it is
-       called in <main>.cpp.  This allows the user to grab gparms,
-       setup_problem(), etc before getting here . */
-
-    /* Allocate memory for new blocks and patches. */
-    init_block_and_patch_data(domain);
-
-    /* Physical BCs are needed in boundary level exchange
-       Assume only one block, since we are assuming mthbc */
-    int num = domain->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        /* This assumes that each block has the same physical
-           boundary conditions, which doesn't make much sense... */
-        fclaw2d_block_t *block = &domain->blocks[i];
-        set_block_data(block,gparms->mthbc);
-    }
-
-    fclaw_global_infof("  -- Building patches ... ");
-
-    /* Construct new patches - this step needs to be virtualized */
-    fclaw2d_domain_iterate_patches(domain, fclaw2d_clawpatch_define_cb,
-                                   (void *) NULL);
-
-    fclaw_global_infof("Done\n");
-
-    /* Set up the parallel ghost patch data structure. */
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
-    fclaw2d_partition_setup(domain);
-
-    fclaw_global_infof("Done\n");
-
-}
-#endif
 
 /* Initialize a base level of grids */
 void amrinit (fclaw2d_domain_t **domain)
@@ -188,7 +136,7 @@ void amrinit (fclaw2d_domain_t **domain)
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
-    double t = 0;
+    double t;
 
     // This is where the timing starts.
     ddata->is_latest_domain = 1;
@@ -199,23 +147,18 @@ void amrinit (fclaw2d_domain_t **domain)
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
 
-    /* Set problem dependent parameters for Riemann solvers, etc.
-       This has to be called after the mapping context has been set */
     if (vt.problem_setup != NULL)
     {
         vt.problem_setup(*domain);
     }
 
-    set_domain_time(*domain,t);
+    fclaw2d_regrid_new_domain_setup(NULL,*domain);
 
-    /* build_initial_domain(*domain); */
-    fclaw2d_setup_new_domain(NULL,*domain);
-
-    // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
 
     fclaw_bool time_interp = fclaw_false;
+    t = get_domain_time(*domain);
     fclaw2d_set_physical_bc(*domain,minlevel,t,time_interp);
 
     // VTK output during amrinit
@@ -240,9 +183,6 @@ void amrinit (fclaw2d_domain_t **domain)
     // Refine as needed, one level at a time.
     for (int level = minlevel; level < maxlevel; level++)
     {
-        // Tag each level, one at at time, and rebuild domain after each
-        // level.
-
         fclaw2d_domain_iterate_level(*domain, level, cb_tag4refinement_init,
                                      (void *) NULL);
 
@@ -252,9 +192,8 @@ void amrinit (fclaw2d_domain_t **domain)
 
         if (have_new_refinement)
         {
-            // Set up all data structures for new domain, but don't yet
-            // populate with data
-            fclaw2d_setup_new_domain(*domain,new_domain);
+            fclaw2d_regrid_new_domain_setup(*domain,new_domain);
+
 
             // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
@@ -265,6 +204,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // for using at tagging criteria, if necessary.
             int new_level = level+1;
             time_interp = fclaw_false;
+            t = get_domain_time(new_domain);
             fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain
@@ -292,7 +232,6 @@ void amrinit (fclaw2d_domain_t **domain)
 
             /* Repartition domain to new processors. */
             fclaw2d_partition_domain(domain, level);
-
         }
         else
         {
