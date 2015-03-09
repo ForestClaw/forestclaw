@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_defs.H"
 #include "fclaw_options.h"
 #include <fclaw_package.h>
+#include <fclaw2d_vtable.h>
 #include <amr_utils.h>
 
 #include <fclaw2d_clawpatch.h>
@@ -125,3 +126,129 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
     ClawPatch *cp = get_clawpatch(this_patch);
     return cp->block_corner_count();
 }
+
+/* ------------------------------------------------------------------
+   Repartition and rebuild new domains, or construct initial domain
+ -------------------------------------------------------------------- */
+#ifdef __cplusplus
+extern "C" {
+#if 0
+}
+#endif
+#endif
+
+
+void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              int blockno, int patchno)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int level = this_patch->level;
+
+    ClawPatch *cp = new ClawPatch();
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               blockno,
+               level,
+               gparms);
+
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    pdata->cp = cp;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_set_clawpatch;
+}
+
+void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx,
+                                void *user)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,this_patch_idx);
+
+    if (vt.patch_setup != NULL)
+    {
+        vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+}
+
+void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               void *user)
+{
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    double* patch_data = (double*) ((void**)user)[patch_num];
+
+    pack_clawpatch(this_patch,patch_data);
+}
+
+void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 void *user)
+{
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    double* patch_data = (double*) ((void**)user)[patch_num];
+
+    fclaw_bool time_interp = fclaw_false;
+    unpack_clawpatch(domain,this_patch,this_block_idx,this_patch_idx,
+                     patch_data,time_interp);
+}
+
+void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
+{
+    // We expect this ClawPatch to exist.
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    delete pdata->cp;
+    pdata->cp = NULL;
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_delete_clawpatch;
+}
+
+void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    cp->pack_griddata(qdata);
+}
+
+void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                      int this_block_idx, int this_patch_idx, double *qdata,
+                      fclaw_bool time_interp)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    if (time_interp)
+        cp->unpack_griddata_time_interpolated(qdata);
+    else
+        cp->unpack_griddata(qdata);
+}
+
+size_t pack_size(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
+    return size*sizeof(double);
+}
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

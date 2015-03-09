@@ -15,6 +15,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost.h \
+	src/fclaw2d_partition.h \
 	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
@@ -55,6 +56,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
 	src/fclaw2d_regrid.cpp \
+	src/fclaw2d_partition.cpp \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
@@ -85,7 +87,6 @@ libforestclaw_compiled_sources = \
 	src/amrreset.cpp \
 	src/subcycle_manager.cpp \
 	src/amr_advance.cpp \
-	src/amr_repartition_domain.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \

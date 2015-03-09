@@ -23,9 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_REGRID_H
-#define FCLAW2D_REGRID_H
+#ifndef FCLAW2D_PARTITION_H
+#define FCLAW2D_PARTITION_H
+#include <fclaw2d_vtable.h>
 
+#if 0
 #ifdef __cplusplus
 extern "C"
 {
@@ -33,21 +35,23 @@ extern "C"
 }
 #endif
 #endif
-
-
-#if 0
-void build_initial_domain(fclaw2d_domain_t* domain);
 #endif
 
-void fclaw2d_setup_new_domain(fclaw2d_domain_t* old_domain,
-                              fclaw2d_domain_t* new_domain);
+void fclaw2d_partition_setup(fclaw2d_domain_t* domain);
+void fclaw2d_partition_exchange_all(fclaw2d_domain_t* domain);
 
-void fclaw2d_rebuild_domain(fclaw2d_domain_t* old_domain,
-                            fclaw2d_domain_t* new_domain);
+/** Repartition all patches in parallel.
+ * \param [in] mode             A level for amrinit, -1 for running simulation.
+ */
+void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
 
-void fclaw2d_regrid(fclaw2d_domain_t **domain);
+void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
+                                      int exchange_minlevel, int exchange_maxlevel);
 
+void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
+                             int exchange_maxlevel);
 
+#if 0
 #ifdef __cplusplus
 #if 0
 {
@@ -55,4 +59,5 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain);
 }
 #endif
 
+#endif
 #endif

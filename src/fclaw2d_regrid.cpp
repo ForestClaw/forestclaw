@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <amr_utils.H>
 #include "fclaw2d_ghost.h"
+#include "fclaw2d_partition.h"
 #include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
@@ -108,13 +109,13 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 
 
 static
-void cb_rebuild_patches(fclaw2d_domain_t * old_domain,
-                        fclaw2d_patch_t * old_patch,
-                        fclaw2d_domain_t * new_domain,
-                        fclaw2d_patch_t * new_patch,
-                        fclaw2d_patch_relation_t newsize,
-                        int blockno, int old_patchno,
-                        int new_patchno,  void *user)
+void cb_set_new_data(fclaw2d_domain_t * old_domain,
+                     fclaw2d_patch_t * old_patch,
+                     fclaw2d_domain_t * new_domain,
+                     fclaw2d_patch_t * new_patch,
+                     fclaw2d_patch_relation_t newsize,
+                     int blockno, int old_patchno,
+                     int new_patchno,  void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
@@ -155,6 +156,52 @@ void cb_rebuild_patches(fclaw2d_domain_t * old_domain,
     }
 }
 
+void fclaw2d_setup_new_domain(fclaw2d_domain_t* old_domain,
+                              fclaw2d_domain_t* new_domain)
+{
+    const amr_options_t *gparms;
+    double t;
+
+    if (old_domain == NULL)
+    {
+        fclaw_global_infof("Building initial domain\n");
+    }
+    else
+    {
+        fclaw_global_infof("Rebuilding  domain\n");
+        t = get_domain_time(old_domain);
+
+        /* Allocate memory for user data types (but they don't get set) */
+        init_domain_data(new_domain);
+        copy_domain_data(old_domain,new_domain);
+        set_domain_time(new_domain,t);
+    }
+
+    gparms = get_domain_parms(new_domain);
+
+    init_block_and_patch_data(new_domain);
+
+    int num = new_domain->num_blocks;
+    for (int i = 0; i < num; i++)
+    {
+        fclaw2d_block_t *block = &new_domain->blocks[i];
+        /* This will work for rectangular domains ... */
+        set_block_data(block,gparms->mthbc);
+    }
+
+    fclaw2d_domain_iterate_patches(new_domain, fclaw2d_clawpatch_build_cb,
+                                   (void *) NULL);
+
+    fclaw_global_infof("Done\n");
+
+    /* Set up the parallel ghost patch data structure. */
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
+
+    fclaw2d_partition_setup(new_domain);
+
+    fclaw_global_infof("Done\n");
+}
+
 
 void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
@@ -181,10 +228,10 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     {
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        rebuild_domain(*domain, new_domain);
+        fclaw2d_setup_new_domain(*domain, new_domain);
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_rebuild_patches,
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_set_new_data,
                                        (void *) NULL);
 
         /* TODO: can we use global min/maxlevels here? */
@@ -207,7 +254,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
         new_domain = NULL;
 
-        repartition_domain(domain, -1);
+        fclaw2d_partition_domain(domain, -1);
         fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID);
         fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
                             (*domain)->global_minlevel, (*domain)->global_maxlevel);

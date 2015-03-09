@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "clawpack_fort.H"
+#include "fclaw2d_partition.h"
 #include "fclaw2d_physical_bc.h"
 
 #include "fclaw2d_vtable.h"
@@ -86,7 +87,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
 }
 
 static
-void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
+void cb_domain_populate (fclaw2d_domain_t * old_domain,
                            fclaw2d_patch_t * old_patch,
                            fclaw2d_domain_t * new_domain,
                            fclaw2d_patch_t * new_patch,
@@ -100,12 +101,6 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-#if 0
-        // Need a copy function in regrid_functions
-        fclaw2d_regrid_functions_t *rf = get_regrid_functions(old_domain);
-        (rf->f_patch_copy2samesize)(new_domain,old_patch,new_patch,blockno,old_patchno,
-                                    new_patchno);
-#endif
         vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,old_patchno,
                                     new_patchno);
     }
@@ -132,25 +127,68 @@ void cb_domain_adapt_init (fclaw2d_domain_t * old_domain,
     }
     else
     {
-        fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
+        fclaw_global_essentialf("cb_domain_populate : newsize not recognized\n");
         exit(1);
     }
 }
 
+#if 0
+static
+void build_initial_domain(fclaw2d_domain_t* domain)
+{
+    fclaw_global_infof("Building initial domain\n");
 
-// Initialize a base level of grids
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    /* init_domain_data(*domain) is not called here, because it is
+       called in <main>.cpp.  This allows the user to grab gparms,
+       setup_problem(), etc before getting here . */
+
+    /* Allocate memory for new blocks and patches. */
+    init_block_and_patch_data(domain);
+
+    /* Physical BCs are needed in boundary level exchange
+       Assume only one block, since we are assuming mthbc */
+    int num = domain->num_blocks;
+    for (int i = 0; i < num; i++)
+    {
+        /* This assumes that each block has the same physical
+           boundary conditions, which doesn't make much sense... */
+        fclaw2d_block_t *block = &domain->blocks[i];
+        set_block_data(block,gparms->mthbc);
+    }
+
+    fclaw_global_infof("  -- Building patches ... ");
+
+    /* Construct new patches - this step needs to be virtualized */
+    fclaw2d_domain_iterate_patches(domain, fclaw2d_clawpatch_define_cb,
+                                   (void *) NULL);
+
+    fclaw_global_infof("Done\n");
+
+    /* Set up the parallel ghost patch data structure. */
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
+    fclaw2d_partition_setup(domain);
+
+    fclaw_global_infof("Done\n");
+
+}
+#endif
+
+/* Initialize a base level of grids */
 void amrinit (fclaw2d_domain_t **domain)
 {
     int i;
     char basename[BUFSIZ];
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(*domain);
-
+    const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
-
     fclaw2d_map_context_t *cont = get_map_context(*domain);
     SET_CONTEXT(&cont);
+
+    int minlevel = gparms->minlevel;
+    int maxlevel = gparms->maxlevel;
+    double t = 0;
 
     // This is where the timing starts.
     ddata->is_latest_domain = 1;
@@ -168,14 +206,10 @@ void amrinit (fclaw2d_domain_t **domain)
         vt.problem_setup(*domain);
     }
 
-    double t = 0;
-
     set_domain_time(*domain,t);
 
-    build_initial_domain(*domain);
-
-    int minlevel = gparms->minlevel;
-    int maxlevel = gparms->maxlevel;
+    /* build_initial_domain(*domain); */
+    fclaw2d_setup_new_domain(NULL,*domain);
 
     // Initialize base level grid - combine with 'amr_set_base_level' above?
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
@@ -220,12 +254,11 @@ void amrinit (fclaw2d_domain_t **domain)
         {
             // Set up all data structures for new domain, but don't yet
             // populate with data
-            rebuild_domain(*domain,new_domain);
-
+            fclaw2d_setup_new_domain(*domain,new_domain);
 
             // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
-                                           cb_domain_adapt_init,
+                                           cb_domain_populate,
                                            (void *) NULL);
 
             // Set boundary need ghost cell values so they are available
@@ -251,14 +284,14 @@ void amrinit (fclaw2d_domain_t **domain)
                           gparms->prefix, level);
                 fclaw2d_output_write_vtk (*domain, basename);
 
-                // out of timer
+                /* out of timer */
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
                 ddata = NULL;
             }
 
-            // Repartition domain to new processors.
-            repartition_domain(domain, level);
+            /* Repartition domain to new processors. */
+            fclaw2d_partition_domain(domain, level);
 
         }
         else
@@ -268,11 +301,11 @@ void amrinit (fclaw2d_domain_t **domain)
         }
     }
 
-    // Print global minimum and maximum levels
+    /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",
                 (*domain)->global_minlevel, (*domain)->global_maxlevel);
 
-    // Stop timer
+    /* Stop timer */
     ddata = get_domain_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }

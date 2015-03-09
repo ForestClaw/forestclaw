@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
+#include "fclaw2d_partition.h"
 
 #include <sc_statistics.h>
 
@@ -33,6 +34,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
                    (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
 } while (0)
+
+
+static
+void delete_ghost_patches(fclaw2d_domain_t* domain)
+{
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+
+        delete_clawpatch(domain, ghost_patch);
+        delete_patch_data(ghost_patch);
+    }
+}
 
 
 void amrreset(fclaw2d_domain_t **domain)

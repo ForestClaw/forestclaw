@@ -67,6 +67,29 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch);
 
+void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              int blockno, int patchno);
+
+/* A callback for building the domain and repartitioning */
+void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx,
+                                void *user);
+
+void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               void *user);
+
+void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 void *user);
+
 
 #ifdef __cplusplus
 #if 0

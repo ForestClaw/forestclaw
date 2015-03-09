@@ -28,7 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "fclaw2d_typedefs.h"
-#include "fclaw2d_regrid.H"
+#include "fclaw2d_clawpatch.h"
+#include "fclaw2d_regrid.h"
 
 #include "fclaw2d_vtable.h"
 
@@ -46,24 +47,12 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
            need to be passed in */
         int patchno = i;
 
-        set_clawpatch(domain,ghost_patch,blockno,patchno);
-    }
-}
-
-void delete_ghost_patches(fclaw2d_domain_t* domain)
-{
-    for(int i = 0; i < domain->num_ghost_patches; i++)
-    {
-        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-
-        delete_clawpatch(domain, ghost_patch);
-        delete_patch_data(ghost_patch);
+        fclaw2d_clawpatch_define(domain,ghost_patch,blockno,patchno);
     }
 }
 
 /* This is called by rebuild_domain */
-static
-void setup_parallel_ghost_exchange(fclaw2d_domain_t* domain)
+void fclaw2d_partition_setup(fclaw2d_domain* domain)
 {
     size_t data_size =  pack_size(domain);
     fclaw2d_domain_exchange_t *e;
@@ -145,16 +134,6 @@ unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
     }
 }
 
-#if 0
-/* This is called anytime we need to update ghost patch data */
-void exchange_ghost_patch_data(fclaw2d_domain_t* domain, fclaw_bool time_interp)
-{
-    exchange_ghost_patch_data_levels (domain, time_interp,
-                                      domain->global_minlevel, domain->global_maxlevel);
-}
-#endif
-
-
 /* This is called anytime we need to update ghost patch data for certain levels
    The assumption is that the finest level is a time_interpolated level.  The
    routine 'unpack_ghost_patches' knows this, and so unpacks ghost patches to the
@@ -202,7 +181,7 @@ unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
 
 
 /* This is called anytime we need to update ghost patch data for certain levels */
-void exchange_ghost_patch_data_all(fclaw2d_domain_t* domain)
+void fclaw2d_partition_exchange_all(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     fclaw2d_domain_exchange_t *e = get_domain_exchange_data(domain);
@@ -241,147 +220,7 @@ void exchange_ghost_patch_data_all(fclaw2d_domain_t* domain)
 
 
 
-/* ------------------------------------------------------------------
-   Repartition and rebuild new domains, or construct initial domain
- -------------------------------------------------------------------- */
-
-/* Build initial set of patches */
-static
-void cb_build_patches(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       void *user)
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
-    set_clawpatch(domain,this_patch,this_block_idx,this_patch_idx);
-
-    if (vt.patch_setup != NULL)
-    {
-        vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
-    }
-}
-
-
-static
-void cb_pack_patches(fclaw2d_domain_t *domain,
-                     fclaw2d_patch_t *this_patch,
-                     int this_block_idx,
-                     int this_patch_idx,
-                     void *user)
-{
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-
-    pack_clawpatch(this_patch,patch_data);
-}
-
-static
-void cb_unpack_patches(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       void *user)
-{
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-
-    fclaw_bool time_interp = fclaw_false;
-    unpack_clawpatch(domain,this_patch,this_block_idx,this_patch_idx,
-                     patch_data,time_interp);
-}
-
-
-
-void rebuild_domain(fclaw2d_domain_t* old_domain, fclaw2d_domain_t* new_domain)
-{
-    fclaw_global_infof("Rebuilding domain\n");
-
-    const amr_options_t *gparms = get_domain_parms(old_domain);
-    double t = get_domain_time(old_domain);
-
-    // Allocate memory for user data types (but they don't get set)
-    init_domain_data(new_domain);
-
-    copy_domain_data(old_domain,new_domain);
-
-    // Why isn't this done in copy_domain_data?
-    set_domain_time(new_domain,t);
-
-    // Allocate memory for new blocks and patches.
-    init_block_and_patch_data(new_domain);
-
-    // Physical BCs are needed in boundary level exchange
-    // Assume only one block, since we are assuming mthbc
-    int num = new_domain->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &new_domain->blocks[i];
-        // This is kind of dumb for now, since block won't in general
-        // have the same physical boundary conditions types.
-        set_block_data(block,gparms->mthbc);
-    }
-
-    fclaw_global_infof("  -- Rebuilding patches ... ");
-
-    fclaw2d_domain_iterate_patches(new_domain, cb_build_patches,(void *) NULL);
-
-    fclaw_global_infof("Done\n");
-
-    // Set up the parallel ghost patch data structure.
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
-
-    setup_parallel_ghost_exchange(new_domain);
-
-    fclaw_global_infof("Done\n");
-}
-
-void build_initial_domain(fclaw2d_domain_t* domain)
-{
-    fclaw_global_infof("Building initial domain\n");
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    // init_domain_data(*domain) is not called here, because it is
-    // called in <main>.cpp.  This allows the user to grab gparms,
-    // setup_problem(), etc before getting here .
-
-    // Allocate memory for new blocks and patches.
-    init_block_and_patch_data(domain);
-
-    // Physical BCs are needed in boundary level exchange
-    // Assume only one block, since we are assuming mthbc
-    int num = domain->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        // This assumes that each block has the same physical
-        // boundary conditions, which doesn't make much sense...
-        fclaw2d_block_t *block = &domain->blocks[i];
-        set_block_data(block,gparms->mthbc);
-    }
-
-    // Construct new patches
-    fclaw_global_infof("  -- Rebuilding patches ... ");
-
-    fclaw2d_domain_iterate_patches(domain, cb_build_patches,(void *) NULL);
-
-    fclaw_global_infof("Done\n");
-
-    // Set up the parallel ghost patch data structure.
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
-
-    setup_parallel_ghost_exchange(domain);
-
-    fclaw_global_infof("Done\n");
-
-}
-
-
-void repartition_domain(fclaw2d_domain_t** domain, int mode)
+void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 {
     char basename[BUFSIZ];
 
@@ -396,7 +235,7 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
     fclaw2d_domain_allocate_before_partition (*domain, data_size, &patch_data);
 
     // For all (patch i) { pack its numerical data into patch_data[i] }
-    fclaw2d_domain_iterate_patches(*domain, cb_pack_patches,(void *) patch_data);
+    fclaw2d_domain_iterate_patches(*domain, fclaw2d_clawpatch_pack_cb,(void *) patch_data);
 
 
     // this call creates a new domain that is valid after partitioning
@@ -410,7 +249,7 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
     {
         fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
-        rebuild_domain(*domain, domain_partitioned);
+        fclaw2d_setup_new_domain(*domain, domain_partitioned);
 
 	/* Stop the timer in new since, since its state is now 1. We don't care about the
 	   timer in the old state.  */
@@ -422,7 +261,7 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         // TODO: for all (patch i) { unpack numerical data from patch_data[i] }
-        fclaw2d_domain_iterate_patches(domain_partitioned, cb_unpack_patches,
+        fclaw2d_domain_iterate_patches(domain_partitioned, fclaw2d_clawpatch_unpack_cb,
                                        (void *) patch_data);
 
         /* then the old domain is no longer necessary */
@@ -453,32 +292,4 @@ void repartition_domain(fclaw2d_domain_t** domain, int mode)
 
     // free the data that was used in the parallel transfer of patches
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
-}
-
-
-/* ------------------------------------------------------------------
-   Print out diagnostic information
- -------------------------------------------------------------------- */
-
-static
-void cb_proc_info (fclaw2d_domain_t *domain,
-                   fclaw2d_patch_t *this_patch,
-                   int this_block_idx,
-                   int this_patch_idx,
-                   void *user)
-{
-    int level = this_patch->level;
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int64_t patch_num =
-        domain->global_num_patches_before +
-        (int64_t) (this_block->num_patches_before + this_patch_idx);
-
-    fclaw_debugf("%5d %5d %5d\n",(int) patch_num,level,this_patch_idx);
-}
-
-
-
-void amr_print_patches_and_procs(fclaw2d_domain_t *domain)
-{
-        fclaw2d_domain_iterate_patches(domain, cb_proc_info,(void *) NULL);
 }
