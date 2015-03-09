@@ -75,6 +75,21 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
     return cp->area();
 }
 
+double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    return cp->q();
+}
+
+
+double *fclaw2d_clawpatch_get_q_time_interp(fclaw2d_domain_t* domain,
+                                            fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = get_clawpatch(this_patch);
+    return cp->q_time_interp();
+}
+
 
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,

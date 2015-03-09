@@ -23,15 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
-
-#include "amr_forestclaw.H"
+#include "forestclaw2d.H"
 #include "amr_utils.H"
-#include "fclaw2d_typedefs.h"
 #include "fclaw2d_clawpatch.h"
 #include "fclaw2d_regrid.h"
-
 #include "fclaw2d_vtable.h"
+#include "fclaw2d_partition.h"
 
 /* Also needed in amrreset */
 fclaw2d_domain_exchange_t*
@@ -107,15 +104,14 @@ void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 int level = this_patch->level;
 
-                ClawPatch *cp = get_clawpatch(this_patch);
                 double *q;
                 if (exchange_minlevel < level && level <= exchange_maxlevel)
                 {
-                    q = cp->q();
+                    q = fclaw2d_clawpatch_get_q(domain,this_patch);
                 }
                 else if (level == exchange_minlevel)
                 {
-                    q = cp->q_time_interp();
+                    q = fclaw2d_clawpatch_get_q_time_interp(domain,this_patch);
                 }
                 else
                 {
@@ -213,8 +209,7 @@ void fclaw2d_partition_exchange_all(fclaw2d_domain_t* domain)
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                ClawPatch *cp = get_clawpatch(this_patch);
-                double *q = cp->q();
+                double *q = fclaw2d_clawpatch_get_q(domain,this_patch);
                 e->patch_data[zz++] = (void*) q;
             }
         }
