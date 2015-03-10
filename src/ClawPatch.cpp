@@ -1,8 +1,6 @@
 #include "ClawPatch.H"
 #include "fclaw2d_typedefs.h"
-#include "amr_includes.H"
-#include "amr_utils.H"
-#include <fclaw2d_clawpatch.h>
+#include "fclaw2d_timeinterp.H"
 
 fclaw_app_t* ClawPatch::app;
 
@@ -514,7 +512,7 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha)
 
     /* Do interpolation only on interior, since ghost cells in qcurr
        are invalid and will lead to floating point exceptions */
-    TIMEINTERP_INTERIOR(m_mx,m_my,m_mbc,m_meqn,qcurr,qlast,qinterp,alpha);
+    TIMEINTERP_INTERIOR(&m_mx,&m_my,&m_mbc,&m_meqn,qcurr,qlast,qinterp,&alpha);
 }
 
 
@@ -623,15 +621,3 @@ int ClawPatch::size()
     /* Use this to create new data */
     return m_griddata.size();
 }
-
-
-/* -----------------------------------------------------
-   Some external functions that work with ClawPatches.
-   ----------------------------------------------------- */
-
-#if 0
-void link_app_to_clawpatch(fclaw_app_t* app)
-{
-    ClawPatch::app = app;
-}
-#endif
