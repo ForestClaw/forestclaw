@@ -74,7 +74,7 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
     ClawPatch *cp;
     int blockno;
 
-    cp = get_clawpatch(this_patch);
+    cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);

@@ -78,7 +78,7 @@ void cb_total_area(fclaw2d_domain_t *domain,
 #if 0
     ClawPatch *cp = fclaw2d_clawpatch_cp(domain,this_patch);
 #endif
-    ClawPatch* cp = get_clawpatch(this_patch);
+    ClawPatch* cp = fclaw2d_clawpatch_get_cp(this_patch);
     double *area = cp->area();
 
     *sum += total_area_(mx,my,mbc,area);
@@ -98,7 +98,7 @@ void cb_min_cell_area(fclaw2d_domain_t *domain,
     int my = gparms->my;
     int mbc = gparms->mbc;
 
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     double *area = cp->area();
     double dx = cp->dx();
     double dy = cp->dy();
@@ -119,7 +119,7 @@ void cb_max_cell_area(fclaw2d_domain_t *domain,
     int my = gparms->my;
     int mbc = gparms->mbc;
 
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     double *area = cp->area();
     double dx = cp->dx();
     double dy = cp->dy();
