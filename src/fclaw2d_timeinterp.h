@@ -23,39 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_timeinterp.h"
-#include "fclaw2d_clawpatch.H"
-#include "ClawPatch.H"
+#ifndef FCLAW2D_TIMEINTERP_H
+#define FCLAW2D_TIMEINTERP_H
 
+#include "forestclaw2d.h"
 
-static
-void cb_setup_time_interp(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
+#ifdef __cplusplus
+extern "C"
 {
-    /* This is called for all patches on the coarse level */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    double &alpha = *((double*) user);
-
-    /* This constructs a time interpolated version of the data on
-       the coarser grid */
-    cp->setup_for_time_interpolation(alpha);
-}
-
-
-
-/* ----------------------------------------------------------------------
-   Main routine in this file.  This file assumes that both coarse and
-   fine grids have valid interior data;  they only need to exchange (
-   via interpolating and averaging) ghost cell values.
-   -------------------------------------------------------------------- */
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
 void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
-                        int level,double alpha)
+                       int level, double alpha);
+
+#define TIMEINTERP_INTERIOR FCLAW_F77_FUNC (timeinterp_interior, TIMEINTERP_INTERIOR)
+void TIMEINTERP_INTERIOR(const int *mx, const int* my, const int* mbc,
+                          const int *meqn,double qcurr[], double qlast[],
+                          double qinterp[],const double* alpha);
+
+#ifdef __cplusplus
+#if 0
 {
-    /* Store time interpolated data into m_griddata_time_sync. */
-    fclaw2d_domain_iterate_level(domain, level,cb_setup_time_interp,
-                                     (void *) &alpha);
+#endif
 }
+#endif
+
+#endif

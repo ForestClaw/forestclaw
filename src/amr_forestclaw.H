@@ -116,19 +116,10 @@ void level_exchange (fclaw2d_domain_t * domain, int a_level);
 void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
                            double t_level, fclaw_bool time_interp);
 
-void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
-                       int level, double alpha);
-
-#define TIMEINTERP_INTERIOR FCLAW_F77_FUNC (timeinterp_interior, TIMEINTERP_INTERIOR)
-void TIMEINTERP_INTERIOR(const int &mx, const int& my, const int& mbc,
-                          const int &meqn,double qcurr[], double qlast[],
-                          double qinterp[],const double& alpha);
-
-
 void update_ghost_all_levels(fclaw2d_domain_t* domain,
                              fclaw2d_timer_names_t running);
 
-
+#if 0
 // amr_physbc.cpp
 void set_phys_bc (fclaw2d_domain_t * domain, int a_level, double a_level_time,
                   fclaw_bool time_interp);
@@ -141,6 +132,7 @@ void fclaw2d_physbc_default(fclaw2d_domain *domain,
                             double dt,
                             fclaw_bool intersects_phys_bdry[],
                             fclaw_bool time_interp);
+#endif
 
 
 // -------------------------------------------

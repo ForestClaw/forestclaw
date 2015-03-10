@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_forestclaw.H>
 
 #include <amr_single_step.H>
+#include "fclaw2d_timeinterp.H"
 
 
 /* ----------------------------------------------------------

@@ -88,24 +88,9 @@ int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
    Set user data with user defined variables, etc.
    ----------------------------------------------------------------- */
 void set_block_data (fclaw2d_block_t * block, const int mthbc[]);
-void set_patch_data (fclaw2d_patch_t * patch, ClawPatch * cp);
 
 void copy_domain_data (fclaw2d_domain_t * old_domain,
                        fclaw2d_domain_t * new_domain);
-
-/* -----------------------------------------------------------------
-   Link routines that don't have any other place to go...
-   ----------------------------------------------------------------- */
-void link_problem_setup (fclaw2d_domain_t * domain,
-                         fclaw2d_problem_setup_t f_problem_setup);
-
-fclaw2d_domain_exchange_t *fclaw2d_domain_get_exchange_data (fclaw2d_domain_t *
-                                                             domain);
-
-void fclaw2d_domain_set_exchange_data (fclaw2d_domain_t * domain,
-                                       fclaw2d_domain_exchange_t * e);
-
-
 
 #ifdef __cplusplus
 #if 0

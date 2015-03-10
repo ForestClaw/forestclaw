@@ -212,11 +212,13 @@ void set_block_data(fclaw2d_block_t *block, const int mthbc[])
 }
 
 
+#if 0
 void set_patch_data(fclaw2d_patch_t *patch, ClawPatch* cp)
 {
     fclaw2d_patch_data_t *pdata = get_patch_data(patch);
     pdata->cp = cp;
 }
+#endif
 
 
 // -----------------------------------------------------------------
@@ -302,12 +304,14 @@ double get_domain_time(fclaw2d_domain_t *domain)
 
 
 // Will change the name of this to 'get_clawpatch' eventually
+#if 0
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch)
 {
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t *) patch->user;
 
     return pdata->cp;
 }
+#endif
 
 /* end of helper functions */
 
