@@ -23,17 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "no_solver_user.H"
 #include <forestclaw2d.H>
+#include <fclaw2d_clawpatch.H>
 #include <fclaw_base.h>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_map_query.h>
-
-#include <amr_utils.H>
-
 #include <fclaw_register.h>
 
-#include "no_solver_user.H"
+#include <amr_utils.H>
 
 #ifdef __cplusplus
 extern "C"

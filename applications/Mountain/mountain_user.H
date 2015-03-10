@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MOUNTAIN_USER_H
 
 #include <fc2d_clawpack46.H>
-#include <amr_forestclaw.H>
+#include <fclaw2d_clawpatch.H>
 
 #ifdef __cplusplus
 extern "C"
@@ -53,59 +53,6 @@ void mountain_patch_setup(fclaw2d_domain_t *domain,
 #define SET_CAPACITY FCLAW_F77_FUNC(set_capacity,SET_CAPACITY)
 void SET_CAPACITY(int* mx, int *my, int *mbc, double *dx,double *dy,
                   double area[],int* maux, double *aux);
-
-
-#if 0
-    void mountain_tag4refinement_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn, const int& blockno,
-                               const double& xlower, const double& ylower,
-                               const double& dx, const double& dy,
-                               double q[], const int& init_flag, int& tag_patch);
-
-    void mountain_tag4coarsening_(const int& mx,const int& my,const int& mbc,
-                               const int& meqn,const double& xlower,
-                               const double& ylower, const double& dx, const double& dy,
-                               double qcoarsened[], int& tag_patch);
-
-    void mountain_write_tfile_(const int& iframe,const double& time,
-                            const int& mfields,const int& ngrids,
-                            const int& maux);
-
-    void mountain_write_qfile_(const int& meqn,
-                            const int& mbc, const int& mx,const int& my,
-                            const double& xlower,const double& ylower,
-                            const double& dx, const double& dy,
-                            double q[], const int& iframe,const int& patch_num,
-                            const int& level,const int& blockno,
-                            const int& mpirank);
-#endif
-
-#if 0
-    void qinit_manifold_(const int& meqn, const int& mbc,
-                         const int& mx, const int& my,
-                         const double& xlower, const double& ylower,
-                         const double& dx, const double& dy,
-                         const int& blockno,double q[],
-                         const int& maux, double aux[]);
-
-    void setaux_manifold_(const int& mbc,const int& mx, const int& my,
-                          const double& xlower, const double& ylower,
-                          const double& dx, const double& dy,
-                          const int& maux, double aux[],
-                          const int& blockno,
-                          double xp[], double yp[], double zp[],
-                          double xd[], double yd[], double zd[],
-                          double area[]);
-
-    void b4step2_manifold_(const int& mbc,const int& mx,const int& my,
-                           const int& meqn, double q[],
-                           const double& dx,const double& dy,
-                           const int& blockno,
-                           double xd[], double yd[], double zd[],
-                           const double& time,
-                           const double& dt, const int& maux, double aux[]);
-#endif
-
 
 void mountain_link_solvers(fclaw2d_domain_t *domain);
 

@@ -24,6 +24,8 @@
 */
 
 #include <fclaw_options.h>
+#include <fclaw2d_clawpatch.H>
+
 #include <amr_forestclaw.H>
 #include <amr_utils.H>
 

@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_USER_H
 #define TORUS_USER_H
 
-#include <amr_forestclaw.H>
-#include <p4est_connectivity.h>
+#include "fclaw2d_clawpatch.H"
 
 #ifdef __cplusplus
 extern "C"

@@ -23,14 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-#include <fclaw2d_map.h>
-
-#include <fclaw_register.h>
-#include "fclaw2d_vtable.h"
-
 #include "metric_user.H"
+#include <fclaw2d_clawpatch.H>
+#include <fclaw2d_clawpatch.H>
+#include <fclaw2d_map.h>
+#include "fclaw2d_vtable.h"
+#include <fclaw_register.h>
+
+#include <amr_utils.H>
+#include <amr_forestclaw.H>
+
+
 
 typedef struct user_options
 {

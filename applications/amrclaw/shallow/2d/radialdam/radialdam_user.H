@@ -26,7 +26,7 @@
 #ifndef RADIALDAM_USER_H
 #define RADIALDAM_USER_H
 
-#include "forestclaw2d.H"
+#include "fclaw2d_clawpatch.H"
 #include "fc2d_clawpack46.H"
 
 #ifdef __cplusplus

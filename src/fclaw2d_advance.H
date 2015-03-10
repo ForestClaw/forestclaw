@@ -27,13 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_ADVANCE_H
 #define FCLAW2D_ADVANCE_H
 
-/* This file should come first to retrieve configure-time information */
-#include <fclaw_config.h>
-
 #include "forestclaw2d.h"
 #include "subcycle_manager.H"
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #ifdef __cplusplus
 extern "C"
@@ -43,15 +38,8 @@ extern "C"
 #endif
 #endif
 
-
-
 double advance_all_levels (fclaw2d_domain_t * domain,
                            subcycle_manager * a_time_stepper);
-
-
-#if 0
-void check_conservation (fclaw2d_domain_t * domain);
-#endif
 
 
 #ifdef __cplusplus

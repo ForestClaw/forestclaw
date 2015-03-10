@@ -23,12 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "no_solver_user.H"
+#include <fclaw2d_clawpatch.H>
+#include <ClawPatch.H>
+
 #include <fclaw2d_vtable.h>
 #include <fclaw_register.h>
 #include <fclaw2d_regrid_default.h>
 #include <fclaw2d_physical_bc.h>
 
-#include "no_solver_user.H"
 
 #ifdef __cplusplus
 extern "C"

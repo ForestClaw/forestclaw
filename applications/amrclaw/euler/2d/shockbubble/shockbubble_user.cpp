@@ -23,10 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
 #include "shockbubble_user.H"
+#include "fclaw2d_vtable.h"
 
 #ifdef __cplusplus
 extern "C"
