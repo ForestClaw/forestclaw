@@ -23,11 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_regrid.h"
+#include "fclaw2d_ghost_fill.h"
+
 #include <forestclaw2d.h>
 #include <amr_utils.H>
-#include "fclaw2d_ghost.h"
 #include "fclaw2d_partition.h"
 #include <fclaw2d_vtable.h>
+#include "fclaw2d_clawpatch.H"
 
 #ifdef __cplusplus
 extern "C"

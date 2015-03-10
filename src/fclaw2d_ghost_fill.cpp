@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **/
 
+#include "fclaw2d_ghost_fill.h"
 #include "amr_includes.H"
 #include "fclaw2d_partition.h"
 

@@ -26,9 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** \file
  * Average, coarsen and copy between grids at faces.
  **/
-
-#include "amr_includes.H"
+#include "fclaw2d_ghost_fill.h"
 #include "fclaw2d_clawpatch.H"
+#include "ClawPatch.H"
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
 enum

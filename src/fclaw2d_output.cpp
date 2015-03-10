@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_output.h>
 #include <fclaw2d_clawpatch.H>
-
+#include <ClawPatch.H>
 #include <amr_utils.H>
 #include <forestclaw2d.h>
 #include <fclaw2d_vtable.h>

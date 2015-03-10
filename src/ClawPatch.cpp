@@ -1,6 +1,8 @@
 #include "ClawPatch.H"
 #include "fclaw2d_typedefs.h"
 #include "fclaw2d_timeinterp.H"
+#include "clawpack_fort.H"
+
 
 fclaw_app_t* ClawPatch::app;
 
@@ -130,11 +132,6 @@ double* ClawPatch::q_time_sync(fclaw_bool time_interp)
         return m_griddata_time_interpolated.dataPtr();
     else
         return m_griddata.dataPtr();
-}
-
-double* ClawPatch::q_time_interp()
-{
-    return m_griddata_time_interpolated.dataPtr();
 }
 
 void ClawPatch::save_current_step()

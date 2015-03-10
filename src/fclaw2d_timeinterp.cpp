@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_timeinterp.h"
 #include "fclaw2d_clawpatch.H"
-#include "ClawPatch.H"
 
 
 static
@@ -35,13 +34,8 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    /* This is called for all patches on the coarse level */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     double &alpha = *((double*) user);
-
-    /* This constructs a time interpolated version of the data on
-       the coarser grid */
-    cp->setup_for_time_interpolation(alpha);
+    fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
 }
 
 

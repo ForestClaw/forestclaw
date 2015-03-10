@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.H"
+#include "forestclaw2d.h"
 #include "amr_utils.H"
 #include "fclaw2d_clawpatch.h"
 #include "fclaw2d_regrid.h"
@@ -105,18 +105,9 @@ void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
                 int level = this_patch->level;
 
                 double *q;
-                if (exchange_minlevel < level && level <= exchange_maxlevel)
-                {
-                    q = fclaw2d_clawpatch_get_q(domain,this_patch);
-                }
-                else if (level == exchange_minlevel)
-                {
-                    q = fclaw2d_clawpatch_get_q_time_interp(domain,this_patch);
-                }
-                else
-                {
-                    q = NULL;
-                }
+                int time_interp = exchange_minlevel < level &&
+                                                      level <= exchange_maxlevel;
+                q = fclaw2d_clawpatch_get_q_timesync(domain,this_patch,time_interp);
                 e->patch_data[zz++] = (void*) q;        /* Put this patch's data location */
             }
         }

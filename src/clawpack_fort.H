@@ -34,12 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_options.h"
 #include "fclaw2d_transform.h"
 
-#if 0
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {          /* Beginning of extern "C" */
@@ -68,13 +62,6 @@ void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& idir, const int& iside, const int& num_neighbors,
                             const int& refratio, const int& igrid,
                             fclaw2d_transform_data_t** transform_cptr);
-
-#if 0
-void fixcapaq2_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                double qcoarse[], double qfine[], double areacoarse[], double areafine[],
-                const int& p4est_refineFactor,
-                const int& refratio, const int& igrid);
-#endif
 
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
@@ -238,18 +225,6 @@ void compute_tangents_(const int& mx, const int& my, const int& mbc,
 void compute_surf_normals_(const int& mx, const int& my, const int& mbc,
                            double xnormals[],double ynormals[],double edge_lengths[],
                            double curvature[], double surfnormals[], double area[]);
-
-
-/* ----------------------------------------------------------------------------------
-   Output and diagnostics
-   ---------------------------------------------------------------------------------- */
-
-void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                  const double& dx, const double& dy,
-                  const double q[], const double area[], double& sum);
-
-void interpdata_(const int& m,double qlast[],double qcurr[], double qinterp[],
-                 const double& alpha);
 
 #ifdef __cplusplus
 #if 0

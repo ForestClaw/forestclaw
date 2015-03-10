@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef FCLAW2D_PARTITION_H
 #define FCLAW2D_PARTITION_H
+
+#include <fclaw2d_convenience.h>
 #include <fclaw2d_vtable.h>
 
 #if 0

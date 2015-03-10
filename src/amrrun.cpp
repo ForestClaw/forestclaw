@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_advance.H>
 #include <amr_includes.H>
 #include <fclaw2d_output.h>
 #include <fclaw2d_regrid.h>

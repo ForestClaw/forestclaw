@@ -23,32 +23,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GHOST_H
-#define FCLAW2D_GHOST_H
 
-#include <fclaw2d_vtable.h>
+#ifndef FCLAW2D_ADVANCE_H
+#define FCLAW2D_ADVANCE_H
+
+/* This file should come first to retrieve configure-time information */
+#include <fclaw_config.h>
+
+#include "forestclaw2d.h"
+#include "subcycle_manager.H"
+
+/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}
+}                               /* need this because indent is dumb */
 #endif
 #endif
 
 
-void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
-                                     fclaw2d_timer_names_t running);
+
+double advance_all_levels (fclaw2d_domain_t * domain,
+                           subcycle_manager * a_time_stepper);
 
 
-void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain,
-                                  int coarse_level, int fine_level,
-                                  subcycle_manager *a_time_stepper,
-                                  fclaw2d_timer_names_t running);
+#if 0
+void check_conservation (fclaw2d_domain_t * domain);
+#endif
+
 
 #ifdef __cplusplus
 #if 0
-{
+{                               /* need this because indent is dumb */
 #endif
 }
 #endif

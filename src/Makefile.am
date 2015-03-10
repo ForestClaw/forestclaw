@@ -13,8 +13,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
+	src/fclaw2d_advance.H \
 	src/fclaw2d_physical_bc.h \
-	src/fclaw2d_ghost.h \
+	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_partition.h \
 	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
@@ -81,13 +82,12 @@ libforestclaw_compiled_sources = \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
-	src/clawpack_fort.cpp \
 	src/ClawPatch.cpp \
 	src/amrinit.cpp \
 	src/amrrun.cpp \
 	src/amrreset.cpp \
 	src/subcycle_manager.cpp \
-	src/amr_advance.cpp \
+	src/fclaw2d_advance.cpp \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \

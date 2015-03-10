@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_UTILS_H
 #define AMR_UTILS_H
 
+#include "fclaw2d_map.H"
 #include "fclaw_options.h"
 #include "forestclaw2d.h"
 
-#include "amr_forestclaw.H"
 #include "fclaw2d_typedefs.h"
 
 #include "fclaw2d_capi.h"

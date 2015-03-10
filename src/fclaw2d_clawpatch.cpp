@@ -25,16 +25,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <fclaw2d_clawpatch.H>
-
+#include <ClawPatch.H>
 #include <forestclaw2d.h>
 #include <amr_utils.h>
 #include <fclaw2d_vtable.h>
 
+/* This should be replaced in each example eventually with .... */
 void link_app_to_clawpatch(fclaw_app_t* app)
 {
     ClawPatch::app = app;
 }
 
+/* ... this, or something equivalent */
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
     ClawPatch::app = app;
@@ -88,6 +90,15 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
     return cp->area();
 }
 
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **q, int* meqn)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *q = cp->q();
+    *meqn = cp->meqn();
+}
+
 double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch)
 {
@@ -95,14 +106,32 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
-
-double *fclaw2d_clawpatch_get_q_time_interp(fclaw2d_domain_t* domain,
-                                            fclaw2d_patch_t* this_patch)
+void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch,
+                                     fclaw_bool time_interp,
+                                     double **q, int* meqn)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->q_time_interp();
+    *q = cp->q_time_sync(time_interp);
+    *meqn = cp->meqn();
 }
 
+double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch,
+                                         int time_interp)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->q_time_sync(time_interp);
+}
+
+
+
+void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->save_current_step();
+}
 
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
@@ -119,33 +148,6 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* t
     *surfnormals = cp->surf_normals();
     *curvature   = cp->curvature();
     *edgelengths = cp->edge_lengths();
-}
-
-void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch,
-                                 double **q, int* meqn)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *q = cp->q();
-    *meqn = cp->meqn();
-}
-
-void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t* this_patch,
-                                     fclaw_bool time_interp,
-                                     double **q, int* meqn)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *q = cp->q_time_sync(time_interp);
-    *meqn = cp->meqn();
-}
-
-
-void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
-                                         fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->save_current_step();
 }
 
 int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
@@ -198,16 +200,6 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     }
 }
 
-#if 0
-void fclaw2d_clawpatch_pack(fclaw2d_patch_t* this_patch,double* qdata)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    FCLAW_ASSERT(cp != NULL);
-    cp->pack_griddata(qdata);
-}
-#endif
-
-
 void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -221,9 +213,6 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
     cp->pack_griddata(patch_data);
-#if 0
-    fclaw2d_clawpatch_pack(this_patch,patch_data);
-#endif
 }
 
 void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
@@ -256,10 +245,6 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
     else
         cp->unpack_griddata(patch_data);
 
-#if 0
-    fclaw2d_clawpatch_unpack(domain,this_patch,this_block_idx,this_patch_idx,
-                             patch_data,time_interp);
-#endif
 }
 
 void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
@@ -286,4 +271,12 @@ size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
     int meqn = gparms->meqn;
     size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
     return size*sizeof(double);
+}
+
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        double alpha)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->setup_for_time_interpolation(alpha);
 }
