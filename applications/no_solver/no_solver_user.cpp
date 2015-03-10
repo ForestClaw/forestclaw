@@ -81,7 +81,7 @@ double no_solver_update(fclaw2d_domain_t *domain,
     gparms = fclaw2d_forestclaw_get_options(domain);
 
     /* This is needed to avoid a floating point errror */
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->save_current_step();  // Save for time interpolation
 
     return gparms->desired_cfl;
