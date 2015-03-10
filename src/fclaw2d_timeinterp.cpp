@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amr_includes.H"
+#include "fclaw2d_clawpatch.H"
 
 
 static
@@ -34,7 +35,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           void *user)
 {
     /* This is called for all patches on the coarse level */
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     double &alpha = *((double*) user);
 
     /* This constructs a time interpolated version of the data on

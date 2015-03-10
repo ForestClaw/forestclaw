@@ -629,7 +629,9 @@ int ClawPatch::size()
    Some external functions that work with ClawPatches.
    ----------------------------------------------------- */
 
+#if 0
 void link_app_to_clawpatch(fclaw_app_t* app)
 {
     ClawPatch::app = app;
 }
+#endif

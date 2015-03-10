@@ -24,16 +24,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include <fclaw2d_clawpatch.H>
+
 #include <forestclaw2d.h>
-#include "fclaw2d_defs.H"
-#include "fclaw_options.h"
-#include <fclaw_package.h>
-#include <fclaw2d_vtable.h>
 #include <amr_utils.h>
+#include <fclaw2d_vtable.h>
 
-#include <fclaw2d_clawpatch.h>
+void link_app_to_clawpatch(fclaw_app_t* app)
+{
+    ClawPatch::app = app;
+}
 
-class ClawPatch;
+void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
+{
+    ClawPatch::app = app;
+}
+
+
+ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
+
+{
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    return pdata->cp;
+}
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
@@ -41,7 +54,7 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *mx = cp->mx();
     *my = cp->my();
     *mbc = cp->mbc();
@@ -58,7 +71,7 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
                                    double **area)
 {
     /* Declared as a friend in ClawPatch.H */
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *xp = cp->xp();
     *yp = cp->yp();
     *zp = cp->zp();
@@ -71,14 +84,14 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->area();
 }
 
 double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->q();
 }
 
@@ -86,7 +99,7 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
 double *fclaw2d_clawpatch_get_q_time_interp(fclaw2d_domain_t* domain,
                                             fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->q_time_interp();
 }
 
@@ -98,7 +111,7 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* t
                                     double **edgelengths, double **curvature)
 {
     /* or just call the member functions? */
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *xnormals    = cp->xface_normals();
     *ynormals    = cp->yface_normals();
     *xtangents   = cp->xface_tangents();
@@ -112,7 +125,7 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *q = cp->q();
     *meqn = cp->meqn();
 }
@@ -122,7 +135,7 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      double **q, int* meqn)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *q = cp->q_time_sync(time_interp);
     *meqn = cp->meqn();
 }
@@ -131,28 +144,20 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
 void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
                                          fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->save_current_step();
 }
 
 int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->block_corner_count();
 }
 
 /* ------------------------------------------------------------------
    Repartition and rebuild new domains, or construct initial domain
  -------------------------------------------------------------------- */
-#ifdef __cplusplus
-extern "C" {
-#if 0
-}
-#endif
-#endif
-
-
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               int blockno, int patchno)
@@ -193,6 +198,16 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     }
 }
 
+#if 0
+void fclaw2d_clawpatch_pack(fclaw2d_patch_t* this_patch,double* qdata)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    FCLAW_ASSERT(cp != NULL);
+    cp->pack_griddata(qdata);
+}
+#endif
+
+
 void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -203,7 +218,24 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 
-    pack_clawpatch(this_patch,patch_data);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    FCLAW_ASSERT(cp != NULL);
+    cp->pack_griddata(patch_data);
+#if 0
+    fclaw2d_clawpatch_pack(this_patch,patch_data);
+#endif
+}
+
+void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
+                                    int this_block_idx, int this_patch_idx,
+                                    double *qdata, fclaw_bool time_interp)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    if (time_interp)
+        cp->unpack_griddata_time_interpolated(qdata);
+    else
+        cp->unpack_griddata(qdata);
 }
 
 void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
@@ -217,14 +249,25 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
     double* patch_data = (double*) ((void**)user)[patch_num];
 
     fclaw_bool time_interp = fclaw_false;
-    unpack_clawpatch(domain,this_patch,this_block_idx,this_patch_idx,
-                     patch_data,time_interp);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+
+    if (time_interp)
+        cp->unpack_griddata_time_interpolated(patch_data);
+    else
+        cp->unpack_griddata(patch_data);
+
+#if 0
+    fclaw2d_clawpatch_unpack(domain,this_patch,this_block_idx,this_patch_idx,
+                             patch_data,time_interp);
+#endif
 }
 
-void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
+void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch)
 {
     // We expect this ClawPatch to exist.
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    FCLAW_ASSERT(pdata->cp != NULL);
     delete pdata->cp;
     pdata->cp = NULL;
 
@@ -232,22 +275,7 @@ void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
     ++ddata->count_delete_clawpatch;
 }
 
-void pack_clawpatch(fclaw2d_patch_t* this_patch,double* qdata)
-{
-    ClawPatch *cp = get_clawpatch(this_patch);
-    cp->pack_griddata(qdata);
-}
 
-void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata,
-                      fclaw_bool time_interp)
-{
-    ClawPatch *cp = get_clawpatch(this_patch);
-    if (time_interp)
-        cp->unpack_griddata_time_interpolated(qdata);
-    else
-        cp->unpack_griddata(qdata);
-}
 
 size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
 {
@@ -259,11 +287,3 @@ size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
     size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
     return size*sizeof(double);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

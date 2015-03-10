@@ -320,7 +320,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
     int refratio = gparms->refratio;
 
-    ClawPatch *this_cp = get_clawpatch(this_patch);
+    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
     for (int icorner = 0; icorner < NumCorners; icorner++)
     {
         block_corner_count = 0;
@@ -369,7 +369,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             fclaw_bool remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
             if (is_coarse)
             {
-                ClawPatch *corner_cp = get_clawpatch(corner_patch);
+                ClawPatch *corner_cp = fclaw2d_clawpatch_get_cp(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
                 if (!(ispillowsphere && is_block_corner))
                 {

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_options.h"
 #include <fclaw_package.h>
 
+class ClawPatch;
 
 #ifdef __cplusplus
 extern "C"
@@ -41,11 +42,22 @@ extern "C"
 #endif
 #endif
 
+void link_app_to_clawpatch(fclaw_app_t* app);
+void fclaw2d_clawpatch_link_app(fclaw_app_t* app);
+
+
+ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
+
+
+void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch);
+
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy);
+
 
 void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch,
@@ -67,8 +79,22 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch);
 
-double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
-double *fclaw2d_clawpatch_get_q_time_interp(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
+double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t* this_patch);
+
+double *fclaw2d_clawpatch_get_q_time_interp(fclaw2d_domain_t* domain,
+                                            fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch,
+                                     fclaw_bool time_interp,
+                                     double **q, int* meqn);
+
+void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch);
+
+int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch);
 
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
@@ -87,6 +113,11 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
                                int this_patch_idx,
                                void *user);
 
+void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
+                                    int this_block_idx, int this_patch_idx,
+                                    double *qdata, fclaw_bool time_interp);
+
 void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
@@ -95,6 +126,18 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 
 size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
 
+#if 0
+void fclaw2d_clawpatch_pack(fclaw2d_patch_t* this_patch,double* data);
+#endif
+
+size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
+
+
+
+
+#if 0
+ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
+#endif
 
 
 #ifdef __cplusplus

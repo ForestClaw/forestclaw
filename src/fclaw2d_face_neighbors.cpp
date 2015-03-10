@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
 #include "amr_includes.H"
+#include "fclaw2d_clawpatch.H"
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
 enum
@@ -205,7 +206,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
-    ClawPatch *this_cp = get_clawpatch(this_patch);
+    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
     for (int iface = 0; iface < NumFaces; iface++)
     {
         int idir = iface/2;
@@ -265,7 +266,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                     {
-                        ClawPatch *fine_neighbor_cp = get_clawpatch(neighbor_patches[igrid]);
+                        ClawPatch *fine_neighbor_cp =
+                            fclaw2d_clawpatch_get_cp(neighbor_patches[igrid]);
                         transform_data.neighbor_patch = neighbor_patches[igrid];
                         transform_data.fine_grid_pos = igrid;
                         if (interpolate_to_neighbor && !remote_neighbor)
@@ -290,7 +292,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     /* Copy to same size patch */
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
-                    ClawPatch *neighbor_cp = get_clawpatch(neighbor_patch);
+                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patches[0];
                     transform_data.fine_grid_pos = 0;
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
@@ -299,7 +301,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             else if (is_fine && remote_neighbor && read_parallel_patches)
             {
                 /* Swap 'this_patch' and the neighbor patch */
-                ClawPatch *coarse_cp = get_clawpatch(neighbor_patches[0]);
+                ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
                 ClawPatch *fine_cp = this_cp;
 
                 /* Figure out which grid we got */

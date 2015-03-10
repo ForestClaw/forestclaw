@@ -23,9 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fc2d_dummy.H"
+#include "fclaw2d_clawpatch.H"
 #include <clawpack_fort.H>
 #include <amr_utils.H>
-#include "fc2d_dummy.H"
 
 static int s_dummy_package_id = -1;
 
@@ -97,7 +98,7 @@ void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     fc2d_dummy_define_data(domain,cp);
 }
 

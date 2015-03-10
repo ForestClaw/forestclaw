@@ -8,7 +8,7 @@
 #include "clawpack_fort.H"
 
 #include <fclaw_package.h>
-#include "fclaw2d_clawpatch.h"
+#include "fclaw2d_clawpatch.H"
 
 class ClawPatch
 {
@@ -235,27 +235,6 @@ extern "C"
 }
 #endif
 #endif
-
-void link_app_to_clawpatch(fclaw_app_t* app);
-
-
-void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-                   int blockno, int patchno);
-
-void delete_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
-
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-
-
-size_t pack_size(fclaw2d_domain_t* domain);
-void pack_clawpatch(fclaw2d_patch_t* this_patch,double* data);
-void unpack_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                      int this_block_idx, int this_patch_idx, double *qdata,
-                      fclaw_bool time_interp);
-
-ClawPatch* fclaw2d_clawpatch_cp(fclaw2d_domain_t* domain,
-                                fclaw2d_patch_t *this_patch);
-
 
 #ifdef __cplusplus
 #if 0

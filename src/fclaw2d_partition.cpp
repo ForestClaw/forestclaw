@@ -141,7 +141,8 @@ unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
             double *q = (double*) e->ghost_data[patchno];
 
             fclaw_bool time_interp = ghost_patch->level == exchange_minlevel;
-            unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
+            fclaw2d_clawpatch_unpack_ghost(domain, ghost_patch,blockno,
+                                           patchno, q, time_interp);
         }
     }
 }
@@ -187,7 +188,8 @@ unpack_ghost_patches_all(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e)
         double *q = (double*) e->ghost_data[patchno];
 
         fclaw_bool time_interp = fclaw_false;
-        unpack_clawpatch(domain, ghost_patch,blockno, patchno, q, time_interp);
+        fclaw2d_clawpatch_unpack_ghost(domain, ghost_patch,blockno,
+                                       patchno, q, time_interp);
     }
 }
 

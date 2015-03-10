@@ -51,7 +51,7 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    ClawPatch *this_cp = get_clawpatch(this_patch);
+    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     /* Copy most current time step data to grid data. (m_griddata <== m_griddata_last) */
     this_cp->restore_step();
@@ -70,7 +70,7 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    ClawPatch *this_cp = get_clawpatch(this_patch);
+    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     /* Copy grid data (m_griddata) on each patch to temporary storage
        (m_griddata_tmp <== m_griddata); */

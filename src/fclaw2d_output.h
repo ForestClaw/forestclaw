@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_OUTPUT_H
 #define FCLAW2D_OUTPUT_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_vtable.H>
+#include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,16 +34,6 @@ extern "C"
 #if 0
 }
 #endif
-#endif
-
-#if 0
-void fclaw2d_clawpatch_ascii_header(fclaw2d_domain_t* domain,
-                                    int iframe);
-
-void fclaw2d_clawpatch_ascii_output(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
 #endif
 
 void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);

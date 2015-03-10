@@ -43,7 +43,7 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
 
-        delete_clawpatch(domain, ghost_patch);
+        fclaw2d_clawpatch_delete_cp(domain, ghost_patch);
         delete_patch_data(ghost_patch);
     }
 }

@@ -23,11 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_output.h>
+#include <fclaw2d_clawpatch.H>
+
 #include <amr_utils.H>
 #include <forestclaw2d.h>
-#include <fclaw2d_output.h>
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
 
@@ -38,8 +39,6 @@ extern "C"
 }
 #endif
 #endif
-
-
 
 static void
 cb_serial_output (fclaw2d_domain_t * domain,
@@ -103,7 +102,8 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
     cont = get_map_context(domain);
 
     // Patch specific parameters
-    ClawPatch *cp = get_clawpatch (this_patch);
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     const double xlower = cp->xlower ();
     const double ylower = cp->ylower ();
     const double dx = cp->dx ();
@@ -153,7 +153,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
     const int ylane = my + 2 * mbc;
 
     // Patch specific parameters
-    ClawPatch *cp = get_clawpatch (this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     const double *q = cp->q ();
 
     // Enumerate equation data in the patch

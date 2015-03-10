@@ -23,16 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include "fc2d_clawpack46.H"
 
+#include "amr_includes.H"
 #include "amr_forestclaw.H"
 #include "amr_utils.H"
 #include "fclaw_options.h"
 #include "clawpack_fort.H"
-#include "fclaw2d_clawpatch.h"
+#include "fclaw2d_clawpatch.H"
 
 #include "fc2d_clawpack46_options.h"
-#include "fc2d_clawpack46.H"
 
 #include <fclaw_package.h>
 
@@ -160,7 +160,7 @@ int fc2d_clawpack46_get_package_id()
 void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     fc2d_clawpack46_define_auxarray(domain,cp);
 }
 
@@ -168,7 +168,7 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     fc2d_clawpack46_get_auxarray(domain,cp,aux,maux);
 }
 
@@ -400,7 +400,7 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    ClawPatch *cp = get_clawpatch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -466,7 +466,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     gparms = fclaw2d_forestclaw_get_options(domain);
     clawpack_options = fc2d_clawpack46_get_options(domain);
 
-    cp = get_clawpatch(this_patch);
+    cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     level = this_patch->level;
 
