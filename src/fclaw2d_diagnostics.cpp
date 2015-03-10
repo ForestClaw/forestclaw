@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_diagnostics.h"
 #include "forestclaw2d.h"
-#include "amr_utils.h"
-#include "fclaw2d_diagnostics.H"
 #include "fclaw2d_vtable.h"
+
+#include "amr_utils.H"
 
 
 /* global_maximum is in forestclaw2d.c */
@@ -39,21 +40,6 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
     return -maxvalue;
 }
 
-#if 0
-void link_run_diagnostics(fclaw2d_domain_t* domain,
-                          fclaw2d_run_diagnostics_t f_run_diagnostics)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
-    ddata->f_run_diagnostics = f_run_diagnostics;
-}
-
-
-void run_diagnostics_default(fclaw2d_domain_t* domain, const double t)
-{
-    /* don't run any diagnostics */
-}
-#endif
-
 void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain)
 {
     fclaw2d_vtable_t vt;
@@ -65,8 +51,4 @@ void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain)
     FCLAW_ASSERT(vt.run_diagnostics != NULL);
     vt.run_diagnostics(domain,t);
 
-#if 0
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    (ddata->f_run_diagnostics)(domain,t);
-#endif
 }

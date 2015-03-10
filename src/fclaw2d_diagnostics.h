@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DIAGNOSTICS_H
 #define FCLAW2D_DIAGNOSTICS_H
 
+#include "forestclaw2d.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -34,21 +36,8 @@ extern "C"
 #endif
 #endif
 
-#if 0
-/* Now stored in vtable */
-typedef void (*fclaw2d_run_diagnostics_t)(fclaw2d_domain_t *domain,
-                                          const double t);
-#endif
-
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
-
-#if 0
-void link_run_diagnostics(fclaw2d_domain_t* domain,
-                          fclaw2d_run_diagnostics_t f_run_diagnostics);
-
-void run_diagnostics_default(fclaw2d_domain_t* domain, const double t);
-#endif
 
 void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain);
 
