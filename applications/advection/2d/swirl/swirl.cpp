@@ -162,7 +162,7 @@ main (int argc, char **argv)
 
     fc2d_dummy_register(app);
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     /* Run the program */
     if (!retval & !vexit)
