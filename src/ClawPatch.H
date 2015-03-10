@@ -1,14 +1,13 @@
 #ifndef __CLAWPATCH_H
 #define __CLAWPATCH_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
-
-#include "fclaw_options.h"
-#include "clawpack_fort.H"
-
-#include <fclaw_package.h>
+#include "fclaw2d_farraybox.H"
 #include "fclaw2d_clawpatch.H"
+#include "fclaw2d_transform.h"
+#include "fclaw_options.h"
+#include <fclaw_package.h>
+
+#include "clawpack_fort.H"
 
 class ClawPatch
 {

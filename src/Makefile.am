@@ -30,8 +30,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.H \
 	src/fp_exception_glibc_extension.h
 
-libforestclaw_internal_headers = \
-	src/fortran_source2d/debug.i
+libforestclaw_internal_headers =
 
 # -------------------------------------------------------------------
 # Main source files for ForestClaw are here - these need to be compiled
@@ -65,6 +64,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_physical_bc.cpp \
 	src/fclaw2d_timeinterp.cpp \
 	src/fclaw2d_clawpatch.cpp \
+	src/fclaw2d_farraybox.cpp \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -101,7 +101,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/setup_mesh.f \
 	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
-	src/fortran_source2d/debug.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f

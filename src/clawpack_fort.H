@@ -34,9 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_options.h"
 #include "fclaw2d_transform.h"
 
+#if 0
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -242,16 +244,6 @@ void compute_surf_normals_(const int& mx, const int& my, const int& mbc,
    Output and diagnostics
    ---------------------------------------------------------------------------------- */
 
-void write_tfile_(const int &iframe,const double &time,const int &meqn,
-                  const int &ngrids, const int& maux);
-
-void new_qfile_(const int &iframe);
-
-void write_qfile_(const int& maxmx, const int& maxmy, const int& meqn, const int& mbc,
-                  const int& mx, const int& my, const double& xlower, const double& ylower,
-                  const double& dx, const double& dy, double q[], const int& iframe,
-                  const int& patch_idx,const int& level,const int& blockno);
-
 void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
                   const double& dx, const double& dy,
                   const double q[], const double area[], double& sum);
@@ -259,68 +251,11 @@ void compute_sum_(const int& mx, const int& my, const int& mbc, const int& meqn,
 void interpdata_(const int& m,double qlast[],double qcurr[], double qinterp[],
                  const double& alpha);
 
-
-int get_debug_flag_();
-void set_debug_flag_(const int& iflag);
-void set_debug_on_();
-void set_debug_off_();
-fclaw_bool debug_is_on_();
-fclaw_bool debug_is_off_();
-
-void set_debug_info_(const int& block_idx, const int& patch_idx, const int& level);
-void reset_debug_info_();
-int get_block_idx_();
-int get_patch_idx_();
-int get_level_();
-void debug_here_(const int& n, const char str[]);
-
-void dump_patch_(const int& mx, const int& my, const int& m_mbc, const int& meqn,
-                 const int& mq, double q[]);
-
 #ifdef __cplusplus
 #if 0
 {
 #endif
 }           /* end of extern "C" */
 #endif
-
-
-class Box
-{
-public:
-    Box();
-    Box(const int ll[], const int ur[]);
-    Box(const Box& a_box);
-    int smallEnd(int idir) const;
-    int bigEnd(int idir) const;
-
-private:
-    int m_ll[2];
-    int m_ur[2];
-};
-
-class FArrayBox
-{
-public:
-
-    FArrayBox();
-    FArrayBox(const FArrayBox& A);
-    ~FArrayBox();
-    void define(const Box& a_box, int a_fields);
-    double* dataPtr();
-    Box box();
-    int fields();
-    int size();
-    void operator=(const FArrayBox& fbox);
-    void copyToMemory(double *data);
-    void copyFromMemory(double *data);
-private:
-    double *m_data;
-    int m_size;
-    Box m_box;
-    int m_fields;
-    void set_dataPtr(int size);
-
-};
 
 #endif
