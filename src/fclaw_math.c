@@ -36,7 +36,8 @@ extern "C"
 int pow_int(int a, int n)
 {
     int b = 1;
-    for(int i = 0; i < n; i++)
+    int i;
+    for(i = 0; i < n; i++)
     {
         b *= a;
     }
