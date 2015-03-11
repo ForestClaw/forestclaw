@@ -7,6 +7,8 @@ libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw2d_base.h \
+	src/fclaw2d_domain.h \
+	src/fclaw2d_block.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
 	src/fclaw2d_output_ascii.h \
@@ -21,6 +23,7 @@ libforestclaw_installed_headers = \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_clawpatch.H \
+	src/fclaw2d_patch.H \
 	src/clawpack_fort.H \
 	src/fclaw2d_transform.h \
 	src/fclaw_package.h \
@@ -28,7 +31,7 @@ libforestclaw_installed_headers = \
 	src/fortran_source2d/metric_terms.i \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.H \
+	src/fclaw2d_diagnostics.h \
 	src/fp_exception_glibc_extension.h
 
 libforestclaw_internal_headers =
@@ -42,7 +45,13 @@ libforestclaw_compiled_sources = \
 	src/fclaw_options.c \
 	src/fclaw_package.c \
 	src/fclaw_register.c \
+	src/fclaw_math.c \
+	src/fclaw_timer.c \
+	src/fclaw_mpi.c \
 	src/fclaw2d_base.c \
+	src/fclaw2d_domain.c \
+	src/fclaw2d_block.c \
+	src/fclaw2d_patch.cpp \
 	src/fclaw2d_convenience.c \
 	src/forestclaw2d.c \
 	src/fclaw2d_vtable.c \
@@ -91,7 +100,6 @@ libforestclaw_compiled_sources = \
 	src/amr_exchangecoarse.cpp \
 	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \
-	src/amr_utils.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \

@@ -42,8 +42,6 @@ extern "C"
 void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile);
 void fclaw_forestclaw_destroy(fclaw_app_t* app);
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app);
-
 #ifdef __cplusplus
 }
 #if 0

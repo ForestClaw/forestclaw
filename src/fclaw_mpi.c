@@ -23,39 +23,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#include <p4est_base.h>
+#include "fclaw_mpi.h"
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+/* Functions with C prototypes to use forestclaw from C code */
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+void
+fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#ifdef P4EST_MPI
+    int mpiret;
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+    //mpiret = sc_MPI_Init (argc, argv);
+    //SC_CHECK_MPI (mpiret);
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+    int provided;
+    mpiret = sc_MPI_Init_thread (argc, argv, sc_MPI_THREAD_FUNNELED, &provided);
+    if (provided != sc_MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
+    SC_CHECK_MPI (mpiret);
 
+    sc_init (mpicomm, 0, 0, NULL, lp);
+    p4est_init (NULL, lp);
 #endif
+}
+
+void
+fclaw_mpi_finalize (void)
+{
+    int mpiret;
+
+    sc_finalize ();
+
+    mpiret = sc_MPI_Finalize ();
+    SC_CHECK_MPI (mpiret);
+}

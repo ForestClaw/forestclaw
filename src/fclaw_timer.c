@@ -23,39 +23,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#include <fclaw_timer.h>
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
-
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+/* -----------------------------------------------------------------
+   Work with timers
+   ----------------------------------------------------------------- */
 
+double
+fclaw2d_timer_wtime (void)
+{
+    return sc_MPI_Wtime ();
+}
+
+void
+fclaw2d_timer_init (fclaw2d_timer_t *timer)
+{
+    memset (timer, 0, sizeof (fclaw2d_timer_t));
+}
+
+void
+fclaw2d_timer_start (fclaw2d_timer_t *timer)
+{
+    if (!timer->running) {
+        timer->started = fclaw2d_timer_wtime ();
+        timer->stopped = 0.;
+        timer->running = 1;
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void
+fclaw2d_timer_stop (fclaw2d_timer_t *timer)
+{
+    if (timer->running) {
+        timer->stopped = fclaw2d_timer_wtime ();
+        timer->cumulative += timer->stopped - timer->started;
+        timer->running = 0;
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
 #endif

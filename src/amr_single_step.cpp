@@ -48,7 +48,7 @@ static
                                          this_block_idx,
                                          this_patch_idx,t,dt);
 
-    ss_data->maxcfl = max(maxcfl,ss_data->maxcfl);
+    ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
 }
 
 

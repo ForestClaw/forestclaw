@@ -26,16 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_PARTITION_H
 #define FCLAW2D_PARTITION_H
 
-#include <fclaw2d_convenience.h>
-#include <fclaw2d_vtable.h>
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_convenience.h"
+#include "fclaw2d_vtable.h"
 
-#if 0
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
 }
-#endif
 #endif
 #endif
 
@@ -56,7 +55,6 @@ void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
 void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
                              int exchange_maxlevel);
 
-#if 0
 #ifdef __cplusplus
 #if 0
 {
@@ -64,5 +62,4 @@ void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
 }
 #endif
 
-#endif
 #endif

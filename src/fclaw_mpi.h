@@ -23,39 +23,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#ifndef FCLAW_MPI_H
+#define FCLAW_MPI_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+#include "fclaw_mpi.h"
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+/* Functions with C prototypes to use forestclaw from C code */
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+void
+fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp);
+
+void
+fclaw_mpi_finalize (void);
+
+/* These two are defined in amr_utils.cpp */
+void fclaw2d_mpi_debug();
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 #endif

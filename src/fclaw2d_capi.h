@@ -28,11 +28,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* amr_options.h pulls in sc_{options,obstack,containers}.h and sc.h. */
 #if 0
-#include "amr_options.h"
-#endif
-#include "fclaw_options.h"
 #include "forestclaw2d.h"
+#include "fclaw_options.h"
 #include "fclaw_base.h"
+#endif
+
+#include <fclaw2d_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -53,26 +54,6 @@ extern "C"
 #ifdef FCLAW_HAVE_UNISTD_H
 #include <unistd.h>    /* To get process ids */
 #endif
-
-/* -----------------------------------------------------------------
-  Debug routines
-   ---------------------------------------------------------------- */
-
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain);
-const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
-void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
-void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app);
-fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
-
-void set_domain_time(fclaw2d_domain_t *domain, double time);
-double get_domain_time(fclaw2d_domain_t *domain);
-
-/* Misc. routines */
-int num_patches(fclaw2d_domain_t *domain, int level,int include_shadow);
-int pow_int(int a, int n);
-
-/* These two are defined in amr_utils.cpp */
-void fclaw2d_mpi_debug();
 
 void amrinit(fclaw2d_domain_t **domain);
 void amrrun(fclaw2d_domain_t **domain);

@@ -38,10 +38,6 @@ enum
 };
 
 
-void get_block_boundary(fclaw2d_domain_t * domain,
-                        fclaw2d_patch_t * patch,
-                        fclaw_bool *intersects_block);
-
 static
 void get_corner_type(fclaw2d_domain_t* domain,
                      int icorner,
@@ -308,7 +304,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
-    get_block_boundary(domain, this_patch, intersects_block);
+    fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -427,18 +423,4 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             }  /* End of parallel case */
         }  /* End of 'interior_corner' */
     }  /* End of icorner loop */
-}
-
-void get_block_boundary(fclaw2d_domain_t * domain,
-                        fclaw2d_patch_t * patch,
-                        fclaw_bool *intersects_block)
-{
-    for (int iside = 0; iside < NumFaces; iside++)
-    {
-        int iface_flags = fclaw2d_patch_block_face_flags[iside];
-        int is_block_face = (patch->flags & iface_flags) != 0;
-
-        /* True for physical and block boundaries across a face */
-        intersects_block[iside] = is_block_face;
-    }
 }

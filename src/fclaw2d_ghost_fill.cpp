@@ -315,9 +315,9 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     }
 
     /* ---------------------------------------------------------
-       Fill in fine grid data via interpolation.  Fine grid ghost
-       cells on ghost patches are updated.  They must then be
-       passed back to their home processor.
+       Fill in fine grid data via interpolation.
+       Fine grids that live at parallel boundaries may need to get
+       ghost cell data from the coarse ghost patch.
        ---------------------------------------------------------- */
     int minfine = minlevel+1;
     int maxfine = maxlevel;

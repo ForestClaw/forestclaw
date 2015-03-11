@@ -46,6 +46,9 @@ extern "C"
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
 
+amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app);
+
+
 amr_options_t* fclaw_options_register_general (fclaw_app_t * a,
                                      const char *configfile);
 

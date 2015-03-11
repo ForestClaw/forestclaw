@@ -23,39 +23,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#ifndef FCLAW_TIMER_H
+#define FCLAW_TIMER_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+#include <p4est_base.h>
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+/* -----------------------------------------------------------------
+   Work with timers
+   ----------------------------------------------------------------- */
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+typedef enum
+{
+    FCLAW2D_TIMER_NONE = -1,
+    FCLAW2D_TIMER_INIT,
+    FCLAW2D_TIMER_REGRID,
+    FCLAW2D_TIMER_OUTPUT,
+    FCLAW2D_TIMER_CHECK,
+    FCLAW2D_TIMER_ADVANCE,
+    FCLAW2D_TIMER_EXCHANGE,
+    FCLAW2D_TIMER_WALLTIME,
+    FCLAW2D_TIMER_UNACCOUNTED,
+    FCLAW2D_TIMER_BUILDPATCHES,
+    FCLAW2D_TIMER_COUNT
+}
+fclaw2d_timer_names_t;
+
+typedef struct
+{
+    int running;
+    double started, stopped;
+    double cumulative;
+}
+fclaw2d_timer_t;
+
+double fclaw2d_timer_wtime (void);
+
+void fclaw2d_timer_init (fclaw2d_timer_t *timer);
+
+void
+    fclaw2d_timer_start (fclaw2d_timer_t *timer);
+
+void
+    fclaw2d_timer_stop (fclaw2d_timer_t *timer);
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
+
 
 #endif

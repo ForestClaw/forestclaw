@@ -24,17 +24,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_clawpack46.H"
-
-#include "amr_includes.H"
-#include "amr_forestclaw.H"
-#include "amr_utils.H"
-#include "fclaw_options.h"
-#include "clawpack_fort.H"
+#include <fclaw2d_forestclaw.H>
 #include "fclaw2d_clawpatch.H"
+#include <ClawPatch.H>
 
 #include "fc2d_clawpack46_options.h"
-
-#include <fclaw_package.h>
+#include "fclaw_options.h"
 
 static int s_clawpack46_package_id = -1;
 
@@ -481,7 +476,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     int mwaves = clawpack_options->mwaves;
 
-    int maxm = max(mx,my);
+    int maxm = fmax(mx,my);
 
     double cflgrid = 0.0;
 

@@ -29,14 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* NOTE: This file is meant to be included by .cpp files only. */
 
 #include "amr_utils.H"
+
+#if 0
 #include "ClawPatch.H"
 #include "fclaw2d_physical_bc.h"
 #include "fclaw2d_regrid.H"
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-
-using namespace std;
+#endif
 
 #endif

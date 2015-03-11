@@ -23,39 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#ifndef FCLAW2D_FORESTCLAW_H
+#define FCLAW2D_FORESTCLAW_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+/* This file should come first to retrieve configure-time information */
+#include <fclaw_config.h>
 
-#include "fclaw_options.h"
+/* Use as an alternate to GNU feenableexcept */
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
+#include <fp_exception_glibc_extension.h>
+#endif
+
+#include <fenv.h>
+#include <signal.h>
+
+#ifdef FCLAW_HAVE_UNISTD_H
+#include <unistd.h>    /* To get process ids */
+#endif
+
 #include "forestclaw2d.h"
+#include "fclaw2d_base.h"
+#include "fclaw2d_domain.h"
+#include "fclaw2d_block.h"
 
+#include "fclaw2d_capi.h"
+#include "fclaw2d_defs.h"
 
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
-{
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
-
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
-
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #endif

@@ -77,6 +77,11 @@ void get_phys_boundary (fclaw2d_domain_t * domain,
                         int this_block_idx,
                         int this_patch_idx, fclaw_bool * intersects_bc);
 
+/* In fclaw2d_corner_neighbors.cpp */
+void fclaw2d_ghost_get_block_boundary(fclaw2d_domain_t * domain,
+                                      fclaw2d_patch_t * patch,
+                                      fclaw_bool *intersects_block);
+
 void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
                     int this_block_idx,

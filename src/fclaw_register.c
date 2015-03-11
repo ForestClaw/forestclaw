@@ -53,15 +53,6 @@ void fclaw_forestclaw_destroy(fclaw_app_t* app)
     fclaw_package_container_destroy(app);
 }
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app)
-{
-    amr_options_t*  gparms;
-    gparms = (amr_options_t*) fclaw_app_get_attribute(app,"fclaw-options",NULL);
-    FCLAW_ASSERT(gparms != NULL);
-    return gparms;
-}
-
-
 #ifdef __cplusplus
 }
 #if 0

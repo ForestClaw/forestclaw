@@ -23,7 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_clawpatch.H"
 #include "fclaw2d_partition.h"
 
 #include <sc_statistics.h>
@@ -43,8 +44,8 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
 
-        fclaw2d_clawpatch_delete_cp(domain, ghost_patch);
-        delete_patch_data(ghost_patch);
+        fclaw2d_patch_delete_cp(ghost_patch);
+        fclaw2d_patch_delete_data(ghost_patch);
     }
 }
 
@@ -61,14 +62,16 @@ void amrreset(fclaw2d_domain_t **domain)
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = block->patches + j;
+            fclaw2d_patch_delete_cp(patch);
+            fclaw2d_patch_delete_data(patch);
+#if 0
             fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t *) patch->user;
             delete pdata->cp;
             pdata->cp = NULL;
-
-            ++ddata->count_delete_clawpatch;
-
             FCLAW2D_FREE (pdata);
             patch->user = NULL;
+#endif
+            ++ddata->count_delete_clawpatch;
         }
 
         FCLAW2D_FREE (bd);

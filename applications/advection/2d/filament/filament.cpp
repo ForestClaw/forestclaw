@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.H>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
+#include <fclaw_math.h>
 
 #include <amr_forestclaw.H>
 #include <amr_utils.H>

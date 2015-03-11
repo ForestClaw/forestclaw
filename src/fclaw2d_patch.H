@@ -23,39 +23,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#ifndef FCLAW2D_PATCH_H
+#define FCLAW2D_PATCH_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+#include <forestclaw2d.h>
+#include <p4est_base.h>
+#include <fclaw2d_block.h>
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
+class ClawPatch;    /* Incomplete type */
 
 
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+/* Opaque pointer to patch data */
+typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+void init_patch_data(fclaw2d_patch_t *patch);
+
+void fclaw2d_patch_delete_data(fclaw2d_patch_t *patch);
+
+fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
+
+ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch);
+ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch);
+void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch);
+
+void init_block_and_patch_data(fclaw2d_domain_t *domain);
+
+#if 0
+static void cb_num_patches(fclaw2d_domain_t *domain,
+	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
+{
+  (*(int *) user)++;
+}
+
+int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
+{
+    int count = 0;
+    if (include_shadow == 0)
+    {
+        fclaw2d_domain_iterate_level(domain, level,
+                                     cb_num_patches,
+                                     &count);
+    }
+    else
+    {
+        // Include shadow patches
+    }
+    return count;
+}
+#endif
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif

@@ -38,12 +38,6 @@ enum
     FINER_GRID
 };
 
-/* In fclaw2d_corner_neighbors.cpp */
-void get_block_boundary(fclaw2d_domain_t * domain,
-                        fclaw2d_patch_t * patch,
-                        fclaw_bool *intersects_block);
-
-
 /* This function is a bit overkill, but I put it here so the logic in both
    the corner fill and face fill are the same */
 static
@@ -195,7 +189,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
                             intersects_phys_bdry);
 
-    get_block_boundary(domain, this_patch, intersects_block);
+    fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
 
 
     /* Transform data needed at block boundaries */

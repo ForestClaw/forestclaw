@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
+#if 0
 #ifndef AMR_FORESTCLAW_H
 #define AMR_FORESTCLAW_H
 
@@ -43,11 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
-/* Still kept around because other files depend on this include file */
+/* Still kept around because applications files still depend on this include file */
 
+#include "fclaw2d_forestclaw.h"
 #include "fclaw2d_convenience.h"
-#include "forestclaw2d.h"
 #include "fclaw2d_typedefs.h"
-#include "amr_utils.H"
+#endif
+
+#include "fclaw2d_forestclaw.h"
 
 #endif

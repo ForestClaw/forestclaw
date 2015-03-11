@@ -308,8 +308,6 @@ void MAPC2M_ANNULUS (int* blockno, double *xc, double *yc,
 
 /* ---------------------------------------------------------------------------------- */
 
-
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

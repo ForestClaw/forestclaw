@@ -23,39 +23,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#include <fclaw_math.h>
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
-
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+int pow_int(int a, int n)
+{
+    int b = 1;
+    for(int i = 0; i < n; i++)
+    {
+        b *= a;
+    }
+    return b;
+}
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
 
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
 #endif

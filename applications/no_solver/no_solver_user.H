@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NO_SOLVER_USER_H
 #define NO_SOLVER_USER_H
 
-#include "amr_forestclaw.H"
+#include "fclaw2d_forestclaw.h"
 
 #ifdef __cplusplus
 extern "C"

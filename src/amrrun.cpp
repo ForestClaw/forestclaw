@@ -24,11 +24,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <fclaw2d_diagnostics.h>
 #include <fclaw2d_advance.H>
-#include <amr_includes.H>
-#include <fclaw2d_output.h>
 #include <fclaw2d_regrid.h>
+#include <fclaw2d_output.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_clawpatch.H>
+#include <fclaw_math.h>
+#include <ClawPatch.H>
+
+#include <amr_utils.H>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,7 +41,6 @@ extern "C"
 {
 #endif
 #endif
-
 
 /*  -----------------------------------------------------------------
     Time stepping

@@ -23,39 +23,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#include "fclaw2d_forestclaw.h"
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
-
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+void init_block_data(fclaw2d_block_t *block)
+{
+    fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
+    block->user = (void *) bdata;
+}
 
+
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
+{
+    return (fclaw2d_block_data_t *) block->user;
+}
+
+void set_block_data(fclaw2d_block_t *block, const int mthbc[])
+{
+    fclaw2d_block_data_t *bdata = get_block_data(block);
+    for(int i = 0; i < 4; i++)
+    {
+        bdata->mthbc[i] = mthbc[i];
+    }
+}
+
+void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
+                                      fclaw2d_patch_t * patch,
+                                      fclaw_bool *intersects_block)
+{
+    for (int iside = 0; iside < NumFaces; iside++)
+    {
+        int iface_flags = fclaw2d_patch_block_face_flags[iside];
+        int is_block_face = (patch->flags & iface_flags) != 0;
+
+        /* True for physical and block boundaries across a face */
+        intersects_block[iside] = is_block_face;
+    }
+}
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
 #endif

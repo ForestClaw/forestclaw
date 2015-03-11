@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_capi.h"
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
+#include <fclaw_mpi.h>
 
 #include "fp_exception_glibc_extension.h"
 
@@ -459,4 +460,16 @@ void fclaw_options_convert_double_array (const char *array_string,
 void fclaw_options_destroy_array(void* array)
 {
     FCLAW_FREE (array);
+}
+
+/* ---------------------------------------------------------
+   AMR access functions
+   --------------------------------------------------------- */
+
+amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app)
+{
+    amr_options_t*  gparms;
+    gparms = (amr_options_t*) fclaw_app_get_attribute(app,"fclaw-options",NULL);
+    FCLAW_ASSERT(gparms != NULL);
+    return gparms;
 }

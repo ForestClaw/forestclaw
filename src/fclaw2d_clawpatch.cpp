@@ -46,9 +46,36 @@ void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
+    return fclaw2d_patch_get_cp(this_patch);
+#if 0
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
     return pdata->cp;
+#endif
 }
+
+/* ------------------------------------------------------------------
+   Repartition and rebuild new domains, or construct initial domain
+ -------------------------------------------------------------------- */
+void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              int blockno, int patchno)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int level = this_patch->level;
+
+    ClawPatch *cp = fclaw2d_patch_new_cp(this_patch);
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               blockno,
+               level,
+               gparms);
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_set_clawpatch;
+}
+
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
@@ -157,31 +184,6 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
     return cp->block_corner_count();
 }
 
-/* ------------------------------------------------------------------
-   Repartition and rebuild new domains, or construct initial domain
- -------------------------------------------------------------------- */
-void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              int blockno, int patchno)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int level = this_patch->level;
-
-    ClawPatch *cp = new ClawPatch();
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms);
-
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    pdata->cp = cp;
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_set_clawpatch;
-}
 
 void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
@@ -250,6 +252,11 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
+    fclaw2d_patch_delete_cp(this_patch);
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_delete_clawpatch;
+#if 0
     // We expect this ClawPatch to exist.
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
     FCLAW_ASSERT(pdata->cp != NULL);
@@ -258,6 +265,7 @@ void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ++ddata->count_delete_clawpatch;
+#endif
 }
 
 

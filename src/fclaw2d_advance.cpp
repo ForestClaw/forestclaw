@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_timeinterp.H"
 #include <fclaw2d_ghost_fill.h>
 #include <amr_single_step.H>
-
+#include <math.h>
 #include <amr_includes.H>
 #include <fclaw_base.h>
 
@@ -54,7 +54,7 @@ double update_level_solution(fclaw2d_domain_t *domain,
     cfl = amr_level_single_step_update(domain,a_level,t,dt);
 
     /* This needs to be cleaned up a bit */
-    time_data->maxcfl = max(time_data->maxcfl,cfl);
+    time_data->maxcfl = fmax(time_data->maxcfl,cfl);
 
     return cfl;
 }
@@ -102,7 +102,7 @@ double advance_level(fclaw2d_domain_t *domain,
        ------------------------------------------------------------ */
     double cfl_step = update_level_solution(domain,this_level,
                                             &time_data);
-    maxcfl = max(maxcfl,cfl_step);
+    maxcfl = fmax(maxcfl,cfl_step);
 
     fclaw_global_infof("------ Max CFL on level %d is %12.4e " \
                        " (using dt = %12.4e)\n",this_level,cfl_step,time_data.dt);
@@ -131,7 +131,7 @@ double advance_level(fclaw2d_domain_t *domain,
             double cfl_step = advance_level(domain,coarser_level,
                                             last_coarse_step,
                                             maxcfl,a_time_stepper);
-            maxcfl = max(maxcfl,cfl_step);
+            maxcfl = fmax(maxcfl,cfl_step);
 
             if (!a_time_stepper->nosubcycle())
             {
@@ -186,7 +186,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     {
         double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,
                                         a_time_stepper);
-        maxcfl = max(cfl_step,maxcfl);
+        maxcfl = fmax(cfl_step,maxcfl);
         int last_step = a_time_stepper->last_step(maxlevel);
         if (!a_time_stepper->nosubcycle() && last_step < n_fine_steps)
         {

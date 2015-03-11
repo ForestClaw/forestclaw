@@ -38,6 +38,26 @@ extern "C"
 #endif
 #endif
 
+typedef struct fclaw2d_level_time_data
+{
+    /* Single step data. This always has to be set. */
+    double dt;
+    double t_initial;
+    double t_level;
+    double t_coarse;
+
+    /* Needed for explicit CFL limited schemes */
+    double maxcfl;
+
+    /* Extra data that might be needed for more complicated time stepping.
+     * Not always set.
+     */
+    double alpha;               /* Fraction of coarser dt completed. */
+    double dt_coarse;
+    bool is_coarsest;
+    bool fixed_dt;
+}fclaw2d_level_time_data_t;
+
 double advance_all_levels (fclaw2d_domain_t * domain,
                            subcycle_manager * a_time_stepper);
 

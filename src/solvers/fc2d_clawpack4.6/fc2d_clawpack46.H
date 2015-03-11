@@ -26,11 +26,8 @@
 #ifndef FC2D_CLAWPACK46_H
 #define FC2D_CLAWPACK46_H
 
-#include <forestclaw2d.h>
-#include <fclaw_options.h>
-#include <clawpack_fort.H>
-#include <amr_forestclaw.H>
-
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.H>
 #include "fc2d_clawpack46_options.h"
 #include <fclaw_package.h>
 

@@ -23,39 +23,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#ifndef FCLAW2D_BLOCK_H
+#define FCLAW2D_BLOCK_H
 
-/* this header file must come first */
-#include "fclaw2d_defs.H"
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_defs.h"
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
+#ifdef __cplusplus
+extern "C"
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
+#if 0
+}
+#endif
+#endif
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
+typedef struct fclaw2d_block_data
+{
+    int mthbc[FCLAW_NUMFACES];  /* >=0 for physical bc types */
+}
+fclaw2d_block_data_t;
 
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
+
+void init_block_data(fclaw2d_block_t *block);
+
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
+
+void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
+
+void init_block_and_patch_data(fclaw2d_domain_t *domain);
+
+void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
+                                      fclaw2d_patch_t * patch,
+                                      fclaw_bool *intersects_block);
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif
