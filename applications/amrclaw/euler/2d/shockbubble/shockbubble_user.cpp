@@ -24,15 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "shockbubble_user.H"
-#include "fclaw2d_vtable.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 
 static fclaw2d_vtable_t vt;
@@ -53,6 +46,9 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */
     classic_claw.bc2 = &BC2;
+
+    vt.fort_tag4refinement = &TAG4REFINEMENT;
+    vt.fort_tag4coarsening = &TAG4COARSENING;
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
     classic_claw.src2 = &SRC2;
@@ -83,11 +79,3 @@ void shockbubble_patch_setup(fclaw2d_domain_t* domain,
     fc2d_clawpack46_setaux(domain,this_patch,blockno,patchno);
     fc2d_clawpack46_set_capacity(domain,this_patch,blockno,patchno);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

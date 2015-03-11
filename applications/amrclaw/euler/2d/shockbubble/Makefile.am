@@ -15,6 +15,8 @@ applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/setaux.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/bc2.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/src2.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.x/tag4coarsening.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.x/tag4refinement.f \
 	applications/amrclaw/euler/2d/rp/rpn2eu3.f \
 	applications/amrclaw/euler/2d/rp/rpn2eu4.f \
 	applications/amrclaw/euler/2d/rp/rpn2eu5.f \

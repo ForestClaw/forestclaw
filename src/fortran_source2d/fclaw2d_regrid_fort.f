@@ -18,9 +18,8 @@ c     # --------------------------------------------
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq,m
-      double precision xc,yc, qmin, qmax
-      double precision dq, dqi, dqj
+      integer i,j, mq
+      double precision qmin, qmax
 
       tag_patch = 0
 
@@ -64,10 +63,12 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       tag_patch = 0
       qmin = q0(1,1,1)
       qmax = q0(1,1,1)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,q0,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,q1,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,q2,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,q3,qmin,qmax)
+      do mq = 1,meqn
+         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax)
+         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax)
+         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax)
+         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax)
+      enddo
       if (qmax - qmin .lt. coarsen_threshold) then
          tag_patch = 1
          return
@@ -75,16 +76,15 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 
       end
 
-      subroutine fclaw2d_get_minmax(mx,my,mbc,meqn,q,
+      subroutine fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q,
      &      qmin,qmax)
 
       implicit none
-      integer mx,my,mbc,meqn
+      integer mx,my,mbc,meqn,mq
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      integer i,j,mq
+      integer i,j
 
-      mq = 1
       do i = 1,mx
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)

@@ -24,22 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "no_solver_user.H"
-#include <fclaw2d_clawpatch.H>
-#include <ClawPatch.H>
 
-#include <fclaw2d_vtable.h>
-#include <fclaw_register.h>
-#include <fclaw2d_regrid_default.h>
-#include <fclaw2d_physical_bc.h>
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "ClawPatch.H"
 
+#include "fclaw2d_physical_bc.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 static fclaw2d_vtable_t vt;
 
@@ -89,12 +80,3 @@ double no_solver_update(fclaw2d_domain_t *domain,
 
     return gparms->desired_cfl;
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

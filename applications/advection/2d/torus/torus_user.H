@@ -38,10 +38,11 @@ extern "C"
 
 #define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
 
-void SETAUX_MANIFOLD(const int* mx, const int* my, const int* mbc,
+void SETAUX_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
+                     const int* mx, const int* my,
                      const double* xlower, const double* ylower,
-                     const double* dx, const double* dy, const int* blockno,
-                     const int* maux, double aux[], double area[]);
+                     const double* dx, const double* dy,
+                     const int* maux, double aux[]);
 
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
@@ -82,13 +83,6 @@ fclaw2d_map_context_t *
                              const int a, const int b);
 
 
-#if 0
-struct fclaw2d_map_composition
-{
-    fclaw2d_map_context_t* brick;
-    fclaw2d_map_context_t* torus;
-};
-#endif
 
 #ifdef __cplusplus
 #if 0

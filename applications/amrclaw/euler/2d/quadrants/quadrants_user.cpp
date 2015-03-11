@@ -24,15 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "quadrants_user.H"
-#include "fclaw2d_vtable.h"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -67,10 +61,3 @@ void quadrants_problem_setup(fclaw2d_domain_t* domain)
 
     QUADRANTS_SETPROB(&user->gamma);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

@@ -23,19 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
-
 #include "correlatedcb_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -153,13 +145,3 @@ double correlatedcb_update(fclaw2d_domain_t *domain,
 
     return maxcfl;
 }
-
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

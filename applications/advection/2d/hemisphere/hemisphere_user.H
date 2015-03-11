@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HEMISPHERE_USER_H
 
 #include "fclaw2d_clawpatch.H"
-#include "hemisphere_user.H"
 #include "fc2d_clawpack46.H"
 
 

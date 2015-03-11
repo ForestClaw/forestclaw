@@ -23,32 +23,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_options.h>
-#include <fclaw2d_clawpatch.H>
-
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-
-#include <fc2d_clawpack46.H>
-#include <fc2d_dummy.H>
-
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>
-
-#include <fclaw_options.h>
-#include <fclaw_register.h>
-
-#include <p4est_connectivity.h>
-
 #include "swirl_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
+
+#include "fc2d_dummy.H"
 
 
 typedef struct user_options
@@ -177,10 +158,3 @@ main (int argc, char **argv)
 
     return 0;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

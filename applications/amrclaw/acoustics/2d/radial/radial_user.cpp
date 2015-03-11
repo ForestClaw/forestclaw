@@ -23,21 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
-
 #include "radial_user.H"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
+#include "fc2d_clawpack46.H"
 
 static fc2d_clawpack46_vtable_t classic_claw;
 static fclaw2d_vtable_t vt;
@@ -78,11 +65,3 @@ void radial_problem_setup(fclaw2d_domain_t* domain)
        stored in a common block */
     RADIAL_SETPROB(&user->rho,&user->bulk,&user->cc,&user->zz);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

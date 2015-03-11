@@ -24,15 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "metric_user.H"
-#include <fclaw2d_clawpatch.H>
-#include <fclaw2d_clawpatch.H>
-#include <fclaw2d_map.h>
-#include "fclaw2d_vtable.h"
-#include <fclaw_register.h>
-
-#include <amr_utils.H>
-#include <amr_forestclaw.H>
-
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
 
 
 typedef struct user_options
@@ -230,7 +223,7 @@ main (int argc, char **argv)
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
   /* No packages to register */
-  link_app_to_clawpatch(app);
+  fclaw2d_clawpatch_link_app(app);
 
 
   if (!retval & !vexit)

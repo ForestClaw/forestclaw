@@ -23,21 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.H"
-#include "fc2d_clawpack46.H"
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_output_ascii.h>
-#include <fclaw2d_regrid_default.h>
-
 #include "pwconst_user.H"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.h"
+#include "fc2d_clawpack46.H"
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -60,10 +48,3 @@ void pwconst_link_solvers(fclaw2d_domain_t *domain)
     fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

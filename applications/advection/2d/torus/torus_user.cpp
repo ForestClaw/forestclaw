@@ -23,23 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_includes.H"
-#include "fc2d_clawpack46.H"
 #include "torus_user.H"
+#include "fclaw2d_forestclaw.h"
 
-#include <fclaw2d_vtable.h>
-#include <fclaw_register.h>
-#include <fclaw2d_output.h>
-#include <fclaw2d_output_ascii.h>
-#include <fclaw2d_regrid_default.h>
+#include "fc2d_clawpack46.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 static fc2d_clawpack46_vtable_t classic_claw;
 
@@ -47,43 +35,37 @@ static fclaw2d_vtable_t vt;
 
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
-    const amr_options_t *gparms;
-    int m;
-
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack46_init_vtable(&classic_claw);
 
-    gparms = fclaw2d_forestclaw_get_options(domain);
-    m = gparms->manifold;
+    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
 
     vt.problem_setup            = &fc2d_clawpack46_setprob;
+    classic_claw.setprob = &SETPROB;
 
-    vt.patch_setup = m ? &torus_patch_manifold_setup : &fc2d_clawpack46_setaux;
+    if (gparms->manifold)
+    {
+        vt.patch_setup = &torus_patch_manifold_setup;
+        classic_claw.setaux = &SETAUX_MANIFOLD;
+    }
+    else
+    {
+        vt.patch_setup = &fc2d_clawpack46_setaux;
+        classic_claw.setaux = &SETAUX;
+    }
+
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
-    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
-
-    vt.patch_tag4refinement     = &fclaw2d_patch_tag4refinement;
-    vt.fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
-
-    vt.patch_tag4coarsening     = &fclaw2d_patch_tag4coarsening;
-    vt.fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
-
-    vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
-
-    vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
-
-    fclaw2d_set_vtable(domain,&vt);
-
-    /* Needed for the clawpack46 package */
     classic_claw.qinit = &QINIT;
-    classic_claw.setaux = &SETAUX;    /* Called by fc2d_clawpack46_setaux, above */
-    classic_claw.setprob = &SETPROB;
+
+    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
+
+    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
+
+    fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
@@ -93,29 +75,7 @@ void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    double *aux;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fc2d_clawpack46_define_auxarray2(domain,this_patch);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-
-    SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,
-                    &this_block_idx, &maux, aux, area);
+    fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

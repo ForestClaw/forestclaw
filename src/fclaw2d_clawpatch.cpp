@@ -23,20 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
 
-#include <fclaw2d_clawpatch.H>
-#include <ClawPatch.H>
-#include <forestclaw2d.h>
-#include <amr_utils.h>
-#include <fclaw2d_vtable.h>
+#include "ClawPatch.H"
 
-/* This should be replaced in each example eventually with .... */
-void link_app_to_clawpatch(fclaw_app_t* app)
-{
-    ClawPatch::app = app;
-}
-
-/* ... this, or something equivalent */
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
     ClawPatch::app = app;
@@ -47,10 +38,6 @@ ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
     return fclaw2d_patch_get_cp(this_patch);
-#if 0
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    return pdata->cp;
-#endif
 }
 
 /* ------------------------------------------------------------------
@@ -256,16 +243,6 @@ void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ++ddata->count_delete_clawpatch;
-#if 0
-    // We expect this ClawPatch to exist.
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    FCLAW_ASSERT(pdata->cp != NULL);
-    delete pdata->cp;
-    pdata->cp = NULL;
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_delete_clawpatch;
-#endif
 }
 
 

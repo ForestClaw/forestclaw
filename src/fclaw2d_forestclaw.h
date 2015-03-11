@@ -41,11 +41,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>    /* To get process ids */
 #endif
 
+/* Basic objects */
 #include "forestclaw2d.h"
 #include "fclaw2d_base.h"
 #include "fclaw2d_domain.h"
 #include "fclaw2d_block.h"
+/* Don't include fclaw2d_patch.H, since it requires C++ linkage */
 
+/* Basic header files that are probably required by all apps */
+#include "fclaw_options.h"
+#include "fclaw_register.h"
+#include "fclaw_package.h"
+#include "fclaw2d_vtable.h"
+
+/* Mapping interface - needed even if 'nomap' is used.  */
+#include "p4est_connectivity.h"
+#include "fclaw2d_map.h"
+#include "fclaw2d_map_query.h"
+
+#include "fclaw_timer.h"
+
+/* These still need to be cleaned up */
 #include "fclaw2d_capi.h"
 #include "fclaw2d_defs.h"
 

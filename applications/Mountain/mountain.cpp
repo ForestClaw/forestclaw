@@ -23,16 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
-
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-#include <fclaw2d_map_query.h>
-
-#include <fclaw_register.h>
-
 #include "mountain_user.H"
+
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 
 static void *
@@ -163,7 +158,7 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,NULL);
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     if (!retval & !vexit)
     {

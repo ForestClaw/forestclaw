@@ -23,19 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
 #include "interface_user.H"
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 
 static fclaw2d_vtable_t vt;
@@ -77,11 +68,3 @@ void interface_setup_problem(fclaw2d_domain_t* domain)
     user = (user_options_t*) fclaw_app_get_user(app);
     INTERFACE_SETPROB(&user->rhol,&user->cl,&user->rhor,&user->cr);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

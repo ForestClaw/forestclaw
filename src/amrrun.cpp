@@ -24,23 +24,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <fclaw2d_advance.H>
-#include <fclaw2d_regrid.h>
-#include <fclaw2d_output.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_clawpatch.H>
-#include <fclaw_math.h>
-#include <ClawPatch.H>
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "ClawPatch.H"
 
-#include <amr_utils.H>
+#include "fclaw2d_advance.H"
+#include "fclaw2d_regrid.h"
+#include "fclaw2d_output.h"
+#include "fclaw2d_diagnostics.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-{
-#endif
-#endif
+#include "fclaw_math.h"
 
 /*  -----------------------------------------------------------------
     Time stepping
@@ -542,10 +535,3 @@ void amrrun(fclaw2d_domain_t **domain)
         exit(0);
     }
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

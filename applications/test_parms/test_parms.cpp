@@ -23,19 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fc2d_clawpack46.H>
-#include <fclaw_base.h>
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
-#include <fclaw2d_map_query.h>
-
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-#include <fclaw_options.h>
-
-#include <fclaw_register.h>
-
-
+#include "fclaw2d_forestclaw.H"
+#include "fc2d_clawpack46.H"
 
 typedef struct user_options
 {

@@ -23,16 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.H"
+#include "fclaw2d_forestclaw.H"
+
 #include "fclaw2d_partition.h"
 #include "fclaw2d_physical_bc.h"
-#include "fclaw2d_vtable.h"
-#include "amr_utils.H"
 #include "fclaw2d_regrid.h"
-
-// Put this here so that I don't have to include "ClawPatch.H"
-// void set_clawpatch(fclaw2d_domain_t* domain, fclaw2d_patch_t *this_patch,
-//                    int blockno, int patchno);
 
 // This is essentially the same function that is in amr_regrid.cpp
 static

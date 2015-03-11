@@ -23,20 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.H"
-#include "fc2d_clawpack46.H"
 #include "sphere_user.H"
-#include "fclaw2d_vtable.h"
-#include "fclaw2d_regrid_default.h"
-#include <fclaw2d_output_ascii.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.H"
+#include "fc2d_clawpack46.H"
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -61,7 +51,6 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.rpt2 = &RPT2;
 
     fclaw2d_set_vtable(domain,&vt);
-
     fc2d_clawpack46_set_vtable(&classic_claw);
 }
 
@@ -88,11 +77,3 @@ void sphere_patch_setup(fclaw2d_domain_t *domain,
     SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,
                      &maux,aux,&this_block_idx,xd,yd,zd,area);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

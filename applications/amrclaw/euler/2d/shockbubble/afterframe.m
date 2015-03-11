@@ -11,6 +11,7 @@ caxis([0.1 2.81]);
 
 showpatchborders
 setpatchborderprops('linewidth',1);
+showgridlines(1:4);
 % hidepatchborders;
 
 prt = false;

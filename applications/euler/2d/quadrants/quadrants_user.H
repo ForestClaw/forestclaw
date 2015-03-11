@@ -26,6 +26,7 @@
 #ifndef QUADRANTS_USER_H
 #define QUADRANTS_USER_H
 
+#include "fclaw2d_forestclaw.H"
 #include "fclaw2d_clawpatch.H"
 #include "fc2d_clawpack46.H"
 

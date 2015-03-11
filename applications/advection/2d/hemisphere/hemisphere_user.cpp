@@ -23,18 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw2d.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
 #include "hemisphere_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.h"
+#include "fc2d_clawpack46.H"
 
 
 static fclaw2d_vtable_t vt;
@@ -85,11 +77,3 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                     &maux,aux,&this_block_idx,xd,yd,zd,area);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

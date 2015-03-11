@@ -23,30 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <forestclaw2d.h>
-#include <fclaw_options.h>
+#include "torus_user.H"
+
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_clawpatch.H"
 
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
-
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-#include <fclaw_options.h>
-
 #include <p4est_connectivity.h>
 
 #include <fc2d_clawpack46.H>
 
-#include <fclaw_register.h>
-#include "torus_user.H"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 typedef struct user_options
 {
@@ -129,7 +116,8 @@ options_destroy_user (fclaw_app_t * a, void *package, void *registered)
 }
 
 
-static const fclaw_app_options_vtable_t options_vtable_user =
+static const
+fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
     options_postprocess_user,
@@ -150,6 +138,7 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+static
 void run_program(fclaw_app_t* app)
 {
     sc_MPI_Comm            mpicomm;
@@ -272,7 +261,7 @@ main (int argc, char **argv)
 
     /* Link packages to patches */
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     if (!retval & !vexit)
     {
@@ -284,10 +273,3 @@ main (int argc, char **argv)
 
     return 0;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

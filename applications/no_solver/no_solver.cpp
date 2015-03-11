@@ -24,23 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "no_solver_user.H"
-#include <forestclaw2d.H>
-#include <fclaw2d_clawpatch.H>
-#include <fclaw_base.h>
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
-#include <fclaw2d_map_query.h>
-#include <fclaw_register.h>
 
-#include <amr_utils.H>
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
 
 typedef struct user_options
 {
@@ -202,7 +188,7 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     if (!retval & !vexit)
     {
@@ -214,10 +200,3 @@ main (int argc, char **argv)
 
     return 0;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

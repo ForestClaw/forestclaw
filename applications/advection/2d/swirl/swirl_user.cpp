@@ -25,22 +25,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-#include "forestclaw2d.h"
+#include "fclaw2d_forestclaw.h"
 #include <fclaw2d_clawpatch.H>
 #include "fc2d_clawpack46.H"
 #include "fc2d_dummy.H"
-#include "fclaw2d_vtable.h"
 
+/* Leave these in for demonstration purposes */
 #include <fclaw2d_output_ascii.h>
 #include <fclaw2d_regrid_default.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -213,11 +205,3 @@ int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch;
 
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

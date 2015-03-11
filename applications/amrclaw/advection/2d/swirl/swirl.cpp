@@ -23,21 +23,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_options.h>
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
-
-#include <fc2d_clawpack46.H>
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>
-
-#include <fclaw_options.h>
-
-#include <p4est_connectivity.h>
-
-#include <fclaw_register.h>
-
 #include "swirl_user.H"
+
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -145,7 +135,7 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     if (!retval & !vexit)
     {

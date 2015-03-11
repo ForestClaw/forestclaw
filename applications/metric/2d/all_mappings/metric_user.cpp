@@ -23,22 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "ClawPatch.H"
-#include "fclaw2d_map_query.h"
-#include "fclaw2d_clawpatch.h"
-#include "fclaw2d_physical_bc.h"
-#include "fclaw2d_vtable.h"
-
 #include "metric_user.H"
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "ClawPatch.H"
+#include "fclaw2d_physical_bc.h"
 
 static fclaw2d_vtable_t vt;
 
@@ -96,12 +86,3 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
     initialize(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,
                error_ptr,curvature,area);
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

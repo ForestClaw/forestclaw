@@ -42,7 +42,6 @@ extern "C"
 #endif
 #endif
 
-void link_app_to_clawpatch(fclaw_app_t* app);
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app);
 
 

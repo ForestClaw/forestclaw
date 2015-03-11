@@ -23,19 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <amr_includes.H>
-#include <fc2d_clawpack46.H>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_regrid.h>
 #include "mountain_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
+
 
 static fc2d_clawpack46_vtable_t classic_claw;
 static fclaw2d_vtable_t vt;
@@ -92,13 +85,3 @@ double mountain_patch_update(fclaw2d_domain_t *domain,
     /* Don't do anything */
     return gparms->desired_cfl;
 }
-
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

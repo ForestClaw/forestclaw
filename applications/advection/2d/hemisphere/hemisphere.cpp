@@ -23,17 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fc2d_clawpack46.H>
+#include "hemisphere_user.H"
+#include "fc2d_clawpack46.H"
+#include "fclaw2d_clawpatch.H"
+
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
-
-#include <amr_forestclaw.H>
-#include <amr_utils.H>
 #include <fclaw2d_map_query.h>
 
-#include <fclaw_register.h>
-
-#include "hemisphere_user.H"
 
 typedef struct user_options
 {
@@ -183,7 +180,7 @@ int main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    link_app_to_clawpatch(app);
+    fclaw2d_clawpatch_link_app(app);
 
     if (!retval & !vexit)
     {

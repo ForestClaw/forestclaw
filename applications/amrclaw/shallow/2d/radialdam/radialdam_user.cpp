@@ -23,19 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_forestclaw.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_vtable.h"
 #include "radialdam_user.H"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
+#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46.H"
 
 static fclaw2d_vtable_t vt;
 static fc2d_clawpack46_vtable_t classic_claw;
@@ -68,12 +60,3 @@ void radialdam_problem_setup(fclaw2d_domain_t* domain)
     RADIALDAM_SETPROB(&user->g, &user->x0, &user->y0, &user->r0,
                       &user->hin, &user->hout);
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
