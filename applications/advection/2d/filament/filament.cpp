@@ -24,12 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "filament_user.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_clawpatch.H"
 
-#include "fclaw2d_map.h"
-#include "p4est_connectivity.h"
-#include "fclaw2d_map_query.h"
+#include <fclaw2d_clawpatch.hpp>
+#include <fc2d_clawpack46.H>
+
+#include <fclaw2d_map.h>
+#include <p4est_connectivity.h>
+#include <fclaw2d_map_query.h>
 
 #include <fclaw_math.h>
 

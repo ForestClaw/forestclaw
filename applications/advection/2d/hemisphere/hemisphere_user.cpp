@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hemisphere_user.H"
 
-#include "fclaw2d_forestclaw.h"
-#include "fc2d_clawpack46.H"
+#include <fclaw2d_forestclaw.h>
+#include <fc2d_clawpack46.H>
 
 
 static fclaw2d_vtable_t vt;

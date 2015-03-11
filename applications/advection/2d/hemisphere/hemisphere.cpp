@@ -24,8 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "hemisphere_user.H"
-#include "fc2d_clawpack46.H"
-#include "fclaw2d_clawpatch.H"
+
+#include <fc2d_clawpack46.H>
+#include <fclaw2d_clawpatch.hpp>
 
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>

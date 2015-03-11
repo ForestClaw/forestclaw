@@ -22,17 +22,17 @@ include applications/no_solver/Makefile.am
 include applications/advection/2d/swirl_mapped/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
 include applications/advection/2d/torus/Makefile.am
-###   include applications/advection/2d/hemisphere/Makefile.am
-###   include applications/advection/2d/filament/Makefile.am
-###   include applications/advection/2d/sphere/Makefile.am
-###   
+include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/filament/Makefile.am
+include applications/advection/2d/sphere/Makefile.am
+
 ###   # NCAR Transport problems on the sphere
 ###   include applications/NCAR_transport/slotted_disk/Makefile.am
 ###   include applications/NCAR_transport/correlatedcb/Makefile.am
-###   
-###   # Euler example (with mappings)
-###   include applications/euler/2d/quadrants/Makefile.am
-###   
+
+# Euler example (with mappings)
+include applications/euler/2d/quadrants/Makefile.am
+
 ###   # Mountain problem - SSE
 ###   include applications/Mountain/Makefile.am
 ###   
