@@ -116,7 +116,7 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
     if (gparms->mpi_debug)
     {
         fclaw_global_infof("Entering mpi_debug session");
-          fclaw2d_mpi_debug();
+        fclaw_mpi_debug ();
     }
 
     if (gparms->trapfpe)

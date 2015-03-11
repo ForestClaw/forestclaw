@@ -23,15 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <p4est_base.h>
-#include "fclaw_mpi.h"
+#include <fclaw_mpi.h>
 
 /* Functions with C prototypes to use forestclaw from C code */
 
 void
 fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
 {
-#ifdef P4EST_MPI
+#ifdef P4EST_ENABLE_MPI
     int mpiret;
 
     //mpiret = sc_MPI_Init (argc, argv);
@@ -39,12 +38,14 @@ fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
 
     int provided;
     mpiret = sc_MPI_Init_thread (argc, argv, sc_MPI_THREAD_FUNNELED, &provided);
-    if (provided != sc_MPI_THREAD_FUNNELED) printf("Recieved mpi_init_thread level %d\n", provided);
+    if (provided != sc_MPI_THREAD_FUNNELED) {
+        printf("Recieved mpi_init_thread level %d\n", provided);
+    }
     SC_CHECK_MPI (mpiret);
+#endif
 
     sc_init (mpicomm, 0, 0, NULL, lp);
     p4est_init (NULL, lp);
-#endif
 }
 
 void
@@ -54,6 +55,53 @@ fclaw_mpi_finalize (void)
 
     sc_finalize ();
 
+    /* With P4EST_ENABLE_MPI, MPI_Init and MPI_Finalize must match up.
+     * Without it does not matter. */
     mpiret = sc_MPI_Finalize ();
     SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_mpi_debug (void)
+{
+#ifdef FCLAW_ENABLE_MPI
+  int i;
+
+  /* Find out process rank */
+  int my_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+  /* Find out number of processes */
+  int num;
+  MPI_Comm_size(MPI_COMM_WORLD, &num);
+
+  /* Don't do anything until we are done with this part */
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (my_rank == 0)
+  {
+      printf("\n");
+      printf("Getting setup for parallel debugging\n");
+      printf("------------------------------------\n");
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  for(i = 0; i < num; i++)
+  {
+      if (my_rank == i)
+      {
+          printf("Proc %d with process %d is waiting to be attached\n",my_rank,getpid());
+          fflush(stdout);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+  }
+
+  int ii = 0;
+  while (ii == 0)  /* (gdb) set ii=1 */
+  {
+    /* Code will stop here;  set ii=1 to continue in gdb */
+  }
+
+#else
+    fclaw_global_infof
+      ("Option --mpi_debug is set, but code is not compiled for MPI");
+#endif
 }

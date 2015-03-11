@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_MPI_H
 #define FCLAW_MPI_H
 
-#include "fclaw_mpi.h"
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -44,8 +44,7 @@ fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp);
 void
 fclaw_mpi_finalize (void);
 
-/* These two are defined in amr_utils.cpp */
-void fclaw2d_mpi_debug();
+void fclaw_mpi_debug (void);
 
 #ifdef __cplusplus
 #if 0
@@ -54,4 +53,4 @@ void fclaw2d_mpi_debug();
 }
 #endif
 
-#endif
+#endif /* !FCLAW_MPI_H */

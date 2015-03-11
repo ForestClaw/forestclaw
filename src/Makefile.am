@@ -59,7 +59,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map.c \
 	src/fclaw2d_vtk.c \
 	src/fclaw2d_transform.c \
-	src/fclaw2d_mpi_debug.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
 	src/fp_exception_glibc_extension.c \
