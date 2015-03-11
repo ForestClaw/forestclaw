@@ -53,7 +53,6 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 
     /* allocated storage for this package's option values */
     FCLAW_ASSERT (general != NULL);
-    FCLAW_ASSERT (!general->is_registered);
 
     fclaw_options_add_general (opt, general->amropt);
 
@@ -94,10 +93,8 @@ fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
     fclaw_options_general_t *general = (fclaw_options_general_t *) package;
-    sc_options_t *options;
     amr_options_t* gparms;
 
-    options = fclaw_app_get_options (app);
     gparms = general->amropt;
 
     /* Check outstyle. */

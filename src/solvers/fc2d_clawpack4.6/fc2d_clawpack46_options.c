@@ -43,7 +43,6 @@ options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (clawopt != NULL);
-    FCLAW_ASSERT (!clawopt->is_registered);
 
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
