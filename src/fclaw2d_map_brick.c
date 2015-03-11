@@ -5,16 +5,6 @@
 #include <fclaw2d_convenience.h>
 #include <fclaw2d_map_brick.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
-
 static int
 fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -125,10 +115,3 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
     write_brick_data_(&nb,&mi,&mj,bv->xv,bv->yv);
     return cont;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

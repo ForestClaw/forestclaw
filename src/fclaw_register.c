@@ -27,14 +27,6 @@
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 /* Register the forestClaw package and options */
 
 void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
@@ -52,10 +44,3 @@ void fclaw_forestclaw_destroy(fclaw_app_t* app)
 {
     fclaw_package_container_destroy(app);
 }
-
-#ifdef __cplusplus
-}
-#if 0
-{
-#endif
-#endif

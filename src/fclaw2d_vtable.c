@@ -23,16 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_vtable.h"
-#include "fclaw2d_regrid_default.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_regrid_default.h>
 
 /* Initialize any settings that can be set here */
 void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
@@ -81,11 +73,3 @@ fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)
     FCLAW_ASSERT(vt != NULL);
     return *vt;
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

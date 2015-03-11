@@ -60,15 +60,6 @@ To compile it under Linux, execute:
 /* Question: why does this file not include fp_exception_glibc_extension.h? */
 #include <fclaw_config.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
 
 #ifdef LINUX
@@ -134,7 +125,7 @@ fegetexcept (void)
 }
 
 int
-feenableexcept (unsigned int excepts)
+feenableexcept (int excepts)
 {
   static fenv_t fenv;
   unsigned int new_excepts = (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT,
@@ -148,7 +139,7 @@ feenableexcept (unsigned int excepts)
 }
 
 int
-fedisableexcept (unsigned int excepts)
+fedisableexcept (int excepts)
 {
   static fenv_t fenv;
   unsigned int still_on = ~( (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT ),
@@ -346,10 +337,3 @@ int main (int argc, char **argv)
 #endif
 
 #endif /* !FCLAW_HAVE_FEENABLEEXCEPT */
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

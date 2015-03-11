@@ -25,15 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_timer.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 /* -----------------------------------------------------------------
    Work with timers
    ----------------------------------------------------------------- */
@@ -77,10 +68,3 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
         SC_ABORT_NOT_REACHED ();
     }
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

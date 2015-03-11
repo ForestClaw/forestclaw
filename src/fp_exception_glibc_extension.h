@@ -9,11 +9,12 @@
 
 */
 
-#ifndef __FENV_H_LINUX_REPLACEMENT__
-#define __FENV_H_LINUX_REPLACEMENT__
+#ifndef FENV_H_LINUX_REPLACEMENT
+#define FENV_H_LINUX_REPLACEMENT
 
-//#include <fenv.h>
+/* #include <fenv.h> */
 #include <signal.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,9 +37,9 @@ extern "C" {
      to suggest that it's the mask corresponding to bits in
      excepts that is returned.
   */
-  int fegetexcept (void) ;
-  int feenableexcept (unsigned int excepts) ;
-  int fedisableexcept (unsigned int excepts) ;
+  int fegetexcept (void);
+  int feenableexcept (int excepts);
+  int fedisableexcept (int excepts);
 
   /* SAMPLE ALTERNATE FP EXCEPTION HANDLER
 
@@ -60,5 +61,4 @@ extern "C" {
 }
 #endif
 
-
-#endif // __FENV_H_LINUX_REPLACEMENT__
+#endif /* !FENV_H_LINUX_REPLACEMENT */

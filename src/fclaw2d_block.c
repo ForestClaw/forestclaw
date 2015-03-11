@@ -25,21 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 void init_block_data(fclaw2d_block_t *block)
 {
     fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
     block->user = (void *) bdata;
 }
-
 
 fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
 {
@@ -72,10 +62,3 @@ void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
         intersects_block[iside] = is_block_face;
     }
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

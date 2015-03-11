@@ -84,7 +84,9 @@ fclaw_package_container_destroy(fclaw_app_t *app)
     fclaw_package_t *pkg;
     fclaw_package_container_t *pkg_container;
 
-    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute (app, "packages", NULL);
+    FCLAW_ASSERT (pkg_container != NULL);
 
     for(i = 0; i < pkg_container->count; i++)
     {
@@ -104,8 +106,9 @@ int
     fclaw_package_t *new_pkg;
     fclaw_package_container_t *pkg_container;
 
-    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
-    FCLAW_ASSERT(pkg_container != NULL);
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute (app, "packages", NULL);
+    FCLAW_ASSERT (pkg_container != NULL);
 
     FCLAW_ASSERT(pkg_container->count < FCLAW_MAX_PACKAGES);
     id = pkg_container->count++;
@@ -124,7 +127,10 @@ void
     int i;
     fclaw_package_t *pkg;
     fclaw_package_container_t* pkg_container;
-    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
+
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute(app,"packages",NULL);
+
     if (pkg_container != NULL)
     {
 
@@ -145,7 +151,10 @@ void
     int i;
     fclaw_package_t *pkg;
     fclaw_package_container_t* pkg_container;
-    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
+
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute(app, "packages", NULL);
+
     if (pkg_container != NULL)
     {
         for(i = 0; i < pkg_container->count; i++)
@@ -167,9 +176,11 @@ void* fclaw_package_get_options(fclaw_app_t* app, int id)
 {
     fclaw_package_t *pkg;
     fclaw_package_container_t* pkg_container;
-    pkg_container = fclaw_app_get_attribute(app,"packages",NULL);
-    FCLAW_ASSERT(pkg_container != NULL);
-    FCLAW_ASSERT(0 <= id  && id < pkg_container->count);
+
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute (app, "packages", NULL);
+    FCLAW_ASSERT (pkg_container != NULL);
+    FCLAW_ASSERT (0 <= id && id < pkg_container->count);
     pkg = pkg_container->pkgs[id];
     return pkg->options;
 }

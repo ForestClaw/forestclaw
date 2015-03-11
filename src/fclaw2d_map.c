@@ -25,14 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_map.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
 /* This function can be called from Fortran inside of ClawPatch. */
 void
 FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
@@ -536,9 +528,3 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *yp = vrot[1];
     *zp = vrot[2];
 }
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif
