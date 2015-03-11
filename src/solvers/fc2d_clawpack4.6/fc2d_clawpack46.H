@@ -27,9 +27,10 @@
 #define FC2D_CLAWPACK46_H
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.H>
-#include "fc2d_clawpack46_options.h"
+#include <fclaw2d_clawpatch.hpp>
 #include <fclaw_package.h>
+
+#include "fc2d_clawpack46_options.h"
 
 #ifdef __cplusplus
 extern "C"

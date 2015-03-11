@@ -27,10 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_TYPEDEFS_H
 
 /* this header file must come first */
-#include "fclaw2d_defs.H"
+#include <fclaw2d_defs.h>
 
-#include "fclaw_options.h"
-#include "forestclaw2d.h"
+#include <fclaw_options.h>
+#include <forestclaw2d.h>
 
 
 typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;

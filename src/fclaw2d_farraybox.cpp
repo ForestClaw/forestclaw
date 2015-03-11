@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_farraybox.H"
-#include "fclaw2d_defs.H"
+#include <fclaw2d_farraybox.H>
+#include <fclaw2d_defs.h>
 
 /* Difference in nan values :
    The first one is not trapped; the second one is.

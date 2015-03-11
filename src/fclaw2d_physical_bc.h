@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_PHYSICAL_BC_H
 #define FCLAW2D_PHYSICAL_BC_H
 
-#include "fclaw2d_defs.H"
+#include <fclaw2d_defs.h>
 
 #ifdef __cplusplus
 extern "C"

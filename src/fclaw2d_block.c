@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_forestclaw.h"
+#include <fclaw2d_forestclaw.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -49,7 +49,9 @@ fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
 void set_block_data(fclaw2d_block_t *block, const int mthbc[])
 {
     fclaw2d_block_data_t *bdata = get_block_data(block);
-    for(int i = 0; i < 4; i++)
+    int i;
+
+    for (i = 0; i < 4; i++)
     {
         bdata->mthbc[i] = mthbc[i];
     }
@@ -59,7 +61,9 @@ void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
                                       fclaw2d_patch_t * patch,
                                       fclaw_bool *intersects_block)
 {
-    for (int iside = 0; iside < NumFaces; iside++)
+    int iside;
+
+    for (iside = 0; iside < NumFaces; iside++)
     {
         int iface_flags = fclaw2d_patch_block_face_flags[iside];
         int is_block_face = (patch->flags & iface_flags) != 0;

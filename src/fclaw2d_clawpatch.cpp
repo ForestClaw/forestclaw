@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.hpp>
 
-#include "ClawPatch.H"
+#include <ClawPatch.H>
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {

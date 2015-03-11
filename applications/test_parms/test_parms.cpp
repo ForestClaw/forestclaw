@@ -23,7 +23,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_forestclaw.H"
+#include "fclaw2d_forestclaw.h"
 #include "fc2d_clawpack46.H"
 
 typedef struct user_options

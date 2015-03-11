@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_USER_H
 #define TORUS_USER_H
 
-#include "fclaw2d_clawpatch.H"
+#include <fclaw2d_clawpatch.hpp>
 
 #ifdef __cplusplus
 extern "C"

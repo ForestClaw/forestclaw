@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_forestclaw.H"
+#include <fclaw2d_forestclaw.h>
 
-#include "fclaw2d_partition.h"
-#include "fclaw2d_physical_bc.h"
-#include "fclaw2d_regrid.h"
+#include <fclaw2d_partition.h>
+#include <fclaw2d_physical_bc.h>
+#include <fclaw2d_regrid.h>
 
 // This is essentially the same function that is in amr_regrid.cpp
 static

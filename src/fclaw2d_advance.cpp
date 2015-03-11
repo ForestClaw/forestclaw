@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "fclaw2d_advance.H"
-#include "fclaw2d_timeinterp.H"
+#include <fclaw2d_advance.H>
+#include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
-#include <amr_single_step.H>
+#include <amr_single_step.h>
 #include <math.h>
 #include <amr_includes.H>
 #include <fclaw_base.h>

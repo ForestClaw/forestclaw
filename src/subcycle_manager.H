@@ -27,11 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SUBCYCLE_MANAGER_H
 
 /* this header file must come first */
-#include "fclaw2d_defs.H"
+#include <fclaw2d_defs.h>
 
-#include "fclaw2d_convenience.h"
-#include "forestclaw2d.h"
-#include "fclaw_options.h"
+#include <fclaw2d_convenience.h>
+#include <fclaw2d_forestclaw.h>
+#include <fclaw_options.h>
 
 #include <iostream>
 #include <cstdlib>

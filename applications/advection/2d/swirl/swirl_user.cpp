@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-#include "fclaw2d_forestclaw.h"
-#include <fclaw2d_clawpatch.H>
-#include "fc2d_clawpack46.H"
-#include "fc2d_dummy.H"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.hpp>
+#include <fc2d_clawpack46.H>
+#include <fc2d_dummy.H>
 
 /* Leave these in for demonstration purposes */
 #include <fclaw2d_output_ascii.h>

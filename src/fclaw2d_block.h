@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_BLOCK_H
 #define FCLAW2D_BLOCK_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_defs.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_defs.h>
 
 #ifdef __cplusplus
 extern "C"

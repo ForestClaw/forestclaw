@@ -24,12 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_clawpack46.H"
-#include <fclaw2d_forestclaw.H>
-#include "fclaw2d_clawpatch.H"
+#include "fc2d_clawpack46_options.h"
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.hpp>
 #include <ClawPatch.H>
 
-#include "fc2d_clawpack46_options.h"
-#include "fclaw_options.h"
+#include <fclaw_options.h>
 
 static int s_clawpack46_package_id = -1;
 

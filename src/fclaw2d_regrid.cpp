@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <amr_utils.H>
 #include "fclaw2d_partition.h"
 #include <fclaw2d_vtable.h>
-#include "fclaw2d_clawpatch.H"
+#include <fclaw2d_clawpatch.hpp>
 
 #ifdef __cplusplus
 extern "C"

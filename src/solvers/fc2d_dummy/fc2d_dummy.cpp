@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_dummy.H"
-#include "fclaw2d_clawpatch.H"
+#include <fclaw2d_clawpatch.hpp>
 #include <clawpack_fort.H>
 #include <amr_utils.H>
 

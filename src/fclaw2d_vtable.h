@@ -26,9 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include "forestclaw2d.h"
-#include "fclaw_base.h"
-#include "fclaw2d_defs.H"
+#include <forestclaw2d.h>
+#include <fclaw_base.h>
+#include <fclaw2d_defs.h>
 
 #include <fclaw2d_output.h>
 #include <fclaw2d_output_ascii.h>

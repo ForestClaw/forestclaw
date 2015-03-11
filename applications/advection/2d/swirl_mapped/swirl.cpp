@@ -25,12 +25,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-#include "fclaw2d_clawpatch.H"
-#include "fc2d_clawpack46.H"
+#include <fclaw2d_clawpatch.hpp>
+#include <fc2d_clawpack46.H>
 
-#include "p4est_connectivity.h"
-#include "fclaw2d_map.h"
-#include "fclaw2d_map_query.h"
+#include <p4est_connectivity.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_map_query.h>
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)

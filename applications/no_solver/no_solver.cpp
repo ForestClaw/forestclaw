@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "no_solver_user.H"
 
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.hpp>
 
 typedef struct user_options
 {
