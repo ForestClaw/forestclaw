@@ -24,8 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "quadrants_user.H"
-#include "fclaw2d_clawpatch.H"
-#include "fc2d_clawpack46.H"
+
+#include <fclaw2d_clawpatch.hpp>
+#include <fc2d_clawpack46.H>
 
 
 static void *
