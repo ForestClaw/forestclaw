@@ -137,6 +137,12 @@ void amrinit (fclaw2d_domain_t **domain)
     for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
         fclaw2d_timer_init (&ddata->timers[i]);
     }
+
+    /* set specific refinement strategy */
+    fclaw2d_domain_set_refinement
+      (*domain, gparms->smooth_refine, gparms->coarsen_delay);
+
+    /* start timing */
     fclaw2d_domain_barrier (*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);

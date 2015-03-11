@@ -40,7 +40,6 @@ void init_domain_data(fclaw2d_domain_t *domain)
     ddata->domain_exchange = NULL;
 
     ddata->curr_time = 0;
-
 }
 
 void delete_domain_data(fclaw2d_domain_t* domain)
