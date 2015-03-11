@@ -128,7 +128,7 @@ int
 feenableexcept (int excepts)
 {
   static fenv_t fenv;
-  unsigned int new_excepts = (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT,
+  int new_excepts = (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT,
                old_excepts;  // all previous masks
 
   if ( fegetenv (&fenv) ) return -1;
@@ -142,7 +142,7 @@ int
 fedisableexcept (int excepts)
 {
   static fenv_t fenv;
-  unsigned int still_on = ~( (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT ),
+  int still_on = ~( (excepts & FE_ALL_EXCEPT) >> FE_EXCEPT_SHIFT ),
                old_excepts;  // previous masks
 
   if ( fegetenv (&fenv) ) return -1;
@@ -163,10 +163,10 @@ fegetexcept (void)
 }
 
 int
-feenableexcept (unsigned int excepts)
+feenableexcept (int excepts)
 {
   static fenv_t fenv;
-  unsigned int new_excepts = excepts & FE_ALL_EXCEPT,
+  int new_excepts = excepts & FE_ALL_EXCEPT,
                old_excepts;  // previous masks
 
   if ( fegetenv (&fenv) ) return -1;
@@ -180,10 +180,10 @@ feenableexcept (unsigned int excepts)
 }
 
 int
-fedisableexcept (unsigned int excepts)
+fedisableexcept (int excepts)
 {
   static fenv_t fenv;
-  unsigned int new_excepts = excepts & FE_ALL_EXCEPT,
+  int new_excepts = excepts & FE_ALL_EXCEPT,
                old_excepts;  // all previous masks
 
   if ( fegetenv (&fenv) ) return -1;
@@ -259,7 +259,7 @@ void
 fhdl ( int sig, siginfo_t *sip, ucontext_t *scp )
 {
   int fe_code = sip->si_code;
-  unsigned int excepts = fetestexcept (FE_ALL_EXCEPT);
+  int excepts = fetestexcept (FE_ALL_EXCEPT);
 
   switch (fe_code)
   {
