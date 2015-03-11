@@ -25,29 +25,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_math.h>
 
-#ifdef __cplusplus
-extern "C"
+/*
+ * Integer power routine from:
+ * http://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
+ *
+ * Thanks to the bfam developers for finding this: www.bfam.in.
+ */
+int
+pow_int (int base, int exp)
 {
-#if 0
-}
-#endif
-#endif
+    int result = 1;
 
-int pow_int(int a, int n)
-{
-    int b = 1;
-    int i;
-    for(i = 0; i < n; i++)
+    FCLAW_ASSERT (exp >= 0);
+
+    while (exp)
     {
-        b *= a;
+        if (exp & 1)
+        {
+            result *= base;
+        }
+        exp >>= 1;
+        base *= base;
     }
-    return b;
-}
 
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
+    return result;
 }
-#endif

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_MATH_H
 #define FCLAW_MATH_H
 
-#include <fclaw_math.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,12 @@ extern "C"
 #endif
 #endif
 
-int pow_int(int a, int n);
+/** Compute the integer exponential.
+ * \param [in] a        The base of the exponentiation.
+ * \param [in] n        The exponent.  Must be non-negative.
+ * \return              Returns a to the nth power.
+ */
+int pow_int (int a, int n);
 
 #ifdef __cplusplus
 #if 0
@@ -45,4 +50,4 @@ int pow_int(int a, int n);
 }
 #endif
 
-#endif
+#endif /* !FCLAW_MATH_H */
