@@ -221,7 +221,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             int neighbor_block_idx;
             int neighbor_level;   /* = -1, 0, 1 */
             int *ref_flag_ptr = &neighbor_level;
-            int fine_grid_pos;
+            int fine_grid_pos = -1;
             int *fine_grid_pos_ptr = &fine_grid_pos;
 
             /* Get the face neighbor relative to the neighbor's coordinate
@@ -303,6 +303,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
                 int iface_coarse = iface_neighbor;
                 int this_face = iface;
+
+                /* make sure we are not using an unintialized variable */
+                FCLAW_ASSERT (fine_grid_pos_ptr != NULL);
+                FCLAW_ASSERT (fine_grid_pos != -1);
 
                 /* Redo the transformation */
                 if (neighbor_block_idx >= 0)
