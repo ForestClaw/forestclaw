@@ -1,10 +1,48 @@
+Milestones sorted by paper
 
-1. Non-overlapping parallel advection in 2D, no subcycling.
+A. Basic forestclaw paper with global and local time stepping
 
-2. Use generic multiblock meshes and generic per-block geometry mappings.
+ 1. Put the parallel algorithm for global-dt ghost sync into the paper.
+ 2. Implement and test the parallel algorithm for global-dt ghost sync.
+ 3. Put the parallel algorithm for subcycling ghost exchange into paper.
+ 4. Implement and test parallel algorithm for subcycling ghost exchange.
+ 5. Compare storing and computing of metric terms; optimize.
+ 6. Benchmark uniform and adaptive h-convergence for known exact solution.
+ 7. Benchmark parallel scalability for uniform/adaptive, global/local dt.
+ 8. Audit code to remove repeated iterate-all-patches calls.
+ 9. Discuss why we are not doing multiblock corners > 4 and how it might go.
+10. Discuss why we are not doing DG.
 
-3. Enable subcycling and make it work in parallel.
+A (maybe goes into the paper).
 
-4. Enable solvers that require shadow patches and make it work in parallel.
+11. Implement conservation fix or discuss why not and how it would go.
+12. Figure out how to run multiblock boundaries with 2nd order.
+13. Figure out to regrid inside the subcycling.
 
-5. Extend everything to 3D.
+B. Code release
+
+14. When changes stay same size on regrid, move pointers instead of copy data.
+15. Make VTK field names configurable and hook it into the vtable.
+16. Decide on the toplevel object and implement it.
+17. Clean up .h files and make forestclaw usable as a library.
+18. Encapsulate the domain, block, and patch structures.
+19. Isolate Clawpatch as much as possible from the rest of forestclaw.
+20. Figure out the remaining option, file, and package handling.
+21. Move timers into their proper place in the code.
+22. Figure out how to handle mapping, queries, and chaining.
+
+C. Refinement paper
+
+23. Describe the ghost exchange logic, mirrors, and associated p4est features
+24. Compare min/max refinement/coarsening indicators with energy-based ones
+25. Play with smooth_refine and coarsen_delay
+26. Compare our best results with amrclaw
+
+D. MOL paper
+
+27. Implement method of lines, use generic ODE solvers/RK.
+28. Enable solvers that require shadow patches and make it work in parallel.
+
+E. 2.5 D atmospheric flow / terrain following / topography
+
+F. Extend everything to 3D.
