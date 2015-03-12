@@ -276,6 +276,39 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* Be careful with minlevel-maxlevel */
 
+    /* IDEA 1: add boolean about on_parallel_boundary vs. interior.
+     *         1. Do the parallel boundary work here.
+     *            To the least possible amount of work before sending.
+     *             * copy_ghost_samelevel
+     *             * average_ghost_f2c
+     *             * fill_physical_ghost
+     *               (which subset of cells shall do it?)
+     *               (maybe we can skip doing it before sending altogether?)
+     *            More specifically, only copy/average across faces
+     *            between two parallel boundary patches, not corners.
+     *            Argue in paper why no corners needed for 5-point stencils.
+     *         2. Start sending: ghost_exchange_begin.
+     *         3. Do all the work on interior patches and whatever has not
+     *            been computed between parallel boundary patches.
+     *            Do the most possible amount of work while communicating.
+     *             * copy_ghost_samelevel
+     *             * average_ghost_f2c
+     *             * fill_physical_ghost
+     *               (how much of this can we possibly to here: maximize this.)
+     *             * interpolate_ghost_c2f for interior patches and
+     *               faces between parallel boundary and interior patches.
+     *         4. Recieve messages: ghost_exchange_end.
+     *         5. Work on receive buffers / parallel patches with remote data.
+     *             * copy_ghost_samelevel
+     *             * average_ghost_f2c
+     *             * fill_physical_ghost
+     *             * interpolate_ghost_c2f
+     *         6. Repeat 5. for whatever parts of patches that are not done yet.
+     *            Integrate this with 5. so we don't loop over patches twice.
+     *
+     * All of this goes into the paper as detailed algorithm with explanations.
+     */
+
     /* Copy ghost cells at coarse levels.  Include finest level, although it isn't
        needed immediately */
     fclaw_bool read_parallel_patches = fclaw_false;
