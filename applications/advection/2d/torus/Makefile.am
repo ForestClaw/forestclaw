@@ -1,6 +1,7 @@
 ## Makefile.am in applications/advection/2d/sphere
 
-bin_PROGRAMS += applications/advection/2d/torus/torus
+bin_PROGRAMS += applications/advection/2d/torus/torus \
+		applications/advection/2d/torus/torthem
 
 applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/torus_user.cpp \
@@ -23,3 +24,6 @@ applications_advection_2d_torus_torus_CPPFLAGS = \
 
 applications_advection_2d_torus_torus_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
+
+applications_advection_2d_torus_torthem_SOURCES = \
+	applications/advection/2d/torus/torthem.c
