@@ -82,6 +82,8 @@ torthem_init (torthem_t * torthem)
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus postprocess error");
     et = torus_options_check (user);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus check error");
+
+    glob->pkgs = fclaw_package_container_new ();
 }
 
 static void
@@ -92,6 +94,9 @@ torthem_run (torthem_t * torthem)
 static void
 torthem_reset (torthem_t * torthem)
 {
+    fclaw2d_global_t *glob = &torthem->global;
+
+    fclaw_package_container_destroy (glob->pkgs);
     torus_options_reset (&torthem->user);
     fclaw_options_reset (&torthem->global.gparms);
 }

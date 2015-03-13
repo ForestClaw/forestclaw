@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_GLOBAL_H
 
 #include <fclaw_options.h>
+#include <fclaw_package.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -55,7 +56,8 @@ extern const int NumSiblings;
 
 typedef struct fclaw2d_global
 {
-  fclaw_options_t gparms;
+  fclaw_options_t gparms;               /**< Option values for forestclaw. */
+  fclaw_package_container_t *pkgs;      /**< Solver packages for internal use. */
 }
 fclaw2d_global_t;
 
