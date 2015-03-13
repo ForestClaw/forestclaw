@@ -24,12 +24,13 @@
 */
 
 #include "sphere_user.H"
-#include "fclaw2d_forestclaw.h"
-#include "fc2d_clawpack46.H"
 
-#include "fclaw2d_map.h"
-#include "fclaw2d_map_query.h"
-#include "p4est_connectivity.h"
+#include <fclaw2d_forestclaw.h>
+#include <fc2d_clawpack46.h>
+
+#include <fclaw2d_map.h>
+#include <fclaw2d_map_query.h>
+#include <p4est_connectivity.h>
 
 typedef struct user_options
 {

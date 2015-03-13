@@ -27,13 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "torus_user.H"
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
 #include <p4est_connectivity.h>
 
-#include <fc2d_clawpack46.H>
+#include <fc2d_clawpack46.h>
 
 
 static void *

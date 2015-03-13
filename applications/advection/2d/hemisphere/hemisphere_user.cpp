@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hemisphere_user.H"
 
 #include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack46.H>
+#include <fc2d_clawpack46.h>
 
 
 static fclaw2d_vtable_t vt;
@@ -71,7 +71,7 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_define_auxarray2(domain,this_patch);
+    fc2d_clawpack46_define_auxarray(domain,this_patch);
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,

@@ -27,7 +27,6 @@
 #define FC2D_CLAWPACK46_H
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
 #include <fclaw_package.h>
 
 #include "fc2d_clawpack46_options.h"
@@ -39,7 +38,6 @@ extern "C"
 }
 #endif
 #endif
-
 
 
 typedef void (*fc2d_clawpack46_setprob_t)();
@@ -261,16 +259,10 @@ int FC2D_CLAWPACK46_GET_BLOCK();
 void CLAWPACK46_UNSET_BLOCK();
 
 /* -------------------------------------------------------------------------
-   Old routines (that need to be replaced)
-   ------------------------------------------------------------------------- */
-void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain, ClawPatch *cp);
-void fc2d_clawpack46_get_auxarray(fclaw2d_domain_t* domain,
-                                 ClawPatch *cp, double **aux, int* maux);
-
-/* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc2d_clawpack46_define_auxarray2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch);
+void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch);
 
 void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
@@ -374,4 +366,4 @@ fc2d_clawpack46_update(fclaw2d_domain_t *domain,
 #endif
 
 
-#endif
+#endif /* !FC2D_CLAWPACH46_H */
