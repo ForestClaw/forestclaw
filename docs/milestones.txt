@@ -37,6 +37,7 @@ C. Refinement paper
 24. Compare min/max refinement/coarsening indicators with energy-based ones
 25. Play with smooth_refine and coarsen_delay
 26. Compare our best results with amrclaw
+26b. Implement 4:1 refinement
 
 D. MOL paper
 
