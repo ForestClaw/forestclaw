@@ -56,7 +56,8 @@ typedef struct fclaw2d_level_time_data
     double dt_coarse;
     bool is_coarsest;
     bool fixed_dt;
-}fclaw2d_level_time_data_t;
+}
+fclaw2d_level_time_data_t;
 
 double advance_all_levels (fclaw2d_domain_t * domain,
                            subcycle_manager * a_time_stepper);

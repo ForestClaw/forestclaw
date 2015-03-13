@@ -30,27 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <sc.h>
 
-/* Some convenient preprocessor directives *
- * TODO: Having static int in a .H file leads to multiple definitions.
- *       Rather use extern const int declares and define them in a .c file.
- */
-
-#define FCLAW_SPACEDIM 2
-static const int SpaceDim = FCLAW_SPACEDIM;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW_NUMFACES (2 * FCLAW_SPACEDIM)
-static const int NumFaces = FCLAW_NUMFACES;
-
-#define FCLAW_P4EST_REFINE_FACTOR 2
-static const int p4est_refineFactor = FCLAW_P4EST_REFINE_FACTOR;
-
-#define FCLAW_NUM_CORNERS 4
-static const int NumCorners = FCLAW_NUM_CORNERS;
-
-#define FCLAW_NUM_SIBLINGS 4
-static const int NumSiblings = FCLAW_NUM_SIBLINGS;
 
 /* change to P4EST_BOOL ?
  * No, p4est does not know about bool and works with pure int */

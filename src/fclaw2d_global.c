@@ -23,39 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TYPEDEFS_H
-#define FCLAW2D_TYPEDEFS_H
+#include <fclaw2d_global.h>
 
-/* this header file must come first */
-#include <fclaw2d_defs.h>
-
-#include <fclaw_options.h>
-#include <forestclaw2d.h>
-
-
-typedef struct fclaw2d_level_time_data fclaw2d_level_time_data_t;
-
-/* -----------------------------------------------------------
-   Data needed for time stepping
-   ----------------------------------------------------------- */
-struct fclaw2d_level_time_data
-{
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
-
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
-
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
-};
-
-#endif
+const int SpaceDim = FCLAW2D_SPACEDIM;
+const int NumFaces = FCLAW2D_NUMFACES;
+const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+const int NumCorners = FCLAW2D_NUM_CORNERS;
+const int NumSiblings = FCLAW2D_NUM_SIBLINGS;

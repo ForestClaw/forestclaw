@@ -23,45 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BLOCK_H
-#define FCLAW2D_BLOCK_H
+#ifndef FCLAW2D_GLOBAL_H
+#define FCLAW2D_GLOBAL_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_defs.h>
+#include <fclaw_options.h>
 
-#ifdef __cplusplus
-extern "C"
+#define FCLAW2D_SPACEDIM 2
+extern const int SpaceDim;
+
+/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
+   avoid any confusion in the 2d case. */
+#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
+extern const int NumFaces;
+
+#define FCLAW2D_P4EST_REFINE_FACTOR 2
+extern const int p4est_refineFactor;
+
+#define FCLAW2D_NUM_CORNERS 4
+extern const int NumCorners;
+
+#define FCLAW2D_NUM_SIBLINGS 4
+extern const int NumSiblings;
+
+typedef struct fclaw2d_global
 {
-#if 0
+  fclaw_options_t gparms;
 }
-#endif
-#endif
+fclaw2d_global_t;
 
-typedef struct fclaw2d_block_data
-{
-    int mthbc[FCLAW2D_NUMFACES];  /* >=0 for physical bc types */
-}
-fclaw2d_block_data_t;
-
-
-void init_block_data(fclaw2d_block_t *block);
-
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
-
-void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
-                                      fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block);
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
-
-#endif
+#endif /* !FCLAW2D_GLOBAL_H */

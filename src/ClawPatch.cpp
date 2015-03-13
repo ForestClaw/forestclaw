@@ -1,8 +1,9 @@
+
+#include <fclaw2d_global.h>
+
 #include <ClawPatch.H>
-#include <fclaw2d_typedefs.h>
 #include <fclaw2d_timeinterp.h>
 #include <clawpack_fort.H>
-
 
 fclaw_app_t* ClawPatch::app;
 

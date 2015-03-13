@@ -23,9 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** \file
+/** \file fclaw2d_face_neighbors.cpp
  * Average, coarsen and copy between grids at faces.
  **/
+
+#include <fclaw2d_global.h>
+
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_clawpatch.hpp>
 #include <ClawPatch.H>
