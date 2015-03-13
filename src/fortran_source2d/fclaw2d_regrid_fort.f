@@ -24,18 +24,17 @@ c     # --------------------------------------------
       tag_patch = 0
 
 c     # Refine based only on first variable in system.
-      do mq = 1,meqn
-         qmin = q(1,1,mq)
-         qmax = q(1,1,mq)
-         do j = 1,my
-            do i = 1,mx
-               qmin = min(q(i,j,mq),qmin)
-               qmax = max(q(i,j,mq),qmax)
-               if (qmax - qmin .gt. tag_threshold) then
-                  tag_patch = 1
-                  return
-               endif
-            enddo
+      mq = 1
+      qmin = q(1,1,mq)
+      qmax = q(1,1,mq)
+      do j = 1,my
+         do i = 1,mx
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
+            if (qmax - qmin .gt. tag_threshold) then
+               tag_patch = 1
+               return
+            endif
          enddo
       enddo
 
@@ -61,14 +60,13 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision qmin, qmax
 
       tag_patch = 0
-      qmin = q0(1,1,1)
-      qmax = q0(1,1,1)
-      do mq = 1,meqn
-         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax)
-         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax)
-         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax)
-         call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax)
-      enddo
+      mq = 1
+      qmin = q0(1,1,mq)
+      qmax = q0(1,1,mq)
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax)
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax)
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax)
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax)
       if (qmax - qmin .lt. coarsen_threshold) then
          tag_patch = 1
          return
