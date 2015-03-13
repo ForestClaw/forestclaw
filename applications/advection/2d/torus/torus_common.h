@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GLOBAL_H
-#define FCLAW2D_GLOBAL_H
+#ifndef TORUS_COMMON_H
+#define TORUS_COMMON_H
 
-#include <fclaw_options.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,28 +36,25 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM 2
-extern const int SpaceDim;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int NumFaces;
-
-#define FCLAW2D_P4EST_REFINE_FACTOR 2
-extern const int p4est_refineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int NumSiblings;
-
-typedef struct fclaw2d_global
+typedef struct user_options
 {
-  fclaw_options_t gparms;
+    int example;
+    double alpha;
+    double beta;
+
+    const char *latitude_string;
+    double *latitude;
+
+    const char *longitude_string;
+    double *longitude;
+
+    int is_registered;
 }
-fclaw2d_global_t;
+user_options_t;
+
+fclaw_exit_type_t torus_options_postprocess (user_options_t * user);
+fclaw_exit_type_t torus_options_check (user_options_t * user);
+void torus_options_reset (user_options_t * user);
 
 #ifdef __cplusplus
 #if 0
@@ -66,4 +63,4 @@ fclaw2d_global_t;
 }
 #endif
 
-#endif /* !FCLAW2D_GLOBAL_H */
+#endif /* !TORUS_COMMON_H */

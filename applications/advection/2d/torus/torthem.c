@@ -25,17 +25,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 
-static void
-global_init (fclaw2d_global_t * glob)
+#include "torus_common.h"
+
+typedef struct torthem
 {
+    fclaw2d_global_t global;
+    user_options_t user;
+}
+torthem_t;
+
+static void
+torthem_init (torthem_t * torthem)
+{
+    fclaw2d_global_t *glob = &torthem->global;
     fclaw_options_t *gparms = &glob->gparms;
+    user_options_t *user = &torthem->user;
     fclaw_exit_type_t et;
+
+    memset (torthem, 0, sizeof (*torthem));
 
     /* todo: set all other values */
     gparms->dim = 2;
     gparms->mx = 8;
     gparms->my = 8;
     gparms->mbc = 2;
+
+    gparms->periodic_x = 1;
+    gparms->periodic_y = 0;
+    gparms->mi = 18;
+    gparms->mj = 5;
+    gparms->manifold = 1;
 
     gparms->outstyle = 3;
     gparms->nout = 10;
@@ -55,12 +74,26 @@ global_init (fclaw2d_global_t * glob)
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option postprocess error");
     et = fclaw_options_check (gparms);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option check error");
+
+    user->latitude_string = "-50. 50.";
+    user->longitude_string = "0. 360.";
+
+    et = torus_options_postprocess (user);
+    SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus postprocess error");
+    et = torus_options_check (user);
+    SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus check error");
 }
 
 static void
-global_reset (fclaw2d_global_t * glob)
+torthem_run (torthem_t * torthem)
 {
-    fclaw_options_reset (&glob->gparms);
+}
+
+static void
+torthem_reset (torthem_t * torthem)
+{
+    torus_options_reset (&torthem->user);
+    fclaw_options_reset (&torthem->global.gparms);
 }
 
 int
@@ -69,7 +102,7 @@ main (int argc, char **argv)
     int mpiret;
     sc_MPI_Comm mpicomm;
 
-    fclaw2d_global_t global, *glob = &global;
+    torthem_t storthem, *torthem = &storthem;
 
     mpiret = sc_MPI_Init (&argc, &argv);
     SC_CHECK_MPI (mpiret);
@@ -79,9 +112,9 @@ main (int argc, char **argv)
     p4est_init (NULL, SC_LP_ESSENTIAL);
     fclaw_init (NULL, SC_LP_INFO);
 
-    global_init (glob);
-
-    global_reset (glob);
+    torthem_init (torthem);
+    torthem_run (torthem);
+    torthem_reset (torthem);
 
     sc_finalize ();
 

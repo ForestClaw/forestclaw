@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "torus_common.h"
 #include "torus_user.H"
 
 #include <fclaw2d_forestclaw.h>
@@ -34,22 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.H>
 
-
-typedef struct user_options
-{
-    int example;
-    double alpha;
-    double beta;
-
-    const char* latitude_string;
-    double *latitude;
-
-    const char* longitude_string;
-    double *longitude;
-
-    int is_registered;
-
-} user_options_t;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -84,37 +69,24 @@ options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    if (user->example == 3)
-    {
-        fclaw_options_convert_double_array (user->latitude_string, &user->latitude,2);
-        fclaw_options_convert_double_array (user->longitude_string, &user->longitude,2);
-    }
-    return FCLAW_NOEXIT;
+    return torus_options_postprocess (user);
 }
 
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 0 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
+
+    return torus_options_check (user);
 }
 
 static void
 options_destroy_user (fclaw_app_t * a, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    /* Destroy arrays used in options  */
-    if (user->example == 3)
-    {
-        fclaw_options_destroy_array((void*) user->latitude);
-        fclaw_options_destroy_array((void*) user->longitude);
-    }
-}
 
+    torus_options_reset (user);
+}
 
 static const
 fclaw_app_options_vtable_t options_vtable_user =

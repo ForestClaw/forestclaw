@@ -188,7 +188,6 @@ struct amr_options
     int noweightedp;            /**< Don't use weighted partition. */
 };
 
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

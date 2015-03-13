@@ -23,47 +23,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GLOBAL_H
-#define FCLAW2D_GLOBAL_H
+#include "torus_common.h"
 
-#include <fclaw_options.h>
-
-#ifdef __cplusplus
-extern "C"
+fclaw_exit_type_t
+torus_options_postprocess (user_options_t * user)
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+    if (user->example == 3)
+    {
+        fclaw_options_convert_double_array (user->latitude_string,
+                                            &user->latitude, 2);
+        fclaw_options_convert_double_array (user->longitude_string,
+                                            &user->longitude, 2);
+    }
+    return FCLAW_NOEXIT;
+}
 
-#define FCLAW2D_SPACEDIM 2
-extern const int SpaceDim;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int NumFaces;
-
-#define FCLAW2D_P4EST_REFINE_FACTOR 2
-extern const int p4est_refineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int NumSiblings;
-
-typedef struct fclaw2d_global
+fclaw_exit_type_t
+torus_options_check (user_options_t * user)
 {
-  fclaw_options_t gparms;
+    if (user->example < 0 || user->example > 4)
+    {
+        fclaw_global_essentialf
+            ("Option --user:example must be 0, 1, 2, 3 or 4\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
 }
-fclaw2d_global_t;
 
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+void
+torus_options_reset (user_options_t * user)
+{
+    fclaw_options_destroy_array (user->latitude);
+    fclaw_options_destroy_array (user->longitude);
 }
-#endif
-
-#endif /* !FCLAW2D_GLOBAL_H */

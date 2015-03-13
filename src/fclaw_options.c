@@ -64,14 +64,10 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 fclaw_exit_type_t
 fclaw_options_postprocess (fclaw_options_t * amropt)
 {
-  amropt->mthbc = NULL;
   fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
                                    fclaw2d_NumFaces);
 
-  amropt->scale = NULL;
   fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale, 3);
-
-  amropt->shift = NULL;
   fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift, 3);
 
   return FCLAW_NOEXIT;
