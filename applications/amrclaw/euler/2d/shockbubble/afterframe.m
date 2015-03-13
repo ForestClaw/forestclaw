@@ -13,6 +13,9 @@ showpatchborders
 setpatchborderprops('linewidth',1);
 showgridlines(1:5);
 % hidepatchborders;
+delete(get(gca,'title'))
+set(gca,'fontsize',16);
+hidegridlines;
 
 prt = false;
 NoQuery = 0;
