@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct torthem
 {
-    fclaw2d_global_t global;
+    fclaw2d_global_t *global;
     user_options_t user;
 }
 torthem_t;
@@ -37,12 +37,13 @@ torthem_t;
 static void
 torthem_init (torthem_t * torthem)
 {
-    fclaw2d_global_t *glob = &torthem->global;
-    fclaw_options_t *gparms = &glob->gparms;
+    fclaw_options_t *gparms;
     user_options_t *user = &torthem->user;
     fclaw_exit_type_t et;
 
     memset (torthem, 0, sizeof (*torthem));
+    torthem->global = fclaw2d_global_new (NULL);
+    gparms = torthem->global->gparms;
 
     /* todo: set all other values */
     gparms->dim = 2;
@@ -82,8 +83,6 @@ torthem_init (torthem_t * torthem)
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus postprocess error");
     et = torus_options_check (user);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus check error");
-
-    glob->pkgs = fclaw_package_container_new ();
 }
 
 static void
@@ -94,11 +93,9 @@ torthem_run (torthem_t * torthem)
 static void
 torthem_reset (torthem_t * torthem)
 {
-    fclaw2d_global_t *glob = &torthem->global;
-
-    fclaw_package_container_destroy (glob->pkgs);
     torus_options_reset (&torthem->user);
-    fclaw_options_reset (&torthem->global.gparms);
+    fclaw_options_reset (torthem->global->gparms);
+    fclaw2d_global_destroy (torthem->global);
 }
 
 int

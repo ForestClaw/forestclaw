@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CLAWPATCH_H
 #define CLAWPATCH_H
 
+#include <fclaw2d_global.h>
+
 #include <fclaw2d_farraybox.H>
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_transform.h>
@@ -199,6 +201,7 @@ public :
     void* clawpack_patch_data(int id);
 
     static fclaw_app_t* app;
+    static fclaw2d_global_t *global;
 
 protected :
 

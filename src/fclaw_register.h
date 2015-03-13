@@ -39,7 +39,8 @@ extern "C"
 
 /* Register the forestClaw package and options */
 
-void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile);
+fclaw_options_t * fclaw_forestclaw_register (fclaw_app_t* app,
+                                             const char* configfile);
 void fclaw_forestclaw_destroy(fclaw_app_t* app);
 
 #ifdef __cplusplus

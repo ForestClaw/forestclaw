@@ -23,11 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GLOBAL_H
-#define FCLAW2D_GLOBAL_H
+#ifndef FCLAW2D_CLAWPATCH_H
+#define FCLAW2D_CLAWPATCH_H
 
-#include <fclaw_options.h>
-#include <fclaw_package.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,39 +36,8 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM 2
-extern const int SpaceDim;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int NumFaces;
-
-#define FCLAW2D_P4EST_REFINE_FACTOR 2
-extern const int p4est_refineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int NumSiblings;
-
-typedef struct fclaw2d_global
-{
-    int gparms_owned;                   /**< Did we allocate \a gparms? */
-    fclaw_options_t *gparms;            /**< Option values for forestclaw. */
-    fclaw_package_container_t *pkgs;    /**< Solver packages for internal use. */
-}
-fclaw2d_global_t;
-
-/** Allocate a new global structure.
- * \param [in] gparms           If not NULL, we borrow this gparms pointer.
- *                              If NULL, we allocate gparms ourselves.
- */
-fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms);
-
-/** Free a global structures and all members. */
-void fclaw2d_global_destroy (fclaw2d_global_t *);
+void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
+void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
 
 #ifdef __cplusplus
 #if 0
@@ -78,4 +46,4 @@ void fclaw2d_global_destroy (fclaw2d_global_t *);
 }
 #endif
 
-#endif /* !FCLAW2D_GLOBAL_H */
+#endif /* !FCLAW2D_CLAWPATCH_H */

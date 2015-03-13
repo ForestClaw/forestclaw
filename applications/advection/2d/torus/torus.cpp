@@ -206,8 +206,10 @@ void run_program(fclaw_app_t* app)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
     int first_arg;
+    fclaw_app_t *app;
+    fclaw_options_t *gparms;
+    fclaw2d_global_t *glob;
     fclaw_exit_type_t vexit;
 
     /* Options */
@@ -218,9 +220,12 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
+    fclaw2d_clawpatch_link_app (app);
 
     /* Register packages */
-    fclaw_forestclaw_register(app,"fclaw_options_ini");
+    gparms = fclaw_forestclaw_register(app,"fclaw_options_ini");
+    glob = fclaw2d_global_new (gparms);
+
     fc2d_clawpack46_register(app,"fclaw_options.ini");
 
     /* User defined options (defined above) */
@@ -231,15 +236,12 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* Link packages to patches */
-
-    fclaw2d_clawpatch_link_app(app);
-
     if (!retval & !vexit)
     {
         run_program(app);
     }
 
+    fclaw2d_global_destroy (glob);
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 

@@ -1,11 +1,10 @@
 
-#include <fclaw2d_global.h>
-
 #include <ClawPatch.H>
 #include <fclaw2d_timeinterp.h>
 #include <clawpack_fort.H>
 
-fclaw_app_t* ClawPatch::app;
+fclaw_app_t *ClawPatch::app;
+fclaw2d_global_t *ClawPatch::global;
 
 ClawPatch::ClawPatch()
 {

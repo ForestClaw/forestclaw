@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
 
 #include <ClawPatch.H>
@@ -33,6 +34,10 @@ void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
     ClawPatch::app = app;
 }
 
+void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
+{
+    ClawPatch::global = global;
+}
 
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 

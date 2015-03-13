@@ -23,27 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FCLAW2D_CLAWPATCH_HPP
+#define FCLAW2D_CLAWPATCH_HPP
 
-#ifndef FCLAW2D_CLAWPATCH_H
-#define FCLAW2D_CLAWPATCH_H
-
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_patch.H"
-#include "fclaw_options.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_patch.H>
+#include <fclaw2d_clawpatch.h>
+#include <fclaw_options.h>
 #include <fclaw_package.h>
 
-class ClawPatch;
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-void fclaw2d_clawpatch_link_app(fclaw_app_t* app);
-
+#include <ClawPatch.H>
 
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
 
@@ -136,12 +125,4 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
 ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
 #endif
 
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
-
-#endif
+#endif /* !FCLAW2D_CLAWPATCH_HPP */
