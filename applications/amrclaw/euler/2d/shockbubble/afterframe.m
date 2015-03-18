@@ -11,11 +11,13 @@ caxis([0.1 2.81]);
 
 showpatchborders
 setpatchborderprops('linewidth',1);
-showgridlines(1:5);
+% showgridlines(1:5);
 % hidepatchborders;
 delete(get(gca,'title'))
+delete(get(gca,'xlabel'))
+delete(get(gca,'ylabel'))
 set(gca,'fontsize',16);
-hidegridlines;
+hidepatchborders(6);
 
 prt = false;
 NoQuery = 0;
