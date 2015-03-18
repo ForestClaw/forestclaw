@@ -146,7 +146,7 @@ void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
     s_clawpack46_package_id = id;
 }
 
-int fc2d_clawpack46_get_package_id()
+int fc2d_clawpack46_get_package_id (void)
 {
     return s_clawpack46_package_id;
 }
@@ -448,7 +448,6 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                              double t,
                              double dt)
 {
-    const amr_options_t* gparms;
     fc2d_clawpack46_options_t* clawpack_options;
     ClawPatch *cp;
     int level;
@@ -459,7 +458,6 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     FCLAW_ASSERT(classic_vt.rpn2 != NULL);
     FCLAW_ASSERT(classic_vt.rpt2 != NULL);
 
-    gparms = fclaw2d_forestclaw_get_options(domain);
     clawpack_options = fc2d_clawpack46_get_options(domain);
 
     cp = fclaw2d_clawpatch_get_cp(this_patch);

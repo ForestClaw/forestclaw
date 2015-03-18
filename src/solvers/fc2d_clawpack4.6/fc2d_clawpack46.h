@@ -258,6 +258,8 @@ int FC2D_CLAWPACK46_GET_BLOCK();
                                               CLAWPACK46_UNSET_BLOCK)
 void CLAWPACK46_UNSET_BLOCK();
 
+/***************************** MINIMAL API ******************************/
+
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
@@ -276,7 +278,7 @@ void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile);
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t* clawopt);
 
-int fc2d_clawpack46_get_package_id();
+int fc2d_clawpack46_get_package_id (void);
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain);
 
