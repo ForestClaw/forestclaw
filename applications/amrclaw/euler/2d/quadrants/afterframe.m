@@ -10,21 +10,15 @@ cv([1 end]) = [];
 % setcontourlineprops('linewidth',2);
 setpatchborderprops('linewidth',1);
 showpatchborders;
-colorbar;
-
 
 view(2);
 
 NoQuery = 0;
 prt = false;
 if (prt)
-  filename = 'swirl000.png';
-  str = num2str(Frame);
-  len = length(str);
-  filename(8-len+1:8) = str;
-  pstr = ['print -dpng ',filename];
-  disp(pstr);
-  eval(pstr);
+  str = sprintf('quadrant%02d.png',Frame);
+  fprintf('Printing file %s\n',str);
+  print('-dpng',str);
 end;
 
 shg
