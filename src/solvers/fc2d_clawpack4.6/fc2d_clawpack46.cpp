@@ -126,8 +126,20 @@ void fc2d_clawpack46_package_register(fclaw_app_t* app,
 }
 #endif
 
+void
+fc2d_clawpack46_register_vtable (fclaw_package_container_t * pkg_container,
+                                 fc2d_clawpack46_options_t * clawopt)
+{
+    int id;
 
-void fc2d_clawpack46_register(fclaw_app_t* app, const char *configfile)
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    s_clawpack46_package_id =
+      fclaw_package_container_add (pkg_container, clawopt,
+                                   &clawpack46_patch_vtable);
+}
+
+void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
 {
     fc2d_clawpack46_options_t* clawopt;
     int id;

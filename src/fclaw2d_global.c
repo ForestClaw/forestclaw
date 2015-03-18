@@ -68,3 +68,12 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     }
     FCLAW_FREE (glob);
 }
+
+fclaw_package_container_t *
+fclaw2d_global_get_container (fclaw2d_global_t * glob)
+{
+    FCLAW_ASSERT (glob != NULL);
+    FCLAW_ASSERT (glob->pkgs != NULL);
+
+    return glob->pkgs;
+}

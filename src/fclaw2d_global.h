@@ -69,7 +69,11 @@ fclaw2d_global_t;
 fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms);
 
 /** Free a global structures and all members. */
-void fclaw2d_global_destroy (fclaw2d_global_t *);
+void fclaw2d_global_destroy (fclaw2d_global_t * glob);
+
+/** Access the package container from the global type. */
+fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
+                                                         glob);
 
 #ifdef __cplusplus
 #if 0
