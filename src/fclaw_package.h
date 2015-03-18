@@ -55,6 +55,11 @@ struct fclaw_package_vtable
 
 fclaw_package_container_t *fclaw_package_container_new (void);
 void fclaw_package_container_destroy (fclaw_package_container_t * pkgs);
+int fclaw_package_container_add (fclaw_package_container_t * pkg_container,
+                                 void *opt,
+                                 const fclaw_package_vtable_t *vtable);
+
+/*********************** CODE BELOW STILL USING APP ********************/
 
 /* Create, destroy and add packages */
 void fclaw_package_container_new_app (fclaw_app_t *app);
