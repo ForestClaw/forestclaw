@@ -115,6 +115,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     int exponent = gparms->subcycle && !gparms->noweightedp ? 1 : 0;
     fclaw2d_domain_t *domain_partitioned =
         fclaw2d_domain_partition (*domain, exponent);
+
     fclaw_bool have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)
