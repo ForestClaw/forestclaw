@@ -23,45 +23,57 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BLOCK_H
-#define FCLAW2D_BLOCK_H
+#include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_defs.h>
+const int SpaceDim = FCLAW2D_SPACEDIM;
+const int NumFaces = FCLAW2D_NUMFACES;
+const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+const int NumCorners = FCLAW2D_NUM_CORNERS;
+const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
 
-#ifdef __cplusplus
-extern "C"
+fclaw2d_global_t *
+fclaw2d_global_new (fclaw_options_t * gparms)
 {
-#if 0
-}
-#endif
-#endif
+    fclaw2d_global_t *glob;
 
-typedef struct fclaw2d_block_data
+    glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+    if (gparms == NULL)
+    {
+        glob->gparms_owned = 1;
+        glob->gparms = FCLAW_ALLOC_ZERO (fclaw_options_t, 1);
+    }
+    else
+    {
+        glob->gparms_owned = 0;
+        glob->gparms = gparms;
+    }
+
+    glob->pkgs = fclaw_package_container_new ();
+
+    fclaw2d_clawpatch_link_global (glob);
+
+    return glob;
+}
+
+void
+fclaw2d_global_destroy (fclaw2d_global_t * glob)
 {
-    int mthbc[FCLAW2D_NUMFACES];  /* >=0 for physical bc types */
+    FCLAW_ASSERT (glob != NULL);
+
+    fclaw_package_container_destroy (glob->pkgs);
+
+    if (glob->gparms_owned)
+    {
+        FCLAW_FREE (glob->gparms);
+    }
+    FCLAW_FREE (glob);
 }
-fclaw2d_block_data_t;
 
-
-void init_block_data(fclaw2d_block_t *block);
-
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
-
-void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
-                                      fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block);
-
-
-#ifdef __cplusplus
-#if 0
+fclaw_package_container_t *
+fclaw2d_global_get_container (fclaw2d_global_t * glob)
 {
-#endif
-}
-#endif
+    FCLAW_ASSERT (glob != NULL);
+    FCLAW_ASSERT (glob->pkgs != NULL);
 
-#endif
+    return glob->pkgs;
+}

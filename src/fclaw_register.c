@@ -29,7 +29,8 @@
 
 /* Register the forestClaw package and options */
 
-void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
+fclaw_options_t *
+fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
 {
     amr_options_t* gparms;
     gparms = fclaw_options_register_general (app, configfile);
@@ -37,10 +38,12 @@ void fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
     fclaw_app_set_attribute(app,"fclaw-options",gparms);
 
     /* Create a package container */
-    fclaw_package_container_new(app);
+    fclaw_package_container_new_app (app);
+
+    return gparms;
 }
 
 void fclaw_forestclaw_destroy(fclaw_app_t* app)
 {
-    fclaw_package_container_destroy(app);
+    fclaw_package_container_destroy_app (app);
 }

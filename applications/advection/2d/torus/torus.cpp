@@ -23,33 +23,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "torus_user.H"
+#include "torus_common.h"
+#include "torus_user.h"
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
 #include <p4est_connectivity.h>
 
-#include <fc2d_clawpack46.H>
+#include <fc2d_clawpack46.h>
 
-
-typedef struct user_options
-{
-    int example;
-    double alpha;
-    double beta;
-
-    const char* latitude_string;
-    double *latitude;
-
-    const char* longitude_string;
-    double *longitude;
-
-    int is_registered;
-
-} user_options_t;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -84,37 +69,24 @@ options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    if (user->example == 3)
-    {
-        fclaw_options_convert_double_array (user->latitude_string, &user->latitude,2);
-        fclaw_options_convert_double_array (user->longitude_string, &user->longitude,2);
-    }
-    return FCLAW_NOEXIT;
+    return torus_options_postprocess (user);
 }
 
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 0 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
+
+    return torus_options_check (user);
 }
 
 static void
 options_destroy_user (fclaw_app_t * a, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    /* Destroy arrays used in options  */
-    if (user->example == 3)
-    {
-        fclaw_options_destroy_array((void*) user->latitude);
-        fclaw_options_destroy_array((void*) user->longitude);
-    }
-}
 
+    torus_options_reset (user);
+}
 
 static const
 fclaw_app_options_vtable_t options_vtable_user =
@@ -234,8 +206,10 @@ void run_program(fclaw_app_t* app)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
     int first_arg;
+    fclaw_app_t *app;
+    fclaw_options_t *gparms;
+    fclaw2d_global_t *glob;
     fclaw_exit_type_t vexit;
 
     /* Options */
@@ -246,9 +220,12 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
+    fclaw2d_clawpatch_link_app (app);
 
     /* Register packages */
-    fclaw_forestclaw_register(app,"fclaw_options_ini");
+    gparms = fclaw_forestclaw_register(app,"fclaw_options_ini");
+    glob = fclaw2d_global_new (gparms);
+
     fc2d_clawpack46_register(app,"fclaw_options.ini");
 
     /* User defined options (defined above) */
@@ -259,15 +236,12 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* Link packages to patches */
-
-    fclaw2d_clawpatch_link_app(app);
-
     if (!retval & !vexit)
     {
         run_program(app);
     }
 
+    fclaw2d_global_destroy (glob);
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 

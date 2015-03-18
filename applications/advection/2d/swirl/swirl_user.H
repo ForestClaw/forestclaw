@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SWIRL_USER_H
 
 #include "fclaw2d_forestclaw.h"
-#include "fc2d_clawpack46.H"
+#include "fc2d_clawpack46.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -94,7 +94,6 @@ int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-
 
 #ifdef __cplusplus
 #if 0

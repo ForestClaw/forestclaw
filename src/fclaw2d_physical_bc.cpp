@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_global.h>
+
 #include "forestclaw2d.h"
 #include "fclaw2d_physical_bc.h"
 #include "fclaw2d_vtable.h"
-
 
 void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
                                  fclaw2d_patch_t *this_patch,

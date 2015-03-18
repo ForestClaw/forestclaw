@@ -26,7 +26,6 @@
 #ifndef FCLAW_PACKAGE_H
 #define FCLAW_PACKAGE_H
 
-
 #include <fclaw_base.h>
 
 #ifdef __cplusplus
@@ -36,10 +35,6 @@ extern "C"
 }
 #endif
 #endif
-
-
-#define FCLAW_MAX_PACKAGES 20
-
 
 /* Opaque pointers */
 typedef struct fclaw_package_container fclaw_package_container_t;
@@ -58,10 +53,17 @@ struct fclaw_package_vtable
     fclaw_package_data_delete_t destroy_patch_data;
 };
 
+fclaw_package_container_t *fclaw_package_container_new (void);
+void fclaw_package_container_destroy (fclaw_package_container_t * pkgs);
+int fclaw_package_container_add (fclaw_package_container_t * pkg_container,
+                                 void *opt,
+                                 const fclaw_package_vtable_t *vtable);
+
+/*********************** CODE BELOW STILL USING APP ********************/
 
 /* Create, destroy and add packages */
-void fclaw_package_container_new(fclaw_app_t *app);
-void fclaw_package_container_destroy(fclaw_app_t *app);
+void fclaw_package_container_new_app (fclaw_app_t *app);
+void fclaw_package_container_destroy_app (fclaw_app_t *app);
 
 int fclaw_package_container_add_pkg(fclaw_app_t* app,
                                     void* opt,

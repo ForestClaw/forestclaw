@@ -23,11 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "torus_user.H"
-#include <fclaw2d_forestclaw.h>
+#include "torus_user.h"
 
-#include <fc2d_clawpack46.H>
-
+#include <fc2d_clawpack46.h>
 
 static fc2d_clawpack46_vtable_t classic_claw;
 

@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "swirl_user.H"
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
-#include <fc2d_clawpack46.H>
+#include <fclaw2d_clawpatch.h>
+#include <fc2d_clawpack46.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -113,7 +113,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_define_auxarray2(domain,this_patch);
+    fc2d_clawpack46_define_auxarray(domain,this_patch);
 
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 

@@ -6,6 +6,7 @@
 libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_base.h \
+	src/fclaw2d_global.h \
 	src/fclaw2d_base.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_defs.h \
@@ -23,6 +24,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map.h \
 	src/forestclaw2d.h \
 	src/fclaw2d_convenience.h \
+	src/fclaw2d_clawpatch.h \
 	src/fclaw2d_clawpatch.hpp \
 	src/fclaw2d_patch.H \
 	src/clawpack_fort.H \
@@ -49,6 +51,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
+	src/fclaw2d_global.c \
 	src/fclaw2d_base.c \
 	src/fclaw2d_domain.c \
 	src/fclaw2d_block.c \

@@ -23,12 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FCLAW2D_GLOBAL_H
+#define FCLAW2D_GLOBAL_H
 
-#ifndef FCLAW2D_ADVANCE_H
-#define FCLAW2D_ADVANCE_H
-
-#include "forestclaw2d.h"
-#include "subcycle_manager.H"
+#include <fclaw_options.h>
+#include <fclaw_package.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,30 +37,43 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_level_time_data
+#define FCLAW2D_SPACEDIM 2
+extern const int SpaceDim;
+
+/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
+   avoid any confusion in the 2d case. */
+#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
+extern const int NumFaces;
+
+#define FCLAW2D_P4EST_REFINE_FACTOR 2
+extern const int p4est_refineFactor;
+
+#define FCLAW2D_NUM_CORNERS 4
+extern const int NumCorners;
+
+#define FCLAW2D_NUM_SIBLINGS 4
+extern const int NumSiblings;
+
+typedef struct fclaw2d_global
 {
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
-    double t_coarse;
-
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
-
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    double alpha;               /* Fraction of coarser dt completed. */
-    double dt_coarse;
-    bool is_coarsest;
-    bool fixed_dt;
+    int gparms_owned;                   /**< Did we allocate \a gparms? */
+    fclaw_options_t *gparms;            /**< Option values for forestclaw. */
+    fclaw_package_container_t *pkgs;    /**< Solver packages for internal use. */
 }
-fclaw2d_level_time_data_t;
+fclaw2d_global_t;
 
-double advance_all_levels (fclaw2d_domain_t * domain,
-                           subcycle_manager * a_time_stepper);
+/** Allocate a new global structure.
+ * \param [in] gparms           If not NULL, we borrow this gparms pointer.
+ *                              If NULL, we allocate gparms ourselves.
+ */
+fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms);
 
+/** Free a global structures and all members. */
+void fclaw2d_global_destroy (fclaw2d_global_t * glob);
+
+/** Access the package container from the global type. */
+fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
+                                                         glob);
 
 #ifdef __cplusplus
 #if 0
@@ -70,4 +82,4 @@ double advance_all_levels (fclaw2d_domain_t * domain,
 }
 #endif
 
-#endif
+#endif /* !FCLAW2D_GLOBAL_H */

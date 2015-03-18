@@ -26,6 +26,9 @@
 #include <fclaw_package.h>
 
 
+#define FCLAW_MAX_PACKAGES 20
+
+
 /* Data attached to a patch that is independent of  what would normally get
    passed in through a parameter call */
 struct fclaw_package
@@ -47,6 +50,7 @@ struct fclaw_package_container
 {
     fclaw_package_t *pkgs[FCLAW_MAX_PACKAGES];  /* Make adding packages easy ... */
     int count;
+    int max_packages;
 };
 
 
@@ -63,7 +67,8 @@ void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data)
     pkg_data = NULL;
 }
 
-void fclaw_package_container_new(fclaw_app_t* app)
+fclaw_package_container_t *
+fclaw_package_container_new (void)
 {
     int i;
     fclaw_package_container_t* pkg_container;
@@ -74,18 +79,23 @@ void fclaw_package_container_new(fclaw_app_t* app)
         pkg_container->pkgs[i] = NULL;
     }
     pkg_container->count = 0;
-    fclaw_app_set_attribute(app,"packages",pkg_container);
+    pkg_container->max_packages = FCLAW_MAX_PACKAGES;
+
+    return pkg_container;
+};
+
+void fclaw_package_container_new_app (fclaw_app_t* app)
+{
+    fclaw_app_set_attribute(app,"packages",
+                            fclaw_package_container_new ());
 };
 
 void
-fclaw_package_container_destroy(fclaw_app_t *app)
+fclaw_package_container_destroy (fclaw_package_container_t * pkg_container)
 {
     int i;
     fclaw_package_t *pkg;
-    fclaw_package_container_t *pkg_container;
 
-    pkg_container = (fclaw_package_container_t *)
-      fclaw_app_get_attribute (app, "packages", NULL);
     FCLAW_ASSERT (pkg_container != NULL);
 
     for(i = 0; i < pkg_container->count; i++)
@@ -97,17 +107,22 @@ fclaw_package_container_destroy(fclaw_app_t *app)
     FCLAW_FREE(pkg_container);
 }
 
+void
+fclaw_package_container_destroy_app (fclaw_app_t *app)
+{
+    fclaw_package_container_t * pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute (app, "packages", NULL);
+
+    fclaw_package_container_destroy (pkg_container);
+}
+
 int
-    fclaw_package_container_add_pkg(fclaw_app_t* app,
-                                    void* opt,
-                                    const fclaw_package_vtable_t *vtable)
+fclaw_package_container_add (fclaw_package_container_t * pkg_container,
+                             void *opt, const fclaw_package_vtable_t *vtable)
 {
     int id;
     fclaw_package_t *new_pkg;
-    fclaw_package_container_t *pkg_container;
 
-    pkg_container = (fclaw_package_container_t *)
-      fclaw_app_get_attribute (app, "packages", NULL);
     FCLAW_ASSERT (pkg_container != NULL);
 
     FCLAW_ASSERT(pkg_container->count < FCLAW_MAX_PACKAGES);
@@ -118,6 +133,19 @@ int
     new_pkg->options = opt;
     pkg_container->pkgs[id] = new_pkg;
     return id;
+}
+
+int
+    fclaw_package_container_add_pkg(fclaw_app_t* app,
+                                    void* opt,
+                                    const fclaw_package_vtable_t *vtable)
+{
+    fclaw_package_container_t *pkg_container;
+
+    pkg_container = (fclaw_package_container_t *)
+      fclaw_app_get_attribute (app, "packages", NULL);
+
+    return fclaw_package_container_add (pkg_container, opt, vtable);
 }
 
 void

@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.H"
 
-#include <fclaw2d_clawpatch.hpp>
-#include <fc2d_clawpack46.H>
+#include <fclaw2d_clawpatch.h>
+#include <fc2d_clawpack46.h>
 
 #include <p4est_connectivity.h>
 #include <fclaw2d_map.h>

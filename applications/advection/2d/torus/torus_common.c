@@ -23,45 +23,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BLOCK_H
-#define FCLAW2D_BLOCK_H
+#include "torus_common.h"
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_defs.h>
-
-#ifdef __cplusplus
-extern "C"
+fclaw_exit_type_t
+torus_options_postprocess (user_options_t * user)
 {
-#if 0
+    if (user->example == 3)
+    {
+        fclaw_options_convert_double_array (user->latitude_string,
+                                            &user->latitude, 2);
+        fclaw_options_convert_double_array (user->longitude_string,
+                                            &user->longitude, 2);
+    }
+    return FCLAW_NOEXIT;
 }
-#endif
-#endif
 
-typedef struct fclaw2d_block_data
+fclaw_exit_type_t
+torus_options_check (user_options_t * user)
 {
-    int mthbc[FCLAW2D_NUMFACES];  /* >=0 for physical bc types */
+    if (user->example < 0 || user->example > 4)
+    {
+        fclaw_global_essentialf
+            ("Option --user:example must be 0, 1, 2, 3 or 4\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
 }
-fclaw2d_block_data_t;
 
-
-void init_block_data(fclaw2d_block_t *block);
-
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
-
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
-
-void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
-                                      fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block);
-
-
-#ifdef __cplusplus
-#if 0
+void
+torus_options_reset (user_options_t * user)
 {
-#endif
+    fclaw_options_destroy_array (user->latitude);
+    fclaw_options_destroy_array (user->longitude);
 }
-#endif
-
-#endif

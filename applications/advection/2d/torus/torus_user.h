@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_USER_H
 #define TORUS_USER_H
 
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -91,4 +91,4 @@ fclaw2d_map_context_t *
 }
 #endif
 
-#endif
+#endif /* !TORUS_USER_H */

@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
-
 #ifndef FCLAW_OPTIONS_H
 #define FCLAW_OPTIONS_H
 
@@ -45,6 +44,11 @@ extern "C"
 
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
+typedef amr_options_t fclaw_options_t;
+
+fclaw_exit_type_t fclaw_options_postprocess (fclaw_options_t * amropt);
+fclaw_exit_type_t fclaw_options_check (fclaw_options_t * amropt);
+void fclaw_options_reset (fclaw_options_t * amropt);
 
 amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app);
 
@@ -106,6 +110,8 @@ void fclaw_options_destroy_array(void* array);
 
 struct amr_options
 {
+    int dim;
+
     /* Fixed grid size for each grid */
     int mx;      /**< Number of cells in x direction (fixed for all grids) */
     int my;      /**< Number of cells in y direction (fixed for all grids) */
@@ -180,10 +186,7 @@ struct amr_options
     int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
 
     int noweightedp;            /**< Don't use weighted partition. */
-
-    int is_registered;     /**< Internal variable to double-check the flow */
 };
-
 
 #ifdef __cplusplus
 #if 0

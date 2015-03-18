@@ -61,12 +61,23 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
     return NULL;
 }
 
+fclaw_exit_type_t
+fclaw_options_postprocess (fclaw_options_t * amropt)
+{
+  fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
+                                   fclaw2d_NumFaces);
+
+  fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale, 3);
+  fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift, 3);
+
+  return FCLAW_NOEXIT;
+}
+
 static fclaw_exit_type_t
 options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 {
 
     fclaw_options_general_t *general = (fclaw_options_general_t *) package;
-    amr_options_t *amropt;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -79,24 +90,12 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (general->is_registered);
 
     /* Convert strings to arrays */
-    amropt = general->amropt;
-    fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                     fclaw2d_NumFaces);
-    fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale,3);
-    fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift,3);
-
-    /* at this point there are no errors to report */
-    return FCLAW_NOEXIT;
+    return fclaw_options_postprocess (general->amropt);
 }
 
 fclaw_exit_type_t
-options_check_general (fclaw_app_t * app, void *package, void *registered)
+fclaw_options_check (fclaw_options_t * gparms)
 {
-    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
-    amr_options_t* gparms;
-
-    gparms = general->amropt;
-
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
     {
@@ -105,8 +104,9 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
         int nsteps = (int) floor (dT_outer / dT_inner + .5);
         if (fabs (nsteps * dT_inner - dT_outer) > 1e-8)
         {
-            fclaw_global_essentialf( "For fixed dt, initial time step size must divide" \
-                                     " tfinal/nout exactly.\n");
+            fclaw_global_essentialf
+              ("For fixed dt, initial time step size must divide"
+               " tfinal/nout exactly.\n");
             return FCLAW_EXIT_ERROR;
         }
     }
@@ -128,6 +128,21 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
+fclaw_exit_type_t
+options_check_general (fclaw_app_t * app, void *package, void *registered)
+{
+    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+
+    return fclaw_options_check (general->amropt);
+}
+
+void
+fclaw_options_reset (fclaw_options_t * amropt)
+{
+    FCLAW_FREE (amropt->mthbc);
+    FCLAW_FREE (amropt->scale);
+    FCLAW_FREE (amropt->shift);
+}
 
 static void
 options_destroy_general (fclaw_app_t * a, void *package, void *registered)
@@ -146,11 +161,9 @@ options_destroy_general (fclaw_app_t * a, void *package, void *registered)
     /* Destroy option arrays created in postprocess */
     amropt = general->amropt;
 
-    FCLAW_FREE(amropt->mthbc);
-    FCLAW_FREE(amropt->scale);
-    FCLAW_FREE(amropt->shift);
-
+    fclaw_options_reset (amropt);
     FCLAW_FREE(amropt);
+
     FCLAW_FREE (general);
 }
 
