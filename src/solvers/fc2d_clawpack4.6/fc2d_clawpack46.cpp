@@ -130,8 +130,6 @@ void
 fc2d_clawpack46_register_vtable (fclaw_package_container_t * pkg_container,
                                  fc2d_clawpack46_options_t * clawopt)
 {
-    int id;
-
     FCLAW_ASSERT(s_clawpack46_package_id == -1);
 
     s_clawpack46_package_id =
