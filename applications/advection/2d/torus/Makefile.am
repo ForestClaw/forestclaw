@@ -29,3 +29,12 @@ applications_advection_2d_torus_torus_LDADD = \
 applications_advection_2d_torus_torthem_SOURCES = \
 	applications/advection/2d/torus/torthem.c \
 	applications/advection/2d/torus/torus_common.c
+
+## Due to C++ libraries we need to force C++ linking for a C main program
+nodist_EXTRA_applications_advection_2d_torus_torthem_SOURCES = dummy.cxx
+
+applications_advection_2d_torus_torthem_CPPFLAGS = \
+        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
+
+applications_advection_2d_torus_torthem_LDADD = \
+        $(FCLAW_CLAWPACK46_LDADD) $(LDADD)

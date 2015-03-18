@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "torus_common.h"
-#include "torus_user.H"
+#include "torus_user.h"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>

@@ -24,12 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
+#include <fc2d_clawpack46.h>
 
 #include "torus_common.h"
 
 typedef struct torthem
 {
     fclaw2d_global_t *global;
+    fc2d_clawpack46_options_t clawopt;
     user_options_t user;
 }
 torthem_t;
@@ -38,12 +40,15 @@ static void
 torthem_init (torthem_t * torthem)
 {
     fclaw_options_t *gparms;
+    fc2d_clawpack46_options_t *clawopt = &torthem->clawopt;
     user_options_t *user = &torthem->user;
     fclaw_exit_type_t et;
 
     memset (torthem, 0, sizeof (*torthem));
     torthem->global = fclaw2d_global_new (NULL);
     gparms = torthem->global->gparms;
+
+    /**************** FCLAW OPTIONS *************/
 
     /* todo: set all other values */
     gparms->dim = 2;
@@ -75,6 +80,20 @@ torthem_init (torthem_t * torthem)
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option postprocess error");
     et = fclaw_options_check (gparms);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option check error");
+    
+    /**************** CLAWPACK 4.6 OPTIONS *************/
+
+    clawopt->mwaves = 1;
+
+    et = fc2d_clawpack46_postprocess (clawopt);
+    SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 postprocess error");
+    et = fc2d_clawpack46_check (clawopt);
+    SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 check error");
+
+    fc2d_clawpack46_register_vtable (fclaw2d_global_get_container
+                                     (torthem->global), clawopt);
+
+    /**************** TORUS OPTIONS *************/
 
     user->latitude_string = "-50. 50.";
     user->longitude_string = "0. 360.";
@@ -94,6 +113,7 @@ static void
 torthem_reset (torthem_t * torthem)
 {
     torus_options_reset (&torthem->user);
+    fc2d_clawpack46_reset (&torthem->clawopt);
     fclaw_options_reset (torthem->global->gparms);
     fclaw2d_global_destroy (torthem->global);
 }
