@@ -274,7 +274,7 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
        so boundary patches will have to be updated after the exchange.
        ---------------------------------------------------------- */
     int mincoarse = minlevel;
-    int maxcoarse = maxlevel-1;   /* Be careful with minlevel-maxlevel */
+    int maxcoarse = maxlevel-1;   /* Be careful with minlevel=maxlevel */
 
     /* IDEA 1: add boolean about on_parallel_boundary vs. interior.
      *         1. Do the parallel boundary work here.
@@ -326,13 +326,13 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     {
         /* -------------------------------------------------------------
            Parallel ghost patch exchange
-           -------------------------------------------------------------- */
+           ------------------------------------------------------------- */
         fclaw2d_partition_exchange_all(domain);
 
         /* -------------------------------------------------------------
            Repeat above, but now with parallel ghost cells.
            This may involve lots of duplicate work.
-           -------------------------------------------------------------- */
+           ------------------------------------------------------------- */
 
         /* Fill in ghost cells on parallel patch boundaries */
         read_parallel_patches = fclaw_true;
@@ -355,7 +355,7 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     int minfine = minlevel+1;
     int maxfine = maxlevel;
 
-    interpolate_ghost_coarse2fine(domain,minfine, maxfine,time_interp);
+    interpolate_ghost_coarse2fine(domain,minfine, maxfine, time_interp);
 
     /* --------------------------------------------------------- */
     /* Do a final fill in of boundary conditions of all physical
@@ -398,15 +398,16 @@ void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain, int coarse_level,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
 
     int time_interp_level = coarse_level - 1;
+    int minlevel = coarse_level;
+    int maxlevel = fine_level;
 
     fclaw_global_infof("Exchanging ghost patches from levels %d to %d\n",\
-                       coarse_level, fine_level);
+                       minlevel, maxlevel);
     if (!a_time_stepper->nosubcycle())
     {
         fclaw_global_infof("Time interpolated level is %d\n",   \
                            time_interp_level);
     }
-
 
     /* Make available patches from levels coarse to fine */
     set_boundary_patch_ptrs(domain,time_interp_level, fine_level);

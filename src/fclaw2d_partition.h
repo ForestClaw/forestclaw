@@ -38,22 +38,13 @@ extern "C"
 #endif
 #endif
 
+void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
+
 void fclaw2d_partition_setup(fclaw2d_domain_t* domain);
-void fclaw2d_partition_exchange_all(fclaw2d_domain_t* domain);
-
-fclaw2d_domain_exchange_t *
-fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain);
-
 /** Repartition all patches in parallel.
  * \param [in] mode             A level for amrinit, -1 for running simulation.
  */
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
-
-void exchange_ghost_patch_data_levels(fclaw2d_domain_t* domain,
-                                      int exchange_minlevel, int exchange_maxlevel);
-
-void set_boundary_patch_ptrs(fclaw2d_domain_t* domain,int exchange_minlevel,
-                             int exchange_maxlevel);
+void fclaw2d_partition_delete(fclaw2d_domain_t** domain);
 
 #ifdef __cplusplus
 #if 0
