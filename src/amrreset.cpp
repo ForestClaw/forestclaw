@@ -105,9 +105,9 @@ void amrreset(fclaw2d_domain_t **domain)
                         ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative),
                        "UNACCOUNTED");
         sc_stats_compute ((*domain)->mpicomm, FCLAW2D_TIMER_COUNT, stats);
-        sc_stats_print (sc_package_id, SC_LP_PRODUCTION, FCLAW2D_TIMER_COUNT,
+        sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                         stats, 1, 0);
-        SC_GLOBAL_PRODUCTIONF ("Procs %d advance %d %g exchange %d %g "
+        SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
                                "regrid %d %g\n", (*domain)->mpisize,
                                ddata->count_amr_advance,
                                stats[FCLAW2D_TIMER_ADVANCE].average,
@@ -115,7 +115,7 @@ void amrreset(fclaw2d_domain_t **domain)
                                stats[FCLAW2D_TIMER_EXCHANGE].average,
                                ddata->count_amr_regrid,
                                stats[FCLAW2D_TIMER_REGRID].average);
-        SC_GLOBAL_PRODUCTIONF ("Max/P %d advance %d %g exchange %d %g "
+        SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
                                "regrid %d %g\n", (*domain)->mpisize,
                                ddata->count_amr_advance,
                                stats[FCLAW2D_TIMER_ADVANCE].max,
