@@ -15,7 +15,6 @@ end
 
 zoom(1.1^5);
 hidegridlines;
-view([-90,90-25])
 
 NoQuery = 0;
 prt = false;

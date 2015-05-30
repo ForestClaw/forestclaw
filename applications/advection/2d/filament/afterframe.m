@@ -6,9 +6,7 @@ if (PlotParallelPartitions == 0)
     yrbcolormap;
 end
 showpatchborders(1:9);
-setpatchborderprops('linewidth',2);
-% hidepatchborders;
-% delete(get(gca,'title'));
+setpatchborderprops('linewidth',1);
 caxis([0 1]);
 
 % colormap(white);
@@ -31,10 +29,10 @@ end
 shg;
 
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-    filename = framename(Frame,'filament0000','png');    
-    print('-dpng','-r1600',filename);
+    filename = sprintf('filament%04d.png',Frame);    
+    print('-dpng','-r200',filename);
 end;
 
 clear afterframe
