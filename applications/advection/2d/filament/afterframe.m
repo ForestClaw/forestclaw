@@ -29,7 +29,7 @@ end
 shg;
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
     filename = sprintf('filament%04d.png',Frame);    
     print('-dpng','-r200',filename);
