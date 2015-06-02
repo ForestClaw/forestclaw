@@ -26,9 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_EXCHANGE_H
 #define FCLAW2D_EXCHANGE_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_convenience.h"
-#include "fclaw2d_vtable.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_partition.h>
+#include <fclaw2d_convenience.h>
+#include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,15 +39,20 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_exchange_stage_data(fclaw2d_domain_t* domain,
-                                 int exchange_minlevel,
-                                 int exchange_maxlevel);
+void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
+                                    int minlevel,
+                                    int maxlevel,
+                                    int time_interp);
 
 void fclaw2d_exchange_ghost_patches_all(fclaw2d_domain_t* domain);
 
 void fclaw2d_exchange_ghost_patch_partial(fclaw2d_domain_t* domain,
                                           int exchange_minlevel,
                                           int exchange_maxlevel);
+
+void fclaw2d_exchange_ghost_patch_partial_new(fclaw2d_domain_t* domain,
+                                              int exchange_minlevel,
+                                              int exchange_maxlevel);
 
 #ifdef __cplusplus
 #if 0

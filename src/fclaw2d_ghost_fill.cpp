@@ -23,15 +23,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+ * IDEA 1: add boolean about on_parallel_boundary vs. interior.
+ *         1. Do the parallel boundary work here.
+ *            To the least possible amount of work before sending.
+ *             * copy_ghost_samelevel
+ *             * average_ghost_f2c
+ *             * fill_physical_ghost
+ *               (which subset of cells shall do it?)
+ *               (maybe we can skip doing it before sending altogether?)
+ *            More specifically, only copy/average across faces
+ *            between two parallel boundary patches, not corners.
+ *            Argue in paper why no corners needed for 5-point stencils.
+ *         2. Start sending: ghost_exchange_begin.
+ *         3. Do all the work on interior patches and whatever has not
+ *            been computed between parallel boundary patches.
+ *            Do the most possible amount of work while communicating.
+ *             * copy_ghost_samelevel
+ *             * average_ghost_f2c
+ *             * fill_physical_ghost
+ *               (how much of this can we possibly to here: maximize this.)
+ *             * interpolate_ghost_c2f for interior patches and
+ *               faces between parallel boundary and interior patches.
+ *         4. Recieve messages: ghost_exchange_end.
+ *         5. Work on receive buffers / parallel patches with remote data.
+ *             * copy_ghost_samelevel
+ *             * average_ghost_f2c
+ *             * fill_physical_ghost
+ *             * interpolate_ghost_c2f
+ *         6. Repeat 5. for whatever parts of patches that are not done yet.
+ *            Integrate this with 5. so we don't loop over patches twice.
+ *
+ * All of this goes into the paper as detailed algorithm with explanations.
+ */
+
+
 /** \file
  * Fill ghost cells.
  *
  *
  **/
 
-#include "fclaw2d_ghost_fill.h"
-#include "amr_includes.H"
-#include "fclaw2d_partition.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw_timer.h>
+
+#include <fclaw2d_ghost_fill.h>
+#include <fclaw2d_partition.h>
+#include <fclaw2d_exchange.h>
+#include <fclaw2d_domain.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,7 +111,7 @@ void copy_ghost_samelevel(fclaw2d_domain_t* domain, int minlevel,
  * Fill in coarse grid ghost cells by averaging or copying  from neighboring fine grids.
  **/
 static
-void average_ghost_fine2coarse(fclaw2d_domain_t *domain,
+void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
                                int mincoarse,
                                int maxcoarse,
                                fclaw_bool time_interp,
@@ -80,29 +120,49 @@ void average_ghost_fine2coarse(fclaw2d_domain_t *domain,
     /* Average fine grids to coarse grid ghost cells */
     for(int level = maxcoarse; level >= mincoarse; level--)
     {
-        average2ghost(domain,level,time_interp,read_parallel_patches);
+        /* Don't do any time interpolation yet */
+        average2ghost(domain,level,0,read_parallel_patches);
+    }
+    if (time_interp)
+    {
+        /* Average fine grid to coarse time interpolated level */
+        int time_interp_level = mincoarse-1;
+        average2ghost(domain,time_interp_level,time_interp,read_parallel_patches);
     }
 }
 
 static
-void interpolate_ghost_coarse2fine(fclaw2d_domain_t* domain,
+void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
                                    int minfine, int maxfine,
                                    fclaw_bool time_interp)
 {
     /* Interpolate from coarse grid to fine grid ghost */
     for(int level = maxfine; level >= minfine; level--)
     {
-        interpolate2ghost(domain,level,time_interp);
+        interpolate2ghost(domain,level,0);
+    }
+    if (time_interp)
+    {
+        int time_interp_level = minfine-1;
+        interpolate2ghost(domain,time_interp_level,1);
     }
 }
 
 static
-void fill_physical_ghost(fclaw2d_domain_t* domain, int minlevel, int maxlevel,
+void fill_physical_ghost(fclaw2d_domain_t* domain,
+                         int minlevel, int maxlevel,
                          double t, fclaw_bool time_interp)
 {
     for(int level = maxlevel; level >= minlevel; level--)
     {
-        fclaw2d_set_physical_bc(domain,level,t,time_interp);
+        /* No time interpolation yet */
+        fclaw2d_set_physical_bc(domain,level,t,0);
+    }
+    if (time_interp)
+    {
+        /* Fill boundary ghost cells on time interpolated level */
+        int time_interp_level = minlevel-1;
+        fclaw2d_set_physical_bc(domain,time_interp_level,t,1);
     }
 }
 
@@ -169,9 +229,9 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
         fclaw2d_domain_iterate_level(domain, fine_level,
                                      cb_face_fill, (void *) &e_info);
 
-        /* Corner average */
-        /* We can skip the corner update, since we don't need the corner ghost cell
-           values for doing interpolation */
+        /* Corner average :
+           We can skip the corner update, since we don't need the corner ghost cell
+           values for doing interpolation (at least not yet) */
         /*
         fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_average,
                                      (void *) &e_info);
@@ -226,9 +286,24 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
                                  (void *) &e_info);
 }
 
+/* -----------------------------------------------------------------------
+   Public interface
+   ---------------------------------------------------------------------*/
 
+/* This is a single copy between levels that is done on a newly advanced
+   coarser level.  The new and old coarser levels will be time interpolated
+   for filling in coarse grid ghost cells.  The time interpolated level
+   will contain valid, time interpolated ghost cells.  These may be exchanged
+   as parallel ghost patches, and so much have valid data.  */
 
-
+   void fclaw2d_ghost_copy4timeinterp(fclaw2d_domain_t* domain,
+                                      int coarse_level)
+   {
+        /* Fill in ghost cells on parallel patch boundaries */
+        int read_parallel_patches = fclaw_true;
+        copy_ghost_samelevel(domain,coarse_level,coarse_level,
+                             read_parallel_patches);
+   }
 
 /**
  * <summary>Complete exchange of all ghost patches at all levels.</summary>
@@ -249,8 +324,11 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
-                                     fclaw2d_timer_names_t running)
+void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
+                          int minlevel,
+                          int maxlevel,
+                          int time_interp,
+                          fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     if (running != FCLAW2D_TIMER_NONE) {
@@ -260,11 +338,14 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
 
     fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
+#if 0
     int minlevel = domain->global_minlevel;
     int maxlevel = domain->global_maxlevel;
+#endif
 
     /* No time interpolation, since levels are time synchronized */
-    fclaw_bool time_interp = fclaw_false;
+    /* fclaw_bool time_interp = fclaw_false; */
+
     double t = get_domain_time(domain);
 
     /* ---------------------------------------------------------
@@ -273,49 +354,24 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
        this step.  Ghost patches do not yet have valid data, and
        so boundary patches will have to be updated after the exchange.
        ---------------------------------------------------------- */
-    int mincoarse = minlevel;
-    int maxcoarse = maxlevel-1;   /* Be careful with minlevel=maxlevel */
-
-    /* IDEA 1: add boolean about on_parallel_boundary vs. interior.
-     *         1. Do the parallel boundary work here.
-     *            To the least possible amount of work before sending.
-     *             * copy_ghost_samelevel
-     *             * average_ghost_f2c
-     *             * fill_physical_ghost
-     *               (which subset of cells shall do it?)
-     *               (maybe we can skip doing it before sending altogether?)
-     *            More specifically, only copy/average across faces
-     *            between two parallel boundary patches, not corners.
-     *            Argue in paper why no corners needed for 5-point stencils.
-     *         2. Start sending: ghost_exchange_begin.
-     *         3. Do all the work on interior patches and whatever has not
-     *            been computed between parallel boundary patches.
-     *            Do the most possible amount of work while communicating.
-     *             * copy_ghost_samelevel
-     *             * average_ghost_f2c
-     *             * fill_physical_ghost
-     *               (how much of this can we possibly to here: maximize this.)
-     *             * interpolate_ghost_c2f for interior patches and
-     *               faces between parallel boundary and interior patches.
-     *         4. Recieve messages: ghost_exchange_end.
-     *         5. Work on receive buffers / parallel patches with remote data.
-     *             * copy_ghost_samelevel
-     *             * average_ghost_f2c
-     *             * fill_physical_ghost
-     *             * interpolate_ghost_c2f
-     *         6. Repeat 5. for whatever parts of patches that are not done yet.
-     *            Integrate this with 5. so we don't loop over patches twice.
-     *
-     * All of this goes into the paper as detailed algorithm with explanations.
-     */
-
     /* Copy ghost cells at coarse levels.  Include finest level, although it isn't
        needed immediately */
     fclaw_bool read_parallel_patches = fclaw_false;
     copy_ghost_samelevel(domain,minlevel,maxlevel,read_parallel_patches);
 
-    /* Average fine grid data to the coarse grid. */
-    average_ghost_fine2coarse(domain,mincoarse,maxcoarse, time_interp,
+    if (time_interp)
+    {
+        int time_interp_level = minlevel - 1;
+        fclaw_global_infof("Time interpolated level is %d\n",   \
+                           time_interp_level);
+    }
+
+    int mincoarse = minlevel;
+    int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
+
+    /* Average fine grid data to the coarse grid. If we only have a single
+     grid, we have maxcoarse < mincoarse, and this loop does nothing */
+    average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
                               read_parallel_patches);
 
     /* Supply physical boundary conditions on coarse grid;  We don't do the
@@ -327,7 +383,8 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
         /* -------------------------------------------------------------
            Parallel ghost patch exchange
            ------------------------------------------------------------- */
-        fclaw2d_partition_exchange_all(domain);
+        /* fclaw2d_partition_exchange_all(domain); */
+        fclaw2d_exchange_ghost_patches(domain,minlevel,maxlevel,time_interp);
 
         /* -------------------------------------------------------------
            Repeat above, but now with parallel ghost cells.
@@ -336,12 +393,13 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
 
         /* Fill in ghost cells on parallel patch boundaries */
         read_parallel_patches = fclaw_true;
+
         copy_ghost_samelevel(domain,minlevel,maxlevel,
                              read_parallel_patches);
 
         /* Average fine grid data to the coarse grid. */
-        average_ghost_fine2coarse(domain,mincoarse,maxcoarse, time_interp,
-                          read_parallel_patches);
+        average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
+                                  read_parallel_patches);
 
         /* Supply physical boundary conditions on coarse grid */
         fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
@@ -355,7 +413,115 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     int minfine = minlevel+1;
     int maxfine = maxlevel;
 
-    interpolate_ghost_coarse2fine(domain,minfine, maxfine, time_interp);
+    interpolate_coarse2fine_ghost(domain,minfine, maxfine, time_interp);
+
+    /* --------------------------------------------------------- */
+    /* Do a final fill in of boundary conditions of all physical
+       values */
+    fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
+
+    /* --------------------------------------------------------- */
+
+    // Stop timing
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_start (&ddata->timers[running]);
+    }
+}
+
+
+#if 0
+/* ----------------------------------------------------------
+   This does the intermediate ghost patch and ghost cell
+   exchange needed by the subcycled case.
+
+   Assumptions going into this routine :
+   -- coarse_level > global_minlevel
+   -- Data at coarse_level-1 is time interpolated data
+   -- This routine is never called in the non-subcycled case
+   -- This should be more 'lightweight' than doing a complete
+      exchange (across all levels) at each fine grid time
+      step.
+
+   ---------------------------------------------------------- */
+void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain,
+                                  int coarse_level,
+                                  int fine_level,
+                                  subcycle_manager *a_time_stepper,
+                                  fclaw2d_timer_names_t running)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_stop (&ddata->timers[running]);
+    }
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
+
+    int time_interp_level = coarse_level - 1;  /* Always okay */
+
+    int minlevel = coarse_level;  /* coarse_level > domain->global_coarselevel */
+    int maxlevel = fine_level;
+
+    fclaw_global_infof("Exchanging ghost patches from levels %d to %d\n",\
+                       minlevel, maxlevel);
+
+    fclaw_global_infof("Time interpolated level is %d\n",       \
+                       time_interp_level);
+
+    /* Copy between grids at the same level.  We don't worry about the copying at the
+       time interpolated level, since when we interpolated, we used data that was
+       already copied at the coarser level. */
+
+    fclaw_bool read_parallel_patches = fclaw_false;
+    copy_ghost_samelevel(domain,minlevel,maxlevel,read_parallel_patches);
+
+    /* Average fine grid data to the coarse grid. */
+    int mincoarse = minlevel;
+    int maxcoarse = maxlevel-1;   /* maxlevel > minlevel */
+
+    /* Average to time interpolated level as well */
+    average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
+                              read_parallel_patches);
+
+    /* Supply physical boundary conditions on coarse grid; */
+
+    fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+
+    if (domain->mpisize > 1)
+    {
+        /* -------------------------------------------------------------
+           Parallel ghost patch exchange
+           ------------------------------------------------------------- */
+        /* fclaw2d_partition_exchange_all(domain); */
+        fclaw2d_exchange_ghost_patches_all(domain);
+
+        /* -------------------------------------------------------------
+           Repeat above, but now with parallel ghost cells.
+           This may involve lots of duplicate work.
+           ------------------------------------------------------------- */
+
+        /* Fill in ghost cells on parallel patch boundaries */
+        read_parallel_patches = fclaw_true;
+        copy_ghost_samelevel(domain,minlevel,maxlevel,
+                             read_parallel_patches);
+
+        /* Average fine grid data to the coarse grid. */
+        average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
+                                  read_parallel_patches);
+
+        /* Supply physical boundary conditions on coarse grid */
+        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+    }
+
+    /* ---------------------------------------------------------
+       Fill in fine grid data via interpolation.
+       Fine grids that live at parallel boundaries may need to get
+       ghost cell data from the coarse ghost patch.
+       ---------------------------------------------------------- */
+    int minfine = minlevel+1;
+    int maxfine = maxlevel;
+
+    interpolate_coarse2fine_ghost(domain,minfine, maxfine, time_interp);
 
     /* --------------------------------------------------------- */
     /* Do a final fill in of boundary conditions of all physical
@@ -369,53 +535,16 @@ void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_start (&ddata->timers[running]);
     }
-}
+#endif
 
 
-/* ----------------------------------------------------------
-   This does the intermediate ghost patch and ghost cell
-   exchange needed by either the subcycled case or the non
-   subcycled case.
-
-   Assumptions going into this routine :
-   -- coarse_level > global_minlevel
-   -- Data at coarse_level-1 is time interpolated data
-   -- This routine is never called in the non-subcycled case
-   -- This should be more 'lightweight' than doing a complete
-      exchange (across all levels) at each fine grid time
-      step.  But it should be equivalent.
-
-   ---------------------------------------------------------- */
-void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain, int coarse_level,
-                                  int fine_level,
-                                  subcycle_manager *a_time_stepper,
-                                  fclaw2d_timer_names_t running)
-{
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    if (running != FCLAW2D_TIMER_NONE) {
-        fclaw2d_timer_stop (&ddata->timers[running]);
-    }
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
-
-    int time_interp_level = coarse_level - 1;
-    int minlevel = coarse_level;
-    int maxlevel = fine_level;
-
-    fclaw_global_infof("Exchanging ghost patches from levels %d to %d\n",\
-                       minlevel, maxlevel);
-    if (!a_time_stepper->nosubcycle())
-    {
-        fclaw_global_infof("Time interpolated level is %d\n",   \
-                           time_interp_level);
-    }
-
+#if 0
     /* Make available patches from levels coarse to fine */
     set_boundary_patch_ptrs(domain,time_interp_level, fine_level);
 
     /* Do parallel ghost exchange */
     exchange_ghost_patch_data_levels(domain,time_interp_level,
                                      fine_level);
-
     /* -------------------------------------------------------
        Do ghost cell exchange.
        ------------------------------------------------------- */
@@ -455,6 +584,7 @@ void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain, int coarse_level,
         fclaw2d_timer_start (&ddata->timers[running]);
     }
 }
+#endif
 
 
 
@@ -502,8 +632,8 @@ void update_ghost_partial(fclaw2d_domain_t* domain, int coarse_level,
     set_boundary_patch_ptrs(domain,time_interp_level, fine_level);
 
     /* Do parallel ghost exchange */
-    exchange_ghost_patch_data_levels(domain,time_interp_level,
-                                     fine_level);
+    exchange_ghost_patch_partial(domain,time_interp_level,
+                                 fine_level);
 
     /* -------------------------------------------------------
        Do ghost cell exchange.

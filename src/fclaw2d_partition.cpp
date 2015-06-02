@@ -25,13 +25,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_domain.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_partition.h>
 
+/* Also needed in amrreset */
+fclaw2d_domain_exchange_t*
+    fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    return ddata->domain_exchange;
+}
+
 static
 void set_exchange_data(fclaw2d_domain_t* domain,
-                                      fclaw2d_domain_exchange_t *e)
+                       fclaw2d_domain_exchange_t *e)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (domain);
     ddata->domain_exchange = e;
@@ -89,6 +98,7 @@ void fclaw2d_partition_setup(fclaw2d_domain* domain)
 }
 
 
+/* Question : Do all patches on this processor get packed? */
 void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 {
     char basename[BUFSIZ];
@@ -170,7 +180,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 void fclaw2d_partition_delete(fclaw2d_domain_t** domain)
 {
     /* Free old parallel ghost patch data structure, must exist by construction. */
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
     fclaw2d_domain_exchange_t *e_old = ddata->domain_exchange;
 
     delete_ghost_patches(*domain);

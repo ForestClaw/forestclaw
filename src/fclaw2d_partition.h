@@ -38,6 +38,9 @@ extern "C"
 #endif
 #endif
 
+fclaw2d_domain_exchange_t*
+    fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain);
+
 void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
 
 void fclaw2d_partition_setup(fclaw2d_domain_t* domain);

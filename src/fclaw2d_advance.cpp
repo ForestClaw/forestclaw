@@ -135,14 +135,20 @@ double advance_level(fclaw2d_domain_t *domain,
 
             if (!a_time_stepper->nosubcycle())
             {
-                /* Time interpolate this data for a future exchange with
-                   finer grid */
+                /* Time interpolate this data for a future exchange with finer grid */
                 int coarse_inc =
                     a_time_stepper->step_inc(coarser_level);
                 int new_curr_step =
                     a_time_stepper->last_step(this_level);
                 double alpha =
                     double(new_curr_step % coarse_inc)/coarse_inc;
+
+                /* Copy between grids at this level so that time interpolated data
+                   will have valid ghost cells, at least those that can be copied.
+                   This is needed so that we can interpolate to finer neighboring
+                   grids. */
+
+                fclaw2d_ghost_copy4timeinterp(domain,this_level);
 
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
@@ -198,11 +204,15 @@ double advance_all_levels(fclaw2d_domain_t *domain,
             {
                 time_interp_level--;
             }
+
             /* This exchange includes an exchange between level
                maxlevel-n+1 and the time interpolated patch at level
                maxlevel-n. */
-            fclaw2d_ghost_update_partial(domain,time_interp_level+1,maxlevel,
-                                         a_time_stepper,FCLAW2D_TIMER_ADVANCE);
+
+            /* coarsest level is a time interpolated level */
+            int time_interp = 1;
+            fclaw2d_ghost_update(domain,time_interp_level+1,maxlevel,
+                                 time_interp,FCLAW2D_TIMER_ADVANCE);
         }
     }
     /* Do a complete update.  This is needed even if we are regridding
@@ -213,7 +223,8 @@ double advance_all_levels(fclaw2d_domain_t *domain,
        skip this update, and make it clear to the user that ghost cell
        values are not available for determining refinement critera.
     */
-    fclaw2d_ghost_update_all_levels(domain,FCLAW2D_TIMER_ADVANCE);
+    int time_interp = 0;
+    fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
 
     // Stop the timer
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);

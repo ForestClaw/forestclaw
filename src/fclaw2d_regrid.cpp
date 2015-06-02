@@ -254,10 +254,16 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
         new_domain = NULL;
 
+        /* We have a newly created mesh;  We need to get all of the ghost cells
+           filled */
         fclaw2d_partition_domain(domain, -1);
-        fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID);
+        /* fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID); */
+        int minlevel = (*domain)->global_minlevel;
+        int maxlevel = (*domain)->global_maxlevel;
+        int time_interp = 0;
+        fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
         fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
-                            (*domain)->global_minlevel, (*domain)->global_maxlevel);
+                            minlevel,maxlevel);
     }
 
     /* Stop timer */
