@@ -44,6 +44,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int maxlevel,
                                     int time_interp);
 
+#if 0
 void fclaw2d_exchange_ghost_patches_all(fclaw2d_domain_t* domain);
 
 void fclaw2d_exchange_ghost_patch_partial(fclaw2d_domain_t* domain,
@@ -53,6 +54,7 @@ void fclaw2d_exchange_ghost_patch_partial(fclaw2d_domain_t* domain,
 void fclaw2d_exchange_ghost_patch_partial_new(fclaw2d_domain_t* domain,
                                               int exchange_minlevel,
                                               int exchange_maxlevel);
+#endif
 
 #ifdef __cplusplus
 #if 0
