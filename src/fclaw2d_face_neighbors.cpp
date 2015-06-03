@@ -176,9 +176,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
     fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
-
+  
     fclaw_bool read_parallel_patches = filltype->read_parallel_patches;
-
+  
     fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
     fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
@@ -238,7 +238,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             get_face_neighbors(domain,
                                this_block_idx,
                                this_patch_idx,
-                               iface, is_block_face,
+                               iface, 
+			       is_block_face,
                                &neighbor_block_idx,
                                neighbor_patches,
                                &ref_flag_ptr,
@@ -257,7 +258,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             /* Parallel distribution keeps siblings on same processor */
             fclaw_bool remote_neighbor;
             remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
-            if (is_coarse)
+            if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
                 if (neighbor_level == FINER_GRID)
                 {
@@ -295,11 +296,16 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
                 }
             }
-            else if (is_fine && remote_neighbor && read_parallel_patches)
+            else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor && read_parallel_patches)
             {
-                /* Swap 'this_patch' and the neighbor patch */
+	      /* Swap 'this_patch' and the neighbor patch */
                 ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
                 ClawPatch *fine_cp = this_cp;
+
+
+                /* make sure we are not using an unintialized variable */
+                /* FCLAW_ASSERT (fine_grid_pos_ptr != NULL); */
+                FCLAW_ASSERT (fine_grid_pos != -1);
 
                 /* Figure out which grid we got */
                 int igrid = fine_grid_pos;  /* returned from get_face_neighbors, above */
@@ -307,12 +313,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 int iface_coarse = iface_neighbor;
                 int this_face = iface;
 
-                /* make sure we are not using an unintialized variable */
-                FCLAW_ASSERT (fine_grid_pos_ptr != NULL);
-                FCLAW_ASSERT (fine_grid_pos != -1);
-
                 /* Redo the transformation */
-                if (neighbor_block_idx >= 0)
+                if (neighbor_block_idx != this_block_idx)
                 {
                     fclaw2d_patch_face_transformation (iface_coarse, this_face,
                                                        transform_data.transform);
@@ -321,36 +323,15 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 transform_data.neighbor_patch = this_patch;
                 transform_data.fine_grid_pos = igrid;
 
-                if (neighbor_level == COARSER_GRID)
-                {
-                    if (average_from_neighbor)
-                    {
-                        /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
-                        coarse_cp->average_face_ghost(idir,iface_coarse,
-                                                      p4est_refineFactor,refratio,
-                                                      fine_cp,time_interp,
-                                                      igrid, &transform_data);
-                    }
-                    else if (interpolate_to_neighbor)
-                    {
-                        /* Neighbor patch is a coarser grid;  we want to interpolate from parallal
-                           patch to 'this' patch (the finer grid) */
-                        coarse_cp->interpolate_face_ghost(idir,iface_coarse,
-                                                          p4est_refineFactor,refratio,
-                                                          fine_cp,time_interp,
-                                                          igrid, &transform_data);
-                    }
-                }
-                else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
-                {
-                    /* Copy to a parallal patch;  we need these values later for
-                       interpolation to on-proc fine grid corners */
-                    coarse_cp->exchange_face_ghost(iface_coarse,this_cp,&transform_data);
-                }
-                else if (neighbor_level == FINER_GRID)
-                {
-                    /* We don't need to interpolate to parallel patches */
-                }
+		/* "this" grid is now the remote patch; average from "this" to on-proc fine grid */
+		if (average_from_neighbor)
+		  {
+		    /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
+		    coarse_cp->average_face_ghost(idir,iface_coarse,
+						  p4est_refineFactor,refratio,
+						  fine_cp,time_interp,
+						  igrid, &transform_data);
+		  }
             }
         }  /* End of interior face */
     } /* End of iface loop */
