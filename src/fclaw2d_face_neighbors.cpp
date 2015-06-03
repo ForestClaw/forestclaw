@@ -332,6 +332,14 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						  fine_cp,time_interp,
 						  igrid, &transform_data);
                 }
+                else if (interpolate_to_neighbor)
+                {
+                    /* Interpolate from remote neighbor to 'this' patch (the finer grid */
+                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,
+                                                      p4est_refineFactor,refratio,
+                                                      fine_cp,time_interp,
+                                                      igrid, &transform_data);
+                }
             }
         }  /* End of interior face */
     } /* End of iface loop */
