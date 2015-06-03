@@ -218,7 +218,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                       &is_interior_face);
 
 
-        if (is_interior_face)
+        if (is_interior_face)  /* Not on a physical boundary */
         {
             /* Output arguments */
             int neighbor_block_idx;
@@ -325,7 +325,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     if (average_from_neighbor)
                     {
-                        /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
+                        /* Average from remote neighbor to 'this' patch (the finer grid). */
                         coarse_cp->average_face_ghost(idir,iface_coarse,
                                                       p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,
@@ -333,8 +333,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     }
                     else if (interpolate_to_neighbor)
                     {
-                        /* Neighbor patch is a coarser grid;  we want to interpolate from parallal
-                           patch to 'this' patch (the finer grid) */
+                        /* Interpolate from remote neighbor to 'this' patch (the finer grid */
                         coarse_cp->interpolate_face_ghost(idir,iface_coarse,
                                                           p4est_refineFactor,refratio,
                                                           fine_cp,time_interp,
