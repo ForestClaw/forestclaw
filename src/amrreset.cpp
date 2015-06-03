@@ -76,9 +76,11 @@ void amrreset(fclaw2d_domain_t **domain)
 
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {
+#if 0
         printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
                 (*domain)->mpirank,
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
+#endif
     }
 
     /* Evaluate timers if this domain has not been superseded yet. */
