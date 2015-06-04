@@ -1,6 +1,16 @@
 c     # Template function for setting refinement criteria.  The
-c     # user can copy this file to their directory, and then set the
-c     # vt.fort_tag4refinement = &tag4refinement.
+c     # user can copy this file to their directory.  To
+c     # indicate that this file should be used, set :
+c     #
+c     #      fclaw2d_vtable_t vt;
+c     #      /* .... */
+c     #      vt.fort_tag4refinement = &tag4refinement;
+c     #      fclaw2d_set_vtable(domain,&vt);
+c     #
+c     # in virtual tables (typically set in <application>_user.cpp, in a
+c     # a routine link '<application>_link_solvers(domain)'
+c     #
+c     # See also 'tag4coarsening.f'
 
       subroutine tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
