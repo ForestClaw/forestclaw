@@ -206,7 +206,6 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
     e_info.time_interp = time_interp;
     e_info.read_parallel_patches = read_parallel_patches;
     e_info.exchange_type = FCLAW2D_AVERAGE;
-    int fine_level = coarse_level + 1;
 
     /* Only update ghost cells at local boundaries */
     e_info.grid_type = FCLAW2D_IS_COARSE;
@@ -224,6 +223,7 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
         /* Second pass : average from local fine grids to remote coarse grids. These
            coarse grids might be needed for interpolation later. */
         e_info.grid_type = FCLAW2D_IS_FINE;
+        int fine_level = coarse_level + 1;
 
         /* Face average */
         fclaw2d_domain_iterate_level(domain, fine_level,
@@ -232,10 +232,10 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
         /* Corner average :
            We can skip the corner update, since we don't need the corner ghost cell
            values for doing interpolation (at least not yet) */
-        /*
+#if 0
         fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_average,
                                      (void *) &e_info);
-        */
+#endif
     }
 }
 
@@ -277,13 +277,11 @@ void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
 
     /* Interpolate to faces at parallel boundaries from coarse grid ghost
        patches */
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_face_fill,
-                                 (void *) &e_info);
+    fclaw2d_domain_iterate_level(domain, fine_level, cb_face_fill,(void *) &e_info);
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_fill,
-                                 (void *) &e_info);
+    fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_fill,(void *) &e_info);
 }
 
 /* -----------------------------------------------------------------------
@@ -380,8 +378,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* Fill in ghost cells on parallel patch boundaries */
         read_parallel_patches = fclaw_true;
 
-        copy_ghost_samelevel(domain,minlevel,maxlevel,
-                             read_parallel_patches);
+        copy_ghost_samelevel(domain,minlevel,maxlevel,read_parallel_patches);
 
         /* Average fine grid data to the coarse grid. */
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,

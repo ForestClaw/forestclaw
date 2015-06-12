@@ -234,6 +234,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
             fclaw2d_patch_t* neighbor_patches[p4est_refineFactor];
 
+            /* Reset this in case it got set in a remote copy */
+            transform_data.this_patch = this_patch;
+            this_cp = fclaw2d_clawpatch_get_cp(this_patch);
+
             /* transform_data.block_iface = iface; */
             get_face_neighbors(domain,
                                this_block_idx,
@@ -291,17 +295,34 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     /* Copy to same size patch */
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
-                    transform_data.neighbor_patch = neighbor_patches[0];
+                    transform_data.neighbor_patch = neighbor_patch;
                     transform_data.fine_grid_pos = 0;
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+                    if (remote_neighbor)
+                    {
+                        /* We need to copy to the remote neighbor; switch contexts, but
+                           use ClawPatches that are only in scope here, to avoid
+                           conflicts with above uses of the same variables */
+                        ClawPatch *neighbor_cp = this_cp;
+                        ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
+                        transform_data.this_patch = neighbor_patch;
+                        transform_data.neighbor_patch = this_patch;
+                        int this_iface = iface_neighbor;
+                        if (neighbor_block_idx >= 0)
+                        {
+                            fclaw2d_patch_face_transformation (this_iface, iface,
+                                                               transform_data.transform);
+                        }
+                        this_cp->exchange_face_ghost(this_iface,neighbor_cp,&transform_data);
+                    }
                 }
             }
-            else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor && read_parallel_patches)
+            else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
+                     && read_parallel_patches)
             {
                 /* Swap 'this_patch' and the neighbor patch */
                 ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
                 ClawPatch *fine_cp = this_cp;
-
 
                 /* make sure we are not using an unintialized variable */
                 /* FCLAW_ASSERT (fine_grid_pos_ptr != NULL); */
@@ -314,7 +335,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 int this_face = iface;
 
                 /* Redo the transformation */
-                if (neighbor_block_idx != this_block_idx)
+                if (neighbor_block_idx > 0)
                 {
                     fclaw2d_patch_face_transformation (iface_coarse, this_face,
                                                        transform_data.transform);
@@ -323,10 +344,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 transform_data.neighbor_patch = this_patch;
                 transform_data.fine_grid_pos = igrid;
 
-		/* "this" grid is now the remote patch; average from "this" to on-proc fine grid */
 		if (average_from_neighbor)
                 {
-		    /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
+		    /* Average from 'this' grid (fine grid) to remote grid (coarse grid) */
 		    coarse_cp->average_face_ghost(idir,iface_coarse,
 						  p4est_refineFactor,refratio,
 						  fine_cp,time_interp,

@@ -379,12 +379,14 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     {
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
-                            /* We don't need to interpolate to parallel patches */
+                            /* Interpolate 'this_cp' (coarse grid) to 'corner_cp' (fine grid)
+                               'icorner' is the coarse grid corner. */
                             this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
                                                               time_interp,&transform_data);
                         }
                         else if (average_from_neighbor)
                         {
+                            /* average 'corner_cp' (fine grid) to 'this_cp' (coarse grid) */
                             this_cp->average_corner_ghost(icorner,refratio,corner_cp,
                                                           time_interp, &transform_data);
                         }
@@ -418,7 +420,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }  /* Ende of non-parallel patch case */
-            else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor && read_parallel_patches)
+            else if (is_fine && neighbor_level == COARSER_GRID &&
+                     remote_neighbor && read_parallel_patches)
             {
                 /* Swap 'this_patch' and the neighbor patch */
                 ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(corner_patch);
@@ -433,17 +436,16 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 		/* "this" grid is now the remote patch; average from "this" to on-proc fine grid */
 		if (average_from_neighbor)
                 {
-		    /* Neighbor patch is a coarser grid;  we want to average 'this_patch' to it */
+		    /* Average from remote patch (fine grid) to 'this_patch' (coarse grid) */
 		    coarse_cp->average_corner_ghost(coarse_icorner,refratio,
-						  fine_cp,time_interp,
-						  &transform_data);
+                                                    fine_cp,time_interp,
+                                                    &transform_data);
                 }
                 else if (interpolate_to_neighbor)
                 {
-                    /* Interpolate from remote neighbor to 'this' patch (the finer grid */
+                    /* Interpolate from remote patch (coarse grid) to 'this' patch (fine grid) */
                     coarse_cp->interpolate_corner_ghost(coarse_icorner,refratio,fine_cp,
-                                                      time_interp,
-                                                      &transform_data);
+                                                      time_interp,&transform_data);
                 }
             }  /* End of parallel case */
         }  /* End of 'interior_corner' */
