@@ -12,7 +12,7 @@ include src/solvers/fc2d_dummy/Makefile.am
 
 # Simple examples to test options handling, etc, but no solvers.
 include applications/dummy/Makefile.am
-include applications/no_solver/Makefile.am
+### include applications/no_solver/Makefile.am
 ###   include applications/test_parms/Makefile.am
 
 # Test metric terms (curvature, for example)
