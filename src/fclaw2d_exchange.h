@@ -23,12 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_PARTITION_H
-#define FCLAW2D_PARTITION_H
+#ifndef FCLAW2D_EXCHANGE_H
+#define FCLAW2D_EXCHANGE_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_convenience.h"
-#include "fclaw2d_vtable.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_partition.h>
+#include <fclaw2d_convenience.h>
+#include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,16 +39,22 @@ extern "C"
 #endif
 #endif
 
-fclaw2d_domain_exchange_t*
-    fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain);
+void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
+                                    int minlevel,
+                                    int maxlevel,
+                                    int time_interp);
 
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
+#if 0
+void fclaw2d_exchange_ghost_patches_all(fclaw2d_domain_t* domain);
 
-void fclaw2d_partition_setup(fclaw2d_domain_t* domain);
-/** Repartition all patches in parallel.
- * \param [in] mode             A level for amrinit, -1 for running simulation.
- */
-void fclaw2d_partition_delete(fclaw2d_domain_t** domain);
+void fclaw2d_exchange_ghost_patch_partial(fclaw2d_domain_t* domain,
+                                          int exchange_minlevel,
+                                          int exchange_maxlevel);
+
+void fclaw2d_exchange_ghost_patch_partial_new(fclaw2d_domain_t* domain,
+                                              int exchange_minlevel,
+                                              int exchange_maxlevel);
+#endif
 
 #ifdef __cplusplus
 #if 0

@@ -94,16 +94,14 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user);
 
+void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
+                          int fine_level,
+                          int coarse_level,
+                          int time_interp,
+                          fclaw2d_timer_names_t running);
 
-
-void fclaw2d_ghost_update_all_levels(fclaw2d_domain_t* domain,
-                                     fclaw2d_timer_names_t running);
-
-
-void fclaw2d_ghost_update_partial(fclaw2d_domain_t* domain,
-                                  int coarse_level, int fine_level,
-                                  subcycle_manager *a_time_stepper,
-                                  fclaw2d_timer_names_t running);
+void fclaw2d_ghost_copy4timeinterp(fclaw2d_domain_t* domain,
+                                   int level);
 
 #ifdef __cplusplus
 #if 0

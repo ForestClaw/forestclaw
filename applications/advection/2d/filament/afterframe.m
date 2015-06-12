@@ -31,7 +31,7 @@ shg;
 NoQuery = 0;
 prt = false;
 if (prt)
-    filename = sprintf('filament%04d.png',Frame);    
+    filename = sprintf('filament%04d.png',Frame);
     print('-dpng','-r200',filename);
 end;
 
@@ -39,4 +39,3 @@ clear afterframe
 clear mapc2m
 clear mapc2m_squareddisk
 clear mapc2m_pillowdisk
-

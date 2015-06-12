@@ -37,19 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 } while (0)
 
 
-static
-void delete_ghost_patches(fclaw2d_domain_t* domain)
-{
-    for(int i = 0; i < domain->num_ghost_patches; i++)
-    {
-        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-
-        fclaw2d_patch_delete_cp(ghost_patch);
-        fclaw2d_patch_delete_data(ghost_patch);
-    }
-}
-
-
 void amrreset(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
@@ -78,19 +65,25 @@ void amrreset(fclaw2d_domain_t **domain)
         block->user = NULL;
     }
 
+    fclaw2d_partition_delete(domain);
+
+#if 0
     // Free old parallel ghost patch data structure, must exist by construction.
     delete_ghost_patches(*domain);
     fclaw2d_domain_exchange_t *e_old = fclaw2d_partition_get_exchange_data(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
+#endif
 
-    // Output memory discrepancy for the ClawPatch
+    /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {
+#if 0
         printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
                 (*domain)->mpirank,
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
+#endif
     }
 
-    // Evaluate timers if this domain has not been superseded yet.
+    /* Evaluate timers if this domain has not been superseded yet. */
     if (ddata->is_latest_domain) {
         sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
 

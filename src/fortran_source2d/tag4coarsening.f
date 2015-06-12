@@ -1,3 +1,17 @@
+c     # Template function for setting coarsening criteria.  The
+c     # user can copy this file to their directory.  To
+c     # indicate that this file should be used, set :
+c     #
+c     #      fclaw2d_vtable_t vt;
+c     #      /* .... */
+c     #      vt.fort_tag4coarsening = &tag4coarsening;
+c     #      fclaw2d_set_vtable(domain,&vt);
+c     #
+c     # in virtual tables (typically set in <application>_user.cpp, in a
+c     # a routine link '<application>_link_solvers(domain)'
+c     #
+c     # See also 'tag4refinement.f'
+
       subroutine tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)

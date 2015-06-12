@@ -290,6 +290,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
     fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
 
+    fclaw_bool read_parallel_patches = filltype->read_parallel_patches;
+
     fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
     fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
@@ -367,7 +369,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             }
 
             fclaw_bool remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
-            if (is_coarse)
+            if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
                 ClawPatch *corner_cp = fclaw2d_clawpatch_get_cp(corner_patch);
                 transform_data.neighbor_patch = corner_patch;
@@ -377,12 +379,14 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     {
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
-                            /* We don't need to interpolate to parallel patches */
+                            /* Interpolate 'this_cp' (coarse grid) to 'corner_cp' (fine grid)
+                               'icorner' is the coarse grid corner. */
                             this_cp->interpolate_corner_ghost(icorner,refratio,corner_cp,
                                                               time_interp,&transform_data);
                         }
                         else if (average_from_neighbor)
                         {
+                            /* average 'corner_cp' (fine grid) to 'this_cp' (coarse grid) */
                             this_cp->average_corner_ghost(icorner,refratio,corner_cp,
                                                           time_interp, &transform_data);
                         }
@@ -416,12 +420,33 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                 }
             }  /* Ende of non-parallel patch case */
-            else if (remote_neighbor && is_fine)
+            else if (is_fine && neighbor_level == COARSER_GRID &&
+                     remote_neighbor && read_parallel_patches)
             {
-                /* Neighbor is a parallel patch and we need to switch 'this_patch' with
-                   the 'ghost_patch'.  */
+                /* Swap 'this_patch' and the neighbor patch */
+                ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(corner_patch);
+                ClawPatch *fine_cp = this_cp;
 
+                /* Need to switch corners */
+                int coarse_icorner = 3-icorner;
 
+                transform_data.this_patch = corner_patch;
+                transform_data.neighbor_patch = this_patch;
+
+		/* "this" grid is now the remote patch; average from "this" to on-proc fine grid */
+		if (average_from_neighbor)
+                {
+		    /* Average from remote patch (fine grid) to 'this_patch' (coarse grid) */
+		    coarse_cp->average_corner_ghost(coarse_icorner,refratio,
+                                                    fine_cp,time_interp,
+                                                    &transform_data);
+                }
+                else if (interpolate_to_neighbor)
+                {
+                    /* Interpolate from remote patch (coarse grid) to 'this' patch (fine grid) */
+                    coarse_cp->interpolate_corner_ghost(coarse_icorner,refratio,fine_cp,
+                                                      time_interp,&transform_data);
+                }
             }  /* End of parallel case */
         }  /* End of 'interior_corner' */
     }  /* End of icorner loop */
