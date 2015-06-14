@@ -201,8 +201,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         }
         else
         {
-            fclaw_global_essentialf("this_block_idx = %d\n",this_block_idx);
-            fclaw_global_essentialf("corner_block_idx = %d\n",*corner_block_idx);
+            fclaw_global_essentialf("WARNING : this_block_idx = %d\n",this_block_idx);
+            fclaw_global_essentialf("WARNING : corner_block_idx = %d\n",*corner_block_idx);
             fclaw_global_essentialf("get_corner_neighbors " \
                                     "(fclaw2d_corner_neighbors.cpp : " \
                                     "We should not be here\n");
