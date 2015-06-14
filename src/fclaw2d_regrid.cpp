@@ -92,13 +92,15 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 
     if (level > minlevel)
     {
-        double xlower[4], ylower[4];
         int family_coarsened = 1;
+#if 0
+        double xlower[4], ylower[4];
         for (int igrid = 0; igrid < NumSiblings; igrid++)
         {
             xlower[igrid] = fine_patches[igrid].xlower;
             ylower[igrid] = fine_patches[igrid].ylower;
         }
+#endif
         family_coarsened = vt.patch_tag4coarsening(domain,&fine_patches[0],
                                                   blockno, fine0_patchno);
         if (family_coarsened == 1)
