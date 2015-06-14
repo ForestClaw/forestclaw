@@ -195,7 +195,6 @@ void amrinit (fclaw2d_domain_t **domain)
         {
             fclaw2d_regrid_new_domain_setup(*domain,new_domain);
 
-
             // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                            cb_domain_populate,
