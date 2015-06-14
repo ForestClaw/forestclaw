@@ -45,30 +45,6 @@ ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
     return fclaw2d_patch_get_cp(this_patch);
 }
 
-/* ------------------------------------------------------------------
-   Repartition and rebuild new domains, or construct initial domain
- -------------------------------------------------------------------- */
-void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              int blockno, int patchno)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int level = this_patch->level;
-
-    ClawPatch *cp = fclaw2d_patch_new_cp(this_patch);
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms);
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_set_clawpatch;
-}
-
-
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
@@ -125,6 +101,14 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        double alpha)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->setup_for_time_interpolation(alpha);
+}
+
 void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t* this_patch,
                                      fclaw_bool time_interp,
@@ -152,7 +136,8 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
     cp->save_current_step();
 }
 
-void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,
                                     double **surfnormals,
@@ -174,6 +159,31 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->block_corner_count();
+}
+
+
+
+/* ------------------------------------------------------------------
+   Repartition and rebuild new domains, or construct initial domain
+ -------------------------------------------------------------------- */
+void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              int blockno, int patchno)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int level = this_patch->level;
+
+    ClawPatch *cp = fclaw2d_patch_new_cp(this_patch);
+    cp->define(this_patch->xlower,
+               this_patch->ylower,
+               this_patch->xupper,
+               this_patch->yupper,
+               blockno,
+               level,
+               gparms);
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_set_clawpatch;
 }
 
 
@@ -211,7 +221,8 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
 
 void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch,
-                                    int this_block_idx, int this_patch_idx,
+                                    int this_block_idx,
+                                    int this_patch_idx,
                                     double *qdata, fclaw_bool time_interp)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
@@ -266,12 +277,4 @@ size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
     int meqn = gparms->meqn;
     size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
     return size*sizeof(double);
-}
-
-void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        double alpha)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->setup_for_time_interpolation(alpha);
 }
