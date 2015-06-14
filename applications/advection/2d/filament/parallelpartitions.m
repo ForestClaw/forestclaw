@@ -8,20 +8,12 @@ function pp = parallelpartitions(q)
 pp.seed = 337;   % Random seed for processor colormap.
 pp.npmax = 4;    % Number of processors
 
-pp.qcolors = [];
+pp.qmin = 0.01;
+pp.qmax = 1.01;
+pp.qmin = 2;
+pp.qmax = 4;
 
-qcolors = q;
-m = isnan(q);
-qcolors(m) = 0.5;
-qcolors(~m) = nan;  % Other values should be colored by processor color
-
-% Map q linearly into colormap; constrain entire color map into
-% range [qmin, qmax].  Set values that should use the partition
-% colormap to nan;
-
-pp.qmin = 0;
-pp.qmax = 1;
-pp.qcolors = qcolors;
-pp.colormap = colormap(white(64));  % Color map for q portion.
+pp.qcolors = q;
+pp.colormap = colormap(yrbcolormap);  % Color map for q portion.
 
 end

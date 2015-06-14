@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-map = 'nomap';
-% map = 'cart';
+% map = 'nomap';
+map = 'cart';
 % map = 'pillowdisk';
 % map = 'squareddisk';
 % map = 'pillowdisk5';
@@ -18,7 +18,7 @@ switch map
         yp = yc;
     case 'cart'
         % (xc,yc) in [0,1]x[0,1]
-        s = 0;
+        s = 0.025;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
                 

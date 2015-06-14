@@ -39,3 +39,4 @@ clear afterframe
 clear mapc2m
 clear mapc2m_squareddisk
 clear mapc2m_pillowdisk
+clear parallelpartitions
