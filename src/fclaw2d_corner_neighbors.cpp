@@ -142,7 +142,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        &corner_patch_idx, rcornerno,
                                        &neighbor_type);
 
-    if (domain->mpirank == 0 && this_patch_idx == 11)
+    if (domain->mpirank == 0 && this_patch_idx == 11 && this_block_idx == 0)
     {
         fclaw_global_essentialf("corner_block_idx = %d\n",*corner_block_idx);
         fclaw_global_essentialf("this_block_idx = %d\n",this_block_idx);
