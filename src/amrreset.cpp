@@ -51,13 +51,6 @@ void amrreset(fclaw2d_domain_t **domain)
             fclaw2d_patch_t *patch = block->patches + j;
             fclaw2d_patch_delete_cp(patch);
             fclaw2d_patch_delete_data(patch);
-#if 0
-            fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t *) patch->user;
-            delete pdata->cp;
-            pdata->cp = NULL;
-            FCLAW2D_FREE (pdata);
-            patch->user = NULL;
-#endif
             ++ddata->count_delete_clawpatch;
         }
 
@@ -67,20 +60,11 @@ void amrreset(fclaw2d_domain_t **domain)
 
     fclaw2d_partition_delete(domain);
 
-#if 0
-    // Free old parallel ghost patch data structure, must exist by construction.
-    delete_ghost_patches(*domain);
-    fclaw2d_domain_exchange_t *e_old = fclaw2d_partition_get_exchange_data(*domain);
-    fclaw2d_domain_free_after_exchange (*domain, e_old);
-#endif
-
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {
-#if 0
         printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
                 (*domain)->mpirank,
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
-#endif
     }
 
     /* Evaluate timers if this domain has not been superseded yet. */

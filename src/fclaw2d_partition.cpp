@@ -67,12 +67,14 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
 static
 void delete_ghost_patches(fclaw2d_domain_t* domain)
 {
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
 
         fclaw2d_patch_delete_cp(ghost_patch);
         fclaw2d_patch_delete_data(ghost_patch);
+        ++ddata->count_delete_clawpatch;
     }
 }
 
@@ -144,7 +146,8 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         /* TODO: for all (patch i) { unpack numerical data from patch_data[i] } */
-        fclaw2d_domain_iterate_patches(domain_partitioned, fclaw2d_clawpatch_unpack_cb,
+        fclaw2d_domain_iterate_patches(domain_partitioned,
+                                       fclaw2d_clawpatch_unpack_cb,
                                        (void *) patch_data);
 
         /* then the old domain is no longer necessary */

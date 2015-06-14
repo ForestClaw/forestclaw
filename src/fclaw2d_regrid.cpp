@@ -200,10 +200,8 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
     fclaw2d_domain_iterate_patches(new_domain, fclaw2d_clawpatch_build_cb,
                                    (void *) NULL);
 
-    fclaw_global_infof("Done\n");
-
     /* Set up the parallel ghost patch data structure. */
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... ");
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
 
     fclaw2d_partition_setup(new_domain);
 
@@ -215,6 +213,9 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+
+    fclaw_global_infof("Regridding domain\n");
+
 
     /* First determine which families should be coarsened. */
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
@@ -234,6 +235,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
     if (have_new_refinement)
     {
+        fclaw_global_infof(" -- Have new refinement\n");
+
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
         fclaw2d_regrid_new_domain_setup(*domain, new_domain);

@@ -241,14 +241,19 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 
 }
 
+#if 0
+/* count_delete_clawpatch is incremented in amrreset */
 void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
+    printf("Delete clawpatch_delete\n");
+    exit(0);
     fclaw2d_patch_delete_cp(this_patch);
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ++ddata->count_delete_clawpatch;
 }
+#endif
 
 
 
