@@ -117,6 +117,7 @@ static
 void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int this_block_idx,
                          int this_patch_idx,
+                         fclaw2d_patch_t* this_patch,
                          int icorner,
                          int block_iface,
                          fclaw_bool is_block_corner,
@@ -140,6 +141,15 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        icorner, &rproc_corner, corner_block_idx,
                                        &corner_patch_idx, rcornerno,
                                        &neighbor_type);
+
+    if (domain->mpirank == 0 && this_patch_idx == 11)
+    {
+        fclaw_global_essentialf("corner_block_idx = %d\n",*corner_block_idx);
+        fclaw_global_essentialf("this_block_idx = %d\n",this_block_idx);
+        fclaw_global_essentialf("local_num_patches : %d\n",domain->local_num_patches);
+        fclaw_global_essentialf("global_num_patches : %lld\n",domain->global_num_patches);
+        fclaw_global_essentialf("ghost_num_patches : %d\n",domain->num_ghost_patches);
+    }
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)
@@ -344,9 +354,11 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             int rcornerno;
 
             transform_data.icorner = icorner;
+            corner_block_idx = -1;
             get_corner_neighbor(domain,
                                 this_block_idx,
                                 this_patch_idx,
+                                this_patch,
                                 icorner,
                                 transform_data.block_iface,
                                 is_block_corner,
