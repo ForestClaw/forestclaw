@@ -1,0 +1,41 @@
+$483 = 0
+(gdb) p blockno
+$484 = 1
+(gdb) p patchno
+$485 = 11
+(gdb) p block->num_patches
+$486 = 64
+(gdb) p domain->blocks->num_patches
+$487 = 154
+(gdb) p domain->num_ghost_patches
+$488 = 28
+(gdb) 
+>>> 4*165+0
+660
+>>> 
+(gdb) p *(mesh->quad_to_corner+650)@20
+$482 = {257, 165, 156, 160, 164, 168, 256, 163, 277, 187, 0, 1072693248, 0, 1072693248, 157, 161, 165, 169, 160, 172}
+(gdb) p mesh->quad_to_corner[660]
+$483 = 0
+(gdb) p qid
+$489 = 0
+
+(gdb) bt 1
+#0  fclaw2d_patch_corner_neighbors (domain=0x2eeb950, blockno=1, patchno=11, cornerno=0, rproc=0x7ffed1ef1ac0, rblockno=0x7ffed1ef1c08, 
+    rpatchno=0x7ffed1ef1ac4, rcorner=0x7ffed1ef1c10, neighbor_size=0x7ffed1ef1ac8) at ../forestclaw/src/forestclaw2d.c:829
+(More stack frames follow...)
+(gdb) list 829
+824	        if (qid < mesh->local_num_quadrants)
+825	        {
+826	            /* local quadrant may be in a different tree */
+827	            *rproc = domain->mpirank;
+828	            *rblockno = (int) mesh->quad_to_tree[qid];
+829	            rtree = p4est_tree_array_index (p4est->trees,
+830	                                            (p4est_topidx_t) * rblockno);
+831	            FCLAW_ASSERT (rtree->quadrants_offset <= qid);
+832	            qid -= rtree->quadrants_offset;     /* relative to tree */
+833	            q = p4est_quadrant_array_index (&rtree->quadrants, qid);
+
+(gdb) p *rblockno
+$491 = 0
+
