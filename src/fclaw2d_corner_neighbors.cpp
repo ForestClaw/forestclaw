@@ -194,12 +194,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             /* Get encoding of transforming a neighbor coordinate across a face */
             fclaw2d_patch_face_transformation (block_iface, rfaceno, ftransform);
         }
-        else
-        {
-            /* Assume that we are on the same block */
-            ftransform[8] = 4;
-        }
-#if 0
         else if (this_block_idx == *corner_block_idx)
         {
             /* Both patches are in the same block, so we set the transform to
@@ -215,7 +209,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                     "We should not be here\n");
             exit(0);
         }
-#endif
     }
     else if (!has_corner_neighbor && is_block_corner)
     {
