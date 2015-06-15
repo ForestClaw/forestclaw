@@ -143,6 +143,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        rcornerno,
                                        &neighbor_type);
 
+#if 0
     if (domain->mpirank == 0 && this_patch_idx == 11 && this_block_idx == 0)
     {
         fclaw_global_essentialf("corner_block_idx = %d\n",*corner_block_idx);
@@ -151,6 +152,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         fclaw_global_essentialf("global_num_patches : %lld\n",domain->global_num_patches);
         fclaw_global_essentialf("ghost_num_patches : %d\n",domain->num_ghost_patches);
     }
+#endif
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)
