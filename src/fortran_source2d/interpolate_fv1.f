@@ -285,7 +285,6 @@ c        # chosen from centered (sc) slope
          sc = (sl + sr)/2.d0
          compute_slopes = min(abs(sl),abs(sr),abs(sc))*
      &         max(0.d0,sign(1.d0,sl*sr))*sign(1.d0,sc)
-         write(6,*) 'WARNING : compute_slopes set to average'
          compute_slopes = sc
 
       endif
