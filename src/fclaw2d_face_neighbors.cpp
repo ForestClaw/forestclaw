@@ -203,6 +203,11 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
+    fclaw2d_transform_data_t transform_data_finegrid;
+    transform_data_finegrid.mx = gparms->mx;
+    transform_data_finegrid.my = gparms->my;
+    transform_data_finegrid.based = 1;   // cell-centered data in this routine.
+
     ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
     for (int iface = 0; iface < NumFaces; iface++)
     {
@@ -271,7 +276,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         ClawPatch *fine_neighbor_cp =
                             fclaw2d_clawpatch_get_cp(neighbor_patches[igrid]);
                         transform_data.neighbor_patch = neighbor_patches[igrid];
-                        transform_data.fine_grid_pos = igrid;
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
                             /* interpolate to igrid */
@@ -296,11 +300,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
-                    transform_data.fine_grid_pos = 0;
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
                     if (remote_neighbor)
                     {
-                        /* We need to copy to the remote neighbor; switch contexts, but
+                        /* We also need to copy _to_ the remote neighbor; switch contexts, but
                            use ClawPatches that are only in scope here, to avoid
                            conflicts with above uses of the same variables */
                         ClawPatch *neighbor_cp = this_cp;
@@ -320,29 +323,25 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
                      && read_parallel_patches)
             {
+                transform_data_finegrid.this_patch = neighbor_patches[0];
+                transform_data_finegrid.neighbor_patch = this_patch;
+
                 /* Swap 'this_patch' and the neighbor patch */
                 ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
                 ClawPatch *fine_cp = this_cp;
 
-                /* make sure we are not using an unintialized variable */
-                /* FCLAW_ASSERT (fine_grid_pos_ptr != NULL); */
-                FCLAW_ASSERT (fine_grid_pos != -1);
-
-                /* Figure out which grid we got */
-                int igrid = fine_grid_pos;  /* returned from get_face_neighbors, above */
-
                 int iface_coarse = iface_neighbor;
-                int this_face = iface;
+                int iface_fine = iface;
 
                 /* Redo the transformation */
-                if (neighbor_block_idx > 0)
+                if (neighbor_block_idx >= 0)
                 {
-                    fclaw2d_patch_face_transformation (iface_coarse, this_face,
-                                                       transform_data.transform);
+                    fclaw2d_patch_face_transformation (iface_coarse, iface_fine,
+                                                       transform_data_finegrid.transform);
                 }
-                transform_data.this_patch = neighbor_patches[0];  /* only one (coarse) neighbor */
-                transform_data.neighbor_patch = this_patch;
-                transform_data.fine_grid_pos = igrid;
+                transform_data_finegrid.this_patch = neighbor_patches[0];  /* only one (coarse) neighbor */
+                transform_data_finegrid.neighbor_patch = this_patch;
+                int igrid = fine_grid_pos;
 
 		if (average_from_neighbor)
                 {
@@ -350,7 +349,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 		    coarse_cp->average_face_ghost(idir,iface_coarse,
 						  p4est_refineFactor,refratio,
 						  fine_cp,time_interp,
-						  igrid, &transform_data);
+						  igrid, &transform_data_finegrid);
                 }
                 else if (interpolate_to_neighbor)
                 {
@@ -358,7 +357,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     coarse_cp->interpolate_face_ghost(idir,iface_coarse,
                                                       p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,
-                                                      igrid, &transform_data);
+                                                      igrid, &transform_data_finegrid);
                 }
             }
         }  /* End of interior face */
