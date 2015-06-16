@@ -333,13 +333,11 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
-    transform_data.is_block_face = -1;
 
     fclaw2d_transform_data_t transform_data_finegrid;
     transform_data_finegrid.mx = gparms->mx;
     transform_data_finegrid.my = gparms->my;
     transform_data_finegrid.based = 1;   // cell-centered data in this routine.
-    transform_data_finegrid.is_block_face = -1;
 
     int refratio = gparms->refratio;
 

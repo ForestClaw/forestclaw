@@ -49,11 +49,12 @@ typedef struct fclaw2d_transform_data
     int is_block_corner;
     int block_iface;   /* -1 for interior faces or block corners */
 
-
+#if 0
     /* These don't seem to be used */
     int is_block_face;    /* not a corner */
     int fine_grid_pos;         /* Fine grid position (0 or 1) */
     int is_block_boundary;     /* is_block_face ? */
+#endif
 }
 fclaw2d_transform_data_t;
 
