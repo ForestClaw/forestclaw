@@ -354,6 +354,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         &is_block_corner,
                         &transform_data.block_iface);
 
+        transform_data_finegrid.block_iface = -1;
+
         if (is_interior_corner)
         {
             /* Interior to the domain, not necessarily to a block */

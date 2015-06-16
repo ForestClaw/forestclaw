@@ -334,7 +334,10 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
     double t = get_domain_time(domain);
 
+    /* uncomment this if debugging ghost cell interpolation */
+#if 0
     fclaw_global_essentialf("WARNING : compute_slopes set to average\n");
+#endif
 
     /* ---------------------------------------------------------
        Get coarse grid ghost cells ready to use for interpolation.
