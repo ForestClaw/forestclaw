@@ -334,8 +334,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
     double t = get_domain_time(domain);
 
-    /* uncomment this if debugging ghost cell interpolation */
 #if 0
+    /* uncomment this if debugging ghost cell interpolation */
     fclaw_global_essentialf("WARNING : compute_slopes set to average\n");
 #endif
 

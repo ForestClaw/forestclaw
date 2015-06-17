@@ -323,7 +323,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
                      && read_parallel_patches)
             {
-	      /* fclaw2d_transform_data_t transform_data; */
+                fclaw2d_transform_data_t transform_data;
 	        transform_data.mx = gparms->mx;
 	        transform_data.my = gparms->my;
 	        transform_data.based = 1;   // cell-centered data in this routine.
@@ -340,6 +340,11 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     fclaw2d_patch_face_transformation (iface_coarse, iface_fine,
                                                        transform_data.transform);
+                }
+                else
+                {
+                    /* assume that face is at the interior of a block */
+                    transform_data.transform[8] = 4;
                 }
 
                 transform_data.this_patch = neighbor_patches[0];
