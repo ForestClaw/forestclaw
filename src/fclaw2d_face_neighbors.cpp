@@ -323,9 +323,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
                      && read_parallel_patches)
             {
-                transform_data_finegrid.this_patch = neighbor_patches[0];
-                transform_data_finegrid.neighbor_patch = this_patch;
-
                 /* Swap 'this_patch' and the neighbor patch */
                 ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
                 ClawPatch *fine_cp = this_cp;
@@ -333,14 +330,22 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 int iface_coarse = iface_neighbor;
                 int iface_fine = iface;
 
+                transform_data_finegrid.this_patch = neighbor_patches[0];
+                transform_data_finegrid.neighbor_patch = this_patch;
+
+
                 /* Redo the transformation */
                 if (neighbor_block_idx >= 0)
                 {
                     fclaw2d_patch_face_transformation (iface_coarse, iface_fine,
                                                        transform_data_finegrid.transform);
                 }
-                transform_data_finegrid.this_patch = neighbor_patches[0];  /* only one (coarse) neighbor */
-                transform_data_finegrid.neighbor_patch = this_patch;
+#if 0
+                transform_data.this_patch = neighbor_patches[0];  /* only one (coarse) neighbor */
+                transform_data.neighbor_patch = this_patch;
+#endif
+
+
                 int igrid = fine_grid_pos;
 
 		if (average_from_neighbor)
