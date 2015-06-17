@@ -203,11 +203,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
-    fclaw2d_transform_data_t transform_data_finegrid;
-    transform_data_finegrid.mx = gparms->mx;
-    transform_data_finegrid.my = gparms->my;
-    transform_data_finegrid.based = 1;   // cell-centered data in this routine.
-
     ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
     for (int iface = 0; iface < NumFaces; iface++)
     {
@@ -306,6 +301,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         /* We also need to copy _to_ the remote neighbor; switch contexts, but
                            use ClawPatches that are only in scope here, to avoid
                            conflicts with above uses of the same variables */
+
+                        /* Create a new transform so we don't mess up the original one */
+                        fclaw2d_transform_data_t transform_data;
+                        transform_data.mx = gparms->mx;
+                        transform_data.my = gparms->my;
+                        transform_data.based = 1;   // cell-centered data in this routine.
+
                         ClawPatch *neighbor_cp = this_cp;
                         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                         transform_data.this_patch = neighbor_patch;
@@ -315,6 +317,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         {
                             fclaw2d_patch_face_transformation (this_iface, iface,
                                                                transform_data.transform);
+                        }
+                        else
+                        {
+                            transform_data.transform[8] = 4;
                         }
                         this_cp->exchange_face_ghost(this_iface,neighbor_cp,&transform_data);
                     }
