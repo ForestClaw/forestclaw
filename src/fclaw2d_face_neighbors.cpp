@@ -334,10 +334,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 	        transform_data.my = gparms->my;
 	        transform_data.based = 1;   // cell-centered data in this routine.
 
-                /* Swap 'this_patch' and the neighbor patch */
-                ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
-                ClawPatch *fine_cp = this_cp;
-
                 int iface_coarse = iface_neighbor;
                 int iface_fine = iface;
 
@@ -357,11 +353,16 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 transform_data.neighbor_patch = this_patch;
 
                 int igrid = fine_grid_pos;
+                int idir_coarse = iface_coarse/2;
+
+                /* Swap 'this_patch' (fine grid) and the neighbor patch (a coarse grid) */
+                ClawPatch *coarse_cp = fclaw2d_clawpatch_get_cp(neighbor_patches[0]);
+                ClawPatch *fine_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
 		if (average_from_neighbor)
                 {
 		    /* Average from 'this' grid (fine grid) to remote grid (coarse grid) */
-		    coarse_cp->average_face_ghost(idir,iface_coarse,
+		    coarse_cp->average_face_ghost(idir_coarse,iface_coarse,
 						  p4est_refineFactor,refratio,
 						  fine_cp,time_interp,
 						  igrid, &transform_data);
@@ -369,7 +370,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 else if (interpolate_to_neighbor)
                 {
                     /* Interpolate from remote neighbor to 'this' patch (the finer grid */
-                    coarse_cp->interpolate_face_ghost(idir,iface_coarse,
+                    coarse_cp->interpolate_face_ghost(idir_coarse,iface_coarse,
                                                       p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,
                                                       igrid, &transform_data);
