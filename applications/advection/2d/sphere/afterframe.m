@@ -30,3 +30,4 @@ shg;
 clear afterframe;
 clear mapc2m;
 clear mapc2m_cubed_sphere;
+clear parallelpartitions;
