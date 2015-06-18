@@ -475,8 +475,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 {
                     /* Interpolate from remote patch (coarse grid) to 'this' patch (fine grid) */
                     int coarse_icorner = transform_data_finegrid.icorner;
+                    fedisableexcept(FE_INVALID);
                     coarse_cp->interpolate_corner_ghost(coarse_icorner,refratio,fine_cp,
                                                       time_interp,&transform_data_finegrid);
+                    feenableexcept(FE_INVALID);
                 }
             }  /* End of parallel case */
         }  /* End of 'interior_corner' */
