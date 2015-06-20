@@ -100,11 +100,22 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     }
 
     /* Do exchange to update ghost patch data */
-    fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
+    if (time_interp)
+    {
+        int time_interp_level = minlevel-1;
+        fclaw2d_domain_ghost_exchange(domain, e, time_interp_level, maxlevel);
+        /* Store newly updated e->ghost_patch_data into ghost patches constructed
+           locally */
+        unpack_ghost_patches(domain,e,time_interp_level,maxlevel,time_interp);
+    }
+    else
+    {
+        fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
+        /* Store newly updated e->ghost_patch_data into ghost patches constructed
+           locally */
+        unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
+    }
 
-    /* Store newly updated e->ghost_patch_data into ghost patches constructed
-       locally */
-    unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */
     ++ddata->count_ghost_exchange;

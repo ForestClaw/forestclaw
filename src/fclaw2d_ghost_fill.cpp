@@ -121,11 +121,13 @@ void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
     for(int level = maxcoarse; level >= mincoarse; level--)
     {
         /* Don't do any time interpolation yet */
-        average2ghost(domain,level,0,read_parallel_patches);
+        int time_interp = 0;
+        average2ghost(domain,level,time_interp,read_parallel_patches);
     }
     if (time_interp)
     {
-        /* Average fine grid to coarse time interpolated level */
+        /* Average fine grid to coarse time interpolated level.  Time interpolated
+         faces need correct values.  */
         int time_interp_level = mincoarse-1;
         average2ghost(domain,time_interp_level,time_interp,read_parallel_patches);
     }
@@ -139,12 +141,15 @@ void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
     /* Interpolate from coarse grid to fine grid ghost */
     for(int level = maxfine; level >= minfine; level--)
     {
-        interpolate2ghost(domain,level,0);
+        /* No need to interpolate to coarse time-interpolated grids */
+        int time_interp = 0;
+        interpolate2ghost(domain,level,time_interp);
     }
     if (time_interp)
     {
-        int time_interp_level = minfine-1;
-        interpolate2ghost(domain,time_interp_level,1);
+        /* interpolate from time interpolated level */
+        int mincoarse = minfine-1;
+        interpolate2ghost(domain,mincoarse,time_interp);
     }
 }
 
@@ -193,7 +198,6 @@ void copy2ghost(fclaw2d_domain_t *domain, int level,
     /* corner exchanges */
     fclaw2d_domain_iterate_level(domain, level, cb_corner_fill,
                                  (void *) &e_info);
-
 }
 
 
@@ -203,7 +207,7 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
                    fclaw_bool read_parallel_patches)
 {
     fclaw2d_exchange_info_t e_info;
-    e_info.time_interp = time_interp;
+    e_info.time_interp = time_interp; /* Does this matter here? */
     e_info.read_parallel_patches = read_parallel_patches;
     e_info.exchange_type = FCLAW2D_AVERAGE;
 
@@ -223,6 +227,7 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
         /* Second pass : average from local fine grids to remote coarse grids. These
            coarse grids might be needed for interpolation later. */
         e_info.grid_type = FCLAW2D_IS_FINE;
+
         int fine_level = coarse_level + 1;
 
         /* Face average */
@@ -240,23 +245,27 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
 }
 
 static
-void interpolate2ghost(fclaw2d_domain_t *domain,int fine_level,
-                       fclaw_bool time_interp)
+void interpolate2ghost(fclaw2d_domain_t *domain,
+                       int fine_level,
+                       fclaw_bool time_interp,
+                       fclaw_bool read_parallel_patches)
 {
     fclaw2d_exchange_info_t e_info;
     e_info.time_interp = time_interp;
     e_info.level = fine_level;
     e_info.exchange_type = FCLAW2D_INTERPOLATE;
 
+    /* This should always be set to true, since we only interpolate
+       after a parallel exchange */
+     e_info.read_parallel_patches = read_parallel_patches;
+
     int coarse_level = fine_level - 1;
 
     /* ----------------------------------------------------------
-       First pass - iterate over coarse grids and update ghost
-       cells on local fine grids.
+       First pass - look for fine grids to interpolate to. This
+       should include include the time interpolated level.
        ---------------------------------------------------------- */
 
-    /* Interpolation done over all patches */
-    e_info.read_parallel_patches = fclaw_true;
     e_info.grid_type = FCLAW2D_IS_COARSE;
 
     /* Face interpolate */
