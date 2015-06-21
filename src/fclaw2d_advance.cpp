@@ -211,8 +211,12 @@ double advance_all_levels(fclaw2d_domain_t *domain,
 
             /* coarsest level is a time interpolated level */
             int time_interp = 1;
+            fclaw2d_ghost_update(domain,minlevel,maxlevel,
+                                 time_interp,FCLAW2D_TIMER_ADVANCE);
+#if 0
             fclaw2d_ghost_update(domain,time_interp_level+1,maxlevel,
                                  time_interp,FCLAW2D_TIMER_ADVANCE);
+#endif
         }
     }
     /* Do a complete update.  This is needed even if we are regridding
