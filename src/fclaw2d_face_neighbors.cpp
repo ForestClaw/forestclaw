@@ -370,10 +370,15 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 else if (interpolate_to_neighbor)
                 {
                     /* Interpolate from remote neighbor to 'this' patch (the finer grid */
+                    fedisableexcept(FE_INVALID);
                     coarse_cp->interpolate_face_ghost(idir_coarse,iface_coarse,
                                                       p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,
                                                       igrid, &transform_data);
+                    if (gparms->trapfpe)
+                    {
+                        feenableexcept(FE_INVALID);
+                    }
                 }
             }
         }  /* End of interior face */
