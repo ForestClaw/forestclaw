@@ -262,6 +262,7 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
        ---------------------------------------------------------- */
 
     e_info.grid_type = FCLAW2D_IS_COARSE;
+    e_info.read_parallel_patches = fclaw_true;
 
     /* Face interpolate */
     fclaw2d_domain_iterate_level(domain,coarse_level, cb_face_fill,
