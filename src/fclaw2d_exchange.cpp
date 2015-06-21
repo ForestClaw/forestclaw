@@ -74,6 +74,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
 
     /* Store pointers to local boundary data.  We do this here
        because we may be exchanging with time interpolated data. */
+    fclaw_debugf("Exchanging ghost patches : Setting up pointers.\n");
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
@@ -119,10 +120,13 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     }
 #endif
 
+    fclaw_debugf("Exchanging ghost patches : Doing exchange.\n");
     fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
     /* Store newly updated e->ghost_patch_data into ghost patches constructed
        locally */
+    fclaw_debugf("Exchanging ghost patches : Unpacking ghost patches.\n");
     unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
+    fclaw_debugf("Exchanging ghost patches : Done.\n");
 
 
     /* Count calls to this function */

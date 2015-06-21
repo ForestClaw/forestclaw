@@ -228,6 +228,8 @@ double advance_all_levels(fclaw2d_domain_t *domain,
        values are not available for determining refinement critera.
     */
     int time_interp = 0;
+    fclaw_global_infof("Advance is done with coarse grid step at " \
+                      " time %12.6e\n",a_time_stepper->initial_time());
     fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
 
     // Stop the timer
