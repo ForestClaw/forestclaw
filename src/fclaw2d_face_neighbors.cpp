@@ -377,9 +377,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                                       igrid, &transform_data);
                     if (gparms->trapfpe)
                     {
-#if 0
                         feenableexcept(FE_INVALID);
-#endif
                     }
                 }
             }
