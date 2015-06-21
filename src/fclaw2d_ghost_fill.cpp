@@ -247,17 +247,12 @@ void average2ghost(fclaw2d_domain_t *domain, int coarse_level,
 static
 void interpolate2ghost(fclaw2d_domain_t *domain,
                        int fine_level,
-                       fclaw_bool time_interp,
-                       fclaw_bool read_parallel_patches)
+                       fclaw_bool time_interp)
 {
     fclaw2d_exchange_info_t e_info;
     e_info.time_interp = time_interp;
     e_info.level = fine_level;
     e_info.exchange_type = FCLAW2D_INTERPOLATE;
-
-    /* This should always be set to true, since we only interpolate
-       after a parallel exchange */
-     e_info.read_parallel_patches = read_parallel_patches;
 
     int coarse_level = fine_level - 1;
 
