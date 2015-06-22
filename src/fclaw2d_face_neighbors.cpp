@@ -262,12 +262,17 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             /* Parallel distribution keeps siblings on same processor */
             fclaw_bool remote_neighbor;
             remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
-            if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
+            if (is_coarse)
             {
                 if (neighbor_level == FINER_GRID)
                 {
                     for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
                     {
+                        remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[igrid]);
+                        if (!((read_parallel_patches && remote_neighbor) || !remote_neighbor))
+                        {
+                            continue;
+                        }
                         ClawPatch *fine_neighbor_cp =
                             fclaw2d_clawpatch_get_cp(neighbor_patches[igrid]);
                         transform_data.neighbor_patch = neighbor_patches[igrid];
