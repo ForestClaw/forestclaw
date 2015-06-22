@@ -143,13 +143,6 @@ double advance_level(fclaw2d_domain_t *domain,
                 double alpha =
                     double(new_curr_step % coarse_inc)/coarse_inc;
 
-                /* Copy between grids at this level so that time interpolated data
-                   will have valid ghost cells, at least those that can be copied.
-                   This is needed so that we can interpolate to finer neighboring
-                   grids. */
-
-                fclaw2d_ghost_copy4timeinterp(domain,this_level);
-
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 

@@ -39,8 +39,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         int level = ghost_patch->level;
 
-        /* if (level >= minlevel-1) */
-        if (1)
+        if (level >= minlevel-1)
         {
             int blockno = ghost_patch->u.blockno;
 
@@ -101,33 +100,17 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
         }
     }
 
-    /* Do exchange to update ghost patch data */
-#if 0
+    /* Exchange only over levels currently in use */
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
         fclaw2d_domain_ghost_exchange(domain, e, time_interp_level, maxlevel);
-        /* Store newly updated e->ghost_patch_data into ghost patches constructed
-           locally */
-        unpack_ghost_patches(domain,e,time_interp_level,maxlevel,time_interp);
     }
     else
     {
         fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
-        /* Store newly updated e->ghost_patch_data into ghost patches constructed
-           locally */
-        unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
     }
-#endif
-
-    fclaw_debugf("Exchanging ghost patches : Doing exchange.\n");
-    fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
-    /* Store newly updated e->ghost_patch_data into ghost patches constructed
-       locally */
-    fclaw_debugf("Exchanging ghost patches : Unpacking ghost patches.\n");
     unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
-    fclaw_debugf("Exchanging ghost patches : Done.\n");
-
 
     /* Count calls to this function */
     ++ddata->count_ghost_exchange;
