@@ -67,7 +67,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int **ref_flag_ptr,
                         int **fine_grid_pos_ptr,
                         int **iface_neighbor_ptr,
-                        int ftransform[])
+                        int ftransform[],
+                        fclaw2d_transform_data_t* ftransform_finegrid)
 {
     int rproc[p4est_refineFactor];
     int rblockno;
@@ -110,11 +111,25 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         /* Get encoding of transforming a neighbor coordinate across a face */
         fclaw2d_patch_face_transformation (iface, rfaceno, ftransform);
 
+#if 0
+        fclaw2d_patch_face_swap(*iface_neighbor_ptr,&rfaceno);
+#endif
+        int iface1, rface1;
+        iface1 = iface;
+        rface1 = rfaceno;
+        fclaw2d_patch_face_swap(&iface1,&rface1);
+        fclaw2d_patch_face_transformation (iface1, rface1,
+                                           ftransform_finegrid->transform);
+        ftransform_finegrid->block_iface = iface1;
+        **iface_neighbor_ptr = iface1;
+
+
         if (!is_block_face)
         {
             /* If we are within one patch this is a special case */
             FCLAW_ASSERT (*neighbor_block_idx == -1);
             ftransform[8] = 4;
+            ftransform_finegrid->transform[8] = 4;
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -158,8 +173,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             }
             neighbor_patches[ir] = neighbor;
         }
-        **iface_neighbor_ptr = iface;
-        fclaw2d_patch_face_swap(*iface_neighbor_ptr,&rfaceno);
     }
 }
 
@@ -203,6 +216,11 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
+    fclaw2d_transform_data_t transform_data_finegrid;
+    transform_data_finegrid.mx = gparms->mx;
+    transform_data_finegrid.my = gparms->my;
+    transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
+
     ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
     for (int iface = 0; iface < NumFaces; iface++)
     {
@@ -238,6 +256,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             transform_data.this_patch = this_patch;
             this_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
+            transform_data_finegrid.block_iface = -1;
+
             /* transform_data.block_iface = iface; */
             get_face_neighbors(domain,
                                this_block_idx,
@@ -249,7 +269,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                &ref_flag_ptr,
                                &fine_grid_pos_ptr,
                                &iface_neighbor_ptr,
-                               transform_data.transform);
+                               transform_data.transform,
+                               &transform_data_finegrid);
+
+            /* Needed for switching the context */
+            transform_data_finegrid.this_patch = neighbor_patches[0];
+            transform_data_finegrid.neighbor_patch = this_patch;
+
 
             /* fclaw_bool block_boundary = (neighbor_block_idx >= 0); */
             if (ref_flag_ptr == NULL)
@@ -301,65 +327,31 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+
+                    /* We also need to copy _to_ the remote neighbor; switch contexts, but
+                       use ClawPatches that are only in scope here, to avoid
+                       conflicts with above uses of the same variables. This is needed
+                       in case we want to interpolate to adjacent corners on fine grids.*/
                     if (remote_neighbor)
                     {
-                        /* We also need to copy _to_ the remote neighbor; switch contexts, but
-                           use ClawPatches that are only in scope here, to avoid
-                           conflicts with above uses of the same variables */
-
                         /* Create a new transform so we don't mess up the original one */
-                        fclaw2d_transform_data_t transform_data;
-                        transform_data.mx = gparms->mx;
-                        transform_data.my = gparms->my;
-                        transform_data.based = 1;   // cell-centered data in this routine.
-
                         ClawPatch *neighbor_cp = this_cp;
                         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
-                        transform_data.this_patch = neighbor_patch;
-                        transform_data.neighbor_patch = this_patch;
                         int this_iface = iface_neighbor;
-                        if (neighbor_block_idx >= 0)
-                        {
-                            fclaw2d_patch_face_transformation (this_iface, iface,
-                                                               transform_data.transform);
-                        }
-                        else
-                        {
-                            transform_data.transform[8] = 4;
-                        }
-                        this_cp->exchange_face_ghost(this_iface,neighbor_cp,&transform_data);
+                        this_cp->exchange_face_ghost(this_iface,neighbor_cp,
+                                                     &transform_data_finegrid);
                     }
                 }
             }
             else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
                      && read_parallel_patches)
             {
-                fclaw2d_transform_data_t transform_data;
-	        transform_data.mx = gparms->mx;
-	        transform_data.my = gparms->my;
-	        transform_data.based = 1;   // cell-centered data in this routine.
-
                 int iface_coarse = iface_neighbor;
+#if 0
                 int iface_fine = iface;
+#endif
+                int igrid = fine_grid_pos;  /* Not used */
 
-                FCLAW_ASSERT(iface_coarse >=0 && iface_coarse < 4);
-
-                /* Redo the transformation */
-                if (neighbor_block_idx >= 0)
-                {
-                    fclaw2d_patch_face_transformation (iface_coarse, iface_fine,
-                                                       transform_data.transform);
-                }
-                else
-                {
-                    /* assume that face is at the interior of a block */
-                    transform_data.transform[8] = 4;
-                }
-
-                transform_data.this_patch = neighbor_patches[0];
-                transform_data.neighbor_patch = this_patch;
-
-                int igrid = fine_grid_pos;
                 int idir_coarse = iface_coarse/2;
 
                 /* Swap 'this_patch' (fine grid) and the neighbor patch (a coarse grid) */
@@ -372,7 +364,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 		    coarse_cp->average_face_ghost(idir_coarse,iface_coarse,
 						  p4est_refineFactor,refratio,
 						  fine_cp,time_interp,
-						  igrid, &transform_data);
+						  igrid, &transform_data_finegrid);
                 }
                 else if (interpolate_to_neighbor)
                 {
@@ -381,7 +373,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     coarse_cp->interpolate_face_ghost(idir_coarse,iface_coarse,
                                                       p4est_refineFactor,refratio,
                                                       fine_cp,time_interp,
-                                                      igrid, &transform_data);
+                                                      igrid, &transform_data_finegrid);
                     if (gparms->trapfpe)
                     {
                         feenableexcept(FE_INVALID);
