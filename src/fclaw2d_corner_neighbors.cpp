@@ -197,11 +197,12 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             /* rfaceno might be > 3 */
             ftransform_finegrid->block_iface = rfaceno;
 #endif
-            fclaw2d_patch_face_transformation (rfaceno, block_iface,
+            int iface1, rface1;
+            iface1 = block_iface;
+            rface1 = rfaceno;
+            fclaw2d_patch_face_swap(&iface1,&rface1);
+            fclaw2d_patch_face_transformation (iface1, rface1,
                                                ftransform_finegrid->transform);
-#if 0
-            fclaw2d_patch_face_swap(&ftransform_finegrid->block_iface,&rfaceno);
-#endif
         }
         else if (this_block_idx == *corner_block_idx)
         {
