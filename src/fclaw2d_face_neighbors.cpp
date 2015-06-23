@@ -111,9 +111,6 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         /* Get encoding of transforming a neighbor coordinate across a face */
         fclaw2d_patch_face_transformation (iface, rfaceno, ftransform);
 
-#if 0
-        fclaw2d_patch_face_swap(*iface_neighbor_ptr,&rfaceno);
-#endif
         int iface1, rface1;
         iface1 = iface;
         rface1 = rfaceno;
@@ -347,11 +344,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                      && read_parallel_patches)
             {
                 int iface_coarse = iface_neighbor;
-#if 0
-                int iface_fine = iface;
-#endif
                 int igrid = fine_grid_pos;  /* Not used */
-
                 int idir_coarse = iface_coarse/2;
 
                 /* Swap 'this_patch' (fine grid) and the neighbor patch (a coarse grid) */
