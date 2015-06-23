@@ -139,8 +139,12 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 
     fclaw_bool has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain,
-                                       this_block_idx, this_patch_idx,icorner,
-                                       &rproc_corner, corner_block_idx,&corner_patch_idx,
+                                       this_block_idx,
+                                       this_patch_idx,
+                                       icorner,
+                                       &rproc_corner,
+                                       corner_block_idx,
+                                       &corner_patch_idx,
                                        rcornerno,
                                        &neighbor_type);
 
@@ -188,10 +192,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             fclaw2d_patch_face_transformation (block_iface, rfaceno, ftransform);
 
             /* Needed for interpolation coarse grid ghost patch to fine grid on-proc patch */
+#if 0
             FCLAW_ASSERT(0 <= rfaceno && rfaceno < 4);
+            /* rfaceno might be > 3 */
             ftransform_finegrid->block_iface = rfaceno;
+#endif
             fclaw2d_patch_face_transformation (rfaceno, block_iface,
                                                ftransform_finegrid->transform);
+            fclaw2d_patch_face_swap(&ftransform_finegrid->block_iface,&rfaceno);
         }
         else if (this_block_idx == *corner_block_idx)
         {
