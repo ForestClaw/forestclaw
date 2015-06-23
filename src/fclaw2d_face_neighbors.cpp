@@ -342,6 +342,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 int iface_coarse = iface_neighbor;
                 int iface_fine = iface;
 
+                FCLAW_ASSERT(iface_coarse >=0 && iface_coarse < 4);
+
                 /* Redo the transformation */
                 if (neighbor_block_idx >= 0)
                 {
