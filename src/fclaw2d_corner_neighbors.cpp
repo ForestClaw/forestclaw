@@ -199,7 +199,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
 #endif
             fclaw2d_patch_face_transformation (rfaceno, block_iface,
                                                ftransform_finegrid->transform);
+#if 0
             fclaw2d_patch_face_swap(&ftransform_finegrid->block_iface,&rfaceno);
+#endif
         }
         else if (this_block_idx == *corner_block_idx)
         {
