@@ -191,12 +191,6 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             /* Get encoding of transforming a neighbor coordinate across a face */
             fclaw2d_patch_face_transformation (block_iface, rfaceno, ftransform);
 
-            /* Needed for interpolation coarse grid ghost patch to fine grid on-proc patch */
-#if 0
-            FCLAW_ASSERT(0 <= rfaceno && rfaceno < 4);
-            /* rfaceno might be > 3 */
-            ftransform_finegrid->block_iface = rfaceno;
-#endif
             int iface1, rface1;
             iface1 = block_iface;
             rface1 = rfaceno;
