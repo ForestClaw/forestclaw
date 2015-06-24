@@ -1,10 +1,13 @@
-% Compute speedup and efficiency
+% SPEEDUP computes speedup and efficiency of a parallal process
+%
+% ALPHA=SPEEDUP(P,T) computes the best-fit speed-up and parallel efficiency
+% of a process on with timings in vector T, on P processors.  The model
+% used is : 
 % 
-% Model : S = T(1)/T(p) = p^alpha
-% 
-%   T(p) = T(1)*p^(-alpha)
+%   Speedup :     S = T(1)/T(p) = p^alpha
+%       -->    T(p) = T(1)*p^(-alpha)
 %   
-%       T = C*p^(-alpha)
+%   T = C*p^(-alpha)
 %   log(T) = alpha*(-log(p)) + log(C)
 %   
 % We expect alpha \approx 1.

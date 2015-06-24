@@ -25,7 +25,7 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
-
+axis off
 shg;
 
 NoQuery = 0;

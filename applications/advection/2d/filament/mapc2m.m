@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'nomap';
-map = 'cart';
+map = 'nomap';
+% map = 'cart';
 % map = 'pillowdisk';
 % map = 'squareddisk';
 % map = 'pillowdisk5';
