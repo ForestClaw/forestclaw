@@ -102,8 +102,6 @@ libforestclaw_compiled_sources = \
 	src/amrreset.cpp \
 	src/subcycle_manager.cpp \
 	src/fclaw2d_advance.cpp \
-	src/amr_exchangecoarse.cpp \
-	src/amr_levelexchange.cpp \
 	src/amr_single_step.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
