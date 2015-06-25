@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <ClawPatch.H>
 
-/* This is used to determine neighbor patch relative level (finer, coarser or samesize) */
+/* This is used to determine neighbor patch relative level
+   (finer, coarser or samesize) */
 enum
 {
     COARSER_GRID = -1,
@@ -102,7 +103,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
     if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
     {
         /* This case should be excluded by earlier checkes */
-        printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch found\n");
+        printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch " \
+               "found\n");
         exit(0);
     }
     else
