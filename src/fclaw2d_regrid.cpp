@@ -227,10 +227,7 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
     /* Set up the parallel ghost patch data structure. */
     fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
 
-    if (new_domain->mpisize > 1)
-    {
-        fclaw2d_partition_setup(new_domain);
-    }
+    fclaw2d_partition_setup(new_domain);
 
     fclaw_global_infof("Done\n");
 }
@@ -286,10 +283,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
         /* We have a newly created mesh;  We need to get all of the ghost cells
            filled */
-        if ((*domain)->mpisize > 1)
-        {
-            fclaw2d_partition_domain(domain, -1);
-        }
+
+        fclaw2d_partition_domain(domain, -1);
 
         /* fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID); */
         int minlevel = (*domain)->global_minlevel;

@@ -55,10 +55,7 @@ void amrreset(fclaw2d_domain_t **domain)
         block->user = NULL;
     }
 
-    if ((*domain)->mpisize > 1)
-    {
-        fclaw2d_partition_delete(domain);
-    }
+    fclaw2d_partition_delete(domain);
 
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {

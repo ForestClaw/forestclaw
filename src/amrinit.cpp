@@ -255,10 +255,7 @@ void amrinit (fclaw2d_domain_t **domain)
             }
 
             /* Repartition domain to new processors. */
-            if ((*domain)->mpisize > 1)
-            {
-                fclaw2d_partition_domain(domain, level);
-            }
+            fclaw2d_partition_domain(domain, level);
         }
         else
         {
