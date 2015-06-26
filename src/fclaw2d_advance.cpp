@@ -165,7 +165,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
                           subcycle_manager *a_time_stepper)
 {
     // Start timer for advancing the levels
-    fclaw2d_domain_data_t* ddata = get_domain_data(domain);
+    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
     /* These are global minimum and maximum values */

@@ -58,7 +58,7 @@ fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
 void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
 
     /* Initialize user data */
     fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
@@ -77,7 +77,7 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
 
     if (pdata != NULL)
     {
-        fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
         delete pdata->cp;
         ++ddata->count_delete_clawpatch;
 

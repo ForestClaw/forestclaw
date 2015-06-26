@@ -50,7 +50,7 @@ void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
     domain->user = NULL;
 }
 
-fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain)
+fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw2d_domain_t *domain)
 {
     return (fclaw2d_domain_data_t *) domain->user;
 }
@@ -58,10 +58,10 @@ fclaw2d_domain_data_t *get_domain_data(fclaw2d_domain_t *domain)
 
 void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
 {
-    fclaw2d_domain_data_t *ddata_old = get_domain_data(old_domain);
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data(old_domain);
 
     /* Has the data already been allocated? */
-    fclaw2d_domain_data_t *ddata_new = get_domain_data(new_domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data(new_domain);
 
 
     /* Move timers over to the new domain */
@@ -104,13 +104,13 @@ int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
 
 void set_domain_time(fclaw2d_domain_t *domain, double time)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     ddata->curr_time = time;
 }
 
 double get_domain_time(fclaw2d_domain_t *domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     return ddata->curr_time;
 }
 

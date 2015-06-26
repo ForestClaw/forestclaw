@@ -164,7 +164,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             {
                 /* Get current domain data since it may change during
                    regrid. */
-                fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+                fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
                 fclaw2d_run_diagnostics(*domain);
@@ -348,7 +348,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             if (gparms->run_diagnostics)
             {
                 /* Get current domain data since it may change during regrid */
-                fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+                fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
                 fclaw2d_run_diagnostics(*domain);
@@ -461,7 +461,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
         if (gparms->run_diagnostics)
         {
             /* Get current domain data since it may change during regrid */
-            fclaw2d_domain_data_t *ddata = get_domain_data(*domain);
+            fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
             fclaw2d_run_diagnostics(*domain);

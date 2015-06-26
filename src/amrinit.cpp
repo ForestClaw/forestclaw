@@ -96,8 +96,8 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
 
-    fclaw2d_domain_data_t *ddata_new = get_domain_data (new_domain);
-    fclaw2d_domain_data_t *ddata_old = get_domain_data (old_domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
@@ -149,7 +149,7 @@ void amrinit (fclaw2d_domain_t **domain)
     char basename[BUFSIZ];
     const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
-    fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_map_context_t *cont = get_map_context(*domain);
     SET_CONTEXT(&cont);
 
@@ -239,7 +239,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // VTK output during amrinit
             if (gparms->vtkout & 1) {
                 // into timer
-                ddata = get_domain_data (*domain);
+                ddata = fclaw2d_domain_get_data (*domain);
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
 
@@ -269,6 +269,6 @@ void amrinit (fclaw2d_domain_t **domain)
                 (*domain)->global_minlevel, (*domain)->global_maxlevel);
 
     /* Stop timer */
-    ddata = get_domain_data(*domain);
+    ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }
