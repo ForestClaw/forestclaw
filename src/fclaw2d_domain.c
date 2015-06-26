@@ -42,7 +42,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->curr_time = 0;
 }
 
-void delete_domain_data(fclaw2d_domain_t* domain)
+void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
 

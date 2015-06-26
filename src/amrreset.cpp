@@ -109,7 +109,7 @@ void amrreset(fclaw2d_domain_t **domain)
     }
 
 
-    delete_domain_data(*domain);  // Delete allocated pointers to set of functions.
+    fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
