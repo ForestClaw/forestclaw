@@ -213,6 +213,54 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     }
 }
 
+void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch)
+{
+    printf("fclaw2d_clawpatch_delete_cp : we shouldn't be here\n");
+    exit(0);
+    fclaw2d_patch_delete_cp(this_patch);
+
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+    ++ddata->count_delete_clawpatch;
+}
+
+
+/* ----------------------------------------------------------
+   Pack and unpack for parallel ghost exchanges. Note this is
+   different from the packing/unpacking that happens when
+   partitioning the domain
+   ----------------------------------------------------------*/
+void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    double *qdata, fclaw_bool time_interp)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    if (time_interp)
+        cp->unpack_griddata_time_interpolated(qdata);
+    else
+        cp->unpack_griddata(qdata);
+}
+
+
+/* --------------------------------------------------------
+   Pack local patches on this processor before repartitioning;
+   retrieve patches that migrated across parallel borders to
+   load balance the computation.
+   -------------------------------------------------------*/
+
+size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
+    return size*sizeof(double);
+}
+
 void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -226,19 +274,6 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
     cp->pack_griddata(patch_data);
-}
-
-void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double *qdata, fclaw_bool time_interp)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    if (time_interp)
-        cp->unpack_griddata_time_interpolated(qdata);
-    else
-        cp->unpack_griddata(qdata);
 }
 
 void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
@@ -259,28 +294,4 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
     else
         cp->unpack_griddata(patch_data);
 
-}
-
-void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch)
-{
-    printf("fclaw2d_clawpatch_delete_cp : we shouldn't be here\n");
-    exit(0);
-    fclaw2d_patch_delete_cp(this_patch);
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_delete_clawpatch;
-}
-
-
-
-size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
-    return size*sizeof(double);
 }
