@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "filament_user.H"
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_patch.hpp>
 #include <fc2d_clawpack46.h>
 
 #include <fclaw2d_map.h>
