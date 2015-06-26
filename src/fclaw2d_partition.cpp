@@ -52,7 +52,7 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-        init_patch_data(ghost_patch);
+
         int blockno = ghost_patch->u.blockno;
 
         /* not clear how useful this patchno is.  In any case, it isn't

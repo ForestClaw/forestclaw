@@ -68,6 +68,8 @@ void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch)
 
 void init_patch_data(fclaw2d_patch_t *patch)
 {
+    printf("init_patch_data : We shouldn't be here\n");
+    exit(0);
     fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
     patch->user = (void *) pdata;
 }

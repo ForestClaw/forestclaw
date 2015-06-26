@@ -264,6 +264,8 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
+    printf("fclaw2d_clawpatch_delete_cp : we shouldn't be here\n");
+    exit(0);
     fclaw2d_patch_delete_cp(this_patch);
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
