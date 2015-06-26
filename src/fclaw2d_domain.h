@@ -80,6 +80,11 @@ fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time);
 double
 fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
 
+fclaw2d_map_context_t*
+fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain);
+
+
+
 
 /* --------------------------------------------------- */
 #if 0
@@ -113,9 +118,6 @@ fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
 
 const amr_options_t*
 get_domain_parms(fclaw2d_domain_t *domain);
-
-fclaw2d_map_context_t* get_map_context(fclaw2d_domain_t* domain);
-
 
 #ifdef __cplusplus
 #if 0

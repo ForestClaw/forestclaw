@@ -138,7 +138,7 @@ const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
     return fclaw2d_forestclaw_get_options(domain);
 }
 
-fclaw2d_map_context_t* get_map_context(fclaw2d_domain_t* domain)
+fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain)
 {
     fclaw2d_map_context_t* cont;
   cont = (fclaw2d_map_context_t*)

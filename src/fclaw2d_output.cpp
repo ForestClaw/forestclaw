@@ -99,7 +99,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
     const int mx = gparms->mx;
     const int my = gparms->my;
 
-    cont = get_map_context(domain);
+    cont = fclaw2d_domain_get_map_context(domain);
 
     // Patch specific parameters
 

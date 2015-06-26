@@ -150,7 +150,7 @@ void amrinit (fclaw2d_domain_t **domain)
     const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_map_context_t *cont = get_map_context(*domain);
+    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(*domain);
     SET_CONTEXT(&cont);
 
     int minlevel = gparms->minlevel;

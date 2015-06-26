@@ -141,7 +141,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     int corner_patch_idx;
     fclaw2d_patch_relation_t neighbor_type;
 
-    fclaw2d_map_context_t *cont = get_map_context(domain);
+    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
     fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
     fclaw_bool has_corner_neighbor =
@@ -333,7 +333,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw_bool is_interior_corner;
     int block_corner_count;
 
-    fclaw2d_map_context_t *cont = get_map_context(domain);
+    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
     fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
     fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
