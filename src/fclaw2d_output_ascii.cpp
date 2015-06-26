@@ -49,7 +49,7 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
 
     amropt = fclaw2d_forestclaw_get_options(domain);
 
-    time = get_domain_time(domain);
+    time = fclaw2d_domain_get_time(domain);
     ngrids = fclaw2d_domain_get_num_patches(domain);
 
     meqn = amropt->meqn;

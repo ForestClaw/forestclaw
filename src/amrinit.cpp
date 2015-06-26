@@ -183,7 +183,7 @@ void amrinit (fclaw2d_domain_t **domain)
                                  (void *) NULL);
 
     fclaw_bool time_interp = fclaw_false;
-    t = get_domain_time(*domain);
+    t = fclaw2d_domain_get_time(*domain);
     fclaw2d_set_physical_bc(*domain,minlevel,t,time_interp);
 
     // VTK output during amrinit
@@ -228,7 +228,7 @@ void amrinit (fclaw2d_domain_t **domain)
             // for using at tagging criteria, if necessary.
             int new_level = level+1;
             time_interp = fclaw_false;
-            t = get_domain_time(new_domain);
+            t = fclaw2d_domain_get_time(new_domain);
             fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain

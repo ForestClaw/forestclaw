@@ -46,7 +46,7 @@ void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain)
     double t;
 
     vt = fclaw2d_get_vtable(domain);
-    t = get_domain_time(domain);
+    t = fclaw2d_domain_get_time(domain);
 
     FCLAW_ASSERT(vt.run_diagnostics != NULL);
     vt.run_diagnostics(domain,t);

@@ -152,7 +152,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
             subcycle_manager time_stepper;
             time_stepper.define(*domain,gparms,t_curr);
 
-            set_domain_time(*domain,t_curr);
+            fclaw2d_domain_set_time(*domain,t_curr);
 
             /* In case we have to reject this step */
             if (!gparms->use_fixed_dt)
@@ -296,7 +296,7 @@ static void outstyle_1(fclaw2d_domain_t **domain)
         }
 
         /* Output file at every outer loop iteration */
-        set_domain_time(*domain,t_curr);
+        fclaw2d_domain_set_time(*domain,t_curr);
         iframe++;
         fclaw2d_output_frame(*domain,iframe);
     }
@@ -328,7 +328,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     /* Increase dt to value appropriate for level 0 */
     double dt_level0 = initial_dt*level_factor;
     double t_curr = t0;
-    set_domain_time(*domain,t_curr);
+    fclaw2d_domain_set_time(*domain,t_curr);
     int n = 0;
 
     while (n < nstep_outer)
@@ -405,7 +405,7 @@ static void outstyle_3(fclaw2d_domain_t **domain)
             }
 
             t_curr += dt_minlevel;
-            set_domain_time(*domain,t_curr);
+            fclaw2d_domain_set_time(*domain,t_curr);
 
             /* New time step, which should give a cfl close to the desired cfl. */
             if (!gparms->use_fixed_dt)
@@ -451,7 +451,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
 
     double t0 = 0;
     double t_curr = t0;
-    set_domain_time(*domain,t_curr);
+    fclaw2d_domain_set_time(*domain,t_curr);
     int n = 0;
     while (n < nstep_outer)
     {
@@ -482,7 +482,7 @@ static void outstyle_4(fclaw2d_domain_t **domain)
         t_curr += dt_minlevel;
         n++;
 
-        set_domain_time(*domain,t_curr);
+        fclaw2d_domain_set_time(*domain,t_curr);
 
         if (gparms->regrid_interval > 0)
         {
