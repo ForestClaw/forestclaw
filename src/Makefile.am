@@ -1,4 +1,3 @@
-
 # This file is part of ForestClaw.
 # Makefile.am in src
 # included non-recursively from toplevel directory
@@ -27,7 +26,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_clawpatch.h \
 	src/fclaw2d_clawpatch.hpp \
-	src/fclaw2d_patch.H \
+	src/fclaw2d_patch.hpp \
 	src/clawpack_fort.H \
 	src/fclaw2d_transform.h \
 	src/fclaw_package.h \
