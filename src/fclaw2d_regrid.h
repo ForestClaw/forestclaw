@@ -46,6 +46,22 @@ void fclaw2d_rebuild_domain(fclaw2d_domain_t* old_domain,
 void fclaw2d_regrid(fclaw2d_domain_t **domain);
 
 
+void fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx,
+                                   void *user);
+
+void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
+                               fclaw2d_patch_t * old_patch,
+                               fclaw2d_domain_t * new_domain,
+                               fclaw2d_patch_t * new_patch,
+                               fclaw2d_patch_relation_t newsize,
+                               int blockno,
+                               int old_patchno,
+                               int new_patchno,
+                               void *user);
+
 #ifdef __cplusplus
 #if 0
 {

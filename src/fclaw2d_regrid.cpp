@@ -43,16 +43,17 @@ extern "C"
 #endif
 
 
-static
-void cb_tag4refinement(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       void *user)
+void fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx,
+                                   void *user)
 {
     fclaw2d_vtable_t vt;
-    int initflag, refine_patch, maxlevel, level;
+    int refine_patch, maxlevel, level;
     const amr_options_t* gparms;
+
+    int domain_init = *((int*) user);
 
     vt = fclaw2d_get_vtable(domain);
     gparms = get_domain_parms(domain);
@@ -60,14 +61,11 @@ void cb_tag4refinement(fclaw2d_domain_t *domain,
     maxlevel = gparms->maxlevel;
     level = this_patch->level;
 
-    /* The initial mesh is built in a separate call (see amrinit) */
-    initflag = 0;
-
     if (level < maxlevel)
     {
         refine_patch  =
             vt.patch_tag4refinement(domain,this_patch,this_block_idx,
-                                    this_patch_idx, initflag);
+                                    this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
@@ -107,19 +105,20 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 }
 
 
-static
-void cb_repopulate(fclaw2d_domain_t * old_domain,
-                   fclaw2d_patch_t * old_patch,
-                   fclaw2d_domain_t * new_domain,
-                   fclaw2d_patch_t * new_patch,
-                   fclaw2d_patch_relation_t newsize,
-                   int blockno,
-                   int old_patchno,
-                   int new_patchno,
-                   void *user)
+void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
+                               fclaw2d_patch_t * old_patch,
+                               fclaw2d_domain_t * new_domain,
+                               fclaw2d_patch_t * new_patch,
+                               fclaw2d_patch_relation_t newsize,
+                               int blockno,
+                               int old_patchno,
+                               int new_patchno,
+                               void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
+
+    int domain_init = *((int*) user);
 
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
@@ -134,6 +133,7 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
         fclaw2d_patch_t *fine_siblings = new_patch;
+        fclaw2d_patch_t *coarse_patch = old_patch;
         for (int i = 0; i < NumSiblings; i++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
@@ -141,14 +141,20 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_data_new(new_domain,fine_patch);
             fclaw2d_clawpatch_build_cb(new_domain,fine_patch,blockno,
                                        fine_patchno,(void*) NULL);
+            if (domain_init)
+            {
+                vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
+            }
         }
 
-        fclaw2d_patch_t *coarse_patch = old_patch;
-        int coarse_patchno = old_patchno;
-        int fine_patchno = new_patchno;
+        if (!domain_init)
+        {
+            int coarse_patchno = old_patchno;
+            int fine_patchno = new_patchno;
 
-        vt.patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
-                                  blockno,coarse_patchno,fine_patchno);
+            vt.patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
+                                      blockno,coarse_patchno,fine_patchno);
+        }
         fclaw2d_patch_data_delete(old_domain,coarse_patch);
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
@@ -163,12 +169,20 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
                                    coarse_patchno,(void*) NULL);
 
-        vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                blockno,coarse_patchno, fine_patchno);
-        for(int i = 0; i < 4; i++)
+        if (domain_init)
         {
-            fclaw2d_patch_t* fine_patch = &fine_siblings[i];
-            fclaw2d_patch_data_delete(old_domain,fine_patch);
+            fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
+            exit(0);
+        }
+        else
+        {
+            vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
+                                    blockno,coarse_patchno, fine_patchno);
+            for(int i = 0; i < 4; i++)
+            {
+                fclaw2d_patch_t* fine_patch = &fine_siblings[i];
+                fclaw2d_patch_data_delete(old_domain,fine_patch);
+            }
         }
     }
     else
@@ -239,9 +253,9 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
                                     (void*) NULL);
 
-    /* Then refine. */
-    fclaw2d_domain_iterate_patches(*domain, cb_tag4refinement,
-                                   (void *) NULL);
+    int domain_init = 0;
+    fclaw2d_domain_iterate_patches(*domain, fclaw2d_regrid_tag4refinement,
+                                   (void *) &domain_init);
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */
@@ -260,8 +274,9 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         fclaw2d_regrid_new_domain_setup(*domain, new_domain);
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,cb_repopulate,
-                                       (void *) NULL);
+        fclaw2d_domain_iterate_adapted(*domain, new_domain,
+                                       fclaw2d_regrid_repopulate,
+                                       (void *) &domain_init);
 
         /* free memory associated with old domain */
         amrreset(domain);

@@ -31,35 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_clawpatch.hpp>
 
-// This is essentially the same function that is in amr_regrid.cpp
-static
-void cb_tag4refinement_init(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            void *user)
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    int maxlevel = gparms->maxlevel;
-    int level = this_patch->level;
-    int initflag = 1;
-
-    if (level < maxlevel)
-    {
-        fclaw_bool refine_patch  =
-            vt.patch_tag4refinement(domain,this_patch,this_block_idx,
-                                    this_patch_idx,initflag);
-
-        if (refine_patch)
-        {
-            fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
-        }
-    }
-}
 
 /* -----------------------------------------------------------------
    Initial grid
@@ -83,73 +54,19 @@ void cb_initialize (fclaw2d_domain_t *domain,
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
-static
-void cb_domain_populate (fclaw2d_domain_t * old_domain,
-                         fclaw2d_patch_t * old_patch,
-                         fclaw2d_domain_t * new_domain,
-                         fclaw2d_patch_t * new_patch,
-                         fclaw2d_patch_relation_t newsize,
-                         int blockno, int old_patchno,
-                         int new_patchno, void *user)
-
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(new_domain);
-
-    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
-    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
-
-    if (newsize == FCLAW2D_PATCH_SAMESIZE)
-    {
-#if 0
-        vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,
-                               old_patchno,
-                               new_patchno);
-#endif
-        new_patch->user = old_patch->user;
-        old_patch->user = NULL;
-        ++ddata_old->count_delete_clawpatch;
-        ++ddata_new->count_set_clawpatch;
-    }
-    else if (newsize == FCLAW2D_PATCH_HALFSIZE)
-    {
-        fclaw2d_patch_t *fine_siblings = new_patch;
-
-        for (int igrid = 0; igrid < NumSiblings; igrid++)
-        {
-            fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
-            int fine_patchno = new_patchno + igrid;
-            fclaw2d_patch_data_new(new_domain,fine_patch);
-            fclaw2d_clawpatch_build_cb(new_domain,
-                                       fine_patch,
-                                       blockno,
-                                       fine_patchno,(void*) NULL);
-
-            vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
-        }
-        fclaw2d_patch_data_delete(old_domain,old_patch);
-    }
-
-    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
-    {
-        // We don't coarsen for the initial time step
-    }
-    else
-    {
-        fclaw_global_essentialf("cb_domain_populate : newsize not recognized\n");
-        exit(1);
-    }
-}
 
 
 /* Initialize a base level of grids */
-void amrinit (fclaw2d_domain_t **domain)
+void fclaw2d_init (fclaw2d_domain_t **domain)
 {
     int i;
     char basename[BUFSIZ];
     const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
+
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
+
+    /* This mapping context is needed by fortran mapping functions */
     fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(*domain);
     SET_CONTEXT(&cont);
 
@@ -208,8 +125,10 @@ void amrinit (fclaw2d_domain_t **domain)
     // Refine as needed, one level at a time.
     for (int level = minlevel; level < maxlevel; level++)
     {
-        fclaw2d_domain_iterate_level(*domain, level, cb_tag4refinement_init,
-                                     (void *) NULL);
+        int domain_init = 1;
+        fclaw2d_domain_iterate_level(*domain, level,
+                                     fclaw2d_regrid_tag4refinement,
+                                     (void *) &domain_init);
 
         // Construct new domain based on tagged patches.
         fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
@@ -221,8 +140,8 @@ void amrinit (fclaw2d_domain_t **domain)
 
             // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,
-                                           cb_domain_populate,
-                                           (void *) NULL);
+                                           fclaw2d_regrid_repopulate,
+                                           (void *) &domain_init);
 
             // Set boundary need ghost cell values so they are available
             // for using at tagging criteria, if necessary.
