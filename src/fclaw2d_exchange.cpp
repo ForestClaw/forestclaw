@@ -71,7 +71,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int maxlevel,
                                     int time_interp)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_domain_exchange_t *e = fclaw2d_partition_get_exchange_data(domain);
 
     /* Store pointers to local boundary data.  We do this here

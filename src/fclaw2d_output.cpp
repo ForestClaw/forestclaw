@@ -193,7 +193,7 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     time = get_domain_time(domain);
 
     /* Record output time */
-    fclaw2d_domain_data_t *ddata = get_domain_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
 
     /* Output VTK file while we're at it */

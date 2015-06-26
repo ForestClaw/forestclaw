@@ -60,6 +60,10 @@ typedef struct fclaw2d_domain_data
 fclaw2d_domain_data_t;
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
+void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
+
+fclaw2d_domain_data_t*
+fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
 
 #if 0
 void
@@ -68,11 +72,10 @@ init_domain_data(fclaw2d_domain_t *domain);
 
 void
 delete_domain_data(fclaw2d_domain_t* domain);
-#endif
 
-void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
 fclaw2d_domain_data_t*
 get_domain_data(fclaw2d_domain_t *domain);
+#endif
 
 void
 copy_domain_data(fclaw2d_domain_t *old_domain,

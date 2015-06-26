@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void amrreset(fclaw2d_domain_t **domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
 
     for(int i = 0; i < (*domain)->num_blocks; i++)
     {

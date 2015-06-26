@@ -121,8 +121,8 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
 
-    fclaw2d_domain_data_t *ddata_old = get_domain_data (old_domain);
-    fclaw2d_domain_data_t *ddata_new = get_domain_data (new_domain);
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
@@ -225,7 +225,7 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
 
 void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
-    fclaw2d_domain_data_t* ddata = get_domain_data(*domain);
+    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 
     fclaw_global_infof("Regridding domain\n");
@@ -279,7 +279,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     }
 
     /* Stop timer */
-    ddata = get_domain_data(*domain);
+    ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 
     /* Count calls to this function */
