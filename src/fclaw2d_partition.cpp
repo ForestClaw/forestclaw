@@ -115,7 +115,8 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
                                               &patch_data);
 
-    /* For all (patch i) { pack its numerical data into patch_data[i] } */
+    /* For all (patch i) { pack its numerical data into patch_data[i] }
+       Does all the data in every patch need to be copied?  */
     fclaw2d_domain_iterate_patches(*domain,
                                    fclaw2d_clawpatch_pack_cb,
                                    (void *) patch_data);
@@ -133,6 +134,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     {
         fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
+
         fclaw2d_regrid_new_domain_setup(*domain, domain_partitioned);
 
 	/* Stop the timer in new since, since its state is now 1. We don't care about the
