@@ -198,7 +198,7 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
 
         /* Allocate memory for user data types (but they don't get set) */
         fclaw2d_domain_data_new(new_domain);
-        copy_domain_data(old_domain,new_domain);
+        fclaw2d_domain_data_copy(old_domain,new_domain);
         set_domain_time(new_domain,t);
     }
 

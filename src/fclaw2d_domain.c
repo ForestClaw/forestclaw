@@ -56,7 +56,7 @@ fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw2d_domain_t *domain)
 }
 
 
-void copy_domain_data(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
+void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
 {
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data(old_domain);
 
