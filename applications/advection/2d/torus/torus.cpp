@@ -191,7 +191,7 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_set_app (domain,app);
 
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
 
     torus_link_solvers(domain);
 

@@ -100,7 +100,7 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app (domain,app);
 
     swirl_link_solvers(domain);

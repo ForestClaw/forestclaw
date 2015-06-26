@@ -82,7 +82,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     quadrants_link_solvers(domain);

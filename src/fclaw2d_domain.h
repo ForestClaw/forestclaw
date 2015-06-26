@@ -59,8 +59,12 @@ typedef struct fclaw2d_domain_data
 }
 fclaw2d_domain_data_t;
 
+void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
+
+#if 0
 void
 init_domain_data(fclaw2d_domain_t *domain);
+#endif
 
 void
 delete_domain_data(fclaw2d_domain_t* domain);

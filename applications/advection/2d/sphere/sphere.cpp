@@ -139,7 +139,7 @@ static
         /* ---------------------------------------------------------------
            Set domain data.
            --------------------------------------------------------------- */
-        init_domain_data(domain);
+        fclaw2d_domain_data_new(domain);
         fclaw2d_domain_set_app(domain,app);
 
         sphere_link_solvers(domain);

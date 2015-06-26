@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_domain.h"
 
-void init_domain_data(fclaw2d_domain_t *domain)
+void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
     ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
