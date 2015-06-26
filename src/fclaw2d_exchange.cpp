@@ -31,8 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 
 static void
-unpack_ghost_patches(fclaw2d_domain_t* domain, fclaw2d_domain_exchange_t *e,
-                     int minlevel, int maxlevel, int time_interp)
+unpack_ghost_patches(fclaw2d_domain_t* domain,
+                     fclaw2d_domain_exchange_t *e,
+                     int minlevel,
+                     int maxlevel,
+                     int time_interp)
 {
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
