@@ -83,32 +83,9 @@ fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
 fclaw2d_map_context_t*
 fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain);
 
-
-
-
-/* --------------------------------------------------- */
-#if 0
-void
-init_domain_data(fclaw2d_domain_t *domain);
-
-
-void
-delete_domain_data(fclaw2d_domain_t* domain);
-
-fclaw2d_domain_data_t*
-get_domain_data(fclaw2d_domain_t *domain);
-
-void
-copy_domain_data(fclaw2d_domain_t *old_domain,
-                 fclaw2d_domain_t *new_domain);
-#endif
-
 int
 fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
 
-int
-num_patches(fclaw2d_domain_t *domain, int level,
-            int include_shadow);
 
 const amr_options_t*
 fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
@@ -118,6 +95,7 @@ fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
 
 const amr_options_t*
 get_domain_parms(fclaw2d_domain_t *domain);
+
 
 #ifdef __cplusplus
 #if 0
