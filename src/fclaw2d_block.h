@@ -44,18 +44,26 @@ typedef struct fclaw2d_block_data
 fclaw2d_block_data_t;
 
 
-void init_block_data(fclaw2d_block_t *block);
+void
+fclaw2d_block_data_new(fclaw2d_domain_t *domain);
 
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
+fclaw2d_block_data_t*
+fclaw2d_block_get_data(fclaw2d_block_t* block);
 
-void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
+void
+    fclaw2d_block_set_data(fclaw2d_block_t* block,const int mthbc[]);
 
 void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
                                       fclaw2d_patch_t * patch,
                                       fclaw_bool *intersects_block);
 
+#if 0
+fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block);
+
+void set_block_data(fclaw2d_block_t *block, const int mthbc[]);
+
+void init_block_and_patch_data(fclaw2d_domain_t *domain);
+#endif
 
 #ifdef __cplusplus
 #if 0

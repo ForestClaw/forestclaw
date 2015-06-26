@@ -23,12 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_patch.hpp"
 #include <forestclaw2d.h>
 #include <p4est_base.h>
 
+#include <fclaw2d_patch.hpp>
 #include <ClawPatch.H>
-
 
 struct fclaw2d_patch_data
 {
@@ -36,57 +35,28 @@ struct fclaw2d_patch_data
 };
 
 
-fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
+fclaw2d_patch_data_t*
+fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
 {
     return (fclaw2d_patch_data_t *) patch->user;
 }
 
-ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
+ClawPatch*
+fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
     return pdata->cp;
 }
 
 
-void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch)
-{
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    if (pdata != NULL)
-    {
-        if (pdata->cp != NULL)
-        {
-            delete pdata->cp;
-            pdata->cp = NULL;
-        }
-    }
-}
-
 /* -------------------------------------------------------------
-   Put this here, since, to avoid linkage problems in fclaw2d_block.c
+   This should be the only place where patch user data gets
+   allocated or deleted.
    ------------------------------------------------------------- */
 
-void init_patch_data(fclaw2d_patch_t *patch)
-{
-    printf("init_patch_data : We shouldn't be here\n");
-    exit(0);
-    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
-    patch->user = (void *) pdata;
-}
-
-ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = new ClawPatch();
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    printf("We shouldn't be here ...\n");
-    exit(0);
-    pdata->cp = cp;
-    return cp;
-}
-
-
-void fclaw2d_patch_user_data_new(fclaw2d_domain_t* domain,
-                                  fclaw2d_patch_t* this_patch)
+void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
 
@@ -100,7 +70,7 @@ void fclaw2d_patch_user_data_new(fclaw2d_domain_t* domain,
     ++ddata->count_set_clawpatch;
 }
 
-void fclaw2d_patch_user_data_delete(fclaw2d_domain_t* domain,
+void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t *this_patch)
 {
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
@@ -113,44 +83,5 @@ void fclaw2d_patch_user_data_delete(fclaw2d_domain_t* domain,
 
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
-    }
-}
-
-static
-void user_data_cleanup_cb(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
-{
-    fclaw2d_patch_user_data_delete(domain,this_patch);
-}
-
-void fclaw2d_patch_user_data_cleanup(fclaw2d_domain_t* domain)
-{
-    fclaw2d_domain_iterate_patches(domain, user_data_cleanup_cb,
-                                   (void *) NULL);
-}
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain)
-{
-    fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
-
-    for (int i = 0; i < domain->num_blocks; i++)
-    {
-        block = &domain->blocks[i];
-        init_block_data(block);
-        for (int j = 0; j < block->num_patches; j++)
-        {
-            patch = &block->patches[j];
-            patch->user = NULL;
-
-#if 0
-            fclaw2d_patch_init_user_data(domain,patch);
-
-            init_patch_data(patch);
-#endif
-        }
     }
 }

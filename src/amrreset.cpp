@@ -48,7 +48,7 @@ void amrreset(fclaw2d_domain_t **domain)
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_user_data_delete(*domain,patch);
+            fclaw2d_patch_data_delete(*domain,patch);
         }
 
         FCLAW2D_FREE (bd);

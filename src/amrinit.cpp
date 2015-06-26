@@ -73,7 +73,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
 {
     fclaw2d_vtable_t vt;
 
-    fclaw2d_patch_user_data_new(domain,this_patch);
+    fclaw2d_patch_data_new(domain,this_patch);
     fclaw2d_clawpatch_build_cb(domain,this_patch,
                                this_block_idx,
                                this_patch_idx,
@@ -119,7 +119,7 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
-            fclaw2d_patch_user_data_new(new_domain,fine_patch);
+            fclaw2d_patch_data_new(new_domain,fine_patch);
             fclaw2d_clawpatch_build_cb(new_domain,
                                        fine_patch,
                                        blockno,
@@ -127,7 +127,7 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
 
             vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
         }
-        fclaw2d_patch_user_data_delete(old_domain,old_patch);
+        fclaw2d_patch_data_delete(old_domain,old_patch);
     }
 
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)

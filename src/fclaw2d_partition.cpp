@@ -60,7 +60,7 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
            need to be passed in */
         int patchno = i;
 
-        fclaw2d_patch_user_data_new(domain,ghost_patch);
+        fclaw2d_patch_data_new(domain,ghost_patch);
         fclaw2d_clawpatch_build_cb(domain,ghost_patch,blockno,
                                        patchno,(void*) NULL);
     }
@@ -69,11 +69,10 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
 static
 void delete_ghost_patches(fclaw2d_domain_t* domain)
 {
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-        fclaw2d_patch_user_data_delete(domain,ghost_patch);
+        fclaw2d_patch_data_delete(domain,ghost_patch);
     }
 }
 

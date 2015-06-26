@@ -418,7 +418,7 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     maxmy = my;
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    fclaw2d_block_data_t *bdata = get_block_data(this_block);
+    fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(this_block);
     int *block_mthbc = bdata->mthbc;
 
     /* Set a local copy of mthbc that can be used for a patch. */

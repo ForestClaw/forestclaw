@@ -126,11 +126,6 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-#if 0
-        /* We should be able to just pass patch pointer here */
-        vt.patch_copy2samesize(new_domain,old_patch,new_patch,
-                               blockno,old_patchno, new_patchno);
-#endif
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
         ++ddata_old->count_delete_clawpatch;
@@ -143,7 +138,7 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
-            fclaw2d_patch_user_data_new(new_domain,fine_patch);
+            fclaw2d_patch_data_new(new_domain,fine_patch);
             fclaw2d_clawpatch_build_cb(new_domain,fine_patch,blockno,
                                        fine_patchno,(void*) NULL);
         }
@@ -154,7 +149,7 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
 
         vt.patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
                                   blockno,coarse_patchno,fine_patchno);
-        fclaw2d_patch_user_data_delete(old_domain,coarse_patch);
+        fclaw2d_patch_data_delete(old_domain,coarse_patch);
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
@@ -164,7 +159,7 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
 
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
-        fclaw2d_patch_user_data_new(new_domain,coarse_patch);
+        fclaw2d_patch_data_new(new_domain,coarse_patch);
         fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
                                    coarse_patchno,(void*) NULL);
 
@@ -173,7 +168,7 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
         for(int i = 0; i < 4; i++)
         {
             fclaw2d_patch_t* fine_patch = &fine_siblings[i];
-            fclaw2d_patch_user_data_delete(old_domain,fine_patch);
+            fclaw2d_patch_data_delete(old_domain,fine_patch);
         }
     }
     else
@@ -209,20 +204,15 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
 
     gparms = get_domain_parms(new_domain);
 
-    init_block_and_patch_data(new_domain);
+    fclaw2d_block_data_new(new_domain);
 
     int num = new_domain->num_blocks;
     for (int i = 0; i < num; i++)
     {
         fclaw2d_block_t *block = &new_domain->blocks[i];
         /* This will work for rectangular domains ... */
-        set_block_data(block,gparms->mthbc);
+        fclaw2d_block_set_data(block,gparms->mthbc);
     }
-
-#if 0
-    fclaw2d_domain_iterate_patches(new_domain, fclaw2d_clawpatch_build_cb,
-                                   (void *) NULL);
-#endif
 
     /* Set up the parallel ghost patch data structure. */
     fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");

@@ -39,6 +39,11 @@ void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
     ClawPatch::global = global;
 }
 
+/* ------------------------------------------------------------
+   General access functions
+   ---------------------------------------------------------- */
+
+/* We also have a fclaw2d_patch_get_cp(this_patch) */
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
@@ -173,10 +178,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     int level = this_patch->level;
 
-#if 0
-    ClawPatch *cp = fclaw2d_patch_new_cp(this_patch);
-#endif
-    ClawPatch *cp = fclaw2d_patch_get_cp(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->define(this_patch->xlower,
                this_patch->ylower,
                this_patch->xupper,
@@ -184,10 +186,6 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                blockno,
                level,
                gparms);
-#if 0
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_set_clawpatch;
-#endif
 }
 
 
@@ -213,22 +211,11 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch)
-{
-    printf("fclaw2d_clawpatch_delete_cp : we shouldn't be here\n");
-    exit(0);
-    fclaw2d_patch_delete_cp(this_patch);
-
-    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
-    ++ddata->count_delete_clawpatch;
-}
-
-
 /* ----------------------------------------------------------
-   Pack and unpack for parallel ghost exchanges. Note this is
-   different from the packing/unpacking that happens when
-   partitioning the domain
+   Parallel ghost exchanges.
+
+   Note this is different from the packing/unpacking that happens
+   when partitioning the domain
    ----------------------------------------------------------*/
 void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch,
@@ -245,7 +232,9 @@ void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
 
 
 /* --------------------------------------------------------
-   Pack local patches on this processor before repartitioning;
+   Domain partitioning.
+
+   Pack local patches on this processor before re-partitioning;
    retrieve patches that migrated across parallel borders to
    load balance the computation.
    -------------------------------------------------------*/
@@ -285,6 +274,11 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
+
+    /* First need to rebuild the patch */
+    fclaw2d_patch_data_new(domain,this_patch);
+    fclaw2d_clawpatch_build_cb(domain,this_patch,this_block_idx,
+                               this_patch_idx,(void*) NULL);
 
     fclaw_bool time_interp = fclaw_false;
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);

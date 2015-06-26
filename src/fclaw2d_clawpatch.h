@@ -40,9 +40,6 @@ extern "C"
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
 
-void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch);
-
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
@@ -122,10 +119,6 @@ size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha);
-
-#if 0
-ClawPatch* get_clawpatch(fclaw2d_patch_t *patch);
-#endif
 
 #ifdef __cplusplus
 #if 0

@@ -26,20 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_forestclaw.h>
 
-void init_block_data(fclaw2d_block_t *block)
-{
-    fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
-    block->user = (void *) bdata;
-}
-
-fclaw2d_block_data_t *get_block_data(fclaw2d_block_t *block)
+fclaw2d_block_data_t *fclaw2d_block_get_data(fclaw2d_block_t *block)
 {
     return (fclaw2d_block_data_t *) block->user;
 }
 
-void set_block_data(fclaw2d_block_t *block, const int mthbc[])
+void fclaw2d_block_set_data(fclaw2d_block_t *block, const int mthbc[])
 {
-    fclaw2d_block_data_t *bdata = get_block_data(block);
+    fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(block);
     int i;
 
     for (i = 0; i < 4; i++)
@@ -61,5 +55,23 @@ void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
 
         /* True for physical and block boundaries across a face */
         intersects_block[iside] = is_block_face;
+    }
+}
+
+static
+void block_data_new(fclaw2d_block_t *block)
+{
+    fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
+    block->user = (void *) bdata;
+}
+
+void fclaw2d_block_data_new(fclaw2d_domain_t *domain)
+{
+    fclaw2d_block_t *block;
+
+    for (int i = 0; i < domain->num_blocks; i++)
+    {
+        block = &domain->blocks[i];
+        block_data_new(block);
     }
 }

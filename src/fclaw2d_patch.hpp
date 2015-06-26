@@ -42,55 +42,20 @@ extern "C"
 #endif
 #endif
 
-/* Opaque pointer to patch data */
+/* Opaque pointer?  Is this feature supported in .h files?  */
 typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
 
-void init_patch_data(fclaw2d_patch_t *patch);
+void
+fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
+                            fclaw2d_patch_t* this_patch);
+void
+fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_t *patch);
 
-void fclaw2d_patch_delete_data(fclaw2d_patch_t *patch);
+fclaw2d_patch_data_t*
+fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
 
-fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
-
-ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch);
-ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch);
-void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch);
-
-void fclaw2d_patch_user_data_new(fclaw2d_domain_t* domain,
-                                  fclaw2d_patch_t* this_patch);
-
-void fclaw2d_patch_user_data_delete(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t *patch);
-void fclaw2d_patch_user_data_cleanup(fclaw2d_domain_t* domain);
-
-
-
-
-void init_block_and_patch_data(fclaw2d_domain_t *domain);
-
-#if 0
-static void cb_num_patches(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
-{
-  (*(int *) user)++;
-}
-
-int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
-{
-    int count = 0;
-    if (include_shadow == 0)
-    {
-        fclaw2d_domain_iterate_level(domain, level,
-                                     cb_num_patches,
-                                     &count);
-    }
-    else
-    {
-        // Include shadow patches
-    }
-    return count;
-}
-#endif
-
+ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* patch);
 
 #ifdef __cplusplus
 #if 0
