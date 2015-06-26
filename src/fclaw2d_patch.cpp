@@ -36,18 +36,6 @@ struct fclaw2d_patch_data
 };
 
 
-void init_patch_data(fclaw2d_patch_t *patch)
-{
-    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
-    patch->user = (void *) pdata;
-}
-
-void fclaw2d_patch_delete_data(fclaw2d_patch_t *patch)
-{
-    fclaw2d_patch_data_t *pd = (fclaw2d_patch_data_t*) patch->user;
-    FCLAW2D_FREE(pd);
-}
-
 fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch)
 {
     return (fclaw2d_patch_data_t *) patch->user;
@@ -60,31 +48,92 @@ ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
     return pdata->cp;
 }
 
-ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = new ClawPatch();
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    pdata->cp = cp;
-    return cp;
-}
 
 void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch)
 {
     fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    FCLAW_ASSERT(pdata->cp != NULL);
-    delete pdata->cp;
-    pdata->cp = NULL;
+    if (pdata != NULL)
+    {
+        if (pdata->cp != NULL)
+        {
+            delete pdata->cp;
+            pdata->cp = NULL;
+        }
+    }
 }
 
 /* -------------------------------------------------------------
    Put this here, since, to avoid linkage problems in fclaw2d_block.c
    ------------------------------------------------------------- */
+
+void init_patch_data(fclaw2d_patch_t *patch)
+{
+    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
+    patch->user = (void *) pdata;
+}
+
+ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = new ClawPatch();
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    printf("We shouldn't be here ...\n");
+    exit(0);
+    pdata->cp = cp;
+    return cp;
+}
+
+
+void fclaw2d_patch_user_data_new(fclaw2d_domain_t* domain,
+                                  fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+
+    /* Initialize user data */
+    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
+    this_patch->user = (void *) pdata;
+
+    /* create new ClawPatch */
+    ClawPatch *cp = new ClawPatch();
+    pdata->cp = cp;
+    ++ddata->count_set_clawpatch;
+}
+
+void fclaw2d_patch_user_data_delete(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t *this_patch)
+{
+    fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
+
+    if (pdata != NULL)
+    {
+        fclaw2d_domain_data_t *ddata = get_domain_data(domain);
+        delete pdata->cp;
+        ++ddata->count_delete_clawpatch;
+
+        FCLAW2D_FREE(pdata);
+        this_patch->user = NULL;
+    }
+}
+
+static
+void user_data_cleanup_cb(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{
+    fclaw2d_patch_user_data_delete(domain,this_patch);
+}
+
+void fclaw2d_patch_user_data_cleanup(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_iterate_patches(domain, user_data_cleanup_cb,
+                                   (void *) NULL);
+}
+
 void init_block_and_patch_data(fclaw2d_domain_t *domain)
 {
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
-
-    // init_domain_data(domain);
 
     for (int i = 0; i < domain->num_blocks; i++)
     {
@@ -93,33 +142,13 @@ void init_block_and_patch_data(fclaw2d_domain_t *domain)
         for (int j = 0; j < block->num_patches; j++)
         {
             patch = &block->patches[j];
+            patch->user = NULL;
+
+#if 0
+            fclaw2d_patch_init_user_data(domain,patch);
+
             init_patch_data(patch);
+#endif
         }
     }
 }
-
-
-
-#if 0
-static void cb_num_patches(fclaw2d_domain_t *domain,
-	fclaw2d_patch_t *patch, int block_no, int patch_no, void *user)
-{
-  (*(int *) user)++;
-}
-
-int num_patches(fclaw2d_domain_t *domain, int level, int include_shadow)
-{
-    int count = 0;
-    if (include_shadow == 0)
-    {
-        fclaw2d_domain_iterate_level(domain, level,
-                                     cb_num_patches,
-                                     &count);
-    }
-    else
-    {
-        // Include shadow patches
-    }
-    return count;
-}
-#endif

@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
+#include <fclaw2d_clawpatch.hpp>
 
 // This is essentially the same function that is in amr_regrid.cpp
 static
@@ -71,6 +72,13 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     void *user)
 {
     fclaw2d_vtable_t vt;
+
+    fclaw2d_patch_user_data_new(domain,this_patch);
+    fclaw2d_clawpatch_build_cb(domain,this_patch,
+                               this_block_idx,
+                               this_patch_idx,
+                               user);
+
     vt = fclaw2d_get_vtable(domain);
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
@@ -88,10 +96,20 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
 
+    fclaw2d_domain_data_t *ddata_new = get_domain_data (new_domain);
+    fclaw2d_domain_data_t *ddata_old = get_domain_data (old_domain);
+
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
-        vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,old_patchno,
-                                    new_patchno);
+#if 0
+        vt.patch_copy2samesize(new_domain,old_patch,new_patch,blockno,
+                               old_patchno,
+                               new_patchno);
+#endif
+        new_patch->user = old_patch->user;
+        old_patch->user = NULL;
+        ++ddata_old->count_delete_clawpatch;
+        ++ddata_new->count_set_clawpatch;
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -101,9 +119,15 @@ void cb_domain_populate (fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[igrid];
             int fine_patchno = new_patchno + igrid;
+            fclaw2d_patch_user_data_new(new_domain,fine_patch);
+            fclaw2d_clawpatch_build_cb(new_domain,
+                                       fine_patch,
+                                       blockno,
+                                       fine_patchno,(void*) NULL);
 
             vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
         }
+        fclaw2d_patch_user_data_delete(old_domain,old_patch);
     }
 
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
@@ -231,7 +255,10 @@ void amrinit (fclaw2d_domain_t **domain)
             }
 
             /* Repartition domain to new processors. */
-            fclaw2d_partition_domain(domain, level);
+            if ((*domain)->mpisize > 1)
+            {
+                fclaw2d_partition_domain(domain, level);
+            }
         }
         else
         {

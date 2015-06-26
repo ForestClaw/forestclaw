@@ -93,14 +93,6 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
     if (level > minlevel)
     {
         int family_coarsened = 1;
-#if 0
-        double xlower[4], ylower[4];
-        for (int igrid = 0; igrid < NumSiblings; igrid++)
-        {
-            xlower[igrid] = fine_patches[igrid].xlower;
-            ylower[igrid] = fine_patches[igrid].ylower;
-        }
-#endif
         family_coarsened = vt.patch_tag4coarsening(domain,&fine_patches[0],
                                                   blockno, fine0_patchno);
         if (family_coarsened == 1)
@@ -121,28 +113,48 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
                    fclaw2d_domain_t * new_domain,
                    fclaw2d_patch_t * new_patch,
                    fclaw2d_patch_relation_t newsize,
-                   int blockno, int old_patchno,
-                   int new_patchno,  void *user)
+                   int blockno,
+                   int old_patchno,
+                   int new_patchno,
+                   void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
 
+    fclaw2d_domain_data_t *ddata_old = get_domain_data (old_domain);
+    fclaw2d_domain_data_t *ddata_new = get_domain_data (new_domain);
+
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
+#if 0
         /* We should be able to just pass patch pointer here */
         vt.patch_copy2samesize(new_domain,old_patch,new_patch,
                                blockno,old_patchno, new_patchno);
+#endif
+        new_patch->user = old_patch->user;
+        old_patch->user = NULL;
+        ++ddata_old->count_delete_clawpatch;
+        ++ddata_new->count_set_clawpatch;
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
         fclaw2d_patch_t *fine_siblings = new_patch;
-        int fine_patchno = old_patchno;
+        for (int i = 0; i < NumSiblings; i++)
+        {
+            fclaw2d_patch_t *fine_patch = &fine_siblings[i];
+            int fine_patchno = new_patchno + i;
+            fclaw2d_patch_user_data_new(new_domain,fine_patch);
+            fclaw2d_clawpatch_build_cb(new_domain,fine_patch,blockno,
+                                       fine_patchno,(void*) NULL);
+        }
 
         fclaw2d_patch_t *coarse_patch = old_patch;
         int coarse_patchno = old_patchno;
+        int fine_patchno = new_patchno;
 
         vt.patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
                                   blockno,coarse_patchno,fine_patchno);
+        fclaw2d_patch_user_data_delete(old_domain,coarse_patch);
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
@@ -152,9 +164,17 @@ void cb_repopulate(fclaw2d_domain_t * old_domain,
 
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
+        fclaw2d_patch_user_data_new(new_domain,coarse_patch);
+        fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
+                                   coarse_patchno,(void*) NULL);
 
         vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
                                 blockno,coarse_patchno, fine_patchno);
+        for(int i = 0; i < 4; i++)
+        {
+            fclaw2d_patch_t* fine_patch = &fine_siblings[i];
+            fclaw2d_patch_user_data_delete(old_domain,fine_patch);
+        }
     }
     else
     {
@@ -199,13 +219,18 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
         set_block_data(block,gparms->mthbc);
     }
 
+#if 0
     fclaw2d_domain_iterate_patches(new_domain, fclaw2d_clawpatch_build_cb,
                                    (void *) NULL);
+#endif
 
     /* Set up the parallel ghost patch data structure. */
     fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
 
-    fclaw2d_partition_setup(new_domain);
+    if (new_domain->mpisize > 1)
+    {
+        fclaw2d_partition_setup(new_domain);
+    }
 
     fclaw_global_infof("Done\n");
 }
@@ -261,7 +286,11 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
         /* We have a newly created mesh;  We need to get all of the ghost cells
            filled */
-        fclaw2d_partition_domain(domain, -1);
+        if ((*domain)->mpisize > 1)
+        {
+            fclaw2d_partition_domain(domain, -1);
+        }
+
         /* fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID); */
         int minlevel = (*domain)->global_minlevel;
         int maxlevel = (*domain)->global_maxlevel;

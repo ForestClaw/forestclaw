@@ -173,7 +173,10 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     int level = this_patch->level;
 
+#if 0
     ClawPatch *cp = fclaw2d_patch_new_cp(this_patch);
+#endif
+    ClawPatch *cp = fclaw2d_patch_get_cp(this_patch);
     cp->define(this_patch->xlower,
                this_patch->ylower,
                this_patch->xupper,
@@ -181,11 +184,17 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                blockno,
                level,
                gparms);
-
+#if 0
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ++ddata->count_set_clawpatch;
+#endif
 }
 
+
+/* This is called from fclaw2d_regrid_new_domain_setup (in fclaw2d_regrid.cpp)
+   every time a new domain is created after regridding.  This is followed by
+   an "iterate_adapted" step, in which data in these patches is copied, averaged or
+   interpolated. */
 
 void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
@@ -252,19 +261,14 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 
 }
 
-#if 0
-/* count_delete_clawpatch is incremented in amrreset */
 void fclaw2d_clawpatch_delete_cp(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
-    printf("Delete clawpatch_delete\n");
-    exit(0);
     fclaw2d_patch_delete_cp(this_patch);
 
     fclaw2d_domain_data_t *ddata = get_domain_data(domain);
     ++ddata->count_delete_clawpatch;
 }
-#endif
 
 
 

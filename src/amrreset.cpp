@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                    (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
 } while (0)
 
-
 void amrreset(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t *ddata = get_domain_data (*domain);
@@ -49,16 +48,17 @@ void amrreset(fclaw2d_domain_t **domain)
         for(int j = 0; j < block->num_patches; j++)
         {
             fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_delete_cp(patch);
-            fclaw2d_patch_delete_data(patch);
-            ++ddata->count_delete_clawpatch;
+            fclaw2d_patch_user_data_delete(*domain,patch);
         }
 
         FCLAW2D_FREE (bd);
         block->user = NULL;
     }
 
-    fclaw2d_partition_delete(domain);
+    if ((*domain)->mpisize > 1)
+    {
+        fclaw2d_partition_delete(domain);
+    }
 
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch) {

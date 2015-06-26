@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <p4est_base.h>
 #include <fclaw2d_block.h>
+#include <fclaw2d_domain.h>
 
 class ClawPatch;    /* Incomplete type */
 
@@ -53,6 +54,16 @@ fclaw2d_patch_data_t *get_patch_data(fclaw2d_patch_t *patch);
 ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch);
 ClawPatch* fclaw2d_patch_new_cp(fclaw2d_patch_t* this_patch);
 void fclaw2d_patch_delete_cp(fclaw2d_patch_t* this_patch);
+
+void fclaw2d_patch_user_data_new(fclaw2d_domain_t* domain,
+                                  fclaw2d_patch_t* this_patch);
+
+void fclaw2d_patch_user_data_delete(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t *patch);
+void fclaw2d_patch_user_data_cleanup(fclaw2d_domain_t* domain);
+
+
+
 
 void init_block_and_patch_data(fclaw2d_domain_t *domain);
 

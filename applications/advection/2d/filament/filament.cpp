@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "filament_user.H"
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_patch.h>
 #include <fc2d_clawpack46.h>
 
 #include <fclaw2d_map.h>
@@ -196,6 +197,8 @@ void run_program(fclaw_app_t* app)
 
     amrinit(&domain);
     amrrun(&domain);
+
+    /* fclaw2d_patch_user_data_cleanup(domain); */
     amrreset(&domain);
 
     fclaw2d_map_destroy(cont);

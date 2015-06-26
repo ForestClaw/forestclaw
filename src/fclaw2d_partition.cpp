@@ -71,10 +71,11 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-
+#if 0
         fclaw2d_patch_delete_cp(ghost_patch);
         fclaw2d_patch_delete_data(ghost_patch);
         ++ddata->count_delete_clawpatch;
+#endif
     }
 }
 
