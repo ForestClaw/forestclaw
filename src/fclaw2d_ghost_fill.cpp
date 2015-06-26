@@ -344,7 +344,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
     fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
-    double t = get_domain_time(domain);
+    double t = fclaw2d_domain_get_time(domain);
 
 #if 0
     /* uncomment this if debugging ghost cell interpolation */

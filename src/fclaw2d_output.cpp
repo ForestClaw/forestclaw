@@ -190,7 +190,7 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     double time;
     vt = fclaw2d_get_vtable(domain);
 
-    time = get_domain_time(domain);
+    time = fclaw2d_domain_get_time(domain);
 
     /* Record output time */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);

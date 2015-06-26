@@ -188,18 +188,22 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
     {
         fclaw_global_infof("Building initial domain\n");
         t = 0;
-        set_domain_time(new_domain,t);
+        fclaw2d_domain_set_time(new_domain,t);
 
     }
     else
     {
         fclaw_global_infof("Rebuilding  domain\n");
-        t = get_domain_time(old_domain);
+#if 0
+        t = fclaw2d_domain_get_time(old_domain);
+#endif
 
         /* Allocate memory for user data types (but they don't get set) */
         fclaw2d_domain_data_new(new_domain);
         fclaw2d_domain_data_copy(old_domain,new_domain);
-        set_domain_time(new_domain,t);
+#if 0
+        fclaw2d_domain_set_time(new_domain,t);
+#endif
     }
 
     gparms = get_domain_parms(new_domain);

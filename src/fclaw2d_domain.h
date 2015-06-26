@@ -61,15 +61,27 @@ fclaw2d_domain_data_t;
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
 void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
+void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
+                              fclaw2d_domain_t *new_domain);
 
 fclaw2d_domain_data_t*
 fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
 
+fclaw_app_t*
+fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
+
 void
-fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
-                         fclaw2d_domain_t *new_domain);
+fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
+                       fclaw_app_t* app);
+
+void
+fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time);
+
+double
+fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
 
 
+/* --------------------------------------------------- */
 #if 0
 void
 init_domain_data(fclaw2d_domain_t *domain);
@@ -86,21 +98,8 @@ copy_domain_data(fclaw2d_domain_t *old_domain,
                  fclaw2d_domain_t *new_domain);
 #endif
 
-fclaw_app_t*
-fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
-
-void
-fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
-                       fclaw_app_t* app);
-
 int
 fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
-
-void
-set_domain_time(fclaw2d_domain_t *domain, double time);
-
-double
-get_domain_time(fclaw2d_domain_t *domain);
 
 int
 num_patches(fclaw2d_domain_t *domain, int level,
