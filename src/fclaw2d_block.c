@@ -68,8 +68,9 @@ void block_data_new(fclaw2d_block_t *block)
 void fclaw2d_block_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_block_t *block;
+    int i;
 
-    for (int i = 0; i < domain->num_blocks; i++)
+    for (i = 0; i < domain->num_blocks; i++)
     {
         block = &domain->blocks[i];
         block_data_new(block);
