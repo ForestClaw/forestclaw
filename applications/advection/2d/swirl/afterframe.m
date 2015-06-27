@@ -13,7 +13,6 @@ over_label = sprintf('1 + %7.1e',qmax-qhi);
 fprintf('%6s %12s\n','qmin',under_label);
 fprintf('%6s %12s\n\n','qmax',over_label);
 
-showgridlines(1:5);
 
 if (ShowUnderOverShoots)
     qlo = 0;
