@@ -54,9 +54,9 @@ extern "C"
 
 void fclaw2d_finalize(fclaw2d_domain_t **domain)
 {
-    fclaw2d_domain_reset(domain);
-
     fclaw2d_timer_report(*domain);
+
+    fclaw2d_domain_reset(domain);
 
 #if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
