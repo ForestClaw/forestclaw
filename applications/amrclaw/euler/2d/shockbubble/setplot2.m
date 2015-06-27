@@ -34,3 +34,5 @@ ContourValues = [];
 
 %---------------------------------
 
+PlotParallelPartitions=0;
+

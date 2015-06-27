@@ -30,3 +30,4 @@ end
 
 clear afterframe
 clear mapc2m
+clear parallelpartitions
