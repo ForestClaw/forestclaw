@@ -120,26 +120,17 @@ static
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
-
-#if 0
-    /* Store parameters */
-    set_domain_parms(domain,gparms);
-    fc2d_clawpack46_set_options (domain,clawpack_options);
-
-    /* Link solvers to the domain */
-    link_problem_setup(domain,slotted_disk_setprob);
-#endif
 
     slotted_disk_link_solvers(domain);
 
     /* --------------------------------------------------
        Initialize and run the simulation
        -------------------------------------------------- */
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     /* --------------------------------------------------
        Clean up the mapping context.
