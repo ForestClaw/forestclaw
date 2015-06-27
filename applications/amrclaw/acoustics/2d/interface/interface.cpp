@@ -24,8 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "interface_user.H"
-#include "fclaw2d_clawpatch.H"
-#include "fc2d_clawpack46.H"
+#include "fclaw2d_clawpatch.h"
+#include "fc2d_clawpack46.h"
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -88,15 +88,15 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     /* ---------------------------------------------------------- */
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     interface_link_solvers(domain);
 
     /* ---------------------------------------------------------- */
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     /* ---------------------------------------------------------- */
     fclaw2d_map_destroy(cont);
