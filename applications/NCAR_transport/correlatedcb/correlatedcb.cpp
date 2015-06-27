@@ -36,8 +36,8 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 1 for pillow grid, "    \
-                        "2 for cubed sphere ");
+                        "[user] 0 for cubed sphere, "    \
+                        "2 for pillowgrid ");
 
     sc_options_add_int (opt, 0, "vflag", &user->vflag, 1, "vflag [1]");
     sc_options_add_int (opt, 0, "init_choice", &user->init_choice, 4, "init_choice [4]");
@@ -62,7 +62,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         FCLAW_ASSERT(user->init_choice == 3 && amropt->meqn == 2);
     }
 
-    if (user->example < 1 || user->example > 2) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
@@ -113,13 +113,14 @@ static
     rotate[1] = pi*gparms->phi/180.0;
 
     switch (user->example) {
+    case 0:
     case 1:
-        conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
-        break;
-    case 2:
         conn = p4est_connectivity_new_cubed();
         cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
+        break;
+    case 2:
+        conn = p4est_connectivity_new_pillow();
+        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
