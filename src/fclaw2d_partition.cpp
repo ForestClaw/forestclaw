@@ -30,6 +30,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_partition.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 /* Also needed in amrreset */
 fclaw2d_domain_exchange_t*
     fclaw2d_partition_get_exchange_data(fclaw2d_domain_t* domain)
@@ -151,7 +160,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
                                        (void *) patch_data);
 
         /* then the old domain is no longer necessary */
-        amrreset(domain);
+        fclaw2d_domain_reset(domain);
         *domain = domain_partitioned;
         domain_partitioned = NULL;
 
@@ -189,3 +198,10 @@ void fclaw2d_partition_delete(fclaw2d_domain_t** domain)
     delete_ghost_patches(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

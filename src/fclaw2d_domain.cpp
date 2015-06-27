@@ -23,7 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_domain.h"
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.hpp>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
@@ -76,6 +86,49 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 
     ddata_new->curr_time = ddata_old->curr_time;
 
+}
+
+void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
+
+    for(int i = 0; i < (*domain)->num_blocks; i++)
+    {
+        fclaw2d_block_t *block = (*domain)->blocks + i;
+        fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
+
+        for(int j = 0; j < block->num_patches; j++)
+        {
+            fclaw2d_patch_t *patch = block->patches + j;
+            fclaw2d_patch_data_delete(*domain,patch);
+        }
+
+        FCLAW2D_FREE (bd);
+        block->user = NULL;
+
+    }
+
+    fclaw2d_partition_delete(domain);
+
+    /* Output memory discrepancy for the ClawPatch */
+    if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch)
+    {
+        printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
+                (*domain)->mpirank,
+                ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
+    }
+
+    /* TODO : Do we need this here?  Will we ever want to report stats during
+       a run? */
+    if (ddata->is_latest_domain)  /* ddata->is_last_domain?  */
+    {
+        fclaw2d_timer_report(*domain);
+    }
+
+    fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
+
+    fclaw2d_domain_destroy(*domain);
+    *domain = NULL;
 }
 
 
@@ -146,3 +199,10 @@ fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain)
   FCLAW_ASSERT (cont != NULL);
   return cont;
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

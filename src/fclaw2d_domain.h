@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_DOMAIN_H
 
 #include <forestclaw2d.h>
-#include <fclaw_timer.h>
+#include <fclaw_timer_enum.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_map.h>
 
@@ -63,6 +63,8 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
 void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
 void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
                               fclaw2d_domain_t *new_domain);
+
+void fclaw2d_domain_reset(fclaw2d_domain_t** domain);
 
 fclaw2d_domain_data_t*
 fclaw2d_domain_get_data(fclaw2d_domain_t *domain);

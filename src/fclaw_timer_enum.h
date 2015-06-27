@@ -23,47 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_FORESTCLAW_H
-#define FCLAW2D_FORESTCLAW_H
+#ifndef FCLAW_TIMER_ENUM_H
+#define FCLAW_TIMER_ENUM_H
 
-/* This file should come first to retrieve configure-time information */
-#include <fclaw_config.h>
-
-/* Use as an alternate to GNU feenableexcept */
-#ifndef FCLAW_HAVE_FEENABLEEXCEPT
-#include <fp_exception_glibc_extension.h>
-#endif
-
-#include <fenv.h>
-#include <signal.h>
-
-#ifdef FCLAW_HAVE_UNISTD_H
-#include <unistd.h>    /* To get process ids */
-#endif
-
-/* Basic objects */
-#include "forestclaw2d.h"
-#include "fclaw2d_base.h"
-#include "fclaw2d_domain.h"
-#include "fclaw2d_block.h"
-/* Don't include fclaw2d_patch.H, since it requires C++ linkage */
-
-/* Basic header files that are probably required by all apps */
-#include "fclaw_options.h"
-#include "fclaw_register.h"
-#include "fclaw_package.h"
-#include "fclaw2d_vtable.h"
-
-/* Mapping interface - needed even if 'nomap' is used.  */
-#include "p4est_connectivity.h"
-#include "fclaw2d_map.h"
-#include "fclaw2d_map_query.h"
-
-#include "fclaw_timer.h"
-
-/* These still need to be cleaned up */
-#include "fclaw2d_capi.h"
-#include "fclaw2d_defs.h"
+#include <p4est_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -73,9 +36,34 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_initialize(fclaw2d_domain_t **domain);
-void fclaw2d_run(fclaw2d_domain_t **domain);
-void fclaw2d_finalize(fclaw2d_domain_t **domain);
+/* -----------------------------------------------------------------
+   Work with timers
+   ----------------------------------------------------------------- */
+
+typedef enum
+{
+    FCLAW2D_TIMER_NONE = -1,
+    FCLAW2D_TIMER_INIT,
+    FCLAW2D_TIMER_REGRID,
+    FCLAW2D_TIMER_OUTPUT,
+    FCLAW2D_TIMER_CHECK,
+    FCLAW2D_TIMER_ADVANCE,
+    FCLAW2D_TIMER_EXCHANGE,
+    FCLAW2D_TIMER_WALLTIME,
+    FCLAW2D_TIMER_UNACCOUNTED,
+    FCLAW2D_TIMER_BUILDPATCHES,
+    FCLAW2D_TIMER_COUNT
+}
+fclaw2d_timer_names_t;
+
+typedef struct
+{
+    int running;
+    double started, stopped;
+    double cumulative;
+}
+fclaw2d_timer_t;
+
 
 #ifdef __cplusplus
 #if 0
@@ -84,7 +72,5 @@ void fclaw2d_finalize(fclaw2d_domain_t **domain);
 }
 #endif
 
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #endif

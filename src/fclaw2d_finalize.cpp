@@ -29,15 +29,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_statistics.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
+#if 0
 #define FCLAW2D_STATS_SET(stats,ddata,NAME) do {                               \
     SC_CHECK_ABORT (!(ddata)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
                     "Timer " #NAME " still running in amrreset");              \
     sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
                    (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
 } while (0)
+#endif
 
-void amrreset(fclaw2d_domain_t **domain)
+
+/* ------------------------------------------------------------------
+   Public interface
+   ---------------------------------------------------------------- */
+
+void fclaw2d_finalize(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_reset(domain);
+
+    fclaw2d_timer_report(*domain);
+
+#if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
 
     for(int i = 0; i < (*domain)->num_blocks; i++)
@@ -65,7 +86,8 @@ void amrreset(fclaw2d_domain_t **domain)
     }
 
     /* Evaluate timers if this domain has not been superseded yet. */
-    if (ddata->is_latest_domain) {
+    if (ddata->is_latest_domain)
+    {
         sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
@@ -108,9 +130,16 @@ void amrreset(fclaw2d_domain_t **domain)
                                stats[FCLAW2D_TIMER_REGRID].max);
     }
 
-
     fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
+#endif
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

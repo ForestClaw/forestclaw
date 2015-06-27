@@ -31,6 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_clawpatch.hpp>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
 
 /* -----------------------------------------------------------------
    Initial grid
@@ -48,7 +56,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_build_cb(domain,this_patch,
                                this_block_idx,
                                this_patch_idx,
-                               user);
+                               (void*) NULL);
 
     vt = fclaw2d_get_vtable(domain);
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
@@ -56,10 +64,15 @@ void cb_initialize (fclaw2d_domain_t *domain,
 
 
 
-/* Initialize a base level of grids */
-void fclaw2d_init (fclaw2d_domain_t **domain)
+/* -----------------------------------------------------------------
+   Public interface
+   ----------------------------------------------------------------- */
+
+void fclaw2d_initialize (fclaw2d_domain_t **domain)
 {
     int i;
+    double t;
+
     char basename[BUFSIZ];
     const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
@@ -72,7 +85,6 @@ void fclaw2d_init (fclaw2d_domain_t **domain)
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
-    double t;
 
     // This is where the timing starts.
     ddata->is_latest_domain = 1;
@@ -151,7 +163,7 @@ void fclaw2d_init (fclaw2d_domain_t **domain)
             fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain
-            amrreset(domain);
+            fclaw2d_finalize(domain);
             *domain = new_domain;
             new_domain = NULL;
 
@@ -191,3 +203,10 @@ void fclaw2d_init (fclaw2d_domain_t **domain)
     ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

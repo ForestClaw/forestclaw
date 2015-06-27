@@ -55,9 +55,9 @@ extern "C"
 #include <unistd.h>    /* To get process ids */
 #endif
 
-void amrinit(fclaw2d_domain_t **domain);
-void amrrun(fclaw2d_domain_t **domain);
-void amrreset(fclaw2d_domain_t **domain);
+void fclaw2d_initialize(fclaw2d_domain_t **domain);
+void fclaw2d_run(fclaw2d_domain_t **domain);
+void fclaw2d_finalize(fclaw2d_domain_t **domain);
 
 #ifdef __cplusplus
 #if 0

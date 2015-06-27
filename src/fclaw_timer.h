@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_TIMER_H
 
 #include <p4est_base.h>
+#include <fclaw2d_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -40,6 +41,7 @@ extern "C"
    Work with timers
    ----------------------------------------------------------------- */
 
+#if 0
 typedef enum
 {
     FCLAW2D_TIMER_NONE = -1,
@@ -63,6 +65,7 @@ typedef struct
     double cumulative;
 }
 fclaw2d_timer_t;
+#endif
 
 double fclaw2d_timer_wtime (void);
 
@@ -73,6 +76,9 @@ void
 
 void
     fclaw2d_timer_stop (fclaw2d_timer_t *timer);
+
+void
+    fclaw2d_timer_report(fclaw2d_domain_t* domain);
 
 #ifdef __cplusplus
 #if 0

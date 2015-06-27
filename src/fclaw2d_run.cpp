@@ -33,6 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 #include "fclaw_math.h"
 
 /*  -----------------------------------------------------------------
@@ -124,7 +133,8 @@ static void outstyle_0(fclaw2d_domain_t **domain)
    Output style 1
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
-static void outstyle_1(fclaw2d_domain_t **domain)
+static
+void outstyle_1(fclaw2d_domain_t **domain)
 {
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
@@ -309,7 +319,8 @@ static void outstyle_2(fclaw2d_domain_t **domain)
 }
 #endif
 
-static void outstyle_3(fclaw2d_domain_t **domain)
+static
+void outstyle_3(fclaw2d_domain_t **domain)
 {
     /* Write out an initial time file */
     int iframe = 0;
@@ -436,7 +447,8 @@ static void outstyle_3(fclaw2d_domain_t **domain)
     }
 }
 
-static void outstyle_4(fclaw2d_domain_t **domain)
+static
+void outstyle_4(fclaw2d_domain_t **domain)
 {
     /* Write out an initial time file */
     int iframe = 0;
@@ -507,8 +519,11 @@ static void outstyle_4(fclaw2d_domain_t **domain)
 }
 
 
+/* ------------------------------------------------------------------
+   Public interface
+   ---------------------------------------------------------------- */
 
-void amrrun(fclaw2d_domain_t **domain)
+void fclaw2d_run(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
@@ -535,3 +550,10 @@ void amrrun(fclaw2d_domain_t **domain)
         exit(0);
     }
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif

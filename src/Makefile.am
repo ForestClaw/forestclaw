@@ -53,7 +53,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_mpi.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_base.c \
-	src/fclaw2d_domain.c \
+	src/fclaw2d_domain.cpp \
 	src/fclaw2d_block.c \
 	src/fclaw2d_patch.cpp \
 	src/fclaw2d_convenience.c \
@@ -96,9 +96,9 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/ClawPatch.cpp \
-	src/amrinit.cpp \
-	src/amrrun.cpp \
-	src/amrreset.cpp \
+	src/fclaw2d_initialize.cpp \
+	src/fclaw2d_run.cpp \
+	src/fclaw2d_finalize.cpp \
 	src/subcycle_manager.cpp \
 	src/fclaw2d_advance.cpp \
 	src/amr_single_step.cpp \

@@ -105,6 +105,10 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
 }
 
 
+/* ----------------------------------------------------------------
+   Public interface
+   -------------------------------------------------------------- */
+
 void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                fclaw2d_patch_t * old_patch,
                                fclaw2d_domain_t * new_domain,
@@ -208,16 +212,9 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
     else
     {
         fclaw_global_infof("Rebuilding  domain\n");
-#if 0
-        t = fclaw2d_domain_get_time(old_domain);
-#endif
-
         /* Allocate memory for user data types (but they don't get set) */
         fclaw2d_domain_data_new(new_domain);
         fclaw2d_domain_data_copy(old_domain,new_domain);
-#if 0
-        fclaw2d_domain_set_time(new_domain,t);
-#endif
     }
 
     gparms = get_domain_parms(new_domain);
@@ -240,7 +237,9 @@ void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
     fclaw_global_infof("Done\n");
 }
 
-
+/* ----------------------------------------------------------------
+   Public interface
+   -------------------------------------------------------------- */
 void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
@@ -279,7 +278,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
                                        (void *) &domain_init);
 
         /* free memory associated with old domain */
-        amrreset(domain);
+        fclaw2d_domain_reset(domain);
         *domain = new_domain;
         new_domain = NULL;
 

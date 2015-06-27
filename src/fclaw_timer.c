@@ -25,6 +25,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_timer.h>
 
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_partition.h>
+#include <sc_statistics.h>
+
+#define FCLAW2D_STATS_SET(stats,ddata,NAME) do {                               \
+    SC_CHECK_ABORT (!(ddata)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
+                    "Timer " #NAME " still running in amrreset");              \
+    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
+                   (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
+} while (0)
+
 /* -----------------------------------------------------------------
    Work with timers
    ----------------------------------------------------------------- */
@@ -67,4 +79,51 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
     {
         SC_ABORT_NOT_REACHED ();
     }
+}
+
+void
+fclaw2d_timer_report(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+
+    sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
+
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
+
+    FCLAW2D_STATS_SET (stats, ddata, INIT);
+    FCLAW2D_STATS_SET (stats, ddata, REGRID);
+    FCLAW2D_STATS_SET (stats, ddata, OUTPUT);
+    FCLAW2D_STATS_SET (stats, ddata, CHECK);
+    FCLAW2D_STATS_SET (stats, ddata, ADVANCE);
+    FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
+    FCLAW2D_STATS_SET (stats, ddata, BUILDPATCHES);
+    FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
+                   ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
+                   (ddata->timers[FCLAW2D_TIMER_INIT].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_REGRID].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_CHECK].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative),
+                   "UNACCOUNTED");
+    sc_stats_compute (domain->mpicomm, FCLAW2D_TIMER_COUNT, stats);
+    sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
+                    stats, 1, 0);
+    SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
+                          "regrid %d %g\n", domain->mpisize,
+                          ddata->count_amr_advance,
+                          stats[FCLAW2D_TIMER_ADVANCE].average,
+                          ddata->count_ghost_exchange,
+                          stats[FCLAW2D_TIMER_EXCHANGE].average,
+                          ddata->count_amr_regrid,
+                          stats[FCLAW2D_TIMER_REGRID].average);
+    SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
+                          "regrid %d %g\n", domain->mpisize,
+                          ddata->count_amr_advance,
+                          stats[FCLAW2D_TIMER_ADVANCE].max,
+                          ddata->count_ghost_exchange,
+                          stats[FCLAW2D_TIMER_EXCHANGE].max,
+                          ddata->count_amr_regrid,
+                          stats[FCLAW2D_TIMER_REGRID].max);
 }
