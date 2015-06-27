@@ -58,3 +58,4 @@ shg
 clear afterframe;
 clear mapc2m;
 clear mapc2m_torus;
+clear parallelpartitions;
