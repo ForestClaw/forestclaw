@@ -56,7 +56,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = latlong; 1 = cubed sphere [0]");
+                        "[user] 0,1 = cubedsphere; 2 = latlong [0]");
 
     fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
                                    "-50 50", &user->latitude, 2,
@@ -87,7 +87,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 0 || user->example > 1) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
         return FCLAW_EXIT_QUIET;
     }
@@ -165,16 +165,17 @@ void run_program(fclaw_app_t* app)
     switch (user->example)
     {
     case 0:
+    case 1:
+        /* Cubed sphere */
+        conn = p4est_connectivity_new_cubed();
+        cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
+        break;
+    case 2:
         /* latlong */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_latlong(brick,gparms->scale,
                                        user->latitude,user->longitude,a,b);
-        break;
-    case 1:
-        /* Cubed sphere */
-        conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED ();
@@ -190,13 +191,13 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_set_app (domain,app);
 
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
 
     latlong_link_solvers(domain);
 
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);
 }

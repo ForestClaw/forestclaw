@@ -2,8 +2,10 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 global map isflat;
 
-map = 'latlong';
+% map = 'latlong';
 map = 'cubedsphere';
+
+isflat = false;
 
 R = 1;
 r = 0.4;
@@ -13,9 +15,9 @@ lat = ll(1:2);
 lng = ll(3:4);
 
 
+
 switch map
     case 'latlong'
-        isflat = false;
         s = 0.0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
 

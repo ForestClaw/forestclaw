@@ -11,7 +11,7 @@ daspect([1 1 1]);
 
 yrbcolormap;
 showpatchborders(1:10);
-caxis([0.2 0.225])
+caxis([0.2 0.21])
 
 daspect([1,1,1]);
 
