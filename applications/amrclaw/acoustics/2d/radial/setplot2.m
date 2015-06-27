@@ -33,3 +33,5 @@ UserVariableFile = ' ';      % name of m-file mapping data to q
 ScatterStyle = setplotstyle('bo','r*','gx');
 x0 = 0;
 y0 = 0;
+
+PlotParallelPartitions=0;
