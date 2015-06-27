@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_DOMAIN_H
 
 #include <forestclaw2d.h>
-#include <fclaw_timer_enum.h>
+#include <fclaw_timer.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_map.h>
 

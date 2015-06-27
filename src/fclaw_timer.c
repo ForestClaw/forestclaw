@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_partition.h>
 #include <sc_statistics.h>
+#include <fclaw2d_domain.h>
 
 #define FCLAW2D_STATS_SET(stats,ddata,NAME) do {                               \
     SC_CHECK_ABORT (!(ddata)->timers[FCLAW2D_TIMER_ ## NAME].running,          \

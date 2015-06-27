@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_TIMER_H
 
 #include <p4est_base.h>
-#include <fclaw2d_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,7 +40,12 @@ extern "C"
    Work with timers
    ----------------------------------------------------------------- */
 
-#if 0
+/* This is used to avoid a circular dependency: fclaw2d_domain.h needs
+   fclaw_timer.h for the definition of fclaw2d_timer_t.  But this
+   file references an fclaw2d_domaint_t struct. */
+
+struct fclaw2d_domain;
+
 typedef enum
 {
     FCLAW2D_TIMER_NONE = -1,
@@ -65,7 +69,6 @@ typedef struct
     double cumulative;
 }
 fclaw2d_timer_t;
-#endif
 
 double fclaw2d_timer_wtime (void);
 
@@ -78,7 +81,7 @@ void
     fclaw2d_timer_stop (fclaw2d_timer_t *timer);
 
 void
-    fclaw2d_timer_report(fclaw2d_domain_t* domain);
+    fclaw2d_timer_report(struct fclaw2d_domain* domain);
 
 #ifdef __cplusplus
 #if 0
