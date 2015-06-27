@@ -163,7 +163,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
             fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
             // free all memory associated with old domain
-            fclaw2d_finalize(domain);
+            fclaw2d_domain_reset(domain);
             *domain = new_domain;
             new_domain = NULL;
 
