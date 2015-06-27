@@ -1,8 +1,5 @@
 setviews;
 
-daspect([1 1 1]);
-axis off;
-
 % showgridlines(1:4)
 showpatchborders();
 
@@ -18,8 +15,11 @@ else
   fprintf('%12s %24.16f\n\n','qmax',qmax);
 end;
 
-view(3);
-zoom(1.1^4);
+view(3)
+daspect([1 1 1]);
+axis off;
+
+axis([-1.1 1.1 -1.1 1.1 0 1.1]);
 
 NoQuery = 0;
 prt = false;
@@ -33,7 +33,7 @@ if (prt)
   eval(pstr);
 end;
 
-shg;
 
 clear afterframe;
 clear mapc2m;
+clear parallelpartitions

@@ -61,8 +61,8 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+    if (user->example < 0 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
     return FCLAW_NOEXIT;
@@ -114,16 +114,17 @@ static
 
 
     switch (user->example) {
+    case 0:
     case 1:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_pillowsphere5(gparms->scale,gparms->shift,
+                                             rotate,user->alpha);
+        break;
+    case 2:
         /* Map unit square to disk using mapc2m_disk.f */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,
                                             rotate);
-        break;
-    case 2:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_pillowsphere5(gparms->scale,gparms->shift,
-                                             rotate,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
