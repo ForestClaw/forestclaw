@@ -25,9 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "slotted_disk_user.H"
 
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
-#include "fc2d_clawpack46.H"
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_clawpatch.h"
+#include "fc2d_clawpack46.h"
 
 
 static fclaw2d_vtable_t vt;
