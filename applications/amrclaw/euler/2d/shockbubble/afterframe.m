@@ -19,6 +19,10 @@ delete(get(gca,'ylabel'))
 set(gca,'fontsize',16);
 hidepatchborders(6);
 
+if (PlotParallelPartitions==1)
+    showpatchborders;
+end
+
 prt = false;
 NoQuery = 0;
 if (prt)
