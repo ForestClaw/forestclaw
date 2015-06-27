@@ -73,7 +73,7 @@ void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack46_define_auxarray2(domain,this_patch);
+    fc2d_clawpack46_define_auxarray(domain,this_patch);
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
