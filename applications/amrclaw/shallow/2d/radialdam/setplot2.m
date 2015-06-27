@@ -26,4 +26,5 @@ ContourValues = [];
   y0 = 0;
   ScatterStyle = setplotstyle('ro','m*','cs','gp','ro','k*');
 
+PlotParallelPartitions=0;
 
