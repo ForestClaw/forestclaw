@@ -40,10 +40,13 @@ extern "C"
    Work with timers
    ----------------------------------------------------------------- */
 
-/* This is used to avoid a circular dependency: fclaw2d_domain.h needs
-   fclaw_timer.h for the definition of fclaw2d_timer_t.  But this
-   file references an fclaw2d_domaint_t struct. */
+/* Define struct here to avoid a circular dependency:
 
+    -- fclaw2d_domain.h needs fclaw_timer.h for the definition
+    of fclaw2d_timer_t.
+
+    -- fclaw2d_time.h  references an fclaw2d_domain_t struct.
+*/
 struct fclaw2d_domain;
 
 typedef enum
@@ -80,6 +83,7 @@ void
 void
     fclaw2d_timer_stop (fclaw2d_timer_t *timer);
 
+/* Use keyword 'struct' to avoid circular dependencies */
 void
     fclaw2d_timer_report(struct fclaw2d_domain* domain);
 
