@@ -50,7 +50,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 2) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
@@ -100,13 +100,14 @@ static
     rotate[1] = pi*gparms->phi/180.0;
 
     switch (user->example) {
+    case 0:
     case 1:
-        conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
-        break;
-    case 2:
         conn = p4est_connectivity_new_cubed();
         cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
+        break;
+    case 2:
+        conn = p4est_connectivity_new_pillow();
+        cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
