@@ -114,19 +114,19 @@ void run_program(fclaw_app_t* app,
 
     switch (user->example) {
     case 0:
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift,rotate);
+        break;
+    case 1:
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_nomap();
         break;
-    case 1:
+    case 2:
         /* Map unit square in [0,1]x[0,1] to [0,1]x[0,1] */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_identity();
-        break;
-    case 2:
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift,rotate);
         break;
     case 3:
         conn = p4est_connectivity_new_disk ();
