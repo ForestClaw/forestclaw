@@ -33,6 +33,9 @@ include applications/NCAR_transport/correlatedcb/Makefile.am
 # Euler example (with mappings)
 include applications/euler/2d/quadrants/Makefile.am
 
+# Shallow water on the sphere
+include applications/shallow/2d/latlong/Makefile.am
+
 # Mountain problem - SSE
 ###   include applications/Mountain/Makefile.am
 
