@@ -57,14 +57,14 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     pwconst_link_solvers(domain);
 
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);
 }
