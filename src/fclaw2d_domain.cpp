@@ -118,12 +118,14 @@ void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
     }
 
+#if 0
     /* TODO : Do we need this here?  Will we ever want to report stats during
        a run? */
     if (ddata->is_latest_domain)  /* ddata->is_last_domain?  */
     {
         fclaw2d_timer_report(*domain);
     }
+#endif
 
     fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
