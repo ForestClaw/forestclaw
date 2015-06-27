@@ -45,7 +45,7 @@ static void *
     user_options_t* user = (user_options_t*) package;
 
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 1 for pillow grid, "    \
+                        "[user] 0,1 for pillow grid, "    \
                         "2 for cubed sphere ");
     user->is_registered = 1;
     return NULL;
@@ -55,8 +55,8 @@ static fclaw_exit_type_t
     options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+    if (user->example < 0 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
     return FCLAW_NOEXIT;
@@ -119,6 +119,7 @@ static
         rotate[1] = pi*gparms->phi/180.0;
 
         switch (user->example) {
+        case 0:
         case 1:
             conn = p4est_connectivity_new_pillow();
             cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
