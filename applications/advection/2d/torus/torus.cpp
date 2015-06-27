@@ -195,9 +195,9 @@ void run_program(fclaw_app_t* app)
 
     torus_link_solvers(domain);
 
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);
 }

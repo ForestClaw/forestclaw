@@ -148,9 +148,10 @@ static
     /* --------------------------------------------------
        Initialize and run the simulation
        -------------------------------------------------- */
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);
 }
