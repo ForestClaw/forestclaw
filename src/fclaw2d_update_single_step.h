@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_SINGLE_STEP_H
 #define AMR_SINGLE_STEP_H
 
-#include "fclaw2d_capi.h"
-#include "forestclaw2d.h"
+#include "fclaw2d_forestclaw.h"
 
 #ifdef __cplusplus
 extern "C"

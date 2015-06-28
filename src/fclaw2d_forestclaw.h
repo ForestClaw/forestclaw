@@ -62,7 +62,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_timer.h"
 
 /* These still need to be cleaned up */
-#include "fclaw2d_capi.h"
 #include "fclaw2d_defs.h"
 
 #ifdef __cplusplus
