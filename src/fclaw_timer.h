@@ -62,8 +62,7 @@ typedef enum
     FCLAW2D_TIMER_UNACCOUNTED,
     FCLAW2D_TIMER_BUILDPATCHES,
     FCLAW2D_TIMER_COUNT
-}
-fclaw2d_timer_names_t;
+} fclaw2d_timer_names_t;
 
 typedef struct
 {

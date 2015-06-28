@@ -25,11 +25,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 
-#include "fclaw2d_regrid.h"
-#include "fclaw2d_ghost_fill.h"
+#include <fclaw2d_regrid.h>
+#include <fclaw2d_ghost_fill.h>
+#include <fclaw_timer.h>
 
 #include <fclaw2d_forestclaw.h>
-#include "fclaw2d_partition.h"
+#include <fclaw2d_partition.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 

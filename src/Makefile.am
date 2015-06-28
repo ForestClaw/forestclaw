@@ -17,7 +17,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_update_single_step.h \
-	src/fclaw2d_advance.H \
+	src/fclaw2d_advance.hpp \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_partition.h \
