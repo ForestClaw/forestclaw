@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "interface_user.H"
+#include "interface_user.h"
 #include "fclaw2d_clawpatch.h"
 #include "fc2d_clawpack46.h"
 
