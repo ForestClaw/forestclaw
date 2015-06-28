@@ -29,7 +29,7 @@
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
 
-#include <fc2d_dummy.H>
+#include <fc2d_dummy.h>
 
 
 typedef struct user_options
