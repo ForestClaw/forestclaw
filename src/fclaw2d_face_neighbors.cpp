@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_clawpatch.h>
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 
 /* This is used to determine neighbor patch relative level
    (finer, coarser or samesize) */

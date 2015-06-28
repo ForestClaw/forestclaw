@@ -26,7 +26,7 @@
 #ifndef FC2D_DUMMY_H
 #define FC2D_DUMMY_H
 
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 #include <fclaw_package.h>
 
 #ifdef __cplusplus

@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPATCH_H
-#define CLAWPATCH_H
+#ifndef CLAWPATCH_HPP
+#define CLAWPATCH_HPP
 
 #include <fclaw2d_global.h>
 
-#include <fclaw2d_farraybox.H>
+#include <fclaw2d_farraybox.hpp>
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_transform.h>
 #include <fclaw_options.h>

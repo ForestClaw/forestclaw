@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
 

@@ -24,10 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
 
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
@@ -72,7 +71,6 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
                                    double **xd, double **yd, double **zd,
                                    double **area)
 {
-    /* Declared as a friend in ClawPatch.H */
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *xp = cp->xp();
     *yp = cp->yp();

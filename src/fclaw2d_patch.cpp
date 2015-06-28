@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <forestclaw2d.h>
+#include <fclaw2d_forestclaw.h>
 #include <p4est_base.h>
 
 #include <fclaw2d_patch.hpp>
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 
 struct fclaw2d_patch_data
 {

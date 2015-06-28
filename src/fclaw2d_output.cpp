@@ -25,11 +25,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_output.h>
 #include <fclaw2d_clawpatch.h>
-#include <ClawPatch.H>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
+
+#include <ClawPatch.hpp>
 
 #ifdef __cplusplus
 extern "C"

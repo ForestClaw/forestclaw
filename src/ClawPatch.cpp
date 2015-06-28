@@ -1,5 +1,5 @@
 
-#include <ClawPatch.H>
+#include <ClawPatch.hpp>
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_neighbors_fort.h>
 

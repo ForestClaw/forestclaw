@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_ADVANCE_HPP
 #define FCLAW2D_ADVANCE_HPP
 
-#include "forestclaw2d.h"
-#include "subcycle_manager.H"
+#include "fclaw2d_forestclaw.h"
+#include "subcycle_manager.hpp"
 
 #ifdef __cplusplus
 extern "C"

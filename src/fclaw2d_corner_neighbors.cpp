@@ -26,8 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_ghost_fill.h>
-#include <ClawPatch.H>
 #include <fclaw2d_map_query.h>
+
+#include <ClawPatch.hpp>
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
    This enum is defined both here and in fclaw2d_face_neighbors.cpp.  Is that okay? */
