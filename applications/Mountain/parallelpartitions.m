@@ -5,7 +5,7 @@ function pp = parallelpartitions(q)
 
 
 
-pp.seed = 230;   % Random seed for processor colormap.
+pp.seed = 237;   % Random seed for processor colormap.
 pp.npmax = 8;    % Number of processors
 
 pp.qcolors = [];

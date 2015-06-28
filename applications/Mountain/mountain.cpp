@@ -25,9 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mountain_user.H"
 
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
-#include "fc2d_clawpack46.H"
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_clawpatch.h"
+#include "fc2d_clawpack46.h"
 
 
 static void *
@@ -47,7 +47,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->example < 1 || user->example > 2) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
         return FCLAW_EXIT_QUIET;
     }
@@ -101,13 +101,14 @@ void run_program(fclaw_app_t* app)
     brick = fclaw2d_map_new_brick(conn,mi,mj);
 
     switch (user->example) {
+    case 0:
     case 1:
-        /* A cut cell mesh */
-        cont = fclaw2d_map_new_identity (brick,gparms->scale,gparms->shift);
-        break;
-    case 2:
         /* A terrain following grid */
         cont = fclaw2d_map_new_mountain (brick,gparms->scale,gparms->shift);
+        break;
+    case 2:
+        /* A cut cell mesh */
+        cont = fclaw2d_map_new_identity (brick,gparms->scale,gparms->shift);
         break;
     default:
         SC_ABORT_NOT_REACHED ();
@@ -118,14 +119,14 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     mountain_link_solvers(domain);
 
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
 }
