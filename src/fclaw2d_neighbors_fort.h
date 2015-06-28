@@ -29,8 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* this header file must come first */
 #include <fclaw2d_defs.h>
 
-#include <fclaw2d_convenience.h>
 #include <forestclaw2d.h>
+#include <fclaw2d_convenience.h>
+
 #include <fclaw_options.h>
 #include <fclaw2d_transform.h>
 
@@ -42,19 +43,8 @@ extern "C"
 #endif
 #endif
 
-void set_common_levels_(const int& maxlevel,const int& a_level,
-                        const int& refratio);
-
-
 /* ------------------------------------------------------------------------ */
 
-
-void average_face_ghost_mapped_(const int& mx, const int& my, const int& mbc,
-                                const int& meqn, double qfine[],double qcoarse[],
-                                const double areacoarse[], const double areafine[],
-                                const int& idir, const int& iside,
-                                const int& num_neighbors, const int& refratio,
-                                const int& igrid);
 
 void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
                             const int& meqn, double qfine[],double qcoarse[],
@@ -164,32 +154,6 @@ void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                  const int& icorner, const int& iside);
 
 /* ----------------------------------------------------------------------------------
-   Tagging for refinement/coarsening
-   ---------------------------------------------------------------------------------- */
-#if 0
-void interpolate_to_fine_patch_(const int& mx,const int& my,const int& mbc,
-                                const int& meqn, double qcoarse[], double qfine[],
-                                const int& p4est_refineFactor,
-                                const int& refratio, const int& igrid);
-
-void average_to_coarse_patch_(const int& mx,const int& my,const int& mbc,
-                              const int& meqn,
-                              double qcoarse[],double qfine[],
-                              double areacoarse[],double areafine[],
-                              const int& p4est_refineFactor,
-                              const int& refratio, const int& igrid,
-                              const int& manifold);
-#endif
-
-#if 0
-void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
-                               const int& meqn, double qcoarse[], double qfine[],
-                               const double areacoarse[], const double areafine[],
-                               const int& p4est_refineFactor,
-                               const int& refratio, const int& igrid);
-#endif
-
-/* ----------------------------------------------------------------------------------
    Mapped grids
    area                : 1 float
    xp,yp,zp, xd,yd zp  : 6 floats
@@ -199,7 +163,7 @@ void average_to_coarse_mapped_(const int& mx,const int& my, const int& mbc,
    surfnormals         : 3 floats
    curvature           : 1 float
    -----------------------------
-   total               : 25 floats (in 2d!!)
+   total               : 25 floats per field (in 2d!!)
 
    ---------------------------------------------------------------------------------- */
 void setup_mesh_(const int& mx, const int& my, const int& mbc,

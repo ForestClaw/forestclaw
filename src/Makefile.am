@@ -27,7 +27,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_clawpatch.h \
 	src/fclaw2d_clawpatch.hpp \
 	src/fclaw2d_patch.hpp \
-	src/clawpack_fort.H \
+	src/fclaw2d_neighbors_fort.h \
 	src/fclaw2d_transform.h \
 	src/fclaw_package.h \
 	src/fclaw_register.h \
