@@ -26,8 +26,8 @@
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
-#include <fclaw2d_clawpatch.H>
-#include <fc2d_clawpack46.H>
+#include <fclaw2d_clawpatch.h>
+#include <fc2d_clawpack46.h>
 
 #ifdef __cplusplus
 extern "C"
