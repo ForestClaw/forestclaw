@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
-#include <fc2d_dummy.H>
+#include <fc2d_dummy.h>
 
 /* Leave these in for demonstration purposes */
 #include <fclaw2d_output_ascii.h>
