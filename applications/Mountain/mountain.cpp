@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mountain_user.H"
+#include "mountain_user.h"
 
 #include "fclaw2d_forestclaw.h"
 #include "fclaw2d_clawpatch.h"
