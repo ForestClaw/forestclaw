@@ -28,11 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_regrid.h"
 #include "fclaw2d_ghost_fill.h"
 
-#include <forestclaw2d.h>
-#include <amr_utils.H>
+#include <fclaw2d_forestclaw.h>
 #include "fclaw2d_partition.h"
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 #ifdef __cplusplus
 extern "C"

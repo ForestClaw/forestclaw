@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_H
 #define FCLAW2D_CLAWPATCH_H
 
+#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 
@@ -119,6 +120,13 @@ size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha);
+
+/* --------------------------------------------------------------
+   Include some of the patch headers that are not included in
+   fclaw2d_patch.hpp
+   ------------------------------------------------------------ */
+
+
 
 #ifdef __cplusplus
 #if 0

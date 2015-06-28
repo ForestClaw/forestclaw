@@ -23,12 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* #include <amr_utils.hpp> */
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_output.h>
 
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 
 #ifdef __cplusplus

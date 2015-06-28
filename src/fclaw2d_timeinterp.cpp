@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 
 static

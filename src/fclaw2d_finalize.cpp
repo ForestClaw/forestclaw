@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_partition.h>
 
 #include <sc_statistics.h>

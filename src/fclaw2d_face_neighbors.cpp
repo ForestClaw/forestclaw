@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 #include <ClawPatch.H>
 
 /* This is used to determine neighbor patch relative level

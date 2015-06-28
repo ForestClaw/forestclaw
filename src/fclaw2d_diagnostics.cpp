@@ -23,11 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_diagnostics.h"
-#include "forestclaw2d.h"
-#include "fclaw2d_vtable.h"
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_vtable.h>
 
-#include "amr_utils.H"
 
 
 /* global_maximum is in forestclaw2d.c */

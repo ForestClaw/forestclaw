@@ -23,13 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_PATCH_H
-#define FCLAW2D_PATCH_H
+#ifndef FCLAW2D_PATCH_HPP
+#define FCLAW2D_PATCH_HPP
 
-#include <forestclaw2d.h>
-#include <p4est_base.h>
-#include <fclaw2d_block.h>
-#include <fclaw2d_domain.h>
+#include <fclaw2d_forestclaw.h>
 
 class ClawPatch;    /* Incomplete type */
 
@@ -45,17 +42,8 @@ extern "C"
 /* Opaque pointer?  Is this feature supported in .h files?  */
 typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
 
-void
-fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
-                            fclaw2d_patch_t* this_patch);
-void
-fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
-                               fclaw2d_patch_t *patch);
 
-fclaw2d_patch_data_t*
-fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
-
-ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* patch);
+ClawPatch* fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch);
 
 #ifdef __cplusplus
 #if 0

@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_map.h>
+#include <fclaw2d_patch.h>
 
 
 #ifdef __cplusplus

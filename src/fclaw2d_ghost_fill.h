@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GHOST_H
 #define FCLAW2D_GHOST_H
 
-#include <amr_utils.H>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_advance.H>

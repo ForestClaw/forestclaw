@@ -25,8 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.hpp>
-/* #include <amr_utils.H> */
+#include <fclaw2d_clawpatch.h>
 
 #ifdef __cplusplus
 extern "C"
