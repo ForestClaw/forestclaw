@@ -52,9 +52,10 @@ struct single_step_data
 
 struct fclaw2d_level_time_data;
 
-double amr_level_single_step_update(fclaw2d_domain_t *domain,
-                                    int level,
-                                    double t, double dt);
+double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
+                                  int level,
+                                  double t, double dt);
+
 
 #ifdef __cplusplus
 #if 0

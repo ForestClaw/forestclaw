@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_advance.h>
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
-#include <amr_single_step.h>
+#include <fclaw2d_update_single_step.h>
 
 #include <math.h>
 
@@ -52,7 +52,7 @@ double update_level_solution(fclaw2d_domain_t *domain,
     double dt = time_data->dt;
     double cfl;
 
-    cfl = amr_level_single_step_update(domain,a_level,t,dt);
+    cfl = fclaw2d_update_single_step(domain,a_level,t,dt);
 
     /* This needs to be cleaned up a bit */
     time_data->maxcfl = fmax(time_data->maxcfl,cfl);

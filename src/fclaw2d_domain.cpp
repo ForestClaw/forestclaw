@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_domain.h>
-#include <fclaw2d_patch.hpp>
+#include <fclaw2d_patch.h>
 
 #ifdef __cplusplus
 extern "C"

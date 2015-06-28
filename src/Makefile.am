@@ -16,6 +16,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
+	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_advance.H \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
@@ -102,7 +103,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_finalize.cpp \
 	src/subcycle_manager.cpp \
 	src/fclaw2d_advance.cpp \
-	src/amr_single_step.cpp \
+	src/fclaw2d_update_single_step.cpp \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \

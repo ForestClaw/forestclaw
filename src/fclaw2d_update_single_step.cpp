@@ -23,9 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "amr_single_step.h"
-#include "amr_includes.H"
-#include "fclaw2d_vtable.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_update_single_step.h>
+#include <fclaw2d_vtable.h>
 
 static
     void cb_single_step(fclaw2d_domain_t *domain,
@@ -65,9 +65,9 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-double amr_level_single_step_update(fclaw2d_domain_t *domain,
-                                    int level,
-                                    double t, double dt)
+double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
+                                  int level,
+                                  double t, double dt)
 {
 
     /* Iterate over every patch at this level */
