@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 libdummy_generated_headers =
 libdummy_installed_headers = \
-	src/solvers/fc2d_dummy/fc2d_dummy.H
+	src/solvers/fc2d_dummy/fc2d_dummy.h
 
 libdummy_compiled_sources = \
 	src/solvers/fc2d_dummy/fc2d_dummy.cpp
