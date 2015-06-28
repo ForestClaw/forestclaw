@@ -12,12 +12,14 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_block.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
+	src/ClawPatch.hpp \
 	src/fclaw2d_output_ascii.h \
 	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_regrid_default.h \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_advance.hpp \
+	src/subcycle_manager.hpp \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_partition.h \
