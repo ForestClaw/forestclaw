@@ -92,7 +92,7 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     swirl_link_solvers(domain);
@@ -100,9 +100,9 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    amrinit(&domain);
-    amrrun(&domain);
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);
+    fclaw2d_finalize(&domain);
 
     /* This has to be in this scope */
     fclaw2d_map_destroy(cont);
