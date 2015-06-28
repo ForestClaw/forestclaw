@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_dummy.H"
-#include <fclaw2d_clawpatch.hpp>
-#include <clawpack_fort.H>
-#include <amr_utils.H>
+#include "fc2d_dummy.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
+#include <clawpack_fort.h>
 
 static int s_dummy_package_id = -1;
 

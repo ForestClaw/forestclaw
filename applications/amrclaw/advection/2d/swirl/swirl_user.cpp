@@ -23,11 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "swirl_user.H"
+
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
-#include <fc2d_clawpack46.H>
+#include <fc2d_clawpack46.h>
 
-#include <swirl_user.H>
 
 
 #ifdef __cplusplus
