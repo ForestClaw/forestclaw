@@ -57,6 +57,7 @@ semilogx(p,eff_computed,'.','markersize',30);
 hold on;
 ph(1) = semilogx(pv,eff_llsq,'b');
 ph(2) = semilogx(pv,eff_true,'b--');
+ylim([0 1.2]);
 
 
 title('Efficiency (S/p)','fontsize',18);
