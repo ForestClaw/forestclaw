@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "pwconst_user.H"
-#include "fc2d_clawpack46.H"
+#include "pwconst_user.h"
+#include "fc2d_clawpack46.h"
 #include "fclaw2d_forestclaw.h"
 
 #include <fclaw2d_map.h>
