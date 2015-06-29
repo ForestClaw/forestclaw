@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "swirl_user.H"
+#include "swirl_user.h"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
@@ -104,7 +104,13 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&maux,
-                    aux,&this_block_idx,xd,yd,zd,area);
+                    aux,&this_block_idx,xd,yd,zd);
+
+    /* Use this to set the capacity, since we can check to make sure
+       mcapa, etc are correctly set */
+    fc2d_clawpack46_set_capacity(domain, this_patch,this_block_idx,
+                                 this_patch_idx);
+
 }
 
 void swirl_patch_b4step2(fclaw2d_domain_t *domain,

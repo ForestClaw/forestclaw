@@ -1,5 +1,5 @@
       subroutine setaux_manifold(mx,my,mbc,xlower,ylower,dx,dy,
-     &      maux,aux,blockno,xd,yd,zd,area)
+     &      maux,aux,blockno,xd,yd,zd)
       implicit none
 
       integer mbc, mx,my, meqn, maux, blockno
@@ -11,13 +11,6 @@
 
       include 'metric_terms.i'
 
-      dxdy = dx*dy
-
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
-            aux(i,j,3) = area(i,j)/dxdy
-         enddo
-      enddo
       t = 0
       call compute_velocity_psi(mx,my,mbc,dx,dy,
      &      blockno, t,xd,yd,zd,aux,maux)

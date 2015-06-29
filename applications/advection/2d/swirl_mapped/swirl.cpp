@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "swirl_user.H"
+#include "swirl_user.h"
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
@@ -55,6 +55,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
+    amr_options_t* gparms = user->gparms;
     if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 1, 2, or 3\n");
         return FCLAW_EXIT_QUIET;
