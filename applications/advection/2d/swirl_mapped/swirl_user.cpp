@@ -51,33 +51,19 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
     gparms = fclaw2d_forestclaw_get_options(domain);
 
-    vt.problem_setup            = &swirl_problem_setup;
     /* classic_claw.setprob = &SETPROB; */
+    vt.problem_setup            = &swirl_problem_setup;
 
-    if (gparms->manifold)
-    {
-        /* setaux_manifold has customized signature */
-        vt.patch_setup = &swirl_patch_setup;
-    }
-    else
-    {
-        vt.patch_setup = &fc2d_clawpack46_setaux;
-        classic_claw.setaux = &SETAUX; /* Uses classic signature */
-    }
+    /* setaux_manifold has customized signature */
+    vt.patch_setup = &swirl_patch_setup;
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
     classic_claw.qinit = &QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
 
-    if (gparms->manifold)
-    {
-        vt.patch_single_step_update = &swirl_patch_update;
-    }
-    else
-    {
-        vt.patch_single_step_update = &fc2d_clawpack46_update;
-    }
+    vt.patch_single_step_update = &swirl_patch_update;
+
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
