@@ -109,7 +109,11 @@ void FArrayBox::set_dataPtr(int a_size)
     {
         if (m_size != a_size)
         {
-            delete [] m_data;
+            if (m_data != NULL)
+            {
+                delete [] m_data;
+                m_data = NULL;
+            }
             m_data = new double[a_size];
         }
         else
