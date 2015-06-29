@@ -55,7 +55,6 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    amr_options_t* gparms = user->gparms;
     if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 1, 2, or 3\n");
         return FCLAW_EXIT_QUIET;

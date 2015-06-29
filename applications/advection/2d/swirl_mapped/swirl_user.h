@@ -61,8 +61,7 @@ void SETAUX_MANIFOLD(const int* mbc,const int* mx, const int* my,
                      const double* dx, const double* dy,
                      const int* maux, double aux[],
                      const int* blockno,
-                     double xd[], double yd[], double zd[],
-                     double area[]);
+                     double xd[], double yd[], double zd[]);
 
 #define B4STEP2_MANIFOLD FCLAW_F77_FUNC(b4step2_manifold,B4STEP2_MANIFOLD)
 void B4STEP2_MANIFOLD(const int* mx,const int* my,const int* mbc,
