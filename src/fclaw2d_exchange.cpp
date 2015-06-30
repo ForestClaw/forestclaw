@@ -30,6 +30,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 
+
+/* Also needed in amrreset */
+fclaw2d_domain_exchange_t*
+    fclaw2d_exchange_get_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    return ddata->domain_exchange;
+}
+
+static
+void set_exchange_data(fclaw2d_domain_t* domain,
+                       fclaw2d_domain_exchange_t *e)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    ddata->domain_exchange = e;
+}
+
+static
+void build_ghost_patches(fclaw2d_domain_t* domain)
+{
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+
+        int blockno = ghost_patch->u.blockno;
+
+        /* not clear how useful this patchno is.  In any case, it isn't
+           used in defining the ClawPatch, so probably doesn't
+           need to be passed in */
+        int patchno = i;
+
+        fclaw2d_patch_data_new(domain,ghost_patch);
+        fclaw2d_clawpatch_build_cb(domain,ghost_patch,blockno,
+                                       patchno,(void*) NULL);
+    }
+}
+
+static
+void delete_ghost_patches(fclaw2d_domain_t* domain)
+{
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        fclaw2d_patch_data_delete(domain,ghost_patch);
+    }
+}
+
+
 static void
 unpack_ghost_patches(fclaw2d_domain_t* domain,
                      fclaw2d_domain_exchange_t *e,
@@ -65,6 +113,38 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
 /* --------------------------------------------------------------------------
    Public interface
    -------------------------------------------------------------------------- */
+/* This is called by rebuild_domain */
+void fclaw2d_exchange_setup(fclaw2d_domain* domain)
+{
+    size_t data_size =  fclaw2d_clawpatch_pack_size(domain);
+    fclaw2d_domain_exchange_t *e;
+
+    /* we just created a grid by amrinit or regrid and we now need to
+       allocate data to store and retrieve local boundary patches and
+       remote ghost patches */
+    e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
+
+    /* Store e so we can retrieve it later */
+    set_exchange_data(domain,e);
+
+    /* Build patches that can be filled later with q data */
+    build_ghost_patches(domain);
+}
+
+void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
+{
+    /* Free old parallel ghost patch data structure, must exist by construction. */
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
+    fclaw2d_domain_exchange_t *e_old = ddata->domain_exchange;
+
+    if (e_old != NULL)
+    {
+        delete_ghost_patches(*domain);
+        fclaw2d_domain_free_after_exchange (*domain, e_old);
+    }
+}
+
+
 /* This is called whenever all time levels are time synchronized. */
 void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int minlevel,
@@ -72,7 +152,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int time_interp)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_domain_exchange_t *e = fclaw2d_partition_get_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
 
     /* Store pointers to local boundary data.  We do this here
        because we may be exchanging with time interpolated data. */

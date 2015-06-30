@@ -65,6 +65,9 @@ void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
 void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
                               fclaw2d_domain_t *new_domain);
 
+void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
+                          fclaw2d_domain_t* new_domain);
+
 void fclaw2d_domain_reset(fclaw2d_domain_t** domain);
 
 fclaw2d_domain_data_t*

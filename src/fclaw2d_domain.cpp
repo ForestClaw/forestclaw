@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_domain.h>
+#include <fclaw2d_exchange.h>
 #include <fclaw2d_patch.h>
 
 #ifdef __cplusplus
@@ -88,6 +89,50 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 
 }
 
+
+void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
+                          fclaw2d_domain_t* new_domain)
+{
+    const amr_options_t *gparms;
+    double t;
+
+    if (old_domain == NULL)
+    {
+        fclaw_global_infof("Building initial domain\n");
+        t = 0;
+        fclaw2d_domain_set_time(new_domain,t);
+
+    }
+    else
+    {
+        fclaw_global_infof("Rebuilding  domain\n");
+        fclaw2d_domain_data_new(new_domain);
+        fclaw2d_domain_data_copy(old_domain,new_domain);
+    }
+
+    gparms = get_domain_parms(new_domain);
+
+    fclaw2d_block_data_new(new_domain);
+
+    int num = new_domain->num_blocks;
+    for (int i = 0; i < num; i++)
+    {
+        fclaw2d_block_t *block = &new_domain->blocks[i];
+        /* This will work for rectangular domains ... */
+        fclaw2d_block_set_data(block,gparms->mthbc);
+    }
+
+#if 0
+    /* Set up the parallel ghost patch data structure. */
+    fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
+
+    fclaw2d_exchange_setup(new_domain);
+#endif
+
+    fclaw_global_infof("Done\n");
+}
+
+
 void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
@@ -108,7 +153,7 @@ void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
 
     }
 
-    fclaw2d_partition_delete(domain);
+    fclaw2d_exchange_delete(domain);
 
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch)

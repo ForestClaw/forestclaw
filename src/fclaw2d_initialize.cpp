@@ -106,7 +106,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         vt.problem_setup(*domain);
     }
 
-    fclaw2d_regrid_new_domain_setup(NULL,*domain);
+    fclaw2d_domain_setup(NULL,*domain);
 
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
@@ -148,7 +148,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
         if (have_new_refinement)
         {
-            fclaw2d_regrid_new_domain_setup(*domain,new_domain);
+            fclaw2d_domain_setup(*domain,new_domain);
 
             // Re-initialize new grids
             fclaw2d_domain_iterate_adapted(*domain, new_domain,

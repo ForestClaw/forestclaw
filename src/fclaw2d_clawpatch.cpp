@@ -198,6 +198,9 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 int this_patch_idx,
                                 void *user)
 {
+    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
+
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
@@ -207,6 +210,7 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     {
         vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
     }
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
 }
 
 /* ----------------------------------------------------------
@@ -278,12 +282,10 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_build_cb(domain,this_patch,this_block_idx,
                                this_patch_idx,(void*) NULL);
 
-    fclaw_bool time_interp = fclaw_false;
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
 
-    if (time_interp)
-        cp->unpack_griddata_time_interpolated(patch_data);
-    else
-        cp->unpack_griddata(patch_data);
+    /* Time interp is false, since we only partition when all grids
+       are time synchronized */
+    cp->unpack_griddata(patch_data);
 
 }

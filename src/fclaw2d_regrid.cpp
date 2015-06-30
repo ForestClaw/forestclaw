@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_partition.h>
+#include <fclaw2d_exchange.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
@@ -196,47 +197,6 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     }
 }
 
-void fclaw2d_regrid_new_domain_setup(fclaw2d_domain_t* old_domain,
-                                     fclaw2d_domain_t* new_domain)
-{
-    const amr_options_t *gparms;
-    double t;
-
-    if (old_domain == NULL)
-    {
-        fclaw_global_infof("Building initial domain\n");
-        t = 0;
-        fclaw2d_domain_set_time(new_domain,t);
-
-    }
-    else
-    {
-        fclaw_global_infof("Rebuilding  domain\n");
-        /* Allocate memory for user data types (but they don't get set) */
-        fclaw2d_domain_data_new(new_domain);
-        fclaw2d_domain_data_copy(old_domain,new_domain);
-    }
-
-    gparms = get_domain_parms(new_domain);
-
-    fclaw2d_block_data_new(new_domain);
-
-    int num = new_domain->num_blocks;
-    for (int i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &new_domain->blocks[i];
-        /* This will work for rectangular domains ... */
-        fclaw2d_block_set_data(block,gparms->mthbc);
-    }
-
-    /* Set up the parallel ghost patch data structure. */
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
-
-    fclaw2d_partition_setup(new_domain);
-
-    fclaw_global_infof("Done\n");
-}
-
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
@@ -270,7 +230,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        fclaw2d_regrid_new_domain_setup(*domain, new_domain);
+        fclaw2d_domain_setup(*domain, new_domain);
 
         /* Average to new coarse grids and interpolate to new fine grids */
         fclaw2d_domain_iterate_adapted(*domain, new_domain,
@@ -282,18 +242,19 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
         new_domain = NULL;
 
-        /* We have a newly created mesh;  We need to get all of the ghost cells
-           filled */
-
+        /* Repartition for load balancing */
         fclaw2d_partition_domain(domain, -1);
 
-        /* fclaw2d_ghost_update_all_levels (*domain,FCLAW2D_TIMER_REGRID); */
+        /* Set up ghost patches */
+        fclaw2d_exchange_setup(*domain);
+
+
+        /* Update ghost cells.  This is needed because we have new coarse or fine
+           patches without valid ghost cells.   */
         int minlevel = (*domain)->global_minlevel;
         int maxlevel = (*domain)->global_maxlevel;
         int time_interp = 0;
         fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
-        fclaw_global_infof ("Global minlevel %d maxlevel %d\n",
-                            minlevel,maxlevel);
     }
 
     /* Stop timer */
