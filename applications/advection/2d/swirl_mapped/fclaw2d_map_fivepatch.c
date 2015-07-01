@@ -24,7 +24,7 @@ fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_AFFINE:
-        return 0;
+        return 1;
     case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_GRAPH:
@@ -38,7 +38,7 @@ fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
