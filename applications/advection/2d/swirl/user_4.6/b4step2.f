@@ -27,8 +27,8 @@ c           # coordinates of lower left corner of grid cell:
             yll = ylower + (j-1)*dy
 
 c           # difference stream function psi to get normal velocities:
-            aux(i,j,1) = -(psi(xll, yll+dy) - psi(xll,yll)) / dy
-            aux(i,j,2) =  (psi(xll+dx, yll) - psi(xll,yll)) / dx
+            aux(i,j,1) = (psi(xll, yll+dy) - psi(xll,yll)) / dy
+            aux(i,j,2) =  -(psi(xll+dx, yll) - psi(xll,yll)) / dx
 
 c           # multiply by time-factor:
             aux(i,j,1) = vt * aux(i,j,1)
