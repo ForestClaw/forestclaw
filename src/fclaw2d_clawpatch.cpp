@@ -300,8 +300,10 @@ void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
 
     /* First need to rebuild the patch */
     fclaw2d_patch_data_new(domain,this_patch);
+
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
     fclaw2d_clawpatch_build_cb(domain,this_patch,this_block_idx,
-                               this_patch_idx,(void*) NULL);
+                               this_patch_idx,(void*) &build_mode);
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
 
