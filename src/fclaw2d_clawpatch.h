@@ -38,6 +38,12 @@ extern "C"
 #endif
 #endif
 
+typedef enum
+{
+    FCLAW2D_BUILD_FOR_GHOST = 0,
+    FCLAW2D_BUILD_FOR_UPDATE,
+} fclaw2d_build_mode_t;
+
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
 
@@ -89,7 +95,8 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
 
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
-                              int blockno, int patchno);
+                              int blockno, int patchno,
+                              fclaw2d_build_mode_t build_mode);
 
 /* A callback for building the domain and repartitioning */
 void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,

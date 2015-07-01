@@ -171,7 +171,8 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
  -------------------------------------------------------------------- */
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
-                              int blockno, int patchno)
+                              int blockno, int patchno,
+                              fclaw2d_build_mode_t build_mode)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     int level = this_patch->level;
@@ -183,7 +184,8 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                this_patch->yupper,
                blockno,
                level,
-               gparms);
+               gparms,
+               build_mode);
 }
 
 
@@ -201,9 +203,20 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
-    fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_build_mode_t build_mode;
+    if (user != NULL)
+    {
+        build_mode = *((fclaw2d_build_mode_t*) user);
+    }
+    else
+    {
+        build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+    }
 
-    if (vt.patch_setup != NULL)
+    fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,
+                             this_patch_idx,build_mode);
+
+    if (vt.patch_setup != NULL && build_mode != FCLAW2D_BUILD_FOR_GHOST)
     {
         vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
     }

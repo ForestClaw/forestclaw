@@ -61,9 +61,11 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
            need to be passed in */
         int patchno = i;
 
+        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_GHOST;
+
         fclaw2d_patch_data_new(domain,ghost_patch);
         fclaw2d_clawpatch_build_cb(domain,ghost_patch,blockno,
-                                       patchno,(void*) NULL);
+                                   patchno,(void*) &build_mode);
     }
 }
 
