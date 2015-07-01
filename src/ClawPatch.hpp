@@ -60,9 +60,10 @@ public :
     void save_current_step();
     void restore_step();
 
-    void pack_griddata(double* qdata);
-    void unpack_griddata(double* qdata);
-    void unpack_griddata_time_interpolated(double* qdata);
+    void ghost_pack(double* qdata, int time_interp);
+    void ghost_unpack(double *qdata,int time_interp);
+    void partition_pack(double* qdata);
+    void partition_unpack(double *qdata);
 
     void setup_for_time_interpolation(const double& alpha);
     void reset_after_time_interpolation();
@@ -153,8 +154,7 @@ public :
     // ----------------------------------------------------------------
 
     void setup_manifold(const int& a_level,
-                        const amr_options_t *gparms,
-                        fclaw2d_build_mode_t build_mode);
+                        const amr_options_t *gparms);
 
     void set_block_corner_count(const int icorner, const int block_corner_count);
 

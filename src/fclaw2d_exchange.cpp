@@ -77,6 +77,7 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         fclaw2d_patch_data_delete(domain,ghost_patch);
     }
+
 }
 
 
@@ -106,7 +107,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_clawpatch_unpack_ghost(domain, ghost_patch, blockno,
+            fclaw2d_clawpatch_ghost_unpack(domain, ghost_patch, blockno,
                                            patchno, q, unpack_to_timeinterp_patch);
         }
     }
@@ -118,7 +119,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
 /* This is called by rebuild_domain */
 void fclaw2d_exchange_setup(fclaw2d_domain* domain)
 {
-    size_t data_size =  fclaw2d_clawpatch_pack_size(domain);
+    size_t data_size =  fclaw2d_clawpatch_ghost_packsize(domain);
     fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by amrinit or regrid and we now need to
@@ -147,6 +148,10 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
 }
 
 
+/* ----------------------------------------------------------------
+   Public interface
+   -------------------------------------------------------------- */
+
 /* This is called whenever all time levels are time synchronized. */
 void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int minlevel,
@@ -171,16 +176,13 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                 int level = this_patch->level;
                 FCLAW_ASSERT(level <= maxlevel);
 
-                double *q;
-                if (time_interp && level == minlevel-1)
-                {
-                    q = fclaw2d_clawpatch_get_q_timesync(domain,this_patch,time_interp);
-                }
-                else
-                {
-                    q = fclaw2d_clawpatch_get_q(domain,this_patch);
-                }
-                e->patch_data[zz++] = (void*) q;
+                /* Copy q and area into one contingous block */
+                int pack_time_interp = time_interp && level == minlevel-1;
+
+                double *q = (double*) e->patch_data[zz++];
+                FCLAW_ASSERT(q != NULL);
+                fclaw2d_clawpatch_ghost_pack(domain,this_patch,q,
+                                             pack_time_interp);
             }
         }
     }

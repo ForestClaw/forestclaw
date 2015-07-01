@@ -52,7 +52,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
-    size_t data_size = fclaw2d_clawpatch_pack_size(*domain);
+    size_t data_size = fclaw2d_clawpatch_partition_packsize(*domain);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
@@ -61,7 +61,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     /* For all (patch i) { pack its numerical data into patch_data[i] }
        Does all the data in every patch need to be copied?  */
     fclaw2d_domain_iterate_patches(*domain,
-                                   fclaw2d_clawpatch_pack_cb,
+                                   fclaw2d_clawpatch_partition_pack_cb,
                                    (void *) patch_data);
 
 
@@ -84,7 +84,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
         fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain_partitioned);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
         fclaw2d_domain_iterate_patches(domain_partitioned,
-                                       fclaw2d_clawpatch_unpack_cb,
+                                       fclaw2d_clawpatch_partition_unpack_cb,
                                        (void *) patch_data);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 

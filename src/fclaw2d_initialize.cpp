@@ -52,12 +52,13 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     void *user)
 {
     fclaw2d_vtable_t vt;
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     fclaw2d_patch_data_new(domain,this_patch);
     fclaw2d_clawpatch_build_cb(domain,this_patch,
                                this_block_idx,
                                this_patch_idx,
-                               (void*) NULL);
+                               (void*) &build_mode);
 
     vt = fclaw2d_get_vtable(domain);
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);

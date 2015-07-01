@@ -122,6 +122,7 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     int domain_init = *((int*) user);
 
@@ -145,7 +146,7 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int fine_patchno = new_patchno + i;
             fclaw2d_patch_data_new(new_domain,fine_patch);
             fclaw2d_clawpatch_build_cb(new_domain,fine_patch,blockno,
-                                       fine_patchno,(void*) NULL);
+                                       fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
                 vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
@@ -172,7 +173,7 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         int coarse_patchno = new_patchno;
         fclaw2d_patch_data_new(new_domain,coarse_patch);
         fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
-                                   coarse_patchno,(void*) NULL);
+                                   coarse_patchno,(void*) &build_mode);
 
         if (domain_init)
         {

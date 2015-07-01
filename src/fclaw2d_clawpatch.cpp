@@ -203,16 +203,7 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
-    fclaw2d_build_mode_t build_mode;
-    if (user != NULL)
-    {
-        build_mode = *((fclaw2d_build_mode_t*) user);
-    }
-    else
-    {
-        build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    }
-
+    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,
                              this_patch_idx,build_mode);
 
@@ -228,17 +219,38 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
    Note this is different from the packing/unpacking that happens
    when partitioning the domain
    ----------------------------------------------------------*/
-void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
+
+size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    int pack_area = gparms->manifold;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*(meqn+pack_area);  /* Store area */
+    return size*sizeof(double);
+}
+
+void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  double *patch_data,
+                                  int time_interp)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    FCLAW_ASSERT(cp != NULL);
+    cp->ghost_pack(patch_data,time_interp);
+}
+
+
+void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
                                     double *qdata, fclaw_bool time_interp)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    if (time_interp)
-        cp->unpack_griddata_time_interpolated(qdata);
-    else
-        cp->unpack_griddata(qdata);
+    cp->ghost_unpack(qdata,time_interp);
 }
 
 
@@ -250,22 +262,22 @@ void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
    load balance the computation.
    -------------------------------------------------------*/
 
-size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain)
+size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;  /* Store area */
     return size*sizeof(double);
 }
 
-void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx,
-                               int this_patch_idx,
-                               void *user)
+void fclaw2d_clawpatch_partition_pack_cb(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         int this_block_idx,
+                                         int this_patch_idx,
+                                         void *user)
 {
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
@@ -273,14 +285,14 @@ void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
-    cp->pack_griddata(patch_data);
+    cp->partition_pack(patch_data);
 }
 
-void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 void *user)
+void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           void *user)
 {
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
@@ -295,6 +307,6 @@ void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
 
     /* Time interp is false, since we only partition when all grids
        are time synchronized */
-    cp->unpack_griddata(patch_data);
+    cp->partition_unpack(patch_data);
 
 }

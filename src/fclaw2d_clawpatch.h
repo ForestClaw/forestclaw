@@ -44,6 +44,7 @@ typedef enum
     FCLAW2D_BUILD_FOR_UPDATE,
 } fclaw2d_build_mode_t;
 
+
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
 
@@ -93,6 +94,15 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
 int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch);
 
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        double alpha);
+
+
+/* -----------------------------------------------------
+   Define/build clawpatches
+   ---------------------------------------------------- */
+
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               int blockno, int patchno,
@@ -105,35 +115,40 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 int this_patch_idx,
                                 void *user);
 
-void fclaw2d_clawpatch_pack_cb(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx,
-                               int this_patch_idx,
-                               void *user);
-
-void fclaw2d_clawpatch_unpack_ghost(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    double *qdata, fclaw_bool time_interp);
-
-void fclaw2d_clawpatch_unpack_cb(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 void *user);
-
-size_t fclaw2d_clawpatch_pack_size(fclaw2d_domain_t* domain);
-
-void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        double alpha);
-
-/* --------------------------------------------------------------
-   Include some of the patch headers that are not included in
-   fclaw2d_patch.hpp
-   ------------------------------------------------------------ */
+/* -----------------------------------------------------
+   Build/pack/size for partitioning
+   ---------------------------------------------------- */
+size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain);
 
 
+void fclaw2d_clawpatch_partition_pack_cb(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         int this_block_idx,
+                                         int this_patch_idx,
+                                         void *user);
+
+void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           void *user);
+
+
+/* -----------------------------------------------------
+   Build/pack/size for ghost exchange
+   ---------------------------------------------------- */
+size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain);
+
+    void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t* this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        double *qdata, fclaw_bool time_interp);
+
+
+void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  double *patch_data,
+                                  int time_interp);
 
 #ifdef __cplusplus
 #if 0

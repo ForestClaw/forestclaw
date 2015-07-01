@@ -73,18 +73,18 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_time_interpolated.define(box, m_meqn);
 
-    if (build_mode != FCLAW2D_BUILD_FOR_GHOST)
-    {
-        m_griddata_last.define(box, m_meqn);
-        m_griddata_save.define(box, m_meqn);
-    }
+    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
 
+    if (build_mode == FCLAW2D_BUILD_FOR_GHOST)
+    {
+        return;
+    }
+    m_griddata_last.define(box, m_meqn);
+    m_griddata_save.define(box, m_meqn);
     if (m_manifold)
     {
-        setup_manifold(a_level,gparms,build_mode);
+        setup_manifold(a_level,gparms);
     }
-
-    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
 
 }
 
@@ -290,21 +290,49 @@ void ClawPatch::restore_step()
     m_griddata = m_griddata_save;
 }
 
-void ClawPatch::pack_griddata(double *q)
+void ClawPatch::ghost_pack(double *q, int time_interp)
+{
+    FCLAW_ASSERT(q != NULL);
+    if (time_interp)
+    {
+        m_griddata_time_interpolated.copyToMemory(q);
+    }
+    else
+    {
+        m_griddata.copyToMemory(q);
+    }
+    if (m_manifold)
+    {
+        int mloc = (2*m_mbc + m_mx)*(2*m_mbc+m_my)*m_meqn;  /* Store area */
+        m_area.copyToMemory(q+mloc);
+    }
+}
+
+void ClawPatch::ghost_unpack(double *q, int time_interp)
+{
+    int mloc = (2*m_mbc + m_mx)*(2*m_mbc+m_my)*m_meqn;  /* Store area */
+    if (time_interp)
+    {
+        m_griddata_time_interpolated.copyFromMemory(q);
+    }
+    else
+    {
+        m_griddata.copyFromMemory(q);
+    }
+    m_area.copyFromMemory(q+mloc);
+}
+
+void ClawPatch::partition_pack(double *q)
 {
     m_griddata.copyToMemory(q);
 }
 
-void ClawPatch::unpack_griddata(double *q)
+void ClawPatch::partition_unpack(double *q)
 {
+    /* We only copy to griddata, since when we are partitioning, all
+       levels are time synchronized */
     m_griddata.copyFromMemory(q);
 }
-
-void ClawPatch::unpack_griddata_time_interpolated(double *q)
-{
-    m_griddata_time_interpolated.copyFromMemory(q);
-}
-
 
 /* ----------------------------------------------------------------
    Exchange/average/interpolate
@@ -528,8 +556,7 @@ void ClawPatch::set_block_corner_count(const int icorner, const int block_corner
 }
 
 void ClawPatch::setup_manifold(const int& level,
-                               const amr_options_t *gparms,
-                               fclaw2d_build_mode_t build_mode)
+                               const amr_options_t *gparms)
 {
     int mx = gparms->mx;
     int my = gparms->my;
@@ -554,13 +581,6 @@ void ClawPatch::setup_manifold(const int& level,
     double *area = m_area.dataPtr();
     compute_area_(mx, my, mbc, m_dx, m_dy,m_xlower, m_ylower,
                   m_blockno, area, level, maxlevel, refratio);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST)
-    {
-        /* We don't need anything else for ghost patches, since we
-           are not updating ghost patches. */
-        return;
-    }
 
     /* Mesh cell centers of physical mesh */
     m_xp.define(box_p,1);
