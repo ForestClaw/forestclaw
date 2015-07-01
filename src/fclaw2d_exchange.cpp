@@ -139,9 +139,22 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     /* Free old parallel ghost patch data structure, must exist by construction. */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
     fclaw2d_domain_exchange_t *e_old = ddata->domain_exchange;
-
     if (e_old != NULL)
     {
+        /* Delete local patches which are passed to other procs */
+        int zz = 0;
+        for (int nb = 0; nb < (*domain)->num_blocks; ++nb)
+        {
+            for (int np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
+            {
+                if ((*domain)->blocks[nb].patches[np].flags &
+                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+                {
+                    FCLAW_FREE(e_old->patch_data[zz++]);
+                }
+            }
+        }
+        /* Delete ghost patches */
         delete_ghost_patches(*domain);
         fclaw2d_domain_free_after_exchange (*domain, e_old);
     }
@@ -164,6 +177,8 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     /* Store pointers to local boundary data.  We do this here
        because we may be exchanging with time interpolated data. */
     fclaw_debugf("Exchanging ghost patches : Setting up pointers.\n");
+    int msize = fclaw2d_clawpatch_ghost_packsize(domain);
+
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
@@ -179,10 +194,11 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                 /* Copy q and area into one contingous block */
                 int pack_time_interp = time_interp && level == minlevel-1;
 
-                double *q = (double*) e->patch_data[zz++];
+                double *q = (double*) FCLAW_ALLOC(double,msize);
                 FCLAW_ASSERT(q != NULL);
                 fclaw2d_clawpatch_ghost_pack(domain,this_patch,q,
                                              pack_time_interp);
+                e->patch_data[zz++] = q;
             }
         }
     }
