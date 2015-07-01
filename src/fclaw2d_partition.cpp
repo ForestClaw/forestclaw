@@ -81,9 +81,12 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         /* TODO: for all (patch i) { unpack numerical data from patch_data[i] } */
+        fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain_partitioned);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
         fclaw2d_domain_iterate_patches(domain_partitioned,
                                        fclaw2d_clawpatch_unpack_cb,
                                        (void *) patch_data);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 
         /* then the old domain is no longer necessary */
         fclaw2d_domain_reset(domain);

@@ -231,11 +231,14 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
         fclaw2d_domain_setup(*domain, new_domain);
+        ddata = fclaw2d_domain_get_data(new_domain);
 
         /* Average to new coarse grids and interpolate to new fine grids */
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
         fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                        fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
 
         /* free memory associated with old domain */
         fclaw2d_domain_reset(domain);
@@ -245,8 +248,13 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* Repartition for load balancing */
         fclaw2d_partition_domain(domain, -1);
 
+        /* Need a new timer */
+        ddata = fclaw2d_domain_get_data(*domain);
+
         /* Set up ghost patches */
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
         fclaw2d_exchange_setup(*domain);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
 
 
         /* Update ghost cells.  This is needed because we have new coarse or fine

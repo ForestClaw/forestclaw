@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_partition.h>
+#include <fclaw2d_exchange.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_clawpatch.h>
@@ -187,6 +188,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
             /* Repartition domain to new processors. */
             fclaw2d_partition_domain(domain, level);
+
+            /* Set up ghost patches */
+            fclaw2d_exchange_setup(*domain);
         }
         else
         {

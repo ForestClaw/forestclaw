@@ -198,9 +198,6 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 int this_patch_idx,
                                 void *user)
 {
-    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
-
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
@@ -210,7 +207,6 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     {
         vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPATCHES]);
 }
 
 /* ----------------------------------------------------------
