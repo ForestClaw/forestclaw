@@ -111,8 +111,10 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     /* Get an initial domain */
     fclaw2d_domain_setup(NULL,*domain);
 
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
 
     fclaw_bool time_interp = fclaw_false;
     t = fclaw2d_domain_get_time(*domain);
