@@ -153,7 +153,10 @@ void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
 
     }
 
-    fclaw2d_exchange_delete(domain);
+    if (ddata->domain_exchange != NULL)
+    {
+        fclaw2d_exchange_delete(domain);
+    }
 
     /* Output memory discrepancy for the ClawPatch */
     if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch)

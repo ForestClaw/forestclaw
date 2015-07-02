@@ -232,6 +232,27 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     return size*sizeof(double);
 }
 
+void fclaw2d_clawpatch_ghost_pack_location(fclaw2_domain_t* domain,
+                                           fclaw2d_patch_t* this_patch,
+                                           void** q)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    if (gparms->manifold)
+    {
+        int msize = fclaw2d_clawpatch_ghost_packsize(domain);
+        *q = (void*) FCLAW_ALLOC(double,msize);
+        FCLAW_ASSERT(q != NULL);
+    }
+    else
+    {
+        /* We will just use the pointer to the data and don't copy.
+           But we don't know yet where to point the data, since we
+           might be using time interpolated data. */
+        *q = NULL;
+    }
+}
+
+
 void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   double *patch_data,

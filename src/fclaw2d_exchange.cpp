@@ -78,7 +78,6 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         fclaw2d_patch_data_delete(domain,ghost_patch);
     }
-
 }
 
 
@@ -130,22 +129,17 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
        remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
-    if (gparms->manifold)
+    int zz = 0;
+    for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
-        int msize = fclaw2d_clawpatch_ghost_packsize(domain);
-        int zz = 0;
-        for (int nb = 0; nb < domain->num_blocks; ++nb)
+        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
-            for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
+            if (domain->blocks[nb].patches[np].flags &
+                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {
-                if (domain->blocks[nb].patches[np].flags &
-                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-                {
-                    /* Copy q and area into one contingous block */
-                    double *q = (double*) FCLAW_ALLOC(double,msize);
-                    FCLAW_ASSERT(q != NULL);
-                    e->patch_data[zz++] = q;
-                }
+                /* Copy q and area into one contingous block */
+                fclaw2d_clawpatch_ghost_pack_location(domain,this_patch,
+                                                      &e->patch_data[zz++]);
             }
         }
     }

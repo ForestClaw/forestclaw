@@ -113,12 +113,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
-    /* Repartition domain to new processors. */
-    fclaw2d_partition_domain(domain, minlevel);
-
-    /* Set up ghost patches */
-    fclaw2d_exchange_setup(*domain);
-
 
     fclaw_bool time_interp = fclaw_false;
     t = fclaw2d_domain_get_time(*domain);
