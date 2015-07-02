@@ -154,7 +154,8 @@ public :
     // ----------------------------------------------------------------
 
     void setup_manifold(const int& a_level,
-                        const amr_options_t *gparms);
+                        const amr_options_t *gparms,
+                        fclaw2d_build_mode_t build_mode);
 
     void set_block_corner_count(const int icorner, const int block_corner_count);
 

@@ -121,14 +121,17 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
 {
     size_t data_size =  fclaw2d_clawpatch_ghost_packsize(domain);
     fclaw2d_domain_exchange_t *e;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(domain);
-
 
     /* we just created a grid by amrinit or regrid and we now need to
        allocate data to store and retrieve local boundary patches and
        remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
+    /* Store locations of on-proc boundary patches that will be communicated
+       to neighboring remote procs.  The pointer stored in e->patch_data[]
+       will point to either the patch data itself, or to a newly allocated
+       contiguous memory block that stores qdata and area (for computations
+       on manifolds).*/
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
@@ -138,18 +141,19 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {
                 /* Copy q and area into one contingous block */
+                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 fclaw2d_clawpatch_ghost_pack_location(domain,this_patch,
                                                       &e->patch_data[zz++]);
             }
         }
     }
 
+    /* Build ghost patches from neighboring remote processors.  These will be
+       filled later with q data and the area, if we are on a manifold */
+    build_ghost_patches(domain);
 
     /* Store e so we can retrieve it later */
     set_exchange_data(domain,e);
-
-    /* Build patches that can be filled later with q data */
-    build_ghost_patches(domain);
 }
 
 void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
@@ -157,28 +161,28 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     /* Free old parallel ghost patch data structure, must exist by construction. */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
     fclaw2d_domain_exchange_t *e_old = ddata->domain_exchange;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(*domain);
 
-    if (gparms->manifold)
+    /* Free contiguous memory, if allocated.  If no memory was allocated
+       (because we are not storing the area), nothing de-allocated. */
+    if (e_old != NULL)
     {
-        if (e_old != NULL)
+        /* Delete local patches which are passed to other procs */
+        int zz = 0;
+        for (int nb = 0; nb < (*domain)->num_blocks; ++nb)
         {
-            /* Delete local patches which are passed to other procs */
-            int zz = 0;
-            for (int nb = 0; nb < (*domain)->num_blocks; ++nb)
+            for (int np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
             {
-                for (int np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
+                if ((*domain)->blocks[nb].patches[np].flags &
+                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    if ((*domain)->blocks[nb].patches[np].flags &
-                        FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-                    {
-                        FCLAW_FREE(e_old->patch_data[zz++]);
-                    }
+                    fclaw2d_clawpatch_ghost_free_pack_location(*domain,
+                                                               &e_old->patch_data[zz++]);
                 }
             }
         }
     }
-    /* Delete ghost patches */
+
+    /* Delete ghost patches from remote neighboring patches */
     delete_ghost_patches(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 }
@@ -196,13 +200,13 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(domain);
-
 
     /* Store pointers to local boundary data.  We do this here
        because we may be exchanging with time interpolated data. */
     fclaw_debugf("Exchanging ghost patches : Setting up pointers.\n");
 
+    /* Pack local data into on-proc patches at the parallel boundary that
+       will be shipped of to other processors. */
     int zz = 0;
     for (int nb = 0; nb < domain->num_blocks; ++nb)
     {
@@ -218,20 +222,21 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                 /* Copy q and area into one contingous block */
                 int pack_time_interp = time_interp && level == minlevel-1;
 
-                double *q;
-                if (gparms->manifold)
+                if (e->patch_data[zz] == NULL)
                 {
-                    q = (double*) e->patch_data[zz];
-                    FCLAW_ASSERT(q != NULL);
-                    fclaw2d_clawpatch_ghost_pack(domain,this_patch,q,
-                                                 pack_time_interp);
+                    /* Re-use memory location of current boundary patch */
+                    e->patch_data[zz] = fclaw2d_clawpatch_get_q_timesync(domain,this_patch,
+                                                                         pack_time_interp);
                 }
                 else
                 {
-                    q = fclaw2d_clawpatch_get_q_timesync(domain,this_patch,
-                                                         pack_time_interp);
+                    /* Pack something more complicated in data location that
+                       has already been pre-allocated.*/
+                    fclaw2d_clawpatch_ghost_pack(domain,this_patch,
+                                                 (double*) e->patch_data[zz],
+                                                 pack_time_interp);
                 }
-                e->patch_data[zz++] = (void*) q;
+                zz++;
             }
         }
     }
@@ -246,6 +251,9 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     {
         fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
     }
+
+    /* Unpack data from remote patches to corresponding ghost patches
+       stored locally */
     unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */

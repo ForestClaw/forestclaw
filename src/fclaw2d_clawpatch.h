@@ -150,6 +150,15 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
                                   double *patch_data,
                                   int time_interp);
 
+void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
+                                           fclaw2d_patch_t* this_patch,
+                                           void **q);
+
+void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
+                                                void **q);
+
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

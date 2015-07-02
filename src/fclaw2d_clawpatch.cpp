@@ -227,27 +227,43 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    int pack_area = gparms->manifold;
-    size_t size = (2*mbc + mx)*(2*mbc+my)*(meqn+pack_area);  /* Store area */
+    int areasize = 0;
+    if (gparms->manifold)
+    {
+        areasize = (2*(mbc+1) + mx)*(2*(mbc+1)+my);
+    }
+    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn + areasize;  /* Store area */
     return size*sizeof(double);
 }
 
-void fclaw2d_clawpatch_ghost_pack_location(fclaw2_domain_t* domain,
+void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
                                            fclaw2d_patch_t* this_patch,
                                            void** q)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     if (gparms->manifold)
     {
+        /* Create contiguous block for data and area */
         int msize = fclaw2d_clawpatch_ghost_packsize(domain);
         *q = (void*) FCLAW_ALLOC(double,msize);
-        FCLAW_ASSERT(q != NULL);
+        FCLAW_ASSERT(*q != NULL);
     }
     else
     {
         /* We will just use the pointer to the data and don't copy.
            But we don't know yet where to point the data, since we
            might be using time interpolated data. */
+        *q = NULL;
+    }
+}
+
+void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
+                                                void **q)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    if (gparms->manifold)
+    {
+        FCLAW_FREE(*q);
         *q = NULL;
     }
 }
