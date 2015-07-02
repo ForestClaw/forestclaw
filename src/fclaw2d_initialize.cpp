@@ -187,12 +187,13 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
                 ddata = NULL;
             }
-
+#if 0
             /* Repartition domain to new processors. */
             fclaw2d_partition_domain(domain, level);
 
             /* Set up ghost patches */
             fclaw2d_exchange_setup(*domain);
+#endif
         }
         else
         {
@@ -200,6 +201,13 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
             break;
         }
     }
+
+    /* Repartition domain to new processors. */
+    fclaw2d_partition_domain(domain, -1);
+
+    /* Set up ghost patches */
+    fclaw2d_exchange_setup(*domain);
+
 
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",

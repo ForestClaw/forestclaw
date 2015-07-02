@@ -85,7 +85,7 @@ void fclaw2d_get_physical_bc(fclaw2d_domain_t *domain,
 
 
 /* -----------------------------------------------------------------------------
-   Set physical boundary conditions on a patch
+   Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
 void fclaw2d_set_physical_bc(fclaw2d_domain_t *domain, int a_level,
