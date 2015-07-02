@@ -100,6 +100,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, BUILDREGRID);
     FCLAW2D_STATS_SET (stats, ddata, BUILDPARTITION);
     FCLAW2D_STATS_SET (stats, ddata, BUILDGHOST);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTCOMM);
     FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
