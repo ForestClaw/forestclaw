@@ -230,8 +230,10 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int mint = 4;
     int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+    FCLAW_ASSERT(hole > 0);
     int packarea = gparms->manifold;
     size_t psize = (wg - hole)*(meqn + packarea);
+    FCLAW_ASSERT(psize > 0);
     return psize*sizeof(double);
 }
 
