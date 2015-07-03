@@ -41,6 +41,13 @@ extern "C"
 /* -------------------------------------------
    Routines needed to fill in ghost cells
    ------------------------------------------- */
+typedef enum fclaw2d_parallel_mode
+{
+    FCLAW2D_BOUNDARY_NO_GHOST = 0,  /* Don't read parallel patches */
+    FCLAW2D_BOUNDARY_READ_GHOST,   /* read parallel patches */
+    FCLAW2D_INTERIOR
+} fclaw2d_parallel_mode_t;
+
 
 typedef enum fclaw2d_exchange_type
 {
@@ -101,6 +108,14 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
 void fclaw2d_ghost_copy4timeinterp(fclaw2d_domain_t* domain,
                                    int level);
+
+#define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
+void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
+                         int *meqn, int *mint,
+                         double qdata[], double area[],
+                         double qpack[], int *psize,
+                         int *packmode, int *ierror);
+
 
 #ifdef __cplusplus
 #if 0

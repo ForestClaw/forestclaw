@@ -357,9 +357,16 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
        this step.  Ghost patches do not yet have valid data, and
        so boundary patches will have to be updated after the exchange.
        ---------------------------------------------------------- */
+
+    /* Copy/average ghost cells at the parallel boundary */
+    fclaw2d_parallel_mode_t parallel_mode = FCLAW2D_BOUNDARY_NO_GHOST;
+
+    fclaw_bool read_parallel_patches = false;
+    copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
+                         read_parallel_patches);
+
     /* Copy ghost cells at coarse levels.  Include finest level, although it isn't
        needed immediately */
-    fclaw_bool read_parallel_patches = fclaw_false;
     copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
                          read_parallel_patches);
 

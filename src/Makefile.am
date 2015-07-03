@@ -106,6 +106,9 @@ libforestclaw_compiled_sources = \
 	src/subcycle_manager.cpp \
 	src/fclaw2d_advance.cpp \
 	src/fclaw2d_update_single_step.cpp \
+	src/fortran_source2d/fclaw2d_ghost_pack.f \
+	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
+	src/fortran_source2d/fclaw2d_regrid_fort.f \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
@@ -113,8 +116,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/phys_corner.f \
 	src/fortran_source2d/setup_mesh.f \
-	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
-	src/fortran_source2d/fclaw2d_regrid_fort.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f

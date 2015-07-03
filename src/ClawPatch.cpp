@@ -1,6 +1,7 @@
 
 #include <ClawPatch.hpp>
 #include <fclaw2d_timeinterp.h>
+#include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_neighbors_fort.h>
 
 fclaw_app_t *ClawPatch::app;
@@ -291,40 +292,61 @@ void ClawPatch::restore_step()
     m_griddata = m_griddata_save;
 }
 
-void ClawPatch::ghost_pack(double *q, int time_interp)
+void ClawPatch::ghost_pack(double *qpack, int time_interp)
 {
-    FCLAW_ASSERT(q != NULL);
-    if (time_interp)
+    int packarea = m_manifold;
+    int packmode = 2*m_manifold;
+    int ierror;
+
+    // Number of internal layers.  At least four are needed to
+    // average fine grid ghost patches onto coarse grid (on-proc)
+    // ghost cells.
+    int mint = 4;
+
+    int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);  // Whole grid
+    int hole = (m_mx - 2*mint)*(m_my - 2*mint);  // Hole in center
+    FCLAW_ASSERT(hole > 0);
+
+    int psize = (wg - hole)*(m_meqn + packarea);
+    FCLAW_ASSERT(psize > 0);
+
+    double *q = q_time_sync(time_interp);
+    double *area = m_area.dataPtr();  // Might be NULL
+
+    FCLAW2D_GHOST_PACK(&m_mx,&m_my,&m_mbc,&m_meqn,&mint,q,area,
+                       qpack,&psize,&packmode,&ierror);
+
+    if (ierror > 0)
     {
-        m_griddata_time_interpolated.copyToMemory(q);
-    }
-    else
-    {
-        m_griddata.copyToMemory(q);
-    }
-    if (m_manifold)
-    {
-        // int mloc = (2*m_mbc + m_mx)*(2*m_mbc+m_my)*m_meqn;  /* Store area */
-        int mloc = m_griddata.size();
-        m_area.copyToMemory(q+mloc);
+        fclaw_global_essentialf("ghost_pack (ClawPatch.cpp) : ierror = %d\n",ierror);
+        exit(0);
     }
 }
 
-void ClawPatch::ghost_unpack(double *q, int time_interp)
+void ClawPatch::ghost_unpack(double *qpack, int time_interp)
 {
-    if (time_interp)
+    int packarea = m_manifold;
+    int packmode = 2*m_manifold + 1;  // 1 or 3
+    int ierror;
+
+    int mint = 4;  // Number of internal layers
+    int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);
+    int hole = (m_mx - 2*mint)*(m_my - 2*mint);
+    FCLAW_ASSERT(hole > 0);
+
+    int psize = (wg - hole)*(m_meqn + packarea);
+    FCLAW_ASSERT(psize > 0);
+
+    double *q = q_time_sync(time_interp);
+    double *area = m_area.dataPtr();  // Might be NULL
+
+    FCLAW2D_GHOST_PACK(&m_mx,&m_my,&m_mbc,&m_meqn,&mint,q,area,
+                       qpack,&psize,&packmode,&ierror);
+
+    if (ierror > 0)
     {
-        m_griddata_time_interpolated.copyFromMemory(q);
-    }
-    else
-    {
-        m_griddata.copyFromMemory(q);
-    }
-    // int mloc = (2*m_mbc + m_mx)*(2*m_mbc+m_my)*m_meqn;  /* Store area */
-    if (m_manifold)
-    {
-        int mloc = m_griddata.size();
-        m_area.copyFromMemory(q+mloc);
+        fclaw_global_essentialf("ghost_unpack (ClawPatch.cpp) : ierror = %d\n",ierror);
+        exit(0);
     }
 }
 
@@ -335,8 +357,8 @@ void ClawPatch::partition_pack(double *q)
 
 void ClawPatch::partition_unpack(double *q)
 {
-    /* We only copy to griddata, since when we are partitioning, all
-       levels are time synchronized */
+    /* We only copy to griddata, since all levels are time
+       synchronized  when repartitioning */
     m_griddata.copyFromMemory(q);
 }
 

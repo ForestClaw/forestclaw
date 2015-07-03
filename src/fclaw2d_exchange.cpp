@@ -242,6 +242,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     }
 
     /* Exchange only over levels currently in use */
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
@@ -251,6 +252,7 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     {
         fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
     }
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
 
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
