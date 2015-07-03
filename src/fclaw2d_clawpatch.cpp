@@ -227,13 +227,12 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    int areasize = 0;
-    if (gparms->manifold)
-    {
-        areasize = (2*(mbc+1) + mx)*(2*(mbc+1)+my);
-    }
-    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn + areasize;  /* Store area */
-    return size*sizeof(double);
+    int mint = 4;
+    int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
+    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+    int packarea = gparms->manifold;
+    size_t psize = (wg - hole)*(meqn + packarea);
+    return psize*sizeof(double);
 }
 
 void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
