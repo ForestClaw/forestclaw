@@ -31,8 +31,8 @@
       k = 1
 c     # Face 0
       do mq = 1,meqn
-         do j = 1-mbc,my-mint
-            do ibc = 1-mbc,mint
+         do j = 0,my-mint
+            do ibc = 0,mint
                if (packdata) then
                   qpack(k) = qdata(ibc,j,mq)
                else
@@ -43,8 +43,8 @@ c     # Face 0
          enddo
 
 c        # Face 2
-         do jbc = 1-mbc,mint
-            do i = mint+1,mx+mbc
+         do jbc = 0,mint
+            do i = mint+1,mx+1
                if (packdata) then
                   qpack(k) = qdata(i,jbc,mq)
                else
@@ -55,8 +55,8 @@ c        # Face 2
          enddo
 
 c        # Face 1
-         do j = mint+1,my+mbc
-            do ibc = mx-mint+1,mx+mbc
+         do j = mint+1,my+1
+            do ibc = mx-mint+1,mx+1
                if (packdata) then
                   qpack(k) = qdata(ibc,j,mq)
                else
@@ -67,8 +67,8 @@ c        # Face 1
          enddo
 
 c        # Face 3
-         do jbc = my-mint+1,my+mbc
-            do i = 1-mbc,mx-mint
+         do jbc = my-mint+1,my+1
+            do i = 0,mx-mint
                if (packdata) then
                   qpack(k) = qdata(i,jbc,mq)
                else
@@ -91,8 +91,8 @@ c        # Face 3
 
 
 c     # Face 0
-      do j = 1-mbc,my-mint
-         do ibc = 1-mbc,mint
+      do j = 0,my-mint
+         do ibc = 0,mint
             if (packdata) then
                qpack(k) = area(ibc,j)
             else
@@ -103,8 +103,8 @@ c     # Face 0
       enddo
 
 c     # Face 2
-      do jbc = 1-mbc,mint
-         do i = mint+1,mx+mbc
+      do jbc = 0,mint
+         do i = mint+1,mx+1
             if (packdata) then
                qpack(k) = area(i,jbc)
             else
@@ -115,8 +115,8 @@ c     # Face 2
       enddo
 
 c     # Face 1
-      do j = mint+1,my+mbc
-         do ibc = mx-mint+1,mx+mbc
+      do j = mint+1,my+1
+         do ibc = mx-mint+1,mx+1
             if (packdata) then
                qpack(k) = area(ibc,j)
             else
@@ -127,8 +127,8 @@ c     # Face 1
       enddo
 
 c     # Face 3
-      do jbc = my-mint+1,my+mbc
-         do i = 1-mbc,mx-mint
+      do jbc = my-mint+1,my+1
+         do i = 0,mx-mint
             if (packdata) then
                qpack(k) = area(i,jbc)
             else
