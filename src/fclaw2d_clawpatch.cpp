@@ -228,7 +228,7 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
     int mint = 4;
-    int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
+    int wg = (2 + mx)*(2 + my);  /* Whole grid */
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
     int packarea = gparms->manifold;
@@ -294,7 +294,7 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    size_t size = (2 + mx)*(2 + my)*meqn;  /* Store area */
+    size_t size = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
     return size*sizeof(double);
 }
 
