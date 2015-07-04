@@ -230,7 +230,7 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int mint = 4;
     int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
-    FCLAW_ASSERT(hole > 0);
+    FCLAW_ASSERT(hole >= 0);
     int packarea = gparms->manifold;
     size_t psize = (wg - hole)*(meqn + packarea);
     FCLAW_ASSERT(psize > 0);
@@ -241,32 +241,17 @@ void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
                                            fclaw2d_patch_t* this_patch,
                                            void** q)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    if (gparms->manifold)
-    {
-        /* Create contiguous block for data and area */
-        int msize = fclaw2d_clawpatch_ghost_packsize(domain);
-        *q = (void*) FCLAW_ALLOC(double,msize);
-        FCLAW_ASSERT(*q != NULL);
-    }
-    else
-    {
-        /* We will just use the pointer to the data and don't copy.
-           But we don't know yet where to point the data, since we
-           might be using time interpolated data. */
-        *q = NULL;
-    }
+    /* Create contiguous block for data and area */
+    int msize = fclaw2d_clawpatch_ghost_packsize(domain);
+    *q = (void*) FCLAW_ALLOC(double,msize);
+    FCLAW_ASSERT(*q != NULL);
 }
 
 void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
                                                 void **q)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    if (gparms->manifold)
-    {
-        FCLAW_FREE(*q);
-        *q = NULL;
-    }
+    FCLAW_FREE(*q);
+    *q = NULL;
 }
 
 
@@ -277,7 +262,8 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
-    cp->ghost_pack(patch_data,time_interp);
+    int pack_layers = 4;
+    cp->ghost_pack(patch_data,time_interp,pack_layers);
 }
 
 
@@ -288,7 +274,8 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                     double *qdata, fclaw_bool time_interp)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->ghost_unpack(qdata,time_interp);
+    int pack_layers = 4;
+    cp->ghost_unpack(qdata,time_interp,pack_layers);
 }
 
 

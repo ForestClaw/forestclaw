@@ -51,6 +51,9 @@ void set_exchange_data(fclaw2d_domain_t* domain,
 static
 void build_ghost_patches(fclaw2d_domain_t* domain)
 {
+
+    fclaw_infof("[%d] Number of ghost patches : %d\n",
+                            domain->mpirank,domain->num_ghost_patches);
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
@@ -201,10 +204,6 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
 
-    /* Store pointers to local boundary data.  We do this here
-       because we may be exchanging with time interpolated data. */
-    fclaw_debugf("Exchanging ghost patches : Setting up pointers.\n");
-
     /* Pack local data into on-proc patches at the parallel boundary that
        will be shipped of to other processors. */
     int zz = 0;
@@ -219,24 +218,12 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                 int level = this_patch->level;
                 FCLAW_ASSERT(level <= maxlevel);
 
-                /* Copy q and area into one contingous block */
                 int pack_time_interp = time_interp && level == minlevel-1;
 
-                if (e->patch_data[zz] == NULL)
-                {
-                    /* Re-use memory location of current boundary patch */
-                    e->patch_data[zz] = fclaw2d_clawpatch_get_q_timesync(domain,this_patch,
-                                                                         pack_time_interp);
-                }
-                else
-                {
-                    /* Pack something more complicated in data location that
-                       has already been pre-allocated.*/
-                    fclaw2d_clawpatch_ghost_pack(domain,this_patch,
-                                                 (double*) e->patch_data[zz],
-                                                 pack_time_interp);
-                }
-                zz++;
+                /* Pack q and area into one contingous block */
+                fclaw2d_clawpatch_ghost_pack(domain,this_patch,
+                                             (double*) e->patch_data[zz++],
+                                             pack_time_interp);
             }
         }
     }
@@ -246,11 +233,41 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+        fclaw2d_domain_ghost_exchange_begin
+            (domain, e,time_interp_level, maxlevel);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+        fclaw2d_domain_ghost_exchange_end (domain, e);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+#if 0
         fclaw2d_domain_ghost_exchange(domain, e, time_interp_level, maxlevel);
+#endif
     }
     else
     {
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+        fclaw2d_domain_ghost_exchange_begin
+            (domain, e, minlevel, maxlevel);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+
+#if 0
+        double t0 = fclaw2d_timer_wtime();
+        double t1 = t0;
+        while (t1-t0 < 1.0e-1)
+        {
+            /* Do some work ... */
+            t1 = fclaw2d_timer_wtime();
+        }
+#endif
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+        fclaw2d_domain_ghost_exchange_end (domain, e);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+#if 0
         fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
+#endif
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
 

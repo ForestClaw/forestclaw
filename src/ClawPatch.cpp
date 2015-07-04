@@ -292,20 +292,21 @@ void ClawPatch::restore_step()
     m_griddata = m_griddata_save;
 }
 
-void ClawPatch::ghost_pack(double *qpack, int time_interp)
+void ClawPatch::ghost_comm(double *qpack, int time_interp,
+                           int packmode,
+                           int pack_layers)
 {
     int packarea = m_manifold;
-    int packmode = 2*m_manifold;
     int ierror;
 
     // Number of internal layers.  At least four are needed to
     // average fine grid ghost patches onto coarse grid (on-proc)
     // ghost cells.
-    int mint = 4;
+    int mint = pack_layers;
 
     int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);  // Whole grid
     int hole = (m_mx - 2*mint)*(m_my - 2*mint);  // Hole in center
-    FCLAW_ASSERT(hole > 0);
+    FCLAW_ASSERT(hole >= 0);
 
     int psize = (wg - hole)*(m_meqn + packarea);
     FCLAW_ASSERT(psize > 0);
@@ -314,7 +315,7 @@ void ClawPatch::ghost_pack(double *qpack, int time_interp)
     double *area = m_area.dataPtr();  // Might be NULL
 
     FCLAW2D_GHOST_PACK(&m_mx,&m_my,&m_mbc,&m_meqn,&mint,q,area,
-                       qpack,&psize,&packmode,&ierror);
+                       qpack,&psize,&packmode,&mint,&ierror);
 
     if (ierror > 0)
     {
@@ -323,31 +324,16 @@ void ClawPatch::ghost_pack(double *qpack, int time_interp)
     }
 }
 
-void ClawPatch::ghost_unpack(double *qpack, int time_interp)
+void ClawPatch::ghost_pack(double *qpack, int time_interp,int pack_layers)
 {
-    int packarea = m_manifold;
+    int packmode = 2*m_manifold;  // 0 or 2
+    ghost_comm(qpack,time_interp,packmode,pack_layers);
+}
+
+void ClawPatch::ghost_unpack(double *qpack, int time_interp, int pack_layers)
+{
     int packmode = 2*m_manifold + 1;  // 1 or 3
-    int ierror;
-
-    int mint = 4;  // Number of internal layers
-    int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);
-    int hole = (m_mx - 2*mint)*(m_my - 2*mint);
-    FCLAW_ASSERT(hole > 0);
-
-    int psize = (wg - hole)*(m_meqn + packarea);
-    FCLAW_ASSERT(psize > 0);
-
-    double *q = q_time_sync(time_interp);
-    double *area = m_area.dataPtr();  // Might be NULL
-
-    FCLAW2D_GHOST_PACK(&m_mx,&m_my,&m_mbc,&m_meqn,&mint,q,area,
-                       qpack,&psize,&packmode,&ierror);
-
-    if (ierror > 0)
-    {
-        fclaw_global_essentialf("ghost_unpack (ClawPatch.cpp) : ierror = %d\n",ierror);
-        exit(0);
-    }
+    ghost_comm(qpack,time_interp,packmode, pack_layers);
 }
 
 void ClawPatch::partition_pack(double *q)

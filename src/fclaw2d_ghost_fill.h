@@ -114,7 +114,8 @@ void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *meqn, int *mint,
                          double qdata[], double area[],
                          double qpack[], int *psize,
-                         int *packmode, int *ierror);
+                         int *packmode, int *pack_layers,
+                         int *ierror);
 
 
 #ifdef __cplusplus
