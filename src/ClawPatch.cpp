@@ -304,7 +304,7 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
     // ghost cells.
     int mint = pack_layers;
 
-    int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);  // Whole grid
+    int wg = (2 + m_mx)*(2 + m_my);  // Whole grid
     int hole = (m_mx - 2*mint)*(m_my - 2*mint);  // Hole in center
     FCLAW_ASSERT(hole >= 0);
 

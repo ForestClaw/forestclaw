@@ -294,7 +294,7 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc+my)*meqn;  /* Store area */
+    size_t size = (2 + mx)*(2 + my)*meqn;  /* Store area */
     return size*sizeof(double);
 }
 
