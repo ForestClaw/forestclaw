@@ -7,6 +7,8 @@
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
+int ClawPatch::pack_layers = -1;
+
 ClawPatch::ClawPatch()
 {
     m_package_data_ptr = fclaw_package_data_new();
@@ -79,6 +81,7 @@ void ClawPatch::define(const double&  a_xlower,
         setup_manifold(a_level,gparms,build_mode);
     }
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
+    ClawPatch::pack_layers = 4;
 
     if (build_mode == FCLAW2D_BUILD_FOR_GHOST)
     {
@@ -293,8 +296,7 @@ void ClawPatch::restore_step()
 }
 
 void ClawPatch::ghost_comm(double *qpack, int time_interp,
-                           int packmode,
-                           int pack_layers)
+                           int packmode)
 {
     int packarea = m_manifold;
     int ierror;
@@ -302,7 +304,7 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
     // Number of internal layers.  At least four are needed to
     // average fine grid ghost patches onto coarse grid (on-proc)
     // ghost cells.
-    int mint = pack_layers;
+    int mint = ClawPatch::pack_layers;
 
     int wg = (2 + m_mx)*(2 + m_my);  // Whole grid
     int hole = (m_mx - 2*mint)*(m_my - 2*mint);  // Hole in center
@@ -324,16 +326,16 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
     }
 }
 
-void ClawPatch::ghost_pack(double *qpack, int time_interp,int pack_layers)
+void ClawPatch::ghost_pack(double *qpack, int time_interp)
 {
     int packmode = 2*m_manifold;  // 0 or 2
-    ghost_comm(qpack,time_interp,packmode,pack_layers);
+    ghost_comm(qpack,time_interp,packmode);
 }
 
-void ClawPatch::ghost_unpack(double *qpack, int time_interp, int pack_layers)
+void ClawPatch::ghost_unpack(double *qpack, int time_interp)
 {
     int packmode = 2*m_manifold + 1;  // 1 or 3
-    ghost_comm(qpack,time_interp,packmode, pack_layers);
+    ghost_comm(qpack,time_interp,packmode);
 }
 
 void ClawPatch::partition_pack(double *q)

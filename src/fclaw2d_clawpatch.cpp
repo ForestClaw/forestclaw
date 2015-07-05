@@ -227,8 +227,9 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int my = gparms->my;
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
-    int mint = 4;
-    int wg = (2 + mx)*(2 + my);  /* Whole grid */
+    FCLAW_ASSERT(ClawPatch::pack_layers > 0);
+    int mint = ClawPatch::pack_layers;
+    int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
     int packarea = gparms->manifold;
@@ -262,8 +263,7 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
-    int pack_layers = 4;
-    cp->ghost_pack(patch_data,time_interp,pack_layers);
+    cp->ghost_pack(patch_data,time_interp);
 }
 
 
@@ -274,8 +274,7 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                     double *qdata, fclaw_bool time_interp)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    int pack_layers = 4;
-    cp->ghost_unpack(qdata,time_interp,pack_layers);
+    cp->ghost_unpack(qdata,time_interp);
 }
 
 
