@@ -60,9 +60,9 @@ public :
     void save_current_step();
     void restore_step();
 
-    void ghost_pack(double* qdata, int time_interp,int pack_layers);
-    void ghost_unpack(double *qdata,int time_interp, int pack_layers);
-    void ghost_comm(double *qpack, int time_interp,int packmode, int pack_layers);
+    void ghost_pack(double* qdata, int time_interp);
+    void ghost_unpack(double *qdata,int time_interp);
+    void ghost_comm(double *qpack, int time_interp,int packmode);
     void partition_pack(double* qdata);
     void partition_unpack(double *qdata);
 
@@ -207,6 +207,7 @@ public :
 
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
+    static int pack_layers;
 
 protected :
 
