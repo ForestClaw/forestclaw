@@ -9,6 +9,14 @@ showpatchborders(1:9);
 setpatchborderprops('linewidth',1);
 caxis([0 1]);
 
+if (t > 0)
+    hold on;
+    N = 1e4;
+    [xout,yout] = filament_soln(N,t);
+    plot(xout,yout,'k','linewidth',2);
+    hold on;
+end
+
 % colormap(white);
 
 caxis([0,1])
@@ -25,6 +33,7 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
+view(2);
 axis off
 shg;
 
