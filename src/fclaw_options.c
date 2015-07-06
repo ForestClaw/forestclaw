@@ -326,11 +326,14 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     /* ---------------------- Control execution -------------------------- */
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,
-                         "Trap floating point exceptions [1]");
+                         "Trap floating point exceptions [T]");
 
     sc_options_add_bool (opt, 0, "mpi_debug", &amropt->mpi_debug,0,
-                        "Start MPI debug session (for attaching processes in gdb) [0]");
+                        "Start MPI debug session (for attaching processes in gdb) [F]");
 
+
+    sc_options_add_bool (opt, 0, "ghost_patch_pack_area", &amropt->ghost_patch_pack_area,1,
+                         "Pack area for parallel comm. of ghost patches [T]");
 
     /* ---------------------- Mapping options -------------------------- */
     sc_options_add_int (opt, 0, "mi", &amropt->mi, 1,

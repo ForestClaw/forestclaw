@@ -207,7 +207,7 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,
                              this_patch_idx,build_mode);
 
-    if (vt.patch_setup != NULL && build_mode != FCLAW2D_BUILD_FOR_GHOST)
+    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
         vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
     }
@@ -225,14 +225,14 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     const amr_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
-    int mbc = gparms->mbc;
     int meqn = gparms->meqn;
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+
     FCLAW_ASSERT(ClawPatch::pack_layers > 0);
     int mint = ClawPatch::pack_layers;
-    int wg = (2*mbc + mx)*(2*mbc + my);  /* Whole grid */
+    int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
-    int packarea = gparms->manifold;
     size_t psize = (wg - hole)*(meqn + packarea);
     FCLAW_ASSERT(psize > 0);
     return psize*sizeof(double);
@@ -261,9 +261,12 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
                                   double *patch_data,
                                   int time_interp)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+    int packmode = 2*packarea;  // 0 or 2  (for pack)
+
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    FCLAW_ASSERT(cp != NULL);
-    cp->ghost_pack(patch_data,time_interp);
+    cp->ghost_comm(patch_data,time_interp,packmode);
 }
 
 
@@ -273,8 +276,12 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                     int this_patch_idx,
                                     double *qdata, fclaw_bool time_interp)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+    int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
+
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->ghost_unpack(qdata,time_interp);
+    cp->ghost_comm(qdata,time_interp,packmode);
 }
 
 

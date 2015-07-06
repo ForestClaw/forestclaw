@@ -170,7 +170,10 @@ struct amr_options
     int run_diagnostics;
     int conservation_check;
     int trapfpe;
+
+    /* Parallel options */
     int mpi_debug;
+    int ghost_patch_pack_area;
 
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
