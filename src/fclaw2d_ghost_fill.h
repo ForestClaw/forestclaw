@@ -41,12 +41,13 @@ extern "C"
 /* -------------------------------------------
    Routines needed to fill in ghost cells
    ------------------------------------------- */
-typedef enum fclaw2d_parallel_mode
+
+typedef enum fclaw2d_ghost_fill_parallel_mode
 {
-    FCLAW2D_BOUNDARY_NO_GHOST = 0,  /* Don't read parallel patches */
-    FCLAW2D_BOUNDARY_READ_GHOST,   /* read parallel patches */
-    FCLAW2D_INTERIOR
-} fclaw2d_parallel_mode_t;
+    FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
+    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
+    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
+} fclaw2d_ghost_fill_parallel_mode_t;
 
 
 typedef enum fclaw2d_exchange_type

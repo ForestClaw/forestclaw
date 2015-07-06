@@ -51,6 +51,7 @@ void set_exchange_data(fclaw2d_domain_t* domain,
 static
 void build_ghost_patches(fclaw2d_domain_t* domain)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);
@@ -65,7 +66,15 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
            need to be passed in */
         int patchno = i;
 
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_GHOST;
+        fclaw2d_build_mode_t build_mode;
+        if (gparms->ghost_patch_pack_area)
+        {
+            build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED;
+        }
+        else
+        {
+            build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
+        }
 
         fclaw2d_patch_data_new(domain,ghost_patch);
         fclaw2d_clawpatch_build_cb(domain,ghost_patch,blockno,
@@ -253,15 +262,6 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
             (domain, e, minlevel, maxlevel);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
 
-#if 0
-        double t0 = fclaw2d_timer_wtime();
-        double t1 = t0;
-        while (t1-t0 < 1.0e-1)
-        {
-            /* Do some work ... */
-            t1 = fclaw2d_timer_wtime();
-        }
-#endif
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
         fclaw2d_domain_ghost_exchange_end (domain, e);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
