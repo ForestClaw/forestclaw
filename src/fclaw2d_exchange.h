@@ -47,6 +47,17 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
                                     int maxlevel,
                                     int time_interp);
 
+void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
+                                          int minlevel,
+                                          int maxlevel,
+                                          int time_interp);
+
+void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
+                                        int minlevel,
+                                        int maxlevel,
+                                        int time_interp);
+
+
 #ifdef __cplusplus
 #if 0
 {

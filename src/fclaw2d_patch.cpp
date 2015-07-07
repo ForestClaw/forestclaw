@@ -85,3 +85,9 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
         this_patch->user = NULL;
     }
 }
+
+int
+fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
+{
+    return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+}

@@ -189,7 +189,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
             if (time_stepper.nosubcycle())
             {
                 /* Take one step of a stable time step for the finest
-                   non-emtpy level. */
+                   non-empty level. */
                 reduce_factor = time_stepper.maxlevel_factor();
             }
             else

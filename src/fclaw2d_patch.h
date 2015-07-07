@@ -73,6 +73,11 @@ fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
 
+
+int
+    fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch);
+
+
 #ifdef __cplusplus
 #if 0
 {

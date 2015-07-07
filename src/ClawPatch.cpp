@@ -8,6 +8,7 @@ fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
 int ClawPatch::pack_layers = -1;
+int ClawPatch::ghost_patch_pack_area = -1;
 
 ClawPatch::ClawPatch()
 {
@@ -83,7 +84,7 @@ void ClawPatch::define(const double&  a_xlower,
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
     ClawPatch::pack_layers = 4;
 
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST)
+    if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
         return;
     }
@@ -298,7 +299,6 @@ void ClawPatch::restore_step()
 void ClawPatch::ghost_comm(double *qpack, int time_interp,
                            int packmode)
 {
-    int packarea = m_manifold;
     int ierror;
 
     // Number of internal layers.  At least four are needed to
@@ -306,7 +306,10 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
     // ghost cells.
     int mint = ClawPatch::pack_layers;
 
-    int wg = (2*m_mbc + m_mx)*(2*m_mbc + m_my);  // Whole grid
+    int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
+
+    /* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
+    int wg = (2 + m_mx)*(2 + m_my);  // Whole grid (one layer of ghost cells)
     int hole = (m_mx - 2*mint)*(m_my - 2*mint);  // Hole in center
     FCLAW_ASSERT(hole >= 0);
 
@@ -324,18 +327,6 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
         fclaw_global_essentialf("ghost_pack (ClawPatch.cpp) : ierror = %d\n",ierror);
         exit(0);
     }
-}
-
-void ClawPatch::ghost_pack(double *qpack, int time_interp)
-{
-    int packmode = 2*m_manifold;  // 0 or 2
-    ghost_comm(qpack,time_interp,packmode);
-}
-
-void ClawPatch::ghost_unpack(double *qpack, int time_interp)
-{
-    int packmode = 2*m_manifold + 1;  // 1 or 3
-    ghost_comm(qpack,time_interp,packmode);
 }
 
 void ClawPatch::partition_pack(double *q)
@@ -595,7 +586,7 @@ void ClawPatch::setup_manifold(const int& level,
     // Compute area of the mesh cell.
     m_area.define(box_p,1);
 
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST)
+    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
     {
         return;
     }
@@ -604,6 +595,10 @@ void ClawPatch::setup_manifold(const int& level,
     compute_area_(mx, my, mbc, m_dx, m_dy,m_xlower, m_ylower,
                   m_blockno, area, level, maxlevel, refratio);
 
+    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED)
+    {
+        return;
+    }
 
     /* Mesh cell centers of physical mesh */
     m_xp.define(box_p,1);

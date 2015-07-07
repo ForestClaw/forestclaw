@@ -41,12 +41,13 @@ extern "C"
 /* -------------------------------------------
    Routines needed to fill in ghost cells
    ------------------------------------------- */
-typedef enum fclaw2d_parallel_mode
+
+typedef enum fclaw2d_ghost_fill_parallel_mode
 {
-    FCLAW2D_BOUNDARY_NO_GHOST = 0,  /* Don't read parallel patches */
-    FCLAW2D_BOUNDARY_READ_GHOST,   /* read parallel patches */
-    FCLAW2D_INTERIOR
-} fclaw2d_parallel_mode_t;
+    FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
+    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
+    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
+} fclaw2d_ghost_fill_parallel_mode_t;
 
 
 typedef enum fclaw2d_exchange_type
@@ -71,6 +72,7 @@ typedef struct fclaw2d_exchange_info
     fclaw2d_grid_type_t grid_type;
 } fclaw2d_exchange_info_t;
 
+#if 0
 void level_exchange (fclaw2d_domain_t * domain, int a_level);
 
 void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
@@ -87,6 +89,7 @@ void get_phys_boundary (fclaw2d_domain_t * domain,
 void fclaw2d_ghost_get_block_boundary(fclaw2d_domain_t * domain,
                                       fclaw2d_patch_t * patch,
                                       fclaw_bool *intersects_block);
+#endif
 
 void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
@@ -106,9 +109,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
+#if 0
 void fclaw2d_ghost_copy4timeinterp(fclaw2d_domain_t* domain,
                                    int level);
 
+#endif
 #define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
 void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *meqn, int *mint,
