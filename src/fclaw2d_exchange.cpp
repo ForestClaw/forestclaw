@@ -205,10 +205,10 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
    -------------------------------------------------------------- */
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
-                                    int minlevel,
-                                    int maxlevel,
-                                    int time_interp)
+void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
+                                          int minlevel,
+                                          int maxlevel,
+                                          int time_interp)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
@@ -243,31 +243,38 @@ void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
     {
         int time_interp_level = minlevel-1;
 
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
         fclaw2d_domain_ghost_exchange_begin
             (domain, e,time_interp_level, maxlevel);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
-
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
-        fclaw2d_domain_ghost_exchange_end (domain, e);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
-#if 0
-        fclaw2d_domain_ghost_exchange(domain, e, time_interp_level, maxlevel);
-#endif
     }
     else
     {
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
-        fclaw2d_domain_ghost_exchange_begin
-            (domain, e, minlevel, maxlevel);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+        fclaw2d_domain_ghost_exchange_begin(domain, e, minlevel, maxlevel);
 
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+    }
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+
+}
+
+/* This is called whenever all time levels are time synchronized. */
+void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
+                                        int minlevel,
+                                        int maxlevel,
+                                        int time_interp)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
+
+    /* Exchange only over levels currently in use */
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+    if (time_interp)
+    {
+        int time_interp_level = minlevel-1;
+
         fclaw2d_domain_ghost_exchange_end (domain, e);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
-#if 0
-        fclaw2d_domain_ghost_exchange(domain, e, minlevel, maxlevel);
-#endif
+    }
+    else
+    {
+        fclaw2d_domain_ghost_exchange_end (domain, e);
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
 
