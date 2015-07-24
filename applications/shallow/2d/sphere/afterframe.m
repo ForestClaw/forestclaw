@@ -9,9 +9,14 @@ alim = alim + [-s s];
 axis([alim alim]);
 daspect([1 1 1]);
 
+if (PlotParallelPartitions == 0)
+    caxis([0.2 0.21]);
+end
+
 yrbcolormap;
 showpatchborders(1:10);
-caxis([0.2 0.21])
+
+colorbar;
 
 daspect([1,1,1]);
 
