@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "latlong_user.H"
+#include "sphere_user.hpp"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
@@ -193,7 +193,7 @@ void run_program(fclaw_app_t* app)
 
     fclaw2d_domain_data_new(domain);
 
-    latlong_link_solvers(domain);
+    sphere_link_solvers(domain);
 
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
