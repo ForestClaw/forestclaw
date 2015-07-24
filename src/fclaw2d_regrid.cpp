@@ -122,12 +122,12 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
-    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     int domain_init = *((int*) user);
 
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
@@ -140,6 +140,7 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     {
         fclaw2d_patch_t *fine_siblings = new_patch;
         fclaw2d_patch_t *coarse_patch = old_patch;
+
         for (int i = 0; i < NumSiblings; i++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
@@ -165,6 +166,12 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
+        if (domain_init)
+        {
+            fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
+            exit(0);
+        }
+
         /* Old grids are the finer grids;  new grid is the coarsened grid */
         fclaw2d_patch_t *fine_siblings = old_patch;
         int fine_patchno = old_patchno;
@@ -172,23 +179,23 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
         fclaw2d_patch_data_new(new_domain,coarse_patch);
-        fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
-                                   coarse_patchno,(void*) &build_mode);
 
-        if (domain_init)
+        /* Area (and possibly other things) should be averaged to coarse grid */
+        fclaw2d_clawpatch_build_from_fine(new_domain,fine_siblings,coarse_patch,
+                                          blockno,coarse_patchno,fine_patchno);
+
+        /* Average the solution. Does this need to be customizable? */
+#if 0
+        vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
+                                blockno,coarse_patchno, fine_patchno);
+#endif
+        fclaw2d_patch_average2coarse(new_domain,fine_siblings,coarse_patch,
+                                     blockno,coarse_patchno, fine_patchno);
+
+        for(int i = 0; i < 4; i++)
         {
-            fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
-            exit(0);
-        }
-        else
-        {
-            vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                    blockno,coarse_patchno, fine_patchno);
-            for(int i = 0; i < 4; i++)
-            {
-                fclaw2d_patch_t* fine_patch = &fine_siblings[i];
-                fclaw2d_patch_data_delete(old_domain,fine_patch);
-            }
+            fclaw2d_patch_t* fine_patch = &fine_siblings[i];
+            fclaw2d_patch_data_delete(old_domain,fine_patch);
         }
     }
     else

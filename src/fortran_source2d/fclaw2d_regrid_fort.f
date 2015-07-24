@@ -257,6 +257,72 @@ c     # Get rectangle in coarse grid for fine grid.
       enddo
       end
 
+c> \ingroup  Averaging
+c> Average area of fine grid siblings to parent coarse grid.
+      subroutine fclaw2d_fort_average_area(mx,my,mbc,
+     &      areacoarse, areafine, igrid)
+      implicit none
+
+      integer mx,my,mbc,p4est_refineFactor, refratio, igrid
+
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
+      double precision sum
+
+c     # This should be refratio*refratio.
+      integer i1,j1, r2, m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
+      double precision kf
+
+      p4est_refineFactor = 2
+      refratio = 2
+
+c     # 'iface' is relative to the coarse grid
+
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_face_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(igrid,refratio)
+      jg = (igrid-ig)/refratio
+
+c     # Get rectangle in coarse grid for fine grid.
+      ic_add = ig*mx/p4est_refineFactor
+      jc_add = jg*mx/p4est_refineFactor
+
+      r2 = refratio*refratio
+      do j = 1,my/p4est_refineFactor
+         do i = 1,mx/p4est_refineFactor
+            i1 = i+ic_add
+            j1 = j+jc_add
+            m = 0
+            do jj = 1,refratio
+               do ii = 1,refratio
+                  i2(m) = (i-1)*refratio + ii
+                  j2(m) = (j-1)*refratio + jj
+                  m = m + 1
+               enddo
+            enddo
+            sum = 0
+            do m = 0,r2-1
+               kf = areafine(i2(m),j2(m))
+               sum = sum + kf
+            enddo
+            areacoarse(i1,j1) = sum
+         enddo
+      enddo
+      end
+
 
 c     # ------------------------------------------------------
 c     # So far, this is only used by the interpolation from

@@ -105,11 +105,22 @@ void FCLAW2D_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
 
 #define FCLAW2D_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fclaw2d_fort_average2coarse, \
                                                 FCLAW2D_FORT_AVERAGE2COARSE)
-void FCLAW2D_FORT_AVERAGE2COARSE(const int* mx,const int* my,
+void FCLAW2D_FORT_AVERAGE2COARSE(const int* mx, const int* my,
                                  const int* mbc, const int* meqn,
                                  double qcoarse[],double qfine[],
                                  double areacoarse[],double areafine[],
                                  const int* igrid, const int* manifold);
+
+
+#define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \
+                                                FCLAW2D_FORT_AVERAGE_AREA)
+void FCLAW2D_FORT_AVERAGE_AREA(const int* mx, const int* my,
+                               const int* mbc,
+                               double areacoarse[],double areafine[],
+                               const int* igrid);
+
+
+
 
 
 /* ------------------------------------------------------------------

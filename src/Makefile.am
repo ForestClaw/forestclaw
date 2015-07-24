@@ -73,6 +73,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
 	src/fclaw2d_regrid.cpp \
+	src/fclaw2d_manifold_default.cpp \
 	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
 	src/fclaw2d_diagnostics.cpp \

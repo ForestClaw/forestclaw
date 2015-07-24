@@ -42,7 +42,7 @@ typedef enum
 {
     FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
     FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED,
-    FCLAW2D_BUILD_FOR_UPDATE,
+    FCLAW2D_BUILD_FOR_UPDATE
 } fclaw2d_build_mode_t;
 
 
@@ -68,6 +68,13 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
                                     double **xtangents, double **ytangents,
                                     double **surfnormals, double ** edgelengths,
                                     double **curvature);
+
+void fclaw2d_clawpatch_manifold_setup(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch,
+                                      int blockno,
+                                      int patchno,
+                                      fclaw2d_build_mode_t build_mode);
+
 
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch);
@@ -115,6 +122,14 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx,
                                 void *user);
+
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *fine_patches,
+                                       fclaw2d_patch_t *coarse_patch,
+                                       int blockno,
+                                       int coarse_patchno,
+                                       int fine0_patchno);
+
 
 /* -----------------------------------------------------
    Build/pack/size for partitioning

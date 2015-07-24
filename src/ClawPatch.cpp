@@ -77,10 +77,13 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_time_interpolated.define(box, m_meqn);
 
+#if 0
     if (m_manifold)
     {
         setup_manifold(a_level,gparms,build_mode);
     }
+#endif
+
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
     ClawPatch::pack_layers = 4;
 
@@ -562,6 +565,82 @@ void ClawPatch::set_block_corner_count(const int icorner, const int block_corner
     m_block_corner_count[icorner] = block_corner_count;
 }
 
+void ClawPatch::setup_area_storage()
+{
+    int mx = m_mx;
+    int my = m_my;
+    int mbc = m_mbc;
+
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -mbc;
+    }
+    ur[0] = mx + mbc + 1;
+    ur[1] = my + mbc + 1;
+
+    Box box_p(ll,ur);
+    m_area.define(box_p,1);
+}
+
+void ClawPatch::setup_manifold_storage()
+{
+    int mx = m_mx;
+    int my = m_my;
+    int mbc = m_mbc;
+
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -mbc;
+    }
+    ur[0] = mx + mbc + 1;
+    ur[1] = my + mbc + 1;
+
+    Box box_p(ll,ur);   /* Store cell centered values here */
+
+#if 0
+    // Compute area of the mesh cell.
+    m_area.define(box_p,1);
+
+    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+    {
+        return;
+    }
+#endif
+
+    /* Mesh cell centers of physical mesh */
+    m_xp.define(box_p,1);
+    m_yp.define(box_p,1);
+    m_zp.define(box_p,1);
+    m_surf_normals.define(box_p,3);
+    m_curvature.define(box_p,3);
+
+    /* Node centered values */
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -mbc;
+    }
+    ur[0] = mx + mbc + 2;
+    ur[1] = my + mbc + 2;
+    Box box_d(ll,ur);
+
+    m_xd.define(box_d,1);
+    m_yd.define(box_d,1);
+    m_zd.define(box_d,1);
+
+    /* Face centered values */
+    m_xface_normals.define(box_d,3);
+    m_yface_normals.define(box_d,3);
+    m_xface_tangents.define(box_d,3);
+    m_yface_tangents.define(box_d,3);
+    m_edge_lengths.define(box_d,2);
+}
+
+
+#if 0
 void ClawPatch::setup_manifold(const int& level,
                                const amr_options_t *gparms,
                                fclaw2d_build_mode_t build_mode)
@@ -656,7 +735,7 @@ void ClawPatch::setup_manifold(const int& level,
     compute_surf_normals_(mx,my,mbc,xnormals,ynormals,edge_lengths,
                           curvature, surfnormals,area);
 }
-
+#endif
 
 /* ----------------------------------------------------------------
    Output and diagnostics

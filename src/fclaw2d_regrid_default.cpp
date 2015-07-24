@@ -179,6 +179,11 @@ void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
     }
 }
 
+/* It seems that there is only one way to average the solution, but
+   what about other things the user might want to do?   Maybe we need
+   something like "average from fine" routine which handles more generic
+   things, including area averaging, and maybe something to do with averaging
+   stuff in aux arrays. */
 void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *fine_patches,
                                   fclaw2d_patch_t *coarse_patch,
@@ -223,6 +228,36 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                areacoarse, areafine, &igrid,
                                &gparms->manifold);
 
+    }
+}
+
+void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *fine_patches,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno, int coarse_patchno,
+                                   int fine0_patchno)
+
+{
+    int mx,my, mbc;
+    double xlower,ylower,dx,dy;
+
+    double *areacoarse, *areafine;
+    int igrid, fine_patchno;
+    fclaw2d_patch_t *fine_patch;
+
+    fclaw2d_clawpatch_grid_data(domain,coarse_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
+
+    for(igrid = 0; igrid < 4; igrid++)
+    {
+        fine_patch = &fine_patches[igrid];
+        fine_patchno = fine0_patchno + igrid;
+
+        areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+
+        FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
 }
 
