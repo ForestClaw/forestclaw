@@ -15,8 +15,7 @@
 
 c     # We may not even need this if we project out the correct surface
 c     # normal from the velocities.
-c      return
-
+      return
 
       do i=1,mx
          do j=1,my

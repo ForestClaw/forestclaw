@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LATLONG_USER_H
-#define LATLONG_USER_H
+#ifndef SPHERE_USER_H
+#define SPHERE_USER_H
 
 #include <fclaw2d_clawpatch.hpp>
 
@@ -45,14 +45,14 @@ void SETAUX_SPHERE(const int* mx, const int* my,const int* mbc,
                    double xtangents[], double ytangents[],
                    double surnormals[]);
 
-void latlong_link_solvers(fclaw2d_domain_t *domain);
+void sphere_link_solvers(fclaw2d_domain_t *domain);
 
-void latlong_patch_manifold_setup(fclaw2d_domain_t *domain,
+void sphere_patch_manifold_setup(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx);
 
-double latlong_patch_update(fclaw2d_domain_t *domain,
+double sphere_patch_update(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
