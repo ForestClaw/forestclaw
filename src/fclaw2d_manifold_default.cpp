@@ -61,8 +61,9 @@ void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
     vt = fclaw2d_get_vtable(domain);
 
     /* vt.fort_compute_area(...) */
+    int ghost_only = 0;
     compute_area_(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                  &blockno, area, &level, &maxlevel, &refratio);
+                  &blockno, area, &level, &maxlevel, &refratio, &ghost_only);
 }
 
 
@@ -113,8 +114,8 @@ void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data2(domain,this_patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
-                                   &edgelengths,
-                                   &surfnormals,&curvature);
+                                   &surfnormals,&edgelengths,
+                                   &curvature);
 
 
     /* vt.fort_compute_normals(...) */
@@ -123,41 +124,11 @@ void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
 
     compute_tangents_(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,edgelengths);
 
-}
-
-void fclaw2d_manifold_compute_curvature(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int blockno,
-                                        int patchno)
-{
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    double *xp,*yp,*zp;
-    double *xd,*yd,*zd;
-    double *xnormals, *ynormals;
-    double *xtangents, *ytangents;
-    double *edgelengths;
-    double *surfnormals, *curvature;
-    double *area;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(domain,this_patch,
-                                  &xp,&yp,&zp,&xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_metric_data2(domain,this_patch,
-                                   &xnormals,&ynormals,
-                                   &xtangents,&ytangents,
-                                   &edgelengths,
-                                   &surfnormals,&curvature);
-
-    /* vt.fort_compute_curvature(...) */
     compute_surf_normals_(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
                           curvature, surfnormals, area);
 
-
 }
+
 
 
 #ifdef __cplusplus

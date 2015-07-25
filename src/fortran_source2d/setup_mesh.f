@@ -54,11 +54,12 @@ c              # Physical locations of cell centers
       end
 
       subroutine compute_area(mx,my,mbc,dx,dy,xlower, ylower,
-     &      blockno,area, level,maxlevel,refratio)
+     &      blockno,area, level,maxlevel,refratio,ghost_only)
       implicit none
 
       integer mx,my,mbc,level, refratio,maxlevel, blockno
       double precision dx,dy, xlower, ylower
+      integer ghost_only
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer*8 cont, get_context
@@ -70,11 +71,11 @@ c        # We don't need to compute areas all the way to the
 c        # finest level.
          call compute_area_affine(mx,my,mbc,dx,dy,
      &         xlower, ylower, blockno,area, level,maxlevel,
-     &         refratio)
+     &         refratio,ghost_only)
       else
          call compute_area_general(mx,my,mbc,dx,dy,
      &         xlower, ylower, blockno,area, level,maxlevel,
-     &         refratio)
+     &         refratio,ghost_only)
       endif
 
       end
@@ -82,11 +83,12 @@ c        # finest level.
 
       subroutine compute_area_general(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, level,
-     &      maxlevel,refratio)
+     &      maxlevel,refratio,ghost_only)
       implicit none
 
       integer mx,my,mbc,level, refratio,maxlevel, blockno
       double precision dx,dy, xlower, ylower
+      integer ghost_only
 
 
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -100,6 +102,7 @@ c        # finest level.
       double precision dxf, dyf, xdf, ydf, total_area, a
       double precision xef, yef, xe,ye
       integer k, m
+      logical is_area_interior
 
       integer*8 map_context_ptr, get_context
 
@@ -121,6 +124,10 @@ c     # in the diagonal cells - so the areas there are less accurate
 c     # than in the rest of the mesh.
       do j = -mbc,my+mbc+1
          do i = -mbc,mx+mbc+1
+            if (is_area_interior(mx,my,i,j) .and.
+     &            ghost_only .eq. 1) then
+               continue
+            endif
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
             sum_area = 0.d0
@@ -153,11 +160,12 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
 
       subroutine compute_area_affine(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, level,
-     &      maxlevel,refratio)
+     &      maxlevel,refratio,ghost_only)
       implicit none
 
       integer mx,my,mbc,level, refratio,maxlevel, blockno
       double precision dx,dy, xlower, ylower
+      integer ghost_only
 
 
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -167,6 +175,7 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
       double precision xe,ye, xp1,yp1,zp1
       double precision quad(0:1,0:1,3)
       double precision get_area_approx
+      logical is_area_interior
 
       integer*8 map_context_ptr, get_context
 
@@ -174,6 +183,10 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
 
       do j = -mbc,my+mbc+1
          do i = -mbc,mx+mbc+1
+            if (is_area_interior(mx,my,i,j) .and.
+     &            ghost_only .eq. 1) then
+               continue
+            endif
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
             do icell = 0,1
@@ -246,9 +259,17 @@ c     # computed at the center of the mesh cell.
 
       end
 
+      logical function is_area_interior(mx,my,i,j)
+      implicit none
+      integer mx,my,i,j
+
+      is_area_interior = i .ge. 0 .and. i .le. mx+1 .and.
+     &      j .ge. 0 .and. j .le. my+1
+
+      end
 
 
-      SUBROUTINE compute_normals(mx,my,mbc,xp,yp,zp,xd,yd,zd,
+      subroutine compute_normals(mx,my,mbc,xp,yp,zp,xd,yd,zd,
      &      xnormals,ynormals)
       IMPLICIT NONE
 

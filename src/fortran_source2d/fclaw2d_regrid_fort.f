@@ -321,6 +321,9 @@ c     # Get rectangle in coarse grid for fine grid.
             areacoarse(i1,j1) = sum
          enddo
       enddo
+
+c     # Compute area in the ghost cells
+
       end
 
 

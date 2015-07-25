@@ -180,14 +180,15 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         int coarse_patchno = new_patchno;
         fclaw2d_patch_data_new(new_domain,coarse_patch);
 
+#if 0
         fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
                                    coarse_patchno,(void*) &build_mode);
-#if 0
-        /* Area (and possibly other things) should be averaged to coarse grid */
+#endif
+
+        /* Area (and possibly other things) should be averaged to coarse grid. */
         fclaw2d_clawpatch_build_from_fine(new_domain,fine_siblings,coarse_patch,
                                           blockno,coarse_patchno,fine_patchno,
                                           build_mode);
-#endif
 
         /* Average the solution. Does this need to be customizable? */
 #if 0

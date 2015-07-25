@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_manifold_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -234,7 +235,8 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
 void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *fine_patches,
                                    fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int coarse_patchno,
+                                   int blockno,
+                                   int coarse_patchno,
                                    int fine0_patchno)
 
 {
@@ -259,6 +261,13 @@ void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
+    const amr_options_t* gparms = get_domain_parms(domain);
+    int level = coarse_patch->level;
+    int refratio = gparms->refratio;
+    int maxlevel = gparms->maxlevel;
+    int ghost_only = 1;
+    compute_area_(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                  &blockno, areacoarse, &level, &maxlevel, &refratio, &ghost_only);
 }
 
 

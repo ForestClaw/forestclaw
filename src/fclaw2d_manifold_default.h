@@ -51,11 +51,6 @@ void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
                                       int blockno,
                                       int patchno);
 
-void fclaw2d_manifold_compute_curvature(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int blockno,
-                                        int patchno);
-
 #ifdef __cplusplus
 #if 0
 {

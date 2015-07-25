@@ -48,7 +48,8 @@ void compute_area_(const int* mx, const int* my, const int* mbc,
                    const double* dx, const double* dy,
                    const double* xlower, const double* ylower,
                    const int* blockno, double area[],
-                   const int* level, const int* maxlevel, const int* refratio);
+                   const int* level, const int* maxlevel,
+                   const int* refratio, const int* ghost_only);
 
 void compute_normals_(const int* mx, const int* my, const int* mbc,
                       double xp[], double yp[], double zp[],
