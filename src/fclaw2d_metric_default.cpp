@@ -60,11 +60,97 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
 
     vt = fclaw2d_get_vtable(domain);
 
-    /* vt.fort_compute_area(...) */
+    /* Could make this a virtual function, but what is the signature?
+       vt.fort_compute_area(...) */
+
     int ghost_only = 0;
-    vt.fort_compute_area(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                         &blockno, area, &level, &maxlevel, &refratio,
-                         &ghost_only);
+    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, area, &level, &maxlevel, &refratio,
+                              &ghost_only);
+}
+
+void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t* this_patch,
+                                       int blockno,
+                                       int patchno)
+{
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *area = fclaw2d_clawpatch_get_area(domain,this_patch);
+
+    int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
+    double *favg = FCLAW_ALLOC(double,size);
+
+    int ghost_only = 0;
+    int compute_avg = 0;
+    fclaw2d_fort_aux_func_t f = &ONE;
+    FCLAW2D_FORT_INTEGRATE_EXACT(&mx,&my,&mbc,&dx,&dy,
+                                 &xlower, &ylower, &blockno,
+                                 area, &f, favg, &compute_avg,
+                                 &ghost_only);
+    FCLAW_FREE(favg);
+}
+
+
+void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch,
+                                   int blockno,
+                                   int patchno)
+{
+    int mx,my, mbc;
+    double xlower,ylower,dx,dy;
+    double *area;
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+
+    /* Set area in ghost cells not set above */
+    const amr_options_t* gparms = get_domain_parms(domain);
+    int level = this_patch->level;
+    int maxlevel = gparms->maxlevel;
+    int refratio = gparms->refratio;
+    int ghost_only = 1;
+
+    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, area, &level, &maxlevel, &refratio,
+                              &ghost_only);
+
+}
+
+void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch,
+                                         int blockno,
+                                         int patchno)
+{
+    int mx,my, mbc;
+    double xlower,ylower,dx,dy;
+    double *area;
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+
+    /* Not needed, but seems to be bad form to send in a NULL */
+    int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
+    double *favg = FCLAW_ALLOC(double,size);
+
+    /* Set area in ghost cells not set above */
+    int ghost_only = 1;
+    int compute_avg = 0;
+    fclaw2d_fort_aux_func_t f = &ONE;
+    FCLAW2D_FORT_INTEGRATE_EXACT(&mx,&my,&mbc,&dx,&dy,
+                                 &xlower, &ylower, &blockno,
+                                 area, &f, favg, &compute_avg,
+                                 &ghost_only);
+
+    FCLAW_FREE(favg);
 }
 
 

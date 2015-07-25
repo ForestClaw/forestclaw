@@ -47,6 +47,21 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
                                  int blockno,
                                  int patchno);
 
+void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t* this_patch,
+                                   int blockno,
+                                   int patchno);
+
+void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t* this_patch,
+                                       int blockno,
+                                       int patchno);
+
+void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t* this_patch,
+                                         int blockno,
+                                         int patchno);
+
 /* Includes computation of normals and tangents to face, as well
    as surface normals and curvature */
 void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,

@@ -44,7 +44,7 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->fort_setup_mesh          = &FCLAW2D_FORT_SETUP_MESH;
 
     vt->metric_compute_area      = &fclaw2d_metric_compute_area;
-    vt->fort_compute_area        = &FCLAW2D_FORT_COMPUTE_AREA;
+    vt->metric_area_set_ghost    = &fclaw2d_metric_area_set_ghost;
 
     vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
     vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;

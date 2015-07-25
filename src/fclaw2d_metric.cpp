@@ -68,18 +68,13 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
 
-    /* Set area in ghost cells not set above */
-    const amr_options_t* gparms = get_domain_parms(domain);
-    int level = coarse_patch->level;
-    int maxlevel = gparms->maxlevel;
-    int refratio = gparms->refratio;
-    int ghost_only = 1;
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
 
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, areacoarse, &level, &maxlevel, &refratio,
-                              &ghost_only);
-
+    /* Use either exact or approximate method */
+    vt.metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
 }
+
 
 
 #ifdef __cplusplus

@@ -82,6 +82,11 @@ typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_domain_t *domain,
                                               int blockno,
                                               int patchno);
 
+typedef void (*fclaw2d_metric_area_set_ghost_t)(fclaw2d_domain_t *domain,
+                                                fclaw2d_patch_t* this_patch,
+                                                int blockno,
+                                                int patchno);
+
 typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
                                                  fclaw2d_patch_t *this_patch,
                                                  int blockno,
@@ -137,7 +142,7 @@ typedef struct fclaw2d_vtable
     fclaw2d_fort_setup_mesh_t          fort_setup_mesh;
 
     fclaw2d_metric_compute_area_t      metric_compute_area;  /* wrapper */
-    fclaw2d_fort_compute_area_t        fort_compute_area;
+    fclaw2d_metric_area_set_ghost_t    metric_area_set_ghost;
 
     fclaw2d_metric_compute_normals_t    metric_compute_normals;  /* wrapper */
     fclaw2d_fort_compute_normals_t      fort_compute_normals;

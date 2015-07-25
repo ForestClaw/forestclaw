@@ -68,6 +68,8 @@ typedef void (*fclaw2d_fort_compute_surf_normals_t)(const int* mx, const int* my
                                                     double surfnormals[], double area[]);
 
 
+typedef double (*fclaw2d_fort_aux_func_t)(double* xc, double *yc);
+
 
 #define FCLAW2D_FORT_SETUP_MESH \
     FCLAW_F77_FUNC(fclaw2d_fort_setup_mesh,FCLAW2D_FORT_SETUP_MESH)
@@ -86,6 +88,13 @@ void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
                                const int* blockno, double area[],
                                const int* level, const int* maxlevel,
                                const int* refratio, const int* ghost_only);
+
+#define FCLAW2D_FORT_INTEGRATE_EXACT FCLAW_F77_FUNC(fclaw2d_fort_integrate_exact, \
+                                                    FCLAW2D_FORT_INTEGRATE_EXACT)
+void FCLAW2D_FORT_INTEGRATE_EXACT(int* mx,int* my,int* mbc,double* dx,double* dy,
+                                  double* xlower, double* ylower, int* blockno,
+                                  double area[], fclaw2d_fort_aux_func_t *f,
+                                  double favg[], int* compute_avg, int* ghost_only);
 
 #define FCLAW2D_FORT_COMPUTE_NORMALS \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_normals,FCLAW2D_FORT_COMPUTE_NORMALS)
@@ -108,6 +117,10 @@ void FCLAW2D_FORT_COMPUTE_SURF_NORMALS(const int* mx, const int* my, const int* 
                                        double edge_lengths[],
                                        double curvature[],
                                        double surfnormals[], double area[]);
+
+#define ONE FCLAW_F77_FUNC(one,ONE)
+double ONE(double* xc, double *yc);
+
 
 #ifdef __cplusplus
 #if 0
