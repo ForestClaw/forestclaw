@@ -39,7 +39,19 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->patch_setup = NULL;
     vt->run_diagnostics = NULL;
 
-    /* The default values below should work for most applications */
+    /* Default metric functions */
+    vt->metric_setup_mesh        = &fclaw2d_metric_setup_mesh;
+    vt->fort_setup_mesh          = &FCLAW2D_FORT_SETUP_MESH;
+
+    vt->metric_compute_area      = &fclaw2d_metric_compute_area;
+    vt->fort_compute_area        = &FCLAW2D_FORT_COMPUTE_AREA;
+
+    vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
+    vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
+    vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
+    vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+
+    /* Defaults for regridding */
     vt->regrid_average2coarse    = &fclaw2d_regrid_average2coarse;
     vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
 
@@ -52,6 +64,7 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->regrid_tag4coarsening    = &fclaw2d_regrid_tag4coarsening;
     vt->fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
 
+    /* Defaults for writing output */
     vt->write_header             = &fclaw2d_output_header_ascii;
     vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
 

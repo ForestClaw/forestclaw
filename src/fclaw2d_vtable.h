@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_output_ascii.h>
 #include <fclaw2d_regrid_default.h>
+#include <fclaw2d_metric_default.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -71,15 +72,30 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      double t,
                                                      double dt);
 
+typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_domain_t *domain,
+                                            fclaw2d_patch_t *this_patch,
+                                            int blockno,
+                                            int patchno);
+
+typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_domain_t *domain,
+                                              fclaw2d_patch_t* this_patch,
+                                              int blockno,
+                                              int patchno);
+
+typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
+                                                 fclaw2d_patch_t *this_patch,
+                                                 int blockno,
+                                                 int patchno);
+
 typedef int (*fclaw2d_regrid_tag4refinement_t)(fclaw2d_domain_t *domain,
                                               fclaw2d_patch_t *this_patch,
                                               int this_block_idx, int this_patch_idx,
                                               int initflag);
 
 typedef int (*fclaw2d_regrid_tag4coarsening_t)(fclaw2d_domain_t *domain,
-                                                     fclaw2d_patch_t *this_patch,
-                                                     int this_blockno,
-                                                     int this_patchno);
+                                               fclaw2d_patch_t *this_patch,
+                                               int this_blockno,
+                                               int this_patchno);
 
 typedef void (*fclaw2d_regrid_interpolate2fine_t)(fclaw2d_domain_t* domain,
                                                  fclaw2d_patch_t *coarse_patch,
@@ -117,6 +133,17 @@ typedef struct fclaw2d_vtable
     fclaw2d_patch_single_step_update_t patch_single_step_update;
 
     /* Building patches, including functions to create metric terms */
+    fclaw2d_metric_setup_mesh_t        metric_setup_mesh;    /* wrapper */
+    fclaw2d_fort_setup_mesh_t          fort_setup_mesh;
+
+    fclaw2d_metric_compute_area_t      metric_compute_area;  /* wrapper */
+    fclaw2d_fort_compute_area_t        fort_compute_area;
+
+    fclaw2d_metric_compute_normals_t    metric_compute_normals;  /* wrapper */
+    fclaw2d_fort_compute_normals_t      fort_compute_normals;
+    fclaw2d_fort_compute_tangents_t     fort_compute_tangents;
+    fclaw2d_fort_compute_surf_normals_t fort_compute_surf_normals;
+
 
     /* regridding functions */
     fclaw2d_regrid_average2coarse_t    regrid_average2coarse;

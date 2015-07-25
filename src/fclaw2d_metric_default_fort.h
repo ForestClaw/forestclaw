@@ -36,6 +36,38 @@ extern "C"
 #endif
 #endif
 
+/* Typedef'd functions that user can set to whatever they want */
+typedef void (*fclaw2d_fort_setup_mesh_t)(const int* mx, const int* my, const int* mbc,
+                                         const double* xlower, const double* ylower,
+                                         const double* dx, const double* dy,
+                                         int* blockno,
+                                         double xp[], double yp[], double zp[],
+                                         double xd[], double yd[], double zd[]);
+
+typedef void (*fclaw2d_fort_compute_area_t)(const int* mx, const int* my, const int* mbc,
+                                            const double* dx, const double* dy,
+                                            const double* xlower, const double* ylower,
+                                            const int* blockno, double area[],
+                                            const int* level, const int* maxlevel,
+                                            const int* refratio, const int* ghost_only);
+
+typedef void (*fclaw2d_fort_compute_normals_t)(const int* mx, const int* my, const int* mbc,
+                                               double xp[], double yp[], double zp[],
+                                               double xd[], double yd[], double zd[],
+                                               double xnormals[], double ynormals[]);
+
+typedef void (*fclaw2d_fort_compute_tangents_t)(const int* mx, const int* my, const int* mbc,
+                                                double xd[], double yd[], double zd[],
+                                                double xtangents[], double ytangents[],
+                                                double edge_lengths[]);
+
+typedef void (*fclaw2d_fort_compute_surf_normals_t)(const int* mx, const int* my, const int* mbc,
+                                                    double xnormals[],double ynormals[],
+                                                    double edge_lengths[],
+                                                    double curvature[],
+                                                    double surfnormals[], double area[]);
+
+
 
 #define FCLAW2D_FORT_SETUP_MESH \
     FCLAW_F77_FUNC(fclaw2d_fort_setup_mesh,FCLAW2D_FORT_SETUP_MESH)
@@ -76,9 +108,6 @@ void FCLAW2D_FORT_COMPUTE_SURF_NORMALS(const int* mx, const int* my, const int* 
                                        double edge_lengths[],
                                        double curvature[],
                                        double surfnormals[], double area[]);
-
-
-
 
 #ifdef __cplusplus
 #if 0

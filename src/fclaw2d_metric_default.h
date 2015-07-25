@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_DEFAULT_H
 #define FCLAW2D_METRIC_DEFAULT_H
 
+#include <fclaw2d_metric_default_fort.h>
 #include "forestclaw2d.h"
 
 #ifdef __cplusplus
@@ -46,16 +47,12 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
                                  int blockno,
                                  int patchno);
 
+/* Includes computation of normals and tangents to face, as well
+   as surface normals and curvature */
 void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
                                     fclaw2d_patch_t *this_patch,
                                     int blockno,
                                     int patchno);
-
-void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t* this_patch,
-                                 int blockno,
-                                 int patchno);
-
 
 #ifdef __cplusplus
 #if 0
