@@ -238,7 +238,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
     }
 
     /* Exchange only over levels currently in use */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
@@ -251,7 +251,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
         fclaw2d_domain_ghost_exchange_begin(domain, e, minlevel, maxlevel);
 
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
 
 }
 
@@ -265,7 +265,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
     fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
 
     /* Exchange only over levels currently in use */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
     if (time_interp)
     {
         fclaw2d_domain_ghost_exchange_end (domain, e);
@@ -274,7 +274,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
     {
         fclaw2d_domain_ghost_exchange_end (domain, e);
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
 
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
