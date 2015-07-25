@@ -1,4 +1,5 @@
-      subroutine fclaw2d_fort_setup_mesh(mx,my,mbc,xlower,ylower,
+      subroutine fclaw2d_fort_setup_mesh(mx,my,mbc,
+     &      xlower,ylower,
      &      dx,dy,blockno,xp,yp,zp,xd,yd,zd)
       implicit none
 
@@ -80,7 +81,6 @@ c        # finest level.
       endif
 
       end
-
 
       subroutine fclaw2d_fort_compute_area_general(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, level,
