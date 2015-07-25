@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_manifold_default_fort.h>
+#include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -109,6 +109,7 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
+#if 0
 void fclaw2d_patch_copy2samesize(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t *old_patch,
                                  fclaw2d_patch_t* new_patch,
@@ -129,7 +130,7 @@ void fclaw2d_patch_copy2samesize(fclaw2d_domain_t* domain,
 
     memcpy(qnew,qold,meqn*(mx+2*mbc)*(my+2*mbc)*sizeof(double));
 }
-
+#endif
 
 void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t *coarse_patch,
@@ -232,12 +233,12 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_patches,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno,
-                                   int coarse_patchno,
-                                   int fine0_patchno)
+void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *fine_patches,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 int blockno,
+                                 int coarse_patchno,
+                                 int fine0_patchno)
 
 {
     int mx,my, mbc;

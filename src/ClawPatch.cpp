@@ -3,7 +3,7 @@
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_neighbors_fort.h>
-#include <fclaw2d_manifold_default_fort.h>
+#include <fclaw2d_metric_default_fort.h>
 
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
@@ -78,6 +78,7 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_time_interpolated.define(box, m_meqn);
 
+    // Set up storage for metric terms, if needed.
     if (gparms->manifold)
     {
         setup_area_storage();
@@ -86,17 +87,10 @@ void ClawPatch::define(const double&  a_xlower,
             /* Don't need any more manifold info for ghost patches */
             if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
             {
-                setup_manifold_storage();
+                setup_metric_storage();
             }
         }
     }
-
-#if 0
-    if (m_manifold)
-    {
-        setup_manifold(a_level,gparms,build_mode);
-    }
-#endif
 
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
     ClawPatch::pack_layers = 4;
@@ -598,7 +592,7 @@ void ClawPatch::setup_area_storage()
     m_area.define(box_p,1);
 }
 
-void ClawPatch::setup_manifold_storage()
+void ClawPatch::setup_metric_storage()
 {
     int mx = m_mx;
     int my = m_my;
@@ -642,106 +636,6 @@ void ClawPatch::setup_manifold_storage()
     m_yface_tangents.define(box_d,3);
     m_edge_lengths.define(box_d,2);
 }
-
-
-#if 0
-void ClawPatch::setup_manifold(const int& level,
-                               const amr_options_t *gparms,
-                               fclaw2d_build_mode_t build_mode)
-{
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-
-    int maxlevel = gparms->maxlevel;
-    int refratio = gparms->refratio;
-
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = -mbc;
-    }
-    ur[0] = mx + mbc + 1;
-    ur[1] = my + mbc + 1;
-
-    Box box_p(ll,ur);   /* Store cell centered values here */
-
-    // Compute area of the mesh cell.
-    m_area.define(box_p,1);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-    {
-        return;
-    }
-
-    double *area = m_area.dataPtr();
-    compute_area_(&mx, &my, &mbc, &m_dx, &m_dy,&m_xlower, &m_ylower,
-                  &m_blockno, area, &level, &maxlevel, &refratio);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED)
-    {
-        return;
-    }
-
-    /* Mesh cell centers of physical mesh */
-    m_xp.define(box_p,1);
-    m_yp.define(box_p,1);
-    m_zp.define(box_p,1);
-    m_surf_normals.define(box_p,3);
-    m_curvature.define(box_p,3);
-
-    /* Node centered values */
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = -mbc;
-    }
-    ur[0] = mx + mbc + 2;
-    ur[1] = my + mbc + 2;
-    Box box_d(ll,ur);
-
-    m_xd.define(box_d,1);
-    m_yd.define(box_d,1);
-    m_zd.define(box_d,1);
-
-    /* Face centered values */
-    m_xface_normals.define(box_d,3);
-    m_yface_normals.define(box_d,3);
-    m_xface_tangents.define(box_d,3);
-    m_yface_tangents.define(box_d,3);
-    m_edge_lengths.define(box_d,2);
-
-
-    /* Get pointers to pass to mesh routine */
-    double *xp = m_xp.dataPtr();
-    double *yp = m_yp.dataPtr();
-    double *zp = m_zp.dataPtr();
-    double *xd = m_xd.dataPtr();
-    double *yd = m_yd.dataPtr();
-    double *zd = m_zd.dataPtr();
-    double *area = m_area.dataPtr();
-
-    double *xnormals = m_xface_normals.dataPtr();
-    double *ynormals = m_yface_normals.dataPtr();
-    double *xtangents = m_xface_tangents.dataPtr();
-    double *ytangents = m_yface_tangents.dataPtr();
-    double *surfnormals = m_surf_normals.dataPtr();
-    double *curvature = m_curvature.dataPtr();
-    double *edge_lengths = m_edge_lengths.dataPtr();
-
-    /* Compute centers and corners of mesh cell */
-    setup_mesh_(&mx,&my,&mbc,&m_xlower,&m_ylower,&m_dx,&m_dy,&m_blockno,
-                xp,yp,zp,xd,yd,zd);
-
-    compute_normals_(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
-                     xnormals,ynormals);
-
-    compute_tangents_(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,edge_lengths);
-
-    compute_surf_normals_(&mx,&my,&mbc,xnormals,ynormals,edge_lengths,
-                          curvature, surfnormals,area);
-}
-#endif
 
 /* ----------------------------------------------------------------
    Output and diagnostics

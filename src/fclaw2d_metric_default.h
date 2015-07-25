@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_MANIFOLD_DEFAULT_H
-#define FCLAW2D_MANIFOLD_DEFAULT_H
+#ifndef FCLAW2D_METRIC_DEFAULT_H
+#define FCLAW2D_METRIC_DEFAULT_H
 
 #include "forestclaw2d.h"
 
@@ -36,20 +36,20 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_manifold_setup_mesh(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
+void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno);
+
+void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t* this_patch,
                                  int blockno,
                                  int patchno);
 
-void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t* this_patch,
-                                   int blockno,
-                                   int patchno);
-
-void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
+void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    int blockno,
+                                    int patchno);
 
 #ifdef __cplusplus
 #if 0

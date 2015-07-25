@@ -65,7 +65,7 @@ public :
     void partition_unpack(double *qdata);
 
     void setup_area_storage();
-    void setup_manifold_storage();
+    void setup_metric_storage();
 
     void setup_for_time_interpolation(const double& alpha);
     void reset_after_time_interpolation();

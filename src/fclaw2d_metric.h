@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_MANIFOLD_H
-#define FCLAW2D_MANIFOLD_H
+#ifndef FCLAW2D_METRIC_H
+#define FCLAW2D_METRIC_H
 
 #include "forestclaw2d.h"
 
@@ -36,11 +36,11 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_patches,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int coarse_patchno,
-                                   int fine0_patchno);
+void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *fine_patches,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 int blockno, int coarse_patchno,
+                                 int fine0_patchno);
 
 #ifdef __cplusplus
 #if 0

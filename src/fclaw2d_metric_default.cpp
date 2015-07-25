@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_manifold_default_fort.h>
+#include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,10 +38,10 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t* this_patch,
-                                   int blockno,
-                                   int patchno)
+void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 int blockno,
+                                 int patchno)
 {
     fclaw2d_vtable_t vt;
     int mx,my,mbc;
@@ -67,10 +67,10 @@ void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
 }
 
 
-void fclaw2d_manifold_setup_mesh(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int blockno,
-                                 int patchno)
+void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -90,10 +90,10 @@ void fclaw2d_manifold_setup_mesh(fclaw2d_domain_t *domain,
 
 }
 
-void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno)
+void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    int blockno,
+                                    int patchno)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;

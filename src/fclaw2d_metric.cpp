@@ -39,11 +39,11 @@ extern "C"
 #endif
 
 
-void fclaw2d_manifold_average_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_patches,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int coarse_patchno,
-                                   int fine0_patchno)
+void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *fine_patches,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 int blockno, int coarse_patchno,
+                                 int fine0_patchno)
 
 {
     fclaw2d_vtable_t vt;
