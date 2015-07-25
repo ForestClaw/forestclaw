@@ -132,6 +132,7 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
    Manifold setup and access
  ------------------------------------------------------------------ */
 
+static
 void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch,
                                       int blockno,

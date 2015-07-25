@@ -69,13 +69,6 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
                                     double **surfnormals, double ** edgelengths,
                                     double **curvature);
 
-void fclaw2d_clawpatch_manifold_setup(fclaw2d_domain_t* domain,
-                                      fclaw2d_patch_t* this_patch,
-                                      int blockno,
-                                      int patchno,
-                                      fclaw2d_build_mode_t build_mode);
-
-
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch);
 
