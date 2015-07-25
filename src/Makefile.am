@@ -112,6 +112,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
+	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
