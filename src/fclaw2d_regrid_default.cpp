@@ -37,10 +37,10 @@ extern "C"
 #endif
 
 
-int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int blockno, int patchno,
-                                 int initflag)
+int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int blockno, int patchno,
+                                  int initflag)
 {
     fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn;
@@ -67,10 +67,10 @@ int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *fine_patches,
-                                 int blockno,
-                                 int patchno)
+int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *fine_patches,
+                                  int blockno,
+                                  int patchno)
 {
     fclaw2d_vtable_t vt;
 
@@ -109,34 +109,12 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
-#if 0
-void fclaw2d_patch_copy2samesize(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t *old_patch,
-                                 fclaw2d_patch_t* new_patch,
-                                 int blockno, int old_patchno,
-                                 int new_patchno)
-{
-    int mx,my,mbc,meqn;
-    double *qold, *qnew;
-    const amr_options_t* gparms;
 
-    gparms = get_domain_parms(domain);
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
-
-    fclaw2d_clawpatch_soln_data(domain,old_patch,&qold,&meqn);
-    fclaw2d_clawpatch_soln_data(domain,new_patch,&qnew,&meqn);
-
-    memcpy(qnew,qold,meqn*(mx+2*mbc)*(my+2*mbc)*sizeof(double));
-}
-#endif
-
-void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t *coarse_patch,
-                                    fclaw2d_patch_t* fine_patches,
-                                    int this_blockno, int coarse_patchno,
-                                    int fine0_patchno)
+void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t *coarse_patch,
+                                     fclaw2d_patch_t* fine_patches,
+                                     int this_blockno, int coarse_patchno,
+                                     int fine0_patchno)
 
 {
     fclaw2d_vtable_t vt;
@@ -186,11 +164,11 @@ void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
    something like "average from fine" routine which handles more generic
    things, including area averaging, and maybe something to do with averaging
    stuff in aux arrays. */
-void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *fine_patches,
-                                  fclaw2d_patch_t *coarse_patch,
-                                  int blockno, int fine0_patchno,
-                                  int coarse_patchno)
+void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *fine_patches,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno, int fine0_patchno,
+                                   int coarse_patchno)
 
 {
     fclaw2d_vtable_t vt;
@@ -232,45 +210,6 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
 
     }
 }
-
-void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *fine_patches,
-                                 fclaw2d_patch_t *coarse_patch,
-                                 int blockno,
-                                 int coarse_patchno,
-                                 int fine0_patchno)
-
-{
-    int mx,my, mbc;
-    double xlower,ylower,dx,dy;
-
-    double *areacoarse, *areafine;
-    int igrid, fine_patchno;
-    fclaw2d_patch_t *fine_patch;
-
-    fclaw2d_clawpatch_grid_data(domain,coarse_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
-
-    for(igrid = 0; igrid < 4; igrid++)
-    {
-        fine_patch = &fine_patches[igrid];
-        fine_patchno = fine0_patchno + igrid;
-
-        areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
-
-        FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
-    }
-    const amr_options_t* gparms = get_domain_parms(domain);
-    int level = coarse_patch->level;
-    int refratio = gparms->refratio;
-    int maxlevel = gparms->maxlevel;
-    int ghost_only = 1;
-    compute_area_(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                  &blockno, areacoarse, &level, &maxlevel, &refratio, &ghost_only);
-}
-
 
 #ifdef __cplusplus
 #if 0

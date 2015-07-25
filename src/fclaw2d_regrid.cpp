@@ -43,12 +43,12 @@ extern "C"
 #endif
 #endif
 
-
-void fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *this_patch,
-                                   int this_block_idx,
-                                   int this_patch_idx,
-                                   void *user)
+/* This is also called from fclaw2d_initialize, so is not made static */
+void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx,
+                                      void *user)
 {
     fclaw2d_vtable_t vt;
     int refine_patch, maxlevel, level;
@@ -65,7 +65,7 @@ void fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     if (level < maxlevel)
     {
         refine_patch  =
-            vt.patch_tag4refinement(domain,this_patch,this_block_idx,
+            vt.regrid_tag4refinement(domain,this_patch,this_block_idx,
                                     this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
@@ -76,10 +76,10 @@ void fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 
 /* Tag family for coarsening */
 static
-void cb_tag4coarsening(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *fine_patches,
-                       int blockno, int fine0_patchno,
-                       void *user)
+void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *fine_patches,
+                              int blockno, int fine0_patchno,
+                              void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_vtable_t vt;
@@ -92,7 +92,7 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
     if (level > minlevel)
     {
         int family_coarsened = 1;
-        family_coarsened = vt.patch_tag4coarsening(domain,&fine_patches[0],
+        family_coarsened = vt.regrid_tag4coarsening(domain,&fine_patches[0],
                                                   blockno, fine0_patchno);
         if (family_coarsened == 1)
         {
@@ -110,15 +110,15 @@ void cb_tag4coarsening(fclaw2d_domain_t *domain,
    Public interface
    -------------------------------------------------------------- */
 
-void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
-                               fclaw2d_patch_t * old_patch,
-                               fclaw2d_domain_t * new_domain,
-                               fclaw2d_patch_t * new_patch,
-                               fclaw2d_patch_relation_t newsize,
-                               int blockno,
-                               int old_patchno,
-                               int new_patchno,
-                               void *user)
+void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
+                                  fclaw2d_patch_t * old_patch,
+                                  fclaw2d_domain_t * new_domain,
+                                  fclaw2d_patch_t * new_patch,
+                                  fclaw2d_patch_relation_t newsize,
+                                  int blockno,
+                                  int old_patchno,
+                                  int new_patchno,
+                                  void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(new_domain);
@@ -146,8 +146,8 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
             fclaw2d_patch_data_new(new_domain,fine_patch);
-            fclaw2d_clawpatch_build_cb(new_domain,fine_patch,blockno,
-                                       fine_patchno,(void*) &build_mode);
+            fclaw2d_clawpatch_build(new_domain,fine_patch,blockno,
+                                    fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
                 vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
@@ -159,7 +159,7 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int coarse_patchno = old_patchno;
             int fine_patchno = new_patchno;
 
-            vt.patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
+            vt.regrid_interpolate2fine(new_domain,coarse_patch,fine_siblings,
                                       blockno,coarse_patchno,fine_patchno);
         }
         fclaw2d_patch_data_delete(old_domain,coarse_patch);
@@ -180,23 +180,14 @@ void fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         int coarse_patchno = new_patchno;
         fclaw2d_patch_data_new(new_domain,coarse_patch);
 
-#if 0
-        fclaw2d_clawpatch_build_cb(new_domain,coarse_patch,blockno,
-                                   coarse_patchno,(void*) &build_mode);
-#endif
-
         /* Area (and possibly other things) should be averaged to coarse grid. */
         fclaw2d_clawpatch_build_from_fine(new_domain,fine_siblings,coarse_patch,
                                           blockno,coarse_patchno,fine_patchno,
                                           build_mode);
 
         /* Average the solution. Does this need to be customizable? */
-#if 0
-        vt.patch_average2coarse(new_domain,fine_siblings,coarse_patch,
+        vt.regrid_average2coarse(new_domain,fine_siblings,coarse_patch,
                                 blockno,coarse_patchno, fine_patchno);
-#endif
-        fclaw2d_patch_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                     blockno,coarse_patchno, fine_patchno);
 
         for(int i = 0; i < 4; i++)
         {
@@ -223,11 +214,11 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
 
     /* First determine which families should be coarsened. */
-    fclaw2d_domain_iterate_families(*domain, cb_tag4coarsening,
+    fclaw2d_domain_iterate_families(*domain, cb_regrid_tag4coarsening,
                                     (void*) NULL);
 
     int domain_init = 0;
-    fclaw2d_domain_iterate_patches(*domain, fclaw2d_regrid_tag4refinement,
+    fclaw2d_domain_iterate_patches(*domain, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 
     /* Rebuild domain if necessary */
@@ -250,7 +241,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* Average to new coarse grids and interpolate to new fine grids */
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
         fclaw2d_domain_iterate_adapted(*domain, new_domain,
-                                       fclaw2d_regrid_repopulate,
+                                       cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
 

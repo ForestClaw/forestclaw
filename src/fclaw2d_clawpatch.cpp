@@ -219,11 +219,11 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
    an "iterate_adapted" step, in which data in these patches is copied, averaged or
    interpolated. */
 
-void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int blockno,
-                                int patchno,
-                                void *user)
+void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno,
+                             int patchno,
+                             void *user)
 {
     fclaw2d_vtable_t vt;
 
@@ -405,8 +405,8 @@ void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
     fclaw2d_patch_data_new(domain,this_patch);
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_clawpatch_build_cb(domain,this_patch,this_block_idx,
-                               this_patch_idx,(void*) &build_mode);
+    fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
+                            this_patch_idx,(void*) &build_mode);
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
 

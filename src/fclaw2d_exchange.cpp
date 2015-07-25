@@ -77,8 +77,8 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
         }
 
         fclaw2d_patch_data_new(domain,ghost_patch);
-        fclaw2d_clawpatch_build_cb(domain,ghost_patch,blockno,
-                                   patchno,(void*) &build_mode);
+        fclaw2d_clawpatch_build(domain,ghost_patch,blockno,
+                                patchno,(void*) &build_mode);
     }
 }
 
@@ -268,8 +268,6 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_MPI]);
     if (time_interp)
     {
-        int time_interp_level = minlevel-1;
-
         fclaw2d_domain_ghost_exchange_end (domain, e);
     }
     else

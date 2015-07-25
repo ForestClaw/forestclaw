@@ -37,33 +37,26 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int blockno, int patchno,
-                                 int initflag);
+int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int blockno, int patchno,
+                                  int initflag);
 
-int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int blockno, int patchno);
+int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int blockno, int patchno);
 
-void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *fine_siblings,
-                                  fclaw2d_patch_t *coarse_patch,
-                                  int blockno, int fine_patchno,
-                                  int coarse_patchno);
+void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *fine_siblings,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno, int fine_patchno,
+                                   int coarse_patchno);
 
-void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t *coarse_patch,
-                                    fclaw2d_patch_t* fine_patch,
-                                    int this_blockno, int coarse_patchno,
-                                    int fine_patchno);
-
-void fclaw2d_patch_copy2samesize(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t *old_patch,
-                                 fclaw2d_patch_t* new_patch,
-                                 int blockno, int old_patchno,
-                                 int new_patchno);
-
+void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t *coarse_patch,
+                                     fclaw2d_patch_t* fine_patch,
+                                     int this_blockno, int coarse_patchno,
+                                     int fine_patchno);
 
 #ifdef __cplusplus
 #if 0

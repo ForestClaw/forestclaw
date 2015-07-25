@@ -117,11 +117,11 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_build_mode_t build_mode);
 
 /* A callback for building the domain and repartitioning */
-void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                void *user);
+void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             void *user);
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *fine_patches,
