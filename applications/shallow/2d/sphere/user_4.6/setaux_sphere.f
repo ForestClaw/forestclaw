@@ -13,13 +13,6 @@
 
       include 'metric_terms.i'
 
-
-c      double precision    xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-c      double precision    ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-c      double precision   xtangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-c      double precision   ytangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-c      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
-
 c     The aux array has the following elements:
 c     1  kappa = ratio of cell area to dxc*dyc
 c     2  enx = x-component of normal vector to left edge in tangent plane
@@ -66,8 +59,6 @@ c     19  bathymetry - averaged over all possible finer cells
             enddo
          enddo
       enddo
-
-      return
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx + mbc
