@@ -62,8 +62,9 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
 
     /* vt.fort_compute_area(...) */
     int ghost_only = 0;
-    compute_area_(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                  &blockno, area, &level, &maxlevel, &refratio, &ghost_only);
+    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, area, &level, &maxlevel, &refratio,
+                              &ghost_only);
 }
 
 
@@ -85,8 +86,8 @@ void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     /* Compute centers and corners of mesh cell */
-    setup_mesh_(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
-                xp,yp,zp,xd,yd,zd);
+    FCLAW2D_FORT_SETUP_MESH(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
+                            xp,yp,zp,xd,yd,zd);
 
 }
 
@@ -119,13 +120,14 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
 
 
     /* vt.fort_compute_normals(...) */
-    compute_normals_(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
-                     xnormals,ynormals);
+    FCLAW2D_FORT_COMPUTE_NORMALS(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+                                 xnormals,ynormals);
 
-    compute_tangents_(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,edgelengths);
+    FCLAW2D_FORT_COMPUTE_TANGENTS(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
+                                  edgelengths);
 
-    compute_surf_normals_(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
-                          curvature, surfnormals, area);
+    FCLAW2D_FORT_COMPUTE_SURF_NORMALS(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
+                                      curvature, surfnormals, area);
 
 }
 

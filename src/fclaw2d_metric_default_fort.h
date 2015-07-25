@@ -37,32 +37,45 @@ extern "C"
 #endif
 
 
-void setup_mesh_(const int* mx, const int* my, const int* mbc,
-                 const double* xlower, const double* ylower,
-                 const double* dx, const double* dy,
-                 int* blockno,
-                 double xp[], double yp[], double zp[],
-                 double xd[], double yd[], double zd[]);
+#define FCLAW2D_FORT_SETUP_MESH \
+    FCLAW_F77_FUNC(fclaw2d_fort_setup_mesh,FCLAW2D_FORT_SETUP_MESH)
+void FCLAW2D_FORT_SETUP_MESH(const int* mx, const int* my, const int* mbc,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             int* blockno,
+                             double xp[], double yp[], double zp[],
+                             double xd[], double yd[], double zd[]);
 
-void compute_area_(const int* mx, const int* my, const int* mbc,
-                   const double* dx, const double* dy,
-                   const double* xlower, const double* ylower,
-                   const int* blockno, double area[],
-                   const int* level, const int* maxlevel,
-                   const int* refratio, const int* ghost_only);
+#define FCLAW2D_FORT_COMPUTE_AREA \
+    FCLAW_F77_FUNC(fclaw2d_fort_compute_area,FCLAW2D_FORT_COMPUTE_AREA)
+void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
+                               const double* dx, const double* dy,
+                               const double* xlower, const double* ylower,
+                               const int* blockno, double area[],
+                               const int* level, const int* maxlevel,
+                               const int* refratio, const int* ghost_only);
 
-void compute_normals_(const int* mx, const int* my, const int* mbc,
-                      double xp[], double yp[], double zp[],
-                      double xd[], double yd[], double zd[],
-                      double xnormals[], double ynormals[]);
+#define FCLAW2D_FORT_COMPUTE_NORMALS \
+    FCLAW_F77_FUNC(fclaw2d_fort_compute_normals,FCLAW2D_FORT_COMPUTE_NORMALS)
+void FCLAW2D_FORT_COMPUTE_NORMALS(const int* mx, const int* my, const int* mbc,
+                                  double xp[], double yp[], double zp[],
+                                  double xd[], double yd[], double zd[],
+                                  double xnormals[], double ynormals[]);
 
-void compute_tangents_(const int* mx, const int* my, const int* mbc,
-                      double xd[], double yd[], double zd[],
-                      double xtangents[], double ytangents[], double edge_lengths[]);
+#define FCLAW2D_FORT_COMPUTE_TANGENTS \
+    FCLAW_F77_FUNC(fclaw2d_fort_compute_tangents,FCLAW2D_FORT_COMPUTE_TANGENTS)
+void FCLAW2D_FORT_COMPUTE_TANGENTS(const int* mx, const int* my, const int* mbc,
+                                   double xd[], double yd[], double zd[],
+                                   double xtangents[], double ytangents[],
+                                   double edge_lengths[]);
 
-void compute_surf_normals_(const int* mx, const int* my, const int* mbc,
-                           double xnormals[],double ynormals[],double edge_lengths[],
-                           double curvature[], double surfnormals[], double area[]);
+#define FCLAW2D_FORT_COMPUTE_SURF_NORMALS \
+    FCLAW_F77_FUNC(fclaw2d_fort_compute_surf_normals,FCLAW2D_FORT_COMPUTE_SURF_NORMALS)
+void FCLAW2D_FORT_COMPUTE_SURF_NORMALS(const int* mx, const int* my, const int* mbc,
+                                       double xnormals[],double ynormals[],
+                                       double edge_lengths[],
+                                       double curvature[],
+                                       double surfnormals[], double area[]);
 
 
 

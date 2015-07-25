@@ -73,6 +73,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
 	src/fclaw2d_regrid.cpp \
+	src/fclaw2d_metric.cpp \
 	src/fclaw2d_metric_default.cpp \
 	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
@@ -110,13 +111,13 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_ghost_pack.f \
 	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
+	src/fortran_source2d/fclaw2d_metric_default_fort.f \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
 	src/fortran_source2d/exchange_fv1.f \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/phys_corner.f \
-	src/fortran_source2d/setup_mesh.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f

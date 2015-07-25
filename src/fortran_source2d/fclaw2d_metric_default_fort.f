@@ -1,5 +1,5 @@
-      subroutine setup_mesh(mx,my,mbc,xlower,ylower,dx,dy,
-     &      blockno,xp,yp,zp,xd,yd,zd)
+      subroutine fclaw2d_fort_setup_mesh(mx,my,mbc,xlower,ylower,
+     &      dx,dy,blockno,xp,yp,zp,xd,yd,zd)
       implicit none
 
       integer mx,my, mbc, blockno
@@ -53,8 +53,9 @@ c              # Physical locations of cell centers
       enddo
       end
 
-      subroutine compute_area(mx,my,mbc,dx,dy,xlower, ylower,
-     &      blockno,area, level,maxlevel,refratio,ghost_only)
+      subroutine fclaw2d_fort_compute_area(mx,my,mbc,dx,dy,
+     &      xlower, ylower, blockno,area, level,maxlevel,
+     &      refratio,ghost_only)
       implicit none
 
       integer mx,my,mbc,level, refratio,maxlevel, blockno
@@ -69,11 +70,11 @@ c              # Physical locations of cell centers
       if (isaffine()) then
 c        # We don't need to compute areas all the way to the
 c        # finest level.
-         call compute_area_affine(mx,my,mbc,dx,dy,
+         call fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
      &         xlower, ylower, blockno,area, level,maxlevel,
      &         refratio,ghost_only)
       else
-         call compute_area_general(mx,my,mbc,dx,dy,
+         call fclaw2d_fort_compute_area_general(mx,my,mbc,dx,dy,
      &         xlower, ylower, blockno,area, level,maxlevel,
      &         refratio,ghost_only)
       endif
@@ -81,7 +82,7 @@ c        # finest level.
       end
 
 
-      subroutine compute_area_general(mx,my,mbc,dx,dy,
+      subroutine fclaw2d_fort_compute_area_general(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, level,
      &      maxlevel,refratio,ghost_only)
       implicit none
@@ -118,15 +119,11 @@ c        # finest level.
 c     # Primary cells.  Note that we don't do anything special
 c     # in the diagonal cells - so the areas there are less accurate
 c     # than in the rest of the mesh.
-
-c     # Primary cells.  Note that we don't do anything special
-c     # in the diagonal cells - so the areas there are less accurate
-c     # than in the rest of the mesh.
       do j = -mbc,my+mbc+1
          do i = -mbc,mx+mbc+1
             if (is_area_interior(mx,my,i,j) .and.
      &            ghost_only .eq. 1) then
-               continue
+               cycle
             endif
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
@@ -158,7 +155,7 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
       end
 
 
-      subroutine compute_area_affine(mx,my,mbc,dx,dy,
+      subroutine fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, level,
      &      maxlevel,refratio,ghost_only)
       implicit none
@@ -185,7 +182,7 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
          do i = -mbc,mx+mbc+1
             if (is_area_interior(mx,my,i,j) .and.
      &            ghost_only .eq. 1) then
-               continue
+               cycle
             endif
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
@@ -205,6 +202,17 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
       enddo
 
       end
+
+      logical function is_area_interior(mx,my,i,j)
+      implicit none
+      integer mx,my,i,j
+
+      is_area_interior = i .ge. 0 .and. i .le. mx+1 .and.
+     &      j .ge. 0 .and. j .le. my+1
+
+      end
+
+
 
 
 c     # This is the area element based on a bilinear approximation to
@@ -259,18 +267,8 @@ c     # computed at the center of the mesh cell.
 
       end
 
-      logical function is_area_interior(mx,my,i,j)
-      implicit none
-      integer mx,my,i,j
-
-      is_area_interior = i .ge. 0 .and. i .le. mx+1 .and.
-     &      j .ge. 0 .and. j .le. my+1
-
-      end
-
-
-      subroutine compute_normals(mx,my,mbc,xp,yp,zp,xd,yd,zd,
-     &      xnormals,ynormals)
+      subroutine fclaw2d_fort_compute_normals(mx,my,mbc,
+     &      xp,yp,zp,xd,yd,zd,xnormals,ynormals)
       IMPLICIT NONE
 
       INTEGER mx,my,mbc
@@ -324,21 +322,21 @@ c           # Now do y-faces
             taup(2) = yd(i+1,j) - yd(i,j)
             taup(3) = zd(i+1,j) - zd(i,j)
 
-            CALL get_normal(taup,taud,nv,sp)
+            call get_normal(taup,taud,nv,sp)
 
 c           # nv has unit length
-            DO m = 1,3
+            do m = 1,3
                ynormals(i,j,m) = nv(m)
-            ENDDO
-         ENDDO
-      ENDDO
+            enddo
+         enddo
+      enddo
 
 
-      END SUBROUTINE compute_normals
+      end subroutine
 
 
-      SUBROUTINE compute_tangents(mx,my,mbc,xd,yd,zd,
-     &      xtangents,ytangents,edge_lengths)
+      subroutine fclaw2d_fort_compute_tangents(mx,my,mbc,
+     &      xd,yd,zd, xtangents,ytangents,edge_lengths)
       IMPLICIT NONE
 
       INTEGER mx,my,mbc
@@ -381,14 +379,14 @@ c           # Now do y-faces
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
 c           # nv has unit length
-            DO m = 1,3
+            do m = 1,3
                ytangents(i,j,m) = taup(m)
-            ENDDO
+            enddo
             edge_lengths(i,j,2) = tlen
-         ENDDO
-      ENDDO
+         enddo
+      enddo
 
-      END SUBROUTINE compute_tangents
+      end subroutine
 
 
 c     # Compute an approximate unit normal to cell edge
@@ -527,7 +525,7 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
 
       end
 
-      SUBROUTINE compute_surf_normals(mx,my,mbc,
+      subroutine fclaw2d_fort_compute_surf_normals(mx,my,mbc,
      &      xnormals,ynormals,edge_lengths,curvature,
      &      surfnormals,area)
       IMPLICIT NONE
@@ -586,5 +584,74 @@ c              # construct cross product
          enddo
       enddo
 
+
+      end
+
+c> \ingroup  Averaging
+c> Average area of fine grid siblings to parent coarse grid.
+      subroutine fclaw2d_fort_average_area(mx,my,mbc,
+     &      areacoarse, areafine, igrid)
+      implicit none
+
+      integer mx,my,mbc,p4est_refineFactor, refratio, igrid
+
+c     # these will be empty if we are not on a manifold.
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
+      double precision sum
+
+c     # This should be refratio*refratio.
+      integer i1,j1, r2, m
+      integer rr2
+      parameter(rr2 = 4)
+      integer i2(0:rr2-1),j2(0:rr2-1)
+      double precision kf
+
+      p4est_refineFactor = 2
+      refratio = 2
+
+c     # 'iface' is relative to the coarse grid
+
+      r2 = refratio*refratio
+      if (r2 .ne. rr2) then
+         write(6,*) 'average_face_ghost (claw2d_utils.f) ',
+     &         '  Refratio**2 is not equal to rr2'
+         stop
+      endif
+
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(igrid,refratio)
+      jg = (igrid-ig)/refratio
+
+c     # Get rectangle in coarse grid for fine grid.
+      ic_add = ig*mx/p4est_refineFactor
+      jc_add = jg*mx/p4est_refineFactor
+
+      r2 = refratio*refratio
+      do j = 0,my/p4est_refineFactor+1
+         do i = 0,mx/p4est_refineFactor +1
+            i1 = i+ic_add
+            j1 = j+jc_add
+            m = 0
+            do jj = 1,refratio
+               do ii = 1,refratio
+                  i2(m) = (i-1)*refratio + ii
+                  j2(m) = (j-1)*refratio + jj
+                  m = m + 1
+               enddo
+            enddo
+            sum = 0
+            do m = 0,r2-1
+               kf = areafine(i2(m),j2(m))
+               sum = sum + kf
+            enddo
+            areacoarse(i1,j1) = sum
+         enddo
+      enddo
+
+c     # Compute area in the ghost cells
 
       end

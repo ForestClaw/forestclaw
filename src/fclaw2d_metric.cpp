@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_regrid_default_fort.h>
+#include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -46,7 +46,6 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
                                  int fine0_patchno)
 
 {
-    fclaw2d_vtable_t vt;
     int mx,my, mbc;
     double xlower,ylower,dx,dy;
 
@@ -68,6 +67,18 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
+
+    /* Set area in ghost cells not set above */
+    const amr_options_t* gparms = get_domain_parms(domain);
+    int level = coarse_patch->level;
+    int maxlevel = gparms->maxlevel;
+    int refratio = gparms->refratio;
+    int ghost_only = 1;
+
+    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, areacoarse, &level, &maxlevel, &refratio,
+                              &ghost_only);
+
 }
 
 
