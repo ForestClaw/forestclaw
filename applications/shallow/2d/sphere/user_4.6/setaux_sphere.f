@@ -67,14 +67,7 @@ c     19  bathymetry - averaged over all possible finer cells
          enddo
       enddo
 
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
-            do m = 1,3
-               aux(i,j,19) = surfnormals(i,j,m)
-            enddo
-         enddo
-      enddo
-
+      return
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx + mbc
@@ -84,5 +77,17 @@ c     19  bathymetry - averaged over all possible finer cells
             aux(i,j,18) = yc
          enddo
       enddo
+
+
+c     # Bathymetry
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
+            do m = 1,3
+               aux(i,j,19) = surfnormals(i,j,m)
+            enddo
+         enddo
+      enddo
+
+
 
       end

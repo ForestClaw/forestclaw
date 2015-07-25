@@ -157,38 +157,6 @@ void fclaw2d_clawpatch_manifold_setup(fclaw2d_domain_t* domain,
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->setup_manifold_storage();
-
-#if 0
-    if (build_mode ==  FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-    {
-        /* Area will be unpacked from ghost patches received from
-           parallel MPI communication. */
-        return;
-    }
-
-    /* vt.patch_manifold_compute_area(...) */
-    fclaw2d_manifold_compute_area(domain,this_patch,blockno,patchno);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-    {
-        /* Assume that area has already been averaged, if needed.  We may also
-           want to construct edge lengths, etc, from fine grids, rather than
-           recomputing here.   Something like a general "build from fine"
-           routine. */
-
-        /* vt.patch_manifold_setup_mesh(...) */
-        fclaw2d_manifold_setup_mesh(domain,this_patch,blockno,patchno);
-
-        /* vt.patch_manifold_compute_normals(...) */
-        fclaw2d_manifold_compute_normals(domain,this_patch,blockno,patchno);
-
-        /* vt.patch_manifold_compute_curvature(...) */
-        fclaw2d_manifold_compute_curvature(domain,this_patch,blockno,patchno);
-    }
-#endif
-
     /* vt.patch_manifold_setup_mesh(...) */
     fclaw2d_manifold_setup_mesh(domain,this_patch,blockno,patchno);
 
@@ -263,10 +231,6 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                gparms,
                build_mode);
 
-    if (gparms->manifold)
-    {
-        fclaw2d_clawpatch_manifold_setup(domain,this_patch,blockno,build_mode);
-    }
 }
 
 
@@ -286,34 +250,26 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = get_domain_parms(domain);
 
-#if 0
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms,
-               build_mode);
-#endif
     fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
 
+#if 0
     if (gparms->manifold)
     {
         fclaw2d_clawpatch_area_storage(domain,this_patch,blockno,patchno);
 
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
-            /* Don't need any more manifold info for ghost patches */
             fclaw2d_manifold_compute_area(domain,this_patch,blockno,patchno);
+
+            /* Don't need any more manifold info for ghost patches */
             if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
             {
-                fclaw2d_clawpatch_manifold_setup(domain,this_patch,
-                                                 blockno,patchno);
+                fclaw2d_clawpatch_manifold_storage(domain,this_patch,blockno,patchno);
+                fclaw2d_clawpatch_manifold_setup(domain,this_patch,blockno,patchno);
             }
         }
     }
+#endif
 
     vt = fclaw2d_get_vtable(domain);
     if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
@@ -327,35 +283,21 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *coarse_patch,
                                        int blockno,
                                        int coarse_patchno,
-                                       int fine0_patchno)
+                                       int fine0_patchno,
+                                       fclaw2d_build_mode_t build_mode)
 {
     fclaw2d_vtable_t vt;
     const amr_options_t *gparms = get_domain_parms(domain);
-
-    fclaw2d_build_mode_t build_mode =  FCLAW2D_BUILD_FOR_UPDATE;
-
-#if 0
-    int level = this_patch->level;
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms,
-               build_mode);
-#endif
 
     fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
 
     if (gparms->manifold)
     {
         fclaw2d_clawpatch_area_storage(domain,coarse_patch,blockno,coarse_patchno);
-
         fclaw2d_manifold_average_area(domain,fine_patches,coarse_patch,
                                       blockno, coarse_patchno, fine0_patchno);
 
+        fclaw2d_clawpatch_manifold_storage(domain,coarse_patch,blockno,coarse_patchno);
         fclaw2d_clawpatch_manifold_setup(domain,coarse_patch,blockno,
                                          coarse_patchno);
     }

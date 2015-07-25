@@ -39,9 +39,9 @@ extern "C"
 #endif
 
 void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t* this_patch,
-                              int blockno,
-                              int patchno)
+                                   fclaw2d_patch_t* this_patch,
+                                   int blockno,
+                                   int patchno)
 {
     fclaw2d_vtable_t vt;
     int mx,my,mbc;

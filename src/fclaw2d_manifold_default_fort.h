@@ -37,48 +37,27 @@ extern "C"
 #endif
 
 
-#if 0
-void fclaw2d_manifold_setup_mesh(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int blockno,
-                              int patchno);
-
-void fclaw2d_manifold_compute_area(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t* this_patch,
-                                   int blockno,
-                                   int patchno);
-
-void fclaw2d_manifold_compute_normals(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
-
-void fclaw2d_manifold_compute_curvature(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        int blockno,
-                                        int patchno);
-
-#endif
-
 void setup_mesh_(const int* mx, const int* my, const int* mbc,
                  const double* xlower, const double* ylower,
-                 const double* dx, const double* dy,int* blockno,
+                 const double* dx, const double* dy,
+                 int* blockno,
                  double xp[], double yp[], double zp[],
                  double xd[], double yd[], double zd[]);
 
 void compute_area_(const int* mx, const int* my, const int* mbc,
-                   const double* m_dx, const double* m_dy,const double* m_xlower,
-                   const double* m_ylower, const int* blockno, double area[],
+                   const double* dx, const double* dy,
+                   const double* xlower, const double* ylower,
+                   const int* blockno, double area[],
                    const int* level, const int* maxlevel, const int* refratio);
 
 void compute_normals_(const int* mx, const int* my, const int* mbc,
                       double xp[], double yp[], double zp[],
                       double xd[], double yd[], double zd[],
-                      double xnormals[],double ynormals[]);
+                      double xnormals[], double ynormals[]);
 
 void compute_tangents_(const int* mx, const int* my, const int* mbc,
                       double xd[], double yd[], double zd[],
-                      double xtangents[],double ytangents[],double edge_lengths[]);
+                      double xtangents[], double ytangents[], double edge_lengths[]);
 
 void compute_surf_normals_(const int* mx, const int* my, const int* mbc,
                            double xnormals[],double ynormals[],double edge_lengths[],
