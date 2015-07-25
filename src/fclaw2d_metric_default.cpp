@@ -123,15 +123,25 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
 
     vt = fclaw2d_get_vtable(domain);
 
-    /* vt.fort_compute_normals(...) */
-    vt.fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
-                                   xnormals,ynormals);
+    /* The user could set these to NULL to avoid doing these computations ... */
 
-    vt.fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
-                                  edgelengths);
+    if (vt.fort_compute_normals != NULL)
+    {
+        vt.fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+                                xnormals,ynormals);
+    }
 
-    vt.fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
-                                        curvature, surfnormals, area);
+    if (vt.fort_compute_tangents != NULL)
+    {
+        vt.fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
+                                 edgelengths);
+    }
+
+    if (vt.fort_compute_surf_normals != NULL)
+    {
+        vt.fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
+                                     curvature, surfnormals, area);
+    }
 
 }
 
