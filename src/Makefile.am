@@ -117,7 +117,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/interpolate_fv1.f \
 	src/fortran_source2d/exchange_fv1.f \
 	src/fortran_source2d/diagnostics.f \
-	src/fortran_source2d/phys_corner.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f

@@ -521,29 +521,6 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
 
 
 /* ----------------------------------------------------------------
-   Phyisical boundary conditions
-   ---------------------------------------------------------------- */
-
-void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                                      const double& t, const double& dt)
-{
-    double *q = m_griddata.dataPtr();
-
-    /* This routine doesn't do anything ... */
-    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
-}
-
-void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side,
-                                                ClawPatch* cp)
-{
-    double *this_q = m_griddata.dataPtr();
-    double *neighbor_q = cp->m_griddata.dataPtr();
-
-    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q,
-                                a_corner, a_side);
-}
-
-/* ----------------------------------------------------------------
    Time interpolation
    ---------------------------------------------------------------- */
 void ClawPatch::setup_for_time_interpolation(const double& alpha)

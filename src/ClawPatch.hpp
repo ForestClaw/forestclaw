@@ -142,15 +142,6 @@ public :
                              const double& t,
                              const double& dt);
 
-    // Corners that lie on a physical face - data has to be exchanged
-    // in a particular way
-    void set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                               const double& t, const double& dt);
-
-    // Exchange corner ghost with boundary neighbor
-    void exchange_phys_face_corner_ghost(const int& a_corner,
-                                         const int& a_iface, ClawPatch* cp);
-
     // ----------------------------------------------------------------
     // Mapped grids
     // ----------------------------------------------------------------
