@@ -14,7 +14,7 @@ pp.qmax = 0.25;
 
 pp.colormap = colormap(jet(64));  % Color map for q portion.
 
-pp.plotq = false;
+pp.plotq = true;
 
 pp.qcolors = [];
 
