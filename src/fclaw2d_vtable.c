@@ -75,6 +75,14 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)
 {
     fclaw2d_domain_attribute_add (domain,"vtable",vt);
+    if (vt->metric_compute_area == &fclaw2d_metric_compute_area)
+    {
+        vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost;
+    }
+    else if (vt->metric_compute_area == &fclaw2d_metric_compute_area_exact)
+    {
+        vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
+    }
 }
 
 fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)

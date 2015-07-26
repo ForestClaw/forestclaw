@@ -1,5 +1,5 @@
       subroutine fclaw2d_fort_integrate_exact(mx,my,mbc,
-     &      xlower, ylower,dx,dy,blockno,deg,area,f,favg,
+     &      dx,dy,xlower, ylower,blockno,area,f,favg,
      &      compute_avg,ghost_only)
       implicit none
 
@@ -11,6 +11,7 @@
       double precision favg(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       integer compute_avg, ghost_only
 
+      deg = 4
       call integrate_exact(mx,my,mbc,xlower,ylower,dx,dy,
      &      blockno,deg,area,f,favg,compute_avg,ghost_only)
 

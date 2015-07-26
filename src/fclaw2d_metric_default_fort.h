@@ -91,7 +91,7 @@ void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
 
 #define FCLAW2D_FORT_INTEGRATE_EXACT FCLAW_F77_FUNC(fclaw2d_fort_integrate_exact, \
                                                     FCLAW2D_FORT_INTEGRATE_EXACT)
-void FCLAW2D_FORT_INTEGRATE_EXACT(int* mx,int* my,int* mbc,double* dx,double* dy,
+void FCLAW2D_FORT_INTEGRATE_EXACT(int* mx,int* my,int* mbc, double* dx,double* dy,
                                   double* xlower, double* ylower, int* blockno,
                                   double area[], fclaw2d_fort_aux_func_t *f,
                                   double favg[], int* compute_avg, int* ghost_only);
