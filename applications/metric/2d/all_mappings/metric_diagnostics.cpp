@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "metric_user.H"
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
+#include "metric_user.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 
-#include "fclaw2d_diagnostics.h"
-#include "ClawPatch.H"
+#include <fclaw2d_diagnostics.h>
+#include <ClawPatch.hpp>
 
 static
 double metric_surface_area(fclaw2d_map_context_t* cont)
@@ -128,7 +128,7 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
     sum = fclaw2d_domain_global_sum (domain, sum);
 
-    fclaw2d_map_context_t* cont = get_map_context(domain);
+    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
     double exact_area = metric_surface_area(cont);
 
     fclaw_global_productionf("%30s %24.16f\n","Total area",sum);

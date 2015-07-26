@@ -23,12 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "metric_user.H"
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
+#include "metric_user.h"
 
-#include "ClawPatch.H"
-#include "fclaw2d_physical_bc.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
+#include <ClawPatch.hpp>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_physical_bc.h>
+#include <fclaw2d_regrid.h>
 
 static fclaw2d_vtable_t vt;
 
@@ -40,6 +42,10 @@ void metric_link_patch(fclaw2d_domain_t *domain)
 
     vt.patch_initialize = &metric_patch_initialize;
     vt.patch_physical_bc = &fclaw2d_physical_bc_default;  /* Doesn't do anything */
+
+    vt.fort_tag4refinement = &TAG4REFINEMENT;
+
+    vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
 
     vt.run_diagnostics = &metric_diagnostics;
 
@@ -79,7 +85,8 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
     error.define(cp->dataBox(),1);
     error_ptr = error.dataPtr();
 
-    fclaw2d_map_context_t* cont = get_map_context(domain);
+    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
+
     blockno = this_block_idx;
     compute_error(meqn,mbc,mx,my,&cont,blockno,xlower,ylower,dx,dy,
                   curvature,error_ptr);

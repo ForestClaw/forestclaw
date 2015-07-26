@@ -1,9 +1,10 @@
-      subroutine metric_tag4refinement(mx,my,mbc,meqn,xlower,ylower,
-     &      dx,dy,q,init_flag, blockno, tag_patch)
+      subroutine tag4refinement(mx,my,mbc,meqn,xlower,ylower,
+     &      dx,dy,blockno,q,tag_threshold, init_flag,tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
       integer blockno
+      double precision tag_threshold
       double precision xlower, ylower, dx, dy, xc
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qe
@@ -15,7 +16,7 @@
       tag_patch = 0
       do j = 1,my
          do i = 1,mx
-            if (q(i,j,3) .gt. 1.0d-3) then
+            if (q(i,j,2) .gt. tag_threshold) then
                tag_patch = 1
                return
             endif
@@ -47,7 +48,7 @@ c     # we would coarsen an initial grid.
       return
       do i = 1,mx
          do j = 1,my
-            if (q(i,j,3) .gt. 1) then
+            if (q(i,j,2) .gt. 1) then
                tag_patch = 1
                return
             endif

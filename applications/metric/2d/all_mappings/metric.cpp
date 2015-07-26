@@ -23,9 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "metric_user.H"
-#include "fclaw2d_forestclaw.H"
-#include "fclaw2d_clawpatch.H"
+#include "metric_user.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 
 
 typedef struct user_options
@@ -175,7 +175,7 @@ void run_program(fclaw_app_t* app)
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  init_domain_data(domain);
+  fclaw2d_domain_data_new(domain);
   fclaw2d_domain_set_app(domain,app);
 
   /* Link other routines that need to be included. */
@@ -185,9 +185,9 @@ void run_program(fclaw_app_t* app)
      Initialize and run the simulation
      -------------------------------------------------- */
 
-  amrinit(&domain);
-  amrrun(&domain);
-  amrreset(&domain);
+  fclaw2d_initialize(&domain);
+  fclaw2d_run(&domain);
+  fclaw2d_finalize(&domain);
 
   /* --------------------------------------------------
      Clean up.
