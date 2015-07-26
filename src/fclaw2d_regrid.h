@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_REGRID_H
 
 #include "forestclaw2d.h"
+#include <fclaw2d_regrid_default.h>
+#include <fclaw2d_regrid_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"

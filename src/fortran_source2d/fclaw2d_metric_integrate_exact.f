@@ -11,7 +11,7 @@
       double precision favg(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       integer compute_avg, ghost_only
 
-      deg = 4
+      deg = 2
       call integrate_exact(mx,my,mbc,xlower,ylower,dx,dy,
      &      blockno,deg,area,f,favg,compute_avg,ghost_only)
 
@@ -42,8 +42,8 @@
       call fclaw2d_map_c2m(map_context_ptr,
      &         blockno,xc1,yc1,x(2),y(2),z(2))
 
-      xc1 = xc + h
-      yc1 = yc
+      xc1 = xc
+      yc1 = yc + h
       call fclaw2d_map_c2m(map_context_ptr,
      &         blockno,xc1,yc1,x(3),y(3),z(3))
 
@@ -96,7 +96,8 @@ c     # ------------------------------------------------------
 
       do i = -mbc,mx+mbc+1
          do j = -mbc,my+mbc+1
-            if (is_area_interior2(mx,my,i,j)) then
+            if (is_area_interior2(mx,my,i,j)
+     &            .and. ghost_only .eq. 1) then
                cycle
             endif
             xlow = xlower + (i-1)*dx

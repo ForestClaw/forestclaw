@@ -227,6 +227,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
                              void *user)
 {
     fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -237,7 +238,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
     {
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
-            fclaw2d_metric_compute_area(domain,this_patch,blockno,patchno);
+            vt.metric_compute_area(domain,this_patch,blockno,patchno);
 
             /* Don't need any more manifold info for ghost patches */
             if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
@@ -263,6 +264,8 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_build_mode_t build_mode)
 {
     fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
     const amr_options_t *gparms = get_domain_parms(domain);
 
     fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
@@ -270,7 +273,8 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
     if (gparms->manifold)
     {
         fclaw2d_metric_average_area(domain,fine_patches,coarse_patch,
-                                      blockno, coarse_patchno, fine0_patchno);
+                                    blockno, coarse_patchno, fine0_patchno);
+
         fclaw2d_clawpatch_metric_setup(domain,coarse_patch,blockno,
                                        coarse_patchno);
     }
