@@ -367,6 +367,9 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     int i;
     fclaw2d_block_t *block;
 
+    FCLAW_ASSERT (!domain->just_adapted);
+    FCLAW_ASSERT (!domain->just_partitioned);
+
     for (i = 0; i < domain->num_blocks; ++i)
     {
         block = domain->blocks + i;
@@ -408,6 +411,10 @@ fclaw2d_domain_t *
 fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    FCLAW_ASSERT (domain->pp_owned);
+    P4EST_ASSERT (!domain->just_adapted);
+    P4EST_ASSERT (!domain->just_partitioned);
 
     /* propagate desired refinement level to neighbors */
     if (domain->smooth_refine)
@@ -536,13 +543,14 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     }
 
     /* do the adaptation */
-    FCLAW_ASSERT (domain->pp_owned);
     if (p4est_wrap_adapt (wrap))
     {
         fclaw2d_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
+        newd->just_adapted = 1;
+
         fclaw2d_domain_copy_parameters (newd, domain);
         return newd;
     }
@@ -558,12 +566,18 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     FCLAW_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (domain->just_adapted);
+    FCLAW_ASSERT (!domain->just_partitioned);
+
+    domain->just_adapted = 0;
     if (p4est_wrap_partition (wrap, weight_exponent))
     {
         fclaw2d_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
+        newd->just_partitioned = 1;
+
         fclaw2d_domain_copy_parameters (newd, domain);
         return newd;
     }
@@ -579,6 +593,11 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     FCLAW_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (!domain->just_adapted);
+    FCLAW_ASSERT (domain->just_partitioned);
+
+    domain->just_partitioned = 0;
+
     p4est_wrap_complete (wrap);
 }
 

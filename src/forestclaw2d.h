@@ -120,6 +120,9 @@ struct fclaw2d_domain
     int64_t global_num_patches_before;  /* Number of patches on lower procs */
     int global_minlevel, global_maxlevel;       /* global, well-defined */
 
+    int just_adapted;           /**< true after non-trivial adaptation */
+    int just_partitioned;       /**< true after non-trivial partition */
+
     int num_blocks;
     fclaw2d_block_t *blocks;    /* allocated storage */
     int num_exchange_patches;   /* # my patches relevant to other procs.
