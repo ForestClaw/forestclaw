@@ -86,8 +86,8 @@ void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
                                const double* dx, const double* dy,
                                const double* xlower, const double* ylower,
                                const int* blockno, double area[],
-                               const int* level, const int* maxlevel,
-                               const int* refratio, const int* ghost_only);
+                               const int* quadsize, double quadstore[],
+                               const int* ghost_only);
 
 #define FCLAW2D_FORT_INTEGRATE_EXACT FCLAW_F77_FUNC(fclaw2d_fort_integrate_exact, \
                                                     FCLAW2D_FORT_INTEGRATE_EXACT)

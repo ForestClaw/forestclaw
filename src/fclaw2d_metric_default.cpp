@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw_math.h>
 #include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
@@ -63,10 +64,14 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
     /* Could make this a virtual function, but what is the signature?
        vt.fort_compute_area(...) */
 
+    int m = pow_int(refratio,maxlevel-level);
+    double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
+
     int ghost_only = 0;
     FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &level, &maxlevel, &refratio,
-                              &ghost_only);
+                              &blockno, area, &m, quadstore, &ghost_only);
+
+    FCLAW_FREE(quadstore);
 }
 
 void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
@@ -117,10 +122,13 @@ void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t* domain,
     int refratio = gparms->refratio;
     int ghost_only = 1;
 
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &level, &maxlevel, &refratio,
-                              &ghost_only);
+    int m = pow_int(refratio,maxlevel-level);
+    double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 
+    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, area, &m, quadstore,
+                              &ghost_only);
+    FCLAW_FREE(quadstore);
 }
 
 void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t* domain,

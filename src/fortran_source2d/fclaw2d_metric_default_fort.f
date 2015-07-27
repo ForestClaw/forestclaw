@@ -55,11 +55,12 @@ c              # Physical locations of cell centers
       end
 
       subroutine fclaw2d_fort_compute_area(mx,my,mbc,dx,dy,
-     &      xlower, ylower, blockno,area, level,maxlevel,
-     &      refratio,ghost_only)
+     &      xlower, ylower, blockno,area, quadsize, quadstore,
+     &      ghost_only)
       implicit none
 
-      integer mx,my,mbc,level, refratio,maxlevel, blockno
+      integer mx,my,mbc,blockno, quadsize
+      double precision quadstore(0:quadsize,0:quadsize,3)
       double precision dx,dy, xlower, ylower
       integer ghost_only
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -72,23 +73,23 @@ c              # Physical locations of cell centers
 c        # We don't need to compute areas all the way to the
 c        # finest level.
          call fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
-     &         xlower, ylower, blockno,area, level,maxlevel,
-     &         refratio,ghost_only)
+     &         xlower, ylower, blockno,area, ghost_only)
       else
          call fclaw2d_fort_compute_area_general(mx,my,mbc,dx,dy,
-     &         xlower, ylower, blockno,area, level,maxlevel,
-     &         refratio,ghost_only)
+     &         xlower, ylower, blockno,area,quadsize,quadstore,
+     &         ghost_only)
       endif
 
       end
 
-      subroutine fclaw2d_fort_compute_area_general(mx,my,mbc,dx,dy,
-     &      xlower, ylower, blockno,area, level,
-     &      maxlevel,refratio,ghost_only)
+      subroutine fclaw2d_fort_compute_area_general(mx,my,mbc,
+     &      dx,dy, xlower, ylower, blockno,area,
+     &      quadsize, quadstore,ghost_only)
       implicit none
 
-      integer mx,my,mbc,level, refratio,maxlevel, blockno
+      integer mx,my,mbc,blockno, quadsize
       double precision dx,dy, xlower, ylower
+      double precision quadstore(0:quadsize,0:quadsize,3)
       integer ghost_only
 
 
@@ -105,14 +106,11 @@ c        # finest level.
       integer k, m
       logical is_area_interior
 
-      integer*8 map_context_ptr, get_context
+      integer*8 cont, get_context
 
-      map_context_ptr = get_context()
+      cont = get_context()
 
-      rfactor = 1
-      do ir = level,maxlevel-1
-         rfactor = rfactor*refratio
-      enddo
+      rfactor = quadsize
       dxf = dx/rfactor
       dyf = dy/rfactor
 
@@ -127,22 +125,32 @@ c     # than in the rest of the mesh.
             endif
             xe = xlower + (i-1)*dx
             ye = ylower + (j-1)*dy
-            sum_area = 0.d0
 
-            do ii = 1,rfactor
-               do jj = 1,rfactor
-                  xef = xe + (ii - 1)*dxf
-                  yef = ye + (jj - 1)*dyf
+            do ii = 0,rfactor
+               do jj = 0,rfactor
+                  xef = xe + ii*dxf
+                  yef = ye + jj*dyf
+
+                  call fclaw2d_map_c2m(cont,
+     &                  blockno,xef,yef,xp1,yp1,zp1)
+
+                  quadstore(ii,jj,1) = xp1
+                  quadstore(ii,jj,2) = yp1
+                  quadstore(ii,jj,3) = zp1
+               enddo
+            enddo
+
+            sum_area = 0.d0
+            do ii = 0,rfactor-1
+               do jj = 0,rfactor-1
                   do icell = 0,1
                      do jcell = 0,1
-                        xcorner = xef + icell*dxf
-                        ycorner = yef + jcell*dyf
-                        call fclaw2d_map_c2m(map_context_ptr,
-     &                        blockno,xcorner,ycorner,xp1,yp1,zp1)
-c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
-                        quad(icell,jcell,1) = xp1
-                        quad(icell,jcell,2) = yp1
-                        quad(icell,jcell,3) = zp1
+                        quad(icell,jcell,1) =
+     &                        quadstore(ii+icell,jj+jcell,1)
+                        quad(icell,jcell,2) =
+     &                        quadstore(ii+icell,jj+jcell,2)
+                        quad(icell,jcell,3) =
+     &                        quadstore(ii+icell,jj+jcell,3)
                      enddo
                   enddo
                   sum_area = sum_area + get_area_approx(quad)
@@ -156,11 +164,10 @@ c                        call mapc2m(xcorner,ycorner,xp1,yp1,zp1)
 
 
       subroutine fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
-     &      xlower, ylower, blockno,area, level,
-     &      maxlevel,refratio,ghost_only)
+     &      xlower, ylower, blockno,area,ghost_only)
       implicit none
 
-      integer mx,my,mbc,level, refratio,maxlevel, blockno
+      integer mx,my,mbc,blockno
       double precision dx,dy, xlower, ylower
       integer ghost_only
 

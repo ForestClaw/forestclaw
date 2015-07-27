@@ -11,7 +11,7 @@
       double precision favg(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       integer compute_avg, ghost_only
 
-      deg = 2
+      deg = 4
       call integrate_exact(mx,my,mbc,xlower,ylower,dx,dy,
      &      blockno,deg,area,f,favg,compute_avg,ghost_only)
 
@@ -23,39 +23,55 @@
       double precision xc,yc,txi(3),teta(3)
       integer blockno
       double precision norm_cross
-      double precision x(3),y(3),z(3),h
-      double precision xc1,yc1
+      double precision h,h2, xc1, yc1
+      double precision a(-4:4),v(-4:4)
+      double precision x(-4:4),y(-4:4),z(-4:4)
+      integer n, m, i
 
-      integer*8 map_context_ptr, get_context
+      integer*8 cont, get_context
 
-      map_context_ptr = get_context()
+c     # Fourth order fd approximation to the first derivative
+      data n /5/
+      data a /0, 0, 8.333333333333333d-02, -6.666666666666666d-01, 0,
+     &      6.666666666666666d-01, -8.333333333333333d-02, 0, 0/
 
-      h = 1.0e-8
+c     # Second order fd approximation
+c     data n /3/
+c     data a /0,0,0,-0.5d0, 0, 0.5d0, 0, 0, 0/
+
+      cont = get_context()
+
+      m = (n-1)/2
+      h = 1.0d-4
+
+      do i= 1,3
+         txi(i) = 0
+         teta(i) = 0
+      enddo
+
+
+      yc1 = yc
+      do i = -m,m
+         if (i .eq. 0) cycle
+         xc1 = xc + h*i
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc1,yc1,x(i),y(i),z(i))
+         txi(1) = txi(1) + a(i)*x(i)
+         txi(2) = txi(2) + a(i)*y(i)
+         txi(3) = txi(3) + a(i)*z(i)
+      enddo
 
       xc1 = xc
-      yc1 = yc
-      call fclaw2d_map_c2m(map_context_ptr,
-     &         blockno,xc1,yc1,x(1),y(1),z(1))
+      do i = -m,m
+         yc1 = yc + h*i
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc1,yc1,x(i),y(i),z(i))
+         teta(1) = teta(1) + a(i)*x(i)
+         teta(2) = teta(2) + a(i)*y(i)
+         teta(3) = teta(3) + a(i)*z(i)
+      enddo
 
-      xc1 = xc + h
-      yc1 = yc
-      call fclaw2d_map_c2m(map_context_ptr,
-     &         blockno,xc1,yc1,x(2),y(2),z(2))
-
-      xc1 = xc
-      yc1 = yc + h
-      call fclaw2d_map_c2m(map_context_ptr,
-     &         blockno,xc1,yc1,x(3),y(3),z(3))
-
-      txi(1) = (x(2) - x(1))/h
-      txi(2) = (y(2) - y(1))/h
-      txi(3) = (z(2) - z(1))/h
-
-      teta(1) = (x(3) - x(1))/h
-      teta(2) = (y(3) - y(1))/h
-      teta(3) = (z(3) - z(1))/h
-
-      area_element_exact = norm_cross(txi,teta)
+      area_element_exact = norm_cross(txi,teta)/(h*h)
 
       end
 
@@ -92,7 +108,7 @@ c     # ------------------------------------------------------
 
       integer i,j,ii,jj, k
       double precision xlow, ylow, a,b,c,d,dx,dy, area1
-      double precision quad_square
+      double precision quad_square, quad_square_area
 
       do i = -mbc,mx+mbc+1
          do j = -mbc,my+mbc+1
@@ -111,8 +127,8 @@ c     # ------------------------------------------------------
      &               blockno,area1,compute_avg)
                area(i,j) = area1
             else
-               area(i,j) = quad_square(one,a,b,c,d,deg,
-     &               blockno,area1,compute_avg)
+               area(i,j) = quad_square_area(a,b,c,d,deg,
+     &               blockno)
             endif
          enddo
       enddo
@@ -172,6 +188,39 @@ c     # ------------------------------------------------------
          quad_square = fint2/area2
       endif
       area = area2
+
+      end
+
+      double precision function quad_square_area(a,b,c,d,
+     &      deg,blockno)
+      implicit none
+
+      integer deg
+      integer blockno
+      double precision a,b, c,d
+      double precision x(8),wx(8), xc,yc,qn
+      double precision y(8),wy(8), qn2,fc
+      double precision fint2,fint1,area2,h
+      double precision area_element_exact, ae
+      integer i,j
+
+      call gltable2(x,wx,deg,a,b)
+      call gltable2(y,wy,deg,c,d)
+
+      fint2 = 0
+      do i = 1,deg
+         xc = x(i)
+         fint1 = 0
+         do j = 1,deg
+            yc = y(j)
+            h = wy(j)
+            ae = area_element_exact(xc,yc,blockno)
+            fint1 = fint1 + ae*h
+         enddo
+         fint2 = fint2 + wx(i)*fint1
+      enddo
+
+      quad_square_area = fint2
 
       end
 
