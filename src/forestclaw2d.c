@@ -1286,7 +1286,7 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
         {
             ostay = uof + ul - oskip;
             ostay = SC_MAX (ostay, 0);
-            ostay = SC_MIN (ostay, nbp);
+            ostay = SC_MIN (ostay, obp);
         }
         FCLAW_ASSERT (0 <= opre && opre <= ostay && ostay <= obp);
 
