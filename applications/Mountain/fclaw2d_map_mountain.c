@@ -3,14 +3,6 @@
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
 
-#define MAPC2M_MOUNTAIN FCLAW_F77_FUNC (mapc2m_mountain,MAPC2M_MOUNTAIN)
-void MAPC2M_MOUNTAIN (int* blockno, double *xc, double *yc,
-                      double *xp, double *yp, double *zp, double *scale);
-
-#define MOUNTAIN_HEIGHT FCLAW_F77_FUNC (mountain_height,MOUNTAIN_HEIGHT)
-double MOUNTAIN_HEIGHT (double *xp);
-
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -18,6 +10,13 @@ extern "C"
 }
 #endif
 #endif
+
+#define MAPC2M_MOUNTAIN FCLAW_F77_FUNC (mapc2m_mountain,MAPC2M_MOUNTAIN)
+void MAPC2M_MOUNTAIN (int* blockno, double *xc, double *yc,
+                      double *xp, double *yp, double *zp, double *scale);
+
+#define MOUNTAIN_HEIGHT FCLAW_F77_FUNC (mountain_height,MOUNTAIN_HEIGHT)
+double MOUNTAIN_HEIGHT (double *xp);
 
 static int
 fclaw2d_map_query_mountain (fclaw2d_map_context_t * cont, int query_identifier)
