@@ -1202,12 +1202,11 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
                                     void *user)
 {
     int uf, ul, uof;
-    int oskip, nskip;
-    int nbp;
-    int npre, nstay;
+    int obp, nbp, oskip, nskip;
+    int opre, npre, ostay, nstay;
     int i, oj, nj;
 #ifdef FCLAW_ENABLE_DEBUG
-    int obp, odone, ndone;
+    int odone, ndone;
 #endif
     fclaw2d_block_t *old_block, *new_block;
     fclaw2d_patch_t *old_patch, *new_patch;
@@ -1270,17 +1269,30 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
             continue;
         }
         old_block = old_domain->blocks + i;
+        obp = old_block->num_patches;
         oskip = old_block->num_patches_before;
 #ifdef FCLAW_ENABLE_DEBUG
-        obp = old_block->num_patches;
         odone = 0;
 #endif
 
-        /* Iterate over the patches that stay local */
-        oj = uof - oskip;
-        FCLAW_ASSERT (0 <= oj);
-        FCLAW_ASSERT (oj + ul <= obp);
-        for (; nj < nstay; ++oj, ++nj)
+        /* We may have preexisting patches.  Figure out the source range */
+        opre = uof - oskip;
+        opre = SC_MAX (opre, 0);
+        if (opre >= obp)
+        {
+            opre = ostay = obp;
+        }
+        else
+        {
+            ostay = uof + ul - oskip;
+            ostay = SC_MAX (ostay, 0);
+            ostay = SC_MIN (ostay, nbp);
+        }
+        FCLAW_ASSERT (0 <= opre && opre <= ostay && ostay <= obp);
+
+        /* Iterate over the patches that stay local, if any */
+        FCLAW_ASSERT (ostay - opre == nstay - npre);
+        for (oj = opre; nj < nstay; ++oj, ++nj)
         {
             FCLAW_ASSERT (oj < old_block->num_patches);
             FCLAW_ASSERT (nj < new_block->num_patches);
@@ -1293,6 +1305,8 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
             ++ndone;
 #endif
         }
+        FCLAW_ASSERT (oj == ostay);
+        FCLAW_ASSERT (odone <= obp);
 
         /* Iterate over second set of newly received patches */
         for (; nj < nbp; ++nj)
@@ -1306,9 +1320,8 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
         }
 
         /* consistency checks */
-        FCLAW_ASSERT (odone <= obp);
-        FCLAW_ASSERT (ndone == nbp);
         FCLAW_ASSERT (nj == new_block->num_patches);
+        FCLAW_ASSERT (ndone == nbp);
     }
 }
 
