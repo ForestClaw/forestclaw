@@ -38,6 +38,39 @@ extern "C"
 #endif
 #endif
 
+static
+void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
+                            fclaw2d_patch_t * old_patch,
+                            fclaw2d_domain_t * new_domain,
+                            fclaw2d_patch_t * new_patch,
+                            int blockno,
+                            int old_patchno, int new_patchno,
+                            void *user)
+{
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+
+    if (old_patch != NULL)
+    {
+        FCLAW_ASSERT(old_patch->xlower == new_patch->xlower);
+        FCLAW_ASSERT(old_patch->ylower == new_patch->ylower);
+        FCLAW_ASSERT(old_patch->xupper == new_patch->xupper);
+        FCLAW_ASSERT(old_patch->yupper == new_patch->yupper);
+
+        new_patch->user = old_patch->user;
+        old_patch->user = NULL;
+        ++ddata_old->count_delete_clawpatch;
+        ++ddata_new->count_set_clawpatch;
+    }
+    else
+    {
+        /* We need to rebuild the patch from scratch. 'user' contains
+           the packed data received from remote processor. */
+        cb_fclaw2d_clawpatch_partition_unpack(new_domain,new_patch,
+                                              blockno,new_patchno,user);
+    }
+}
+
 
 /* --------------------------------------------------------------------------
    Public interface
@@ -83,9 +116,19 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
         /* TODO: for all (patch i) { unpack numerical data from patch_data[i] } */
         fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain_partitioned);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
+
+        /* Old version */
         fclaw2d_domain_iterate_patches(domain_partitioned,
                                        cb_fclaw2d_clawpatch_partition_unpack,
                                        (void *) patch_data);
+
+#if 0
+        /* New version? */
+        fclaw2d_domain_iterate_partitioned(*domain,domain_partitioned,
+                                           cb_partition_transfer,
+                                           NULL);
+#endif
+
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 
         /* then the old domain is no longer necessary */

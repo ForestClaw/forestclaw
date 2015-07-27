@@ -154,18 +154,24 @@ void FArrayBox::define(const Box& a_box, int a_fields)
 
 void FArrayBox::copyToMemory(double *data)
 {
+    memcpy(data,m_data,m_size*sizeof(double));
+#if 0
     for(int i = 0; i < m_size; i++)
     {
         data[i] = m_data[i];
     }
+#endif
 }
 
 void FArrayBox::copyFromMemory(double *data)
 {
+    memcpy(m_data,data,m_size*sizeof(double));
+#if 0
     for(int i = 0; i < m_size; i++)
     {
         m_data[i] = data[i];
     }
+#endif
 }
 
 
