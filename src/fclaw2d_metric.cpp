@@ -23,11 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_REGRID_DEFAULT_H
-#define FCLAW2D_REGRID_DEFAULT_H
+#include <fclaw2d_global.h>
 
-#include <forestclaw2d.h>
-#include <fclaw2d_regrid_default_fort.h>
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,32 +38,48 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno,
-                                  int initflag);
 
-int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno);
+void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *fine_patches,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 int blockno, int coarse_patchno,
+                                 int fine0_patchno)
 
-void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_siblings,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int fine_patchno,
-                                   int coarse_patchno);
+{
+    int mx,my, mbc;
+    double xlower,ylower,dx,dy;
 
-void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t *coarse_patch,
-                                     fclaw2d_patch_t* fine_patch,
-                                     int this_blockno, int coarse_patchno,
-                                     int fine_patchno);
+    double *areacoarse, *areafine;
+    int igrid, fine_patchno;
+    fclaw2d_patch_t *fine_patch;
+
+    fclaw2d_clawpatch_grid_data(domain,coarse_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
+
+    for(igrid = 0; igrid < 4; igrid++)
+    {
+        fine_patch = &fine_patches[igrid];
+        fine_patchno = fine0_patchno + igrid;
+
+        areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+
+        FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
+    }
+
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    /* Use either exact or approximate method */
+    vt.metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
+}
+
+
 
 #ifdef __cplusplus
 #if 0
 {
 #endif
 }
-#endif
-
 #endif

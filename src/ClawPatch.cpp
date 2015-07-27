@@ -3,6 +3,7 @@
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_neighbors_fort.h>
+#include <fclaw2d_metric_default_fort.h>
 
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
@@ -77,10 +78,20 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata.define(box, m_meqn);
     m_griddata_time_interpolated.define(box, m_meqn);
 
-    if (m_manifold)
+    // Set up storage for metric terms, if needed.
+    if (gparms->manifold)
     {
-        setup_manifold(a_level,gparms,build_mode);
+        setup_area_storage();
+        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        {
+            /* Don't need any more manifold info for ghost patches */
+            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+            {
+                setup_metric_storage();
+            }
+        }
     }
+
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
     ClawPatch::pack_layers = 4;
 
@@ -510,29 +521,6 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
 
 
 /* ----------------------------------------------------------------
-   Phyisical boundary conditions
-   ---------------------------------------------------------------- */
-
-void ClawPatch::set_phys_corner_ghost(const int& a_corner, const int a_mthbc[],
-                                      const double& t, const double& dt)
-{
-    double *q = m_griddata.dataPtr();
-
-    /* This routine doesn't do anything ... */
-    set_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, q, a_corner, t, dt, a_mthbc);
-}
-
-void ClawPatch::exchange_phys_face_corner_ghost(const int& a_corner, const int& a_side,
-                                                ClawPatch* cp)
-{
-    double *this_q = m_griddata.dataPtr();
-    double *neighbor_q = cp->m_griddata.dataPtr();
-
-    exchange_phys_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, this_q, neighbor_q,
-                                a_corner, a_side);
-}
-
-/* ----------------------------------------------------------------
    Time interpolation
    ---------------------------------------------------------------- */
 void ClawPatch::setup_for_time_interpolation(const double& alpha)
@@ -562,15 +550,30 @@ void ClawPatch::set_block_corner_count(const int icorner, const int block_corner
     m_block_corner_count[icorner] = block_corner_count;
 }
 
-void ClawPatch::setup_manifold(const int& level,
-                               const amr_options_t *gparms,
-                               fclaw2d_build_mode_t build_mode)
+void ClawPatch::setup_area_storage()
 {
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int maxlevel = gparms->maxlevel;
-    int refratio = gparms->refratio;
+    int mx = m_mx;
+    int my = m_my;
+    int mbc = m_mbc;
+
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = -mbc;
+    }
+    ur[0] = mx + mbc + 1;
+    ur[1] = my + mbc + 1;
+
+    Box box_p(ll,ur);
+    m_area.define(box_p,1);
+}
+
+void ClawPatch::setup_metric_storage()
+{
+    int mx = m_mx;
+    int my = m_my;
+    int mbc = m_mbc;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -582,23 +585,6 @@ void ClawPatch::setup_manifold(const int& level,
     ur[1] = my + mbc + 1;
 
     Box box_p(ll,ur);   /* Store cell centered values here */
-
-    // Compute area of the mesh cell.
-    m_area.define(box_p,1);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-    {
-        return;
-    }
-
-    double *area = m_area.dataPtr();
-    compute_area_(mx, my, mbc, m_dx, m_dy,m_xlower, m_ylower,
-                  m_blockno, area, level, maxlevel, refratio);
-
-    if (build_mode == FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED)
-    {
-        return;
-    }
 
     /* Mesh cell centers of physical mesh */
     m_xp.define(box_p,1);
@@ -626,37 +612,7 @@ void ClawPatch::setup_manifold(const int& level,
     m_xface_tangents.define(box_d,3);
     m_yface_tangents.define(box_d,3);
     m_edge_lengths.define(box_d,2);
-
-
-    /* Get pointers to pass to mesh routine */
-    double *xp = m_xp.dataPtr();
-    double *yp = m_yp.dataPtr();
-    double *zp = m_zp.dataPtr();
-    double *xd = m_xd.dataPtr();
-    double *yd = m_yd.dataPtr();
-    double *zd = m_zd.dataPtr();
-
-    double *xnormals = m_xface_normals.dataPtr();
-    double *ynormals = m_yface_normals.dataPtr();
-    double *xtangents = m_xface_tangents.dataPtr();
-    double *ytangents = m_yface_tangents.dataPtr();
-    double *surfnormals = m_surf_normals.dataPtr();
-    double *curvature = m_curvature.dataPtr();
-    double *edge_lengths = m_edge_lengths.dataPtr();
-
-    /* Compute centers and corners of mesh cell */
-    setup_mesh_(mx,my,mbc,m_xlower,m_ylower,m_dx,m_dy,m_blockno,
-                xp,yp,zp,xd,yd,zd);
-
-    compute_normals_(mx,my,mbc,xp,yp,zp,xd,yd,zd,
-                     xnormals,ynormals);
-
-    compute_tangents_(mx,my,mbc,xd,yd,zd,xtangents,ytangents,edge_lengths);
-
-    compute_surf_normals_(mx,my,mbc,xnormals,ynormals,edge_lengths,
-                          curvature, surfnormals,area);
 }
-
 
 /* ----------------------------------------------------------------
    Output and diagnostics

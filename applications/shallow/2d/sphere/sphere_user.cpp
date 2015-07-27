@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "latlong_user.H"
+#include "sphere_user.hpp"
 #include <fclaw2d_forestclaw.h>
 
 #include <fc2d_clawpack46.h>
@@ -33,7 +33,7 @@ static fc2d_clawpack46_vtable_t classic_claw;
 
 static fclaw2d_vtable_t vt;
 
-void latlong_link_solvers(fclaw2d_domain_t *domain)
+void sphere_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
     fc2d_clawpack46_init_vtable(&classic_claw);
@@ -41,13 +41,15 @@ void latlong_link_solvers(fclaw2d_domain_t *domain)
     vt.problem_setup = &fc2d_clawpack46_setprob;
     classic_claw.setprob = &SETPROB;
 
-    vt.patch_setup = &latlong_patch_manifold_setup;
+    vt.patch_setup = &sphere_patch_manifold_setup;
     /* classic_claw.setaux = &SETAUX_SPHERE; */
 
     vt.patch_initialize = &fc2d_clawpack46_qinit;
     classic_claw.qinit = &QINIT;
 
     vt.patch_physical_bc = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
+
+    vt.metric_compute_area = &fclaw2d_metric_compute_area;
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
     classic_claw.b4step2 = &B4STEP2;
@@ -60,7 +62,7 @@ void latlong_link_solvers(fclaw2d_domain_t *domain)
 
 }
 
-void latlong_patch_manifold_setup(fclaw2d_domain_t *domain,
+void sphere_patch_manifold_setup(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)

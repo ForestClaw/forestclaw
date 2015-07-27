@@ -491,9 +491,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* --------------------------------------------------------------
            Start send ...
            ------------------------------------------------------------*/
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
         fclaw2d_exchange_ghost_patches_begin(domain,minlevel,maxlevel,time_interp);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_BEGIN]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
 
         /* --------------------------------------------------------------
            Finish exchanges in the interior of the grid.
@@ -523,9 +523,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            Parallel ghost patch exchange
            ------------------------------------------------------------- */
 
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
         fclaw2d_exchange_ghost_patches_end(domain,minlevel,maxlevel,time_interp);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
 
         /* -------------------------------------------------------------
            Repeat above, but now with parallel ghost cells.

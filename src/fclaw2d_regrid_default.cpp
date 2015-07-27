@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_metric_default_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,10 +37,10 @@ extern "C"
 #endif
 
 
-int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
-                                 int blockno, int patchno,
-                                 int initflag)
+int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int blockno, int patchno,
+                                  int initflag)
 {
     fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn;
@@ -66,10 +67,10 @@ int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *fine_patches,
-                                 int blockno,
-                                 int patchno)
+int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *fine_patches,
+                                  int blockno,
+                                  int patchno)
 {
     fclaw2d_vtable_t vt;
 
@@ -108,33 +109,12 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Callback routine for tagging
    ----------------------------------------------------------------- */
-void fclaw2d_patch_copy2samesize(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t *old_patch,
-                                 fclaw2d_patch_t* new_patch,
-                                 int blockno, int old_patchno,
-                                 int new_patchno)
-{
-    int mx,my,mbc,meqn;
-    double *qold, *qnew;
-    const amr_options_t* gparms;
 
-    gparms = get_domain_parms(domain);
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
-
-    fclaw2d_clawpatch_soln_data(domain,old_patch,&qold,&meqn);
-    fclaw2d_clawpatch_soln_data(domain,new_patch,&qnew,&meqn);
-
-    memcpy(qnew,qold,meqn*(mx+2*mbc)*(my+2*mbc)*sizeof(double));
-}
-
-
-void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t *coarse_patch,
-                                    fclaw2d_patch_t* fine_patches,
-                                    int this_blockno, int coarse_patchno,
-                                    int fine0_patchno)
+void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t *coarse_patch,
+                                     fclaw2d_patch_t* fine_patches,
+                                     int this_blockno, int coarse_patchno,
+                                     int fine0_patchno)
 
 {
     fclaw2d_vtable_t vt;
@@ -179,11 +159,16 @@ void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
     }
 }
 
-void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *fine_patches,
-                                  fclaw2d_patch_t *coarse_patch,
-                                  int blockno, int fine0_patchno,
-                                  int coarse_patchno)
+/* It seems that there is only one way to average the solution, but
+   what about other things the user might want to do?   Maybe we need
+   something like "average from fine" routine which handles more generic
+   things, including area averaging, and maybe something to do with averaging
+   stuff in aux arrays. */
+void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *fine_patches,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno, int fine0_patchno,
+                                   int coarse_patchno)
 
 {
     fclaw2d_vtable_t vt;
@@ -225,7 +210,6 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
 
     }
 }
-
 
 #ifdef __cplusplus
 #if 0

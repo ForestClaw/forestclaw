@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_output_ascii.h>
 #include <fclaw2d_regrid_default.h>
+#include <fclaw2d_metric_default.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -71,15 +72,47 @@ typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
                                                      double t,
                                                      double dt);
 
-typedef int (*fclaw2d_patch_tag4refinement_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_domain_t *domain,
+                                            fclaw2d_patch_t *this_patch,
+                                            int blockno,
+                                            int patchno);
+
+typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_domain_t *domain,
+                                              fclaw2d_patch_t* this_patch,
+                                              int blockno,
+                                              int patchno);
+
+typedef void (*fclaw2d_metric_area_set_ghost_t)(fclaw2d_domain_t *domain,
+                                                fclaw2d_patch_t* this_patch,
+                                                int blockno,
+                                                int patchno);
+
+typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
+                                                 fclaw2d_patch_t *this_patch,
+                                                 int blockno,
+                                                 int patchno);
+
+typedef int (*fclaw2d_regrid_tag4refinement_t)(fclaw2d_domain_t *domain,
                                               fclaw2d_patch_t *this_patch,
                                               int this_block_idx, int this_patch_idx,
                                               int initflag);
 
-typedef int (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
-                                                     fclaw2d_patch_t *this_patch,
-                                                     int this_blockno,
-                                                     int this_patchno);
+typedef int (*fclaw2d_regrid_tag4coarsening_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *this_patch,
+                                               int this_blockno,
+                                               int this_patchno);
+
+typedef void (*fclaw2d_regrid_interpolate2fine_t)(fclaw2d_domain_t* domain,
+                                                 fclaw2d_patch_t *coarse_patch,
+                                                 fclaw2d_patch_t* fine_patches,
+                                                 int this_blockno, int coarse_patchno,
+                                                 int fine_patchno);
+
+typedef void (*fclaw2d_regrid_average2coarse_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *fine_siblings,
+                                               fclaw2d_patch_t *coarse_patch,
+                                               int blockno, int fine_patchno,
+                                               int coarse_patchno);
 
 typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
                                              int iframe);
@@ -91,23 +124,7 @@ typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_domain_t *domain,
                                            int iframe,int patch_num,
                                            int level);
 
-typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_domain_t* domain,
-                                                 fclaw2d_patch_t *coarse_patch,
-                                                 fclaw2d_patch_t* fine_patches,
-                                                 int this_blockno, int coarse_patchno,
-                                                 int fine_patchno);
 
-typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_domain_t *domain,
-                                               fclaw2d_patch_t *fine_siblings,
-                                               fclaw2d_patch_t *coarse_patch,
-                                               int blockno, int fine_patchno,
-                                               int coarse_patchno);
-
-typedef void (*fclaw2d_patch_copy2samesize_t)(fclaw2d_domain_t* domain,
-                                              fclaw2d_patch_t *old_patch,
-                                              fclaw2d_patch_t* new_patch,
-                                              int blockno, int old_patchno,
-                                              int new_patchno);
 
 typedef void (*fclaw2d_run_diagnostics_t)(fclaw2d_domain_t *domain, const double t);
 
@@ -120,26 +137,40 @@ typedef struct fclaw2d_vtable
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;
 
-    fclaw2d_patch_copy2samesize_t      patch_copy2samesize;
+    /* Building patches, including functions to create metric terms */
+    fclaw2d_metric_setup_mesh_t        metric_setup_mesh;    /* wrapper */
+    fclaw2d_fort_setup_mesh_t          fort_setup_mesh;
 
-    fclaw2d_patch_average2coarse_t     patch_average2coarse;
+    fclaw2d_metric_compute_area_t      metric_compute_area;  /* wrapper */
+    fclaw2d_metric_area_set_ghost_t    metric_area_set_ghost;
+
+    fclaw2d_metric_compute_normals_t    metric_compute_normals;  /* wrapper */
+    fclaw2d_fort_compute_normals_t      fort_compute_normals;
+    fclaw2d_fort_compute_tangents_t     fort_compute_tangents;
+    fclaw2d_fort_compute_surf_normals_t fort_compute_surf_normals;
+
+
+    /* regridding functions */
+    fclaw2d_regrid_average2coarse_t    regrid_average2coarse;
     fclaw2d_fort_average2coarse_t      fort_average2coarse;
 
-    fclaw2d_patch_interpolate2fine_t   patch_interpolate2fine;
+    fclaw2d_regrid_interpolate2fine_t  regrid_interpolate2fine;
     fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
 
-    fclaw2d_patch_tag4refinement_t     patch_tag4refinement;
+    fclaw2d_regrid_tag4refinement_t    regrid_tag4refinement;
     fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
 
-    fclaw2d_patch_tag4coarsening_t     patch_tag4coarsening;
+    fclaw2d_regrid_tag4coarsening_t    regrid_tag4coarsening;
     fclaw2d_fort_tag4coarsening_t      fort_tag4coarsening;
 
+    /* output functions */
     fclaw2d_patch_write_header_t       write_header;
     fclaw2d_fort_write_header_t        fort_write_header;
 
     fclaw2d_patch_write_file_t         patch_write_file;
     fclaw2d_fort_write_file_t          fort_write_file;
 
+    /* diagnostic functions */
     fclaw2d_run_diagnostics_t          run_diagnostics;
 
 } fclaw2d_vtable_t;

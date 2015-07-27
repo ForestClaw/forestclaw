@@ -72,25 +72,6 @@ typedef struct fclaw2d_exchange_info
     fclaw2d_grid_type_t grid_type;
 } fclaw2d_exchange_info_t;
 
-#if 0
-void level_exchange (fclaw2d_domain_t * domain, int a_level);
-
-void exchange_with_coarse (fclaw2d_domain_t * domain, int a_level,
-                           double t_level, fclaw_bool time_interp);
-
-void update_ghost_all_levels(fclaw2d_domain_t* domain,
-                             fclaw2d_timer_names_t running);
-
-void get_phys_boundary (fclaw2d_domain_t * domain,
-                        int this_block_idx,
-                        int this_patch_idx, fclaw_bool * intersects_bc);
-
-/* In fclaw2d_corner_neighbors.cpp */
-void fclaw2d_ghost_get_block_boundary(fclaw2d_domain_t * domain,
-                                      fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block);
-#endif
-
 void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
                     int this_block_idx,
@@ -109,11 +90,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
-#if 0
-void fclaw2d_ghost_copy4timeinterp(fclaw2d_domain_t* domain,
-                                   int level);
-
-#endif
 #define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
 void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *meqn, int *mint,

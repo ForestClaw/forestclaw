@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_metric_default.h>
+#include <fclaw2d_metric.h>
 
 #include <ClawPatch.hpp>
 
@@ -39,7 +41,7 @@ void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 }
 
 /* ------------------------------------------------------------
-   General access functions
+   Solution access functions
    ---------------------------------------------------------- */
 
 /* We also have a fclaw2d_patch_get_cp(this_patch) */
@@ -63,29 +65,6 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
     *ylower = cp->ylower();
     *dx = cp->dx();
     *dy = cp->dy();
-}
-
-void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch,
-                                   double **xp, double **yp, double **zp,
-                                   double **xd, double **yd, double **zd,
-                                   double **area)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *xp = cp->xp();
-    *yp = cp->yp();
-    *zp = cp->zp();
-    *xd = cp->xd();
-    *yd = cp->yd();
-    *zd = cp->zd();
-    *area = cp->area();
-}
-
-double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->area();
 }
 
 void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
@@ -139,6 +118,53 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
     cp->save_current_step();
 }
 
+/* ------------------------------------------------------------------
+   Miscellaneous
+ ------------------------------------------------------------------ */
+int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->block_corner_count();
+}
+
+/* ------------------------------------------------------------------
+   Manifold setup and access
+ ------------------------------------------------------------------ */
+
+static
+void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch,
+                                      int blockno,
+                                      int patchno)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    /* vt.patch_manifold_setup_mesh(...) */
+    fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
+
+    /* vt.patch_manifold_compute_normals(...) */
+    fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
+}
+
+
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch,
+                                   double **xp, double **yp, double **zp,
+                                   double **xd, double **yd, double **zd,
+                                   double **area)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *xp = cp->xp();
+    *yp = cp->yp();
+    *zp = cp->zp();
+    *xd = cp->xd();
+    *yd = cp->yd();
+    *zd = cp->zd();
+    *area = cp->area();
+}
+
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
@@ -157,18 +183,17 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
     *edgelengths = cp->edge_lengths();
 }
 
-int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->block_corner_count();
+    return cp->area();
 }
 
-
-
 /* ------------------------------------------------------------------
-   Repartition and rebuild new domains, or construct initial domain
+   Re-partition and rebuild new domains, or construct initial domain
  -------------------------------------------------------------------- */
+
 void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               int blockno, int patchno,
@@ -186,6 +211,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                level,
                gparms,
                build_mode);
+
 }
 
 
@@ -194,22 +220,73 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
    an "iterate_adapted" step, in which data in these patches is copied, averaged or
    interpolated. */
 
-void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                void *user)
+void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno,
+                             int patchno,
+                             void *user)
 {
     fclaw2d_vtable_t vt;
     vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    fclaw2d_clawpatch_define(domain,this_patch,this_block_idx,
-                             this_patch_idx,build_mode);
+    const amr_options_t *gparms = get_domain_parms(domain);
 
+    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
+
+    if (gparms->manifold)
+    {
+        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        {
+            vt.metric_compute_area(domain,this_patch,blockno,patchno);
+
+            /* Don't need any more manifold info for ghost patches */
+            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+            {
+                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
+            }
+        }
+    }
+
+    vt = fclaw2d_get_vtable(domain);
     if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
-        vt.patch_setup(domain,this_patch,this_block_idx,this_patch_idx);
+        vt.patch_setup(domain,this_patch,blockno,patchno);
+    }
+}
+
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *fine_patches,
+                                       fclaw2d_patch_t *coarse_patch,
+                                       int blockno,
+                                       int coarse_patchno,
+                                       int fine0_patchno,
+                                       fclaw2d_build_mode_t build_mode)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
+
+    if (gparms->manifold)
+    {
+        fclaw2d_metric_average_area(domain,fine_patches,coarse_patch,
+                                    blockno, coarse_patchno, fine0_patchno);
+
+        fclaw2d_clawpatch_metric_setup(domain,coarse_patch,blockno,
+                                       coarse_patchno);
+    }
+
+    vt = fclaw2d_get_vtable(domain);
+    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    {
+        /* We might want to distinguish between new fine grid patches, and
+           new coarse grid patches.  In the latter case, we might just average
+           aux array info, for example, rather than recreate it from scratch.
+           Something like a general "build from fine" routine might be needed */
+        vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
     }
 }
 
@@ -304,7 +381,7 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
     return size*sizeof(double);
 }
 
-void fclaw2d_clawpatch_partition_pack_cb(fclaw2d_domain_t *domain,
+void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *this_patch,
                                          int this_block_idx,
                                          int this_patch_idx,
@@ -319,7 +396,7 @@ void fclaw2d_clawpatch_partition_pack_cb(fclaw2d_domain_t *domain,
     cp->partition_pack(patch_data);
 }
 
-void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
+void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx,
@@ -333,8 +410,8 @@ void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
     fclaw2d_patch_data_new(domain,this_patch);
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_clawpatch_build_cb(domain,this_patch,this_block_idx,
-                               this_patch_idx,(void*) &build_mode);
+    fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
+                            this_patch_idx,(void*) &build_mode);
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
 

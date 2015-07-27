@@ -153,43 +153,6 @@ void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
                                  const int& meqn, double qthis[],double qneighbor[],
                                  const int& icorner, const int& iside);
 
-/* ----------------------------------------------------------------------------------
-   Mapped grids
-   area                : 1 float
-   xp,yp,zp, xd,yd zp  : 6 floats
-   xnormals, ynormals  : 6 floats
-   ytangents, ytangent : 6 floats
-   edgelengths         : 2 floats
-   surfnormals         : 3 floats
-   curvature           : 1 float
-   -----------------------------
-   total               : 25 floats per field (in 2d!!)
-
-   ---------------------------------------------------------------------------------- */
-void setup_mesh_(const int& mx, const int& my, const int& mbc,
-                 const double& xlower, const double& ylower,
-                 const double& dx, const double& dy,int& blockno,
-                 double xp[], double yp[], double zp[],
-                 double xd[], double yd[], double zd[]);
-
-void compute_area_(const int& mx, const int& my, const int& mbc,
-                   const double& m_dx, const double& m_dy,const double& m_xlower,
-                   const double& m_ylower, const int& blockno, double area[],
-                   const int& level, const int& maxlevel, const int& refratio);
-
-void compute_normals_(const int& mx, const int& my, const int& mbc,
-                      double xp[], double yp[], double zp[],
-                      double xd[], double yd[], double zd[],
-                      double xnormals[],double ynormals[]);
-
-void compute_tangents_(const int& mx, const int& my, const int& mbc,
-                      double xd[], double yd[], double zd[],
-                      double xtangents[],double ytangents[],double edge_lengths[]);
-
-void compute_surf_normals_(const int& mx, const int& my, const int& mbc,
-                           double xnormals[],double ynormals[],double edge_lengths[],
-                           double curvature[], double surfnormals[], double area[]);
-
 #ifdef __cplusplus
 #if 0
 {

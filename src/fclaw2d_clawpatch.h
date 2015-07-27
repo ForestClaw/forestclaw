@@ -42,7 +42,7 @@ typedef enum
 {
     FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
     FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED,
-    FCLAW2D_BUILD_FOR_UPDATE,
+    FCLAW2D_BUILD_FOR_UPDATE
 } fclaw2d_build_mode_t;
 
 
@@ -110,11 +110,20 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_build_mode_t build_mode);
 
 /* A callback for building the domain and repartitioning */
-void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                void *user);
+void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             void *user);
+
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *fine_patches,
+                                       fclaw2d_patch_t *coarse_patch,
+                                       int blockno,
+                                       int coarse_patchno,
+                                       int fine0_patchno,
+                                       fclaw2d_build_mode_t build_mode);
+
 
 /* -----------------------------------------------------
    Build/pack/size for partitioning
@@ -122,13 +131,13 @@ void fclaw2d_clawpatch_build_cb(fclaw2d_domain_t *domain,
 size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain);
 
 
-void fclaw2d_clawpatch_partition_pack_cb(fclaw2d_domain_t *domain,
+void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *this_patch,
                                          int this_block_idx,
                                          int this_patch_idx,
                                          void *user);
 
-void fclaw2d_clawpatch_partition_unpack_cb(fclaw2d_domain_t *domain,
+void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx,

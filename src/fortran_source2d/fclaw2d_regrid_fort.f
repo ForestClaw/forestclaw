@@ -257,7 +257,6 @@ c     # Get rectangle in coarse grid for fine grid.
       enddo
       end
 
-
 c     # ------------------------------------------------------
 c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should

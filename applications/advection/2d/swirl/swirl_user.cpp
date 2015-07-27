@@ -48,10 +48,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc        = &swirl_patch_physical_bc;
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
-    vt.patch_tag4refinement     = &swirl_patch_tag4refinement;
+    vt.regrid_tag4refinement     = &swirl_patch_tag4refinement;
     vt.fort_tag4refinement      = &TAG4REFINEMENT;
 
-    vt.patch_tag4coarsening     = &swirl_patch_tag4coarsening;
+    vt.regrid_tag4coarsening     = &swirl_patch_tag4coarsening;
     vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
