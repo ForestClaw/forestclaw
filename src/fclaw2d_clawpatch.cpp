@@ -406,7 +406,7 @@ void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 
-    /* First need to rebuild the patch */
+    /* Create new data in 'user' pointer */
     fclaw2d_patch_data_new(domain,this_patch);
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
