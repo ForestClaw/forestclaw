@@ -202,11 +202,18 @@ void
 fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
 {
     sc_keyvalue_t *a = domain->attributes;
+#ifdef FCLAW_ENABLE_DEBUG
     sc_keyvalue_entry_type_t et;
+#endif
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (sc_keyvalue_exists (a, name));
-    et = sc_keyvalue_unset (a, name);
+#ifndef FCLAW_ENABLE_DEBUG
+    (void)
+#else
+    et =
+#endif
+        sc_keyvalue_unset (a, name);
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
