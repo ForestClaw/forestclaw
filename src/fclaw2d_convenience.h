@@ -114,6 +114,18 @@ fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
 fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain,
                                             int weight_exponent);
 
+/** Query the window of patches that is not transferred on partition.
+ * \param [in] domain           A domain after a non-trivial partition
+ *                              and before calling \ref fclaw2d_domain_complete.
+ * \param [out] unchanged_first         First still-local patch in the new partition.
+ * \param [out] unchanged_length        Number of patches that not changed owners.
+ * \param [out] unchanged_old_first     First stayed_local patch in the old partition.
+ */
+void fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
+                                         int *unchanged_first,
+                                         int *unchanged_length,
+                                         int *unchanged_old_first);
+
 /** Clean up after fclaw2d_domain_partition returned non-NULL.
  * \param [in,out] domain       Current domain that was partitioned.
  */
