@@ -564,19 +564,23 @@ fclaw2d_domain_t *
 fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_locidx_t uf, ul, uof;
 
     FCLAW_ASSERT (domain->pp_owned);
     FCLAW_ASSERT (domain->just_adapted);
     FCLAW_ASSERT (!domain->just_partitioned);
 
     domain->just_adapted = 0;
-    if (p4est_wrap_partition (wrap, weight_exponent))
+    if (p4est_wrap_partition (wrap, weight_exponent, &uf, &ul, &uof))
     {
         fclaw2d_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
         newd->just_partitioned = 1;
+        newd->partition_unchanged_first = (int) uf;
+        newd->partition_unchanged_length = (int) ul;
+        newd->partition_unchanged_old_first = (int) uof;
 
         fclaw2d_domain_copy_parameters (newd, domain);
         return newd;
@@ -584,6 +588,27 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     else
     {
         return NULL;
+    }
+}
+
+void
+fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
+                                    int *unchanged_first,
+                                    int *unchanged_length,
+                                    int *unchanged_old_first)
+{
+    FCLAW_ASSERT (domain->pp_owned);
+    FCLAW_ASSERT (!domain->just_adapted);
+    FCLAW_ASSERT (domain->just_partitioned);
+
+    if (unchanged_first != NULL) {
+      *unchanged_first = domain->partition_unchanged_first;
+    }
+    if (unchanged_length != NULL) {
+      *unchanged_length = domain->partition_unchanged_length;
+    }
+    if (unchanged_old_first != NULL) {
+      *unchanged_old_first = domain->partition_unchanged_old_first;
     }
 }
 
@@ -597,6 +622,9 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     FCLAW_ASSERT (domain->just_partitioned);
 
     domain->just_partitioned = 0;
+    domain->partition_unchanged_first = 0;
+    domain->partition_unchanged_length = 0;
+    domain->partition_unchanged_old_first = 0;
 
     p4est_wrap_complete (wrap);
 }
