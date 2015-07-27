@@ -117,17 +117,17 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
         fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain_partitioned);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 
+#if 0
         /* Old version */
         fclaw2d_domain_iterate_patches(domain_partitioned,
                                        cb_fclaw2d_clawpatch_partition_unpack,
                                        (void *) patch_data);
+#endif
 
-#if 0
         /* New version? */
         fclaw2d_domain_iterate_partitioned(*domain,domain_partitioned,
                                            cb_partition_transfer,
-                                           NULL);
-#endif
+                                           (void*) patch_data);
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 
