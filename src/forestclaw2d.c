@@ -1189,6 +1189,123 @@ fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
+                                    fclaw2d_domain_t * new_domain,
+                                    fclaw2d_transfer_callback_t tcb,
+                                    void *user)
+{
+    int uf, ul, uof;
+    int oskip, nskip;
+    int nbp;
+    int npre, nstay;
+    int i, oj, nj;
+#ifdef FCLAW_ENABLE_DEBUG
+    int obp, odone, ndone;
+#endif
+    fclaw2d_block_t *old_block, *new_block;
+    fclaw2d_patch_t *old_patch, *new_patch;
+
+    FCLAW_ASSERT (!old_domain->pp_owned);
+    FCLAW_ASSERT (new_domain->pp_owned);
+    FCLAW_ASSERT (new_domain->just_partitioned);
+    FCLAW_ASSERT (old_domain->pp == new_domain->pp);
+    FCLAW_ASSERT (old_domain->num_blocks == new_domain->num_blocks);
+
+    /* get information on overlapping window of local patches */
+    uf = new_domain->partition_unchanged_first;
+    ul = new_domain->partition_unchanged_length;
+    uof = new_domain->partition_unchanged_old_first;
+
+    /* go through the blocks in the old and new partitions */
+    for (i = 0; i < new_domain->num_blocks; i++)
+    {
+        /* if this block has no patches we skip it */
+        new_block = new_domain->blocks + i;
+        nbp = new_block->num_patches;
+        if (nbp == 0)
+        {
+            continue;
+        }
+        nskip = new_block->num_patches_before;
+#ifdef FCLAW_ENABLE_DEBUG
+        ndone = 0;
+#endif
+
+        /* This block has patches.  See which of these preexisted locally */
+        npre = uf - nskip;
+        npre = SC_MAX (npre, 0);
+        if (npre >= nbp)
+        {
+            npre = nstay = nbp;
+        }
+        else
+        {
+            nstay = uf + ul - nskip;
+            nstay = SC_MAX (nstay, 0);
+            nstay = SC_MIN (nstay, nbp);
+        }
+        FCLAW_ASSERT (0 <= npre && npre <= nstay && nstay <= nbp);
+
+        /* Iterate over first set of newly received patches */
+        for (nj = 0; nj < npre; ++nj)
+        {
+            FCLAW_ASSERT (nj < new_block->num_patches);
+            new_patch = new_block->patches + nj;
+            tcb (old_domain, NULL, new_domain, new_patch, i, -1, nj, user);
+#ifdef FCLAW_ENABLE_DEBUG
+            ++ndone;
+#endif
+        }
+
+        /* are we done with the patches in this block, all of which new? */
+        if (nj == nbp)
+        {
+            continue;
+        }
+        old_block = old_domain->blocks + i;
+        oskip = old_block->num_patches_before;
+#ifdef FCLAW_ENABLE_DEBUG
+        obp = old_block->num_patches;
+        odone = 0;
+#endif
+
+        /* Iterate over the patches that stay local */
+        oj = uof - oskip;
+        FCLAW_ASSERT (0 <= oj);
+        FCLAW_ASSERT (oj + ul <= obp);
+        for (; nj < nstay; ++oj, ++nj)
+        {
+            FCLAW_ASSERT (oj < old_block->num_patches);
+            FCLAW_ASSERT (nj < new_block->num_patches);
+            old_patch = old_block->patches + oj;
+            new_patch = new_block->patches + nj;
+            tcb (old_domain, old_patch, new_domain, new_patch,
+                 i, oj, nj, user);
+#ifdef FCLAW_ENABLE_DEBUG
+            ++odone;
+            ++ndone;
+#endif
+        }
+
+        /* Iterate over second set of newly received patches */
+        for (; nj < nbp; ++nj)
+        {
+            FCLAW_ASSERT (nj < new_block->num_patches);
+            new_patch = new_block->patches + nj;
+            tcb (old_domain, NULL, new_domain, new_patch, i, -1, nj, user);
+#ifdef FCLAW_ENABLE_DEBUG
+            ++ndone;
+#endif
+        }
+
+        /* consistency checks */
+        FCLAW_ASSERT (odone <= obp);
+        FCLAW_ASSERT (ndone == nbp);
+        FCLAW_ASSERT (nj == new_block->num_patches);
+    }
+}
+
+void
 fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
                                      void ***patch_data)
 {

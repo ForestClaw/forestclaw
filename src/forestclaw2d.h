@@ -126,7 +126,8 @@ struct fclaw2d_domain
     int partition_unchanged_length;     /**< number of unchanged quadrants */
     int partition_unchanged_old_first;  /**< local index wrt. previous partition */
 
-    int num_blocks;
+    int num_blocks;             /**< Total number of blocks.
+                                     TODO: only store non-empty blocks. */
     fclaw2d_block_t *blocks;    /* allocated storage */
     int num_exchange_patches;   /* # my patches relevant to other procs.
                                    Identified by this expression to be true:
@@ -568,7 +569,8 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
 /** Iterate over the previous and the adapted domain simultaneously.
  * \param [in,out] old_domain   Domain before adaptation.
  * \param [in,out] new_domain   Domain after adaptation.
- * \param [in] mcb              Callback
+ * \param [in] mcb              Callback.
+ * \param [in,out] user         This pointer is passed to the callback.
  */
 void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_domain_t * new_domain,
@@ -601,6 +603,42 @@ void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
  */
 void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
                                               void ***patch_data);
+
+/** Callback to iterate through the partitions.
+ * We traverse every patch in the new partition.  If that patch was already
+ * on the local processor before the partition, we identify its memory.
+ * \param [in,out] old_domain   Domain before partition.
+ * \param [in,out] old_patch    If the patch stayed local, this is the pointer
+ *                              in reference to the old domain and partition.
+ *                              Otherwise, this patch pointer is set to NULL.
+ * \param [in,out] new_domain   Domain after partition.
+ * \param [in,out] new_patch    Patch in the new domain and partition.
+ * \param [in] blockno          Number of the current block.
+ * \param [in] old_patchno      Number of the patch that stayed local wrt. the
+ *                              old domain and partition.  Minus one otherwise.
+ * \param [in] new_patchno      Number of the iterated patch wrt. the new
+ *                              domain and partition.
+ * \param [in,out] user         Pointer passed to \ref
+ *                              fclaw2d_domain_iterate_partitioned.
+ */
+typedef void (*fclaw2d_transfer_callback_t) (fclaw2d_domain_t * old_domain,
+                                             fclaw2d_patch_t * old_patch,
+                                             fclaw2d_domain_t * new_domain,
+                                             fclaw2d_patch_t * new_patch,
+                                             int blockno,
+                                             int old_patchno, int new_patchno,
+                                             void *user);
+
+/** Iterate over the previous and partitioned domain simultaneously.
+ * \param [in,out] old_domain   Domain before partition.
+ * \param [in,out] new_domain   Domain after partition.
+ * \param [in] tcb              Callback.
+ * \param [in,out] user         This pointer is passed to the callback.
+ */
+void fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
+                                         fclaw2d_domain_t * new_domain,
+                                         fclaw2d_transfer_callback_t tcb,
+                                         void *user);
 
 /** Free buffers that were used in transfering data during partition.
  * \param [in,out] domain       The memory lives inside this domain.
