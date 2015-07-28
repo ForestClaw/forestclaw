@@ -499,6 +499,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            Finish exchanges in the interior of the grid.
            ------------------------------------------------------------*/
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
         int minfine = minlevel+1;
         int maxfine = maxlevel;
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
@@ -519,8 +520,10 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
         fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
+
         /* -------------------------------------------------------------
-           Parallel ghost patch exchange
+           Receive ghost patches ...
            ------------------------------------------------------------- */
 
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
