@@ -95,11 +95,13 @@ struct fclaw2d_block
     int is_boundary[4];         /* physical boundary flag */
     int num_patches;            /* local patches in this block */
     int num_patches_before;     /* in all previous blocks */
+    int num_exchange_patches;   /* exchange patches in this block */
     int minlevel, maxlevel;     /* local over this block.  If this proc doesn't
                                    store any patches in this block, we set
                                    maxlevel < 0 <= minlevel. */
     fclaw2d_patch_t *patches;   /* allocated storage */
     fclaw2d_patch_t **patchbylevel;     /* array of pointers */
+    fclaw2d_patch_t **exchange_patches; /* one pointer for each exchange patch */
     void *user;
 };
 
@@ -133,6 +135,7 @@ struct fclaw2d_domain
                                    Identified by this expression to be true:
                                    (patch->flags &
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
+    fclaw2d_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /* # off-proc patches relevant to this proc */
     fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
 

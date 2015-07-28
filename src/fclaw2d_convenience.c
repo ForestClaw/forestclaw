@@ -70,6 +70,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     int level;
     int face;
     int nb, nm, mirror_quadrant_num;
+    int block_nm_pre;
     int local_num_patches;
     int tree_minlevel, local_minlevel;
     int tree_maxlevel, local_maxlevel;
@@ -102,6 +103,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
     if (domain->num_exchange_patches > 0)
     {
+        domain->exchange_patches = FCLAW_ALLOC (fclaw2d_patch_t *,
+                                                domain->num_exchange_patches);
         mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
         mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
         FCLAW_ASSERT (mirror_quadrant_num >= 0);
@@ -173,6 +176,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->patchbylevel =
             FCLAW_ALLOC_ZERO (fclaw2d_patch_t *,
                               domain->possible_maxlevel + 1);
+
+        block_nm_pre = nm;
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
@@ -188,6 +193,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             if (mirror_quadrant_num == local_num_patches)
             {
                 patch->flags |= FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY;
+                domain->exchange_patches[nm] = patch;
                 domain->mirror_target_levels[nm] = &patch->target_level;
                 if (++nm < domain->num_exchange_patches)
                 {
@@ -227,6 +233,11 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         local_maxlevel = SC_MAX (local_maxlevel, tree_maxlevel);
         block->minlevel = tree_minlevel;
         block->maxlevel = tree_maxlevel;
+        block->num_exchange_patches = nm - block_nm_pre;
+        if (block->num_exchange_patches > 0)
+        {
+            block->exchange_patches = domain->exchange_patches + block_nm_pre;
+        }
     }
     FCLAW_ASSERT (local_num_patches ==
                   (int) wrap->p4est->local_num_quadrants);
@@ -381,6 +392,7 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     FCLAW_FREE (domain->ghost_patches);
     FCLAW_FREE (domain->ghost_target_levels);
     FCLAW_FREE (domain->mirror_target_levels);
+    FCLAW_FREE (domain->exchange_patches);
 
     if (domain->pp_owned)
     {
