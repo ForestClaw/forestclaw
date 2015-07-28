@@ -613,14 +613,17 @@ fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (!domain->just_adapted);
     FCLAW_ASSERT (domain->just_partitioned);
 
-    if (unchanged_first != NULL) {
-      *unchanged_first = domain->partition_unchanged_first;
+    if (unchanged_first != NULL)
+    {
+        *unchanged_first = domain->partition_unchanged_first;
     }
-    if (unchanged_length != NULL) {
-      *unchanged_length = domain->partition_unchanged_length;
+    if (unchanged_length != NULL)
+    {
+        *unchanged_length = domain->partition_unchanged_length;
     }
-    if (unchanged_old_first != NULL) {
-      *unchanged_old_first = domain->partition_unchanged_old_first;
+    if (unchanged_old_first != NULL)
+    {
+        *unchanged_old_first = domain->partition_unchanged_old_first;
     }
 }
 
