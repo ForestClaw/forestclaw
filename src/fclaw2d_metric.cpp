@@ -50,7 +50,7 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
 
     double *areacoarse, *areafine;
-    int igrid, fine_patchno;
+    int igrid;
     fclaw2d_patch_t *fine_patch;
 
     fclaw2d_clawpatch_grid_data(domain,coarse_patch,&mx,&my,&mbc,
@@ -61,7 +61,6 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
-        fine_patchno = fine0_patchno + igrid;
 
         areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
 

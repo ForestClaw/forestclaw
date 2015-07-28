@@ -122,7 +122,7 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
     double *qcoarse,*qfine;
     double *areacoarse,*areafine;
     double *xp,*yp,*zp,*xd,*yd,*zd;
-    int igrid, fine_patchno;
+    int igrid;
 
     const amr_options_t* gparms;
     fclaw2d_patch_t* fine_patch;
@@ -142,7 +142,6 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
     for (igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
-        fine_patchno = fine0_patchno + igrid;
 
         fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
 
@@ -177,7 +176,7 @@ void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
     double *xp,*yp,*zp,*xd,*yd,*zd;
-    int igrid, fine_patchno;
+    int igrid;
     fclaw2d_patch_t *fine_patch;
 
     vt = fclaw2d_get_vtable(domain);
@@ -194,7 +193,6 @@ void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
-        fine_patchno = fine0_patchno + igrid;
 
         fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
 

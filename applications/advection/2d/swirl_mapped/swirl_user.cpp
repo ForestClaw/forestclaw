@@ -45,11 +45,8 @@ static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
-    const amr_options_t *gparms;
     fclaw2d_init_vtable(&vt);
     fc2d_clawpack46_init_vtable(&classic_claw);
-
-    gparms = fclaw2d_forestclaw_get_options(domain);
 
     /* classic_claw.setprob = &SETPROB; */
     vt.problem_setup            = &swirl_problem_setup;

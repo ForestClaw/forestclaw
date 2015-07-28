@@ -244,7 +244,7 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                         "Verbosity mode [0]");
 #endif
 
-    sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 1,
+    sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 0,
                             "Enable serial output [F]");
     sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
                            "Output file prefix [fort]");
