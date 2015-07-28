@@ -177,11 +177,14 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
     fclaw_global_essentialf ("This is %s\n", FCLAW_PACKAGE_STRING);
     fclaw_global_productionf ("%-*s %s\n", w, "CPP", FCLAW_CPP);
     fclaw_global_productionf ("%-*s %s\n", w, "CPPFLAGS", FCLAW_CPPFLAGS);
+    fclaw_global_productionf ("%-*s %s\n", w, "F77", FCLAW_F77);
+    fclaw_global_productionf ("%-*s %s\n", w, "FFLAGS", FCLAW_FFLAGS);
     fclaw_global_productionf ("%-*s %s\n", w, "CC", FCLAW_CC);
     fclaw_global_productionf ("%-*s %s\n", w, "CFLAGS", FCLAW_CFLAGS);
     fclaw_global_productionf ("%-*s %s\n", w, "CXX", FCLAW_CXX);
     fclaw_global_productionf ("%-*s %s\n", w, "CXXFLAGS", FCLAW_CXXFLAGS);
     fclaw_global_productionf ("%-*s %s\n", w, "LDFLAGS", FCLAW_LDFLAGS);
+    fclaw_global_productionf ("%-*s %s\n", w, "FLIBS", FCLAW_FLIBS);
     fclaw_global_productionf ("%-*s %s\n", w, "LIBS", FCLAW_LIBS);
 }
 
