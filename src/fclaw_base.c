@@ -538,8 +538,13 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     {
     case FCLAW_NOEXIT:
         fclaw_global_infof ("Option parsing successful\n");
+        /* Ok maybe this is essential for now.
+         * Note: standard log level for a run used for producing results
+         *       should be PRODUCTION.  ESSENTIAL is only for those who
+         *       choose to ignore potentially important information.
+         */
         sc_options_print_summary (fclaw_get_package_id (),
-                                  FCLAW_VERBOSITY_PRODUCTION, a->opt);
+                                  FCLAW_VERBOSITY_ESSENTIAL, a->opt);
         break;
     case FCLAW_EXIT_QUIET:
         /* we assume that the application has printed or will print something */
