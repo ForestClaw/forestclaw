@@ -46,6 +46,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->count_amr_advance = 0;
     ddata->count_ghost_exchange = 0;
     ddata->count_amr_regrid = 0;
+    dddata->count_multiproc_corner = 0;
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
 
     ddata->domain_exchange = NULL;

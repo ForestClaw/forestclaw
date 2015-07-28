@@ -385,6 +385,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                  int maxlevel,
                                  int time_interp)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     const amr_options_t *gparms = get_domain_parms(domain);
     int refratio = gparms->refratio;
 
@@ -448,6 +449,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
                     this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+                    ++ddata->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
                 {
@@ -477,6 +479,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                                         &transform_data);
                         }
                     }
+                    ++ddata->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
                 {
@@ -484,7 +487,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                        on ghost patches.  Proof : Consider the corners of the fine
                        patch at either end of the face shared by the coarse and
                        fine patch. Well-balancing assures that at neither of these
-                       corners is the fine grid a coarse grid" to a corner adjacent
+                       corners is the fine grid a "coarse grid" to a corner adjacent
                        patch.  So the fine grid will never be needed for interpolation
                        at any grid adjacent to either of these two corners, and so
                        it does not need valid ghost cells along the face shared with the
