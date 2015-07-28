@@ -175,6 +175,7 @@ c     # ------------------------------------------------------
          do j = 1,deg
             yc = y(j)
             h = wy(j)
+c           # sum(w) = (b-a)*(d-c) in each direction.
             area1 = area1 + h
             ae = area_element_exact(xc,yc,blockno)
             fint1 = fint1 + f(xc,yc)*ae*h
@@ -185,6 +186,7 @@ c     # ------------------------------------------------------
 
       quad_square = fint2
       if (compute_avg .eq. 1) then
+c        # Average in computational space?
          quad_square = fint2/area2
       endif
       area = area2
