@@ -188,7 +188,7 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
        to happen once when setting up the exchange.
        ------------------------------------------------------- */
     fclaw2d_domain_indirect_t *ind =
-        fclaw2d_domain_indirect_exchange_begin(domain);
+        fclaw2d_domain_indirect_begin(domain);
 
     /* Do some some work that we hope to hide by communication above.  */
     set_indirect_data(domain,ind);
@@ -200,7 +200,7 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
     /* ---------------------------------------------------------
        Receive ghost patch meta data from send initiated above.
        ------------------------------------------------------- */
-    fclaw2d_domain_indirect_exchange_end(ind);
+    fclaw2d_domain_indirect_end(domain,ind);
 }
 
 void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
@@ -235,7 +235,7 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     /* Destroy indirect data needed to communicate between ghost patches
        from different procs */
     fclaw2d_domain_indirect_t* ind_old = get_indirect_data(*domain);
-    fclaw2d_domain_indirect_destroy(ind_old);
+    fclaw2d_domain_indirect_destroy(*domain,ind_old);
 }
 
 
