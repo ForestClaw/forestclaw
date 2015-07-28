@@ -11,7 +11,7 @@
       double precision favg(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       integer compute_avg, ghost_only
 
-      deg = 4
+      deg = 2
       call integrate_exact(mx,my,mbc,xlower,ylower,dx,dy,
      &      blockno,deg,area,f,favg,compute_avg,ghost_only)
 
@@ -31,18 +31,18 @@
       integer*8 cont, get_context
 
 c     # Fourth order fd approximation to the first derivative
-      data n /5/
-      data a /0, 0, 8.333333333333333d-02, -6.666666666666666d-01, 0,
-     &      6.666666666666666d-01, -8.333333333333333d-02, 0, 0/
+c      data n /5/
+c      data a /0, 0, 8.333333333333333d-02, -6.666666666666666d-01, 0,
+c     &      6.666666666666666d-01, -8.333333333333333d-02, 0, 0/
 
 c     # Second order fd approximation
-c     data n /3/
-c     data a /0,0,0,-0.5d0, 0, 0.5d0, 0, 0, 0/
+      data n /3/
+      data a /0,0,0,-0.5d0, 0, 0.5d0, 0, 0, 0/
 
       cont = get_context()
 
       m = (n-1)/2
-      h = 1.0d-4
+      h = 1.0d-8
 
       do i= 1,3
          txi(i) = 0
@@ -107,8 +107,9 @@ c     # ------------------------------------------------------
       double precision favg(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j,ii,jj, k
-      double precision xlow, ylow, a,b,c,d,dx,dy, area1
-      double precision quad_square, quad_square_area
+      double precision xlow, ylow, a,b,c,d,dx,dy
+      double precision quad_square_favg, quad_square_area
+      double precision area_phys
 
       do i = -mbc,mx+mbc+1
          do j = -mbc,my+mbc+1
@@ -123,9 +124,9 @@ c     # ------------------------------------------------------
             c = ylow
             d = ylow + dy
             if (compute_avg .eq. 1) then
-               favg(i,j) = quad_square(f,a,b,c,d,deg,
-     &               blockno,area1,compute_avg)
-               area(i,j) = area1
+               favg(i,j) = quad_square_favg(f,a,b,c,d,deg,
+     &               blockno,area_phys)
+               area(i,j) = area_phys
             else
                area(i,j) = quad_square_area(a,b,c,d,deg,
      &               blockno)
@@ -148,48 +149,52 @@ c     # ------------------------------------------------------
 c     # ------------------------------------------------------
 c     # Misc. functions needed for all quad calculations
 c     # ------------------------------------------------------
-      double precision function quad_square(f,a,b,c,d,deg,
-     &      blockno,area,compute_avg)
+      double precision function quad_square_favg(f,a,b,c,d,deg,
+     &      blockno,area_phys)
       implicit none
 
       double precision f
       integer deg
-      integer compute_avg
       integer blockno
-      double precision a,b, c,d, area
-      double precision x(8),wx(8), xc,yc,qn
-      double precision y(8),wy(8), qn2,fc
-      double precision area1,fint1,area2,fint2, h
-      double precision area_element_exact, ae
+      double precision a,b, c,d, area_phys
+      double precision x(8),wx(8), xc,yc
+      double precision y(8),wy(8)
+      double precision area_element_exact, ae, h
+      double precision area_phys1, area_phys2
+      double precision area_comp1, area_comp2
+      double precision favg1, favg2
       integer i,j
 
       call gltable2(x,wx,deg,a,b)
       call gltable2(y,wy,deg,c,d)
 
-      fint2 = 0
-      area2 = 0
+c     # area_comp = computational area (b-a)*(d-c) of mesh cell
+c     # area_phys = physical area of mesh cell
+
+      favg2 = 0
+      area_comp2 = 0
+      area_phys2 = 0
       do i = 1,deg
-         fint1 = 0
-         area1 = 0
+         favg1 = 0
+         area_comp1 = 0
+         area_phys1 = 0
          xc = x(i)
          do j = 1,deg
             yc = y(j)
             h = wy(j)
-c           # sum(w) = (b-a)*(d-c) in each direction.
-            area1 = area1 + h
+            area_comp1 = area_comp1 + h
             ae = area_element_exact(xc,yc,blockno)
-            fint1 = fint1 + f(xc,yc)*ae*h
+            area_phys1 = area_phys1 + ae*h
+            favg1 = favg1 + f(xc,yc)*ae*h
          enddo
-         area2 = area2 + wx(i)*area1
-         fint2 = fint2 + wx(i)*fint1
+         area_comp2 = area_comp2 + wx(i)*area_comp1
+         area_phys2 = area_phys2 + wx(i)*area_phys1
+         favg2 = favg2 + wx(i)*favg1
       enddo
 
-      quad_square = fint2
-      if (compute_avg .eq. 1) then
-c        # Average in computational space?
-         quad_square = fint2/area2
-      endif
-      area = area2
+c     # Note that this is the average in computational space.
+      quad_square_favg = favg2/area_comp2
+      area_phys = area_phys2
 
       end
 
@@ -200,29 +205,29 @@ c        # Average in computational space?
       integer deg
       integer blockno
       double precision a,b, c,d
-      double precision x(8),wx(8), xc,yc,qn
-      double precision y(8),wy(8), qn2,fc
-      double precision fint2,fint1,area2,h
-      double precision area_element_exact, ae
+      double precision x(8),wx(8), xc,yc
+      double precision y(8),wy(8)
+      double precision area_element_exact, ae, h
+      double precision area_phys1, area_phys2
       integer i,j
 
       call gltable2(x,wx,deg,a,b)
       call gltable2(y,wy,deg,c,d)
 
-      fint2 = 0
+      area_phys2 = 0
       do i = 1,deg
          xc = x(i)
-         fint1 = 0
+         area_phys1 = 0
          do j = 1,deg
             yc = y(j)
             h = wy(j)
             ae = area_element_exact(xc,yc,blockno)
-            fint1 = fint1 + ae*h
+            area_phys1 = area_phys1 + ae*h
          enddo
-         fint2 = fint2 + wx(i)*fint1
+         area_phys2 = area_phys2 + wx(i)*area_phys1
       enddo
 
-      quad_square_area = fint2
+      quad_square_area = area_phys2
 
       end
 
