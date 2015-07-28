@@ -46,7 +46,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->count_amr_advance = 0;
     ddata->count_ghost_exchange = 0;
     ddata->count_amr_regrid = 0;
-    dddata->count_multiproc_corner = 0;
+    ddata->count_multiproc_corner = 0;
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
 
     ddata->domain_exchange = NULL;
@@ -85,6 +85,7 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
     ddata_new->count_amr_advance = ddata_old->count_amr_advance;
     ddata_new->count_ghost_exchange = ddata_old->count_ghost_exchange;
     ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
+    ddata_new->count_multiproc_corner = ddata_old->count_multiproc_corner;
 
 
     ddata_new->curr_time = ddata_old->curr_time;
@@ -169,15 +170,6 @@ void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
                 (*domain)->mpirank,
                 ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
     }
-
-#if 0
-    /* TODO : Do we need this here?  Will we ever want to report stats during
-       a run? */
-    if (ddata->is_latest_domain)  /* ddata->is_last_domain?  */
-    {
-        fclaw2d_timer_report(*domain);
-    }
-#endif
 
     fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 

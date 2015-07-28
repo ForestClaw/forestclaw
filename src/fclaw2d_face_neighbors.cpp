@@ -409,7 +409,6 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
         int level = this_ghost_patch->level;
         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_ghost_patch);
 
-        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
         fclaw2d_domain_indirect_t *ind = ddata->domain_indirect;
 
         transform_data.this_patch = this_ghost_patch;
