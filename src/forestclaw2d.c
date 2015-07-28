@@ -1461,12 +1461,11 @@ struct fclaw2d_domain_indirect
     int ready;
     fclaw2d_domain_t *domain;
     fclaw2d_domain_exchange_t *e;
-    int *pbdata;
 };
 
 static void
-indirect_encode (p4est_ghost_t * ghost, int mpirank, int *rproc,
-                 int *rpatchno)
+indirect_encode (p4est_ghost_t * ghost, int mpirank,
+                 int *rproc, int *rpatchno)
 {
     p4est_quadrant_t *g;
 
@@ -1488,7 +1487,8 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     int num_exc;
     int neall, nb, ne, np;
     int face;
-    int *pi, *rproc, *rblockno, *rpatchno, *rfaceno;
+    int *pbdata, *pi;
+    int *rproc, *rblockno, *rpatchno, *rfaceno;
     size_t data_size;
     fclaw2d_block_t *block;
     fclaw2d_domain_indirect_t *ind;
@@ -1505,14 +1505,15 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     ind->e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* loop through exchange patches and fill their neighbor information */
-    ind->pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * 6);
+    pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * 6);
     for (neall = 0, nb = 0; nb < domain->num_blocks; ++nb)
     {
-        ind->e->patch_data[neall] = (void *) pi;
         block = domain->blocks + nb;
         for (ne = 0; ne < block->num_exchange_patches; ++ne, ++neall)
         {
+            ind->e->patch_data[neall] = (void *) pi;
             np = (int) (block->exchange_patches[ne] - block->patches);
+            FCLAW_ASSERT (0 <= np && np < block->num_patches);
             for (face = 0; face < P4EST_FACES; ++face)
             {
                 rproc = pi;
@@ -1545,6 +1546,9 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     /* post messages */
     fclaw2d_domain_ghost_exchange_begin (domain, ind->e,
                                          0, domain->global_maxlevel);
+
+    /* it is safe to destroy the sent data now */
+    FCLAW_FREE (pbdata);
 
     return ind;
 }
@@ -1709,21 +1713,24 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                 /* no match on this face; we pretend a boundary situation */
                 if (!good)
                 {
-                    rproc[0] = rpatchno[0] = -1;
+                    FCLAW_ASSERT (rproc[0] == -1);
+                    FCLAW_ASSERT (rpatchno[0] == -1);
                     rproc[1] = rpatchno[1] = -1;
                     *rfaceno &= ~(3 << 6);
                 }
 
-                /* and move to the next face data item */
+                /* move to the next face data item */
                 pi += 6;
             }
         }
     }
     FCLAW_ASSERT (ng == domain->num_ghost_patches);
 
+    /* hash data is local to this function */
     FCLAW_FREE (pli_keys);
     sc_hash_destroy (pli_hash);
 
+    /* now we allow queries on the ghost data */
     ind->ready = 1;
 }
 
@@ -1751,8 +1758,6 @@ fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (domain == ind->domain);
 
     fclaw2d_domain_free_after_exchange (domain, ind->e);
-    FCLAW_FREE (ind->pbdata);
-
     FCLAW_FREE (ind);
 }
 
