@@ -90,6 +90,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
+void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
+                                 int minlevel,
+                                 int maxlevel,
+                                 int time_interp);
+
 #define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
 void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *meqn, int *mint,

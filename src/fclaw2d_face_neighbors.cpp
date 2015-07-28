@@ -102,7 +102,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
     if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
     {
-        /* This case should be excluded by earlier checkes */
+        /* This case should be excluded by earlier checks */
         printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch " \
                "found\n");
         exit(0);
@@ -377,4 +377,122 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             }
         }  /* End of interior face */
     } /* End of iface loop */
+}
+
+
+void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
+                                 int minlevel,
+                                 int maxlevel,
+                                 int time_interp)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int refratio = gparms->refratio;
+
+    int rproc[2];
+    int rpatchno[2];
+    int rblockno;
+    int rfaceno;
+
+    fclaw2d_transform_data_t transform_data;
+    transform_data.mx = gparms->mx;
+    transform_data.my = gparms->my;
+    transform_data.based = 1;                 /* cell-centered data in this routine. */
+
+    /* Loop over ghost patches to do any face exchanges that didn't happen
+       before the ghost patch exchange was done */
+
+    for(int i = 0; i < domain->num_ghost_patches; i++)
+    {
+        fclaw2d_patch_t* this_ghost_patch = &domain->ghost_patches[i];
+        int blockno = this_ghost_patch->u.blockno;
+        int level = this_ghost_patch->level;
+        ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_ghost_patch);
+
+        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+        fclaw2d_domain_indirect_t *ind = ddata->domain_indirect;
+
+        transform_data.this_patch = this_ghost_patch;
+
+        for (int iface = 0; iface < NumFaces; iface++)
+        {
+            int idir = iface/2;
+
+            /* We are only looking for faces between two ghost patches
+               from different processors, since these will not have
+               exchange face data before being thrown over proc fence.
+            */
+            int this_ghost_idx = i;
+            fclaw2d_patch_relation_t neighbor_type =
+                fclaw2d_domain_indirect_neighbors(ind,this_ghost_idx,
+                                                  iface,rproc,
+                                                  &rblockno, rpatchno,
+                                                  &rfaceno);
+
+            if (neighbor_type != FCLAW2D_PATCH_BOUNDARY)
+            {
+                /* We have a neighbor ghost patch that came from a
+                   different proc */
+
+                fclaw2d_patch_face_transformation (iface, rfaceno,
+                                                   transform_data.transform);
+
+                int is_block_face = blockno == rblockno;
+                if (!is_block_face)
+                {
+                    transform_data.transform[8] = 4;
+                }
+                if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+                {
+                    /* Copy from same size neighbor */
+                    fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
+                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
+                    transform_data.neighbor_patch = neighbor_patch;
+                    this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+                }
+                else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+                {
+                    /* Average from fine grid neighbor */
+                    for (int igrid = 0; igrid < p4est_refineFactor; igrid++)
+                    {
+                        if (rpatchno[igrid] != -1)
+                        {
+                            fclaw2d_patch_t *neighbor_patch =
+                                &domain->ghost_patches[rpatchno[igrid]];
+                            transform_data.neighbor_patch = neighbor_patch;
+
+                            ClawPatch *neighbor_cp =
+                                fclaw2d_clawpatch_get_cp(neighbor_patch);
+
+                            int average_to_timeinterp_patch = 0;
+                            if (time_interp && level == minlevel-1)
+                            {
+                                average_to_timeinterp_patch = 1;
+                            }
+
+                            /* Note : igrid isn't used here; could be removed */
+                            this_cp->average_face_ghost(idir,iface,p4est_refineFactor,
+                                                        refratio,neighbor_cp,
+                                                        average_to_timeinterp_patch,
+                                                        igrid,
+                                                        &transform_data);
+                        }
+                    }
+                }
+                else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+                {
+                    /* Don't do anything; we don't need fine grid ghost cells
+                       on ghost patches.  Proof : Consider the corners of the fine
+                       patch at either end of the face shared by the coarse and
+                       fine patch. Well-balancing assures that at neither of these
+                       corners is the fine grid a coarse grid" to a corner adjacent
+                       patch.  So the fine grid will never be needed for interpolation
+                       at any grid adjacent to either of these two corners, and so
+                       it does not need valid ghost cells along the face shared with the
+                       coarse grid. */
+                }
+            }
+
+        }
+    }
+
 }

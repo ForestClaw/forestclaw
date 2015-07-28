@@ -49,6 +49,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
 
     ddata->domain_exchange = NULL;
+    ddata->domain_indirect = NULL;
 
     ddata->curr_time = 0;
 }

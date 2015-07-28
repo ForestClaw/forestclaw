@@ -32,20 +32,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 
 
-/* Also needed in amrreset */
+/* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*
-    fclaw2d_exchange_get_data(fclaw2d_domain_t* domain)
+    get_exchange_data(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     return ddata->domain_exchange;
 }
 
+/* Should these be access functions in domain?  */
 static
 void set_exchange_data(fclaw2d_domain_t* domain,
                        fclaw2d_domain_exchange_t *e)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     ddata->domain_exchange = e;
+}
+
+static
+fclaw2d_domain_indirect_t*
+    get_indirect_data(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    return ddata->domain_indirect;
+}
+
+static
+void set_indirect_data(fclaw2d_domain_t* domain,
+                       fclaw2d_domain_indirect_t *ind)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    ddata->domain_indirect = ind;
 }
 
 static
@@ -139,6 +156,9 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
        remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
+    /* Store e so we can retrieve it later */
+    set_exchange_data(domain,e);
+
     /* Store locations of on-proc boundary patches that will be communicated
        to neighboring remote procs.  The pointer stored in e->patch_data[]
        will point to either the patch data itself, or to a newly allocated
@@ -160,19 +180,33 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain)
         }
     }
 
+    /* ---------------------------------------------------------
+       Start send for ghost patch meta-data needed to handle
+       multi-proc corner case
+
+       Note that this is a parallel communication, but only needs
+       to happen once when setting up the exchange.
+       ------------------------------------------------------- */
+    fclaw2d_domain_indirect_t *ind =
+        fclaw2d_domain_indirect_exchange_begin(domain);
+
+    /* Do some some work that we hope to hide by communication above.  */
+    set_indirect_data(domain,ind);
+
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
     build_ghost_patches(domain);
 
-    /* Store e so we can retrieve it later */
-    set_exchange_data(domain,e);
+    /* ---------------------------------------------------------
+       Receive ghost patch meta data from send initiated above.
+       ------------------------------------------------------- */
+    fclaw2d_domain_indirect_exchange_end(ind);
 }
 
 void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
 {
     /* Free old parallel ghost patch data structure, must exist by construction. */
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
-    fclaw2d_domain_exchange_t *e_old = ddata->domain_exchange;
+    fclaw2d_domain_exchange_t *e_old = get_exchange_data(*domain);
 
     /* Free contiguous memory, if allocated.  If no memory was allocated
        (because we are not storing the area), nothing de-allocated. */
@@ -197,6 +231,11 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     /* Delete ghost patches from remote neighboring patches */
     delete_ghost_patches(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
+
+    /* Destroy indirect data needed to communicate between ghost patches
+       from different procs */
+    fclaw2d_domain_indirect_t* ind_old = get_indirect_data(*domain);
+    fclaw2d_domain_indirect_destroy(ind_old);
 }
 
 
@@ -211,7 +250,8 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
                                           int time_interp)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
+
+    fclaw2d_domain_exchange_t *e = get_exchange_data(domain);
 
     /* Pack local data into on-proc patches at the parallel boundary that
        will be shipped of to other processors. */
@@ -261,10 +301,10 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
                                         int maxlevel,
                                         int time_interp)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_domain_exchange_t *e = fclaw2d_exchange_get_data(domain);
+    fclaw2d_domain_exchange_t *e = get_exchange_data(domain);
 
     /* Exchange only over levels currently in use */
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM_END]);
     if (time_interp)
     {

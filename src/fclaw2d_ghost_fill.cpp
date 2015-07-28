@@ -439,7 +439,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
 
-    if (domain->mpisize == 0)
+    if (domain->mpisize == 1)
     {
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_ALL;
@@ -515,7 +515,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
 
         interpolate_coarse2fine_ghost(domain,minfine, maxfine,
-                                      time_interp,read_parallel_patches,
+                                      time_interp,
+                                      read_parallel_patches,
                                       parallel_mode);
 
         fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
@@ -527,8 +528,15 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            ------------------------------------------------------------- */
 
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
-        fclaw2d_exchange_ghost_patches_end(domain,minlevel,maxlevel,time_interp);
+        fclaw2d_exchange_ghost_patches_end(domain,minlevel,maxlevel,
+                                           time_interp);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTCOMM]);
+
+        /* -------------------------------------------------------------
+           Loop over ghost patches to find indirect neighbors and do
+           any necessary face exchanges.
+           ------------------------------------------------------------- */
+        fclaw2d_face_neighbor_ghost(domain,minlevel,maxlevel,time_interp);
 
         /* -------------------------------------------------------------
            Repeat above, but now with parallel ghost cells.

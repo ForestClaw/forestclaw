@@ -56,7 +56,7 @@ typedef struct fclaw2d_domain_data
 
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;
-
+    fclaw2d_domain_indirect_t *domain_indirect;
 }
 fclaw2d_domain_data_t;
 
@@ -70,9 +70,19 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
 
 void fclaw2d_domain_reset(fclaw2d_domain_t** domain);
 
+
+/* ----------------------------------------------------
+   Access functions for domain member data, stored in
+   domain->user.  These include :
+
+      -- fclaw_app_t
+      -- time
+      -- mapping context
+   --------------------------------------------------- */
 fclaw2d_domain_data_t*
 fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
 
+/* fclaw_app_t */
 fclaw_app_t*
 fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
 
@@ -80,12 +90,16 @@ void
 fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
                        fclaw_app_t* app);
 
+
+/* time */
 void
 fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time);
 
 double
 fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
 
+
+/* Mapping context */
 fclaw2d_map_context_t*
 fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain);
 
@@ -93,14 +107,15 @@ int
 fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
 
 
+/* Options */
 const amr_options_t*
 fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
 
-void*
-fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
-
 const amr_options_t*
 get_domain_parms(fclaw2d_domain_t *domain);
+
+void*
+fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
 
 
 #ifdef __cplusplus

@@ -256,11 +256,10 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* Need a new timer */
         ddata = fclaw2d_domain_get_data(*domain);
 
-        /* Set up ghost patches */
+        /* Set up ghost patches. No parallel communication is done here */
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
         fclaw2d_exchange_setup(*domain);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
-
 
         /* Update ghost cells.  This is needed because we have new coarse or fine
            patches without valid ghost cells.   */
