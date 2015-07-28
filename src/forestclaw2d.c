@@ -1741,13 +1741,54 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
                                    int *rblockno, int rpatchno[2],
                                    int *rfaceno)
 {
+    int *pi;
+    int grproc0, grfaceno;
+    fclaw2d_patch_relation_t prel;
+
     FCLAW_ASSERT (ind != NULL && ind->ready);
     FCLAW_ASSERT (domain == ind->domain);
 
-    rproc[0] = rproc[1] = -1;
-    rpatchno[0] = rpatchno[1] = -1;
+    FCLAW_ASSERT (0 <= ghostno && ghostno < domain->num_ghost_patches);
+    FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
 
-    return FCLAW2D_PATCH_BOUNDARY;
+    /* check the type of neighbor situation */
+    pi = (int *) ind->e->ghost_data[ghostno] + 6 * faceno;
+    grproc0 = pi[0];
+    grfaceno = pi[5];
+    if (!(grfaceno & (3 << 6)))
+    {
+        if (grproc0 == -1)
+        {
+            /* optimize for the most likely case */
+            rproc[0] = rpatchno[0] = -1;
+            rproc[1] = rpatchno[1] = -1;
+            return FCLAW2D_PATCH_BOUNDARY;
+        }
+        else
+        {
+            prel = FCLAW2D_PATCH_SAMESIZE;
+        }
+    }
+    if (grfaceno & (1 << 6))
+    {
+        prel = FCLAW2D_PATCH_HALFSIZE;
+    }
+    else
+    {
+        FCLAW_ASSERT (grfaceno & (1 << 7));
+        prel = FCLAW2D_PATCH_DOUBLESIZE;
+    }
+
+    /* aslign the queried values */
+    rproc[0] = grproc0;
+    rproc[1] = pi[1];
+    *rblockno = pi[2];
+    rpatchno[0] = pi[3];
+    rpatchno[1] = pi[4];
+    *rfaceno = grfaceno & ~(3 << 6);
+
+    /* and return */
+    return prel;
 }
 
 void
