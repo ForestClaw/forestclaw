@@ -114,11 +114,15 @@ c                 # ---------------------------------------------
                            sum = sum + qf*kf
                            af_sum = af_sum + kf
                         enddo
-c                        kc = areacoarse(ic,jc)
-c                        qcoarse(ic,jc,mq) = sum/kc
+c                       # ----------------------------------------
+c                       # At block seams, the coarse grid mesh cell
+c                       # areas may not have been computed using
+c                       # the correct metrics.
+c                       # ----------------------------------------
+c                       kc = areacoarse(ic,jc)
+c                       qcoarse(ic,jc,mq) = sum/kc
 
-c                       # Use area of the fine grids so that we get more
-c                       # accurate averages.
+c                       # Use areas of the fine grid mesh cells instead.
                         qcoarse(ic,jc,mq) = sum/af_sum
                      else
                         sum = 0
