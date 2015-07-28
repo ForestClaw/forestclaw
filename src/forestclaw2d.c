@@ -1456,6 +1456,47 @@ fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
     FCLAW_FREE (e);
 }
 
+fclaw2d_domain_indirect_t *
+fclaw2d_domain_indirect_exchange_begin (fclaw2d_domain_t * domain)
+{
+    fclaw2d_domain_indirect_t *ind;
+
+    ind = FCLAW_ALLOC_ZERO (fclaw2d_domain_indirect_t, 1);
+    ind->domain = domain;
+
+    return ind;
+}
+
+void
+fclaw2d_domain_indirect_exchange_end (fclaw2d_domain_indirect_t * ind)
+{
+    FCLAW_ASSERT (ind != NULL && !ind->ready);
+
+    ind->ready = 1;
+}
+
+fclaw2d_patch_relation_t
+fclaw2d_domain_indirect_neighbors (fclaw2d_domain_indirect_t * ind,
+                                   int ghostno, int faceno, int rproc[2],
+                                   int *rblockno, int rpatchno[2],
+                                   int *rfaceno)
+{
+    FCLAW_ASSERT (ind != NULL && ind->ready);
+
+    rproc[0] = rproc[1] = -1;
+    rpatchno[0] = rpatchno[1] = -1;
+
+    return FCLAW2D_PATCH_BOUNDARY;
+}
+
+void
+fclaw2d_domain_indirect_destroy (fclaw2d_domain_indirect_t * ind)
+{
+    FCLAW_ASSERT (ind != NULL && ind->ready);
+
+    FCLAW_FREE (ind);
+}
+
 void
 fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
 {
