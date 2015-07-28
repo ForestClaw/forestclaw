@@ -95,12 +95,9 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
        This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
        entry above, or by calling fclaw2d_clawpack46_qinit(...) from here. */
 
-    const amr_options_t *amropt;
     int mx,my,mbc,meqn, maux, maxmx, maxmy;
     double xlower,ylower,dx,dy;
     double *q, *aux;
-
-    amropt = get_domain_parms(domain);
 
     vt = fclaw2d_get_vtable(domain);
 
@@ -146,13 +143,12 @@ int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
-    int tag_patch, level;
+    int tag_patch;
     const amr_options_t *amropt;
     double rt;
 
     amropt = get_domain_parms(domain);
     rt = amropt->refine_threshold;
-    level = this_patch->level;
 
     vt = fclaw2d_get_vtable(domain);
 
