@@ -1456,32 +1456,286 @@ fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
     FCLAW_FREE (e);
 }
 
-fclaw2d_domain_indirect_t *
-fclaw2d_domain_indirect_exchange_begin (fclaw2d_domain_t * domain)
+struct fclaw2d_domain_indirect
 {
-    fclaw2d_domain_indirect_t *ind;
+    int ready;
+    fclaw2d_domain_t *domain;
+    fclaw2d_domain_exchange_t *e;
+    int *pbdata;
+};
 
+static void
+indirect_encode (p4est_ghost_t * ghost, int mpirank, int *rproc,
+                 int *rpatchno)
+{
+    p4est_quadrant_t *g;
+
+    if (*rproc == mpirank)
+    {
+        /* includes the case FCLAW2D_PATCH_BOUNDARY */
+        *rproc = *rpatchno = -1;
+    }
+    else
+    {
+        g = p4est_quadrant_array_index (&ghost->ghosts, *rpatchno);
+        *rpatchno = (int) g->p.piggy3.local_num;
+    }
+}
+
+fclaw2d_domain_indirect_t *
+fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
+{
+    int num_exc;
+    int neall, nb, ne, np;
+    int face;
+    int *pi, *rproc, *rblockno, *rpatchno, *rfaceno;
+    size_t data_size;
+    fclaw2d_block_t *block;
+    fclaw2d_domain_indirect_t *ind;
+    fclaw2d_patch_relation_t prel;
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_ghost_t *ghost = p4est_wrap_get_ghost (wrap);
+
+    num_exc = domain->num_exchange_patches;
+    data_size = P4EST_FACES * 6 * sizeof (int);
+
+    /* allocate internal state for this operation */
     ind = FCLAW_ALLOC_ZERO (fclaw2d_domain_indirect_t, 1);
     ind->domain = domain;
+    ind->e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
+
+    /* loop through exchange patches and fill their neighbor information */
+    ind->pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * 6);
+    for (neall = 0, nb = 0; nb < domain->num_blocks; ++nb)
+    {
+        ind->e->patch_data[neall] = (void *) pi;
+        block = domain->blocks + nb;
+        for (ne = 0; ne < block->num_exchange_patches; ++ne, ++neall)
+        {
+            np = (int) (block->exchange_patches[ne] - block->patches);
+            for (face = 0; face < P4EST_FACES; ++face)
+            {
+                rproc = pi;
+                rblockno = rproc + 2;
+                rpatchno = rblockno + 1;
+                rfaceno = rpatchno + 2;
+                prel = fclaw2d_patch_face_neighbors
+                    (domain, nb, np, face, rproc, rblockno, rpatchno,
+                     rfaceno);
+
+                /* obtain proper ghost patch numbers for the receiver */
+                indirect_encode (ghost, domain->mpirank,
+                                 &rproc[0], &rpatchno[0]);
+                if (prel == FCLAW2D_PATCH_HALFSIZE)
+                {
+                    indirect_encode
+                        (ghost, domain->mpirank, &rproc[1], &rpatchno[1]);
+                    *rfaceno |= 1 << 6;
+                }
+                else if (prel == FCLAW2D_PATCH_DOUBLESIZE)
+                {
+                    *rfaceno |= 1 << 7;
+                }
+                pi += 6;
+            }
+        }
+    }
+    FCLAW_ASSERT (neall == num_exc);
+
+    /* post messages */
+    fclaw2d_domain_ghost_exchange_begin (domain, ind->e,
+                                         0, domain->global_maxlevel);
 
     return ind;
 }
 
-void
-fclaw2d_domain_indirect_exchange_end (fclaw2d_domain_indirect_t * ind)
+static uint64_t
+pli_make_key (int p, int rpatchno)
 {
+    return (((uint64_t) p) << 32) + rpatchno;
+}
+
+static unsigned
+pli_hash_function (const void *v, const void *u)
+{
+    const uint64_t ui1 = *(uint64_t *) v;
+    uint32_t i1, i2, i3;
+
+    i1 = (uint32_t) ui1;
+    i2 = (uint32_t) (ui1 >> 16);
+    i3 = (uint32_t) (ui1 >> 32);
+    sc_hash_mix (i1, i2, i3);
+    sc_hash_final (i1, i2, i3);
+
+    return (unsigned) i1;
+}
+
+static int
+pli_equal_function (const void *v1, const void *v2, const void *u)
+{
+    const uint64_t ui1 = *(uint64_t *) v1;
+    const uint64_t ui2 = *(uint64_t *) v2;
+
+    return ui1 == ui2;
+}
+
+static int
+pli_make_ng (void **found, uint64_t * pli_keys)
+{
+    return (int) ((uint64_t *) * found - pli_keys);
+}
+
+static int
+indirect_decode (sc_hash_t * pli_hash, uint64_t * pli_keys,
+                 int mpisize, int mpirank, int *rproc, int *rpatchno)
+{
+    int good = 0;
+    int retval;
+    uint64_t akey;
+    void **found;
+
+    if (*rproc == mpirank)
+    {
+        *rproc = *rpatchno = -1;
+    }
+    if (*rproc != -1)
+    {
+        FCLAW_ASSERT (0 <= *rproc && *rproc < mpisize);
+        akey = pli_make_key (*rproc, *rpatchno);
+        retval = sc_hash_lookup (pli_hash, &akey, &found);
+        if (retval)
+        {
+            *rpatchno = pli_make_ng (found, pli_keys);
+            good = 1;
+        }
+        else
+        {
+            *rproc = *rpatchno = -1;
+        }
+    }
+    else
+    {
+        FCLAW_ASSERT (*rpatchno == -1);
+    }
+
+    return good;
+}
+
+void
+fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
+                             fclaw2d_domain_indirect_t * ind)
+{
+    int ndgp;
+    int good;
+    int p, ng;
+#ifdef FCLAW_ENABLE_DEBUG
+    int gprev;
+#endif
+    int gpatch;
+    int face;
+    int *rproc, *rpatchno, *rfaceno;
+    int *pi;
+    uint64_t *pli_keys, *plik;
+    sc_hash_t *pli_hash;
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_ghost_t *ghost = p4est_wrap_get_ghost (wrap);
+    p4est_quadrant_t *g;
+
     FCLAW_ASSERT (ind != NULL && !ind->ready);
+    FCLAW_ASSERT (domain == ind->domain);
+    ndgp = domain->num_ghost_patches;
+
+    /* prepare lookup logic for processor-local ghost indices */
+    pli_keys = plik = FCLAW_ALLOC (uint64_t, ndgp);
+    pli_hash = sc_hash_new (pli_hash_function, pli_equal_function,
+                            NULL, NULL);
+    for (ng = 0, p = 0; p < domain->mpisize; ++p)
+    {
+#ifdef FCLAW_ENABLE_DEBUG
+        gprev = -1;
+#endif
+        for (; ng < (int) ghost->proc_offsets[p + 1]; ++ng)
+        {
+            g = p4est_quadrant_array_index (&ghost->ghosts, ng);
+            gpatch = (int) g->p.piggy3.local_num;
+            FCLAW_ASSERT (gprev < gpatch);
+            *plik = pli_make_key (p, gpatch);
+            SC_EXECUTE_ASSERT_TRUE
+                (sc_hash_insert_unique (pli_hash, plik, NULL));
+#ifdef FCLAW_ENABLE_DEBUG
+            gprev = gpatch;
+#endif
+            ++plik;
+        }
+    }
+
+    /* receive messages */
+    fclaw2d_domain_ghost_exchange_end (domain, ind->e);
+
+    /* go through ghosts a second time, now working on received data */
+    for (ng = 0, p = 0; p < domain->mpisize; ++p)
+    {
+        for (; ng < (int) ghost->proc_offsets[p + 1]; ++ng)
+        {
+            g = p4est_quadrant_array_index (&ghost->ghosts, ng);
+            gpatch = (int) g->p.piggy3.local_num;
+            pi = (int *) ind->e->ghost_data[ng];
+
+            /* go through face neighbor patches of this ghost */
+            for (face = 0; face < P4EST_FACES; ++face)
+            {
+                rproc = pi;
+                rpatchno = pi + 3;
+                rfaceno = pi + 5;
+
+                /* check first face neighbor */
+                FCLAW_ASSERT (rproc[0] != p);
+                good = indirect_decode (pli_hash, pli_keys,
+                                        domain->mpisize, domain->mpirank,
+                                        &rproc[0], &rpatchno[0]);
+                FCLAW_ASSERT (rpatchno[0] == -1 ||
+                              (0 <= rpatchno[0] && rpatchno[0] < ndgp));
+                if (*rfaceno & (1 << 6))
+                {
+                    /* check second of two halfsize neighbors */
+                    FCLAW_ASSERT (rproc[1] != p);
+                    good = indirect_decode (pli_hash, pli_keys,
+                                            domain->mpisize, domain->mpirank,
+                                            &rproc[1], &rpatchno[1]) || good;
+                    FCLAW_ASSERT (rpatchno[1] == -1 ||
+                                  (0 <= rpatchno[1] && rpatchno[1] < ndgp));
+                }
+
+                /* no match on this face; we pretend a boundary situation */
+                if (!good)
+                {
+                    rproc[0] = rpatchno[0] = -1;
+                    rproc[1] = rpatchno[1] = -1;
+                    *rfaceno &= ~(3 << 6);
+                }
+
+                /* and move to the next face data item */
+                pi += 6;
+            }
+        }
+    }
+    FCLAW_ASSERT (ng == domain->num_ghost_patches);
+
+    FCLAW_FREE (pli_keys);
+    sc_hash_destroy (pli_hash);
 
     ind->ready = 1;
 }
 
 fclaw2d_patch_relation_t
-fclaw2d_domain_indirect_neighbors (fclaw2d_domain_indirect_t * ind,
+fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
+                                   fclaw2d_domain_indirect_t * ind,
                                    int ghostno, int faceno, int rproc[2],
                                    int *rblockno, int rpatchno[2],
                                    int *rfaceno)
 {
     FCLAW_ASSERT (ind != NULL && ind->ready);
+    FCLAW_ASSERT (domain == ind->domain);
 
     rproc[0] = rproc[1] = -1;
     rpatchno[0] = rpatchno[1] = -1;
@@ -1490,9 +1744,14 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_indirect_t * ind,
 }
 
 void
-fclaw2d_domain_indirect_destroy (fclaw2d_domain_indirect_t * ind)
+fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
+                                 fclaw2d_domain_indirect_t * ind)
 {
     FCLAW_ASSERT (ind != NULL && ind->ready);
+    FCLAW_ASSERT (domain == ind->domain);
+
+    fclaw2d_domain_free_after_exchange (domain, ind->e);
+    FCLAW_FREE (ind->pbdata);
 
     FCLAW_FREE (ind);
 }
