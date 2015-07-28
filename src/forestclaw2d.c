@@ -1531,11 +1531,11 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
                 {
                     indirect_encode
                         (ghost, domain->mpirank, &rproc[1], &rpatchno[1]);
-                    *rfaceno |= 1 << 6;
+                    *rfaceno |= 1 << 26;
                 }
                 else if (prel == FCLAW2D_PATCH_DOUBLESIZE)
                 {
-                    *rfaceno |= 1 << 7;
+                    *rfaceno |= 1 << 27;
                 }
                 pi += 6;
             }
@@ -1699,7 +1699,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                                         &rproc[0], &rpatchno[0]);
                 FCLAW_ASSERT (rpatchno[0] == -1 ||
                               (0 <= rpatchno[0] && rpatchno[0] < ndgp));
-                if (*rfaceno & (1 << 6))
+                if (*rfaceno & (1 << 26))
                 {
                     /* check second of two halfsize neighbors */
                     FCLAW_ASSERT (rproc[1] != p);
@@ -1716,7 +1716,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                     FCLAW_ASSERT (rproc[0] == -1);
                     FCLAW_ASSERT (rpatchno[0] == -1);
                     rproc[1] = rpatchno[1] = -1;
-                    *rfaceno &= ~(3 << 6);
+                    *rfaceno &= ~(3 << 26);
                 }
 
                 /* move to the next face data item */
@@ -1755,7 +1755,7 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
     pi = (int *) ind->e->ghost_data[ghostno] + 6 * faceno;
     grproc0 = pi[0];
     grfaceno = pi[5];
-    if (!(grfaceno & (3 << 6)))
+    if (!(grfaceno & (3 << 26)))
     {
         if (grproc0 == -1)
         {
@@ -1768,24 +1768,30 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         {
             prel = FCLAW2D_PATCH_SAMESIZE;
         }
-    }
-    if (grfaceno & (1 << 6))
-    {
-        prel = FCLAW2D_PATCH_HALFSIZE;
+        *rfaceno = grfaceno;
     }
     else
     {
-        FCLAW_ASSERT (grfaceno & (1 << 7));
-        prel = FCLAW2D_PATCH_DOUBLESIZE;
+        if (grfaceno & (1 << 26))
+        {
+            FCLAW_ASSERT (!(grfaceno & (1 << 27)));
+            prel = FCLAW2D_PATCH_HALFSIZE;
+        }
+        else
+        {
+            FCLAW_ASSERT (grfaceno & (1 << 27));
+            prel = FCLAW2D_PATCH_DOUBLESIZE;
+        }
+        *rfaceno = grfaceno & ~(3 << 26);
     }
+    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_FACES * P4EST_HALF);
 
-    /* aslign the queried values */
+    /* aslign the remaining output values */
     rproc[0] = grproc0;
     rproc[1] = pi[1];
     *rblockno = pi[2];
     rpatchno[0] = pi[3];
     rpatchno[1] = pi[4];
-    *rfaceno = grfaceno & ~(3 << 6);
 
     /* and return */
     return prel;
