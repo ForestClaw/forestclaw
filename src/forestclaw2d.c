@@ -1583,7 +1583,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
             }
         }
     }
-    FCLAW_ASSERT ((int) (pbdata - pi) == neall * P4EST_FACES * 6);
+    FCLAW_ASSERT ((int) (pi - pbdata) == neall * P4EST_FACES * 6);
     FCLAW_ASSERT (neall == num_exc);
 
     /* post messages */
