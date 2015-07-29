@@ -1,0 +1,57 @@
+#! /bin/sh
+
+FILE=`readlink -f "$1"`
+NAME=`basename "$FILE" .tar.gz`
+
+function bdie {
+	echo "$1"
+	exit 1
+}
+
+if test ! -f "$FILE" ; then
+	bdie "Please specify a forestclaw .tar.gz"
+fi
+
+# Check directories
+
+UNPACK="$HOME/nosave/unpack"
+BUILD="$HOME/nosave/build/$NAME"
+INSTALL="$HOME/stuff/local/$NAME"
+
+mkdir -p "$INSTALL" || bdie "Could not mkdir -p INSTALL"
+
+# Unpack
+
+cd "$UNPACK" || bdie "Could not cd into UNPACK"
+tar -xvzf "$FILE" || bdie "Could not UNPACK"
+
+# Make and install
+
+rm -rf "$BUILD"
+for TYPE in DEBUG FAST ; do
+	DIR="$BUILD/$TYPE"
+	export LDFLAGS="-L/bgsys/local/lib -L$XLFLIB_FZJ -L$ZLIB_LIB"
+	export LIBS="-lesslbg -lxlf90_r"
+	export CPPFLAGS="-I$ZLIB_INC"
+	CONFOPTS=
+	if test "x$TYPE" = xDEBUG ; then
+		export CFLAGS="-g -O0 -qsimd=noauto"
+		CONFOPTS="--enable-debug --enable-logging=SC_LP_INFO"
+		STRIP=
+		#continue
+	else
+		export CFLAGS="-O3 -qstrict -qarch=qp -qtune=qp"
+		CONFOPTS=
+		STRIP=-strip
+		#continue
+	fi
+	mkdir -p "$DIR" || bdie "Could not mkdir -p $DIR"
+	cd "$DIR" || bdie "Could not cd into $DIR"
+
+	"$UNPACK/$NAME/configure" \
+--enable-mpi \
+--prefix="$INSTALL/$TYPE" --without-blas --disable-shared $CONFOPTS
+
+	echo "Make $TYPE"
+	make -j8 "install$STRIP" >"$DIR/make.log" 2>"$DIR/make.err"
+done
