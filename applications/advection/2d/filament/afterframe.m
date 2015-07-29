@@ -14,7 +14,7 @@ if (t > 0)
     N = 1e4;
     [xout,yout] = filament_soln(N,t);
     plot(xout,yout,'k','linewidth',2);
-    hold on;
+    hold off;
 end
 
 % colormap(white);
