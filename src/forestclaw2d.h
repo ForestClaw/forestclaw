@@ -398,20 +398,19 @@ void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
 void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
                                         int ftransform[]);
 
-/** Correct the face transformation so it can be used intra-block.
- * \param [in] myblock      A valid block number.
- * \param [in] otherblock   A valid block number.  If this is equal to
- *                          \b myblock, we modify \b ftransform accordingly.
+/** Modify the face transformation depending no intra-block usage.
+ * This function can be called any number of times on the same transform array.
  * \param [in,out] ftransform   Array of values as created by \ref
  *                              fclaw2d_patch_face_transformation.
+ * \param [in] sameblock        Transformation supposed to work in same block?
  */
-void fclaw2d_patch_face_transformation_block (int myblock, int otherblock,
-                                              int ftransform[]);
+void fclaw2d_patch_face_transformation_block (int ftransform[],
+                                              int sameblock);
 
 /** Return whether a face transformation is valid.
  * \param [in] ftransform       Array of values as created by \ref
  *                              fclaw2d_patch_face_transformation,
- *                              possibly postprocessed by \ref
+ *                              possibly modified by \ref
  *                              fclaw2d_patch_face_transformation_block.
  * \return                      True if valid, false if not.
  */

@@ -530,18 +530,21 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 }
 
 void
-fclaw2d_patch_face_transformation_block (int myblock, int otherblock,
-                                         int ftransform[])
+fclaw2d_patch_face_transformation_block (int ftransform[], int sameblock)
 {
-    FCLAW_ASSERT (0 <= myblock && 0 <= otherblock);
     FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
-    if (myblock == otherblock)
+    if (sameblock)
     {
-        ftransform[8] = 4;
+        ftransform[8] |= 4;
     }
+    else
+    {
+        ftransform[8] &= ~4;
+    }
+    FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 }
 
-static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 4 };
+static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 7 };
 
 int
 fclaw2d_patch_face_transformation_valid (const int ftransform[])
