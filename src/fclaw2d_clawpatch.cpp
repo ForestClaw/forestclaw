@@ -30,6 +30,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ClawPatch.hpp>
 
+
+/* This is a duplicate of the function in fclaw2d_farraybox.cpp */
+static
+void set_snan(double& f)
+{
+    /* From :
+      "NaNs, Uninitialized Variables, and C++"
+      http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
+    */
+    *((long long*)&f) = 0x7ff0000000000001LL;
+}
+
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
     ClawPatch::app = app;
@@ -323,6 +335,17 @@ void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
     int msize = fclaw2d_clawpatch_ghost_packsize(domain);
     *q = (void*) FCLAW_ALLOC(double,msize);
     FCLAW_ASSERT(*q != NULL);
+
+#if FCLAW_DEBUG
+    /* This should go in some kind of debug pre-processing block */
+    double snan;
+    set_snan(snan);
+    double *qq = (double*) *q;
+    for(int i = 0; i < msize; i++)
+    {
+        qq[i] = snan;
+    }
+#endif
 }
 
 void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
