@@ -440,7 +440,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                 fclaw2d_patch_face_transformation (iface, rfaceno,
                                                    transform_data.transform);
 
-                int is_block_face = blockno == rblockno;
+                int is_block_face = blockno != rblockno;
                 if (!is_block_face)
                 {
                     transform_data.transform[8] = 4;
