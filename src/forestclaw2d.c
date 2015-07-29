@@ -1506,6 +1506,20 @@ indirect_encode (p4est_ghost_t * ghost, int mpirank,
     }
 }
 
+static void
+indirect_match (int *pi,
+                int **rproc, int **rblockno, int **rpatchno, int **rfaceno)
+{
+    FCLAW_ASSERT (pi != NULL);
+    FCLAW_ASSERT (rproc != NULL && rblockno != NULL);
+    FCLAW_ASSERT (rpatchno != NULL && rfaceno != NULL);
+
+    *rproc = pi;
+    *rblockno = pi + 2;
+    *rpatchno = pi + 3;
+    *rfaceno = pi + 5;
+}
+
 fclaw2d_domain_indirect_t *
 fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
 {
@@ -1541,10 +1555,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
             FCLAW_ASSERT (0 <= np && np < block->num_patches);
             for (face = 0; face < P4EST_FACES; ++face)
             {
-                rproc = pi;
-                rblockno = rproc + 2;
-                rpatchno = rblockno + 1;
-                rfaceno = rpatchno + 2;
+                indirect_match (pi, &rproc, &rblockno, &rpatchno, &rfaceno);
                 prel = fclaw2d_patch_face_neighbors
                     (domain, nb, np, face, rproc, rblockno, rpatchno,
                      rfaceno);
@@ -1566,6 +1577,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
             }
         }
     }
+    FCLAW_ASSERT ((int) (pbdata - pi) == neall * P4EST_FACES * 6);
     FCLAW_ASSERT (neall == num_exc);
 
     /* post messages */
@@ -1662,7 +1674,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
 #endif
     int gpatch;
     int face;
-    int *rproc, *rpatchno, *rfaceno;
+    int *rproc, *rblockno, *rpatchno, *rfaceno;
     int *pi;
     uint64_t *pli_keys, *plik;
     sc_hash_t *pli_hash;
@@ -1713,9 +1725,8 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
             /* go through face neighbor patches of this ghost */
             for (face = 0; face < P4EST_FACES; ++face)
             {
-                rproc = pi;
-                rpatchno = pi + 3;
-                rfaceno = pi + 5;
+                /* access values that were shipped with the ghost */
+                indirect_match (pi, &rproc, &rblockno, &rpatchno, &rfaceno);
 
                 /* check first face neighbor */
                 FCLAW_ASSERT (rproc[0] != p);
@@ -1767,7 +1778,7 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
                                    int *rfaceno)
 {
     int *pi;
-    int grproc0, grfaceno;
+    int *grproc, *grblockno, *grpatchno, *grfaceno;
     fclaw2d_patch_relation_t prel;
 
     FCLAW_ASSERT (ind != NULL && ind->ready);
@@ -1778,11 +1789,14 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
 
     /* check the type of neighbor situation */
     pi = (int *) ind->e->ghost_data[ghostno] + 6 * faceno;
-    grproc0 = pi[0];
-    grfaceno = pi[5];
-    if (!(grfaceno & (3 << 26)))
+    indirect_match (pi, &grproc, &grblockno, &grpatchno, &grfaceno);
+    *rblockno = *grblockno;
+    FCLAW_ASSERT (0 <= *rblockno && *rblockno < domain->num_blocks);
+    *rfaceno = *grfaceno & ~(3 << 26);
+    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_FACES * P4EST_HALF);
+    if (!(*grfaceno & (3 << 26)))
     {
-        if (grproc0 == -1)
+        if (grproc[0] == -1)
         {
             /* optimize for the most likely case */
             rproc[0] = rpatchno[0] = -1;
@@ -1793,30 +1807,26 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         {
             prel = FCLAW2D_PATCH_SAMESIZE;
         }
-        *rfaceno = grfaceno;
     }
     else
     {
-        if (grfaceno & (1 << 26))
+        if (*grfaceno & (1 << 26))
         {
-            FCLAW_ASSERT (!(grfaceno & (1 << 27)));
+            FCLAW_ASSERT (!(*grfaceno & (1 << 27)));
             prel = FCLAW2D_PATCH_HALFSIZE;
         }
         else
         {
-            FCLAW_ASSERT (grfaceno & (1 << 27));
+            FCLAW_ASSERT (*grfaceno & (1 << 27));
             prel = FCLAW2D_PATCH_DOUBLESIZE;
         }
-        *rfaceno = grfaceno & ~(3 << 26);
     }
-    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_FACES * P4EST_HALF);
 
     /* aslign the remaining output values */
-    rproc[0] = grproc0;
-    rproc[1] = pi[1];
-    *rblockno = pi[2];
-    rpatchno[0] = pi[3];
-    rpatchno[1] = pi[4];
+    rproc[0] = grproc[0];
+    rproc[1] = grproc[1];
+    rpatchno[0] = grpatchno[0];
+    rpatchno[1] = grpatchno[1];
 
     /* and return */
     return prel;
