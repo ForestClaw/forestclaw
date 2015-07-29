@@ -162,13 +162,14 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         *block_corner_count = 4;  /* assume four for now */
         /* We don't have a block corner transformation, so I am going to
            treat this as if it were an interior corner */
-        fclaw2d_patch_face_transformation_block (ftransform, 1);
-        fclaw2d_patch_face_transformation_block
-          (ftransform_finegrid->transform, 1);
+        fclaw2d_patch_face_transformation_intra (ftransform);
+        fclaw2d_patch_face_transformation_intra
+            (ftransform_finegrid->transform);
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
         /* Case 2 : 'icorner' is a hanging node */
+        /* We do not return valid transformation objects! */
         *ref_flag_ptr = NULL;
         *corner_patch = NULL;
         return;
@@ -215,9 +216,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         {
             /* Both patches are in the same block, so we set the transform to
                a default transform */
-            fclaw2d_patch_face_transformation_block (ftransform, 1);
-            fclaw2d_patch_face_transformation_block
-              (ftransform_finegrid->transform, 1);
+            fclaw2d_patch_face_transformation_intra (ftransform);
+            fclaw2d_patch_face_transformation_intra
+                (ftransform_finegrid->transform);
         }
         else
         {
