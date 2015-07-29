@@ -127,7 +127,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     local_maxlevel = -1;
 
     /* prepare propagation of refinement/coarsening marks */
-    domain->smooth_refine = 0;
+    domain->p.smooth_refine = 0;
+    domain->p.smooth_level = 0;
     domain->mirror_target_levels =
         FCLAW_ALLOC (void *, domain->num_exchange_patches);
     domain->ghost_target_levels =
@@ -407,7 +408,8 @@ static void
 fclaw2d_domain_copy_parameters (fclaw2d_domain_t * domain_dest,
                                 fclaw2d_domain_t * domain_src)
 {
-    domain_dest->smooth_refine = domain_src->smooth_refine;
+    memcpy (&domain_dest->p, &domain_src->p,
+            sizeof (fclaw2d_domain_persist_t));
 }
 
 static fclaw2d_patch_t *
@@ -429,7 +431,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     P4EST_ASSERT (!domain->just_partitioned);
 
     /* propagate desired refinement level to neighbors */
-    if (domain->smooth_refine)
+    if (domain->p.smooth_refine)
     {
         int ng, nb, np;
         int face, corner;

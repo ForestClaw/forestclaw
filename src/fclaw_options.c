@@ -284,6 +284,8 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_bool (opt, 0, "smooth-refine", &amropt->smooth_refine,
                          0, "Refinement smoothing[F]");
+    sc_options_add_int (opt, 0, "smooth-level", &amropt->smooth_refine_level,
+                        0, "Lowest level for smooth-refine[0]");
 
     sc_options_add_int (opt, 0, "coarsen-delay", &amropt->coarsen_delay,
                         0, "Number skipped coarsenings[0]");
