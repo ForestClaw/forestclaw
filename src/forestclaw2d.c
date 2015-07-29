@@ -544,6 +544,13 @@ fclaw2d_patch_face_transformation_block (int ftransform[], int sameblock)
     FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 }
 
+void
+fclaw2d_patch_face_transformation_intra (int ftransform[])
+{
+    memset (ftransform, 0, 9 * sizeof (int));
+    ftransform[8] = 4;
+}
+
 static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 7 };
 
 int
