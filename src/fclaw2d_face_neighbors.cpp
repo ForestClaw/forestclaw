@@ -396,6 +396,8 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
     int rblockno;
     int rfaceno;
 
+    int min_interp_level = time_interp ? minlevel-1 : minlevel;
+
     fclaw2d_transform_data_t transform_data;
     transform_data.mx = gparms->mx;
     transform_data.my = gparms->my;
@@ -411,6 +413,12 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
         fclaw2d_patch_t* this_ghost_patch = &domain->ghost_patches[i];
         int blockno = this_ghost_patch->u.blockno;
         int level = this_ghost_patch->level;
+        if (level < min_interp_level)
+        {
+            /* We don't need to worry about ghost patches that are at
+               coarser levels than we are currently working on */
+            continue;
+        }
         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_ghost_patch);
 
         int this_ghost_idx = i;
