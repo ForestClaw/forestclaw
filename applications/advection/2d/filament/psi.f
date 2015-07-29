@@ -21,7 +21,7 @@ c      psi = r**2
 c     # Filament formation
       psi = (4.d0/3.d0)*r**3
 
-c      psi = x - y
+      psi = x + y
 
       return
       end

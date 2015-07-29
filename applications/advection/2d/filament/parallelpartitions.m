@@ -12,6 +12,7 @@ pp.qmin = 0.01;
 pp.qmax = 1.01;
 % pp.qmin = 2;
 % pp.qmax = 4;
+pp.plotq = false;
 
 pp.qcolors = q;
 pp.colormap = colormap(yrbcolormap);  % Color map for q portion.

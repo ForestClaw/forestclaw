@@ -13,7 +13,7 @@ if (t > 0)
     hold on;
     N = 1e4;
     [xout,yout] = filament_soln(N,t);
-    plot(xout,yout,'k','linewidth',2);
+    % plot(xout,yout,'k','linewidth',2);
     hold off;
 end
 
