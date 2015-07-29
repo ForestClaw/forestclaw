@@ -103,14 +103,25 @@ struct fclaw2d_block
     void *user;
 };
 
+/** This structure identify parameters that are copied from a domain
+ * to a new domain derived by adaptation or partitioning. */
+typedef struct fclaw2d_domain_persist
+{
+    int smooth_refine;          /**< Boolean tells us whether to communicate
+                                     the desired refinement level to neighbors. */
+    int smooth_level;           /**< The minimum level that refinement smoothing
+                                     is enabled on.  Use 0 for al levels. */
+}
+fclaw2d_domain_persist_t;
+
 struct fclaw2d_domain
 {
     sc_MPI_Comm mpicomm;        /* MPI communicator */
     int mpisize, mpirank;       /* MPI variables */
     int possible_maxlevel;      /* theoretical maximum that can be reached */
 
-    int smooth_refine;          /**< Boolean tells us whether to communicate
-                                     the desired refinement level to neighbors. */
+    fclaw2d_domain_persist_t p;         /**< Parameters that carry over from
+                                             one domain to a derived one. */
 
     int local_num_patches;      /* sum of patches over all blocks on this proc */
     int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
@@ -525,13 +536,17 @@ void fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
  * \param [in,out] domain       This domain's refinement strategy is set.
  * \param [in] smooth_refine    Activate or deactivete refinement smoothing.
  *                              A newly created domain has this set to false.
+ * \param [in] smooth_level     If \b smooth_refine is true, denotes the
+ *                              lowest level that activates the smoothing.
+ *                              Use zero for smoothing across all levels.
  * \param [in] coarsen_delay    Non-negative number to set the delay for
  *                              coarsening after a patch has been last refined.
  *                              This number is a global threshold that is compared
  *                              against each patch's individual counter.
  */
 void fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
-                                    int smooth_refine, int coarsen_delay);
+                                    int smooth_refine, int smooth_level,
+                                    int coarsen_delay);
 
 /** Mark a patch for refinement.
  * It is safe to call this function from an iterator callback except
