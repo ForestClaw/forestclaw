@@ -392,7 +392,7 @@ void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
  *                              fclaw2d_patch_face_transformation.
  * \return                      True if valid, false if not.
  */
-int fclaw2d_patch_face_transformation_valid (int ftransform[]);
+int fclaw2d_patch_face_transformation_valid (const int ftransform[]);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.

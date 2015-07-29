@@ -532,7 +532,7 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 4 };
 
 int
-fclaw2d_patch_face_transformation_valid (int ftransform[])
+fclaw2d_patch_face_transformation_valid (const int ftransform[])
 {
     int i;
 
