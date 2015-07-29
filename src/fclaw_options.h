@@ -141,6 +141,7 @@ struct amr_options
     int maxlevel;
     int regrid_interval;
     int smooth_refine;
+    int smooth_refine_level;
     int coarsen_delay;
     double refine_threshold;
     double coarsen_threshold;

@@ -529,6 +529,18 @@ fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
     FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 }
 
+void
+fclaw2d_patch_face_transformation_block (int myblock, int otherblock,
+                                         int ftransform[])
+{
+    FCLAW_ASSERT (0 <= myblock && 0 <= otherblock);
+    FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
+    if (myblock == otherblock)
+    {
+        ftransform[8] = 4;
+    }
+}
+
 static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 4 };
 
 int
@@ -1056,13 +1068,15 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 
 void
 fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
-                               int smooth_refine, int coarsen_delay)
+                               int smooth_refine, int smooth_level,
+                               int coarsen_delay)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     FCLAW_ASSERT (coarsen_delay >= 0);
 
-    domain->smooth_refine = smooth_refine;
+    domain->p.smooth_refine = smooth_refine;
+    domain->p.smooth_level = smooth_level;
     p4est_wrap_set_coarsen_delay (wrap, coarsen_delay, 0);
 }
 
@@ -1075,11 +1089,13 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
 
     /* bump target level up */
     patch = fclaw2d_domain_get_patch (domain, blockno, patchno);
-    patch->target_level = patch->level + 1;
+    patch->target_level =
+        patch->level >= domain->p.smooth_level ?
+        patch->level + 1 : patch->level;
     patch->target_level = SC_MIN (patch->target_level, P4EST_QMAXLEVEL);
 
     /* if we do smooth refinement, all marking is done inside adapt */
-    if (!domain->smooth_refine)
+    if (!domain->p.smooth_refine)
     {
         p4est_wrap_mark_refine (wrap,
                                 (p4est_locidx_t) blockno,
@@ -1100,7 +1116,7 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     patch->target_level = SC_MAX (patch->target_level, 0);
 
     /* if we do smooth refinement, all marking is done inside adapt */
-    if (!domain->smooth_refine)
+    if (!domain->p.smooth_refine)
     {
         p4est_wrap_mark_coarsen (wrap,
                                  (p4est_locidx_t) blockno,
