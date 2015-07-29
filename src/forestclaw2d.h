@@ -387,6 +387,13 @@ void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
 void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
                                         int ftransform[]);
 
+/** Return whether a face transformation is valid.
+ * \param [in] ftransform       Array of values as created by \ref
+ *                              fclaw2d_patch_face_transformation.
+ * \return                      True if valid, false if not.
+ */
+int fclaw2d_patch_face_transformation_valid (int ftransform[]);
+
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).

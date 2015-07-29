@@ -511,19 +511,40 @@ fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
     const int iface = *faceno;
     const int orientation = *rfaceno / P4EST_FACES;
 
-    P4EST_ASSERT (orientation < P4EST_HALF);
-    P4EST_ASSERT (*faceno < P4EST_FACES);
+    P4EST_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
+    P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
+    P4EST_ASSERT (0 <= orientation && orientation < P4EST_HALF);
 
     *faceno = *rfaceno % P4EST_FACES;
     *rfaceno = iface + P4EST_FACES * orientation;
 
-    P4EST_ASSERT (*faceno < P4EST_FACES);
+    P4EST_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
+    P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
 }
 
 void
 fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 {
     p4est_expand_face_transform (faceno, rfaceno, ftransform);
+    FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
+}
+
+static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 4 };
+
+int
+fclaw2d_patch_face_transformation_valid (int ftransform[])
+{
+    int i;
+
+    for (i = 0; i < 9; ++i)
+    {
+        if (ftransform[i] < 0 || ftransform[i] > ftransform_max[i])
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 void
@@ -543,6 +564,8 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
     FCLAW_ASSERT (based == 0 || based == 1);
+
+    FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 
 #if 0
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
@@ -624,6 +647,8 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
     FCLAW_ASSERT (based == 0 || based == 1);
+
+    FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 
 #if 0
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
