@@ -129,7 +129,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
             FCLAW_ASSERT (*neighbor_block_idx == -1);
             fclaw2d_patch_face_transformation_block (ftransform, 1);
             fclaw2d_patch_face_transformation_block
-              (ftransform_finegrid->transform, 1);
+                (ftransform_finegrid->transform, 1);
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -451,10 +451,8 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                                    transform_data.transform);
 
                 int is_block_face = blockno != rblockno;
-                if (!is_block_face)
-                {
-                    transform_data.transform[8] = 4;
-                }
+                fclaw2d_patch_face_transformation_block(transform_data.transform,
+                                                        !is_block_face);
                 if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
                 {
                     /* Copy from same size neighbor */

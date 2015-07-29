@@ -398,14 +398,22 @@ void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
 void fclaw2d_patch_face_transformation (int faceno, int rfaceno,
                                         int ftransform[]);
 
-/** Modify the face transformation depending no intra-block usage.
+/** Modify an existing face transformation depending on intra-block usage.
  * This function can be called any number of times on the same transform array.
- * \param [in,out] ftransform   Array of values as created by \ref
+ * \param [in,out] ftransform   Array of values necessarily created by \ref
  *                              fclaw2d_patch_face_transformation.
  * \param [in] sameblock        Transformation supposed to work in same block?
  */
 void fclaw2d_patch_face_transformation_block (int ftransform[],
                                               int sameblock);
+
+/** Fill an array with the axis combination of a face neighbor transformation
+ * that operates on two patches in the same block (the trivial case).
+ * Use when there is no prior call to \ref fclaw2d_patch_face_transformation.
+ * Don't postprocess the result any further -- it's only useful intra-block.
+ * \param [out] ftransform      Gets initialized to a same-block transform.
+ */
+void fclaw2d_patch_face_transformation_intra (int ftransform[]);
 
 /** Return whether a face transformation is valid.
  * \param [in] ftransform       Array of values as created by \ref
