@@ -399,7 +399,9 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
     fclaw2d_transform_data_t transform_data;
     transform_data.mx = gparms->mx;
     transform_data.my = gparms->my;
-    transform_data.based = 1;                 /* cell-centered data in this routine. */
+    transform_data.based = 1;      /* cell-centered data in this routine. */
+
+    fclaw2d_domain_indirect_t *ind = ddata->domain_indirect;
 
     /* Loop over ghost patches to do any face exchanges that didn't happen
        before the ghost patch exchange was done */
@@ -411,7 +413,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
         int level = this_ghost_patch->level;
         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_ghost_patch);
 
-        fclaw2d_domain_indirect_t *ind = ddata->domain_indirect;
+        int this_ghost_idx = i;
 
         transform_data.this_patch = this_ghost_patch;
 
@@ -423,7 +425,6 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                from different processors, since these will not have
                exchange face data before being thrown over proc fence.
             */
-            int this_ghost_idx = i;
             fclaw2d_patch_relation_t neighbor_type =
                 fclaw2d_domain_indirect_neighbors(domain,
                                                   ind,
