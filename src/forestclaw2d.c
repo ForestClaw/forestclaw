@@ -1808,8 +1808,10 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         if (grproc[0] == -1)
         {
             /* optimize for the most likely case */
-            FCLAW_ASSERT (rproc[0] == -1 && rpatchno[0] == -1);
-            FCLAW_ASSERT (rproc[1] == -1 && rpatchno[1] == -1);
+            FCLAW_ASSERT (grproc[0] == -1 && grpatchno[0] == -1);
+            FCLAW_ASSERT (grproc[1] == -1 && grpatchno[1] == -1);
+            rproc[0] = rpatchno[0] = -1;
+            rproc[1] = rpatchno[1] = -1;
             return FCLAW2D_PATCH_BOUNDARY;
         }
         else
