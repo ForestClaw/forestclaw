@@ -162,8 +162,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         *block_corner_count = 4;  /* assume four for now */
         /* We don't have a block corner transformation, so I am going to
            treat this as if it were an interior corner */
-        ftransform[8] = 4;
-        ftransform_finegrid->transform[8] = 4;
+        fclaw2d_patch_face_transformation_block (ftransform, 1);
+        fclaw2d_patch_face_transformation_block
+          (ftransform_finegrid->transform, 1);
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
@@ -214,8 +215,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         {
             /* Both patches are in the same block, so we set the transform to
                a default transform */
-            ftransform_finegrid->transform[8] = 4;
-            ftransform[8] = 4;
+            fclaw2d_patch_face_transformation_block (ftransform, 1);
+            fclaw2d_patch_face_transformation_block
+              (ftransform_finegrid->transform, 1);
         }
         else
         {

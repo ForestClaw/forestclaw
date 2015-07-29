@@ -127,8 +127,9 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         {
             /* If we are within one patch this is a special case */
             FCLAW_ASSERT (*neighbor_block_idx == -1);
-            ftransform[8] = 4;
-            ftransform_finegrid->transform[8] = 4;
+            fclaw2d_patch_face_transformation_block (ftransform, 1);
+            fclaw2d_patch_face_transformation_block
+              (ftransform_finegrid->transform, 1);
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
