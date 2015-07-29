@@ -480,7 +480,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     {
         /* one same-size or double-size neighbor */
         fclaw2d_patch_encode_neighbor (domain, mesh, qtq,
-                                       rproc, rblockno + 0, rpatchno);
+                                       rproc + 0, rblockno, rpatchno + 0);
         for (k = 1; k < P4EST_HALF; ++k)
         {
             rproc[k] = -1;
@@ -1494,6 +1494,7 @@ indirect_encode (p4est_ghost_t * ghost, int mpirank,
 {
     p4est_quadrant_t *g;
 
+    FCLAW_ASSERT (0 <= *rproc && *rproc < ghost->mpisize);
     if (*rproc == mpirank)
     {
         /* includes the case FCLAW2D_PATCH_BOUNDARY */
@@ -1501,8 +1502,11 @@ indirect_encode (p4est_ghost_t * ghost, int mpirank,
     }
     else
     {
+        FCLAW_ASSERT (ghost->proc_offsets[*rproc] <= *rpatchno &&
+                      *rpatchno < ghost->proc_offsets[*rproc + 1]);
         g = p4est_quadrant_array_index (&ghost->ghosts, *rpatchno);
         *rpatchno = (int) g->p.piggy3.local_num;
+        FCLAW_ASSERT (*rpatchno >= 0);
     }
 }
 
@@ -1553,6 +1557,8 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
             ind->e->patch_data[neall] = (void *) pi;
             np = (int) (block->exchange_patches[ne] - block->patches);
             FCLAW_ASSERT (0 <= np && np < block->num_patches);
+            FCLAW_ASSERT (block->exchange_patches[ne] ==
+                          domain->exchange_patches[neall]);
             for (face = 0; face < P4EST_FACES; ++face)
             {
                 indirect_match (pi, &rproc, &rblockno, &rpatchno, &rfaceno);
@@ -1584,7 +1590,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     fclaw2d_domain_ghost_exchange_begin (domain, ind->e,
                                          0, domain->global_maxlevel);
 
-    /* it is safe to destroy the sent data now */
+    /* it is safe to destroy the sent data now; they have been copied */
     FCLAW_FREE (pbdata);
 
     return ind;
@@ -1593,6 +1599,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
 static uint64_t
 pli_make_key (int p, int rpatchno)
 {
+    FCLAW_ASSERT (p >= 0 && rpatchno >= 0);
     return (((uint64_t) p) << 32) + rpatchno;
 }
 
@@ -1667,7 +1674,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                              fclaw2d_domain_indirect_t * ind)
 {
     int ndgp;
-    int good;
+    int good, good2;
     int p, ng;
 #ifdef FCLAW_ENABLE_DEBUG
     int gprev;
@@ -1709,6 +1716,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
             ++plik;
         }
     }
+    FCLAW_ASSERT ((int) (plik - pli_keys) == ndgp);
 
     /* receive messages */
     fclaw2d_domain_ghost_exchange_end (domain, ind->e);
@@ -1733,16 +1741,17 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                 good = indirect_decode (pli_hash, pli_keys,
                                         domain->mpisize, domain->mpirank,
                                         &rproc[0], &rpatchno[0]);
-                FCLAW_ASSERT (rpatchno[0] == -1 ||
+                FCLAW_ASSERT ((rproc[0] == -1 && rpatchno[0] == -1) ||
                               (0 <= rpatchno[0] && rpatchno[0] < ndgp));
                 if (*rfaceno & (1 << 26))
                 {
                     /* check second of two halfsize neighbors */
                     FCLAW_ASSERT (rproc[1] != p);
-                    good = indirect_decode (pli_hash, pli_keys,
-                                            domain->mpisize, domain->mpirank,
-                                            &rproc[1], &rpatchno[1]) || good;
-                    FCLAW_ASSERT (rpatchno[1] == -1 ||
+                    good2 = indirect_decode (pli_hash, pli_keys,
+                                             domain->mpisize, domain->mpirank,
+                                             &rproc[1], &rpatchno[1]);
+                    good = good || good2;
+                    FCLAW_ASSERT ((rproc[1] == -1 && rpatchno[1] == -1) ||
                                   (0 <= rpatchno[1] && rpatchno[1] < ndgp));
                 }
 
@@ -1799,8 +1808,8 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         if (grproc[0] == -1)
         {
             /* optimize for the most likely case */
-            rproc[0] = rpatchno[0] = -1;
-            rproc[1] = rpatchno[1] = -1;
+            FCLAW_ASSERT (rproc[0] == -1 && rpatchno[0] == -1);
+            FCLAW_ASSERT (rproc[1] == -1 && rpatchno[1] == -1);
             return FCLAW2D_PATCH_BOUNDARY;
         }
         else
@@ -1827,6 +1836,22 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
     rproc[1] = grproc[1];
     rpatchno[0] = grpatchno[0];
     rpatchno[1] = grpatchno[1];
+#ifdef FCLAW_ENABLE_DEBUG
+    if (rproc[0] != -1)
+    {
+        FCLAW_ASSERT (0 <= rproc[0] && rproc[0] < domain->mpisize);
+        FCLAW_ASSERT (rproc[0] != domain->mpirank);
+        FCLAW_ASSERT (0 <= rpatchno[0] &&
+                      rpatchno[0] < domain->num_ghost_patches);
+    }
+    if (prel == FCLAW2D_PATCH_HALFSIZE && rproc[1] != -1)
+    {
+        FCLAW_ASSERT (0 <= rproc[1] && rproc[1] < domain->mpisize);
+        FCLAW_ASSERT (rproc[1] != domain->mpirank);
+        FCLAW_ASSERT (0 <= rpatchno[1] &&
+                      rpatchno[1] < domain->num_ghost_patches);
+    }
+#endif
 
     /* and return */
     return prel;
