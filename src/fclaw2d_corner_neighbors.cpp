@@ -481,9 +481,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 {
                     /* Disable floating point traps so we don't catch the one-off case
                        at multi-proc corners */
-#if 0
-                    fedisableexcept(FE_INVALID);
-#endif
                     if (!(is_block_corner && ispillowsphere))
                     {
                         /* Interpolate from remote patch (coarse grid) to
@@ -498,10 +495,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         /* Pillow sphere : icorner doesn't change */
                         coarse_cp->mb_interpolate_block_corner_ghost(icorner,refratio,
                                                                      fine_cp,time_interp);
-                    }
-                    if (gparms->trapfpe)
-                    {
-                        feenableexcept(FE_INVALID);
                     }
                 }
                 else if (average_from_neighbor)

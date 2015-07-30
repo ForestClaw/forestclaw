@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * IDEA 1: add boolean about on_parallel_boundary vs. interior.
  *         1. Do the parallel boundary work here.
  *            To the least possible amount of work before sending.
- *             * copy_ghost_samelevel
+ *             * copy_samelevel
  *             * average_ghost_f2c
  *             * fill_physical_ghost
  *               (which subset of cells shall do it?)
@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *         3. Do all the work on interior patches and whatever has not
  *            been computed between parallel boundary patches.
  *            Do the most possible amount of work while communicating.
- *             * copy_ghost_samelevel
+ *             * copy_samelevel
  *             * average_ghost_f2c
  *             * fill_physical_ghost
  *               (how much of this can we possibly to here: maximize this.)
@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *               faces between parallel boundary and interior patches.
  *         4. Recieve messages: ghost_exchange_end.
  *         5. Work on receive buffers / parallel patches with remote data.
- *             * copy_ghost_samelevel
+ *             * copy_samelevel
  *             * average_ghost_f2c
  *             * fill_physical_ghost
  *             * interpolate_ghost_c2f
@@ -150,7 +150,7 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
    Loop over all levels
    ----------------------------------------------- */
 static
-void copy_ghost_samelevel(fclaw2d_domain_t* domain,
+void copy_samelevel(fclaw2d_domain_t* domain,
                           int minlevel,
                           int maxlevel,
                           fclaw_bool time_interp,
@@ -445,7 +445,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
             FCLAW2D_BOUNDARY_ALL;
         fclaw_bool read_parallel_patches = false;
 
-        copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(domain,minlevel,maxlevel,time_interp,
                              read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
@@ -463,7 +463,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                                       parallel_mode);
         /* --------------------------------------------------------- */
         /* Do a final fill in of boundary conditions of all physical
-           values */
+           values. Could we just do minfine to maxfine? */
         fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
     }
     else
@@ -477,8 +477,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
             FCLAW2D_BOUNDARY_GHOST_ONLY;
         fclaw_bool read_parallel_patches = false;
 
-        copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
-                             read_parallel_patches,parallel_mode);
+        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+                       read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
                                   time_interp,
@@ -504,8 +504,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         int maxfine = maxlevel;
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
-        copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
-                             read_parallel_patches,parallel_mode);
+        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+                       read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
                                   time_interp,
@@ -519,6 +519,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                                       read_parallel_patches,
                                       parallel_mode);
 
+        /* minfine to maxfine?  */
         fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
@@ -547,7 +548,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
         read_parallel_patches = fclaw_true;
 
-        copy_ghost_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(domain,minlevel,maxlevel,time_interp,
                              read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
