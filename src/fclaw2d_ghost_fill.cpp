@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 
 #include <fclaw2d_ghost_fill.h>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_domain.h>
@@ -79,6 +80,9 @@ extern "C" {
 }
 #endif
 #endif
+
+
+
 
 /* -------------------------------------------------
    Basic routines - operate on a single level
@@ -422,6 +426,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     fclaw_global_essentialf("WARNING : compute_slopes set to average\n");
 #endif
 
+    /* For debugging */
+    fclaw2d_clawpatch_set_boundary_to_nan(domain,time_interp);
+
     /* ---------------------------------------------------------
        Get coarse grid ghost cells ready to use for interpolation.
        Coarse ghost cells on ghost patches are not updated in
@@ -439,7 +446,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
 
-    if (domain->mpisize == 1)
+    if (domain->mpisize == 0)
     {
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_ALL;
@@ -472,7 +479,10 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            Do work we can do before sending
            ------------------------------------------------------------*/
 
-        /* Copy/average ghost cells at the parallel boundary */
+        /* Copy/average ghost cells in local patches at the parallel boundary.
+           This is needed so that when these boundary patches get sent to other
+           processors as ghost patches, they have valid ghost cells if needed
+           for interpolation.*/
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_GHOST_ONLY;
         fclaw_bool read_parallel_patches = false;
@@ -485,7 +495,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                                   read_parallel_patches,
                                   parallel_mode);
 
-        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+        /* This is needed when the parallel boundary intersects the physical
+           boundary.  In this case, a coarse grid ghost patch might
+           need to have physical boundary conditions in order to interpolate
+           to a fine grid local patch. */
+        fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
 
 
         /* --------------------------------------------------------------
@@ -512,7 +526,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                                   read_parallel_patches,
                                   parallel_mode);
 
-        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+        fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
 
         interpolate_coarse2fine_ghost(domain,minfine, maxfine,
                                       time_interp,
@@ -520,7 +534,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                                       parallel_mode);
 
         /* minfine to maxfine?  */
-        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+        fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
 
@@ -554,7 +568,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
                                   read_parallel_patches,parallel_mode);
 
-        fill_physical_ghost(domain,mincoarse,maxcoarse,t,time_interp);
+        fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
 
 
         interpolate_coarse2fine_ghost(domain,minfine, maxfine,
@@ -571,7 +585,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw2d_timer_start (&ddata->timers[running]);
     }
 }
-
 
 
 #ifdef __cplusplus

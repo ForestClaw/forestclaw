@@ -302,6 +302,36 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
     }
 }
 
+
+/* -------------------------------------------------
+   For debugging
+   ----------------------------------------------- */
+void cb_set_bc_to_value(fclaw2d_domain_t* domain,
+                      fclaw2d_patch_t* this_patch,
+                      int blockno,
+                      int patchno,
+                      void *user)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s = *((set_bc*) user);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->set_boundary_to_value(s.time_interp,s.value);
+}
+
+
+void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
+                                           int time_interp)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s;
+    s.time_interp = time_interp;
+    fclaw2d_farraybox_set_to_nan(s.value);
+    fclaw2d_domain_iterate_patches(domain, cb_set_bc_to_value,
+                                   (void *)  &s);
+}
+
+
+
 /* ----------------------------------------------------------
    Parallel ghost exchanges.
 

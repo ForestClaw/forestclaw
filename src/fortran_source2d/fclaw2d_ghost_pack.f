@@ -144,3 +144,47 @@ c     # Face 3
       endif
 
       end
+
+
+      subroutine fclaw2d_set_boundary_to_value(mx,my,mbc,meqn,q,val)
+      implicit none
+
+      integer mx,my,mbc,meqn
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision val
+
+      integer i,j,ibc,jbc,mq
+
+c     # set boundary in strips, as with the packing routines
+
+c     # Face 0
+      do mq = 1,meqn
+         do j = 1-mbc,my
+            do ibc = 1,mbc
+               q(1-ibc,j,mq) = val
+            enddo
+         enddo
+
+c        # Face 2
+         do jbc = 1,mbc
+            do i = 1,mx+mbc
+               q(i,1-jbc,mq) = val
+            enddo
+         enddo
+
+c        # Face 1
+         do j = 1,my+mbc
+            do ibc = 1,mbc
+               q(mx+ibc,j,mq) = val
+            enddo
+         enddo
+
+c        # Face 3
+         do jbc = 1,mbc
+            do i = 1-mbc,mx
+               q(i,my+jbc,mq) = val
+            enddo
+         enddo
+      enddo
+
+      end

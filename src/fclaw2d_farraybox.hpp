@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_FARRAYBOX_H
 #define FCLAW2D_FARRAYBOX_H
 
+
+void fclaw2d_farraybox_set_to_nan(double& f);
+
 class Box
 {
 public:

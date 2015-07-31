@@ -46,7 +46,6 @@ void set_qnan(double& f)
     f = NAN;
 }
 
-
 static
 void set_snan(double& f)
 {
@@ -62,6 +61,13 @@ void set_big_number(double& f)
 {
     f = 1e99;
 }
+
+
+void fclaw2d_farraybox_set_to_nan(double& f)
+{
+    set_snan(f);
+}
+
 
 
 FArrayBox::FArrayBox()

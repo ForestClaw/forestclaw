@@ -103,6 +103,10 @@ void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *packmode, int *pack_layers,
                          int *ierror);
 
+#define FCLAW2D_SET_BOUNDARY_TO_VALUE FCLAW_F77_FUNC(fclaw2d_set_boundary_to_value, \
+                                                     FCLAW2D_SET_BOUNDARY_TO_VALUE)
+void FCLAW2D_SET_BOUNDARY_TO_VALUE(int *mx, int* my, int* mbc,
+                                   int* meqn,double* q, double* val);
 
 #ifdef __cplusplus
 #if 0

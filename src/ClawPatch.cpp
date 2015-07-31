@@ -356,6 +356,14 @@ void ClawPatch::partition_unpack(double *q)
    Exchange/average/interpolate
    ---------------------------------------------------------------- */
 
+void ClawPatch::set_boundary_to_value(const int& time_interp,
+                                      double& value)
+{
+    double *q = q_time_sync(time_interp);
+    FCLAW2D_SET_BOUNDARY_TO_VALUE(&m_mx, &m_my, &m_mbc, &m_meqn, q, &value);
+}
+
+
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
                                     fclaw2d_transform_data_t* transform_data)

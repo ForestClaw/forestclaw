@@ -118,6 +118,9 @@ public :
                                   fclaw_bool a_time_interp,
                                   fclaw2d_transform_data_t* transform_cptr);
 
+    void set_boundary_to_value(const int& time_interp,
+                               double& value);
+
     /* ----------------------------------------------------------------
        Pillow grid ghost exchanges
        ---------------------------------------------------------------- */
