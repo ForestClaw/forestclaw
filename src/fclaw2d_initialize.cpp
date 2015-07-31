@@ -140,10 +140,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     // Refine as needed, one level at a time.
     if (minlevel < maxlevel)
     {
-        int level =  minlevel;
         int domain_init = 1;
-        fclaw_bool have_new_refinement = 1;
-        while (level < maxlevel && have_new_refinement)
+        for (int level = minlevel; level < maxlevel; level++)
         {
             fclaw2d_domain_iterate_level(*domain, level,
                                          cb_fclaw2d_regrid_tag4refinement,
@@ -151,7 +149,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
             // Construct new domain based on tagged patches.
             fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-            have_new_refinement = new_domain != NULL;
+            int have_new_refinement = new_domain != NULL;
 
             // Domain data may go out of scope now.
             ddata = NULL;
@@ -203,20 +201,17 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
                 /* Set up ghost patches */
                 fclaw2d_exchange_setup(*domain);
+            }
+            else
+            {
+                /* minlevel == maxlevel;  no refining necessary.  We have an initial
+                   partition, so we don't need to partition a new domaoin. */
 
-                level++;
+                fclaw2d_exchange_setup(*domain);
+                break;
             }
         }
     }
-    else
-    {
-        /* minlevel == maxlevel;  no refining necessary.  We have an initial
-           partition, so we don't need to partition a new domaoin. */
-
-        fclaw2d_exchange_setup(*domain);
-    }
-
-
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",
                 (*domain)->global_minlevel, (*domain)->global_maxlevel);
