@@ -129,7 +129,7 @@ c                       # Use areas of the fine grid mesh cells instead.
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
-                        qcoarse(ic,jc,mq) = sum/r2
+                        qcoarse(ic,jc,mq) = sum/dble(r2)
                      endif
                   endif
                enddo
@@ -172,7 +172,7 @@ c                        qcoarse(ic,jc,mq) = sum/kc
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
-                        qcoarse(ic,jc,mq) = sum/r2
+                        qcoarse(ic,jc,mq) = sum/dble(r2)
                      endif
                   endif
                enddo
@@ -277,7 +277,7 @@ c                  qcoarse(i1,j1,mq) = sum/kc
                   do m = 0,r2-1
                      sum = sum + qfine(i2(m),j2(m),mq)
                   enddo
-                  qcoarse(i1,j1,mq) = sum/r2
+                  qcoarse(i1,j1,mq) = sum/dble(r2)
                endif
 
 
