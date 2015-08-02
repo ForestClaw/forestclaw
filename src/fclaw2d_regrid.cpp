@@ -268,6 +268,15 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         int time_interp = 0;
         fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
     }
+    else
+    {
+        /* Update ghost cells.  This is needed because we have new coarse or fine
+           patches without valid ghost cells.   */
+        int minlevel = (*domain)->global_minlevel;
+        int maxlevel = (*domain)->global_maxlevel;
+        int time_interp = 0;
+        fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
+    }
 
     /* Stop timer */
     ddata = fclaw2d_domain_get_data(*domain);

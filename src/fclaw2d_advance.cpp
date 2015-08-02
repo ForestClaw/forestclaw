@@ -219,12 +219,14 @@ double advance_all_levels(fclaw2d_domain_t *domain,
        be called a second time.
        Idea : If we know we are regridding before the next step, we could
        skip this update, and make it clear to the user that ghost cell
-       values are not available for determining refinement critera.
+       values are not available for determining refinement criteria.
     */
     int time_interp = 0;
     fclaw_global_infof("Advance is done with coarse grid step at " \
                       " time %12.6e\n",a_time_stepper->initial_time());
+#if 0
     fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
+#endif
 
     // Stop the timer
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
