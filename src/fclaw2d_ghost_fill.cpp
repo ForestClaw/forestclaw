@@ -427,7 +427,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 #endif
 
     /* For debugging */
-    fclaw2d_clawpatch_set_boundary_to_nan(domain,time_interp);
+    fclaw2d_clawpatch_set_boundary_to_nan(domain,minlevel,maxlevel,time_interp);
 
     /* ---------------------------------------------------------
        Get coarse grid ghost cells ready to use for interpolation.
@@ -498,9 +498,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* This is needed when the parallel boundary intersects the physical
            boundary.  In this case, a coarse grid ghost patch might
            need to have physical boundary conditions in order to interpolate
-           to a fine grid local patch. */
+           to a fine grid local patch.
+           In the non-parallel case, this is bogus. */
         fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
-
 
         /* --------------------------------------------------------------
            Start send ...
@@ -535,6 +535,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
         /* minfine to maxfine?  */
         fill_physical_ghost(domain,minlevel,maxlevel,t,time_interp);
+
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
 
