@@ -13,12 +13,12 @@ PROGRAM compare_files
 
   INTEGER :: i,j, n, m
 
-  INTEGER :: ngrids, mfields
-  INTEGER :: ngrids1, mfields1
-  INTEGER :: ngrids2, mfields2
-  INTEGER :: ngrid, level, mx, my, blockno
-  INTEGER :: ngrid1, level1, mx1, my1, blockno1
-  INTEGER :: ngrid2, level2, mx2, my2, blockno2
+  INTEGER :: ngrids, meqn
+  INTEGER :: ngrids1, meqn1
+  INTEGER :: ngrids2, meqn2
+  INTEGER :: ngrid, level, mx, my, blockno, mpirank
+  INTEGER :: ngrid1, level1, mx1, my1, blockno1, mpirank1
+  INTEGER :: ngrid2, level2, mx2, my2, blockno2, mpirank2
 
   DOUBLE PRECISION :: xlow, ylow, dx, dy, t
   DOUBLE PRECISION :: xlow1, ylow1, dx1, dy1, t1
@@ -38,18 +38,37 @@ PROGRAM compare_files
   !! CHARACTER :: c
   INTEGER :: nstp, ipos, idigit, l1, l2
 
-!! Size of compare.dat grid
-  WRITE(6,'(A)') 'Enter directory 1 : '
-  READ(5,*) dir1
+  INTEGER :: num_args, ix
+  CHARACTER(len=12), DIMENSION(:), ALLOCATABLE :: args
 
-  WRITE(6,'(A)') 'Enter directory 2 : '
-  READ(5,*) dir2
+  num_args = COMMAND_ARGUMENT_COUNT()
+  ALLOCATE(args(num_args))  ! I've omitted checking the return status of the allocation
 
-  WRITE(6,'(A)') 'Enter directory for results (directory must exist) : '
-  READ(5,*) dir3
+  IF (num_args > 0) THEN
+     !! Read from the command line
+     DO ix = 1, num_args
+        CALL GET_COMMAND_ARGUMENT(ix,args(ix))
+     END DO
 
-  WRITE(6,'(A)') 'Enter Frame number to compare : '
-  READ(5,*) iframe
+     dir1 = TRIM('save_proc')//TRIM(args(1))
+     dir2 = TRIM('save_proc')//TRIM(args(2))
+     dir3 = TRIM('compare')
+     READ(args(3),*) iframe
+  ELSE
+
+     !! Size of compare.dat grid
+     WRITE(6,'(A)') 'Enter directory 1 : '
+     READ(5,*) dir1
+
+     WRITE(6,'(A)') 'Enter directory 2 : '
+     READ(5,*) dir2
+
+     WRITE(6,'(A)') 'Enter directory for results (directory must exist) : '
+     READ(5,*) dir3
+
+     WRITE(6,'(A)') 'Enter Frame number to compare : '
+     READ(5,*) iframe
+  END IF
 
   !! OPEN(10,file='compare_results.dat')
   !! READ(10,*) iframe
@@ -91,25 +110,20 @@ PROGRAM compare_files
   WRITE(6,*) dir2_fname2
   WRITE(6,*) ' '
 
-  dir3_fname3 = TRIM(dir3)//'/'//TRIM(fname3)
-  WRITE(6,*) 'A summary of the results will be stored in : '
-  WRITE(6,*) dir3_fname3
-
-
   OPEN(10,file=dir1_fname2)
   READ(10,*) t1
-  READ(10,*) mfields1
+  READ(10,*) meqn1
   READ(10,*) ngrids1
   CLOSE(10)
 
   OPEN(10,file=dir2_fname2)
   READ(10,*) t2
-  READ(10,*) mfields2
+  READ(10,*) meqn2
   READ(10,*) ngrids2
   CLOSE(10)
 
-  IF (mfields1 .NE. mfields2) THEN
-     WRITE(6,*) 'mfields1 .ne. mfields2'
+  IF (meqn1 .NE. meqn2) THEN
+     WRITE(6,*) 'meqn1 .ne. meqn2'
      stop
   ENDIF
 
@@ -124,23 +138,33 @@ PROGRAM compare_files
   ENDIF
   t = t1
   ngrids = ngrids1
-  mfields = mfields1
+  meqn = meqn1
 
-  ALLOCATE(max_grids(0:ngrids-1,mfields))
+  WRITE(6,'(A,F24.8)') 'Time of simulation : t = ',t
 
-  CALL write_tfile(iframe,t,mfields,ngrids,dir3)
+  dir3_fname3 = TRIM(dir3)//'/'//TRIM(fname3)
+  WRITE(6,*) 'A summary of the results will be stored in : '
+  WRITE(6,*) dir3_fname3
+
+
+  ALLOCATE(max_grids(0:ngrids-1,meqn))
+
+  CALL write_tfile(iframe,t,meqn,ngrids,dir3)
   CALL new_qfile(iframe,dir3)
 
-  ALLOCATE(grid_max(mfields),global_max(mfields))
+  ALLOCATE(grid_max(meqn),global_max(meqn))
   grid_max = 0
   global_max = 0
 
-  OPEN(10,file=dir1_fname1)
-  OPEN(20,file=dir2_fname1)
+
+
+  OPEN(10,FILE=dir1_fname1,ERR=100)
+  OPEN(20,FILE=dir2_fname1,ERR=200)
   DO n = 0, ngrids-1
      READ(10,*) ngrid1
      READ(10,*) level1
      READ(10,*) blockno1
+     READ(10,*) mpirank1
      READ(10,*) mx1
      READ(10,*) my1
      READ(10,*) xlow1
@@ -151,6 +175,7 @@ PROGRAM compare_files
      READ(20,*) ngrid2
      READ(20,*) level2
      READ(20,*) blockno2
+     READ(20,*) mpirank2
      READ(20,*) mx2
      READ(20,*) my2
      READ(20,*) xlow2
@@ -184,23 +209,24 @@ PROGRAM compare_files
      level = level1
      ngrid = ngrid1
      blockno = blockno1
+     mpirank = MAX(mpirank1,mpirank2)
      dx = dx1
      dy = dy1
      xlow = xlow1
      ylow = ylow1
 
-     ALLOCATE(q1(mx,my,mfields))
-     ALLOCATE(q2(mx,my,mfields))
-     ALLOCATE(qc(mx,my,mfields))
+     ALLOCATE(q1(mx,my,meqn))
+     ALLOCATE(q2(mx,my,meqn))
+     ALLOCATE(qc(mx,my,meqn))
 
-     DO m = 1,mfields
+     DO m = 1,meqn
         max_grids(ngrid,m) = 0
      ENDDO
      DO j = 1,my
         DO i = 1,mx
-           READ(10,*) (q1(i,j,m),m = 1,mfields)
-           READ(20,*) (q2(i,j,m),m = 1,mfields)
-           DO m = 1,mfields
+           READ(10,*) (q1(i,j,m),m = 1,meqn)
+           READ(20,*) (q2(i,j,m),m = 1,meqn)
+           DO m = 1,meqn
               qc(i,j,m) = ABS(q1(i,j,m)-q2(i,j,m))
               IF (qc(i,j,m) .GT. global_max(m)) THEN
                  global_max(m) = qc(i,j,m)  !! Largest difference on all grids
@@ -211,8 +237,8 @@ PROGRAM compare_files
         ENDDO
      ENDDO
 
-     CALL write_qfile(mx,my,mfields,xlow,ylow, &
-          dx,dy,qc,iframe,ngrid,level,blockno,dir3)
+     CALL write_qfile(mx,my,meqn,xlow,ylow, &
+          dx,dy,qc,iframe,ngrid,level,blockno,mpirank,dir3)
 
 
      DEALLOCATE(q1, q2, qc)
@@ -221,32 +247,36 @@ PROGRAM compare_files
   CLOSE(20)
 
   WRITE(6,*) ' '
-  DO m = 1,mfields
+  DO m = 1,meqn
      WRITE(6,150) global_max(m), m, grid_max(m)
   ENDDO
 
   WRITE(6,*) ' '
   OPEN(30,file=dir3_fname3)
-  DO m = 1,mfields
+  DO m = 1,meqn
      WRITE(30,150) global_max(m), m, grid_max(m)
   ENDDO
   WRITE(30,*) ' '
 
   DO n = 0,ngrids-1
-     WRITE(30,'(I5,10E16.4)') n, (max_grids(n,m),m=1,mfields)
+     WRITE(30,'(I5,10E16.4)') n, (max_grids(n,m),m=1,meqn)
   ENDDO
   CLOSE(30)
 130 FORMAT(E30.16,'     ',A)
 140 FORMAT(I30,   '     ',A)
 150 FORMAT(E30.16, '     occurs in field',I5,' on grid ',I5)
 
+  RETURN
+100 WRITE(6,*) 'Could not open file ', dir1_fname1
+200 WRITE(6,*) 'Could not open file ', dir2_fname1
+
 END PROGRAM compare_files
 
 
-SUBROUTINE write_tfile(iframe,time,mfields,ngrids,dir3)
+SUBROUTINE write_tfile(iframe,time,meqn,ngrids,dir3)
   IMPLICIT NONE
 
-  INTEGER :: iframe,mfields,ngrids,maux
+  INTEGER :: iframe,meqn,ngrids,maux
   CHARACTER(100) :: dir3, dir3_fname1, dir3_fname2
   CHARACTER(10) :: fname1
   CHARACTER(10) :: fname2
@@ -269,13 +299,14 @@ SUBROUTINE write_tfile(iframe,time,mfields,ngrids,dir3)
 
   maux = 0
   OPEN(matunit2,file=dir3_fname2)
-  WRITE(matunit2,1000) time,mfields,ngrids,maux
+  WRITE(matunit2,1000) time,meqn,ngrids,maux
 1000 FORMAT(e18.8,'    time', /, &
-          i5,'                 mfields'/, &
+          i5,'                 meqn'/, &
           i5,'                 ngrids'/, &
           i5,'                 maux'/,/)
 
   CLOSE(matunit2)
+
 
 END SUBROUTINE write_tfile
 
@@ -306,16 +337,16 @@ SUBROUTINE new_qfile(iframe,dir3)
 END SUBROUTINE new_qfile
 
 
-SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
-     dx,dy,q,iframe,patch_num,level,blockno,dir3)
+SUBROUTINE write_qfile(mx,my,meqn,xlower,ylower, &
+     dx,dy,q,iframe,patch_num,level,blockno,mpirank,dir3)
 
   IMPLICIT NONE
 
-  INTEGER :: mfields,mbc,mx,my
+  INTEGER :: meqn,mbc,mx,my,mpirank
   INTEGER :: iframe,patch_num, level, blockno
   DOUBLE PRECISION :: xlower, ylower, dx, dy
 
-  DOUBLE PRECISION q(mx,my,mfields)
+  DOUBLE PRECISION q(mx,my,meqn)
 
   CHARACTER(10) :: fname1
   INTEGER :: matunit1
@@ -338,12 +369,13 @@ SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
   dir3_fname1 = TRIM(dir3)//'/'//trim(fname1)
   OPEN(fid_com,file=dir3_fname1,position='append');
 
-  WRITE(fid_com,1001) patch_num, level, blockno, mx, my
+  WRITE(fid_com,1001) patch_num, level, blockno, mpirank, mx, my
 1001 FORMAT(i5,'                 grid_number',/, &
-          i5,'                 AMR_level',/, &
-          i5,'                 block_number',/, &
-          i5,'                 mx',/, &
-          i5,'                 my')
+            i5,'                 AMR_level',/, &
+            i5,'                 block_number',/, &
+            i5,'                 mpi_rank',/, &
+            i5,'                 mx',/, &
+            i5,'                 my')
 
 
   WRITE(fid_com,1002) xlower,ylower,dx,dy
@@ -352,9 +384,9 @@ SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
           e24.16,'    dx', /, &
           e24.16,'    dy',/)
 
-  IF (mfields .GT. 10) THEN
+  IF (meqn .GT. 10) THEN
      !!        # Format statement 109 below will not work.
-     WRITE(6,'(A,A)') 'Warning (out2.f) : mfields > 5; ', &
+     WRITE(6,'(A,A)') 'Warning (out2.f) : meqn > 10; ', &
           'change format statement 109.'
      STOP
   ENDIF
@@ -362,17 +394,17 @@ SUBROUTINE write_qfile(mx,my,mfields,xlower,ylower, &
   !!      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
   DO j = 1,my
      DO i = 1,mx
-        DO mq = 1,mfields
+        DO mq = 1,meqn
            IF (ABS(q(i,j,mq)) .LT. 1d-99) THEN
               q(i,j,mq) = 0.d0
            ENDIF
         END DO
-        WRITE(fid_com,120) INT(q(i,j,1)), (q(i,j,mq),mq=2,mfields)
+        WRITE(fid_com,120) (q(i,j,mq),mq=1,meqn)
      ENDDO
      WRITE(fid_com,*) ' '
   ENDDO
 !! Print the first field assuming it is the MPI rank (i.e. an integer)
-120 FORMAT (I5,10E26.16)
+120 FORMAT (10E26.16)
 
   CLOSE(fid_com)
 
