@@ -125,6 +125,8 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_build_mode_t build_mode);
 
 void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
+                                           int minlevel,
+                                           int maxlevel,
                                            int time_interp);
 
 /* -----------------------------------------------------

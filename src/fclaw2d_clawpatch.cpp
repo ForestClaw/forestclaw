@@ -320,14 +320,28 @@ void cb_set_bc_to_value(fclaw2d_domain_t* domain,
 
 
 void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
+                                           int minlevel,
+                                           int maxlevel,
                                            int time_interp)
 {
     struct set_bc { int time_interp; double value; };
     struct set_bc s;
     s.time_interp = time_interp;
     fclaw2d_farraybox_set_to_nan(s.value);
-    fclaw2d_domain_iterate_patches(domain, cb_set_bc_to_value,
-                                   (void *)  &s);
+    int time_interp_minlevel;
+    if (time_interp)
+    {
+        time_interp_minlevel = minlevel-1;
+    }
+    else
+    {
+        time_interp_minlevel = minlevel;
+    }
+    for (int level = time_interp_minlevel; level <= maxlevel; level++)
+    {
+        fclaw2d_domain_iterate_level(domain, level,cb_set_bc_to_value,
+                                     (void *)  &s);
+    }
 }
 
 
