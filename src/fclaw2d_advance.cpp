@@ -224,9 +224,15 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     int time_interp = 0;
     fclaw_global_infof("Advance is done with coarse grid step at " \
                       " time %12.6e\n",a_time_stepper->initial_time());
-#if 0
-    fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
-#endif
+    const amr_options_t *gparms = get_domain_parms(domain);
+    if (gparms->regrid_interval > 1)
+    {
+        /* We don't know when we will regrid next, so do the ghost update here, to
+           avoid problems with invalid ghost cells. If regrid_interval == 1, we will
+           be doing a ghost update in regrid, even if we don't actually get a new
+           refinement. */
+        fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
+    }
 
     // Stop the timer
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
