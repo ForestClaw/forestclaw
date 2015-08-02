@@ -139,7 +139,7 @@ c     # periodic:
 c     # solid wall (assumes 3'rd component is velocity or momentum in y):
       do 335 m=1,meqn
          do 335 jbc=1,mbc
-            do 335 i = 1,mx
+            do 335 i = 1-mbc,mx+mbc
                q(i,1-jbc,m) = q(i,jbc,m)
   335       continue
 c     # negate the normal velocity:
