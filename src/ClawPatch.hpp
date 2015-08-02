@@ -82,7 +82,18 @@ public :
        ---------------------------------------------------------------- */
     void exchange_face_ghost(const int& a_iface,
                              ClawPatch *a_neighbor_cp,
+                             int time_interp,
                              fclaw2d_transform_data_t* transform_data);
+
+    // Exchange corner ghost cells with interior neighbor (interior to the domain)
+    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor,
+                               int time_interp,
+                               fclaw2d_transform_data_t* transform_data);
+
+    void mb_exchange_block_corner_ghost(const int& a_icorner,
+                                        ClawPatch *a_neighbor_cp,
+                                        int time_interp);
+
 
     // Average finer grid values onto coarser grid ghost cells
     void average_face_ghost(const int& a_idir,
@@ -94,6 +105,15 @@ public :
                             const int& igrid,
                             fclaw2d_transform_data_t* transform_data);
 
+    void average_corner_ghost(const int& a_corner, const int& a_refratio,
+                              ClawPatch *cp_fine,
+                              fclaw_bool a_time_interp,
+                              fclaw2d_transform_data_t* transform_cptr);
+
+    void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
+                                       ClawPatch *cp_fine,
+                                       fclaw_bool a_time_interp);
+
     // Interpoalte coarser values onto fine grid ghost
     void interpolate_face_ghost(const int& a_idir,
                                 const int& a_iside,
@@ -104,19 +124,14 @@ public :
                                 const int& igrid,
                                 fclaw2d_transform_data_t* transform_data);
 
-    // Exchange corner ghost cells with interior neighbor (interior to the domain)
-    void exchange_corner_ghost(const int& a_corner, ClawPatch *cp_neighbor,
-                               fclaw2d_transform_data_t* transform_data);
-
-    void average_corner_ghost(const int& a_corner, const int& a_refratio,
-                              ClawPatch *cp_fine,
-                              fclaw_bool a_time_interp,
-                              fclaw2d_transform_data_t* transform_cptr);
-
     void interpolate_corner_ghost(const int& a_corner, const int& a_refratio,
                                   ClawPatch *cp_fine,
                                   fclaw_bool a_time_interp,
                                   fclaw2d_transform_data_t* transform_cptr);
+
+    void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
+                                           ClawPatch *cp_fine,
+                                           fclaw_bool a_time_interp);
 
     void set_boundary_to_value(const int& time_interp,
                                double& value);
@@ -124,17 +139,6 @@ public :
     /* ----------------------------------------------------------------
        Pillow grid ghost exchanges
        ---------------------------------------------------------------- */
-    void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        ClawPatch *a_neighbor_cp);
-
-    void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       ClawPatch *cp_fine,
-                                       fclaw_bool a_time_interp);
-
-    void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           ClawPatch *cp_fine,
-                                           fclaw_bool a_time_interp);
-
     // ----------------------------------------------------------------------------------
     // Physical boundary conditions
     // ----------------------------------------------------------------------------------

@@ -443,6 +443,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
                         this_cp->exchange_corner_ghost(icorner,corner_cp,
+                                                       time_interp,
                                                        &transform_data);
                     }
                 }
@@ -465,7 +466,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                     else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
-                        this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp);
+                        this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp,
+                                                                time_interp);
                     }
                 }
             }  /* End of non-parallel patch case */

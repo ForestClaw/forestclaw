@@ -366,9 +366,10 @@ void ClawPatch::set_boundary_to_value(const int& time_interp,
 
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
+                                    int time_interp,
                                     fclaw2d_transform_data_t* transform_data)
 {
-    double *qthis = m_griddata.dataPtr();
+    double *qthis = q_time_sync(time_interp);
     double *qneighbor = neighbor_cp->m_griddata.dataPtr();
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
                          &transform_data);
@@ -376,9 +377,10 @@ void ClawPatch::exchange_face_ghost(const int& a_iface,
 
 
 void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
+                                      int time_interp,
                                       fclaw2d_transform_data_t* transform_data)
 {
-    double *qthis = m_griddata.dataPtr();
+    double *qthis = q_time_sync(time_interp);
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
@@ -478,9 +480,10 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
    ---------------------------------------------------------------- */
 
 void ClawPatch::mb_exchange_block_corner_ghost(const int& a_corner,
-                                               ClawPatch *cp_corner)
+                                               ClawPatch *cp_corner,
+                                               int time_interp)
 {
-    double *qthis = m_griddata.dataPtr();
+    double *qthis = q_time_sync(time_interp);
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
 

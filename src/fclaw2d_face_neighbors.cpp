@@ -127,9 +127,13 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         {
             /* If we are within one patch this is a special case */
             FCLAW_ASSERT (*neighbor_block_idx == -1);
+#if 0
             fclaw2d_patch_face_transformation_block (ftransform, 1);
             fclaw2d_patch_face_transformation_block
                 (ftransform_finegrid->transform, 1);
+#endif
+            ftransform[8] = 4;
+            ftransform_finegrid->transform[8] = 4;
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -326,7 +330,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
-                    this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+                    this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
+                                                 &transform_data);
 
                     /* We also need to copy _to_ the remote neighbor; switch contexts, but
                        use ClawPatches that are only in scope here, to avoid
@@ -339,6 +344,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                         int this_iface = iface_neighbor;
                         this_cp->exchange_face_ghost(this_iface,neighbor_cp,
+                                                     time_interp,
                                                      &transform_data_finegrid);
                     }
                 }
@@ -444,15 +450,22 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                                    transform_data.transform);
 
                 int is_block_face = blockno != rblockno;
+#if 0
                 fclaw2d_patch_face_transformation_block(transform_data.transform,
                                                         !is_block_face);
+#endif
+                if (!is_block_face)
+                {
+                    transform_data.transform[8] = 4;
+                }
                 if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
                 {
                     /* Copy from same size neighbor */
                     fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
-                    this_cp->exchange_face_ghost(iface,neighbor_cp,&transform_data);
+                    this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
+                                                 &transform_data);
                     ++ddata->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
