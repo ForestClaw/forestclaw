@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_ghost_fill.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -112,10 +113,13 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     /* Get an initial domain */
     fclaw2d_domain_setup(NULL,*domain);
 
+    /* Initialize patches on uniformly refined level minlevel */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
+
+
 
     fclaw_bool time_interp = fclaw_false;
     t = fclaw2d_domain_get_time(*domain);
@@ -137,7 +141,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
     }
 
-    // Refine as needed, one level at a time.
+    /* Build up initial refinement.  We have to do this level by
+       level to get all levels */
     if (minlevel < maxlevel)
     {
         int domain_init = 1;
@@ -156,6 +161,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
             if (have_new_refinement)
             {
+                fclaw_global_infof(" -- Have new initial refinement\n");
+
                 fclaw2d_domain_setup(*domain,new_domain);
                 ddata = fclaw2d_domain_get_data(new_domain);
 
@@ -165,13 +172,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                                                cb_fclaw2d_regrid_repopulate,
                                                (void *) &domain_init);
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
-
-                // Set boundary need ghost cell values so they are available
-                // for using at tagging criteria, if necessary.
-                int new_level = level+1;
-                time_interp = fclaw_false;
-                t = fclaw2d_domain_get_time(new_domain);
-                fclaw2d_set_physical_bc(new_domain,new_level,t,time_interp);
 
                 // free all memory associated with old domain
                 fclaw2d_domain_reset(domain);
@@ -196,21 +196,41 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                     ddata = NULL;
                 }
 
-                /* Repartition domain to new processors. Do I need this here?*/
-                fclaw2d_partition_domain(domain, level);
+                /* Repartition domain to new processors.   Second arg is the
+                   mode for VTK output */
+                fclaw2d_partition_domain(domain,level);
+
+                /* Need a new timer */
+                ddata = fclaw2d_domain_get_data(*domain);
+
 
                 /* Set up ghost patches */
+                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
                 fclaw2d_exchange_setup(*domain);
+                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+
+                /* Update ghost cells.  This is needed because we have new coarse or fine
+                   patches without valid ghost cells.   */
+                int minlevel = (*domain)->global_minlevel;
+                int maxlevel = (*domain)->global_maxlevel;
+                int time_interp = 0;
+                fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_INIT);
             }
             else
             {
-                /* minlevel == maxlevel;  no refining necessary.  We have an initial
-                   partition, so we don't need to partition a new domaoin. */
-
-                fclaw2d_exchange_setup(*domain);
+                /* We don't have a new refinement, and so can break out of level loop */
                 break;
             }
-        }
+        }  /* Level loop (minlevel --> maxlevel) */
+    }
+    else
+    {
+        /* minlevel == maxlevel;  no refining necessary.  We have an initial
+           partition, so we don't need to partition a new domaoin.  But we do
+           need to set up ghost patches .*/
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+        fclaw2d_exchange_setup(*domain);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
     }
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",
