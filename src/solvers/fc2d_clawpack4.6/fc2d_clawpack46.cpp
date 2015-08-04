@@ -406,12 +406,9 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
@@ -441,7 +438,11 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
+#if 0
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     q = cp->q_time_sync(time_interp);
+#endif
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
