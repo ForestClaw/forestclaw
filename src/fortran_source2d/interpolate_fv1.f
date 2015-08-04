@@ -33,10 +33,10 @@ c     # ----------------------------------------------------------
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2, m
-      integer i, ic1, ic2, ibc, ii, ifine
-      integer j, jc1, jc2, jbc, jj, jfine
+      integer i, ic1, ic2, ibc, ifine,i1
+      integer j, jc1, jc2, jbc, jfine,j1
       integer ic_add, jc_add, ic, jc, mth
-      double precision shiftx, shifty, gradx, grady, qc, sl, sr, value
+      double precision gradx, grady, qc, sl, sr, value
       double precision compute_slopes
 
 c     # This should be refratio*refratio.
@@ -46,6 +46,10 @@ c     # This should be refratio*refratio.
       logical is_valid_interp
       logical skip_this_grid
 
+      integer a(2,2)
+      integer ii,jj,dc(2),df(2,0:rr2-1),iff,jff
+      double precision shiftx(0:rr2-1),shifty(0:rr2-1)
+
       mth = 5
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -53,6 +57,30 @@ c     # This should be refratio*refratio.
      &         '  Refratio**2 is not equal to rr2'
          stop
       endif
+
+
+      call build_transform(transform_ptr,a)
+
+c     # This needs to be written for refratios .ne. 2.
+      m = 0
+      do jj = 0,1
+         do ii = 0,1
+c           # Direction on coarse grid
+            dc(1) = ii
+            dc(2) = jj
+
+c           # Direction on fine grid (converted using metric). Divide
+c           # by refratio to scale length to unit vector
+            df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2))/refratio
+            df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2))/refratio
+
+c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
+            shiftx(m) = (ii-0.5d0)/2.d0
+            shifty(m) = (jj-0.5d0)/2.d0
+            m = m + 1
+         enddo
+      enddo
+c     # Create map :
 
       do mq = 1,meqn
          if (idir .eq. 0) then
@@ -64,7 +92,9 @@ c           # this ensures that we get 'hanging' corners
                ic = mx
             endif
             do jc = 1,mx
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
+               i1 = ic
+               j1 = jc
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
                skip_this_grid = .false.
                do m = 0,r2-1
@@ -87,14 +117,11 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
                   sr = (qcoarse(ic,jc+1,mq) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
-c                 # This works for smooth grid mappings as well.
-                  do m = 0,r2-1
-                     shiftx =
-     &                     (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                     shifty =
-     &                     (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                     value = qc + shiftx*gradx + shifty*grady
-                     qfine(i2(m),j2(m),mq) = value
+                  do m = 0,rr2-1
+                     iff = i2(0) + df(1,m)
+                     jff = j2(0) + df(2,m)
+                     value = qc + gradx*shiftx(m) + grady*shifty(m)
+                     qfine(iff,jff,mq) = value
                   enddo
                endif
             enddo
@@ -105,7 +132,9 @@ c                 # This works for smooth grid mappings as well.
                jc = my
             endif
             do ic = 1,mx
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
+    1          i1 = ic
+               j1 = jc
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
 c              # ---------------------------------------------
 c              # Two 'half-size' neighbors will be passed into
@@ -134,20 +163,45 @@ c              # ---------------------------------------------
                   sr = (qcoarse(ic,jc+1,mq) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
-c                 # Compute interpolant for each of four
-c                 # fine grid cells.
-                  do m = 0,r2-1
-                     shiftx =
-     &                     (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-                     shifty =
-     &                     (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-                     value = qc + shiftx*gradx + shifty*grady
-                     qfine(i2(m),j2(m),mq) = value
+                  do m = 0,rr2-1
+                     iff = i2(0) + df(1,m)
+                     jff = j2(0) + df(2,m)
+                     value = qc + gradx*shiftx(m) + grady*shifty(m)
+                     qfine(iff,jff,mq) = value
                   enddo
-               endif
-            enddo
+
+               endif                    !! Don't skip this grid
+            enddo                       !! i loop
+         endif                          !! end idir branch
+      enddo                             !! endo mq loop
+
+      end
+
+      logical function check_indices(iff,jff,i2,j2)
+      implicit none
+
+      integer iff,jff,i2(0:3),j2(0:3)
+      integer m
+      logical found_iff, found_jff
+
+      found_iff = .false.
+      do m = 0,3
+         if (i2(m) .eq. iff) then
+            found_iff = .true.
+            exit
          endif
       enddo
+
+      found_jff = .false.
+      do m = 0,3
+         if (j2(m) .eq. jff) then
+            found_jff = .true.
+            exit
+         endif
+      enddo
+
+      check_indices = found_iff .and. found_jff
+
 
       end
 
@@ -176,7 +230,7 @@ c                 # fine grid cells.
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer ic, jc, mq, ibc,jbc, mth,i,j
-      double precision qc, sl, sr, gradx, grady, shiftx, shifty
+      double precision qc, sl, sr, gradx, grady
       double precision compute_slopes, value
 
 c     # This should be refratio*refratio.
@@ -185,12 +239,38 @@ c     # This should be refratio*refratio.
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
+      integer a(2,2)
+      integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
+      double precision shiftx(0:rr2-1), shifty(0:rr2-1)
+      logical check_indices
+
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
          write(6,*) 'average_corner_ghost (claw2d_utils.f) ',
      &         '  Refratio**2 is not equal to rr2'
          stop
       endif
+
+      call build_transform(transform_ptr,a)
+
+      m = 0
+      do jj = 0,1
+         do ii = 0,1
+c           # Direction on coarse grid
+            dc(1) = ii
+            dc(2) = jj
+
+c           # Direction on fine grid (converted using metric). Divide
+c           # by 2 (refratio) to scale length to unit vector
+            df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2))/2
+            df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2))/2
+
+c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
+            shiftx(m) = (ii-0.5d0)/2.d0
+            shifty(m) = (jj-0.5d0)/2.d0
+            m = m + 1
+         enddo
+      enddo
 
 
       mth = 5
@@ -213,6 +293,11 @@ c     # This should be refratio*refratio.
          qc = qcoarse(ic,jc,mq)
 
 c        # Interpolate coarse grid corners to fine grid corner ghost cells
+         i1 = ic
+         j1 = jc
+         call fclaw2d_transform_face_half(i1,j1,i2,j2,
+     &         transform_ptr)
+
 
 c        # Compute limited slopes in both x and y. Note we are not
 c        # really computing slopes, but rather just differences.
@@ -225,17 +310,13 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
          sr = (qcoarse(ic,jc+1,mq) - qc)
          grady = compute_slopes(sl,sr,mth)
 
-c        # This works for smooth grid mappings as well.
-         i1 = ic
-         j1 = jc
-         call fclaw2d_transform_corner_half(i1,j1,i2,j2,
-     &         transform_ptr)
-         do m = 0,r2-1
-            shiftx = (i2(m)-i2(0)- refratio/2.d0 + 0.5)/refratio
-            shifty = (j2(m)-j2(0)- refratio/2.d0 + 0.5)/refratio
-            value = qc + shiftx*gradx + shifty*grady
-            qfine(i2(m),j2(m),mq) = value
+         do m = 0,rr2-1
+            iff = i2(0) + df(1,m)
+            jff = j2(0) + df(2,m)
+            value = qc + gradx*shiftx(m) + grady*shifty(m)
+            qfine(iff,jff,mq) = value
          enddo
+
       enddo
 
       end
@@ -294,5 +375,48 @@ c         compute_slopes = sc
 
       endif
 
+
+      end
+
+      subroutine build_transform(transform_ptr,a)
+      implicit none
+
+      integer a(2,2)
+      integer*8 transform_ptr
+      integer f(2)
+      integer mi(4),mj(4)
+      integer i1,j1
+
+c     # Assume index mapping fclaw2d_transform_face_half has the
+c     # the form
+c     #
+c     #       T(ic,jc) = A*(ic,jc) + F = (iff,jff)
+c     #
+c     # where (ic,jc) is the coarse grid index, and (iff,jff)
+c     # is the first fine grid index.
+c     #
+c     # We can recover coefficients A(2,2) with the following
+c     # calls to T.
+
+      i1 = 0
+      j1 = 0
+      call fclaw2d_transform_face_half(i1,j1,mi,mj,
+     &      transform_ptr)
+      f(1) = mi(1)
+      f(2) = mj(1)
+
+      i1 = 1
+      j1 = 0
+      call fclaw2d_transform_face_half(i1,j1,mi,mj,
+     &      transform_ptr)
+      a(1,1) = mi(1) - f(1)
+      a(2,1) = mj(1) - f(2)
+
+      i1 = 0
+      j1 = 1
+      call fclaw2d_transform_face_half(i1,j1,mi,mj,
+     &      transform_ptr)
+      a(1,2) = mi(1) - f(1)
+      a(2,2) = mj(1) - f(2)
 
       end
