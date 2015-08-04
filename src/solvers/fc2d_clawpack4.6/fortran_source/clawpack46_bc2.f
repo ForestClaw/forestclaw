@@ -6,7 +6,7 @@
       double precision xlower, ylower, dx, dy, t, dt
 
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, *)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       integer m, i, j, ibc, jbc
 
