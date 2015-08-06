@@ -135,6 +135,12 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         old_patch->user = NULL;
         ++ddata_old->count_delete_clawpatch;
         ++ddata_new->count_set_clawpatch;
+#if 0
+        fclaw2d_clawpatch_initialize_after_regrid(new_domain,
+                                                  new_patch,
+                                                  blockno,
+                                                  new_patchno);
+#endif
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -250,7 +256,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         *domain = new_domain;
         new_domain = NULL;
 
-        /* Repartition for load balancing */
+        /* Repartition for load balancing.  Second arg (mode) for vtk output */
         fclaw2d_partition_domain(domain, -1);
 
         /* Need a new timer */
@@ -262,20 +268,29 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
 
         /* Update ghost cells.  This is needed because we have new coarse or fine
-           patches without valid ghost cells.   */
+           patches without valid ghost cells.   Time_interp = 0, since we only
+           only regrid when all levels are time synchronized. */
         int minlevel = (*domain)->global_minlevel;
         int maxlevel = (*domain)->global_maxlevel;
         int time_interp = 0;
-        fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
+        double sync_time = fclaw2d_domain_get_time(*domain);
+        fclaw2d_ghost_update(*domain,
+                             minlevel,
+                             maxlevel,
+                             sync_time,
+                             time_interp,
+                             FCLAW2D_TIMER_REGRID);
     }
     else
     {
-        /* Update ghost cells.  This is needed because we have new coarse or fine
-           patches without valid ghost cells.   */
-        int minlevel = (*domain)->global_minlevel;
-        int maxlevel = (*domain)->global_maxlevel;
-        int time_interp = 0;
-        fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_REGRID);
+#if 0
+        /* We updated all the ghost cells when leaving advance, so don't need to do
+           it here */
+        /* Set up ghost patches. No parallel communication is done here */
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+        fclaw2d_exchange_setup(*domain);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+#endif
     }
 
     /* Stop timer */
