@@ -206,7 +206,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool intersects_phys_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
 
-    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+    fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,
                             intersects_phys_bdry);
 
     fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
@@ -419,6 +419,14 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                coarser levels than we are currently working on */
             continue;
         }
+
+        int use_timeinterp_patch = 0;
+        if (time_interp && level == minlevel-1)
+        {
+            use_timeinterp_patch = 1;
+        }
+
+
         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_ghost_patch);
 
         int this_ghost_idx = i;
@@ -464,7 +472,8 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                     fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
-                    this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
+                    this_cp->exchange_face_ghost(iface,neighbor_cp,
+                                                 use_timeinterp_patch,
                                                  &transform_data);
                     ++ddata->count_multiproc_corner;
                 }
@@ -482,16 +491,10 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                             ClawPatch *neighbor_cp =
                                 fclaw2d_clawpatch_get_cp(neighbor_patch);
 
-                            int average_to_timeinterp_patch = 0;
-                            if (time_interp && level == minlevel-1)
-                            {
-                                average_to_timeinterp_patch = 1;
-                            }
-
                             /* Note : igrid isn't used here; could be removed */
                             this_cp->average_face_ghost(idir,iface,p4est_refineFactor,
                                                         refratio,neighbor_cp,
-                                                        average_to_timeinterp_patch,
+                                                        use_timeinterp_patch,
                                                         igrid,
                                                         &transform_data);
                         }
