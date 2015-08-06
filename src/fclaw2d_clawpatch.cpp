@@ -99,8 +99,23 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha)
 {
+    /* We use the pack size here to make sure we are setting
+       everything correctly;  it isn't needed for memory
+       allocation */
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int mint = 2;  /* Number of internal layers needed */
+
+    int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
+    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+    FCLAW_ASSERT(hole >= 0);
+    size_t psize = (wg - hole)*meqn;
+    FCLAW_ASSERT(psize > 0);
+
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->setup_for_time_interpolation(alpha);
+    cp->setup_for_time_interpolation(alpha,psize);
 }
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
@@ -306,11 +321,64 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
 /* -------------------------------------------------
    For debugging
    ----------------------------------------------- */
-void cb_set_bc_to_value(fclaw2d_domain_t* domain,
-                      fclaw2d_patch_t* this_patch,
-                      int blockno,
-                      int patchno,
-                      void *user)
+void cb_set_corners_to_value(fclaw2d_domain_t* domain,
+                            fclaw2d_patch_t* this_patch,
+                            int blockno,
+                            int patchno,
+                            void *user)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s = *((set_bc*) user);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->set_corners_to_value(s.time_interp,s.value);
+}
+
+
+void fclaw2d_clawpatch_set_corners_to_value(fclaw2d_domain_t* domain,
+                                            int minlevel,
+                                            int maxlevel,
+                                            int time_interp,
+                                            double value)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s;
+    s.time_interp = time_interp;
+    s.value = value;
+
+    for (int level = minlevel; level <= maxlevel; level++)
+    {
+        s.time_interp = 0;
+        fclaw2d_domain_iterate_level(domain, level,cb_set_corners_to_value,
+                                     (void *)  &s);
+    }
+    if (time_interp)
+    {
+        s.time_interp = time_interp;
+        int time_interp_minlevel = minlevel-1;
+        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
+                                     cb_set_corners_to_value,
+                                     (void *)  &s);
+    }
+}
+
+void fclaw2d_clawpatch_set_corners_to_nan(fclaw2d_domain_t* domain,
+                                           int minlevel,
+                                           int maxlevel,
+                                           int time_interp)
+{
+    double s;
+    fclaw2d_farraybox_set_to_nan(s);
+    fclaw2d_clawpatch_set_corners_to_value(domain,minlevel,maxlevel,
+                                           time_interp,s);
+}
+
+
+
+void cb_set_boundary_to_value(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t* this_patch,
+                              int blockno,
+                              int patchno,
+                              void *user)
 {
     struct set_bc { int time_interp; double value; };
     struct set_bc s = *((set_bc*) user);
@@ -319,31 +387,55 @@ void cb_set_bc_to_value(fclaw2d_domain_t* domain,
 }
 
 
+
+void fclaw2d_clawpatch_set_boundary_to_value(fclaw2d_domain_t* domain,
+                                             int minlevel,
+                                             int maxlevel,
+                                             int time_interp,
+                                             double value)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s;
+    s.time_interp = time_interp;
+    s.value = value;
+
+    for (int level = minlevel; level <= maxlevel; level++)
+    {
+        s.time_interp = 0;
+        fclaw2d_domain_iterate_level(domain, level,cb_set_boundary_to_value,
+                                     (void *)  &s);
+    }
+    if (time_interp)
+    {
+        s.time_interp = time_interp;
+        int time_interp_minlevel = minlevel-1;
+        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
+                                     cb_set_boundary_to_value,
+                                     (void *)  &s);
+    }
+}
+
 void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
                                            int minlevel,
                                            int maxlevel,
                                            int time_interp)
 {
-    struct set_bc { int time_interp; double value; };
-    struct set_bc s;
-    s.time_interp = time_interp;
-    fclaw2d_farraybox_set_to_nan(s.value);
-    int time_interp_minlevel;
-    if (time_interp)
-    {
-        time_interp_minlevel = minlevel-1;
-    }
-    else
-    {
-        time_interp_minlevel = minlevel;
-    }
-    for (int level = time_interp_minlevel; level <= maxlevel; level++)
-    {
-        fclaw2d_domain_iterate_level(domain, level,cb_set_bc_to_value,
-                                     (void *)  &s);
-    }
+    double s;
+    fclaw2d_farraybox_set_to_nan(s);
+    fclaw2d_clawpatch_set_boundary_to_value(domain,minlevel,maxlevel,
+                                            time_interp,s);
 }
 
+
+
+void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
+                                               fclaw2d_patch_t* this_patch,
+                                               int this_block_idx,
+                                               int this_patch_idx)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->initialize_after_regrid();
+}
 
 
 /* ----------------------------------------------------------
@@ -485,5 +577,13 @@ void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
     /* Time interp is false, since we only partition when all grids
        are time synchronized */
     cp->partition_unpack(patch_data);
+}
 
+void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
+                                                  fclaw2d_patch_t* this_patch,
+                                                  int this_block_idx,
+                                                  int this_patch_idx)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->initialize_after_partition();
 }

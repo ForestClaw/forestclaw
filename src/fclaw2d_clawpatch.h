@@ -129,6 +129,24 @@ void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
                                            int maxlevel,
                                            int time_interp);
 
+void fclaw2d_clawpatch_set_boundary_to_value(fclaw2d_domain_t* domain,
+                                             int minlevel,
+                                             int maxlevel,
+                                             int time_interp,
+                                             double value);
+
+void fclaw2d_clawpatch_set_corners_to_value(fclaw2d_domain_t* domain,
+                                            int minlevel,
+                                            int maxlevel,
+                                            int time_interp,
+                                            double value);
+
+void fclaw2d_clawpatch_set_corners_to_nan(fclaw2d_domain_t* domain,
+                                          int minlevel,
+                                          int maxlevel,
+                                          int time_interp);
+
+
 /* -----------------------------------------------------
    Build/pack/size for partitioning
    ---------------------------------------------------- */
@@ -146,6 +164,16 @@ void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
                                            int this_block_idx,
                                            int this_patch_idx,
                                            void *user);
+
+void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
+                                                  fclaw2d_patch_t* this_patch,
+                                                  int this_block_idx,
+                                                  int this_patch_idx);
+void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
+                                               fclaw2d_patch_t* this_patch,
+                                               int this_block_idx,
+                                               int this_patch_idx);
+
 
 
 /* -----------------------------------------------------
