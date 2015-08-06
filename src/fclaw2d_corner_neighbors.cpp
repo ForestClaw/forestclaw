@@ -339,7 +339,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
     fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
-    fclaw2d_get_physical_bc(domain,this_block_idx,this_patch_idx,
+    fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
     fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
@@ -372,6 +372,10 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         &transform_data.block_iface);
 
         transform_data_finegrid.block_iface = -1;
+
+        /* This needs to be set here;  other wise external corners
+           don't get set. */
+        this_cp->set_block_corner_count(icorner,block_corner_count);
 
         if (is_interior_corner)
         {
