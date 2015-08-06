@@ -138,7 +138,7 @@ c     # Face 3
          enddo
       enddo
 
-      kfinal = k-1;
+      kfinal = k-1
       if (kfinal .ne. psize) then
          ierror = 2
       endif
@@ -186,5 +186,29 @@ c        # Face 3
             enddo
          enddo
       enddo
+
+      end
+
+      subroutine fclaw2d_set_corners_to_value(mx,my,mbc,meqn,
+     &      q,value)
+      implicit none
+
+      integer mx,my,mbc,meqn
+      double precision value
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer mq,ibc,jbc
+
+      do mq = 1,meqn
+         do ibc = mbc,mbc
+            do jbc = mbc,mbc
+               q(1-ibc,1-jbc,mq) = value
+               q(mx+ibc,1-jbc,mq) = value
+               q(mx+ibc,my+jbc,mq) = value
+               q(1-ibc,my+jbc,mq) = value
+            enddo
+         enddo
+      enddo
+
 
       end
