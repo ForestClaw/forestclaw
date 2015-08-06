@@ -63,12 +63,14 @@ public :
     void ghost_comm(double *qpack, int time_interp, int packmode);
     void partition_pack(double* qdata);
     void partition_unpack(double *qdata);
+    void initialize_after_partition();
+    void initialize_after_regrid();
 
     void setup_area_storage();
     void setup_metric_storage();
 
-    void setup_for_time_interpolation(const double& alpha);
-    void reset_after_time_interpolation();
+    void setup_for_time_interpolation(const double& alpha, const int& psize);
+    // void reset_after_time_interpolation();
     double* q_time_sync(fclaw_bool time_interp);
     FArrayBox newGrid();
 
@@ -135,6 +137,9 @@ public :
 
     void set_boundary_to_value(const int& time_interp,
                                double& value);
+
+    void set_corners_to_value(const int& time_interp,
+                              double& value);
 
     /* ----------------------------------------------------------------
        Pillow grid ghost exchanges
@@ -207,6 +212,7 @@ public :
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
     static int pack_layers;
+    static int ghost_pack_size;
     static int ghost_patch_pack_area;
 
 protected :

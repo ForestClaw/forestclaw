@@ -39,6 +39,10 @@ void ClawPatch::define(const double&  a_xlower,
     m_mbc = gparms->mbc;
     m_blockno = a_blockno;
     m_meqn = gparms->meqn;
+    for (int m=0; m < 4; m++)
+    {
+        m_block_corner_count[m] = 0;
+    }
 
     m_manifold = gparms->manifold;
 
@@ -104,6 +108,21 @@ void ClawPatch::define(const double&  a_xlower,
     m_griddata_save.define(box, m_meqn);
 
 }
+
+void ClawPatch::initialize_after_regrid()
+{
+    m_griddata_last.set_to_nan();
+    m_griddata_save.set_to_nan();
+    m_griddata_time_interpolated.set_to_nan();
+}
+
+void ClawPatch::initialize_after_partition()
+{
+    m_griddata_last.set_to_nan();
+    m_griddata_save.set_to_nan();
+    m_griddata_time_interpolated.set_to_nan();
+}
+
 
 void ClawPatch::copyFrom(ClawPatch *a_cp)
 {
@@ -363,6 +382,13 @@ void ClawPatch::set_boundary_to_value(const int& time_interp,
     FCLAW2D_SET_BOUNDARY_TO_VALUE(&m_mx, &m_my, &m_mbc, &m_meqn, q, &value);
 }
 
+void ClawPatch::set_corners_to_value(const int& time_interp,
+                                     double& value)
+{
+    double *q = q_time_sync(time_interp);
+    FCLAW2D_SET_CORNERS_TO_VALUE(&m_mx, &m_my, &m_mbc, &m_meqn, q, &value);
+}
+
 
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
@@ -370,7 +396,7 @@ void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     fclaw2d_transform_data_t* transform_data)
 {
     double *qthis = q_time_sync(time_interp);
-    double *qneighbor = neighbor_cp->m_griddata.dataPtr();
+    double *qneighbor = neighbor_cp->q_time_sync(time_interp);
     exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
                          &transform_data);
 }
@@ -381,7 +407,7 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                                       fclaw2d_transform_data_t* transform_data)
 {
     double *qthis = q_time_sync(time_interp);
-    double *qcorner = cp_corner->m_griddata.dataPtr();
+    double *qcorner = cp_corner->q_time_sync(time_interp);
 
     exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
                            &transform_data);
@@ -534,21 +560,25 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
 /* ----------------------------------------------------------------
    Time interpolation
    ---------------------------------------------------------------- */
-void ClawPatch::setup_for_time_interpolation(const double& alpha)
+void ClawPatch::setup_for_time_interpolation(const double& alpha,
+                                             const int& psize)
 {
     /* Store time interpolated data that will be use in coarse grid
        exchanges */
     double *qlast = m_griddata_last.dataPtr();
     double *qcurr = m_griddata.dataPtr();
     double *qinterp = m_griddata_time_interpolated.dataPtr();
-    int size = m_griddata.size();
-
-    /* Copy everything first to fill in ghost cells of qinterp */
-    memcpy(qinterp,qlast,size*sizeof(double));
+    int ierror;
 
     /* Do interpolation only on interior, since ghost cells in qcurr
        are invalid and will lead to floating point exceptions */
-    TIMEINTERP_INTERIOR(&m_mx,&m_my,&m_mbc,&m_meqn,qcurr,qlast,qinterp,&alpha);
+    FCLAW2D_TIMEINTERP_FORT(&m_mx,&m_my,&m_mbc,&m_meqn,&psize,
+                            qcurr,qlast,qinterp,&alpha,&ierror);
+    if (ierror > 0)
+    {
+        fclaw_global_essentialf("fclaw2d_timeinterp : incorrect pack size\n");
+        exit(0);
+    }
 }
 
 
