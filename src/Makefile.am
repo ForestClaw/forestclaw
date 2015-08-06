@@ -111,6 +111,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_ghost_pack.f \
 	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
+	src/fortran_source2d/fclaw2d_timeinterp_fort.f \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/philim.f \
@@ -119,7 +120,6 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/exchange_fv1.f \
 	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/cellave2.f \
-	src/fortran_source2d/timeinterp_interior.f \
 	src/fortran_source2d/fdisc.f
 
 # this variable is used for headers that are not publicly installed
