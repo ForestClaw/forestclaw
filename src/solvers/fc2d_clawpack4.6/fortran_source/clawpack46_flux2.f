@@ -79,7 +79,7 @@ c
       double precision     s(1-mbc:maxm+mbc, mwaves)
       double precision  wave(1-mbc:maxm+mbc, meqn, mwaves)
 
-      double precision cfl1d, gupdate
+      double precision cfl1d, gupdate,dtdxave
 
       logical limit
       double precision dtcom, dxcom, dycom, tcom
@@ -143,7 +143,8 @@ c
 c        # For correction terms below, need average of dtdx in cell
 c        # i-1 and i.  Compute these and overwrite dtdx1d:
 c
-         dtdx1d(i-1) = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
+c         dtdx1d(i-1) = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
+         dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
 c
          do 120 m=1,meqn
             cqxx(i,m) = 0.d0
@@ -151,7 +152,7 @@ c
 c
 c              # second order corrections:
                cqxx(i,m) = cqxx(i,m) + dabs(s(i,mw))
-     &             * (1.d0 - dabs(s(i,mw))*dtdx1d(i-1)) * wave(i,m,mw)
+     &             * (1.d0 - dabs(s(i,mw))*dtdxave) * wave(i,m,mw)
 c
   119          continue
             faddm(i,m) = faddm(i,m) + 0.5d0 * cqxx(i,m)
@@ -163,7 +164,7 @@ c
 c
        if (method(3).eq.0) go to 999   !# no transverse propagation
 c
-       if (method(3).eq.2) then
+       if (method(2) .gt. 1 .and. method(3) .eq. 2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
           do 150 i = 1, mx+1
              do 150 m=1,meqn
@@ -202,11 +203,11 @@ c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 180 m=1,meqn
           do 180 i = 1, mx+1
-               gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
+               gupdate = 0.5d0*dtdx1d(i) * bmasdq(i,m)
                gaddm(i,m,1) = gaddm(i,m,1) - gupdate
                gaddp(i,m,1) = gaddp(i,m,1) - gupdate
 c
-               gupdate = 0.5d0*dtdx1d(i-1) * bpasdq(i,m)
+               gupdate = 0.5d0*dtdx1d(i) * bpasdq(i,m)
                gaddm(i,m,2) = gaddm(i,m,2) - gupdate
                gaddp(i,m,2) = gaddp(i,m,2) - gupdate
   180          continue
