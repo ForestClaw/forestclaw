@@ -54,6 +54,9 @@ public:
     double* dataPtr();
     Box box();
     int fields();
+    void set_to_value(double &value);
+    void set_to_nan();
+    void set_to_big_number();
     int size();
     void operator=(const FArrayBox& fbox);
     void copyToMemory(double *data);

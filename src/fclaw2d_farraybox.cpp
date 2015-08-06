@@ -180,6 +180,38 @@ void FArrayBox::copyFromMemory(double *data)
 #endif
 }
 
+void FArrayBox::set_to_value(double &value)
+{
+    // Set value.
+    for (int i = 0; i < m_size; i++)
+    {
+        m_data[i] = value;
+    }
+}
+
+void FArrayBox::set_to_nan()
+{
+    double snan,big_number;
+    set_snan(snan);
+    set_big_number(big_number);
+    // Set value.
+    for (int i = 0; i < m_size; i++)
+    {
+        m_data[i] = big_number;
+    }
+}
+
+void FArrayBox::set_to_big_number()
+{
+    double big_number;
+    set_big_number(big_number);
+    // Set value.
+    for (int i = 0; i < m_size; i++)
+    {
+        m_data[i] = big_number;
+    }
+}
+
 
 // copy constructor
 void FArrayBox::operator=(const FArrayBox& fbox)
