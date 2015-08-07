@@ -148,7 +148,7 @@ c
 c     # amdq = SUM s*wave   over left-going waves
 c     # apdq = SUM s*wave   over right-going waves
 c
-      do 100 m=1,4
+      do 100 m=1,meqn
          do 100 i=2-mbc, mx+mbc
             amdq(i,m) = 0.d0
             apdq(i,m) = 0.d0
