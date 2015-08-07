@@ -127,9 +127,16 @@ PROGRAM compare_files
      stop
   ENDIF
 
-  IF (ABS(t1-t2) > 1e-13) THEN
-     WRITE(6,*) 't1 .ne. t2', t1, t2
-     stop
+  IF (t1 .ne. t2) THEN
+     WRITE(6,'(A)') 't1 is not exactly equal to t2'
+     WRITE(6,'(E30.20)') t1
+     WRITE(6,'(E30.20)') t2
+     WRITE(6,'(E30.16)') ABS(t1-t2)
+     WRITE(6,*)
+     IF (ABS(t1-t2) > 1e-13) THEN
+        WRITE(6,*) 't1 and t2 are not close enough'
+        STOP
+     ENDIF
   ENDIF
 
   IF (ngrids1 .NE. ngrids2) THEN
