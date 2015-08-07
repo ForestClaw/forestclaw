@@ -4,8 +4,8 @@ axis([0 2.0 0 0.5])
 axis equal; 
 axis tight
 
-fprintf('%10s : %12.4f\n','qmin',qmin);
-fprintf('%10s : %12.4f\n','qmax',qmax);
+fprintf('%10s : %12.4e\n','qmin',qmin);
+fprintf('%10s : %12.4e\n','qmax',qmax);
 
 caxis([0.1 2.81]);
 
