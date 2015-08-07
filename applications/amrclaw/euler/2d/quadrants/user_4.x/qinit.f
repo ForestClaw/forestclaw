@@ -52,8 +52,8 @@ c      # Fourth quadrant:
        rpv(4) = 1.206045378311055d0
 c
 c      # location of four corners:
-       xs = .75d0
-       ys = .75d0
+       xs = .8d0
+       ys = .8d0
 c
        do 15 i=1-mbc,mx+mbc
           xcell = xlower + (i-0.5d0)*dx
