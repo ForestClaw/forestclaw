@@ -130,7 +130,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* Update ghost cells.  This is needed because we have new coarse or fine
        patches without valid ghost cells.   */
-    int time_interp = 0;
+    fclaw2d_clawpatch_finegrid_neighbors(*domain);
 #if 0
     fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_INIT);
 
@@ -226,6 +226,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
                 fclaw2d_exchange_setup(*domain);
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+
+                fclaw2d_clawpatch_finegrid_neighbors(*domain);
 
 #if 0
                 /* We only need to update the physical ghost cells because we

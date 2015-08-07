@@ -52,6 +52,7 @@ double update_level_solution(fclaw2d_domain_t *domain,
     double dt = time_data->dt;
     double cfl;
 
+    /* Note : there might not be any grids at this level */
     cfl = fclaw2d_update_single_step(domain,a_level,t,dt);
 
     /* This needs to be cleaned up a bit */
@@ -99,7 +100,8 @@ double advance_level(fclaw2d_domain_t *domain,
 
     /* ------------------------------------------------------------
        Advance this level from 'a_curr_fine_step' to
-       'a_curr_fine_step + dt_level'
+       'a_curr_fine_step + dt_level'  This returns 0 if there are
+       no grids at this level.
        ------------------------------------------------------------ */
     double cfl_step = update_level_solution(domain,this_level,
                                             &time_data);
@@ -147,6 +149,8 @@ double advance_level(fclaw2d_domain_t *domain,
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
+                /* This happens even if there are no grids at the
+                   time interp level */
                 fclaw2d_timeinterp(domain,coarser_level,alpha);
             }
         }
@@ -159,7 +163,7 @@ double advance_level(fclaw2d_domain_t *domain,
 }
 
 /* -------------------------------------------------------------
-   Main routine : Called from amrrun.cpp
+   Main routine : Called from fclaw2d_run.
    ------------------------------------------------------------- */
 
 double advance_all_levels(fclaw2d_domain_t *domain,
@@ -209,8 +213,14 @@ double advance_all_levels(fclaw2d_domain_t *domain,
             fclaw2d_ghost_update(domain,minlevel,maxlevel,
                                  time_interp,FCLAW2D_TIMER_ADVANCE);
 #endif
-            fclaw2d_ghost_update(domain,time_interp_level+1,maxlevel,
-                                 time_interp,FCLAW2D_TIMER_ADVANCE);
+            double sync_time = a_time_stepper->level_time(last_step);
+
+            fclaw2d_ghost_update(domain,
+                                 time_interp_level+1,
+                                 maxlevel,
+                                 sync_time,
+                                 time_interp,
+                                 FCLAW2D_TIMER_ADVANCE);
         }
     }
     /* Do a complete update.  This is needed even if we are regridding
@@ -221,18 +231,19 @@ double advance_all_levels(fclaw2d_domain_t *domain,
        skip this update, and make it clear to the user that ghost cell
        values are not available for determining refinement criteria.
     */
-    int time_interp = 0;
     fclaw_global_infof("Advance is done with coarse grid step at " \
                       " time %12.6e\n",a_time_stepper->initial_time());
-    const amr_options_t *gparms = get_domain_parms(domain);
-    if (gparms->regrid_interval > 1)
-    {
-        /* We don't know when we will regrid next, so do the ghost update here, to
-           avoid problems with invalid ghost cells. If regrid_interval == 1, we will
-           be doing a ghost update in regrid, even if we don't actually get a new
-           refinement. */
-        fclaw2d_ghost_update(domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_ADVANCE);
-    }
+
+    /* We have to do this here, since we may need ghost cells for interpolating
+       coarse grids to newly created fine grids.  If we have a new refinement,
+       we follow the regridding step with a second update_ghost */
+
+    int time_interp = 0;
+
+    /* Physical time needed for physical boundary conditions */
+    double sync_time =  a_time_stepper->level_time(n_fine_steps);
+    fclaw2d_ghost_update(domain,minlevel,maxlevel,sync_time,
+                         time_interp,FCLAW2D_TIMER_ADVANCE);
 
     // Stop the timer
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);

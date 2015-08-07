@@ -8,7 +8,7 @@
       double precision   qlast(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qinterp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, m,mint,k,kfinal
+      integer i,j, m,mint,k,kfinal, ng
 
 c     # Number of interior layers to compute.  Since we only
 c     # interpolate from time-interpolated levels, we only
@@ -17,11 +17,14 @@ c     # need two layers.  If we were averaging, we'd need four.
       ierror = 0
       k = 1
 
-      do m = 1,meqn
+c     # This could also be set to 0 or 1.  But be sure to also set
+c     # set ng in fclaw2d_clawpatch_setup_timeinterp.
+      ng = 0
 
+      do m = 1,meqn
 c        # Face 0
-         do j = 0,my-mint
-            do i = 0,mint
+         do j = 1-ng,my-mint
+            do i = 1-ng,mint
                qinterp(i,j,m) = qlast(i,j,m) +
      &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
@@ -29,8 +32,8 @@ c        # Face 0
          enddo
 
 c        # Face 2
-         do j = 0,mint
-            do i = mint+1,mx+1
+         do j = 1-ng,mint
+            do i = mint+1,mx+ng
                qinterp(i,j,m) = qlast(i,j,m) +
      &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
@@ -38,8 +41,8 @@ c        # Face 2
          enddo
 
 c        # Face 1
-         do j = mint+1,my+1
-            do i = mx-mint+1,mx+1
+         do j = mint+1,my+ng
+            do i = mx-mint+1,mx+ng
                qinterp(i,j,m) = qlast(i,j,m) +
      &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
@@ -47,8 +50,8 @@ c        # Face 1
          enddo
 
 c        # Face 3
-         do j = my-mint+1,my+1
-            do i = 0,mx-mint
+         do j = my-mint+1,my+ng
+            do i = 1-ng,mx-mint
                qinterp(i,j,m) = qlast(i,j,m) +
      &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1

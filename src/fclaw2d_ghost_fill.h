@@ -87,6 +87,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int fine_level,
                           int coarse_level,
+                          double sync_time,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
@@ -106,6 +107,11 @@ void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
 #define FCLAW2D_SET_BOUNDARY_TO_VALUE FCLAW_F77_FUNC(fclaw2d_set_boundary_to_value, \
                                                      FCLAW2D_SET_BOUNDARY_TO_VALUE)
 void FCLAW2D_SET_BOUNDARY_TO_VALUE(int *mx, int* my, int* mbc,
+                                   int* meqn,double* q, double* val);
+
+#define FCLAW2D_SET_CORNERS_TO_VALUE FCLAW_F77_FUNC(fclaw2d_set_corners_to_value, \
+                                                     FCLAW2D_SET_CORNERS_TO_VALUE)
+void FCLAW2D_SET_CORNERS_TO_VALUE(int *mx, int* my, int* mbc,
                                    int* meqn,double* q, double* val);
 
 #ifdef __cplusplus

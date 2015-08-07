@@ -72,6 +72,8 @@ public :
     void setup_for_time_interpolation(const double& alpha, const int& psize);
     // void reset_after_time_interpolation();
     double* q_time_sync(fclaw_bool time_interp);
+    void finegrid_neighbors(int y);
+    int has_finegrid_neighbors();
     FArrayBox newGrid();
 
     Box dataBox();  /* Box containing data pointer q */
@@ -258,6 +260,7 @@ protected :
     FArrayBox m_curvature;  // ???
 
     int m_block_corner_count[4];
+    int m_has_finegrid_neighbors;
 
     /* This is an opaque pointer */
     fclaw_package_data_t *m_package_data_ptr;

@@ -39,6 +39,11 @@ extern "C"
 void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
                        int level, double alpha);
 
+int fclaw2d_timeinterp_has_finegrid_neighbors(fclaw2d_domain_t * domain,
+                                              int blockno,
+                                              int patchno);
+
+
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \
                                                 FCLAW2D_TIMEINTERP_FORT)
 void FCLAW2D_TIMEINTERP_FORT(const int *mx, const int* my, const int* mbc,

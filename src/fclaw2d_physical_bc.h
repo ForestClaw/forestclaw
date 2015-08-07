@@ -36,14 +36,31 @@ extern "C"
 #endif
 #endif
 
+
+struct fclaw2d_physical_time_info_t
+{
+    double level_time;
+    int time_interp;
+};
+
+
+void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx,
+                                void *user);
+
+
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_get_physical_bc(fclaw2d_domain_t *domain,
+void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
                              int this_block_idx,
                              int this_patch_idx,
                              fclaw_bool *intersects_bdry);
 
-void fclaw2d_set_physical_bc(fclaw2d_domain_t *domain, int a_level,
-                             double a_level_time, fclaw_bool time_interp);
+void fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
+                             int level,
+                             double level_time,
+                             int time_interp);
 
 void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
                                  fclaw2d_patch_t *this_patch,

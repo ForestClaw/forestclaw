@@ -43,6 +43,7 @@ void ClawPatch::define(const double&  a_xlower,
     {
         m_block_corner_count[m] = 0;
     }
+    m_has_finegrid_neighbors = 0;
 
     m_manifold = gparms->manifold;
 
@@ -579,6 +580,16 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha,
         fclaw_global_essentialf("fclaw2d_timeinterp : incorrect pack size\n");
         exit(0);
     }
+}
+
+void ClawPatch::finegrid_neighbors(int y)
+{
+    m_has_finegrid_neighbors = y;
+}
+
+int ClawPatch::has_finegrid_neighbors()
+{
+    return m_has_finegrid_neighbors;
 }
 
 

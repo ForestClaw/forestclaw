@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_metric_default.h>
+#include <fclaw2d_timeinterp.h>
 #include <fclaw2d_metric.h>
 
 #include <ClawPatch.hpp>
@@ -95,6 +96,33 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
+static
+void cb_has_finegrid_neighbors(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno,
+                               void* user)
+{
+    int y =
+        fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->finegrid_neighbors(y);
+}
+
+void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_iterate_patches(domain,cb_has_finegrid_neighbors,
+                                   (void*) NULL);
+}
+
+int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
+                                             fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->has_finegrid_neighbors();
+}
+
+
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha)
@@ -108,7 +136,8 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
     int meqn = gparms->meqn;
     int mint = 2;  /* Number of internal layers needed */
 
-    int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
+    int ng = 0;  /* Number of ghost cells (mbc,1,2,..) */
+    int wg = (2*ng + mx)*(2*ng + my);  /* Whole grid  (one layer of ghost cells)*/
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
     size_t psize = (wg - hole)*meqn;

@@ -26,16 +26,90 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_clawpatch.h>
 
+int fclaw2d_timeinterp_has_finegrid_neighbors(fclaw2d_domain_t * domain,
+                                              int blockno,
+                                              int patchno)
+{
+    for (int iface = 0; iface < 4; iface++)
+    {
+        int rproc[2];
+        int rblockno;
+        int rpatchno[2];
+        int rfaceno;
+
+        fclaw2d_patch_relation_t neighbor_type =
+            fclaw2d_patch_face_neighbors(domain,
+                                         blockno,
+                                         patchno,
+                                         iface,
+                                         rproc,
+                                         &rblockno,
+                                         rpatchno,
+                                         &rfaceno);
+
+        if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        {
+            return 1;
+        }
+    }
+
+    for (int icorner = 0; icorner < 4; icorner++)
+    {
+        int rproc_corner;
+        int cornerpatchno;
+        int cornerblockno;
+        int rcornerno;
+        fclaw2d_patch_relation_t neighbor_type;
+
+        int has_corner_neighbor =
+            fclaw2d_patch_corner_neighbors(domain,
+                                           blockno,
+                                           patchno,
+                                           icorner,
+                                           &rproc_corner,
+                                           &cornerblockno,
+                                           &cornerpatchno,
+                                           &rcornerno,
+                                           &neighbor_type);
+
+        if (has_corner_neighbor & (neighbor_type == FCLAW2D_PATCH_HALFSIZE))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
 
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
+                          int blockno,
+                          int patchno,
                           void *user)
 {
+#if 0
+    /* These ideas are unfortunately really slow! */
+    if (fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno))
+    {
+        /* Only create time interpolated for patches with
+           fine grid neighbors. */
+        double &alpha = *((double*) user);
+        fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
+    }
+#endif
+    if (fclaw2d_clawpatch_has_finegrid_neighbors(domain,this_patch))
+    {
+        double &alpha = *((double*) user);
+        fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
+    }
+#if 0
+    /* Seems better to just fill in each grid without checking to see if this
+       grid will be needed for interplation to finer grids */
     double &alpha = *((double*) user);
     fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
+#endif
 }
 
 
