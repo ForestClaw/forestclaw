@@ -11,6 +11,12 @@ cv([1 end]) = [];
 setpatchborderprops('linewidth',1);
 showpatchborders;
 
+% caxis([-1e-8,1e-8]);
+% colormap(yrbcolormap);
+
+fprintf('%10s : %12.4e\n','qmin',qmin);
+fprintf('%10s : %12.4e\n','qmax',qmax);
+
 view(2);
 
 NoQuery = 0;
@@ -24,3 +30,4 @@ end;
 shg
 
 clear afterframe;
+clear parallelpartitions;
