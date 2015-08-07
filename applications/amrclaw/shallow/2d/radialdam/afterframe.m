@@ -1,11 +1,12 @@
 if PlotType ~= 4
     cv = [0.61 : 0.02 : 1.31];
     drawcontourlines(cv);
-    caxis([0.8 1.2])
+    caxis([0.5 1.2])
     axis([-2.5 2.5 -2.5 2.5])
-    showpatchborders;
-    
+    showpatchborders;    
     axis square
+    colormap(jet);
+    colorbar;
 end
 
 if PlotType==4
