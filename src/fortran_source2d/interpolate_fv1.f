@@ -289,15 +289,14 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
          jc = my
       endif
 
+c     # Interpolate coarse grid corners to fine grid corner ghost cells
+      i1 = ic
+      j1 = jc
+      call fclaw2d_transform_corner_half(i1,j1,i2,j2,
+     &      transform_ptr)
+
       do mq = 1,meqn
          qc = qcoarse(ic,jc,mq)
-
-c        # Interpolate coarse grid corners to fine grid corner ghost cells
-         i1 = ic
-         j1 = jc
-         call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &         transform_ptr)
-
 
 c        # Compute limited slopes in both x and y. Note we are not
 c        # really computing slopes, but rather just differences.
