@@ -215,7 +215,8 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         else if (this_block_idx == *corner_block_idx)
         {
             /* Both patches are in the same block, so we set the transform to
-               a default transform */
+               a default transform.  This could be the case for periodic boundaries. */
+            *block_corner_count = 4;  /* assume four for now */
             fclaw2d_patch_face_transformation_intra (ftransform);
             fclaw2d_patch_face_transformation_intra
                 (ftransform_finegrid->transform);
