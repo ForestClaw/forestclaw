@@ -14,7 +14,7 @@ c     # -------------------------------------------------------
 
       common /compi/ pi
 
-      pi = 4.d0*atan(1.0)
+      pi = 4.d0*atan(1.d0)
 
       if (blockno .eq. 2) then
          xp = (2*xc - 1)*alpha/sqrt(2.d0);
