@@ -23,7 +23,7 @@
 
       open(unit=matunit2,file=matname2)
       write(matunit2,1000) time,meqn,ngrids
- 1000 format(e18.8,'    time', /,
+ 1000 format(e130.20,'    time', /,
      &      i5,'                 meqn'/,
      &      i5,'                 ngrids')
 
