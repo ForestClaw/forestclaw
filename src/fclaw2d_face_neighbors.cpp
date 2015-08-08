@@ -127,13 +127,9 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         {
             /* If we are within one patch this is a special case */
             FCLAW_ASSERT (*neighbor_block_idx == -1);
-#if 0
-            fclaw2d_patch_face_transformation_block (ftransform, 1);
-            fclaw2d_patch_face_transformation_block
-                (ftransform_finegrid->transform, 1);
-#endif
-            ftransform[8] = 4;
-            ftransform_finegrid->transform[8] = 4;
+            fclaw2d_patch_face_transformation_intra (ftransform);
+            fclaw2d_patch_face_transformation_intra
+                (ftransform_finegrid->transform);
         }
 
         if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -411,7 +407,6 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* this_ghost_patch = &domain->ghost_patches[i];
-        int blockno = this_ghost_patch->u.blockno;
         int level = this_ghost_patch->level;
         if (level < min_interp_level)
         {
@@ -454,17 +449,18 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                 /* We have a neighbor ghost patch that came from a
                    different proc */
 
+                fclaw_bool intersects_block[NumFaces];
+                fclaw2d_block_get_block_boundary(domain, this_ghost_patch,
+                                                 intersects_block);
+                int is_block_face = intersects_block[iface];
+
+
                 fclaw2d_patch_face_transformation (iface, rfaceno,
                                                    transform_data.transform);
 
-                int is_block_face = blockno != rblockno;
-#if 0
-                fclaw2d_patch_face_transformation_block(transform_data.transform,
-                                                        !is_block_face);
-#endif
                 if (!is_block_face)
                 {
-                    transform_data.transform[8] = 4;
+                    fclaw2d_patch_face_transformation_intra(transform_data.transform);
                 }
                 if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
                 {
