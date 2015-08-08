@@ -13,6 +13,9 @@ if (ShowUnderOverShoots == 1)
     colorbar_underover(under_label,over_label);
 end
 
+fprintf('%10s : %12.4e\n','qmin',qmin);
+fprintf('%10s : %12.4e\n','qmax',qmax);
+
 zoom(1.1^5);
 hidegridlines;
 
