@@ -71,39 +71,39 @@ c     # 'iface' is relative to the coarse grid
 
 c     # Average fine grid onto coarse grid
       if (idir .eq. 0) then
-         do jc = 1,my
-            do ibc = 1,mbc
-c              # ibc = 1 corresponds to first layer of ghost cells, and
-c              # ibc = 2 corresponds to the second layer
+         do mq = 1,meqn
+            do jc = 1,my
+               do ibc = 1,mbc
+c                 # ibc = 1 corresponds to first layer of ghost cells, and
+c                 # ibc = 2 corresponds to the second layer
 
-               if (iface_coarse .eq. 0) then
-                  ic = 1-ibc
-               elseif (iface_coarse .eq. 1) then
-                  ic = mx+ibc
-               endif
-
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &               transform_cptr)
-c              # ---------------------------------------------
-c              # Two 'half-size' neighbors will be passed into
-c              # this routine.  Only half of the coarse grid ghost
-c              # indices will be valid for the particular grid
-c              # passed in.  We skip those ghost cells that will
-c              # have to be filled in by the other half-size
-c              # grid.
-c              # ---------------------------------------------
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_average(i2(m),j2(m),mx,my))
-     &                  then
-                     skip_this_grid = .true.
-                     exit
+                  if (iface_coarse .eq. 0) then
+                     ic = 1-ibc
+                  elseif (iface_coarse .eq. 1) then
+                     ic = mx+ibc
                   endif
-               enddo
 
-               if (.not. skip_this_grid) then
-                  if (is_manifold) then
-                     do mq = 1,meqn
+                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                  transform_cptr)
+c                 # ---------------------------------------------
+c                 # Two 'half-size' neighbors will be passed into
+c                 # this routine.  Only half of the coarse grid ghost
+c                 # indices will be valid for the particular grid
+c                 # passed in.  We skip those ghost cells that will
+c                 # have to be filled in by the other half-size
+c                 # grid.
+c                 # ---------------------------------------------
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                     then
+                        skip_this_grid = .true.
+                        exit
+                     endif
+                  enddo
+
+                  if (.not. skip_this_grid) then
+                     if (is_manifold) then
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
@@ -123,42 +123,40 @@ c                       qcoarse(ic,jc,mq) = sum/kc
 
 c                       # Use areas of the fine grid mesh cells instead.
                         qcoarse(ic,jc,mq) = sum/af_sum
-                     enddo
-                  else
-                     do mq = 1,meqn
+                     else
                         sum = 0
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
                         qcoarse(ic,jc,mq) = sum/dble(r2)
-                     enddo
+                     endif
                   endif
-               endif
+               enddo
             enddo
          enddo
       else
-c        # idir = 1 (faces 2,3)
-         do ic = 1,mx
+         do mq = 1,meqn
+c           # idir = 1 (faces 2,3)
             do jbc = 1,mbc
+               do ic = 1,mx
 
-               if (iface_coarse .eq. 2) then
-                  jc = 1-jbc
-               elseif (iface_coarse .eq. 3) then
-                  jc = my+jbc
-               endif
-
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &               transform_cptr)
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_average(i2(m),j2(m),mx,my))
-     &                  then
-                     skip_this_grid = .true.
+                  if (iface_coarse .eq. 2) then
+                     jc = 1-jbc
+                  elseif (iface_coarse .eq. 3) then
+                     jc = my+jbc
                   endif
-               enddo
-               if (.not. skip_this_grid) then
-                  if (is_manifold) then
-                     do mq = 1,meqn
+
+                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                  transform_cptr)
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                     then
+                        skip_this_grid = .true.
+                     endif
+                  enddo
+                  if (.not. skip_this_grid) then
+                     if (is_manifold) then
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
@@ -168,19 +166,17 @@ c        # idir = 1 (faces 2,3)
                            af_sum = af_sum + kf
                         enddo
                         kc = areacoarse(ic,jc)
-c                        qcoarse(ic,jc,mq) = sum/kc
+c                       qcoarse(ic,jc,mq) = sum/kc
                         qcoarse(ic,jc,mq) = sum/af_sum
-                     enddo
-                  else
-                     do mq = 1,meqn
+                     else
                         sum = 0
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
                         qcoarse(ic,jc,mq) = sum/dble(r2)
-                     enddo  !! end meqn
-                  endif  !! manifold loop
-               endif !! skip grid loop
+                     endif              !! manifold loop
+                  endif                 !! skip grid loop
+               enddo
             enddo
          enddo
       endif
