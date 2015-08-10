@@ -70,41 +70,40 @@ c     # 'iface' is relative to the coarse grid
       endif
 
 c     # Average fine grid onto coarse grid
-      do mq = 1,meqn
-         if (idir .eq. 0) then
-            do jc = 1,my
-               do ibc = 1,mbc
-c                 # ibc = 1 corresponds to first layer of ghost cells, and
-c                 # ibc = 2 corresponds to the second layer
+      if (idir .eq. 0) then
+         do jc = 1,my
+            do ibc = 1,mbc
+c              # ibc = 1 corresponds to first layer of ghost cells, and
+c              # ibc = 2 corresponds to the second layer
 
-                  if (iface_coarse .eq. 0) then
-                     ic = 1-ibc
-                  elseif (iface_coarse .eq. 1) then
-                     ic = mx+ibc
+               if (iface_coarse .eq. 0) then
+                  ic = 1-ibc
+               elseif (iface_coarse .eq. 1) then
+                  ic = mx+ibc
+               endif
+
+               call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &               transform_cptr)
+c              # ---------------------------------------------
+c              # Two 'half-size' neighbors will be passed into
+c              # this routine.  Only half of the coarse grid ghost
+c              # indices will be valid for the particular grid
+c              # passed in.  We skip those ghost cells that will
+c              # have to be filled in by the other half-size
+c              # grid.
+c              # ---------------------------------------------
+               skip_this_grid = .false.
+               do m = 0,r2-1
+                  if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                  then
+                     skip_this_grid = .true.
+                     exit
                   endif
+               enddo
 
-c                 # New code
-                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &                  transform_cptr)
-c                 # ---------------------------------------------
-c                 # Two 'half-size' neighbors will be passed into
-c                 # this routine.  Only half of the coarse grid ghost
-c                 # indices will be valid for the particular grid
-c                 # passed in.  We skip those ghost cells that will
-c                 # have to be filled in by the other half-size
-c                 # grid.
-c                 # ---------------------------------------------
-                  skip_this_grid = .false.
-                  do m = 0,r2-1
-                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
-     &                     then
-                        skip_this_grid = .true.
-                        exit
-                     endif
-                  enddo
-
-                  if (.not. skip_this_grid) then
-                     if (is_manifold) then
+               if (.not. skip_this_grid) then
+                  if (is_manifold) then
+                     do mq = 1,meqn
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
@@ -124,38 +123,42 @@ c                       qcoarse(ic,jc,mq) = sum/kc
 
 c                       # Use areas of the fine grid mesh cells instead.
                         qcoarse(ic,jc,mq) = sum/af_sum
-                     else
+                     enddo
+                  else
+                     do mq = 1,meqn
                         sum = 0
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
                         qcoarse(ic,jc,mq) = sum/dble(r2)
-                     endif
+                     enddo
+                  endif
+               endif
+            enddo
+         enddo
+      else
+c        # idir = 1 (faces 2,3)
+         do ic = 1,mx
+            do jbc = 1,mbc
+
+               if (iface_coarse .eq. 2) then
+                  jc = 1-jbc
+               elseif (iface_coarse .eq. 3) then
+                  jc = my+jbc
+               endif
+
+               call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &               transform_cptr)
+               skip_this_grid = .false.
+               do m = 0,r2-1
+                  if (.not. is_valid_average(i2(m),j2(m),mx,my))
+     &                  then
+                     skip_this_grid = .true.
                   endif
                enddo
-            enddo
-         else
-c           # idir = 1 (faces 2,3)
-            do ic = 1,mx
-               do jbc = 1,mbc
-
-                  if (iface_coarse .eq. 2) then
-                     jc = 1-jbc
-                  elseif (iface_coarse .eq. 3) then
-                     jc = my+jbc
-                  endif
-
-                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &                  transform_cptr)
-                  skip_this_grid = .false.
-                  do m = 0,r2-1
-                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
-     &                     then
-                        skip_this_grid = .true.
-                     endif
-                  enddo
-                  if (.not. skip_this_grid) then
-                     if (is_manifold) then
+               if (.not. skip_this_grid) then
+                  if (is_manifold) then
+                     do mq = 1,meqn
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
@@ -167,18 +170,20 @@ c           # idir = 1 (faces 2,3)
                         kc = areacoarse(ic,jc)
 c                        qcoarse(ic,jc,mq) = sum/kc
                         qcoarse(ic,jc,mq) = sum/af_sum
-                     else
+                     enddo
+                  else
+                     do mq = 1,meqn
                         sum = 0
                         do m = 0,r2-1
                            sum = sum + qfine(i2(m),j2(m),mq)
                         enddo
                         qcoarse(ic,jc,mq) = sum/dble(r2)
-                     endif
-                  endif
-               enddo
+                     enddo  !! end meqn
+                  endif  !! manifold loop
+               endif !! skip grid loop
             enddo
-         endif
-      enddo
+         enddo
+      endif
 
       end
 
@@ -237,30 +242,30 @@ c     # This should be refratio*refratio.
       is_manifold = manifold .eq. 1
 
       r2 = refratio*refratio
-      do mq = 1,meqn
-c        # Loop over four corner cells on coarse grid
-         do ibc = 1,mbc
-            do jbc = 1,mbc
-c              # Average fine grid corners onto coarse grid ghost corners
-               if (icorner_coarse .eq. 0) then
-    1             i1 = 1-ibc
-                  j1 = 1-jbc
-               elseif (icorner_coarse .eq. 1) then
-                  i1 = mx+ibc
-                  j1 = 1-jbc
-               elseif (icorner_coarse .eq. 2) then
-                  i1 = 1-ibc
-                  j1 = my+jbc
-               elseif (icorner_coarse .eq. 3) then
-                  i1 = mx+ibc
-                  j1 = my+jbc
-               endif
+c     # Loop over four corner cells on coarse grid
+      do ibc = 1,mbc
+         do jbc = 1,mbc
+c           # Average fine grid corners onto coarse grid ghost corners
+            if (icorner_coarse .eq. 0) then
+    1          i1 = 1-ibc
+               j1 = 1-jbc
+            elseif (icorner_coarse .eq. 1) then
+               i1 = mx+ibc
+               j1 = 1-jbc
+            elseif (icorner_coarse .eq. 2) then
+               i1 = 1-ibc
+               j1 = my+jbc
+            elseif (icorner_coarse .eq. 3) then
+               i1 = mx+ibc
+               j1 = my+jbc
+            endif
 
-c              # Again, a fake routine until the real one is
-c              # available (be sure to pass in (i1,j1)
-               call fclaw2d_transform_corner_half(i1,j1,i2,j2,
-     &               transform_cptr)
-               if (is_manifold) then
+c           # Again, a fake routine until the real one is
+c           # available (be sure to pass in (i1,j1)
+            call fclaw2d_transform_corner_half(i1,j1,i2,j2,
+     &            transform_cptr)
+            if (is_manifold) then
+               do mq = 1,meqn
                   sum = 0
                   af_sum = 0
                   do m = 0,r2-1
@@ -270,20 +275,19 @@ c              # available (be sure to pass in (i1,j1)
                      af_sum = af_sum + kf
                   enddo
                   kc = areacoarse(i1,j1)
-c                  qcoarse(i1,j1,mq) = sum/kc
+c                 qcoarse(i1,j1,mq) = sum/kc
                   qcoarse(i1,j1,mq) = sum/af_sum
-               else
+               enddo
+            else
+               do mq = 1,meqn
                   sum = 0
                   do m = 0,r2-1
                      sum = sum + qfine(i2(m),j2(m),mq)
                   enddo
                   qcoarse(i1,j1,mq) = sum/dble(r2)
-               endif
-
-
-            enddo
+               enddo
+            endif
          enddo
       enddo
-
 
       end
