@@ -547,7 +547,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     }
 
 
-    if (domain->mpisize == 0)
+    if (domain->mpisize == 1)
     {
         /* This seems to be equivalent to the other branch of this loop when
            run on a single processor.  */
@@ -577,8 +577,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* Do a final fill in of boundary conditions of all physical
            values. Could we just do minfine to maxfine? */
         fill_physical_ghost(domain,
-                            mincoarse,
-                            maxcoarse,
+                            minlevel,
+                            maxlevel,
                             sync_time,
                             time_interp,
                             parallel_mode);
