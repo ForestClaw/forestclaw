@@ -376,7 +376,6 @@ void outstyle_3(fclaw2d_domain_t **domain)
                 /* Take one step of a stable time step for the finest
                    non-emtpy level. */
                 reduce_factor = time_stepper.maxlevel_factor();
-                reduce_factor *= steps_to_minlevel;
             }
             else
             {
@@ -424,6 +423,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
             {
                 dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
             }
+
         }  /* Inner time stepping loop */
         n++;
 
