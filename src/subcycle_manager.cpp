@@ -45,7 +45,7 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
 
     /* query the levels that exist in the domain as a whole,
      * regardless of the levels on this processor */
-    m_minlevel = domain->global_minlevel;
+    m_minlevel = domain->global_minlevel;  /* Might be > gparms->minlevel */
     m_maxlevel = domain->global_maxlevel;
     m_levels.resize(m_maxlevel + 1);
 
