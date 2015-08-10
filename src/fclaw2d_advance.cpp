@@ -173,7 +173,9 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
-    /* These are global minimum and maximum values */
+    /* These are global minimum and maximum values (which might
+     not be exactly the min/max set by the user;  some levels
+     may be missing. */
     int minlevel = a_time_stepper->minlevel();
     int maxlevel = a_time_stepper->maxlevel();
 
