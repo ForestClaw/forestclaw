@@ -77,7 +77,14 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
     ss_data.maxcfl = 0;
 
     /* If there are not grids at this level, we return CFL = 0 */
-    fclaw2d_domain_iterate_level(domain, level, cb_single_step,(void *) &ss_data);
+    if (domain->mpisize == 1)
+    {
+        fclaw2d_domain_iterate_level_mthread(domain, level, cb_single_step,(void *) &ss_data);
+    }
+    else
+    {
+        fclaw2d_domain_iterate_level(domain, level, cb_single_step,(void *) &ss_data);
+    }
 
     return ss_data.maxcfl;
 }
