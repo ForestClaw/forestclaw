@@ -344,7 +344,12 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
     while (n < nstep_outer)
     {
+        /* Skip over coarse levels that don't have any grids on them */
         int steps_to_minlevel = pow_int(2,(*domain)->global_minlevel - gparms->minlevel);
+        if (!gparms->subcycle)
+        {
+            steps_to_minlevel = 1;
+        }
         for (int m = 0; m < steps_to_minlevel; m++)
         {
             subcycle_manager time_stepper;
@@ -393,10 +398,11 @@ void outstyle_3(fclaw2d_domain_t **domain)
             /* This is a collective communication - everybody needs to wait here. */
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
 
+            double tc = t_curr + dt_minlevel;
             fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",
                                      time_stepper.minlevel(),n+1,
-                                     dt_minlevel,maxcfl_step, t_curr+dt_minlevel);
+                                     dt_minlevel,maxcfl_step, tc);
 
             if (maxcfl_step > gparms->max_cfl)
             {
@@ -415,7 +421,8 @@ void outstyle_3(fclaw2d_domain_t **domain)
                 }
             }
 
-            t_curr += dt_minlevel;
+            /* Don't update the time until we are sure we want this step */
+            t_curr = tc;
             fclaw2d_domain_set_time(*domain,t_curr);
 
             /* New time step, which should give a cfl close to the desired cfl. */
