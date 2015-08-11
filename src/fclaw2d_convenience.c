@@ -466,10 +466,6 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 patch = block->patches + np;
                 level = patch->level;
                 max_tlevel = patch->target_level;
-                if (level < domain->p.smooth_level)
-                {
-                    goto nosmoothingforthispatch;
-                }
 
                 /* loop through face neighbors of this patch */
                 for (face = 0; max_tlevel <= level &&
@@ -541,7 +537,6 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                     }
                 }
 
-              nosmoothingforthispatch:
                 /* pass refinement marker into the plumbing */
                 if (max_tlevel < level)
                 {
