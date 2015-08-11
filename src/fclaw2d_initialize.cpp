@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_ghost_fill.h>
 
+#include "/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.3/include/omp.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -82,6 +84,17 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     /* This mapping context is needed by fortran mapping functions */
     fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(*domain);
     SET_CONTEXT(&cont);
+
+    int maxthreads = 0;
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            maxthreads = omp_get_num_threads();
+        }
+    }
+    fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
+
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
