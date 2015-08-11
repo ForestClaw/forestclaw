@@ -72,26 +72,28 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);
+    int blockno, patchno;
+    fclaw2d_patch_t *ghost_patch;
+    fclaw2d_build_mode_t build_mode;
+    if (gparms->ghost_patch_pack_area)
+    {
+        build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED;
+    }
+    else
+    {
+        build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
+    }
+
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
-        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        ghost_patch = &domain->ghost_patches[i];
 
-        int blockno = ghost_patch->u.blockno;
+        blockno = ghost_patch->u.blockno;
 
         /* not clear how useful this patchno is.  In any case, it isn't
            used in defining the ClawPatch, so probably doesn't
            need to be passed in */
-        int patchno = i;
-
-        fclaw2d_build_mode_t build_mode;
-        if (gparms->ghost_patch_pack_area)
-        {
-            build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED;
-        }
-        else
-        {
-            build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
-        }
+        patchno = i;
 
         fclaw2d_patch_data_new(domain,ghost_patch);
         fclaw2d_clawpatch_build(domain,ghost_patch,blockno,
