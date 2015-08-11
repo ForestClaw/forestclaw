@@ -91,3 +91,28 @@ fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
 {
     return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
 }
+
+
+void
+fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+                                      fclaw2d_patch_callback_t pcb, void *user)
+{
+    int i, j;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+
+    for (i = 0; i < domain->num_blocks; i++)
+    {
+        block = domain->blocks + i;
+
+#pragma omp parallel for private(patch,j)
+        for (j = 0; j < block->num_patches; j++)
+        {
+            patch = block->patches + j;
+            if (patch->level == level)
+            {
+                pcb (domain, patch, i, j, user);
+            }
+        }
+    }
+}

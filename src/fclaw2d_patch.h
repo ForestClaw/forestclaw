@@ -78,6 +78,10 @@ int
     fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch);
 
 
+void
+fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+                                      fclaw2d_patch_callback_t pcb, void *user);
+
 #ifdef __cplusplus
 #if 0
 {
