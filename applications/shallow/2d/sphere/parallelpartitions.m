@@ -11,24 +11,15 @@ pp.npmax = 4;    % Number of processors
 
 pp.qmin = 0.205;
 pp.qmax = 0.25;
+pp.qmin = 1e-20;
+pp.qmax = eps(1);
+pp.plotq = true;
+
+pp.qcolors = q;
 
 pp.colormap = colormap(jet(64));  % Color map for q portion.
 
-pp.plotq = true;
 
-pp.qcolors = [];
-
-if (nargin == 0)
-    return
-end
-
-qcolors = q;
-
-% Map q linearly into colormap; constrain entire color map into
-% range [qmin, qmax].  Values outside of this range will use
-% the processor color.
-
-pp.qcolors = qcolors;
 
 
 end

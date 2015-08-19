@@ -16,6 +16,9 @@ end
 yrbcolormap;
 showpatchborders(1:10);
 
+fprintf('%10s : %12.4e\n','qmin',qmin);
+fprintf('%10s : %12.4e\n','qmax',qmax);
+
 colorbar;
 
 daspect([1,1,1]);
