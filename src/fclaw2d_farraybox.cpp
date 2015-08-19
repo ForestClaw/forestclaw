@@ -132,7 +132,7 @@ void FArrayBox::set_dataPtr(int a_size)
         set_qnan(qnan);
         set_snan(snan);
         set_big_number(big_number);
-#if 0
+#if FCLAW_DEBUG
         for(int i = 0; i < a_size; i++)
         {
             m_data[i] = snan;
