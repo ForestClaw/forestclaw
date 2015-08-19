@@ -5,6 +5,7 @@ map = 'nomap';
 % map = 'pillowdisk';
 % map = 'squareddisk';
 % map = 'pillowdisk5';
+% map = 'fivepatch';
 
 % This domain should be in [0,2],[0,2]
 
@@ -61,6 +62,23 @@ switch map
         end
         xp = xp + shift(1);
         yp = yp + shift(2);
+        
+    case 'fivepatch'
+        [xp,yp,zp] = mapc2m_fivepatch(xc,yc);
+        b = getblocknumber();
+        s = 0.0;
+        switch b
+            case 0
+                yp = yp - s;
+            case 1
+                xp = xp - s;
+            case 3
+                xp = xp + s;
+            case 4
+                yp = yp + s;
+        end
+        xp = xp+shift(1);
+        yp = yp+shift(1);
 end
 zp = 0*xp;
 

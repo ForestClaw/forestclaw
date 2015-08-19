@@ -10,8 +10,6 @@ pp.npmax = 8;    % Number of processors
 
 pp.qmin = 0.01;
 pp.qmax = 1.01;
-% pp.qmin = 2;
-% pp.qmax = 4;
 pp.plotq = true;
 
 pp.qcolors = q;
