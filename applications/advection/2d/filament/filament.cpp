@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "filament_user.H"
+#include "filament_user.hpp"
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_patch.hpp>
@@ -69,8 +69,8 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    if (user->example < 0 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3 or 4\n");
+    if (user->example < 0 || user->example > 5) {
+        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3, 4 or 5\n");
         return FCLAW_EXIT_QUIET;
     }
     if (user->example == 2)
@@ -81,11 +81,11 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
             return FCLAW_EXIT_QUIET;
         }
     }
-    else if (user->example == 3 || user->example == 4)
+    else if (user->example == 3 || user->example == 4 || user->example == 5)
     {
         if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
         {
-            fclaw_global_essentialf("The squared-disk or the pillowdisk5 " \
+            fclaw_global_essentialf("The five patch mapping " \
                                     "is inadmissable:  " \
                                     "mx*2^minlevel must be greater than " \
                                     "or equal to 32.\n");
@@ -176,6 +176,12 @@ void run_program(fclaw_app_t* app)
         conn = p4est_connectivity_new_disk ();
         cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
                                             rotate,user->alpha);
+        break;
+
+    case 5:
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
+                                          rotate,user->alpha);
         break;
 
     default:

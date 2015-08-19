@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "filament_user.H"
+#include "filament_user.hpp"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
