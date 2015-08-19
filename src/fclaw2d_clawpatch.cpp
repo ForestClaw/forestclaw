@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ClawPatch.hpp>
 
 
+#if FCLAW_DEBUG
 /* This is a duplicate of the function in fclaw2d_farraybox.cpp */
 static
 void set_snan(double& f)
@@ -42,6 +43,7 @@ void set_snan(double& f)
     */
     *((long long*)&f) = 0x7ff0000000000001LL;
 }
+#endif
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
