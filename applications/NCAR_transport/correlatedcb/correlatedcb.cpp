@@ -50,16 +50,15 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    const amr_options_t* amropt;
-    amropt = fclaw_forestclaw_get_options(app);
+    const amr_options_t* gparms = fclaw_forestclaw_get_options(app);
 
     if (user->init_choice == 2)
     {
-        FCLAW_ASSERT(user->init_choice == 2 && amropt->meqn == 1);
+        FCLAW_ASSERT(user->init_choice == 2 && gparms->meqn == 1);
     }
     else if (user->init_choice == 3)
     {
-        FCLAW_ASSERT(user->init_choice == 3 && amropt->meqn == 2);
+        FCLAW_ASSERT(user->init_choice == 3 && gparms->meqn == 2);
     }
 
     if (user->example < 0 || user->example > 2) {
