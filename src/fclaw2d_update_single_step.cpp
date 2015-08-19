@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_update_single_step.h>
 #include <fclaw2d_vtable.h>
 
+static fclaw2d_patch_iterator_t patch_iterator;
+
+
 static
     void cb_single_step(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
@@ -76,15 +79,12 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
     ss_data.dt = dt;
     ss_data.maxcfl = 0;
 
+    /* Don't multithread if we are using more than one processor */
+    patch_iterator = domain->mpisize == 1 ? &fclaw2d_domain_iterate_level_mthread :
+                     &fclaw2d_domain_iterate_level;
+
     /* If there are not grids at this level, we return CFL = 0 */
-    if (domain->mpisize == 1)
-    {
-        fclaw2d_domain_iterate_level_mthread(domain, level, cb_single_step,(void *) &ss_data);
-    }
-    else
-    {
-        fclaw2d_domain_iterate_level(domain, level, cb_single_step,(void *) &ss_data);
-    }
+    patch_iterator(domain, level, cb_single_step,(void *) &ss_data);
 
     return ss_data.maxcfl;
 }

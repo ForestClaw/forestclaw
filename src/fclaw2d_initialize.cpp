@@ -86,13 +86,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     SET_CONTEXT(&cont);
 
     int maxthreads = 0;
-    #pragma omp parallel
-    {
-        #pragma omp single
-        {
-            maxthreads = omp_get_num_threads();
-        }
-    }
+#if defined(_OPENMP)
+    maxthreads = omp_get_max_threads();
+#endif
     fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
 
 

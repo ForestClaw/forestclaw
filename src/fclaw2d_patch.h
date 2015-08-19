@@ -61,6 +61,9 @@ extern "C"
 #endif
 #endif
 
+typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_domain_t * domain, int level,
+                                          fclaw2d_patch_callback_t pcb, void *user);
+
 struct fclaw2d_patch_data;
 
 void

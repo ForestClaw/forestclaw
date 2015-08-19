@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 
 #include <fclaw2d_ghost_fill.h>
+#include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
@@ -82,11 +83,11 @@ extern "C" {
 #endif
 
 
-
-
 /* -------------------------------------------------
    Basic routines - operate on a single level
    ----------------------------------------------- */
+
+static fclaw2d_patch_iterator_t patch_iterator;
 
 struct fclaw2d_ghost_fill_wrap_info
 {
@@ -114,62 +115,6 @@ static void cb_parallel_wrap(fclaw2d_domain_t* domain,
         w.cb_fill(domain,this_patch,this_block_idx,this_patch_idx,w.user);
     }
 }
-#if 0
-
-static void cb_face_wrap(fclaw2d_domain_t* domain,
-                                  fclaw2d_patch_t* this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx,
-                                  void *user)
-{
-    struct fclaw2d_ghost_fill_wrap_info w = *((fclaw2d_ghost_fill_wrap_info*) user);
-    int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
-    if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
-        ((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
-        w.ghost_mode == FCLAW2D_BOUNDARY_ALL)
-    {
-        cb_face_fill(domain,this_patch,this_block_idx,this_patch_idx,w.user);
-    }
-}
-
-static void cb_corner_wrap(fclaw2d_domain_t* domain,
-                           fclaw2d_patch_t* this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           void *user)
-{
-    struct fclaw2d_ghost_fill_wrap_info w = *((fclaw2d_ghost_fill_wrap_info*) user);
-    int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
-    if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
-        ((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
-        w.ghost_mode == FCLAW2D_BOUNDARY_ALL)
-    {
-        cb_corner_fill(domain,this_patch,this_block_idx,this_patch_idx,w.user);
-    }
-}
-
-static void cb_physical_wrap(fclaw2d_domain_t* domain,
-                             fclaw2d_patch_t* this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             void *user)
-{
-    struct fclaw2d_ghost_fill_wrap_info w = *((fclaw2d_ghost_fill_wrap_info*) user);
-
-    int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
-    if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
-        ((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
-        w.ghost_mode == FCLAW2D_BOUNDARY_ALL)
-    {
-        cb_fclaw2d_physical_set_bc(domain,
-                                   this_patch,
-                                   this_block_idx,
-                                   this_patch_idx,
-                                   w.user);
-    }
-}
-#endif
-
 
 static
 void copy2ghost(fclaw2d_domain_t *domain,
@@ -321,15 +266,14 @@ void copy2ghost(fclaw2d_domain_t *domain,
     parallel_mode.ghost_mode = ghost_mode;
     parallel_mode.user = (void*) &e_info;
 
-    /* face exchanges */
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_domain_iterate_level(domain, level, cb_parallel_wrap,
-                                 (void *) &parallel_mode);
-
+    patch_iterator(domain, level, cb_parallel_wrap,
+                   (void *) &parallel_mode);
     /* corner exchanges */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_domain_iterate_level(domain, level, cb_parallel_wrap,
-                                 (void *) &parallel_mode);
+    patch_iterator(domain, level, cb_parallel_wrap,
+                   (void *) &parallel_mode);
+
 }
 
 
@@ -353,15 +297,14 @@ void average2ghost(fclaw2d_domain_t *domain,
     parallel_mode.user = (void*) &e_info;
     parallel_mode.ghost_mode = ghost_mode;
 
-    /* Face average */
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_domain_iterate_level(domain, coarse_level,
-                                 cb_parallel_wrap, (void *) &parallel_mode);
+    patch_iterator(domain, coarse_level,
+                   cb_parallel_wrap, (void *) &parallel_mode);
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_domain_iterate_level(domain, coarse_level, cb_parallel_wrap,
-                                 (void *) &parallel_mode);
+    patch_iterator(domain, coarse_level, cb_parallel_wrap,
+                   (void *) &parallel_mode);
 
     if (read_parallel_patches)
     {
@@ -416,14 +359,13 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
 
     /* Face interpolate */
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_domain_iterate_level(domain,coarse_level, cb_parallel_wrap,
-                                 (void *) &parallel_mode);
+    patch_iterator(domain,coarse_level, cb_parallel_wrap,
+                                         (void *) &parallel_mode);
 
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_domain_iterate_level(domain,coarse_level, cb_parallel_wrap,
-                                 (void *) &parallel_mode);
-
+    patch_iterator(domain,coarse_level, cb_parallel_wrap,
+                  (void *) &parallel_mode);
     /* -----------------------------------------------------
        Second pass - Iterate over local fine grids, looking
        for remote coarse grids we can use to fill in BCs at
@@ -546,17 +488,21 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw2d_clawpatch_finegrid_neighbors(domain);
     }
 
+    /* Multi-thread only in single processor case. */
+    patch_iterator = domain->mpisize == 1 ? &fclaw2d_domain_iterate_level_mthread :
+                     &fclaw2d_domain_iterate_level;
 
     if (domain->mpisize == 1)
     {
         /* This seems to be equivalent to the other branch of this loop when
-           run on a single processor.  */
+           run on a single processor (but is about 20% faster on a
+           single processor) */
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_ALL;
         int read_parallel_patches = 0;
 
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
-                             read_parallel_patches,parallel_mode);
+                       read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
                                   time_interp,
@@ -573,9 +519,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
                                       time_interp,read_parallel_patches,
                                       parallel_mode);
-        /* --------------------------------------------------------- */
-        /* Do a final fill in of boundary conditions of all physical
-           values. Could we just do minfine to maxfine? */
+
         fill_physical_ghost(domain,
                             minlevel,
                             maxlevel,
@@ -592,6 +536,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            This is needed so that when these boundary patches get sent to other
            processors as ghost patches, they have valid ghost cells if needed
            for interpolation.*/
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_GHOST_ONLY;
         int read_parallel_patches = 0;
@@ -617,6 +562,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             time_interp,
                             parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+
         /* --------------------------------------------------------------
            Start send ...
            ------------------------------------------------------------*/
@@ -632,12 +580,12 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
+            read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
-                                  time_interp,
-                                  read_parallel_patches,
-                                  parallel_mode);
+            time_interp,
+            read_parallel_patches,
+            parallel_mode);
 
         fill_physical_ghost(domain,
                             mincoarse,
@@ -687,14 +635,15 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            Repeat above, but now with parallel ghost cells.
            ------------------------------------------------------------- */
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
         parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
         read_parallel_patches = 1;
 
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
-                             read_parallel_patches,parallel_mode);
+            read_parallel_patches,parallel_mode);
 
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
-                                  read_parallel_patches,parallel_mode);
+            read_parallel_patches,parallel_mode);
 
         fill_physical_ghost(domain,
                             minlevel,
@@ -723,7 +672,10 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
            (3) Ghost only (after exchange) : Coarse grid boundary patch interpolates
            to adjacent fine grid.  But now, we need to apply physical BCs to fine grid.
-           So we sweep over all grids to apply phys. BCs.
+           So we sweep over all grids to apply phys. BCs.  This is overkill, since
+           only those fine grids with neighboring coarse grid patches on the parallel boundary
+           are affected, but it is hard to see how to avoid this without some tedious
+           checking.
         */
         fill_physical_ghost(domain,
                             minlevel,
@@ -731,13 +683,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             sync_time,
                             time_interp,
                             FCLAW2D_BOUNDARY_ALL);
-
-#if 0
-        fclaw2d_clawpatch_set_corners_to_nan(domain,minlevel,maxlevel,
-                                             time_interp);
-#endif
-
-
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
     }
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);

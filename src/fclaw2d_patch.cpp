@@ -104,7 +104,6 @@ fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
     for (i = 0; i < domain->num_blocks; i++)
     {
         block = domain->blocks + i;
-
 #pragma omp parallel for private(patch,j)
         for (j = 0; j < block->num_patches; j++)
         {
