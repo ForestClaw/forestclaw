@@ -97,6 +97,7 @@ void
 fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                       fclaw2d_patch_callback_t pcb, void *user)
 {
+#if (_OPENMP)
     int i, j;
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
@@ -114,4 +115,7 @@ fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
             }
         }
     }
+#else
+    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread : We should not be here\n");
+#endif
 }
