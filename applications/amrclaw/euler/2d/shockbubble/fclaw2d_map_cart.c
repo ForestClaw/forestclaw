@@ -47,8 +47,6 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CART:
         return 1;
-    case FCLAW2D_MAP_QUERY_IS_BRICK:
-        return 1;
     default:
         printf("\n");
         printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
@@ -67,6 +65,9 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double *xp, double *yp, double *zp)
 {
     double xc1,yc1,zc1;
+
+    fclaw_global_essentialf("I hope not to be here ..\n");
+    exit(0);
 
     /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
 

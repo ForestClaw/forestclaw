@@ -13,9 +13,6 @@ showpatchborders
 setpatchborderprops('linewidth',1);
 % showgridlines(1:5);
 % hidepatchborders;
-delete(get(gca,'title'))
-delete(get(gca,'xlabel'))
-delete(get(gca,'ylabel'))
 set(gca,'fontsize',16);
 hidepatchborders(6);
 
@@ -31,6 +28,8 @@ if (prt)
     disp(fname);
     print('-dpng',fname);
 end
+
+shg;
 
 clear afterframe
 clear mapc2m

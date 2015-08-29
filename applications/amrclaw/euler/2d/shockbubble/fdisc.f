@@ -20,8 +20,8 @@ c     # particular cases (a straight line and circle) but this routine
 c     # can be modified for any other curve.
 c
 
-      cont = get_context()
-      call fclaw2d_map_c2m(cont,blockno,xc,yc,x,y,z)
+      x = xc
+      y = yc
 
       go to (10,20) idisc
 c

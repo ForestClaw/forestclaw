@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SHOCKBUBBLE_USER_H
-#define SHOCKBUBBLE_USER_H
+#ifndef SHOCKBUBBLE_USER_HPP
+#define SHOCKBUBBLE_USER_HPP
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
@@ -88,9 +88,6 @@ void RPT2EU5(const int* ixy, const int* maxm, const int* meqn, const int* mwaves
 
 void shockbubble_link_solvers(fclaw2d_domain_t *domain);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
-                                            const double scale[],
-                                            const double shift[]);
 
 #ifdef __cplusplus
 #if 0

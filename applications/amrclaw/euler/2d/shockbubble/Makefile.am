@@ -8,7 +8,6 @@ bin_PROGRAMS += applications/amrclaw/euler/2d/shockbubble/shockbubble
 applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/shockbubble.cpp \
 	applications/amrclaw/euler/2d/shockbubble/shockbubble_user.cpp \
-	applications/amrclaw/euler/2d/shockbubble/fclaw2d_map_cart.c \
 	applications/amrclaw/euler/2d/shockbubble/fdisc.f \
 	applications/amrclaw/euler/2d/shockbubble/setprob.f \
 	applications/amrclaw/euler/2d/shockbubble/user_4.x/qinit.f \
