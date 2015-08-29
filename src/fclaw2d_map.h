@@ -167,6 +167,10 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** cont, int *blockno,
  */
 void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
 
+fclaw2d_map_context_t* fclaw2d_map_new_nomap_brick(fclaw2d_map_context_t* brick);
+void fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
+                                 double xc, double yc,
+                                 double *xp, double* yp, double *zp);
 
 /* ----------------------------------------------------------------------------------
    New maps (torus, cubedsphere, disk) and a utility function for calling maps

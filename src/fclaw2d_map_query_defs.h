@@ -56,7 +56,8 @@ extern "C"
 #define FCLAW2D_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
 #define FCLAW2D_MAP_QUERY_IS_HEMISPHERE    16     /* Hemisphere grid */
 #define FCLAW2D_MAP_QUERY_IS_TORUS         17     /* Hemisphere grid */
-#define FCLAW2D_MAP_QUERY_LAST             18     /* Number of "official" queries. */
+#define FCLAW2D_MAP_QUERY_IS_BRICK         18     /* Is a Cartesian brick */
+#define FCLAW2D_MAP_QUERY_LAST             19     /* Number of "official" queries. */
 
 #if 0
 /* Generic query function (kept up to date with list above) */

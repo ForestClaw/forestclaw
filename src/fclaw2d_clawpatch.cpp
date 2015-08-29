@@ -203,7 +203,9 @@ void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
     fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
 
     /* vt.patch_manifold_compute_normals(...) */
+#if 0
     fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
+#endif
 }
 
 
@@ -257,18 +259,9 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               int blockno, int patchno,
                               fclaw2d_build_mode_t build_mode)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int level = this_patch->level;
-
+    /* We are getting closer to getting rid the class ClawPatch */
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->define(this_patch->xlower,
-               this_patch->ylower,
-               this_patch->xupper,
-               this_patch->yupper,
-               blockno,
-               level,
-               gparms,
-               build_mode);
+    cp->define(domain,this_patch,blockno,build_mode);
 
 }
 

@@ -4,6 +4,7 @@
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_neighbors_fort.h>
 #include <fclaw2d_metric_default_fort.h>
+#include <fclaw2d_map_query.h>
 
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
@@ -24,7 +25,7 @@ ClawPatch::~ClawPatch()
     fclaw_package_data_destroy(m_package_data_ptr);
 }
 
-
+#if 0
 void ClawPatch::define(const double&  a_xlower,
                        const double&  a_ylower,
                        const double&  a_xupper,
@@ -33,11 +34,19 @@ void ClawPatch::define(const double&  a_xlower,
                        const int& a_level,
                        const amr_options_t* gparms,
                        fclaw2d_build_mode_t build_mode)
+#endif
+    void ClawPatch::define(fclaw2d_domain_t* domain,
+                           fclaw2d_patch_t* this_patch,
+                           int blockno,
+                           fclaw2d_build_mode_t build_mode)
+
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
+
     m_mx = gparms->mx;
     m_my = gparms->my;
     m_mbc = gparms->mbc;
-    m_blockno = a_blockno;
+    m_blockno = blockno;
     m_meqn = gparms->meqn;
     for (int m=0; m < 4; m++)
     {
@@ -45,14 +54,19 @@ void ClawPatch::define(const double&  a_xlower,
     }
     m_has_finegrid_neighbors = 0;
 
+    fclaw2d_map_context_t* cont =
+        fclaw2d_domain_get_map_context(domain);
+
+    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+
     m_manifold = gparms->manifold;
 
     if (m_manifold)
     {
-        m_xlower = a_xlower;
-        m_ylower = a_ylower;
-        m_xupper = a_xupper;
-        m_yupper = a_yupper;
+        m_xlower = this_patch->xlower;
+        m_ylower = this_patch->ylower;
+        m_xupper = this_patch->xupper;
+        m_yupper = this_patch->yupper;
     }
     else
     {
@@ -60,10 +74,33 @@ void ClawPatch::define(const double&  a_xlower,
         double bx = gparms->bx;
         double ay = gparms->ay;
         double by = gparms->by;
-        m_xlower = ax + (bx - ax)*a_xlower;
-        m_xupper = ax + (bx - ax)*a_xupper;
-        m_ylower = ay + (by - ay)*a_ylower;
-        m_yupper = ay + (by - ay)*a_yupper;
+
+        double xl = this_patch->xlower;
+        double yl = this_patch->ylower;
+        double xu = this_patch->xupper;
+        double yu = this_patch->yupper;
+        double xlower,ylower;
+        double xupper,yupper;
+
+        if (is_brick)
+        {
+            double z;
+            /* Scale to [0,1]x[0,1], based on blockno */
+            fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlower,&ylower,&z);
+            fclaw2d_map_c2m_nomap_brick(cont,blockno,xu,yu,&xupper,&yupper,&z);
+        }
+        else
+        {
+            xlower = xl;
+            ylower = yl;
+            xupper = xu;
+            yupper = yu;
+        }
+
+        m_xlower = ax + (bx - ax)*xlower;
+        m_xupper = ax + (bx - ax)*xupper;
+        m_ylower = ay + (by - ay)*ylower;
+        m_yupper = ay + (by - ay)*yupper;
     }
 
     m_dx = (m_xupper - m_xlower)/m_mx;
