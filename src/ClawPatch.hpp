@@ -41,6 +41,12 @@ public :
     ClawPatch();
     ~ClawPatch();
 
+    void define(fclaw2d_domain_t* domain,
+                fclaw2d_patch_t* this_patch,
+                int a_blockno,
+                fclaw2d_build_mode_t build_mode);
+
+#if 0
     void define(const double&  a_xlower,
                 const double&  a_ylower,
                 const double&  a_xupper,
@@ -49,6 +55,7 @@ public :
                 const int& a_level,
                 const amr_options_t *a_gparms,
                 fclaw2d_build_mode_t build_mode);
+#endif
 
     void copyFrom(ClawPatch *a_cp);
 

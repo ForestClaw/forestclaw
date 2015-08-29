@@ -11,12 +11,12 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_nomap_brick (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
         return 1;
     case FCLAW2D_MAP_QUERY_IS_AFFINE:
@@ -45,7 +45,7 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_CART:
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
         return 1;
     default:
         printf("\n");
@@ -59,42 +59,23 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 }
 
 
-static void
-fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
-                     double xc, double yc,
-                     double *xp, double *yp, double *zp)
+void
+    fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
+                                double xc, double yc,
+                                double *xp, double *yp, double *zp)
 {
-    double xc1,yc1,zc1;
-
-    fclaw_global_essentialf("I hope not to be here ..\n");
-    exit(0);
-
-    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
-
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
-
-    /* square in [-1,1] x [-1,1] */
-    /* We need this to scale and shift the map */
-    MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
-
-    scale_map(cont, xp,yp,zp);
-    shift_map(cont, xp,yp,zp);
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
-                                            const double scale[],
-                                            const double shift[])
+fclaw2d_map_context_t* fclaw2d_map_new_nomap_brick(fclaw2d_map_context_t* brick)
 {
     fclaw2d_map_context_t *cont;
-
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_cart;
-    cont->mapc2m = fclaw2d_map_c2m_cart;
+    cont->query = fclaw2d_map_query_nomap_brick;
+    cont->mapc2m = fclaw2d_map_c2m_nomap_brick;
 
-    set_scale(cont,scale);
-    set_shift(cont,shift);
     cont->brick = brick;
 
     return cont;

@@ -74,6 +74,10 @@ int FCLAW2D_MAP_IS_HEMISPHERE(fclaw2d_map_context_t** cont);
 #define FCLAW2D_MAP_IS_TORUS FCLAW_F77_FUNC_(fclaw2d_map_is_torus,FCLAW2D_MAP_TORUS)
 int FCLAW2D_MAP_IS_TORUS(fclaw2d_map_context_t** cont);
 
+#define FCLAW2D_MAP_IS_BRICK FCLAW_F77_FUNC_(fclaw2d_map_is_brick,FCLAW2D_MAP_BRICK)
+int FCLAW2D_MAP_IS_BRICK(fclaw2d_map_context_t** cont);
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "shockbubble_user.H"
+#include "shockbubble_user.hpp"
 
 #include "fclaw2d_clawpatch.h"
 #include "fc2d_clawpack46.h"
@@ -88,9 +88,10 @@ void run_program(fclaw_app_t* app)
     b = gparms->periodic_y;
 
     /* Use [ax,bx]x[ay,by] */
+
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_cart(brick,gparms->scale,gparms->shift);
+    cont = fclaw2d_map_new_nomap_brick(brick);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 

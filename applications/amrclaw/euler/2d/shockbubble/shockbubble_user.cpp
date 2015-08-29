@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "shockbubble_user.H"
+#include "shockbubble_user.hpp"
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
