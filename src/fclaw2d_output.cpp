@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
+#include <fclaw_math.h>
 
 #include <ClawPatch.hpp>
 
@@ -82,6 +83,82 @@ void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
     }
 
     fclaw2d_domain_iterate_patches (domain, cb_serial_output, (void *) &iframe);
+    fclaw2d_domain_serialization_leave (domain);
+    /* END OF NON-SCALABLE CODE */
+}
+
+
+static void
+cb_tikz_output (fclaw2d_domain_t * domain,
+                fclaw2d_patch_t * this_patch,
+                int this_block_idx, int this_patch_idx,
+                void *user)
+{
+    FILE *fp = (FILE*) user;
+    const amr_options_t *gparms = get_domain_parms (domain);
+
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int64_t patch_num =
+        domain->global_num_patches_before +
+        (int64_t) (this_block->num_patches_before + this_patch_idx);
+
+    int level = this_patch->level;
+    int lmax = gparms->maxlevel;
+
+    int mx, my, mbc;
+    double dx,dy;
+    double xlower, ylower;
+    fclaw2d_clawpatch_grid_data(domain, this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double ax = gparms->ax;
+    double bx = gparms->bx;
+    int mi = gparms->mi;
+    double dxf = (bx-ax)/(mi*mx*pow_int(2,lmax));
+    int fx = mx*pow_int(2,lmax-level);
+
+    double ay = gparms->ay;
+    double by = gparms->by;
+    int mj = gparms->mj;
+    double dyf = (by-ay)/(mj*my*pow_int(2,lmax));
+    int fy = my*pow_int(2,lmax-level);
+
+
+    /* Assume dx = dy */
+    int xlow_d = (xlower-ax)/dxf;
+    int ylow_d = (ylower-ay)/dyf;
+    int xupper_d = xlow_d + fx;
+    int yupper_d = ylow_d + fy;
+    fprintf(fp,"    %% Patch number %ld\n",(long int) patch_num);
+    fprintf(fp,"    \\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n",
+            xlow_d,ylow_d,xupper_d,yupper_d);
+}
+
+
+static
+void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
+{
+    char fname[20];
+    fclaw2d_vtable_t vt;
+    vt= fclaw2d_get_vtable(domain);
+    /* BEGIN NON-SCALABLE CODE */
+    /* Write the file contents in serial.
+       Use only for small numbers of processors. */
+    fclaw2d_domain_serialization_enter (domain);
+
+    sprintf(fname,"tikz.%04d.tex",iframe);
+    FILE *fp = fopen(fname,"w");
+    if (domain->mpirank == 0)
+    {
+        fprintf(fp,"\\begin{tikzpicture}[scale=0.015625]\n");
+    }
+
+    fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
+    if (domain->mpirank == 0)
+    {
+        fprintf(fp,"\\end{tikzpicture}\n");
+    }
+    fclose(fp);
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
@@ -219,6 +296,11 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     if (gparms->serialout)
     {
         fclaw2d_output_write_serial(domain, iframe);
+    }
+
+    if (1)
+    {
+        fclaw2d_output_write_tikz(domain,iframe);
     }
 
     /* Record output time */
