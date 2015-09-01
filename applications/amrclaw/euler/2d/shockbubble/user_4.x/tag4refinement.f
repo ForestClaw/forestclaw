@@ -22,16 +22,10 @@ c     # vt.fort_tag4refinement = &tag4refinement.
 c     # Refine based only on first variable in system.
       qmin = q(1,1,1)
       qmax = q(1,1,1)
-      do j = 2,my-1
-         do i = 2,mx-1
+      do j = 1,my
+         do i = 1,mx
             dq = 0
             do mq = 1,1
-c               qmin = min(q(i,j,mq),qmin)
-c               qmax = max(q(i,j,mq),qmax)
-c               if (qmax - qmin .gt. tag_threshold) then
-c                  tag_patch = 1
-c                  return
-c               endif
                 dqi = dabs(q(i+1,j,mq) - q(i-1,j,mq))
                 dqj = dabs(q(i,j+1,mq) - q(i,j-1,mq))
                 dq  = dmax1(dq, dqi, dqj)

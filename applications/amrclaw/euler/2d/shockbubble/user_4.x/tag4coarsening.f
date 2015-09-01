@@ -39,8 +39,8 @@
       integer i,j
       double precision dqi, dqj
 
-      do i = 2,mx-1
-         do j = 2,my-1
+      do i = 1,mx
+         do j = 1,my
 c           qmin = min(q(i,j,mq),qmin)
 c           qmax = max(q(i,j,mq),qmax)
             dqi = dabs(q(i+1,j,mq) - q(i-1,j,mq))

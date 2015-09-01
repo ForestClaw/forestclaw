@@ -15,6 +15,9 @@ setpatchborderprops('linewidth',1);
 % hidepatchborders;
 set(gca,'fontsize',16);
 
+tstr = sprintf('ForestClaw : t = %12.4f',t/2);
+title(tstr,'fontsize',16);
+
 if (PlotParallelPartitions==1)
     showpatchborders;
 end
