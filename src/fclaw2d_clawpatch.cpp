@@ -203,9 +203,7 @@ void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
     fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
 
     /* vt.patch_manifold_compute_normals(...) */
-#if 0
     fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
-#endif
 }
 
 
