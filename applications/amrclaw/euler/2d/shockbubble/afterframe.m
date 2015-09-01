@@ -14,7 +14,6 @@ setpatchborderprops('linewidth',1);
 % showgridlines(1:5);
 % hidepatchborders;
 set(gca,'fontsize',16);
-hidepatchborders(6);
 
 if (PlotParallelPartitions==1)
     showpatchborders;
