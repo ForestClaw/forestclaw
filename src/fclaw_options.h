@@ -180,6 +180,10 @@ struct amr_options
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:
                                      Will kill all parallel performance. */
+    int tikzout;      /* Boolean */
+    const char *tikz_figsize_string;
+    double *tikz_figsize;  /* In inches */
+    const char *tikz_prefix;  /* prefix of file to include as image in tikz output */
 
     const char *prefix;         /**< This is prepended to output files */
 

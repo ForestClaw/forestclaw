@@ -111,26 +111,37 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_grid_data(domain, this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double ax = gparms->ax;
-    double bx = gparms->bx;
-    int mi = gparms->mi;
-    double dxf = (bx-ax)/(mi*mx*pow_int(2,lmax));
-    int fx = mx*pow_int(2,lmax-level);
+    double ax,bx,ay,by,dxf,dyf;
+    if (!gparms->manifold)
+    {
+        ax = gparms->ax;
+        bx = gparms->bx;
+        ay = gparms->ay;
+        by = gparms->by;
+        int mi = gparms->mi;
+        int mj = gparms->mj;
+        dxf = (bx-ax)/(mi*mx*pow_int(2,lmax));
+        dyf = (by-ay)/(mj*my*pow_int(2,lmax));
+    }
+    else
+    {
+        ax = 0;
+        ay = 0;
+        dxf = 1.0/(mx*pow_int(2,lmax));
+        dyf = 1.0/(my*pow_int(2,lmax));
+    }
 
-    double ay = gparms->ay;
-    double by = gparms->by;
-    int mj = gparms->mj;
-    double dyf = (by-ay)/(mj*my*pow_int(2,lmax));
-    int fy = my*pow_int(2,lmax-level);
 
+    int mxf = mx*pow_int(2,lmax-level);
+    int myf = my*pow_int(2,lmax-level);
 
-    /* Assume dx = dy */
     int xlow_d = (xlower-ax)/dxf;
     int ylow_d = (ylower-ay)/dyf;
-    int xupper_d = xlow_d + fx;
-    int yupper_d = ylow_d + fy;
+    int xupper_d = xlow_d + mxf;
+    int yupper_d = ylow_d + myf;
+
     fprintf(fp,"    %% Patch number %ld\n",(long int) patch_num);
-    fprintf(fp,"    \\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n",
+    fprintf(fp,"    \\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n\n",
             xlow_d,ylow_d,xupper_d,yupper_d);
 }
 
@@ -140,26 +151,68 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
 {
     char fname[20];
     fclaw2d_vtable_t vt;
-    vt= fclaw2d_get_vtable(domain);
+    vt = fclaw2d_get_vtable(domain);
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
-    fclaw2d_domain_serialization_enter (domain);
 
-    sprintf(fname,"tikz.%04d.tex",iframe);
-    FILE *fp = fopen(fname,"w");
+    /* Should be in gparms */
+    const amr_options_t *gparms = get_domain_parms (domain);
+    double figsize[2];
+    figsize[0] = gparms->tikz_figsize[0];   /* Inches */
+    figsize[1] = gparms->tikz_figsize[1];   /* Inches */
+
+    int lmax = gparms->maxlevel;
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mi = gparms->mi;
+    int mj = gparms->mj;
+
+    int mxf = mi*mx*pow_int(2,lmax);
+    int myf = mj*my*pow_int(2,lmax);
+    double sx = figsize[0]/mxf;
+    double sy = figsize[1]/myf;
+
+    /* Don't do anything until we are done with this part */
+    MPI_Barrier(MPI_COMM_WORLD);
+    FILE *fp;
+    sprintf(fname,"tikz.%04d.tex",iframe);  /* fname[20] */
     if (domain->mpirank == 0)
     {
-        fprintf(fp,"\\begin{tikzpicture}[scale=0.015625]\n");
+        /* Only rank 0 opens the file */
+        fp = fopen(fname,"w");
+        fprintf(fp,"\\documentclass{standalone}\n\n");
+        fprintf(fp,"\\usepackage{tikz}\n\n");
+        fprintf(fp,"\\begin{document}\n\n");
+        fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
+        fprintf(fp,"\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",double(mxf)/2,double(myf)/2);
+        fprintf(fp,"{\\includegraphics{%s%04d.png}};\n",gparms->tikz_prefix,iframe);
+        fclose(fp);
     }
 
-    fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
+    MPI_Barrier(MPI_COMM_WORLD);
+    for(int i = 0; i < domain->mpisize; i++)
+    {
+        if (domain->mpirank == i)
+        {
+            fp = fopen(fname,"a");
+            fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
+            fclose(fp);
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
     if (domain->mpirank == 0)
     {
+        fp = fopen(fname,"a");
         fprintf(fp,"\\end{tikzpicture}\n");
+        fprintf(fp,"\\end{document}\n");
+        fclose(fp);
     }
-    fclose(fp);
-    fclaw2d_domain_serialization_leave (domain);
+
+    /* This might not be needed ... */
+    MPI_Barrier(MPI_COMM_WORLD);
+
     /* END OF NON-SCALABLE CODE */
 }
 
@@ -298,9 +351,11 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
         fclaw2d_output_write_serial(domain, iframe);
     }
 
-    if (1)
+    if (gparms->tikzout)
     {
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
         fclaw2d_output_write_tikz(domain,iframe);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
     }
 
     /* Record output time */
