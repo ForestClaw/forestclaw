@@ -35,9 +35,10 @@ if (prt)
     MaxFrames = 31;
     axis off;
     delete(get(gca,'title'));
-    set(gcf,'papersize',[8,2]);
+    figsize = [8,2];  % Should match size set in options
+    set(gcf,'papersize',figsize);
     set(gca,'position',[0 0 1 1]);
-    set(gcf,'paperposition',[0 0 8 2]);
+    set(gcf,'paperposition',[0 0 figsize]);  
     id = input('Input id to use : ');
     if ~isempty(id)
     
@@ -45,7 +46,7 @@ if (prt)
         hidegridlines;
         hidepatchborders;
         if (PlotType == 3)
-            fname = sprintf('results_%03d/fc_sb_schlrn_nomesh_%04d.png',id,Frame);            
+            fname = sprintf('results_%03d/fc_sb_schlrn_%04d.png',id,Frame);            
         else
             fname = sprintf('results_%03d/fc_sb_%04d.png',id,Frame);
         end
