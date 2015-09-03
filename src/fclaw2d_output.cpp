@@ -181,13 +181,9 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
     {
         /* Only rank 0 opens the file */
         fp = fopen(fname,"w");
-        fprintf(fp,"\\documentclass{standalone}\n\n");
-        fprintf(fp,"\\usepackage{tikz}\n\n");
-        fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n\n");
-        fprintf(fp,"\\begin{document}\n\n");
         fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
         fprintf(fp,"    \\node (forestclaw_plot) at (%3.1f,%3.1f)\n",double(mxf)/2,double(myf)/2);
-        fprintf(fp,"    {\\includegraphics{%s%04d.png}};\n\n",gparms->tikz_prefix,iframe);
+        fprintf(fp,"    {\\includegraphics{\\figname}};\n\n");
         fprintf(fp,"\\plotgrid{\n");
         fclose(fp);
     }
@@ -209,7 +205,6 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
         fp = fopen(fname,"a");
         fprintf(fp,"} %% end plotgrid\n");
         fprintf(fp,"\\end{tikzpicture}\n");
-        fprintf(fp,"\\end{document}\n");
         fclose(fp);
     }
 

@@ -182,8 +182,7 @@ struct amr_options
                                      Will kill all parallel performance. */
     int tikzout;      /* Boolean */
     const char *tikz_figsize_string;
-    double *tikz_figsize;  /* In inches */
-    const char *tikz_prefix;  /* prefix of file to include as image in tikz output */
+    double *tikz_figsize;  /* In inches, e.g. [8,2] */
 
     const char *prefix;         /**< This is prepended to output files */
 
