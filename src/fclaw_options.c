@@ -260,9 +260,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                                     "8 6",&amropt->tikz_figsize,2,
                                     "Figure size used by tikz (inches) [8,6]");
 
-    sc_options_add_string (opt, 0, "tikz_prefix", &amropt->tikz_prefix, "fc_fig_",
-                           "Output file prefix file embedded by tikz [fc_fig_]");
-
     /* more clawpack options */
     sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
                            "Maximum CFL allowed [1]");
