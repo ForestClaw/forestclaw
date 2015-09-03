@@ -39,6 +39,8 @@ if (prt)
     set(gcf,'papersize',figsize);
     set(gca,'position',[0 0 1 1]);
     set(gcf,'paperposition',[0 0 figsize]);  
+    
+    % Start printing
     id = input('Input id to use : ');
     if ~isempty(id)
     
@@ -46,13 +48,25 @@ if (prt)
         hidegridlines;
         hidepatchborders;
         if (PlotType == 3)
-            fname = sprintf('results_%03d/fc_sb_schlrn_%04d.png',id,Frame);            
+            fname_prefix = sprintf('fc_sb_schlrn',Frame);            
         else
-            fname = sprintf('results_%03d/fc_sb_%04d.png',id,Frame);
+            fname_prefix = sprintf('fc_sb',Frame);
         end
+        yn = 'y';
+        fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
+        if (exist(fname_png))
+            str = sprintf('Overwrite file %s (y/n) ? ',fname_png);
+            yn = input(str,'s');
+            if (isempty(yn))
+                yn = 'n';
+            end
+        end
+                
         if (strcmp(lower(yn),'y') == 1)
-            fprintf('Printing %s\n',fname);
-            print('-r512','-dpng',fname);
+            fprintf('Printing %s\n',fname_png);
+            print('-r512','-dpng',fname_png);
+            plotgrid = 1;
+            create_tikz_plot(id,Frame,fname_prefix,1);
         end
                 
     end
