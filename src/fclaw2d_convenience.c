@@ -490,8 +490,11 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     npatchno
                                                                     [0]);
                         P4EST_ASSERT (npatch->level == patch->level);
-                        max_tlevel =
-                            SC_MAX (max_tlevel, npatch->target_level);
+                        if (patch->level >= domain->p.smooth_level)
+                            /* Match target level only if we are in a level that
+                               should be refined */
+                            max_tlevel =
+                                SC_MAX (max_tlevel, npatch->target_level);
                     }
                     else if (nrel == FCLAW2D_PATCH_DOUBLESIZE)
                     {
@@ -501,8 +504,9 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     npatchno
                                                                     [0]);
                         P4EST_ASSERT (npatch->level == patch->level - 1);
-                        max_tlevel =
-                            SC_MAX (max_tlevel, npatch->target_level);
+                        if (patch->level >= domain->p.smooth_level)
+                            max_tlevel =
+                                SC_MAX (max_tlevel, npatch->target_level);
                     }
                     else if (nrel == FCLAW2D_PATCH_HALFSIZE)
                     {
@@ -515,8 +519,9 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                    npatchno
                                                                    [k]);
                             P4EST_ASSERT (npatch->level == patch->level + 1);
-                            max_tlevel =
-                                SC_MAX (max_tlevel, npatch->target_level);
+                            if (patch->level >= domain->p.smooth_level)
+                                max_tlevel =
+                                    SC_MAX (max_tlevel, npatch->target_level);
                         }
                     }
                 }
