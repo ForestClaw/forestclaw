@@ -102,9 +102,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     }
 
     /* set specific refinement strategy */
-    int smooth_refine_level = 0;
     fclaw2d_domain_set_refinement
-      (*domain, gparms->smooth_refine, smooth_refine_level,
+      (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
        gparms->coarsen_delay);
 
     /* start timing */
@@ -258,12 +257,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",
                 (*domain)->global_minlevel, (*domain)->global_maxlevel);
-
-    /* Set smooth refine to input value */
-    fclaw2d_domain_set_refinement
-        (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
-         gparms->coarsen_delay);
-
 
     /* Stop timer */
     ddata = fclaw2d_domain_get_data(*domain);
