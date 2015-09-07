@@ -537,8 +537,9 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                nprocs[0],
                                                                nblockno,
                                                                npatchno[0]);
-                        max_tlevel =
-                            SC_MAX (max_tlevel, npatch->target_level);
+                        if (patch->level >= domain->p.smooth_level)
+                            max_tlevel =
+                                SC_MAX (max_tlevel, npatch->target_level);
                     }
                 }
 
