@@ -495,7 +495,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     patch_iterator = &fclaw2d_domain_iterate_level;
 #endif
 
-    if (domain->mpisize == 1)
+    if (domain->mpisize == 0)
     {
         /* This seems to be equivalent to the other branch of this loop when
            run on a single processor (but is about 20% faster on a
