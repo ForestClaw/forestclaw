@@ -46,7 +46,8 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
-showpatchborders;
+% showpatchborders;
+hidepatchborders;
 
 view(2);
 axis off
@@ -59,6 +60,7 @@ if (prt)
     axis([0 2 0 2]);
     axis off;
     delete(get(gca,'title'));
+    hidepatchborders;
     figsize = [4,4];  % Should match size set in options
 %     set(gcf,'papersize',figsize);
 %     set(gca,'position',[0 0 1 1]);
