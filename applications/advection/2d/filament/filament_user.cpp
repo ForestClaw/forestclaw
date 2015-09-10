@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "filament_user.hpp"
+#include "filament_user.h"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
@@ -59,6 +59,9 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.qinit = &QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+
+    vt.fort_tag4refinement = &TAG4REFINEMENT;
+    vt.fort_tag4coarsening = &TAG4COARSENING;
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
     classic_claw.rpn2 = &RPN2;

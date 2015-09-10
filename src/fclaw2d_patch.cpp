@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_base.h>
 
 #include <fclaw2d_patch.hpp>
-#include <ClawPatch.hpp>
+#include <fclaw2d_clawpatch.hpp>
 
 struct fclaw2d_patch_data
 {

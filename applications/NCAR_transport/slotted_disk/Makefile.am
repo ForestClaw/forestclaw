@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/NCAR_transport/slotted_disk/slotted_disk
 
+include_HEADERS += applications/NCAR_transport/slotted_disk/slotted_disk_user.h
+
 applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/NCAR_transport/slotted_disk/slotted_disk_user.cpp \
 	applications/NCAR_transport/slotted_disk/slotted_disk.cpp \

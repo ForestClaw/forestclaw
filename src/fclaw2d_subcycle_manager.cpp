@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <subcycle_manager.hpp>
+#include <fclaw2d_subcycle_manager.hpp>
 
 #include <iostream>
 #include <cstdlib>

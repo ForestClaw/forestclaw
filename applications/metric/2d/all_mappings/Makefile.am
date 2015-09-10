@@ -2,6 +2,7 @@
 
 bin_PROGRAMS += applications/metric/2d/all_mappings/metric
 
+include_HEADERS += applications/metric/2d/all_mappings/metric_user.h
 
 applications_metric_2d_all_mappings_metric_SOURCES = \
 	applications/metric/2d/all_mappings/metric.cpp \

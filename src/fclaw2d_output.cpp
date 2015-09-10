@@ -24,14 +24,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_output.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
 #include <fclaw_math.h>
+#include <fclaw_mpi.h>
+#include <fclaw_base.h>
 
-#include <ClawPatch.hpp>
+#include <fclaw2d_clawpatch.hpp>
+
 
 #ifdef __cplusplus
 extern "C"
@@ -173,6 +175,8 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
     double sx = figsize[0]/mxf;
     double sy = figsize[1]/myf;
 
+#ifdef FCLAW_ENABLE_MPI
+
     /* Don't do anything until we are done with this part */
     MPI_Barrier(MPI_COMM_WORLD);
     FILE *fp;
@@ -212,6 +216,24 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
     MPI_Barrier(MPI_COMM_WORLD);
 
     /* END OF NON-SCALABLE CODE */
+#else
+    FILE *fp;
+    sprintf(fname,"tikz.%04d.tex",iframe);  /* fname[20] */
+    /* Only rank 0 opens the file */
+    fp = fopen(fname,"w");
+    fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
+    fprintf(fp,"    \\node (forestclaw_plot) at (%3.1f,%3.1f)\n",double(mxf)/2,double(myf)/2);
+    fprintf(fp,"    {\\includegraphics{\\figname}};\n\n");
+    fprintf(fp,"\\plotgrid{\n");
+
+    /* Write out each patch to tikz file */
+    fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
+
+    fp = fopen(fname,"a");
+    fprintf(fp,"} %% end plotgrid\n");
+    fprintf(fp,"\\end{tikzpicture}\n");
+    fclose(fp);
+#endif
 }
 
 

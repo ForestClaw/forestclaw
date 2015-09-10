@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "sphere_user.hpp"
+#include "sphere_user.h"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>

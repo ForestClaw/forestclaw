@@ -5,8 +5,10 @@
 
 bin_PROGRAMS += applications/advection/2d/swirl_mapped/swirl
 
+
 applications_advection_2d_swirl_mapped_swirl_SOURCES = \
 	applications/advection/2d/swirl_mapped/swirl_user.cpp \
+	applications/advection/2d/swirl_mapped/swirl_user.h \
 	applications/advection/2d/swirl_mapped/swirl.cpp \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_nomap.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_cart.c \

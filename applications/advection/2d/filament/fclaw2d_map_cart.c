@@ -45,9 +45,11 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
+        return 0;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
+        printf("fclaw2d_map_query_cart (fclaw2d_map_cart.c) : "\
                "Query id not identified;  Maybe the query is not up to "\
                "date?\nSee fclaw2d_map_cart.h.\n");
         printf("Requested query id : %d\n",query_identifier);

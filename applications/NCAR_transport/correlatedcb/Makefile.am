@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/NCAR_transport/correlatedcb/correlatedcb
 
+include_HEADERS += applications/NCAR_transport/correlatedcb/correlatedcb_user.h
+
 applications_NCAR_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/NCAR_transport/correlatedcb/correlatedcb_user.cpp \
 	applications/NCAR_transport/correlatedcb/correlatedcb.cpp \

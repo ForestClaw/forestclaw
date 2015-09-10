@@ -7,6 +7,7 @@ bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
 applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/swirl_user.cpp \
+	applications/advection/2d/swirl/swirl_user.h \
 	applications/advection/2d/swirl/swirl.cpp \
 	applications/advection/2d/swirl/fclaw2d_map_nomap.c \
 	applications/advection/2d/swirl/psi.f \

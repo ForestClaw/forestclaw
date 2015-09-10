@@ -2,8 +2,10 @@
 
 bin_PROGRAMS += applications/advection/2d/hemisphere/hemisphere
 
+
 applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/hemisphere_user.cpp \
+	applications/advection/2d/hemisphere/hemisphere_user.h \
 	applications/advection/2d/hemisphere/hemisphere.cpp \
 	applications/advection/2d/hemisphere/velocity_wind.f \
 	applications/advection/2d/hemisphere/fclaw2d_map_pillowsphere.c \
