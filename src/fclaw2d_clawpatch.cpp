@@ -36,6 +36,591 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 
+
+
+#if FCLAW_DEBUG
+/* This is a duplicate of the function in fclaw2d_farraybox.cpp */
+static
+void set_snan(double& f)
+{
+    /* From :
+      "NaNs, Uninitialized Variables, and C++"
+      http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
+    */
+    *((long long*)&f) = 0x7ff0000000000001LL;
+}
+#endif
+
+void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
+{
+    ClawPatch::app = app;
+}
+
+void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
+{
+    ClawPatch::global = global;
+}
+
+/* ------------------------------------------------------------
+   Solution access functions
+   ---------------------------------------------------------- */
+
+/* We also have a fclaw2d_patch_get_cp(this_patch) */
+ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
+
+{
+    return fclaw2d_patch_get_cp(this_patch);
+}
+
+void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 int* mx, int* my, int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx, double* dy)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *mx = cp->mx();
+    *my = cp->my();
+    *mbc = cp->mbc();
+    *xlower = cp->xlower();
+    *ylower = cp->ylower();
+    *dx = cp->dx();
+    *dy = cp->dy();
+}
+
+void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **q, int* meqn)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *q = cp->q();
+    *meqn = cp->meqn();
+}
+
+double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->q();
+}
+
+static
+void cb_has_finegrid_neighbors(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno,
+                               void* user)
+{
+    int y =
+        fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->finegrid_neighbors(y);
+}
+
+void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain)
+{
+    fclaw2d_domain_iterate_patches(domain,cb_has_finegrid_neighbors,
+                                   (void*) NULL);
+}
+
+int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
+                                             fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->has_finegrid_neighbors();
+}
+
+
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        double alpha)
+{
+    /* We use the pack size here to make sure we are setting
+       everything correctly;  it isn't needed for memory
+       allocation */
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int mint = 2;  /* Number of internal layers needed */
+
+    int ng = 0;  /* Number of ghost cells (mbc,1,2,..) */
+    int wg = (2*ng + mx)*(2*ng + my);  /* Whole grid  (one layer of ghost cells)*/
+    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+    FCLAW_ASSERT(hole >= 0);
+    size_t psize = (wg - hole)*meqn;
+    FCLAW_ASSERT(psize > 0);
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->setup_for_time_interpolation(alpha,psize);
+}
+
+void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch,
+                                     fclaw_bool time_interp,
+                                     double **q, int* meqn)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *q = cp->q_time_sync(time_interp);
+    *meqn = cp->meqn();
+}
+
+double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch,
+                                         int time_interp)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->q_time_sync(time_interp);
+}
+
+
+
+void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
+                                         fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->save_current_step();
+}
+
+/* ------------------------------------------------------------------
+   Miscellaneous
+ ------------------------------------------------------------------ */
+int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->block_corner_count();
+}
+
+/* ------------------------------------------------------------------
+   Manifold setup and access
+ ------------------------------------------------------------------ */
+
+static
+void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch,
+                                      int blockno,
+                                      int patchno)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    /* vt.patch_manifold_setup_mesh(...) */
+    fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
+
+    /* vt.patch_manifold_compute_normals(...) */
+    fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
+}
+
+
+void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch,
+                                   double **xp, double **yp, double **zp,
+                                   double **xd, double **yd, double **zd,
+                                   double **area)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *xp = cp->xp();
+    *yp = cp->yp();
+    *zp = cp->zp();
+    *xd = cp->xd();
+    *yd = cp->yd();
+    *zd = cp->zd();
+    *area = cp->area();
+}
+
+void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
+                                    double **xnormals, double **ynormals,
+                                    double **xtangents, double **ytangents,
+                                    double **surfnormals,
+                                    double **edgelengths, double **curvature)
+{
+    /* or just call the member functions? */
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *xnormals    = cp->xface_normals();
+    *ynormals    = cp->yface_normals();
+    *xtangents   = cp->xface_tangents();
+    *ytangents   = cp->yface_tangents();
+    *surfnormals = cp->surf_normals();
+    *curvature   = cp->curvature();
+    *edgelengths = cp->edge_lengths();
+}
+
+double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
+                                   fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->area();
+}
+
+/* ------------------------------------------------------------------
+   Re-partition and rebuild new domains, or construct initial domain
+ -------------------------------------------------------------------- */
+
+void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t *this_patch,
+                              int blockno, int patchno,
+                              fclaw2d_build_mode_t build_mode)
+{
+    /* We are getting closer to getting rid the class ClawPatch */
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->define(domain,this_patch,blockno,build_mode);
+
+}
+
+
+/* This is called from fclaw2d_regrid_new_domain_setup (in fclaw2d_regrid.cpp)
+   every time a new domain is created after regridding.  This is followed by
+   an "iterate_adapted" step, in which data in these patches is copied, averaged or
+   interpolated. */
+
+void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno,
+                             int patchno,
+                             void *user)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
+
+    if (gparms->manifold)
+    {
+        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        {
+            vt.metric_compute_area(domain,this_patch,blockno,patchno);
+
+            /* Don't need any more manifold info for ghost patches */
+            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+            {
+                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
+            }
+        }
+    }
+
+    vt = fclaw2d_get_vtable(domain);
+    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    {
+        vt.patch_setup(domain,this_patch,blockno,patchno);
+    }
+}
+
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *fine_patches,
+                                       fclaw2d_patch_t *coarse_patch,
+                                       int blockno,
+                                       int coarse_patchno,
+                                       int fine0_patchno,
+                                       fclaw2d_build_mode_t build_mode)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
+
+    if (gparms->manifold)
+    {
+        fclaw2d_metric_average_area(domain,fine_patches,coarse_patch,
+                                    blockno, coarse_patchno, fine0_patchno);
+
+        fclaw2d_clawpatch_metric_setup(domain,coarse_patch,blockno,
+                                       coarse_patchno);
+    }
+
+    vt = fclaw2d_get_vtable(domain);
+    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    {
+        /* We might want to distinguish between new fine grid patches, and
+           new coarse grid patches.  In the latter case, we might just average
+           aux array info, for example, rather than recreate it from scratch.
+           Something like a general "build from fine" routine might be needed */
+        vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
+    }
+}
+
+
+/* -------------------------------------------------
+   For debugging
+   ----------------------------------------------- */
+void cb_set_corners_to_value(fclaw2d_domain_t* domain,
+                            fclaw2d_patch_t* this_patch,
+                            int blockno,
+                            int patchno,
+                            void *user)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s = *((set_bc*) user);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->set_corners_to_value(s.time_interp,s.value);
+}
+
+
+void fclaw2d_clawpatch_set_corners_to_value(fclaw2d_domain_t* domain,
+                                            int minlevel,
+                                            int maxlevel,
+                                            int time_interp,
+                                            double value)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s;
+    s.time_interp = time_interp;
+    s.value = value;
+
+    for (int level = minlevel; level <= maxlevel; level++)
+    {
+        s.time_interp = 0;
+        fclaw2d_domain_iterate_level(domain, level,cb_set_corners_to_value,
+                                     (void *)  &s);
+    }
+    if (time_interp)
+    {
+        s.time_interp = time_interp;
+        int time_interp_minlevel = minlevel-1;
+        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
+                                     cb_set_corners_to_value,
+                                     (void *)  &s);
+    }
+}
+
+void fclaw2d_clawpatch_set_corners_to_nan(fclaw2d_domain_t* domain,
+                                           int minlevel,
+                                           int maxlevel,
+                                           int time_interp)
+{
+    double s;
+    fclaw2d_farraybox_set_to_nan(s);
+    fclaw2d_clawpatch_set_corners_to_value(domain,minlevel,maxlevel,
+                                           time_interp,s);
+}
+
+
+
+void cb_set_boundary_to_value(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t* this_patch,
+                              int blockno,
+                              int patchno,
+                              void *user)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s = *((set_bc*) user);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->set_boundary_to_value(s.time_interp,s.value);
+}
+
+
+
+void fclaw2d_clawpatch_set_boundary_to_value(fclaw2d_domain_t* domain,
+                                             int minlevel,
+                                             int maxlevel,
+                                             int time_interp,
+                                             double value)
+{
+    struct set_bc { int time_interp; double value; };
+    struct set_bc s;
+    s.time_interp = time_interp;
+    s.value = value;
+
+    for (int level = minlevel; level <= maxlevel; level++)
+    {
+        s.time_interp = 0;
+        fclaw2d_domain_iterate_level(domain, level,cb_set_boundary_to_value,
+                                     (void *)  &s);
+    }
+    if (time_interp)
+    {
+        s.time_interp = time_interp;
+        int time_interp_minlevel = minlevel-1;
+        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
+                                     cb_set_boundary_to_value,
+                                     (void *)  &s);
+    }
+}
+
+void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
+                                           int minlevel,
+                                           int maxlevel,
+                                           int time_interp)
+{
+    double s;
+    fclaw2d_farraybox_set_to_nan(s);
+    fclaw2d_clawpatch_set_boundary_to_value(domain,minlevel,maxlevel,
+                                            time_interp,s);
+}
+
+
+
+void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
+                                               fclaw2d_patch_t* this_patch,
+                                               int this_block_idx,
+                                               int this_patch_idx)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->initialize_after_regrid();
+}
+
+
+/* ----------------------------------------------------------
+   Parallel ghost exchanges.
+
+   Note this is different from the packing/unpacking that happens
+   when partitioning the domain
+   ----------------------------------------------------------*/
+
+size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+
+    FCLAW_ASSERT(ClawPatch::pack_layers > 0);
+    int mint = ClawPatch::pack_layers;
+    int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
+    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+    FCLAW_ASSERT(hole >= 0);
+    size_t psize = (wg - hole)*(meqn + packarea);
+    FCLAW_ASSERT(psize > 0);
+    return psize*sizeof(double);
+}
+
+void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
+                                           fclaw2d_patch_t* this_patch,
+                                           void** q)
+{
+    /* Create contiguous block for data and area */
+    int msize = fclaw2d_clawpatch_ghost_packsize(domain);
+    *q = (void*) FCLAW_ALLOC(double,msize);
+    FCLAW_ASSERT(*q != NULL);
+
+#if FCLAW_DEBUG
+    /* This should go in some kind of debug pre-processing block */
+    double snan;
+    set_snan(snan);
+    double *qq = (double*) *q;
+    for(int i = 0; i < msize; i++)
+    {
+        qq[i] = snan;
+    }
+#endif
+}
+
+void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
+                                                void **q)
+{
+    FCLAW_FREE(*q);
+    *q = NULL;
+}
+
+
+void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  double *patch_data,
+                                  int time_interp)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+    int packmode = 2*packarea;  // 0 or 2  (for pack)
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->ghost_comm(patch_data,time_interp,packmode);
+}
+
+
+void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    double *qdata, fclaw_bool time_interp)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
+    int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->ghost_comm(qdata,time_interp,packmode);
+}
+
+
+/* --------------------------------------------------------
+   Domain partitioning.
+
+   Pack local patches on this processor before re-partitioning;
+   retrieve patches that migrated across parallel borders to
+   load balance the computation.
+   -------------------------------------------------------*/
+
+size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int mbc = gparms->mbc;
+    int meqn = gparms->meqn;
+    size_t size = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
+    return size*sizeof(double);
+}
+
+void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         int this_block_idx,
+                                         int this_patch_idx,
+                                         void *user)
+{
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    double* patch_data = (double*) ((void**)user)[patch_num];
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    FCLAW_ASSERT(cp != NULL);
+    cp->partition_pack(patch_data);
+}
+
+void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           void *user)
+{
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    double* patch_data = (double*) ((void**)user)[patch_num];
+
+    /* Create new data in 'user' pointer */
+    fclaw2d_patch_data_new(domain,this_patch);
+
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+    fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
+                            this_patch_idx,(void*) &build_mode);
+
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+
+    /* Time interp is false, since we only partition when all grids
+       are time synchronized */
+    cp->partition_unpack(patch_data);
+}
+
+void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
+                                                  fclaw2d_patch_t* this_patch,
+                                                  int this_block_idx,
+                                                  int this_patch_idx)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->initialize_after_partition();
+}
+
+
+/* ----------------------------------------------------------------
+   ClawPatch member functions (previous in ClawPatch.cpp)
+   ---------------------------------------------------------------- */
+
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
@@ -731,583 +1316,4 @@ int ClawPatch::size()
 {
     /* Use this to create new data */
     return m_griddata.size();
-}
-
-
-#if FCLAW_DEBUG
-/* This is a duplicate of the function in fclaw2d_farraybox.cpp */
-static
-void set_snan(double& f)
-{
-    /* From :
-      "NaNs, Uninitialized Variables, and C++"
-      http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
-    */
-    *((long long*)&f) = 0x7ff0000000000001LL;
-}
-#endif
-
-void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
-{
-    ClawPatch::app = app;
-}
-
-void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
-{
-    ClawPatch::global = global;
-}
-
-/* ------------------------------------------------------------
-   Solution access functions
-   ---------------------------------------------------------- */
-
-/* We also have a fclaw2d_patch_get_cp(this_patch) */
-ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
-
-{
-    return fclaw2d_patch_get_cp(this_patch);
-}
-
-void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch,
-                                 int* mx, int* my, int* mbc,
-                                 double* xlower, double* ylower,
-                                 double* dx, double* dy)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *mx = cp->mx();
-    *my = cp->my();
-    *mbc = cp->mbc();
-    *xlower = cp->xlower();
-    *ylower = cp->ylower();
-    *dx = cp->dx();
-    *dy = cp->dy();
-}
-
-void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch,
-                                 double **q, int* meqn)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *q = cp->q();
-    *meqn = cp->meqn();
-}
-
-double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
-                                fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->q();
-}
-
-static
-void cb_has_finegrid_neighbors(fclaw2d_domain_t* domain,
-                               fclaw2d_patch_t *this_patch,
-                               int blockno,
-                               int patchno,
-                               void* user)
-{
-    int y =
-        fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno);
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->finegrid_neighbors(y);
-}
-
-void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain)
-{
-    fclaw2d_domain_iterate_patches(domain,cb_has_finegrid_neighbors,
-                                   (void*) NULL);
-}
-
-int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
-                                             fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->has_finegrid_neighbors();
-}
-
-
-void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
-                                        fclaw2d_patch_t *this_patch,
-                                        double alpha)
-{
-    /* We use the pack size here to make sure we are setting
-       everything correctly;  it isn't needed for memory
-       allocation */
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int meqn = gparms->meqn;
-    int mint = 2;  /* Number of internal layers needed */
-
-    int ng = 0;  /* Number of ghost cells (mbc,1,2,..) */
-    int wg = (2*ng + mx)*(2*ng + my);  /* Whole grid  (one layer of ghost cells)*/
-    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
-    FCLAW_ASSERT(hole >= 0);
-    size_t psize = (wg - hole)*meqn;
-    FCLAW_ASSERT(psize > 0);
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->setup_for_time_interpolation(alpha,psize);
-}
-
-void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t* this_patch,
-                                     fclaw_bool time_interp,
-                                     double **q, int* meqn)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *q = cp->q_time_sync(time_interp);
-    *meqn = cp->meqn();
-}
-
-double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
-                                         fclaw2d_patch_t* this_patch,
-                                         int time_interp)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->q_time_sync(time_interp);
-}
-
-
-
-void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
-                                         fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->save_current_step();
-}
-
-/* ------------------------------------------------------------------
-   Miscellaneous
- ------------------------------------------------------------------ */
-int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->block_corner_count();
-}
-
-/* ------------------------------------------------------------------
-   Manifold setup and access
- ------------------------------------------------------------------ */
-
-static
-void fclaw2d_clawpatch_metric_setup(fclaw2d_domain_t* domain,
-                                      fclaw2d_patch_t* this_patch,
-                                      int blockno,
-                                      int patchno)
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
-    /* vt.patch_manifold_setup_mesh(...) */
-    fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
-
-    /* vt.patch_manifold_compute_normals(...) */
-    fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
-}
-
-
-void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch,
-                                   double **xp, double **yp, double **zp,
-                                   double **xd, double **yd, double **zd,
-                                   double **area)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *xp = cp->xp();
-    *yp = cp->yp();
-    *zp = cp->zp();
-    *xd = cp->xd();
-    *yd = cp->yd();
-    *zd = cp->zd();
-    *area = cp->area();
-}
-
-void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch,
-                                    double **xnormals, double **ynormals,
-                                    double **xtangents, double **ytangents,
-                                    double **surfnormals,
-                                    double **edgelengths, double **curvature)
-{
-    /* or just call the member functions? */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *xnormals    = cp->xface_normals();
-    *ynormals    = cp->yface_normals();
-    *xtangents   = cp->xface_tangents();
-    *ytangents   = cp->yface_tangents();
-    *surfnormals = cp->surf_normals();
-    *curvature   = cp->curvature();
-    *edgelengths = cp->edge_lengths();
-}
-
-double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->area();
-}
-
-/* ------------------------------------------------------------------
-   Re-partition and rebuild new domains, or construct initial domain
- -------------------------------------------------------------------- */
-
-void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              int blockno, int patchno,
-                              fclaw2d_build_mode_t build_mode)
-{
-    /* We are getting closer to getting rid the class ClawPatch */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->define(domain,this_patch,blockno,build_mode);
-
-}
-
-
-/* This is called from fclaw2d_regrid_new_domain_setup (in fclaw2d_regrid.cpp)
-   every time a new domain is created after regridding.  This is followed by
-   an "iterate_adapted" step, in which data in these patches is copied, averaged or
-   interpolated. */
-
-void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int blockno,
-                             int patchno,
-                             void *user)
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
-    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
-
-    if (gparms->manifold)
-    {
-        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-        {
-            vt.metric_compute_area(domain,this_patch,blockno,patchno);
-
-            /* Don't need any more manifold info for ghost patches */
-            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-            {
-                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
-            }
-        }
-    }
-
-    vt = fclaw2d_get_vtable(domain);
-    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-    {
-        vt.patch_setup(domain,this_patch,blockno,patchno);
-    }
-}
-
-void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *fine_patches,
-                                       fclaw2d_patch_t *coarse_patch,
-                                       int blockno,
-                                       int coarse_patchno,
-                                       int fine0_patchno,
-                                       fclaw2d_build_mode_t build_mode)
-{
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
-
-    if (gparms->manifold)
-    {
-        fclaw2d_metric_average_area(domain,fine_patches,coarse_patch,
-                                    blockno, coarse_patchno, fine0_patchno);
-
-        fclaw2d_clawpatch_metric_setup(domain,coarse_patch,blockno,
-                                       coarse_patchno);
-    }
-
-    vt = fclaw2d_get_vtable(domain);
-    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-    {
-        /* We might want to distinguish between new fine grid patches, and
-           new coarse grid patches.  In the latter case, we might just average
-           aux array info, for example, rather than recreate it from scratch.
-           Something like a general "build from fine" routine might be needed */
-        vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
-    }
-}
-
-
-/* -------------------------------------------------
-   For debugging
-   ----------------------------------------------- */
-void cb_set_corners_to_value(fclaw2d_domain_t* domain,
-                            fclaw2d_patch_t* this_patch,
-                            int blockno,
-                            int patchno,
-                            void *user)
-{
-    struct set_bc { int time_interp; double value; };
-    struct set_bc s = *((set_bc*) user);
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->set_corners_to_value(s.time_interp,s.value);
-}
-
-
-void fclaw2d_clawpatch_set_corners_to_value(fclaw2d_domain_t* domain,
-                                            int minlevel,
-                                            int maxlevel,
-                                            int time_interp,
-                                            double value)
-{
-    struct set_bc { int time_interp; double value; };
-    struct set_bc s;
-    s.time_interp = time_interp;
-    s.value = value;
-
-    for (int level = minlevel; level <= maxlevel; level++)
-    {
-        s.time_interp = 0;
-        fclaw2d_domain_iterate_level(domain, level,cb_set_corners_to_value,
-                                     (void *)  &s);
-    }
-    if (time_interp)
-    {
-        s.time_interp = time_interp;
-        int time_interp_minlevel = minlevel-1;
-        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
-                                     cb_set_corners_to_value,
-                                     (void *)  &s);
-    }
-}
-
-void fclaw2d_clawpatch_set_corners_to_nan(fclaw2d_domain_t* domain,
-                                           int minlevel,
-                                           int maxlevel,
-                                           int time_interp)
-{
-    double s;
-    fclaw2d_farraybox_set_to_nan(s);
-    fclaw2d_clawpatch_set_corners_to_value(domain,minlevel,maxlevel,
-                                           time_interp,s);
-}
-
-
-
-void cb_set_boundary_to_value(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t* this_patch,
-                              int blockno,
-                              int patchno,
-                              void *user)
-{
-    struct set_bc { int time_interp; double value; };
-    struct set_bc s = *((set_bc*) user);
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->set_boundary_to_value(s.time_interp,s.value);
-}
-
-
-
-void fclaw2d_clawpatch_set_boundary_to_value(fclaw2d_domain_t* domain,
-                                             int minlevel,
-                                             int maxlevel,
-                                             int time_interp,
-                                             double value)
-{
-    struct set_bc { int time_interp; double value; };
-    struct set_bc s;
-    s.time_interp = time_interp;
-    s.value = value;
-
-    for (int level = minlevel; level <= maxlevel; level++)
-    {
-        s.time_interp = 0;
-        fclaw2d_domain_iterate_level(domain, level,cb_set_boundary_to_value,
-                                     (void *)  &s);
-    }
-    if (time_interp)
-    {
-        s.time_interp = time_interp;
-        int time_interp_minlevel = minlevel-1;
-        fclaw2d_domain_iterate_level(domain, time_interp_minlevel,
-                                     cb_set_boundary_to_value,
-                                     (void *)  &s);
-    }
-}
-
-void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
-                                           int minlevel,
-                                           int maxlevel,
-                                           int time_interp)
-{
-    double s;
-    fclaw2d_farraybox_set_to_nan(s);
-    fclaw2d_clawpatch_set_boundary_to_value(domain,minlevel,maxlevel,
-                                            time_interp,s);
-}
-
-
-
-void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
-                                               fclaw2d_patch_t* this_patch,
-                                               int this_block_idx,
-                                               int this_patch_idx)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->initialize_after_regrid();
-}
-
-
-/* ----------------------------------------------------------
-   Parallel ghost exchanges.
-
-   Note this is different from the packing/unpacking that happens
-   when partitioning the domain
-   ----------------------------------------------------------*/
-
-size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int meqn = gparms->meqn;
-    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
-
-    FCLAW_ASSERT(ClawPatch::pack_layers > 0);
-    int mint = ClawPatch::pack_layers;
-    int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
-    int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
-    FCLAW_ASSERT(hole >= 0);
-    size_t psize = (wg - hole)*(meqn + packarea);
-    FCLAW_ASSERT(psize > 0);
-    return psize*sizeof(double);
-}
-
-void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
-                                           fclaw2d_patch_t* this_patch,
-                                           void** q)
-{
-    /* Create contiguous block for data and area */
-    int msize = fclaw2d_clawpatch_ghost_packsize(domain);
-    *q = (void*) FCLAW_ALLOC(double,msize);
-    FCLAW_ASSERT(*q != NULL);
-
-#if FCLAW_DEBUG
-    /* This should go in some kind of debug pre-processing block */
-    double snan;
-    set_snan(snan);
-    double *qq = (double*) *q;
-    for(int i = 0; i < msize; i++)
-    {
-        qq[i] = snan;
-    }
-#endif
-}
-
-void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
-                                                void **q)
-{
-    FCLAW_FREE(*q);
-    *q = NULL;
-}
-
-
-void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  double *patch_data,
-                                  int time_interp)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
-    int packmode = 2*packarea;  // 0 or 2  (for pack)
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->ghost_comm(patch_data,time_interp,packmode);
-}
-
-
-void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx,
-                                    double *qdata, fclaw_bool time_interp)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
-    int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->ghost_comm(qdata,time_interp,packmode);
-}
-
-
-/* --------------------------------------------------------
-   Domain partitioning.
-
-   Pack local patches on this processor before re-partitioning;
-   retrieve patches that migrated across parallel borders to
-   load balance the computation.
-   -------------------------------------------------------*/
-
-size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
-{
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
-    return size*sizeof(double);
-}
-
-void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *this_patch,
-                                         int this_block_idx,
-                                         int this_patch_idx,
-                                         void *user)
-{
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    FCLAW_ASSERT(cp != NULL);
-    cp->partition_pack(patch_data);
-}
-
-void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           void *user)
-{
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-
-    /* Create new data in 'user' pointer */
-    fclaw2d_patch_data_new(domain,this_patch);
-
-    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
-                            this_patch_idx,(void*) &build_mode);
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-
-    /* Time interp is false, since we only partition when all grids
-       are time synchronized */
-    cp->partition_unpack(patch_data);
-}
-
-void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
-                                                  fclaw2d_patch_t* this_patch,
-                                                  int this_block_idx,
-                                                  int this_patch_idx)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->initialize_after_partition();
 }

@@ -14,7 +14,8 @@ libforestclaw_installed_headers = \
 	src/forestclaw2d.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
-	src/subcycle_manager.hpp \
+	src/ClawPatch.hpp \
+	src/fclaw2d_subcycle_manager.hpp \
 	src/fclaw2d_advance.hpp \
 	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_clawpatch.hpp \
@@ -72,7 +73,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_domain.cpp \
 	src/fclaw2d_block.c \
 	src/fclaw2d_patch.cpp \
-	src/fclaw2d_convenience.c \
 	src/forestclaw2d.c \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
@@ -80,7 +80,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_transform.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
-	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
@@ -97,6 +96,14 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_timeinterp.cpp \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
+	src/fclaw2d_initialize.cpp \
+	src/fclaw2d_run.cpp \
+	src/fclaw2d_finalize.cpp \
+	src/fclaw2d_subcycle_manager.cpp \
+	src/fclaw2d_advance.cpp \
+	src/fclaw2d_update_single_step.cpp \
+	src/fclaw2d_convenience.c \
+	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -114,12 +121,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/fclaw2d_initialize.cpp \
-	src/fclaw2d_run.cpp \
-	src/fclaw2d_finalize.cpp \
-	src/subcycle_manager.cpp \
-	src/fclaw2d_advance.cpp \
-	src/fclaw2d_update_single_step.cpp \
 	src/fortran_source2d/fclaw2d_ghost_pack.f \
 	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
