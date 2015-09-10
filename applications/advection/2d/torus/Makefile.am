@@ -3,7 +3,8 @@
 bin_PROGRAMS += applications/advection/2d/torus/torus \
 		applications/advection/2d/torus/torthem
 
-include_HEADERS += applications/advection/2d/torus/torus_user.h
+include_HEADERS += applications/advection/2d/torus/torus_user.h \
+		   applications/advection/2d/torus/torus_common.h
 
 applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/torus.cpp \
