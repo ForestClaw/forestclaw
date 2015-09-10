@@ -5,6 +5,8 @@
 
 bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
+include_HEADERS += applications/advection/2d/swirl/swirl_user.h
+
 applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/swirl_user.cpp \
 	applications/advection/2d/swirl/swirl.cpp \

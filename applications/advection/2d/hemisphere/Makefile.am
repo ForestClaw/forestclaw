@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/advection/2d/hemisphere/hemisphere
 
+include_HEADERS += applications/advection/2d/hemisphere/hemisphere_user.h
+
 applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/hemisphere_user.cpp \
 	applications/advection/2d/hemisphere/hemisphere.cpp \

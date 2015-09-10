@@ -5,6 +5,8 @@
 
 bin_PROGRAMS += applications/advection/2d/filament/filament
 
+include_HEADERS += applications/advection/2d/filament/filament_user.h
+
 applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/filament_user.cpp \
 	applications/advection/2d/filament/filament.cpp \
@@ -14,6 +16,8 @@ applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/fclaw2d_map_squareddisk.c \
 	applications/advection/2d/filament/fclaw2d_map_pillowdisk5.c \
 	applications/advection/2d/filament/fclaw2d_map_fivepatch.c \
+	applications/advection/2d/filament/user_4.6/tag4coarsening.f \
+	applications/advection/2d/filament/user_4.6/tag4refinement.f \
 	applications/advection/2d/filament/psi.f \
 	applications/advection/2d/filament/setprob.f \
 	applications/advection/2d/filament/user_4.6/qinit.f \

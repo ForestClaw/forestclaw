@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "filament_user.hpp"
+#include "filament_user.h"
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_patch.hpp>
@@ -154,6 +154,7 @@ void run_program(fclaw_app_t* app)
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_nomap();
         break;
+
     case 1:
         /* in [-1,1]x[-1,1] */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);

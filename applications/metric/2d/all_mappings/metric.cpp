@@ -23,9 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "metric_user.h"
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
+
+#include "metric_user.h"
 
 
 typedef struct user_options
