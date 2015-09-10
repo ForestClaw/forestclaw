@@ -14,7 +14,6 @@ libforestclaw_installed_headers = \
 	src/forestclaw2d.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
-	src/ClawPatch.hpp \
 	src/subcycle_manager.hpp \
 	src/fclaw2d_advance.hpp \
 	src/fclaw2d_farraybox.hpp \
@@ -115,7 +114,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/ClawPatch.cpp \
 	src/fclaw2d_initialize.cpp \
 	src/fclaw2d_run.cpp \
 	src/fclaw2d_finalize.cpp \

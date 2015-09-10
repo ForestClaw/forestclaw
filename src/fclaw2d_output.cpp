@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_output.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_vtk.h>
@@ -33,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_mpi.h>
 #include <fclaw_base.h>
 
-#include <ClawPatch.hpp>
+#include <fclaw2d_clawpatch.hpp>
+
 
 #ifdef __cplusplus
 extern "C"
