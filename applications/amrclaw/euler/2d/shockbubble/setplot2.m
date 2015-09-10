@@ -6,7 +6,7 @@ ForestClaw = 1;     % Plot using ForestClaw preferences.
 %  setplot2.m
 %  called in plotclaw1 before plotting to set various parameters
 
-PlotType = 3;                % type of plot to produce:
+PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
 			     % 2 = contour
 			     % 3 = Schlieren

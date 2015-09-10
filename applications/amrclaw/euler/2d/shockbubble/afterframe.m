@@ -29,6 +29,8 @@ if (PlotParallelPartitions==1)
     showpatchborders;
 end
 
+showpatchborders;
+
 prt = true;
 NoQuery = 0;
 if (prt)
@@ -40,9 +42,14 @@ if (prt)
     set(gca,'position',[0 0 1 1]);
     set(gcf,'paperposition',[0 0 figsize]);  
     
+    % Use this with 'export_fig'
+%     set(gca,'position',[0 0 1 1]);
+%     set(gcf,'units','inches');
+%     set(gcf,'position',[0 0 figsize]);
+    
     % Start printing
     id = input('Input id to use : ');
-    if ~isempty(id)
+    if (~isempty(id) | id == 999)
     
         % No mesh
         hidegridlines;
@@ -55,7 +62,7 @@ if (prt)
         yn = 'y';
         fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
         if (exist(fname_png))
-            str = sprintf('Overwrite file %s (y/n) ? ',fname_png);
+            str = sprintf('Overwrite file %s (y/[n]) ? ',fname_png);
             yn = input(str,'s');
             if (isempty(yn))
                 yn = 'n';
@@ -64,9 +71,10 @@ if (prt)
                 
         if (strcmp(lower(yn),'y') == 1)
             fprintf('Printing %s\n',fname_png);
-            print('-r512','-dpng',fname_png);
-            plotgrid = 1;
-            create_tikz_plot(id,Frame,fname_prefix,1);
+            print('-dpng','-r512',fname_png);
+%             export_fig('-dpng','-transparent','-r512',...
+%                 '-a1','-nocrop',fname_png);
+            create_tikz_plot(id,Frame,fname_prefix);
         end
                 
     end
