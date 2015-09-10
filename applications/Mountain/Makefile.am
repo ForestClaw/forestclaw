@@ -5,10 +5,10 @@
 
 bin_PROGRAMS += applications/Mountain/mountain
 
-include_HEADERS += applications/Mountain/mountain/mountain_user.h
 
 applications_Mountain_mountain_SOURCES = \
 	applications/Mountain/mountain_user.cpp \
+	applications/Mountain/mountain_user.h \
 	applications/Mountain/mountain.cpp \
 	applications/Mountain/mountain_fort.f \
 	applications/Mountain/setprob.f \

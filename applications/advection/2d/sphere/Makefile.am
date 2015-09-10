@@ -2,10 +2,10 @@
 
 bin_PROGRAMS += applications/advection/2d/sphere/sphere
 
-include_HEADERS += applications/advection/2d/sphere/sphere_user.h
 
 applications_advection_2d_sphere_sphere_SOURCES = \
 	applications/advection/2d/sphere/sphere_user.cpp \
+	applications/advection/2d/sphere/sphere_user.h \
 	applications/advection/2d/sphere/sphere.cpp \
 	applications/advection/2d/sphere/fclaw2d_map_cubedsphere.c \
 	applications/advection/2d/sphere/fclaw2d_map_pillowsphere.c \

@@ -2,8 +2,10 @@
 
 bin_PROGRAMS += applications/shallow/2d/sphere/sphere
 
+
 applications_shallow_2d_sphere_sphere_SOURCES = \
 	applications/shallow/2d/sphere/sphere.cpp \
+	applications/shallow/2d/sphere/sphere_user.h \
 	applications/shallow/2d/sphere/sphere_user.cpp \
 	applications/shallow/2d/sphere/fclaw2d_map_latlong.c \
 	applications/shallow/2d/sphere/fclaw2d_map_cubedsphere.c \

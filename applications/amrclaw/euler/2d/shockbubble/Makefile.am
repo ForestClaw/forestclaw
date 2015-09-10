@@ -5,10 +5,10 @@
 
 bin_PROGRAMS += applications/amrclaw/euler/2d/shockbubble/shockbubble
 
-include_HEADERS += applications/amrclaw/euler/2d/shockbubble/shockbubble_user.h
 
 applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/shockbubble.cpp \
+	applications/amrclaw/euler/2d/shockbubble/shockbubble_user.h \
 	applications/amrclaw/euler/2d/shockbubble/shockbubble_user.cpp \
 	applications/amrclaw/euler/2d/shockbubble/fdisc.f \
 	applications/amrclaw/euler/2d/shockbubble/setprob.f \

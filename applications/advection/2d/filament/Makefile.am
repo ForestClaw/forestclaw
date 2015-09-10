@@ -5,10 +5,10 @@
 
 bin_PROGRAMS += applications/advection/2d/filament/filament
 
-include_HEADERS += applications/advection/2d/filament/filament_user.h
 
 applications_advection_2d_filament_filament_SOURCES = \
 	applications/advection/2d/filament/filament_user.cpp \
+	applications/advection/2d/filament/filament_user.h \
 	applications/advection/2d/filament/filament.cpp \
 	applications/advection/2d/filament/fclaw2d_map_nomap.c \
 	applications/advection/2d/filament/fclaw2d_map_cart.c \
