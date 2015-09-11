@@ -624,7 +624,7 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
-int ClawPatch::pack_layers = -1;
+int ClawPatch::pack_layers = 4;
 int ClawPatch::ghost_patch_pack_area = -1;
 
 ClawPatch::ClawPatch()
