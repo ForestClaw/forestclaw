@@ -33,7 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_ghost_fill.h>
 
-#include "/opt/local/lib/gcc49/gcc/x86_64-apple-darwin14/4.9.3/include/omp.h"
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 #ifdef __cplusplus
 extern "C"

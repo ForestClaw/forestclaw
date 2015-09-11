@@ -55,19 +55,21 @@ if (prt)
         hidegridlines;
         hidepatchborders;
         if (PlotType == 3)
-            fname = sprintf('results_%03d/fc_sb_schlrn_%04d.png',id,Frame);
+            fname_prefix = sprintf('results_%03d/fc_sb_schlrn_%04d.png',id,Frame);
         else
             fname_prefix = sprintf('fc_sb',Frame);
         end
         yn = 'y';
         fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
-        if (exist(fname_png))
+        if (exist(fname_png,'file'))
             str = sprintf('Overwrite file %s (y/[n]) ? ',fname_png);
             yn = input(str,'s');
             if (isempty(yn))
                 yn = 'n';
             end
         end
+        
+        
         if (strcmp(lower(yn),'y') == 1)
             fprintf('Printing %s\n',fname_png);
             print('-dpng','-r512',fname_png);
