@@ -4,7 +4,7 @@ end
 
 
 axis([0 2.0 0 0.5])
-axis equal; 
+axis equal;
 axis tight
 
 fprintf('%10s : %12.4e\n','qmin',qmin);
@@ -40,35 +40,35 @@ if (prt)
     figsize = [8,2];  % Should match size set in options
     set(gcf,'papersize',figsize);
     set(gca,'position',[0 0 1 1]);
-    set(gcf,'paperposition',[0 0 figsize]);  
-    
+    set(gcf,'paperposition',[0 0 figsize]);
+
     % Use this with 'export_fig'
 %     set(gca,'position',[0 0 1 1]);
 %     set(gcf,'units','inches');
 %     set(gcf,'position',[0 0 figsize]);
-    
+
     % Start printing
     id = input('Input id to use : ');
     if (~isempty(id) | id == 999)
-    
+
         % No mesh
         hidegridlines;
         hidepatchborders;
         if (PlotType == 3)
-            fname_prefix = sprintf('fc_sb_schlrn',Frame);            
+            fname_prefix = sprintf('results_%03d/fc_sb_schlrn_%04d.png',id,Frame);
         else
             fname_prefix = sprintf('fc_sb',Frame);
         end
         yn = 'y';
         fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
-        if (exist(fname_png))
+        if (exist(fname_png,'file'))
             str = sprintf('Overwrite file %s (y/[n]) ? ',fname_png);
             yn = input(str,'s');
             if (isempty(yn))
                 yn = 'n';
             end
         end
-                
+
         if (strcmp(lower(yn),'y') == 1)
             fprintf('Printing %s\n',fname_png);
             print('-dpng','-r512',fname_png);
@@ -76,9 +76,9 @@ if (prt)
 %                 '-a1','-nocrop',fname_png);
             create_tikz_plot(id,Frame,fname_prefix);
         end
-                
+
     end
-    
+
 end
 
 shg;
