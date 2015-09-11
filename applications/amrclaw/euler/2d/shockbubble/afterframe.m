@@ -68,7 +68,6 @@ if (prt)
                 yn = 'n';
             end
         end
-
         if (strcmp(lower(yn),'y') == 1)
             fprintf('Printing %s\n',fname_png);
             print('-dpng','-r512',fname_png);
