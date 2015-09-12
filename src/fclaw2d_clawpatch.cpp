@@ -61,6 +61,14 @@ void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
     ClawPatch::global = global;
 }
 
+/* Make this static and call from define */
+static
+void fclaw2d_clawpatch_set_static()
+{
+    int ClawPatch::pack_layers = 4;
+    int ClawPatch::ghost_patch_pack_area = 1;
+}
+
 /* ------------------------------------------------------------
    Solution access functions
    ---------------------------------------------------------- */
@@ -624,9 +632,6 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
-int ClawPatch::pack_layers = 4;
-int ClawPatch::ghost_patch_pack_area = -1;
-
 ClawPatch::ClawPatch()
 {
     m_package_data_ptr = fclaw_package_data_new();
@@ -740,7 +745,7 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     }
 
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
-    ClawPatch::pack_layers = 4;
+    fclaw2d_clawpatch_set_static();
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
