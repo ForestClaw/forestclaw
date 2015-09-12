@@ -212,9 +212,6 @@ public :
 
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
-    static int pack_layers;
-    static int ghost_pack_size;
-    static int ghost_patch_pack_area;
 
 protected :
 
