@@ -51,6 +51,7 @@ void set_snan(double& f)
 }
 #endif
 
+
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
     ClawPatch::app = app;
@@ -479,10 +480,9 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int mx = gparms->mx;
     int my = gparms->my;
     int meqn = gparms->meqn;
+    int mint = 2*gparms->mbc;   /* This shoudl be made variable ... */
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
 
-    FCLAW_ASSERT(ClawPatch::pack_layers > 0);
-    int mint = ClawPatch::pack_layers;
     int wg = (2 + mx)*(2 + my);  /* Whole grid  (one layer of ghost cells)*/
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
@@ -624,9 +624,6 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
 fclaw_app_t *ClawPatch::app;
 fclaw2d_global_t *ClawPatch::global;
 
-int ClawPatch::pack_layers = 4;
-int ClawPatch::ghost_patch_pack_area = -1;
-
 ClawPatch::ClawPatch()
 {
     m_package_data_ptr = fclaw_package_data_new();
@@ -740,7 +737,6 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     }
 
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
-    ClawPatch::pack_layers = 4;
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -977,7 +973,8 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
     // Number of internal layers.  At least four are needed to
     // average fine grid ghost patches onto coarse grid (on-proc)
     // ghost cells.
-    int mint = ClawPatch::pack_layers;
+
+    int mint = 4;
 
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
