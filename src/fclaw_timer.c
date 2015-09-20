@@ -97,6 +97,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, CHECK);
     FCLAW2D_STATS_SET (stats, ddata, ADVANCE);
     FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
+    FCLAW2D_STATS_SET (stats, ddata, CFL);
     FCLAW2D_STATS_SET (stats, ddata, BUILDREGRID);
     FCLAW2D_STATS_SET (stats, ddata, BUILDPARTITION);
     FCLAW2D_STATS_SET (stats, ddata, BUILDGHOST);
@@ -108,6 +109,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXTRA1);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA2);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA3);
+    FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
     FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
@@ -116,29 +118,26 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                     ddata->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
                     ddata->timers[FCLAW2D_TIMER_CHECK].cumulative +
                     ddata->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
-                    ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative),
+                    ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_CFL].cumulative),
                    "UNACCOUNTED");
     sc_stats_compute (domain->mpicomm, FCLAW2D_TIMER_COUNT, stats);
     sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                     stats, 1, 0);
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
-                          "regrid %d %g ghost ex. %d %g\n", domain->mpisize,
+                          "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_EXCHANGE].average,
                           ddata->count_amr_regrid,
-                          stats[FCLAW2D_TIMER_REGRID].average,
-                          ddata->count_multiproc_corner,
-                          stats[FCLAW2D_TIMER_GHOST_EXCHANGE].average);
+                          stats[FCLAW2D_TIMER_REGRID].average);
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
-                          "regrid %d %g ghost ex. %d %g\n", domain->mpisize,
+                          "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_EXCHANGE].max,
                           ddata->count_amr_regrid,
-                          stats[FCLAW2D_TIMER_REGRID].max,
-                          ddata->count_multiproc_corner,
-                          stats[FCLAW2D_TIMER_GHOST_EXCHANGE].max);
+                          stats[FCLAW2D_TIMER_REGRID].max);
 }
