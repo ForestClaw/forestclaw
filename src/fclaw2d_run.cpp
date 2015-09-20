@@ -327,8 +327,18 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
+
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
+    if (!gparms->subcycle && gparms->use_fixed_dt)
+    {
+        /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
+           a given nout/nstep pair works for both subcycled
+           and non-subcycled cases */
+        int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
+        nstep_outer *= mf;
+        nstep_inner *= mf;
+    }
 
     double t0 = 0;
     /* The user dt_initial is the appropriate value for minlevel
