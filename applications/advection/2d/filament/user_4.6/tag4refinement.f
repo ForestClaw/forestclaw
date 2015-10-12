@@ -22,9 +22,9 @@ c     # vt.fort_tag4refinement = &tag4refinement.
 c     # Refine based only on first variable in system.
       qmin = q(1,1,1)
       qmax = q(1,1,1)
+      dq = 0
       do j = 1,my
          do i = 1,mx
-            dq = 0
             do mq = 1,1
                 dqi = dabs(q(i+1,j,mq) - q(i-1,j,mq))
                 dqj = dabs(q(i,j+1,mq) - q(i,j-1,mq))
@@ -36,5 +36,6 @@ c     # Refine based only on first variable in system.
             enddo
          enddo
       enddo
+
 
       end

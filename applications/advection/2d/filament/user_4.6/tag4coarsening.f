@@ -15,25 +15,34 @@
       integer i,j, mq
       double precision qmin, qmax, dq
 
-      tag_patch = 0
+      tag_patch = 1
       dq = 0
       do mq = 1,1
-         call get_minmax(mx,my,mbc,meqn,mq,q0,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q1,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q2,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q3,dq)
+         call get_minmax(mx,my,mbc,meqn,mq,q0,dq,
+     &         coarsen_threshold,tag_patch)
+         if (tag_patch .eq. 0) return
+
+         call get_minmax(mx,my,mbc,meqn,mq,q1,dq,
+     &         coarsen_threshold,tag_patch)
+         if (tag_patch .eq. 0) return
+
+         call get_minmax(mx,my,mbc,meqn,mq,q2,dq,
+     &         coarsen_threshold,tag_patch)
+         if (tag_patch .eq. 0) return
+
+         call get_minmax(mx,my,mbc,meqn,mq,q3,dq,
+     &         coarsen_threshold,tag_patch)
+         if (tag_patch .eq. 0) return
       enddo
-      if (dq .lt. coarsen_threshold) then
-         tag_patch = 1
-         return
-      endif
 
       end
 
-      subroutine get_minmax(mx,my,mbc,meqn,mq,q,dq)
+      subroutine get_minmax(mx,my,mbc,meqn,mq,q,dq,
+     &      coarsen_threshold,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq
+      integer mx,my,mbc,meqn,mq,tag_patch
+      double precision coarsen_threshold
       double precision qmin,qmax,dq
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
@@ -41,11 +50,13 @@
 
       do i = 1,mx
          do j = 1,my
-c           qmin = min(q(i,j,mq),qmin)
-c           qmax = max(q(i,j,mq),qmax)
-            dqi = dabs(q(i+1,j,mq) - q(i-1,j,mq))
-            dqj = dabs(q(i,j+1,mq) - q(i,j-1,mq))
-            dq  = dmax1(dq,dqi, dqj)
+            dqi = abs(q(i+1,j,mq) - q(i-1,j,mq))
+            dqj = abs(q(i,j+1,mq) - q(i,j-1,mq))
+            dq  = max1(dq,dqi, dqj)
+            if (dq .gt. coarsen_threshold) then
+               tag_patch = 0
+               return
+            endif
          enddo
       enddo
 
