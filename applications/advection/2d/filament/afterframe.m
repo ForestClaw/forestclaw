@@ -47,12 +47,13 @@ if (ShowUnderOverShoots)
 end
 
 showpatchborders;
+% hidepatchborders;
 
 view(2);
 axis off
 shg;
 
-prt = true;
+prt = false;
 NoQuery = 0;
 if (prt)
     MaxFrames = 31;
@@ -62,13 +63,13 @@ if (prt)
     figsize = [4,4];  % Should match size set in options
 %     set(gcf,'papersize',figsize);
 %     set(gca,'position',[0 0 1 1]);
-%     set(gcf,'paperposition',[0 0 figsize]);  
-    
+%     set(gcf,'paperposition',[0 0 figsize]);
+
     % Use this with 'export_fig'
      set(gca,'position',[0 0 1 1]);
      set(gcf,'units','inches');
      set(gcf,'position',[1 7 figsize]);
-    
+
     % Start printing
     id = input('Input id to use : ');
     if (~isempty(id) | id == 999)
@@ -77,12 +78,12 @@ if (prt)
         fname_soln_tikz_dir = sprintf('results_%03d/filament_tikz_%04d.tex',id,Frame);
         create_filament_soln_tikz(fname_soln_tikz_dir,xout,yout,figsize,1024,1024);
 
-        
+
         % No mesh
         hidegridlines;
         % hidepatchborders;
         if (PlotType == 3)
-            fname_prefix = sprintf('fc_adv_schlrn',Frame);            
+            fname_prefix = sprintf('fc_adv_schlrn',Frame);
         else
             fname_prefix = sprintf('fc_adv',Frame);
         end
@@ -95,7 +96,7 @@ if (prt)
                 yn = 'n';
             end
         end
-                
+
         if (strcmp(lower(yn),'y') == 1)
             fprintf('Printing %s\n',fname_png);
             % print('-dpng','-r256',fname_png);
@@ -104,9 +105,9 @@ if (prt)
             amrclaw = 0;
             create_tikz_plot(id,Frame,fname_prefix,amrclaw,fname_soln_tikz);
         end
-                
+
     end
-    
+
 end
 
 clear afterframe
