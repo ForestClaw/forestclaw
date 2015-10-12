@@ -53,7 +53,7 @@ view(2);
 axis off
 shg;
 
-prt = true;
+prt = false;
 NoQuery = 0;
 if (prt)
     MaxFrames = 31;

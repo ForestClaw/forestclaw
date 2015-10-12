@@ -59,26 +59,40 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       integer i,j, mq
       double precision qmin, qmax
 
-      tag_patch = 0
+c     # Assume that we will coarsen a family unless we find a grid
+c     # that doesn't pass the coarsening test.
+      tag_patch = 1
       mq = 1
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax)
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax)
-      if (qmax - qmin .lt. coarsen_threshold) then
-         tag_patch = 1
-         return
-      endif
+
+c     # If we find that (qmax-qmin > coarsen_threshold) on any
+c     # grid, we return immediately, since the family will then
+c     # not be coarsened.
+
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+     &      coarsen_threshold,tag_patch)
+      if (tag_patch == 0) return
+
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+     &      coarsen_threshold,tag_patch)
+      if (tag_patch == 0) return
+
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+     &      coarsen_threshold,tag_patch)
+      if (tag_patch == 0) return
+
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+     &      coarsen_threshold,tag_patch)
 
       end
 
       subroutine fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q,
-     &      qmin,qmax)
+     &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq
+      integer mx,my,mbc,meqn,mq,tag_patch
+      double precision coarsen_threshold
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
@@ -87,6 +101,12 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
+            if (qmax - qmin .gt. coarsen_threshold) then
+c              # We won't coarsen this family because at least one
+c              # grid fails the coarsening test.
+               tag_patch = 0
+               return
+            endif
          enddo
       enddo
 
