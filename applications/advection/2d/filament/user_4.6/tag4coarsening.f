@@ -20,20 +20,24 @@
       do mq = 1,1
          call get_minmax(mx,my,mbc,meqn,mq,q0,dq,
      &         coarsen_threshold,tag_patch)
-         if (tag_patch .eq. 0) return
+c         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q1,dq,
      &         coarsen_threshold,tag_patch)
-         if (tag_patch .eq. 0) return
+c         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q2,dq,
      &         coarsen_threshold,tag_patch)
-         if (tag_patch .eq. 0) return
+c         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q3,dq,
      &         coarsen_threshold,tag_patch)
-         if (tag_patch .eq. 0) return
+c         if (tag_patch .eq. 0) return
       enddo
+      if (dq .gt. coarsen_threshold) then
+         tag_patch = 0
+      endif
+
 
       end
 
@@ -53,10 +57,10 @@
             dqi = abs(q(i+1,j,mq) - q(i-1,j,mq))
             dqj = abs(q(i,j+1,mq) - q(i,j-1,mq))
             dq  = max1(dq,dqi, dqj)
-            if (dq .gt. coarsen_threshold) then
-               tag_patch = 0
-               return
-            endif
+c            if (dq .gt. coarsen_threshold) then
+c               tag_patch = 0
+c               return
+c            endif
          enddo
       enddo
 
