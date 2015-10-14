@@ -473,9 +473,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
     /* If minlevel == maxlevel, then maxcoarse < mincoase. In this
        case, loops involving averaging and interpolation will be
-       skipped.  In this case, we only copy between patches on
-       same levels, and average to time interpolated levels (if
-       there are any). */
+       skipped and we only copy between patches on
+       same levels. */
 
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
@@ -539,18 +538,26 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            This is needed so that when these boundary patches get sent to other
            processors as ghost patches, they have valid ghost cells if needed
            for interpolation.*/
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
         fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
             FCLAW2D_BOUNDARY_GHOST_ONLY;
         int read_parallel_patches = 0;
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        /* Copy */
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
                        read_parallel_patches,parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
+
+        /* Average */
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
 
         /* This is needed when the parallel boundary intersects the physical
            boundary.  In this case, a coarse grid ghost patch might
@@ -564,9 +571,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             sync_time,
                             time_interp,
                             parallel_mode);
-
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
-
 
         /* --------------------------------------------------------------
            Start send ...
@@ -582,14 +586,26 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOST_HIDE]);
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        /* Copy */
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
             read_parallel_patches,parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
+
+        /* Average */
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
             time_interp,
             read_parallel_patches,
             parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
+
+
+        /* Physical ghost */
         fill_physical_ghost(domain,
                             mincoarse,
                             maxcoarse,
@@ -599,14 +615,20 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
         /* Fine grids that are adjacent to boundary patches don't get
            ghost regions filled in that overlap boundary patch */
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
+
+        /* Interpolate */
         interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
                                       time_interp,
                                       read_parallel_patches,
                                       parallel_mode);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
 
         /* minfine to maxfine?  */
         int minfine = mincoarse+1;
         int maxfine = maxlevel;
+
+        /* Physical ghost */
         fill_physical_ghost(domain,
                             minfine,
                             maxfine,
@@ -642,12 +664,24 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
         read_parallel_patches = 1;
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        /* Copy */
         copy_samelevel(domain,minlevel,maxlevel,time_interp,
             read_parallel_patches,parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
+
+        /* Average */
         average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
             read_parallel_patches,parallel_mode);
 
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
+
+
+        /* Physical */
         fill_physical_ghost(domain,
                             minlevel,
                             maxlevel,
@@ -656,9 +690,13 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             parallel_mode);
 
 
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
+
+        /* Interpolate */
         interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
                                       time_interp,read_parallel_patches,
                                       parallel_mode);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
 
         /* This needs to be over all patches.  The situation that can arise is
            that a coarse grid boundary patch adjacent to a fine grid non-boundary
@@ -680,13 +718,14 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            are affected, but it is hard to see how to avoid this without some tedious
            checking.
         */
+
+        /* Physical */
         fill_physical_ghost(domain,
                             minlevel,
                             maxlevel,
                             sync_time,
                             time_interp,
                             FCLAW2D_BOUNDARY_ALL);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
     }
     // Stop timing
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXCHANGE]);
