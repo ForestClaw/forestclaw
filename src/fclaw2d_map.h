@@ -229,14 +229,15 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t* conn,
    Some mapping utility functions
    ---------------------------------------------------------------------------------- */
 
+#if 0
 #define SET_SCALE FCLAW_F77_FUNC_(set_scale, SET_SCALE)
-void SET_SCALE(const double scale[]);
+void SET_SCALE(fclaw2d_map_context_t* cont, const double scale[]);
 
 #define SET_ROTATION FCLAW_F77_FUNC_(set_rotation, SET_ROTATION)
-void SET_ROTATION(const double rot_angle[]);
+void SET_ROTATE(fclaw2d_map_context_t* cont,const double rot_angle[]);
 
 #define SET_SHIFT FCLAW_F77_FUNC_(set_shift, SET_SHIFT)
-void SET_SHIFT(const double shift[]);
+void SET_SHIFT(fclaw2d_map_context_t* cont,const double shift[]);
 
 #define SCALE_MAP FCLAW_F77_FUNC (scale_map,SCALE_MAP)
 void SCALE_MAP (double *xp, double *yp, double *zp);
@@ -246,6 +247,7 @@ void ROTATE_MAP (double *xp, double *yp, double *zp);
 
 #define SHIFT_MAP FCLAW_F77_FUNC (shift_map,SHIFT_MAP)
 void SHIFT_MAP (double *xp, double *yp, double *zp);
+#endif
 
 #define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
 void SET_BLOCK(const int * a_blockno);
