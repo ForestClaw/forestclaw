@@ -149,21 +149,21 @@ void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
 
 /* These will be converted to MACROS slowly ... */
 
-void setprob_();
+void SETPROB();
 
-void qinit_(const int* maxmx, const int* maxmy, const int* meqn,
+void QINIT(const int* maxmx, const int* maxmy, const int* meqn,
             const int* mbc, const int* mx, const int* my,
             const double* xlower, const double* ylower,
             const double* dx, const double* dy,
             double q[], const int* maux, double aux[]);
 
-void setaux_(const int* maxmx, const int* maxmy, const int* mbc,
+void SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
              const int* mx, const int* my,
              const double* xlower, const double* ylower,
              const double* dx, const double* dy,
              const int* maux, double aux[]);
 
-void bc2_(const int* maxmx, const int* maxmy, const int* meqn,
+void BC2(const int* maxmx, const int* maxmy, const int* meqn,
           const int* mbc, const int* mx, const int* my,
           const double* xlower, const double* ylower,
           const double* dx, const double* dy, const double q[],
@@ -171,14 +171,14 @@ void bc2_(const int* maxmx, const int* maxmy, const int* meqn,
           const double* dt, const int mthbc[]);
 
 
-void b4step2_(const int* maxmx, const int* maxmy, const int* mbc,
+void B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
               const int* mx, const int* my, const int* meqn,
               double q[], const double* xlower, const double* ylower,
               const double* dx, const double* dy,
               const double* t, const double* dt,
               const int* maux, double aux[]);
 
-void src2_(const int* maxmx, const int* maxmy, const int* meqn,
+void SRC2(const int* maxmx, const int* maxmy, const int* meqn,
            const int* mbc, const int* mx,const int* my,
            const double* xlower, const double* ylower,
            const double* dx, const double* dy, double q[],
@@ -186,12 +186,12 @@ void src2_(const int* maxmx, const int* maxmy, const int* meqn,
            const double* dt);
 
 /* Riemann solvers */
-void rpn2_(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+void RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
            const int* mbc,const int* mx, double ql[], double qr[],
            double auxl[], double auxr[], double wave[],
            double s[], double amdq[], double apdq[]);
 
-void rpt2_(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+void RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
            const int* mbc, const int* mx, double ql[], double qr[],
            double aux1[], double aux2[], double aux3[], const int* imp,
            double dsdq[], double bmasdq[], double bpasdq[]);
