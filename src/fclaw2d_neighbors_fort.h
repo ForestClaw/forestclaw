@@ -45,111 +45,99 @@ extern "C"
 
 /* ------------------------------------------------------------------------ */
 
-
-void mb_average_face_ghost_(const int& mx, const int& my, const int& mbc,
-                            const int& meqn, double qfine[],double qcoarse[],
-                            const double areacoarse[], const double areafine[],
-                            const int& idir, const int& iside, const int& num_neighbors,
-                            const int& refratio, const int& igrid,
-                            fclaw2d_transform_data_t** transform_cptr);
-
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
    ---------------------------------------------------------------------------------- */
-void exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                          double qthis[],double qneighbor[], const int& a_idir,
-                          fclaw2d_transform_data_t** transform_cptr);
+#define FCLAW2D_FORT_EXCHANGE_FACE_GHOST FCLAW_F77_FUNC(fclaw2d_fort_exchange_face_ghost, \
+                                                       FCLAW2D_FORT_EXCHANGE_FACE_GHOST)
+void FCLAW2D_FORT_EXCHANGE_FACE_GHOST(const int& mx, const int& my, const int& mbc, const int& meqn,
+                                      double qthis[],double qneighbor[], const int& a_idir,
+                                      fclaw2d_transform_data_t** transform_cptr);
 
-void average_face_ghost_(const int& mx, const int& my, const int& mbc,
-                         const int& meqn,
-                         double qcoarse[],double qfine[],
-                         double areacoarse[], double areafine[],
-                         const int& idir, const int& iside,
-                         const int& num_neighbors,
-                         const int& refratio, const int& igrid,
-                         const int& manifold, fclaw2d_transform_data_t** transform_cptr);
+#define FCLAW2D_FORT_AVERAGE_FACE_GHOST FCLAW_F77_FUNC(fclaw2d_fort_average_face_ghost, \
+                                                       FCLAW2D_FORT_AVERAGE_FACE_GHOST)
+void FCLAW2D_FORT_AVERAGE_FACE_GHOST(const int& mx, const int& my, const int& mbc,
+                                     const int& meqn,
+                                     double qcoarse[],double qfine[],
+                                     double areacoarse[], double areafine[],
+                                     const int& idir, const int& iside,
+                                     const int& num_neighbors,
+                                     const int& refratio, const int& igrid,
+                                     const int& manifold, fclaw2d_transform_data_t** transform_cptr);
 
-void interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
-                             const int& meqn,
-                             double qthis[],double qcoarse[],
-                             const int& idir, const int& iside,
-                             const int& num_neighbors,
-                             const int& refratio, const int& igrid,
-                             fclaw2d_transform_data_t** transform_cptr);
+#define FCLAW2D_FORT_INTERPOLATE_FACE_GHOST FCLAW_F77_FUNC(fclaw2d_fort_interpolate_face_ghost, \
+                                                           FCLAW2D_FORT_INTERPOLATE_FACE_GHOST)
+void FCLAW2D_FORT_INTERPOLATE_FACE_GHOST(const int& mx, const int& my, const int& mbc,
+                                         const int& meqn,
+                                         double qthis[],double qcoarse[],
+                                         const int& idir, const int& iside,
+                                         const int& num_neighbors,
+                                         const int& refratio, const int& igrid,
+                                         fclaw2d_transform_data_t** transform_cptr);
+
+#define FCLAW2D_FORT_EXCHANGE_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_exchange_corner_ghost, \
+                                                          FCLAW2D_FORT_EXCHANGE_CORNER_GHOST)
+void FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                        const int& meqn, double this_q[],double neighbor_q[],
+                                        const int& a_corner,fclaw2d_transform_data_t** transform_cptr);
+
+#define FCLAW2D_FORT_AVERAGE_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_average_corner_ghost, \
+                                                         FCLAW2D_FORT_AVERAGE_CORNER_GHOST)
+void FCLAW2D_FORT_AVERAGE_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                       const int& meqn, const int& a_refratio,
+                                       double qcoarse[], double qfine[],
+                                       double areacoarse[], double areafine[],
+                                       const int& manifold,
+                                       const int& a_corner, fclaw2d_transform_data_t** transform_cptr);
+
+#define FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_interpolate_corner_ghost, \
+                                                             FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST)
+void FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                           const int& meqn, const int& a_refratio, double this_q[],
+                                           double neighbor_q[], const int& a_corner,
+                                           fclaw2d_transform_data_t** transform_cptr);
 
 
-void exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                            const int& meqn, double this_q[],double neighbor_q[],
-                            const int& a_corner,fclaw2d_transform_data_t** transform_cptr);
+#define FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_mb_exchange_block_corner_ghost, \
+                                                                   FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST)
+void FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(const int& mx, const int& my,
+                                                 const int& mbc, const int& meqn,
+                                                 double qthis[], double qneighbor[], const int& icorner,
+                                                 const int& iblock);
 
-void average_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                           const int& meqn, const int& a_refratio,
-                           double qcoarse[], double qfine[],
-                           double areacoarse[], double areafine[],
-                           const int& manifold,
-                           const int& a_corner, fclaw2d_transform_data_t** transform_cptr);
 
-void interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                               const int& meqn, const int& a_refratio, double this_q[],
-                               double neighbor_q[], const int& a_corner,
-                               fclaw2d_transform_data_t** transform_cptr);
-
-void mb_exchange_face_ghost_(const int& mx, const int& my, const int& mbc, const int& meqn,
-                             double qthis[], double qneighbor[], const int& iface,
-                             const int& iblock);
-
-void mb_exchange_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                               const int& meqn,
-                               double qthis[], double qneighbor[], const int& icorner,
-                               int bdry[], const int& iblock);
-
-void mb_exchange_block_corner_ghost_(const int& mx, const int& my,
-                                     const int& mbc, const int& meqn,
-                                     double qthis[], double qneighbor[], const int& icorner,
-                                     const int& iblock);
-
-void mb_interpolate_face_ghost_(const int& mx, const int& my, const int& mbc,
-                                const int& meqn,
-                                double qthis[],double qcoarse[], const int& idir,
-                                const int& iside,
-                                const int& num_neighbors,const int& refratio,
-                                const int& igrid);
-
-void mb_average_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                              const int& meqn,
-                              const int& refratio, double qcoarse[],  double qfine[],
-                              double areacoarse[], double areafine[],
-                              const int& icorner, int intersects_block[]);
 
 // Averaging at block boundaries between coarse and fine grids.
-void  mb_average_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                     const int& meqn,const int& refratio, double qcoarse[],
-                                     double qfine[],double areacoarse[], double areafine[],
-                                     const int& a_coarse_corner,
-                                     const int& blockno);
-
-
-void mb_interpolate_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                  const int& meqn, const int& refratio,
-                                  double qcoarse[],  double qfine[], const int& icorner,
-                                  int intersects_block[]);
+#define FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_mb_average_block_corner_ghost,\
+                                                                  FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST)
+void  FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                                 const int& meqn,const int& refratio, double qcoarse[],
+                                                 double qfine[],double areacoarse[], double areafine[],
+                                                 const int& a_coarse_corner,
+                                                 const int& blockno);
 
 // Averaging at block boundaries between coarse and fine grids.
-void  mb_interpolate_block_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                                         const int& meqn,const int& refratio,
-                                         double qcoarse[],
-                                         double qfine[],const int& a_coarse_corner,
-                                         const int& blockno);
+#define FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_mb_interpolate_block_corner_ghost, \
+                                                         FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST)
+void  FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                                     const int& meqn,const int& refratio,
+                                                     double qcoarse[],
+                                                     double qfine[],const int& a_coarse_corner,
+                                                     const int& blockno);
 
 
 /* ----------------------------------------------------------------------------------
    Physical boundary conditions
    ---------------------------------------------------------------------------------- */
-void set_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
-                            const int& meqn, double q[],const int& icorner,
-                            const double &t, const double& dt, const int mthbc[]);
+#define FCLAW2D_FORT_SET_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_set_phys_corner_ghost, \
+                                                          FCLAW2D_FORT_SET_PHYS_CORNER_GHOST)
+void FCLAW2D_FORT_SET_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
+                                        const int& meqn, double q[],const int& icorner,
+                                        const double &t, const double& dt, const int mthbc[]);
 
-void exchange_phys_corner_ghost_(const int& mx, const int& my, const int& mbc,
+#define FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_exchange_phys_corner_ghost, \
+                                                               FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST)
+void FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
                                  const int& meqn, double qthis[],double qneighbor[],
                                  const int& icorner, const int& iside);
 

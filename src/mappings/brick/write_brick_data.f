@@ -1,4 +1,4 @@
-c     # Write out brick verticies for Matlab
+c     # Write out brick vertices for Matlab
       subroutine write_brick_data(n,mi,mj,xv,yv)
       implicit none
       integer n,mi,mj
