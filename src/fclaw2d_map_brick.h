@@ -36,11 +36,12 @@ extern "C"
 
 
 /* This is used for communicating with Matlab about the mapping */
-void write_brick_data_(int* n,
-                       int* mi,
-                       int* mj,
-                       double xv[],
-                       double yv[]);
+#define WRITE_BRICK_DATA FCLAW_F77_FUNC (write_brick_data,WRITE_BRICK_DATA)
+void WRITE_BRICK_DATA(int* n,
+                      int* mi,
+                      int* mj,
+                      double xv[],
+                      double yv[]);
 
 typedef struct fclaw2d_block_ll
 {

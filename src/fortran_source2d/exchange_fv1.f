@@ -8,7 +8,7 @@ c     # ----------------------------------------------------------
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,
+      subroutine fclaw2d_fort_exchange_face_ghost(mx,my,mbc,meqn,qthis,
      &      qneighbor,iface,transform_ptr)
       implicit none
 
@@ -66,7 +66,7 @@ c                 # y-direction (idir == 1)
       end
 
 
-      subroutine exchange_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_exchange_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
@@ -107,7 +107,7 @@ c              # can now be dropped in.
       end
 
 
-      subroutine exchange_phys_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_exchange_phys_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, icorner, iface)
       implicit none
 

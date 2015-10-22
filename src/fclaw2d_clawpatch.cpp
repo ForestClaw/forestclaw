@@ -1037,8 +1037,8 @@ void ClawPatch::exchange_face_ghost(const int& a_iface,
 {
     double *qthis = q_time_sync(time_interp);
     double *qneighbor = neighbor_cp->q_time_sync(time_interp);
-    exchange_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
-                         &transform_data);
+    FCLAW2D_FORT_EXCHANGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,a_iface,
+                                     &transform_data);
 }
 
 
@@ -1049,7 +1049,7 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
     double *qthis = q_time_sync(time_interp);
     double *qcorner = cp_corner->q_time_sync(time_interp);
 
-    exchange_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
+    FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
                            &transform_data);
 
 }
@@ -1075,7 +1075,7 @@ void ClawPatch::average_face_ghost(const int& a_idir,
     double *areafine = neighbor_cp->m_area.dataPtr();
 
     int manifold = m_manifold ? 1 : 0;
-    average_face_ghost_(m_mx,m_my,m_mbc,m_meqn,
+    FCLAW2D_FORT_AVERAGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,
                         qcoarse,qfine,
                         areacoarse, areafine,
                         a_idir,a_iface_coarse,
@@ -1095,9 +1095,9 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
     double *qcoarse = q_time_sync(a_time_interp);
     double *qfine = neighbor_cp->m_griddata.dataPtr();
 
-    interpolate_face_ghost_(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                            a_p4est_refineFactor,a_refratio,igrid,
-                            &transform_data);
+    FCLAW2D_FORT_INTERPOLATE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                           a_p4est_refineFactor,a_refratio,igrid,
+                           &transform_data);
 }
 
 //
@@ -1114,7 +1114,7 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
     double *areafine = cp_corner->m_area.dataPtr();
 
     int manifold = m_manifold ? 1 : 0;
-    average_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, a_refratio,
+    FCLAW2D_FORT_AVERAGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, a_refratio,
                           qcoarse, qfine,
                           areacoarse, areafine,
                           manifold,
@@ -1135,9 +1135,9 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
     // qcorner is the finer level.
     double *qfine = cp_corner->m_griddata.dataPtr();
 
-    interpolate_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                              a_refratio, qcoarse, qfine,
-                              a_coarse_corner,&transform_data);
+    FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                             a_refratio, qcoarse, qfine,
+                             a_coarse_corner,&transform_data);
 }
 
 
@@ -1153,7 +1153,7 @@ void ClawPatch::mb_exchange_block_corner_ghost(const int& a_corner,
     double *qcorner = cp_corner->m_griddata.dataPtr();
 
 
-    mb_exchange_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
+    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
                                     a_corner, m_blockno);
 
 }
@@ -1172,10 +1172,10 @@ void ClawPatch::mb_average_block_corner_ghost(const int& a_coarse_corner,
     double *areafine = cp_corner->m_area.dataPtr();
     double *qfine = cp_corner->m_griddata.dataPtr();
 
-    mb_average_block_corner_ghost_(m_mx,m_my,m_mbc,m_meqn,
-                                   a_refratio,qcoarse,qfine,
-                                   areacoarse,areafine,
-                                   a_coarse_corner,m_blockno);
+    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(m_mx,m_my,m_mbc,m_meqn,
+                                  a_refratio,qcoarse,qfine,
+                                  areacoarse,areafine,
+                                  a_coarse_corner,m_blockno);
 }
 
 
@@ -1190,9 +1190,9 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
     /* qcorner is the finer level. */
     double *qfine = cp_corner->m_griddata.dataPtr();
 
-    mb_interpolate_block_corner_ghost_(m_mx, m_my, m_mbc, m_meqn,
-                                       a_refratio, qcoarse, qfine,
-                                       a_coarse_corner, m_blockno);
+    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                                      a_refratio, qcoarse, qfine,
+                                      a_coarse_corner, m_blockno);
 }
 
 

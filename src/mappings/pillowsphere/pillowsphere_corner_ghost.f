@@ -4,7 +4,8 @@ c     # corners for the pillow sphere.
 c     # ----------------------------------------------------------------------
 
 c     # Exchange ghost cells at block corner
-      subroutine mb_exchange_block_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_mb_exchange_block_corner_ghost
+     &      (mx,my,mbc,meqn,
      &      qthis, qneighbor, icorner, iblock)
       implicit none
 
@@ -50,7 +51,8 @@ c     # Exchange ghost cells at block corner
       end
 
 c     # Exchange ghost cells at block corner
-      subroutine mb_average_block_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_mb_average_block_corner_ghost
+     &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, areacoarse, areafine,
      &      icorner,iblock)
       implicit none
@@ -142,7 +144,8 @@ c     # Exchange ghost cells at block corner
 
 
 c     # Exchange ghost cells at block corner
-      subroutine mb_interpolate_block_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_mb_interpolate_block_corner_ghost
+     &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, icorner_coarse, iblock)
       implicit none
       integer mx, my, mbc, meqn, icorner_coarse, iblock, refratio
