@@ -125,13 +125,14 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                     stats, 1, 0);
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
-                          "regrid %d %g\n", domain->mpisize,
+                          "regrid %d %g grid count %d\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_EXCHANGE].average,
                           ddata->count_amr_regrid,
-                          stats[FCLAW2D_TIMER_REGRID].average);
+                          stats[FCLAW2D_TIMER_REGRID].average,
+                          ddata->count_single_step);
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
                           "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
@@ -140,4 +141,25 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                           stats[FCLAW2D_TIMER_EXCHANGE].max,
                           ddata->count_amr_regrid,
                           stats[FCLAW2D_TIMER_REGRID].max);
+
+#if 0
+    /* Find out process rank */
+    /* TODO : Fix this so that it doesn't interfere with output printed above. */
+    int my_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    /* Write out individual processor timers */
+    printf("%12s time on proc %d : %12.4f\n","ADVANCE",
+           domain->mpirank,ddata->timers[FCLAW2D_TIMER_ADVANCE].cumulative);
+    printf("%12s time on proc %d : %12.4f\n","GHOSTCOMM",
+           domain->mpirank,ddata->timers[FCLAW2D_TIMER_GHOSTCOMM].cumulative);
+    printf("%12s time on proc %d : %12.4f\n","EXCHANGE",
+           domain->mpirank,ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative);
+    printf("%12s time on proc %d : %12.4f\n","REGRID",
+           domain->mpirank,ddata->timers[FCLAW2D_TIMER_REGRID].cumulative);
+    printf("\n");
+#endif
+
+
 }

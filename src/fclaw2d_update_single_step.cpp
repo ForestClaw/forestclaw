@@ -37,6 +37,7 @@ static
                         int this_patch_idx,
                         void *user)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_vtable_t vt;
     double maxcfl;
 
@@ -51,6 +52,7 @@ static
                                          this_block_idx,
                                          this_patch_idx,t,dt);
 
+    ddata->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
 }
 
@@ -88,6 +90,7 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
 
     /* If there are not grids at this level, we return CFL = 0 */
     patch_iterator(domain, level, cb_single_step,(void *) &ss_data);
+
 
     return ss_data.maxcfl;
 }
