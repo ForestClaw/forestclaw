@@ -48,6 +48,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->count_amr_regrid = 0;
     ddata->count_multiproc_corner = 0;
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
+    ddata->count_single_step = 0;
 
     ddata->domain_exchange = NULL;
     ddata->domain_indirect = NULL;
@@ -86,7 +87,7 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
     ddata_new->count_ghost_exchange = ddata_old->count_ghost_exchange;
     ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
     ddata_new->count_multiproc_corner = ddata_old->count_multiproc_corner;
-
+    ddata_new->count_single_step = ddata_old->count_single_step;
 
     ddata_new->curr_time = ddata_old->curr_time;
 
