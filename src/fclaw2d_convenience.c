@@ -552,6 +552,10 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                             (p4est_locidx_t) nb,
                                             (p4est_locidx_t) np);
                 }
+
+                /* clean up the target markers in case we don't adapt */
+                /* if we adapt, we'll make all new target markers anyway */
+                patch->target_level = patch->level;
             }
         }
     }
