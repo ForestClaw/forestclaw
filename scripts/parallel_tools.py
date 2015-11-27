@@ -645,11 +645,13 @@ def plot_results_internal(val2plot,jobs,markers,colors):
             r'$\clubsuit$',
             r'$\checkmark$']
 
+        markers = [u'D', u's', u'^', u'h', u'v']
+
     if colors == None:
         colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
 
-
     ph = []
+    k = 0  # plot counter to use for colors and symbols
     for j,job in enumerate(jobs):
 
         procs = job["procs"]
@@ -666,7 +668,6 @@ def plot_results_internal(val2plot,jobs,markers,colors):
 
         pmax = np.max(procs_unique)
         for i,v in enumerate(val2plot):
-            R = np.arange(0,len(procs))
             if scaling == 'weak':
                 y_all = job[v]/grids_advanced
             elif scaling == 'strong':
@@ -675,14 +676,14 @@ def plot_results_internal(val2plot,jobs,markers,colors):
                 else:
                     y_all = job[v]
 
-            y_avg = []
-            y_err = []
+            y_avg = np.empty(procs_unique.shape)
+            y_err = np.empty(procs_unique.shape)
             print "%s (%s)" % (v,mode)
-            for p in procs_unique:
+            for i,p in enumerate(procs_unique):
                 y_unique = y_all[np.where(procs == p)]
-                y_avg.append(np.average(y_unique))
-                y_err.append(np.std(y_unique))
-                print "    %12.4e %12.4e" % (y_avg[-1], y_err[-1])
+                y_avg[i] = np.average(y_unique)
+                y_err[i] = np.std(y_unique)
+                print "    %12.4e %12.4e" % (y_avg[i], y_err[i])
             print ""
 
             # Get ideal scaling for this case
@@ -693,23 +694,24 @@ def plot_results_internal(val2plot,jobs,markers,colors):
                 ideal.fill(y_avg[0])
 
             elif scaling == 'strong':
-                if v == 'ghostcomm':
-                    idx = np.where(procs_unique > 1)[0]
+                if True:
+                    idx = np.where(procs_unique > 4)[0]
                     ideal = y_avg[idx[0]]/(procs_unique/procs_unique[idx[0]])
                 else:
                     ideal = y_avg[0]/(procs_unique/procs_unique[0])
 
-            plt.errorbar(procs_unique,y_avg,yerr = y_err,fmt='o',hold=True)
+            plt.errorbar(procs_unique,y_avg,yerr = y_err,hold=True)
             ax = plt.gca();
             ax.set_yscale('log')
-            phandle = plt.loglog(procs_unique,y_avg,marker=markers[j],
-                                 color=colors[j],markersize=10,hold=True,label=v)
+            phandle = plt.loglog(procs_unique,y_avg,marker=markers[k],
+                                 color=colors[k],markersize=10,hold=True,label=v)
             ph.append(phandle[0])
 
-            mb = np.polyfit(np.log(procs_unique),np.log(y_avg),1)
-            ph[j].set_label((v + " (%s, slope = %4.2f)") % (mode,mb[0]))
+            mb = np.polyfit(np.log(procs_unique[idx]),np.log(y_avg[idx]),1)
+            ph[k].set_label((v + " (%s, slope = %4.2f)") % (mode,mb[0]))
 
             plt.loglog(procs_unique,ideal,'k.--',markersize=15)
+            k += 1
 
 
     ax = plt.gca()
