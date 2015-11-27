@@ -239,8 +239,6 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
     if (have_new_refinement)
     {
-        fclaw_global_essentialf("-----> We should not be here\n");
-        exit(0);
         fclaw_global_infof(" -- Have new refinement\n");
 
         /* allocate memory for user patch data and user domain data in the new
@@ -297,7 +295,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 #endif
     }
 
-    /* Stop timer */
+    /* Stop timer.  Be sure to use timers from new grid, if one was
+       created */
     ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
 
