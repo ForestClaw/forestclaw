@@ -437,131 +437,139 @@ def launch_jobs(N=1):
     for i in range(0,N):
         po = subprocess.call(['bash','jobs.sh'])
 
-def compile_results(config_file='create_run.ini'):
-    config = ConfigParser.SafeConfigParser(allow_no_value=True)
-    config.read(config_file)
+def compile_results(results_dir=None,results_file='results.out',
+                    execname=None):
 
-    execname  = config.get('Problem','execname').partition('#')[0].strip()
-    njobs     = int(config.get('Run','njobs').partition('#')[0].strip())
-    proc0     = int(config.get('Run','proc').partition('#')[0].strip())
-    mode      = config.get('Run','mode').partition('#')[0].strip()
-    sc        = config.get('Run','subcycle').partition('#')[0].strip()
-    subcycle  = sc in ['True','T','1']
+    if results_dir == None:
+        results_dir = os.getcwd()
 
-    R = np.array(range(0,njobs))
-    procs = proc0*4**R
+    # Stuff to grep for
+    stats_list = [ 'WALLTIME',
+                   'ADVANCE',
+                   'Statistics for EXCHANGE',
+                   'Statistics for REGRID$',
+                   'GHOSTCOMM$',
+                   'Statistics for CFL',
+                   'Statistics for EXTRA4$',
+                   'TIME_PER_GRID']
 
-    # ----------------------------------------------------------------------------------------
-    stats_list = [ 'WALLTIME', 'ADVANCE', 'Statistics for EXCHANGE','Statistics for REGRID$',
-                   'GHOSTCOMM$','Statistics for CFL','Statistics for EXTRA4$','TIME_PER_GRID']
-    # ----------------------------------------------------------------------------------------
-
-    output_files = os.listdir(os.getcwd())
-
-    resultsfile = open('results.out','w')
-    resultsfile.write("# " + "-"*138)
+    # Compile data to this file
+    resultsfile = open(results_file,'w')
+    resultsfile.write("# " + "-"*158)
     resultsfile.write("\n")
     fstr = "# %8s%8s%6s%8s%8s%8s%16s" + "%12s"*8 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','minlev','maxlev','nout','ratio (%)',
                               'Wall','Advance','Exchange','Regrid','Comm','cfl',
                               'extra','time/grid'))
 
-    resultsfile.write("# " + "-"*138)
+    resultsfile.write("# " + "-"*158)
     resultsfile.write("\n")
-    for j,p in enumerate(procs):
-        fname = '%s_%05d' % (execname,p)
-        pcount = procs[j]
 
-        for f in output_files:
-            if (f.startswith(fname)):
+    # Look for files that look like "torus_00004.o4567".  But if execname is
+    # not supplied, be happy with "*_00004.o4567"
+    if not execname == None:
+        pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
+    else:
+        pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
 
-                # Extract proc count and jobid from output file name
-                # E.g. torus_01.o4578
-                s = f.split('_')[1].split('.o')
-                jobid = int(s[1])
+    output_files = os.listdir(results_dir)
+    for f in output_files:
+        if re.match(pattern,f):
+            # Extract proc count and jobid from file name, e.g. torus_00016.o45678
+            s = f.partition('_')[2].partition('.o')
+            pcount = int(s[0])
+            jobid = int(s[2])
 
-                run_file = open(f,'r')
-                lines = run_file.readlines()
+            run_file = open(f,'r')
+            lines = run_file.readlines()
 
-                # jobid
-                resultsfile.write("  ")   # Make up for "# " added as comments above
-                resultsfile.write("%8d" % jobid)
+            found_bad_file = False
+            for i,l in enumerate(lines):
+                if re.search("exceeded",l):
+                    found_bad_file = True
+                    break
 
-                # proc count
-                resultsfile.write("%8d" % pcount)
+            if found_bad_file:
+                print "Skipping file %s (time exceeded)" % f
+                continue
 
-                # mx
+            # jobid
+            resultsfile.write("  ")   # Make up for "# " added as comments above
+            resultsfile.write("%8d" % jobid)
+
+            # proc count
+            resultsfile.write("%8d" % pcount)
+
+            # mx
+            for i,l in enumerate(lines):
+                if re.search("mx",l):
+                    l1 = lines[i].split()
+                    mx = int(l1[2])
+                    resultsfile.write("%6s" % l1[2])
+                    break
+
+            # minlevel
+            for i,l in enumerate(lines):
+                if re.search("minlevel",l):
+                    l1 = lines[i].split()
+                    minlevel = int(l1[2])
+                    resultsfile.write("%8s" % l1[2])
+                    break
+
+            # maxlevel
+            for i,l in enumerate(lines):
+                if re.search("maxlevel",l):
+                    l1 = lines[i].split()
+                    maxlevel = int(l1[2])
+                    resultsfile.write("%8s" % l1[2])
+                    break
+
+            # nout
+            for i,l in enumerate(lines):
+                if re.search("nout",l):
+                    l1 = lines[i].split()
+                    nout = int(l1[2])
+                    resultsfile.write("%8s" % l1[2])
+                    break
+
+
+            # ratio of adaptive grids advanced to uniform grids advanced
+            # Account for the fact that nout in this case means something
+            # different than in the uniform case.
+            nout_uniform = nout*2**(maxlevel-minlevel)
+            grids_advanced_uniform = nout_uniform*(2**maxlevel)**2/pcount
+            for i,l in enumerate(lines):
+                if re.search('TIME_PER_GRID',l):
+                    a = i
+                    break
+
+            l2 = lines[a+2].split()
+            tpg = float(l2[5]);
+
+            for i,l in enumerate(lines):
+                if re.search('WALLTIME',l):
+                    a = i
+                    break
+            l2 = lines[a+2].split()
+            wt = float(l2[5])
+
+            grids_advanced_per_proc = wt/tpg
+            adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
+            resultsfile.write("%16d" % np.round(grids_advanced_per_proc))
+
+            # Get everything else in list
+            for k,w in enumerate(stats_list):
                 for i,l in enumerate(lines):
-                    if re.search("mx",l):
-                        l1 = lines[i].split()
-                        mx = int(l1[2])
-                        resultsfile.write("%6s" % l1[2])
-                        break
-
-                # minlevel
-                for i,l in enumerate(lines):
-                    if re.search("minlevel",l):
-                        l1 = lines[i].split()
-                        minlevel = int(l1[2])
-                        resultsfile.write("%8s" % l1[2])
-                        break
-
-                # maxlevel
-                for i,l in enumerate(lines):
-                    if re.search("maxlevel",l):
-                        l1 = lines[i].split()
-                        maxlevel = int(l1[2])
-                        resultsfile.write("%8s" % l1[2])
-                        break
-
-                # nout
-                for i,l in enumerate(lines):
-                    if re.search("nout",l):
-                        l1 = lines[i].split()
-                        nout = int(l1[2])
-                        resultsfile.write("%8s" % l1[2])
-                        break
-
-
-                # ratio of adaptive grids advanced to uniform grids advanced
-                # Account for the fact that nout in this case means something
-                # different than in the uniform case.
-                nout_uniform = nout*2**(maxlevel-minlevel)
-                grids_advanced_uniform = nout_uniform*(2**maxlevel)**2/pcount
-                for i,l in enumerate(lines):
-                    if re.search('TIME_PER_GRID',l):
+                    if re.search(w,l):
                         a = i
                         break
 
                 l2 = lines[a+2].split()
-                tpg = float(l2[5]);
+                resultsfile.write("%12.4e" % float(l2[5]))
 
-                for i,l in enumerate(lines):
-                    if re.search('WALLTIME',l):
-                        a = i
-                        break
-                l2 = lines[a+2].split()
-                wt = float(l2[5])
+            resultsfile.write('\n')
 
-                grids_advanced_per_proc = wt/tpg
-                adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
-                resultsfile.write("%16d" % np.round(grids_advanced_per_proc))
-
-
-                # Get everything else in list
-                for k,w in enumerate(stats_list):
-                    for i,l in enumerate(lines):
-                        if re.search(w,l):
-                            a = i
-                            break
-
-                    l2 = lines[a+2].split()
-                    resultsfile.write("%12.4e" % float(l2[5]))
-
-                resultsfile.write('\n')
-
-
-                run_file.close()
+            run_file.close()
 
     resultsfile.close()
 
@@ -601,13 +609,14 @@ def read_results_files():
     for m in mx:
         for p in procs:
             for l in levels:
-                fname = os.path.join("%03d_%02d_%05d" % (m,l,p),'results.out')
+                results_dir = "%03d_%02d_%05d" % (m,l,p)
+                results_file = os.path.join(results_dir,'results.out')
 
-                if not os.path.exists(fname):
-                    print "%s does not exist" % fname
+                if not os.path.exists(results_file):
+                    print "File %s not found\n" % results_file
                     continue
 
-                data = np.loadtxt(fname)
+                data = np.loadtxt(results_file)
 
                 try:
                     # Filter to get data only for this (p,l) combination
