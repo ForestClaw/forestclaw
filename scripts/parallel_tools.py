@@ -567,16 +567,39 @@ def compile_results(config_file='create_run.ini'):
 
 # Read in an array of results that can be used for both weak
 # and strong scaling.
-def read_results_files(mx,pcount,levels):
+def read_results_files():
+
+    import re
+
+    # Get data from directory names
+    dirs = os.listdir(os.getcwd())
+
+    mx1 = []
+    procs1 = []
+    levels1 = []
+    for f in dirs:
+        # Match file names like "008_04_00001"
+        if re.match("[0-9]{3}_[0-9]{2}_[0-9]{5}",f):
+            s = f.partition('_')
+            mx1.append(int(s[0]))
+
+            s = s[2].partition('_')
+            levels1.append(int(s[0]))
+
+            procs1.append(int(s[2]))
+
+    mx = list(set(mx1))
+    procs = list(set(procs1))
+    levels = list(set(levels1))
 
     jobs = dict.fromkeys(mx)
     for m in mx:
-        jobs[m] = dict.fromkeys(pcount)
-        for p in pcount:
+        jobs[m] = dict.fromkeys(procs)
+        for p in procs:
             jobs[m][p] = dict.fromkeys(levels)
 
     for m in mx:
-        for p in pcount:
+        for p in procs:
             for l in levels:
                 fname = os.path.join("%03d_%02d_%05d" % (m,l,p),'results.out')
 
