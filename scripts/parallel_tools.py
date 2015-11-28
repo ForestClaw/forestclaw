@@ -461,9 +461,10 @@ def compile_results(config_file='create_run.ini'):
     resultsfile = open('results.out','w')
     resultsfile.write("# " + "-"*138)
     resultsfile.write("\n")
-    fstr = "# %8s%8s%6s%8s%16s" + "%12s"*8 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','nout','ratio (%)','Wall','Advance',
-                              'Exchange','Regrid','Comm','cfl','extra','time/grid'))
+    fstr = "# %8s%8s%6s%8s%8s%8s%16s" + "%12s"*8 + "\n"
+    resultsfile.write(fstr % ('jobid','p','mx','minlev','maxlev','nout','ratio (%)',
+                              'Wall','Advance','Exchange','Regrid','Comm','cfl',
+                              'extra','time/grid'))
 
     resultsfile.write("# " + "-"*138)
     resultsfile.write("\n")
@@ -497,6 +498,22 @@ def compile_results(config_file='create_run.ini'):
                         resultsfile.write("%6s" % l1[2])
                         break
 
+                # minlevel
+                for i,l in enumerate(lines):
+                    if re.search("minlevel",l):
+                        l1 = lines[i].split()
+                        minlevel = int(l1[2])
+                        resultsfile.write("%8s" % l1[2])
+                        break
+
+                # maxlevel
+                for i,l in enumerate(lines):
+                    if re.search("maxlevel",l):
+                        l1 = lines[i].split()
+                        maxlevel = int(l1[2])
+                        resultsfile.write("%8s" % l1[2])
+                        break
+
                 # nout
                 for i,l in enumerate(lines):
                     if re.search("nout",l):
@@ -505,19 +522,6 @@ def compile_results(config_file='create_run.ini'):
                         resultsfile.write("%8s" % l1[2])
                         break
 
-                # minlevel
-                for i,l in enumerate(lines):
-                    if re.search("minlevel",l):
-                        l1 = lines[i].split()
-                        minlevel = int(l1[2])
-                        break
-
-                # maxlevel
-                for i,l in enumerate(lines):
-                    if re.search("maxlevel",l):
-                        l1 = lines[i].split()
-                        maxlevel = int(l1[2])
-                        break
 
                 # ratio of adaptive grids advanced to uniform grids advanced
                 # Account for the fact that nout in this case means something
@@ -541,7 +545,7 @@ def compile_results(config_file='create_run.ini'):
 
                 grids_advanced_per_proc = wt/tpg
                 adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
-                resultsfile.write("%16d" % int(grids_advanced_per_proc))
+                resultsfile.write("%16d" % np.round(grids_advanced_per_proc))
 
 
                 # Get everything else in list
@@ -561,187 +565,256 @@ def compile_results(config_file='create_run.ini'):
 
     resultsfile.close()
 
-def plot_results(val2plot = 'walltime',config_files='create_run.ini',
-                 figname='scaling.png',results_files='results.out',
-                 markers=None,colors=None):
+# Read in an array of results that can be used for both weak
+# and strong scaling.
+def read_results_files(mx,pcount,levels):
 
-    import matplotlib.pyplot as plt
+    jobs = dict.fromkeys(mx)
+    for m in mx:
+        jobs[m] = dict.fromkeys(pcount)
+        for p in pcount:
+            jobs[m][p] = dict.fromkeys(levels)
 
-    if not isinstance(results_files,list):
-        results_files = [results_files]
+    for m in mx:
+        for p in pcount:
+            for l in levels:
+                fname = os.path.join("%03d_%02d_%05d" % (m,l,p),'results.out')
 
-    if not isinstance(config_files,list):
-        config_files = [config_files]
+                if not os.path.exists(fname):
+                    print "%s does not exist" % fname
+                    continue
 
-    jobs = []
-    for i,r in enumerate(results_files):
+                data = np.loadtxt(fname)
 
-        config = ConfigParser.SafeConfigParser(allow_no_value=True)
-        config.read(config_files[i])
+                try:
+                    # Filter to get data only for this (p,l) combination
+                    msk = (data[:,1] == p) & (data[:,4] == l)
+                except:
+                    print "Something went wrong in reading file %s" % fname
+                    continue
 
-        execname  = config.get('Problem','execname').partition('#')[0].strip()
-        mode      = config.get('Run','mode').partition('#')[0].strip()
-        scaling   = config.get('Run','scaling').partition('#')[0].strip()
-        mx = int(config.get('Run','mx').partition('#')[0].strip())
-        maxlevel = int(config.get('Run','maxlevel').partition('#')[0].strip())
+                job = {}
+                job["jobid"]         = np.array(data[msk,0])
+                job["procs"]         = np.array(data[msk,1])
+                job["mx"]            = np.array(data[msk,2])
+                job["minlevel"]      = np.array(data[msk,3])
+                job["maxlevel"]      = np.array(data[msk,4])
+                job["nout"]          = np.array(data[msk,5])
+                job["grids_per_proc"]= np.array(data[msk,6])
+                job["walltime"]      = np.array(data[msk,7])
+                job["advance"]       = np.array(data[msk,8])
+                job["exchange"]      = np.array(data[msk,9])
+                job["regrid"]        = np.array(data[msk,10])
+                job["ghostcomm"]     = np.array(data[msk,11])
+                job["cfl"]           = np.array(data[msk,12])
+                job["extra"]         = np.array(data[msk,13])
+                job["time_per_grid"] = np.array(data[msk,14])
 
-        try:
-            sw = config.get('Run','scale-uniform').partition('#')[0].strip()
-            scale_uniform = sw in ['T','True','1']
-        except:
-            scale_uniform = False
+                jobs[m][p][l] = job
 
-        data = np.loadtxt(r)
+    return jobs
 
-        job = {}
-        job["jobid"]         = np.array(data[:,0])
-        job["procs"]         = np.array(data[:,1])
-        job["mx"]            = np.array(data[:,2])
-        job["nout"]          = np.array(data[:,3])
-        job["grids"]         = np.array(data[:,4])
-        job["walltime"]      = np.array(data[:,5])
-        job["advance"]       = np.array(data[:,6])
-        job["exchange"]      = np.array(data[:,7])
-        job["regrid"]        = np.array(data[:,8])
-        job["ghostcomm"]     = np.array(data[:,9])
-        job["cfl"]           = np.array(data[:,10])
-        job["extra"]         = np.array(data[:,11])
-        job["time_per_grid"] = np.array(data[:,12])
+def print_jobs(jobs,val2plot='walltime'):
 
-        job["execname"] = execname
-        job["maxlevel"] = maxlevel
-        job["mode"] = mode
-        job["scaling"] = scaling
-        job["mx"] = mx
-        job["scale-uniform"] = scale_uniform
+    mx = sorted(jobs.keys())
 
-        jobs.append(job)
-
-    plot_results_internal(val2plot,jobs,markers,colors)
-
-
+    for m in mx:
+        pcount = sorted(jobs[m].keys())
+        levels = sorted(jobs[m][pcount[0]].keys())
+        data = np.empty((len(pcount),len(levels)))
+        for i,p in enumerate(pcount):
+            for j,l in enumerate(levels):
+                job = jobs[m][p][l]
+                if not job == None:
+                    data[i,j] = np.average(job[val2plot])
+                else:
+                    data[i,j] = None
 
 
-def plot_results_internal(val2plot,jobs,markers,colors):
+        # Header
+        print ""
+        print val2plot
+        linelen = 8 + 5 + 12*len(levels)
+        print_line = "-"*linelen
+        print print_line
+        mxstr = "mx = %d" % m
+        header_format = "{mxstr:>8}" + "{sep:^5}" + "{:>12}" * len(levels)
+        print header_format.format(mxstr = mxstr, sep="|",*levels)
+        print print_line
+        row_format = "{:>8d}" + "{sep:^5}" + "{:>12.2e}"*len(levels)
+        for p, d in zip(pcount, data):
+            print row_format.format(p, sep="|", *d)
+
+        print print_line
+
+
+
+
+
+
+def plot_results(jobs,start_point,val2plot='walltime',
+                 scaling='strong',mode='uniform',
+                 scale_uniform=False):
 
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
-    if not isinstance(val2plot,list):
-        val2plot = [val2plot]
 
-    if markers == None:
-        markers = []
-        for m in Line2D.markers:
-            try:
-                if len(m) == 1 and m != ' ':
-                    markers.append(m)
-            except TypeError:
-                pass
+#     markers = []
+#     for m in Line2D.markers:
+#         try:
+#             if len(m) == 1 and m != ' ':
+#                 markers.append(m)
+#         except TypeError:
+#             pass
+#
+#     styles = markers + [
+#         r'$\lambda$',
+#         r'$\bowtie$',
+#         r'$\circlearrowleft$',
+#         r'$\clubsuit$',
+#         r'$\checkmark$']
 
-        styles = markers + [
-            r'$\lambda$',
-            r'$\bowtie$',
-            r'$\circlearrowleft$',
-            r'$\clubsuit$',
-            r'$\checkmark$']
+    markers = {}
+    markers["walltime"] = r'$\clubsuit$'
+    markers["advance"] = u's'
+    markers["exchange"] = u'h'
+    markers["regrid"] = u'v'
+    markers["ghostcomm"] = u'^'
 
-        markers = [u'D', u's', u'^', u'h', u'v']
+    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
 
-    if colors == None:
-        colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
+    mx = sorted(jobs.keys())
+    pcount = sorted(jobs[mx[0]].keys())
+    levels = sorted(jobs[mx[0]][pcount[0]].keys())
 
+    njobs = len(pcount)
     ph = []
-    k = 0  # plot counter to use for colors and symbols
-    for j,job in enumerate(jobs):
+    t = []
+    mb_data = []
+    for i,sp in enumerate(start_point):
+        if scaling in ['weak','strong']:
+            mx = np.empty(len(pcount),)
+            mx.fill(sp[0])
+            if scaling == 'strong':
+                levels = np.empty(len(pcount),)
+                levels.fill(sp[2])
+            else:
+                levels = range(sp[2],sp[2]+njobs)
+        elif scaling == 'block':
+            mx.reverse()
+            levels = range(sp[2],sp[2]+njobs)
+            pcount = np.empty(len(pcount),)
+            pcount.fill(sp[1])
 
-        procs = job["procs"]
-        procs_unique = np.unique(job["procs"])
+        t = zip(mx,pcount,levels)
 
-        njobs = job["procs"].shape[0]
-        mode = job["mode"]
-        scaling = job["scaling"]
-        mx = job["mx"]
-        maxlevel = job["maxlevel"]
-        scale_uniform = job["scale-uniform"]
+        # Internal plotting routine
+        phandle,mb = plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
+                                           scale_uniform)
 
-        grids_advanced = np.round(job["walltime"]/job["time_per_grid"])
+        phandle.set_color(colors[i])
+        plt.draw()
+        ph.append(phandle)
+        mb_data.append(mb)
 
-        pmax = np.max(procs_unique)
-        for i,v in enumerate(val2plot):
-            if scaling == 'weak':
-                y_all = job[v]/grids_advanced
-            elif scaling == 'strong':
-                if mode == 'uniform' and scale_uniform:
-                    y_all = job[v]*pmax/procs
-                else:
-                    y_all = job[v]
-
-            y_avg = np.empty(procs_unique.shape)
-            y_err = np.empty(procs_unique.shape)
-            print "%s (%s)" % (v,mode)
-            for i,p in enumerate(procs_unique):
-                y_unique = y_all[np.where(procs == p)]
-                y_avg[i] = np.average(y_unique)
-                y_err[i] = np.std(y_unique)
-                print "    %12.4e %12.4e" % (y_avg[i], y_err[i])
-            print ""
-
-            # Get ideal scaling for this case
-            p1 = int(np.log(procs_unique[0])/np.log(4.0))
-            R = np.arange(p1,len(procs_unique)+p1)
-            if scaling == 'weak':
-                ideal = np.empty(len(y_avg),)
-                ideal.fill(y_avg[0])
-
-            elif scaling == 'strong':
-                if True:
-                    idx = np.where(procs_unique > 4)[0]
-                    ideal = y_avg[idx[0]]/(procs_unique/procs_unique[idx[0]])
-                else:
-                    ideal = y_avg[0]/(procs_unique/procs_unique[0])
-
-            plt.errorbar(procs_unique,y_avg,yerr = y_err,hold=True)
-            ax = plt.gca();
-            ax.set_yscale('log')
-            phandle = plt.loglog(procs_unique,y_avg,marker=markers[k],
-                                 color=colors[k],markersize=10,hold=True,label=v)
-            ph.append(phandle[0])
-
-            mb = np.polyfit(np.log(procs_unique[idx]),np.log(y_avg[idx]),1)
-            ph[k].set_label((v + " (%s, slope = %4.2f)") % (mode,mb[0]))
-
-            plt.loglog(procs_unique,ideal,'k.--',markersize=15)
-            k += 1
-
-
+    # Set up axis
     ax = plt.gca()
     ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%d'))
-    ax.xaxis.set_major_locator(plt.FixedLocator(procs_unique))
+
+    if scaling == 'block':
+        ax.xaxis.set_major_locator(plt.FixedLocator(mx))
+        ax.set_xlabel("Block size",fontsize=16)
+    else:
+        ax.xaxis.set_major_locator(plt.FixedLocator(pcount))
+        ax.set_xlabel("Processor count",fontsize=16)
+
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
-    ax.set_xlabel("Processor count",fontsize=16)
-    if scaling == 'weak':
-        plt.legend(handles=ph,labels=val2plot,loc=2)
-    else:
-        plt.legend(handles=ph,labels=val2plot,loc=3)
+
     if mode == 'weak':
         ax.set_ylabel("%s" % ("time/grids advanced"),fontsize=16)
-    if mode == 'strong':
+    else:
         ax.set_ylabel("%s" % ("time"),fontsize=16)
-
     plt.xlim([4**(-0.5), 4**(3.4)])
 
-    # add a title
-    eff_res = mx*(2**maxlevel)
-    if (len(val2plot) == 1):
-        plt.title("%s : %d x %d (%d x %d, %s)" % \
-                  (val2plot[0].capitalize(),eff_res,eff_res,mx,mx,mode))
-    else:
-        plt.title("%s scaling results : %d x %d (%d x %d,%s)" % \
-                  (scaling.capitalize(),eff_res,eff_res,mx,mx,mode))
+    plt.draw()
 
-    plt.savefig("scaling.png")
-    plt.show()
+    return ph,mb_data
+
+
+def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
+                          scale_uniform=False):
+
+    import matplotlib.pyplot as plt
+
+    if isinstance(val2plot,list):
+        print "Only one val2plot allowed per plot"
+        sys.exit()
+
+    v = val2plot
+
+    mode = 'uniform'
+
+    ph = []
+    mx = sorted(jobs.keys())
+    procs = sorted(jobs[mx[0]].keys())
+    levels = sorted(jobs[mx[0]][procs[0]].keys())
+    pmax = np.max(procs)
+    njobs = len(procs)
+    gpp_avg = np.empty(len(procs),)
+    y_avg = np.empty(len(procs),)
+    grids_advanced = np.empty(len(procs),)
+    for j,idx_tuple in enumerate(t):
+
+        m = idx_tuple[0]
+        p = int(idx_tuple[1])
+        l = idx_tuple[2]
+        job = jobs[m][p][l]
+
+        # Each job might include several runs, which must be averaged
+        gpp_avg[j] = np.round(np.average(job["grids_per_proc"]/job["nout"]))
+        grids_advanced[j] = np.round(np.average((job["walltime"]/job["time_per_grid"])))
+
+        if scaling == 'weak':
+            y_avg[j] = np.average(job[v])/grids_advanced[j]
+        elif scaling == 'strong':
+            if mode == 'uniform' and scale_uniform:
+                y_avg[j] = np.average(job[v])*pmax/procs[j]
+            else:
+                y_avg[j] = np.average(job[v])
+        else:
+            y_avg[j] = np.average(job[v])
+
+    if not scaling == 'block':
+        # Get ideal scaling for this case
+        p1 = int(np.log(procs[0])/np.log(4.0))
+        R = np.arange(p1,len(procs)+p1)
+        if scaling == 'weak':
+            idx_llsq = np.arange(0,len(procs))
+            ideal = np.empty(len(y_avg),)
+            ideal.fill(y_avg[0])
+
+        elif scaling == 'strong':
+            idx_llsq = np.extract(np.array(procs) > 4,range(0,len(procs)))
+            pmin = float(np.array(procs[idx_llsq[0]]))
+            ideal = y_avg[idx_llsq[0]]/(np.array(procs)/pmin)
+
+
+        # Add plots
+        # plt.errorbar(procs,y_avg,yerr = y_err,hold=True)
+
+        plt.loglog(procs,ideal,'k.--',markersize=15)
+
+
+        # get best-fit slope
+        mb = np.polyfit(np.log(np.array(procs)[idx_llsq]),np.log(np.array(y_avg)[idx_llsq]),1)
+
+    else:
+        mb = None
+
+    ph = plt.loglog(procs,y_avg,marker=markers[v],markersize=10)
+
+    return ph[0],mb
 
 
 if __name__ == "__main__":
