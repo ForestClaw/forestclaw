@@ -5,47 +5,6 @@ from string import Template
 import re
 import ConfigParser
 
-#  --------------------------
-#  Four scaling categories :
-#  --------------------------
-#
-#  Uniform (weak) (minlevel = maxlevel)
-#  levels/procs  |  5    6    7    8
-#  --------------|-------------------
-#    1  proc     |  W
-#    4  procs    |       W
-#    16 procs    |            W
-#    64 procs    |                W    (possibly scale to save time?)
-#
-#
-#  Uniform (strong) (minlevel = maxlevel)
-#  levels/procs  |  5    6    7    8
-#  --------------|-------------------
-#    1  proc     |                 S   (possibly scale to save time?)
-#    4  procs    |                 S
-#    16 procs    |                 S
-#    64 procs    |                 S
-#
-#
-#  (adaptive, weak)  (minlevel <= maxlevel)
-#  levels/procs  |  5    6    7    8
-#  --------------|-------------------
-#    1  proc     |  W
-#    4  procs    |  W    W
-#    16 procs    |  W    W    W
-#    64 procs    |  W    W    W    W
-#
-#
-#  (adaptive, strong)  (midlevel < maxlevel)
-#  levels/procs  |  5    6    7    8
-#  --------------|-------------------
-#    1  proc     |  S    S    S    S
-#    4  procs    |  S    S    S    S
-#    16 procs    |  S    S    S    S
-#    64 procs    |  S    S    S    S
-
-
-
 
 def write_ini_files(input_file='create_run.ini'):
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
@@ -325,7 +284,7 @@ def write_ini_files(input_file='create_run.ini'):
             procfile = "p_%05d.pbs" % p
             proc_file = open(procfile,'w')
             proc_file.write("#!/bin/bash\n")
-            trun = 2*t[i]
+            trun = np.min([24.0*60**2,2*t[i]])  # Keep jobs under 24 hours
             if trun < 60*30:
                 proc_file.write("#PBS -l walltime=00:30:00\n")
             else:
@@ -455,14 +414,14 @@ def compile_results(results_dir=None,results_file='results.out',
 
     # Compile data to this file
     resultsfile = open(results_file,'w')
-    resultsfile.write("# " + "-"*158)
+    resultsfile.write("# " + "-"*152)
     resultsfile.write("\n")
-    fstr = "# %8s%8s%6s%8s%8s%8s%16s" + "%12s"*8 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','minlev','maxlev','nout','ratio (%)',
+    fstr = "# %6s%8s%6s%6s%6s%8s%12s%12s" + "%12s"*8 + "\n"
+    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','grid/proc',
                               'Wall','Advance','Exchange','Regrid','Comm','cfl',
                               'extra','time/grid'))
 
-    resultsfile.write("# " + "-"*158)
+    resultsfile.write("# " + "-"*152)
     resultsfile.write("\n")
 
     # Look for files that look like "torus_00004.o4567".  But if execname is
@@ -495,7 +454,7 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # jobid
             resultsfile.write("  ")   # Make up for "# " added as comments above
-            resultsfile.write("%8d" % jobid)
+            resultsfile.write("%6d" % jobid)
 
             # proc count
             resultsfile.write("%8d" % pcount)
@@ -513,7 +472,7 @@ def compile_results(results_dir=None,results_file='results.out',
                 if re.search("minlevel",l):
                     l1 = lines[i].split()
                     minlevel = int(l1[2])
-                    resultsfile.write("%8s" % l1[2])
+                    resultsfile.write("%6s" % l1[2])
                     break
 
             # maxlevel
@@ -521,7 +480,7 @@ def compile_results(results_dir=None,results_file='results.out',
                 if re.search("maxlevel",l):
                     l1 = lines[i].split()
                     maxlevel = int(l1[2])
-                    resultsfile.write("%8s" % l1[2])
+                    resultsfile.write("%6s" % l1[2])
                     break
 
             # nout
@@ -532,6 +491,12 @@ def compile_results(results_dir=None,results_file='results.out',
                     resultsfile.write("%8s" % l1[2])
                     break
 
+            # tfinal
+            for i,l in enumerate(lines):
+                if re.search("tfinal",l):
+                    l1 = lines[i].split()
+                    resultsfile.write("%12.2e" % float(l1[2]))
+                    break
 
             # ratio of adaptive grids advanced to uniform grids advanced
             # Account for the fact that nout in this case means something
@@ -543,7 +508,7 @@ def compile_results(results_dir=None,results_file='results.out',
                     a = i
                     break
 
-            l2 = lines[a+2].split()
+            l2 = lines[a+2].split()  # Data if two lines below "TIME_PER_GRID"
             tpg = float(l2[5]);
 
             for i,l in enumerate(lines):
@@ -555,7 +520,7 @@ def compile_results(results_dir=None,results_file='results.out',
 
             grids_advanced_per_proc = wt/tpg
             adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
-            resultsfile.write("%16d" % np.round(grids_advanced_per_proc))
+            resultsfile.write("%12d" % np.round(grids_advanced_per_proc))
 
             # Get everything else in list
             for k,w in enumerate(stats_list):
@@ -565,7 +530,7 @@ def compile_results(results_dir=None,results_file='results.out',
                         break
 
                 l2 = lines[a+2].split()
-                resultsfile.write("%12.4e" % float(l2[5]))
+                resultsfile.write("%12.3e" % float(l2[5]))
 
             resultsfile.write('\n')
 
@@ -575,7 +540,7 @@ def compile_results(results_dir=None,results_file='results.out',
 
 # Read in an array of results that can be used for both weak
 # and strong scaling.
-def read_results_files():
+def read_results_files(results_file='results.out'):
 
     import re
 
@@ -585,38 +550,48 @@ def read_results_files():
     mx1 = []
     procs1 = []
     levels1 = []
+    t = []
     for f in dirs:
         # Match file names like "008_04_00001"
         if re.match("[0-9]{3}_[0-9]{2}_[0-9]{5}",f):
             s = f.partition('_')
-            mx1.append(int(s[0]))
+            m = int(s[0])
+            mx1.append(m)
 
             s = s[2].partition('_')
-            levels1.append(int(s[0]))
+            l = int(s[0])
+            levels1.append(l)
 
-            procs1.append(int(s[2]))
+            p = int(s[2])
+            procs1.append(p)
 
+    t = zip(mx1,procs1,levels1)
     mx = list(set(mx1))
-    procs = list(set(procs1))
-    levels = list(set(levels1))
-
     jobs = dict.fromkeys(mx)
     for m in mx:
-        jobs[m] = dict.fromkeys(procs)
+        mx_sub = [x for x in t if x[0] == m]
+        procs = list(set([x[1] for x in mx_sub]))
+        jobs[m] = dict.fromkeys(set(procs))
         for p in procs:
-            jobs[m][p] = dict.fromkeys(levels)
+            procs_sub = [x for x in mx_sub if x[1] == p]
+            levels = list(set([x[2] for x in procs_sub]))
+            jobs[m][p] = dict.fromkeys(set(levels))
 
     for m in mx:
+        procs = jobs[m].keys()
         for p in procs:
+            levels = jobs[m][p].keys()
             for l in levels:
                 results_dir = "%03d_%02d_%05d" % (m,l,p)
-                results_file = os.path.join(results_dir,'results.out')
 
-                if not os.path.exists(results_file):
-                    print "File %s not found\n" % results_file
+                rf = os.path.join(results_dir,results_file)
+
+                if not os.path.exists(rf):
+                    jobs[m][p][l] = None
+                    print "File %s not found" % rf
                     continue
 
-                data = np.loadtxt(results_file)
+                data = np.loadtxt(rf)
 
                 try:
                     # Filter to get data only for this (p,l) combination
@@ -632,79 +607,83 @@ def read_results_files():
                 job["minlevel"]      = np.array(data[msk,3])
                 job["maxlevel"]      = np.array(data[msk,4])
                 job["nout"]          = np.array(data[msk,5])
-                job["grids_per_proc"]= np.array(data[msk,6])
-                job["walltime"]      = np.array(data[msk,7])
-                job["advance"]       = np.array(data[msk,8])
-                job["exchange"]      = np.array(data[msk,9])
-                job["regrid"]        = np.array(data[msk,10])
-                job["ghostcomm"]     = np.array(data[msk,11])
-                job["cfl"]           = np.array(data[msk,12])
-                job["extra"]         = np.array(data[msk,13])
-                job["time_per_grid"] = np.array(data[msk,14])
+                job["tfinal"]        = np.array(data[msk,6])
+                job["grids_per_proc"]= np.array(data[msk,7])
+                job["walltime"]      = np.array(data[msk,8])
+                job["advance"]       = np.array(data[msk,9])
+                job["exchange"]      = np.array(data[msk,10])
+                job["regrid"]        = np.array(data[msk,11])
+                job["ghostcomm"]     = np.array(data[msk,12])
+                job["cfl"]           = np.array(data[msk,13])
+                job["extra"]         = np.array(data[msk,14])
+                job["time_per_grid"] = np.array(data[msk,15])
 
                 jobs[m][p][l] = job
 
     return jobs
 
-def print_jobs(jobs,val2plot='walltime'):
+def print_jobs(jobs,val2plot):
 
     mx = sorted(jobs.keys())
 
+    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'grids_per_proc']
+    fmt_int = False
+
     for m in mx:
-        pcount = sorted(jobs[m].keys())
-        levels = sorted(jobs[m][pcount[0]].keys())
-        data = np.empty((len(pcount),len(levels)))
-        for i,p in enumerate(pcount):
+        procs = sorted(jobs[m].keys())
+        levels = sorted(jobs[m][procs[0]].keys())
+        data = np.empty((len(procs),len(levels)))
+        for i,p in enumerate(procs):
             for j,l in enumerate(levels):
-                job = jobs[m][p][l]
-                if not job == None:
-                    data[i,j] = np.average(job[val2plot])
-                else:
+                try:
+                    job = jobs[m][p][l]
+                except:
+                    data[i,j] = None
+                    continue
+
+                try:
+                    d = job[val2plot]
+                    fmt_int = val2plot in int_list
+                except:
+                    try:
+                        d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
+                    except:
+                        print "print_results : Invalid 'val2plot'"
+                        sys.exit()
+
+                try:
+                    data[i,j] = np.average(d)
+                except:
+                    print "job (mx=%d,proc=%d,level=%d) is empty" % (m,p,l)
                     data[i,j] = None
 
 
         # Header
         print ""
         print val2plot
-        linelen = 8 + 5 + 12*len(levels)
-        print_line = "-"*linelen
-        print print_line
+        linelen = 8 + 3 + 12*len(levels)
+        line = "-"*linelen
+        print line
         mxstr = "mx = %d" % m
-        header_format = "{mxstr:>8}" + "{sep:^5}" + "{:>12}" * len(levels)
+        header_format = "{mxstr:>8}" + "{sep:>3}" + "{:>12}" * len(levels)
         print header_format.format(mxstr = mxstr, sep="|",*levels)
-        print print_line
-        row_format = "{:>8d}" + "{sep:^5}" + "{:>12.2e}"*len(levels)
-        for p, d in zip(pcount, data):
+        print line
+        # Format integer and float values separately
+        if (val2plot in int_list) or fmt_int:
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>12.0f}"*len(levels)
+        else:
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>12.2e}"*len(levels)
+        for p, d in zip(procs, data):
             print row_format.format(p, sep="|", *d)
 
-        print print_line
-
-
-
-
+        print line
 
 
 def plot_results(jobs,start_point,val2plot='walltime',
-                 scaling='strong',mode='uniform',
-                 scale_uniform=False):
+                 scaling='strong',scale_uniform=False):
 
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
-
-#     markers = []
-#     for m in Line2D.markers:
-#         try:
-#             if len(m) == 1 and m != ' ':
-#                 markers.append(m)
-#         except TypeError:
-#             pass
-#
-#     styles = markers + [
-#         r'$\lambda$',
-#         r'$\bowtie$',
-#         r'$\circlearrowleft$',
-#         r'$\clubsuit$',
-#         r'$\checkmark$']
 
     markers = {}
     markers["walltime"] = r'$\clubsuit$'
@@ -716,29 +695,53 @@ def plot_results(jobs,start_point,val2plot='walltime',
     colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
 
     mx = sorted(jobs.keys())
-    pcount = sorted(jobs[mx[0]].keys())
-    levels = sorted(jobs[mx[0]][pcount[0]].keys())
-
-    njobs = len(pcount)
     ph = []
-    t = []
     mb_data = []
-    for i,sp in enumerate(start_point):
-        if scaling in ['weak','strong']:
-            mx = np.empty(len(pcount),)
-            mx.fill(sp[0])
-            if scaling == 'strong':
-                levels = np.empty(len(pcount),)
-                levels.fill(sp[2])
-            else:
-                levels = range(sp[2],sp[2]+njobs)
-        elif scaling == 'block':
-            mx.reverse()
-            levels = range(sp[2],sp[2]+njobs)
-            pcount = np.empty(len(pcount),)
-            pcount.fill(sp[1])
 
-        t = zip(mx,pcount,levels)
+    # each start point generates a plot, either down a column (strong), across a
+    # diagonal (weak) or from back to front (block size comparison)
+    for i,sp in enumerate(start_point):
+        m = sp[0]
+        p = sp[1]
+        l = sp[2]
+        job = jobs[m][p][l]
+
+        # "headers" for this mx table
+        procs = sorted(jobs[m].keys())
+        levels = sorted(jobs[m][p].keys())
+
+        if scaling  == 'weak':  # Work down/right across diagonal
+            mx_sub = [sp[0] for p in procs if p >= sp[1]]
+            procs_sub =  [p for p in procs if p >= sp[1]]
+            levels_sub = [l for l in levels if l >= sp[2]]
+
+        elif scaling == 'strong':  # Work down colum
+            # assume that mx is fixed
+            mx_sub = [sp[0] for p in procs if p >= sp[1]]
+            procs_sub = [p for p in procs if p >= sp[1]]
+            levels_sub = [sp[2] for p in procs if p >= sp[1]]
+
+        elif scaling == 'block':  # Work down/left and down mx
+            mx_sub = [m for m in mx if m >= sp[0]]
+            levels_sub = [l for l in levels if l <= sp[2]]
+            levels_sub.reverse()
+            procs_sub = [sp[1] for l in levels]
+
+        elif scaling == 'resolution':
+            # scaling as resolution is increased
+            levels_sub = [l for l in levels if l >= sp[2]]
+            mx_sub = [sp[0] for l in levels_sub]
+            procs_sub = [sp[1] for l in levels_sub]
+
+        elif scaling == 'superlinear':
+            # Decrease grid size while increasing proc count; fixed resolution
+            mx_sub = [m for m in mx if m <= sp[0]]
+            mx_sub.reverse()
+            # This assumes that jobs[8] has the most complete list of levels.
+            levels_sub = sorted([l for l in jobs[8][1].keys() if l >= sp[2]])
+            procs_sub = [p for p in procs if p >= sp[1]]
+
+        t = zip(mx_sub,procs_sub,levels_sub)
 
         # Internal plotting routine
         phandle,mb = plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
@@ -756,18 +759,32 @@ def plot_results(jobs,start_point,val2plot='walltime',
     if scaling == 'block':
         ax.xaxis.set_major_locator(plt.FixedLocator(mx))
         ax.set_xlabel("Block size",fontsize=16)
+        l1 = np.log(np.min(mx))/np.log(2)
+        l2 = np.log(np.max(mx))/np.log(2)
+        plt.xlim([2**(l1-0.5),2**(l2+0.5) ])
+
+    elif scaling == 'resolution':
+        levels = sorted(jobs[8][1].keys())
+        ax.xaxis.set_major_locator(plt.FixedLocator(levels))
+        ax.set_xlabel("Levels",fontsize=16)
+        l1 = np.min(levels)
+        l2 = np.max(levels)
+        plt.xlim([l1-0.5,l2+0.5])
+
     else:
-        ax.xaxis.set_major_locator(plt.FixedLocator(pcount))
+        ax.xaxis.set_major_locator(plt.FixedLocator(procs))
         ax.set_xlabel("Processor count",fontsize=16)
+        p1 = np.log(np.min(procs))/np.log(4)
+        p2 = np.log(np.max(procs))/np.log(4)
+        plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
 
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
 
-    if mode == 'weak':
-        ax.set_ylabel("%s" % ("time/grids advanced"),fontsize=16)
+    if scaling == 'weak':
+        ax.set_ylabel("%s" % ("grids advanced/time"),fontsize=16)
     else:
         ax.set_ylabel("%s" % ("time"),fontsize=16)
-    plt.xlim([4**(-0.5), 4**(3.4)])
 
     plt.draw()
 
@@ -786,17 +803,14 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
     v = val2plot
 
     mode = 'uniform'
-
     ph = []
     mx = sorted(jobs.keys())
-    procs = sorted(jobs[mx[0]].keys())
-    levels = sorted(jobs[mx[0]][procs[0]].keys())
-    pmax = np.max(procs)
-    njobs = len(procs)
-    gpp_avg = np.empty(len(procs),)
-    y_avg = np.empty(len(procs),)
-    grids_advanced = np.empty(len(procs),)
-    for j,idx_tuple in enumerate(t):
+    gpp_avg = []
+    y_avg = []
+    grids_advanced =[]
+
+    # First collect y values (which may need to be averaged)
+    for idx_tuple in t:
 
         m = idx_tuple[0]
         p = int(idx_tuple[1])
@@ -804,47 +818,73 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
         job = jobs[m][p][l]
 
         # Each job might include several runs, which must be averaged
-        gpp_avg[j] = np.round(np.average(job["grids_per_proc"]/job["nout"]))
-        grids_advanced[j] = np.round(np.average((job["walltime"]/job["time_per_grid"])))
+        gpp_avg = np.append(gpp_avg,np.round(np.average(job["grids_per_proc"]/job["nout"])))
+        grids_advanced = np.append(grids_advanced,
+                                   np.round(np.average((job["walltime"]/job["time_per_grid"]))))
 
         if scaling == 'weak':
-            y_avg[j] = np.average(job[v])/grids_advanced[j]
-        elif scaling == 'strong':
-            if mode == 'uniform' and scale_uniform:
-                y_avg[j] = np.average(job[v])*pmax/procs[j]
-            else:
-                y_avg[j] = np.average(job[v])
+            y_avg = np.append(y_avg,grids_advanced[-1]/np.average(job[v]))
         else:
-            y_avg[j] = np.average(job[v])
-
-    if not scaling == 'block':
-        # Get ideal scaling for this case
-        p1 = int(np.log(procs[0])/np.log(4.0))
-        R = np.arange(p1,len(procs)+p1)
-        if scaling == 'weak':
-            idx_llsq = np.arange(0,len(procs))
-            ideal = np.empty(len(y_avg),)
-            ideal.fill(y_avg[0])
-
-        elif scaling == 'strong':
-            idx_llsq = np.extract(np.array(procs) > 4,range(0,len(procs)))
-            pmin = float(np.array(procs[idx_llsq[0]]))
-            ideal = y_avg[idx_llsq[0]]/(np.array(procs)/pmin)
+            y_avg = np.append(y_avg,np.min(job[v]))
 
 
-        # Add plots
-        # plt.errorbar(procs,y_avg,yerr = y_err,hold=True)
+    # Plot ideal scaling
+    mx = [x[0] for x in t]
+    procs = [x[1] for x in t]
+    levels = [x[2] for x in t]
 
+    if scaling == 'weak':
+        # Ideal scaling is constant
+        procs = [x[1] for x in t]
+        R = np.array([i for i,p in enumerate(procs)])  # Factor 2
+        ideal = y_avg[0]*2**R
+        ideal = [y_avg[0] for x in t]  # Constant scaling
         plt.loglog(procs,ideal,'k.--',markersize=15)
 
+    elif scaling == 'strong':
+        # Ideal scaling should start at p = 16, not p=1
+        pmin = 16.0
+        tp = zip(procs,y_avg)
+        ymin = [x[1] for x in tp  if x[0] == pmin]
+        ideal = y_avg[0]*np.min(procs)/np.array(procs)
+        plt.loglog(procs,ideal,'k.--',markersize=15)
 
-        # get best-fit slope
-        mb = np.polyfit(np.log(np.array(procs)[idx_llsq]),np.log(np.array(y_avg)[idx_llsq]),1)
+    elif scaling == 'superlinear':
+        ideal = y_avg[0]*np.min(procs)/np.array(procs)
+        plt.loglog(procs,ideal,'k.--',markersize=15)
+
+    elif scaling == 'resolution':
+        R = np.arange(0,len(y_avg))
+        ideal = y_avg[0]*8**R
+        plt.semilogy(levels,ideal,'k.--',markersize=15)
 
     else:
+        # No ideal scaling for 'block' scaling
+        pass
+
+    # get best-fit slope
+    if scaling in ['strong','weak','superlinear']:
+        psub = np.array(procs)
+        mb = np.polyfit(np.log(psub),np.log(y_avg),1)
+
+    elif scaling == 'resolution':
+        levels = np.array([x[2] for x in t])
+        nsub = levels - levels[0] + 1
+        pc = np.polyfit(nsub,np.log(y_avg),1)
+        mb = np.array(np.exp(pc))
+
+    else:
+        # No best-fit line for the 'block' scaling case
         mb = None
 
-    ph = plt.loglog(procs,y_avg,marker=markers[v],markersize=10)
+
+    if scaling == 'block':
+        ph = plt.loglog(mx,y_avg,marker=markers[v],markersize=10)
+    elif scaling in ['strong','weak','superlinear']:
+        ph = plt.loglog(procs,y_avg,marker=markers[v],markersize=10)
+    elif scaling in 'resolution':
+        levels = np.array([x[2] for x in t])
+        ph = plt.semilogy(levels,y_avg,marker=markers[v],markersize=10)
 
     return ph[0],mb
 
