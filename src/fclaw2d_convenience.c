@@ -434,7 +434,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     if (domain->p.smooth_refine)
     {
         int ng, nb, np;
-        int face, corner;
+        int face, corner, fcfirst;
         int nprocs[2], nblockno, npatchno[2], nfc;
         int level, max_tlevel;
         int exists;
@@ -467,8 +467,14 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 level = patch->level;
                 max_tlevel = patch->target_level;
 
+                /* use this to skip the level-up if the quadrant is too big */
+                /* this is a lazy hack because I don't want to indent further */
+                fcfirst =
+                    level >= domain->p.smooth_level ? 0 :
+                    SC_MAX (wrap->p4est_faces, wrap->p4est_children);
+
                 /* loop through face neighbors of this patch */
-                for (face = 0; max_tlevel <= level &&
+                for (face = fcfirst; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
                     nrel = fclaw2d_patch_face_neighbors (domain, nb, np, face,
@@ -516,7 +522,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 }
 
                 /* loop through corner neighbors of this patch */
-                for (corner = 0; max_tlevel <= level &&
+                for (corner = fcfirst; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
                     exists = fclaw2d_patch_corner_neighbors (domain, nb, np,
@@ -552,6 +558,10 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                             (p4est_locidx_t) nb,
                                             (p4est_locidx_t) np);
                 }
+
+                /* clean up the target markers in case we don't adapt */
+                /* if we adapt, we'll make all new target markers anyway */
+                patch->target_level = patch->level;
             }
         }
     }
