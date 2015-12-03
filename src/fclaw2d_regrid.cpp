@@ -219,6 +219,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     fclaw_global_infof("Regridding domain\n");
 
 
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_TAGGING]);
     /* First determine which families should be coarsened. */
     fclaw2d_domain_iterate_families(*domain, cb_regrid_tag4coarsening,
                                     (void*) NULL);
@@ -226,6 +227,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     int domain_init = 0;
     fclaw2d_domain_iterate_patches(*domain, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_TAGGING]);
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */

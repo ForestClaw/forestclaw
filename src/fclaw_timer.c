@@ -100,6 +100,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
     FCLAW2D_STATS_SET (stats, ddata, CFL);
     FCLAW2D_STATS_SET (stats, ddata, BUILDREGRID);
+    FCLAW2D_STATS_SET (stats, ddata, TAGGING);
     FCLAW2D_STATS_SET (stats, ddata, BUILDPARTITION);
     FCLAW2D_STATS_SET (stats, ddata, BUILDGHOST);
     FCLAW2D_STATS_SET (stats, ddata, GHOST_EXCHANGE);
