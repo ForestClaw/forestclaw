@@ -621,6 +621,7 @@ def read_results_files(results_file='results.out'):
         for p in procs:
             levels = jobs[m][p].keys()
             for l in levels:
+
                 results_dir = "%03d_%02d_%05d" % (m,l,p)
 
                 rf = os.path.join(results_dir,results_file)
@@ -884,8 +885,12 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
             data = np.average(job[v])
         except:
             try:
+                # Call function val2plot
                 data = np.average(v(job,mx=m,proc=p,level=l,all=jobs))
             except:
+                import pdb
+                pdb.set_trace()
+
                 print "Invalid val2plot"
                 sys.exit()
 
