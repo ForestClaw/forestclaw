@@ -46,8 +46,11 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
-% showpatchborders;
-hidepatchborders;
+showpatchborders;
+% showgridlines(4);
+setpatchborderprops('linewidth',1)
+% setpatchborderprops(4,'linewidth',3)
+hidepatchborders(9)
 
 view(2);
 axis off

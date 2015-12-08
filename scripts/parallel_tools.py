@@ -192,6 +192,13 @@ def write_ini_files(input_file='create_run.ini'):
     jobfile.write(header_line)
     jobfile.write("\n")
 
+    filein = open('results.in','w')
+    filein.write(header_line)
+    filein.write("\n")
+    filein.write((fmt_str_header + "\n") % tuple_str)
+    filein.write(header_line)
+    filein.write("\n")
+
     cpu_hours = 0
     for i,p in enumerate(procs):
         if grids_per_proc[i] < 4:
@@ -204,6 +211,8 @@ def write_ini_files(input_file='create_run.ini'):
         # Print to console and jobs file
         print fmt_str_numeric % prt_tuple
         jobfile.write((fmt_str_numeric + "\n") % prt_tuple)
+        # Skip comments
+        filein.write(("  " + fmt_str_numeric[2:] + "\n") % prt_tuple)
 
         if scheduler == 'll':
             cpu_hours = cpu_hours + np.max([p,32])*t[i]/(3600.0)
@@ -371,6 +380,13 @@ def write_ini_files(input_file='create_run.ini'):
     jobfile.write("# Estimated core-h (hours) : %6.2f (%4.2f%%)" % \
                   (cpu_hours,100*cpu_hours/350000.0))
     jobfile.write("\n\n");
+
+    filein.write(header_line)
+    filein.write("\n")
+    filein.write("# Estimated core-h (hours) : %6.2f (%4.2f%%)" % \
+                  (cpu_hours,100*cpu_hours/350000.0))
+    filein.write("\n\n")
+    filein.close()
 
     for i,p in enumerate(procs):
 
@@ -577,90 +593,138 @@ def compile_results(results_dir=None,results_file='results.out',
 
 # Read in an array of results that can be used for both weak
 # and strong scaling.
-def read_results_files(results_file='results.out'):
+def read_results_files(dir_list,results_in = None,
+                       results_file='results.out',execname=None):
 
     import re
 
-    # Get data from directory names
-    dirs = os.listdir(os.getcwd())
+    dirs = []
+    for d in dir_list:
+        dirs.append("run_%03d" % d)
+
+    read_input = not results_in == None
+
+    if read_input:
+        # Get data from results.in only
+        pattern = re.compile(results_in)
+        results_file = results_in
+    else:
+        if not execname == None:
+            pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
+        else:
+            pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
 
     mx1 = []
     procs1 = []
     levels1 = []
     t = []
-    for f in dirs:
-        # Match file names like "008_04_00001"
-        if re.match("[0-9]{3}_[0-9]{2}_[0-9]{5}",f):
-            s = f.partition('_')
-            m = int(s[0])
-            mx1.append(m)
-
-            s = s[2].partition('_')
-            l = int(s[0])
-            levels1.append(l)
-
-            p = int(s[2])
-            procs1.append(p)
-
-    t = zip(mx1,procs1,levels1)  # All possible combos
-
-    # Create array of all (procs/levels).  Not every combo will have data.
-    mx = list(set(mx1))
-    procs = list(set([x[1] for x in t]))
-    levels = list(set([x[2] for x in t]))
-
-    # Initialize dictionaries for all values
-    jobs = dict.fromkeys(mx)
-    for m in mx:
-        jobs[m] = dict.fromkeys(set(procs))
-        for p in procs:
-            jobs[m][p] = dict.fromkeys(set(levels))
-
-    for m in mx:
-        procs = jobs[m].keys()
-        for p in procs:
-            levels = jobs[m][p].keys()
-            for l in levels:
-
-                results_dir = "%03d_%02d_%05d" % (m,l,p)
-
+    for results_dir in dirs:
+        # Match file names like run_004
+        files = os.listdir(results_dir)
+        for f in files:
+            if re.match(pattern,f):
+                # Load data file to read in (mx,levels) for this file
                 rf = os.path.join(results_dir,results_file)
 
                 if not os.path.exists(rf):
-                    jobs[m][p][l] = None
+                    print "File %s not found in %s" % (results_file,f)
                     continue
 
                 data = np.loadtxt(rf)
 
-                try:
-                    # Filter to get data only for this (p,l) combination
-                    msk = (data[:,1] == p) & (data[:,4] == l)
-                except:
-                    print "Something went wrong in reading file %s" % fname
+                if read_input:
+                    procs1.extend(data[:,0])
+                    mx1.extend(data[:,1])
+                    levels1.extend(data[:,3])
+                else:
+                    procs1.extend(data[:,1])
+                    mx1.extend(data[:,2])
+                    levels1.extend(data[:,4])
+
+
+    t = zip(mx1,procs1,levels1)  # All possible combos
+
+    # Create array of all (procs/levels).  Not every combo will have data.
+    mx = sorted(list(set(mx1)))
+    procs = sorted(list(set([x[1] for x in t])))
+    levels = sorted(list(set([x[2] for x in t])))
+
+    jobs = dict.fromkeys(mx)
+    for m in mx:
+        jobs[m] = dict.fromkeys(procs)
+        for p in procs:
+            jobs[m][p] = dict.fromkeys(levels)
+
+    # Initialize dictionaries for all values
+    for results_dir in dirs:
+        rundir = int(results_dir.partition('_')[2])
+        files = os.listdir(results_dir)
+        for f in files:
+            if re.match(pattern,f):
+
+                # Load data file to read in (mx,levels) for this file
+                rf = os.path.join(results_dir,results_file)
+
+                if not os.path.exists(rf):
+                    print "File %s not found in %s" % (results_file,f)
                     continue
 
-                job = {}
-                job["jobid"]         = np.array(data[msk,0])
-                job["procs"]         = np.array(data[msk,1])
-                job["mx"]            = np.array(data[msk,2])
-                job["minlevel"]      = np.array(data[msk,3])
-                job["maxlevel"]      = np.array(data[msk,4])
-                job["nout"]          = np.array(data[msk,5])
-                job["tfinal"]        = np.array(data[msk,6])
-                job["grids_per_proc"]= np.array(data[msk,7])
-                job["walltime"]      = np.array(data[msk,8])
-                job["advance"]       = np.array(data[msk,9])
-                job["exchange"]      = np.array(data[msk,10])
-                job["regrid"]        = np.array(data[msk,11])
-                job["ghostcomm"]     = np.array(data[msk,12])
-                job["cfl"]           = np.array(data[msk,13])
-                job["extra"]         = np.array(data[msk,14])
-                job["time_per_grid"] = np.array(data[msk,15])
-                job["buildregrid"]   = np.array(data[msk,16])
-                job["buildghost"]    = np.array(data[msk,17])
-                job["tagging"]    = np.array(data[msk,18])
+                data = np.loadtxt(rf)
 
-                jobs[m][p][l] = job
+                for row in data:
+                    if read_input:
+                        p = row[0]
+                        m = row[1]
+                        l = row[3]
+
+                        s = int(results_dir.partition('_')[2])
+
+                        job = {}
+                        job["rundir"]         = rundir
+                        job["procs"]          = row[0]
+                        job["mx"]             = row[1]
+                        job["minlevel"]       = row[2]
+                        job["maxlevel"]       = row[3]
+                        job["nout"]           = row[4]
+                        job["nstep"]          = row[5]
+                        job["dt"]             = row[6]
+                        job["tfinal"]         = row[7]
+                        job["effres"]         = row[8]
+                        job["grids_per_proc"] = row[9]
+                        job["walltime_est"]   = row[10]
+
+                    else:
+                        p = row[1]
+                        m = row[2]
+                        l = row[4]
+
+                        job = {}
+                        job["jobid"]         = row[0]
+                        job["procs"]         = row[1]
+                        job["mx"]            = row[2]
+                        job["minlevel"]      = row[3]
+                        job["maxlevel"]      = row[4]
+                        job["nout"]          = row[5]
+                        job["tfinal"]        = row[6]
+                        job["grids_per_proc"]= row[7]
+                        job["walltime"]      = row[8]
+                        job["advance"]       = row[9]
+                        job["exchange"]      = row[10]
+                        job["regrid"]        = row[11]
+                        job["ghostcomm"]     = row[12]
+                        job["cfl"]           = row[13]
+                        job["extra"]         = row[14]
+                        job["time_per_grid"] = row[15]
+                        try:
+                            job["buildregrid"]   = row[16]
+                            job["buildghost"]    = row[17]
+                            job["tagging"]       = row[18]
+                        except:
+                            job["buildregrid"] = np.nan
+                            job["buildghost"] = np.nan
+                            job["tagging"] = np.nan
+
+                    jobs[m][p][l] = job
 
     return jobs
 
@@ -695,7 +759,7 @@ def print_jobs(jobs,val2plot):
                     try:
                         d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
                     except:
-                        print "print_results : Invalid 'val2plot'"
+                        print "print_jobs : Invalid 'val2plot'"
                         sys.exit()
 
                 try:
@@ -721,7 +785,7 @@ def print_jobs(jobs,val2plot):
         else:
             row_format = "{:>8d}" + "{sep:>3}" + "{:>12.2e}"*len(levels)
         for p, d in zip(procs, data):
-            print row_format.format(p, sep="|", *d)
+            print row_format.format(int(p), sep="|", *d)
 
         print line
 
@@ -814,7 +878,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
         plt.xlim([2**(l1-0.5),2**(l2+0.5) ])
 
     elif scaling == 'resolution':
-        levels = sorted(jobs[8][1].keys())
+        levels = range(3,9)
         ax.xaxis.set_major_locator(plt.FixedLocator(levels))
         ax.set_xlabel("Levels",fontsize=16)
         l1 = np.min(levels)
@@ -838,13 +902,13 @@ def plot_results(jobs,start_point,val2plot='walltime',
     plt.setp(ax.get_yticklabels(),fontsize=14)
 
     if scaling == 'weak':
-        ax.set_ylabel("%s" % ("grids advanced/time"),fontsize=16)
+        ax.set_ylabel("%s" % ("Efficiency"),fontsize=16)
     else:
         ax.set_ylabel("%s" % ("time"),fontsize=16)
 
     plt.draw()
 
-    return ph,mb_data
+    return ph,mb_data,t
 
 
 def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
@@ -891,7 +955,7 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
                 import pdb
                 pdb.set_trace()
 
-                print "Invalid val2plot"
+                print "plot_results_internal : Invalid val2plot"
                 sys.exit()
 
 
