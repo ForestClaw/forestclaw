@@ -566,7 +566,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 
                 /* clean up the target markers in case we don't adapt */
                 /* if we adapt, we'll make all new target markers anyway */
-                patch->target_level = patch->level;
+                /* patch->target_level = patch->level; */
             }
         }
     }
