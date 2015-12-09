@@ -80,6 +80,19 @@ void subcycle_manager::set_dt_minlevel(const double a_dt_minlevel)
     }
 }
 
+void subcycle_manager::set_dt_maxlevel(const double a_dt_maxlevel)
+{
+    // Time step for minimum level (i.e. coarsest non-empty level).
+    m_dt_maxlevel = a_dt_maxlevel;
+
+    double dt_level = a_dt_maxlevel;
+    m_levels[m_maxlevel].set_dt(dt_level);
+    for (int level = m_minlevel; level <= m_maxlevel; level++)
+    {
+        m_levels[level].set_dt(dt_level);
+    }
+}
+
 
 int subcycle_manager::minlevel_factor()
 {
