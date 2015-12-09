@@ -668,8 +668,8 @@ def print_jobs(jobs,val2plot):
 
     mx = sorted(jobs.keys())
 
-    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'grids_per_proc']
-    fmt_int = False
+    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'grids_per_proc',
+                'rundir']
 
     for m in mx:
         procs = sorted(jobs[m].keys())
@@ -750,6 +750,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
 
     # each start point generates a plot, either down a column (strong), across a
     # diagonal (weak) or from back to front (block size comparison)
+    tlist = []
     for i,sp in enumerate(start_point):
         m = sp[0]
         p = sp[1]
@@ -801,6 +802,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
         plt.draw()
         ph.append(phandle)
         mb_data.append(mb)
+
+        tlist.extend(t)
 
     # Set up axis
     ax = plt.gca()
