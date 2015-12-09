@@ -111,6 +111,7 @@ public:
     double dt(int level);
     void increment_time(const int a_level);
     void set_dt_minlevel(const double a_dt);
+    void set_dt_maxlevel(const double a_dt);
 
     int minlevel_factor();
     int maxlevel_factor();

@@ -397,20 +397,20 @@ void outstyle_3(fclaw2d_domain_t **domain)
             int reduce_factor;
             if (time_stepper.nosubcycle())
             {
-                /* Take one step of a stable time step for the finest
-                   non-emtpy level. */
+                /* Take a global time step of a stable time step for the
+                   finest non-empty level. */
                 reduce_factor = time_stepper.maxlevel_factor();
+                double dt_maxlevel = dt_level0/reduce_factor;
+                time_stepper.set_dt_maxlevel(dt_maxlevel);
             }
             else
             {
                 /* Take one step of a stable time step for the coarsest
                    non-empty level. */
                 reduce_factor = time_stepper.minlevel_factor();
+                double dt_minlevel = dt_level0/reduce_factor;
+                time_stepper.set_dt_minlevel(dt_minlevel);
             }
-            double dt_minlevel = dt_level0/reduce_factor;
-
-            /* This also sets the time step on all finer levels. */
-            time_stepper.set_dt_minlevel(dt_minlevel);
 
             double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
