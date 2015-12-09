@@ -45,6 +45,8 @@ else
     camlight;
 end
 
+setpatchborderprops('linewidth',1)
+hidepatchborders(9)
 
 NoQuery = 0;
 prt = false;
