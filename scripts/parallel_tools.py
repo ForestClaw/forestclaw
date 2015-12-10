@@ -577,8 +577,8 @@ def compile_results(results_dir=None,results_file='results.out',
 
 # Read in an array of results that can be used for both weak
 # and strong scaling.
-def read_results_files(results_file='results.out'):
-
+def read_results_files(dir_list, subdir = None, results_in = None,
+                       results_file='results.out',execname=None):
     import re
 
     # Get data from directory names
@@ -588,12 +588,25 @@ def read_results_files(results_file='results.out'):
     procs1 = []
     levels1 = []
     t = []
-    for f in dirs:
-        # Match file names like "008_04_00001"
-        if re.match("[0-9]{3}_[0-9]{2}_[0-9]{5}",f):
-            s = f.partition('_')
-            m = int(s[0])
-            mx1.append(m)
+    for results_dir in dirs:
+        # Match file names like run_004
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
+
+        files = os.listdir(d)
+        for f in files:
+            if re.match(pattern,f):
+                # Load data file to read in (mx,levels) for this file
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
+
+                if not os.path.exists(rf):
+                    print "File %s not found in %s" % (results_file,f)
+                    continue
 
             s = s[2].partition('_')
             l = int(s[0])
@@ -616,15 +629,24 @@ def read_results_files(results_file='results.out'):
         for p in procs:
             jobs[m][p] = dict.fromkeys(set(levels))
 
-    for m in mx:
-        procs = jobs[m].keys()
-        for p in procs:
-            levels = jobs[m][p].keys()
-            for l in levels:
+    # Initialize dictionaries for all values
+    for results_dir in dirs:
+        rundir = int(results_dir.partition('_')[2])
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
 
-                results_dir = "%03d_%02d_%05d" % (m,l,p)
+        files = os.listdir(d)
+        print files
+        for f in files:
+            if re.match(pattern,f):
 
-                rf = os.path.join(results_dir,results_file)
+                # Load data file to read in (mx,levels) for this file
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
 
                 if not os.path.exists(rf):
                     jobs[m][p][l] = None
