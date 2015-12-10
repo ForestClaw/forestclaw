@@ -1104,13 +1104,13 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
        happens below smooth_level is done only for
        balancing purposes */
 
+#if 0
     patch->target_level =
         patch->level >= domain->p.smooth_level ?
         patch->level + 1 : patch->level;
-
-#if 0
-    patch->target_level =  patch->level + 1;
 #endif
+
+    patch->target_level =  patch->level + 1;
     patch->target_level = SC_MIN (patch->target_level, P4EST_QMAXLEVEL);
 
     /* if we do smooth refinement, all marking is done inside adapt */
