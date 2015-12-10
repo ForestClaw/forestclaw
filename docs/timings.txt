@@ -1,0 +1,12 @@
+
+The following timers shall be a partition of the runtime without overlap or
+gaps:
+
+ghostcomm       communication/packing to update direct/indirect ghosts
+ghostfill	interpolate/average/copy not counting communication
+advance		clawpack advances the solution on grids
+tagging		compute indicators, mark patches
+adapt		fclaw2d_domain_adapt
+rebuild		interpolate/average/copy after regrid, ghost memory alloc
+partpack        pack/unpack data for partitioning
+partition       fclaw2d_domain_partition
