@@ -10,3 +10,19 @@ adapt		fclaw2d_domain_adapt
 rebuild		interpolate/average/copy after regrid, ghost memory alloc
 partpack        pack/unpack data for partitioning
 partition       fclaw2d_domain_partition
+
+How do we report timing statistics?
+
+For each of the above counters each processor shall report say
+a_i = total_runtime_ghostcomm / #local_grids_advanced etc.
+In addition it will be helpful to report #local_grids_advanced itself.
+Finally we do the parallel computation of statistics.
+For weak scaling we report the average or maximum of a_i over all cores.
+For strong scaling we report the same for a straight line over cores,
+or the max_i a_i * max_i #local_grids_advanced_i for one that goes down,
+or the inverse of it for a line that goes up.  The maximum takes in
+variations in the most pessimistic way possible.
+
+The timers' values to report is .cumulative.
+In the statistics structure sc_statinfo_t the most useful output fields are
+.sum_values, average, min, max, standev_mean.
