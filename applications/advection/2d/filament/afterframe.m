@@ -56,10 +56,20 @@ view(2);
 axis off
 shg;
 
-prt = false;
+
 NoQuery = 0;
+prt = false;
 if (prt)
-    MaxFrames = 31;
+  MaxFrames = 41;
+  filename = sprintf('filament_%04d.png',Frame)
+  print('-dpng',filename);
+end
+
+
+prt = false;
+% NoQuery = 0;
+if (prt)
+    MaxFrames = 41;
     axis([0 2 0 2]);
     axis off;
     delete(get(gca,'title'));
