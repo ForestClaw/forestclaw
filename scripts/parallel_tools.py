@@ -593,7 +593,7 @@ def compile_results(results_dir=None,results_file='results.out',
 
 # Read in an array of results that can be used for both weak
 # and strong scaling.
-def read_results_files(dir_list,results_in = None,
+def read_results_files(dir_list, subdir = None, results_in = None,
                        results_file='results.out',execname=None):
 
     import re
@@ -620,11 +620,19 @@ def read_results_files(dir_list,results_in = None,
     t = []
     for results_dir in dirs:
         # Match file names like run_004
-        files = os.listdir(results_dir)
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
+
+        files = os.listdir(d)
         for f in files:
             if re.match(pattern,f):
                 # Load data file to read in (mx,levels) for this file
-                rf = os.path.join(results_dir,results_file)
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
 
                 if not os.path.exists(rf):
                     print "File %s not found in %s" % (results_file,f)
@@ -658,12 +666,21 @@ def read_results_files(dir_list,results_in = None,
     # Initialize dictionaries for all values
     for results_dir in dirs:
         rundir = int(results_dir.partition('_')[2])
-        files = os.listdir(results_dir)
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
+
+        files = os.listdir(d)
+        print files
         for f in files:
             if re.match(pattern,f):
 
                 # Load data file to read in (mx,levels) for this file
-                rf = os.path.join(results_dir,results_file)
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
 
                 if not os.path.exists(rf):
                     print "File %s not found in %s" % (results_file,f)
