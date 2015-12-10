@@ -3,13 +3,18 @@ The following timers shall be a partition of the runtime without overlap or
 gaps:
 
 ghostcomm       communication/packing to update direct/indirect ghosts
+                     -- only ghost fill
+
 ghostfill	interpolate/average/copy not counting communication
 advance		clawpack advances the solution on grids
 tagging		compute indicators, mark patches
 adapt		fclaw2d_domain_adapt
+                       -- just this function
 rebuild		interpolate/average/copy after regrid, ghost memory alloc
 partpack        pack/unpack data for partitioning
+partcomm        Additional partition communication
 partition       fclaw2d_domain_partition
+                       -- just this function
 
 How do we report timing statistics?
 
