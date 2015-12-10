@@ -18,7 +18,7 @@ else
     yout = 0.25*sin(th) + 1;
 end
 hold on;
-% plot(xout,yout,'k','linewidth',2);
+plot(xout,yout,'k','linewidth',2);
 fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
 hold off;
 
