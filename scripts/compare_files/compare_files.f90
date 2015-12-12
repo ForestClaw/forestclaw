@@ -9,7 +9,7 @@ PROGRAM compare_files
   IMPLICIT NONE
 
   INTEGER :: iframe
-  CHARACTER(100) :: dir1, dir2, dir3
+!!  CHARACTER(100) :: dir1, dir2, dir3
 
   INTEGER :: i,j, n, m
 
@@ -40,6 +40,10 @@ PROGRAM compare_files
 
   INTEGER :: num_args, ix
   CHARACTER(len=12), DIMENSION(:), ALLOCATABLE :: args
+  CHARACTER(len=100) dir1,dir2
+  CHARACTER(len=100) dir3
+  INTEGER :: d1, d2
+
 
   num_args = COMMAND_ARGUMENT_COUNT()
   ALLOCATE(args(num_args))  ! I've omitted checking the return status of the allocation
@@ -50,10 +54,14 @@ PROGRAM compare_files
         CALL GET_COMMAND_ARGUMENT(ix,args(ix))
      END DO
 
-     dir1 = TRIM('save_proc')//TRIM(args(1))
-     dir2 = TRIM('save_proc')//TRIM(args(2))
-     dir3 = TRIM('compare')
+     READ(args(1),*) d1
+     READ(args(2),*) d2
      READ(args(3),*) iframe
+
+     WRITE(dir1,'(A,I0.5)') 'run_',d1
+     WRITE(dir2,'(A,I0.5)') 'run_',d2
+     WRITE(dir3,'(A,I0.5,A,I0.5)') 'compare_',d1,'_',d2
+
   ELSE
 
      !! Size of compare.dat grid
@@ -96,7 +104,7 @@ PROGRAM compare_files
   ENDDO
 
   dir1_fname1 = TRIM(dir1)//'/'//trim(fname1)
-   dir2_fname1 = TRIM(dir2)//'/'//trim(fname1)
+  dir2_fname1 = TRIM(dir2)//'/'//trim(fname1)
 
   dir1_fname2 = TRIM(dir1)//'/'//trim(fname2)
   dir2_fname2 = TRIM(dir2)//'/'//trim(fname2)
@@ -290,16 +298,19 @@ SUBROUTINE write_tfile(iframe,time,meqn,ngrids,dir3)
   DOUBLE PRECISION :: time
   INTEGER :: matunit2, nstp,ipos,idigit
 
-  fname1 = 'fort.qxxxx'
-  fname2 = 'fort.txxxx'
-  matunit2 = 52
-  nstp     = iframe
-  DO ipos = 10, 7, -1
-     idigit = MOD(nstp,10)
-     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     fname2(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     nstp = nstp / 10
-  ENDDO
+!!  fname1 = 'fort.qxxxx'
+!!  fname2 = 'fort.txxxx'
+!!  matunit2 = 52
+!!  nstp     = iframe
+!!  DO ipos = 10, 7, -1
+!!     idigit = MOD(nstp,10)
+!!     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     fname2(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     nstp = nstp / 10
+  !!  ENDDO
+
+  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
+  WRITE(fname2,'(A,I0.4)') 'fort.t',iframe
 
   dir3_fname1 = TRIM(dir3)//'/'//trim(fname1)
   dir3_fname2 = TRIM(dir3)//'/'//trim(fname2)
