@@ -5,6 +5,59 @@ from string import Template
 import re
 import ConfigParser
 
+def compare_runs(execname,rerun,iframe):
+    import random
+    import subprocess
+    import shutil
+    # Compare serial and parallel runs
+
+    files = os.listdir(os.getcwd())
+    pattern = re.compile("p_[0-9]{5}.py")
+    proc_list = []
+    for f in files:
+        if re.match(pattern,f):
+            # Do a run for each processor file
+            proc_list.append(int(f.partition('_')[2].partition('.py')[0]))
+
+    if rerun:
+        for p in proc_list:
+            arg_list = ["mpirun","-n","%d" % p,execname,"--inifile=ex_%05d.ini" % p,
+                        "--serialout=T"]
+
+            jobid = random.randint(1000,9999)
+            outfile = "%s_%05d.o%d" % (execname,p,jobid)
+            f = open(outfile,'w')
+            po = subprocess.Popen(arg_list,stdout=f)
+            print "Starting process %d with jobid %d on %d processor(s)." % (po.pid,jobid,p)
+            po.wait()
+
+            rundir = 'run_%05d' % p
+            shutil.rmtree(rundir,True)
+            os.mkdir(rundir)
+            pattern = re.compile("fort.[tq][0-9]{4}")
+
+            fortfiles = os.listdir(os.getcwd())
+            for f in fortfiles:
+                if re.match(pattern,f):
+                    shutil.move(f,rundir)
+
+    else:
+        for i,p in enumerate(proc_list):
+            for q in proc_list[i+1:]:
+                compare_dir = "compare_%05d_%05d" % (p,q)
+                try:
+                    os.mkdir(compare_dir)
+                except:
+                    if rerun:
+                        shutil.rmtree(compare_dir,True)
+                        print "Creating directory %s" % compare_dir
+                else:
+                    print "Using directory %s" % compare_dir
+
+
+                arg_list = ["compare_files", "%5d" % p, "%5d" % q, "%d" % iframe]
+                subprocess.call(arg_list)
+
 
 def write_ini_files(input_file='create_run.ini'):
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
