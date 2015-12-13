@@ -333,6 +333,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
+    int nregrid_interval = gparms->regrid_interval;
     if (!gparms->subcycle && gparms->use_fixed_dt)
     {
         /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
@@ -341,7 +342,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
         int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
         nstep_outer *= mf;
         nstep_inner *= mf;
+        nregrid_interval *= mf;
     }
+
 
     double t0 = 0;
     /* The user dt_initial is the appropriate value for minlevel
@@ -357,13 +360,16 @@ void outstyle_3(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         /* Skip over coarse levels that don't have any grids on them */
-        int steps_to_minlevel = pow_int(2,(*domain)->global_minlevel - gparms->minlevel);
+        int steps_to_minlevel = pow_int(2,(*domain)->global_minlevel - gparms->minlevel)-1;
         if (!gparms->subcycle)
         {
-            steps_to_minlevel = 1;
+            steps_to_minlevel = 0;
         }
-        for (int m = 0; m < steps_to_minlevel; m++)
+        for (int m = 0; m <= steps_to_minlevel; m++)
         {
+            /* If there are no 'minlevel' grids, we may need to take several time steps
+               to get to 1 "nout" step.  */
+
             subcycle_manager time_stepper;
             time_stepper.define(*domain,gparms,t_curr);
 
@@ -452,7 +458,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (gparms->regrid_interval > 0)
         {
-            if (n % gparms->regrid_interval == 0)
+            if (n % nregrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
                 fclaw2d_regrid(domain);

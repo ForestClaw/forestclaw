@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+
+../forestclaw/configure \
+    --enable-mpi \
+    --disable-shared \
+    --enable-static \
+    --without-blas \
+    LDFLAGS="-L/usr/local/zlib/v1.2.7/lib" \
+    LIBS="-lz" \
+    CC=mpixlc_r \
+    CXX=mpixlcxx_r  \
+    F77=mpixlf77_r \
+    FC=mpixlf90_r \
+    CPPFLAGS="-I/usr/local/zlib/include" \
+    CFLAGS="-O2 -qstrict -qarch=qp -qtune=qp -qnostaticlink" \
+    CXXFLAGS="-O2 -qstrict -qarch=qp -qtune=qp -qnostaticlink" \
+    FFLAGS="-O2 -qstrict -qarch=qp -qtune=qp -qnosave" \
+    FCLAGS="-O2 -qstrict -qarch=qp -qtune=qp -qnosave"
+
+#     --no-recursion \
+#     --with-p4est=/Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local \
+#     --with-sc=/Users/calhoun/projects/ForestClaw/code/p4est-build-mpi/local
