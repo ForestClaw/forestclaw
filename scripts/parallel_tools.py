@@ -11,15 +11,16 @@ def compare_runs(execname,rerun,iframe):
     import shutil
     # Compare serial and parallel runs
 
-    files = os.listdir(os.getcwd())
-    pattern = re.compile("p_[0-9]{5}.py")
-    proc_list = []
-    for f in files:
-        if re.match(pattern,f):
-            # Do a run for each processor file
-            proc_list.append(int(f.partition('_')[2].partition('.py')[0]))
-
     if rerun:
+        # Get proc jobs from p_00001.XX files
+        files = os.listdir(os.getcwd())
+        pattern = re.compile("p_[0-9]{5}.py")
+        proc_list = []
+        for f in files:
+            if re.match(pattern,f):
+            # Do a run for each processor file
+                proc_list.append(int(f.partition('_')[2].partition('.py')[0]))
+
         for p in proc_list:
             arg_list = ["mpirun","-n","%d" % p,execname,"--inifile=ex_%05d.ini" % p,
                         "--serialout=T"]
@@ -42,6 +43,16 @@ def compare_runs(execname,rerun,iframe):
                     shutil.move(f,rundir)
 
     else:
+        files = os.listdir(os.getcwd())
+        pattern = re.compile("run_[0-9]{5}")
+        proc_list = []
+        for f in files:
+            if re.match(pattern,f):
+            # Do a run for each processor file
+                proc_list.append(int(f.partition('_')[2]))
+
+        print proc_list
+
         for i,p in enumerate(proc_list):
             for q in proc_list[i+1:]:
                 compare_dir = "compare_%05d_%05d" % (p,q)

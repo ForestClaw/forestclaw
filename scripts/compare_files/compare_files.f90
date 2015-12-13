@@ -255,7 +255,6 @@ PROGRAM compare_files
      CALL write_qfile(mx,my,meqn,xlow,ylow, &
           dx,dy,qc,iframe,ngrid,level,blockno,mpirank,dir3)
 
-
      DEALLOCATE(q1, q2, qc)
   ENDDO
   CLOSE(10)
