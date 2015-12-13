@@ -105,8 +105,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* set specific refinement strategy */
     fclaw2d_domain_set_refinement
-      (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
-       gparms->coarsen_delay);
+        (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
+         gparms->coarsen_delay);
 
     /* start timing */
     fclaw2d_domain_barrier (*domain);
