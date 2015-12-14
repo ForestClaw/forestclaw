@@ -115,8 +115,8 @@ private :
     std::vector<level_data> m_levels;
     int m_local_maxlevel;   /* Local to this proc */
     int m_local_minlevel;
-    int m_minlevel;    /* Set by the user and stored in parms */
-    int m_maxlevel;
+    int m_user_minlevel;    /* Set by the user and stored in parms */
+    int m_user_maxlevel;
     int m_refratio;
     double m_dt_minlevel;
     double m_initial_time;
