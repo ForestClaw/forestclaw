@@ -60,14 +60,15 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
 
     m_local_minlevel = domain->local_minlevel;
     m_local_maxlevel = domain->local_maxlevel;
-    m_minlevel = gparms->minlevel;
-    m_maxlevel = gparms->maxlevel;
 
-    m_levels.resize(m_maxlevel + 1);
+    m_user_minlevel = gparms->minlevel;
+    m_user_maxlevel = gparms->maxlevel;
+
+    m_levels.resize(m_user_maxlevel + 1);
 
     bool subcycle = gparms->subcycle;
     m_nosubcycle = !subcycle;
-    for (int level = m_minlevel; level <= m_local_maxlevel; level++)
+    for (int level = m_user_minlevel; level <= m_local_maxlevel; level++)
     {
         m_levels[level].define(level,m_refratio,m_local_maxlevel,a_initial_t,subcycle);
     }
@@ -88,15 +89,15 @@ fclaw_bool subcycle_manager::subcycle()
 void subcycle_manager::set_dt_minlevel(const double a_dt_minlevel)
 {
     double dt_level = a_dt_minlevel;
-    int rf = pow(m_refratio,m_maxlevel-m_minlevel);
+    int rf = pow(m_refratio,m_user_maxlevel-m_user_minlevel);
     if (!subcycle())
     {
         dt_level /= rf;
     }
     m_dt_minlevel = dt_level;
 
-    m_levels[m_minlevel].set_dt(dt_level);
-    for (int level = m_minlevel+1; level <= m_maxlevel; level++)
+    m_levels[m_user_minlevel].set_dt(dt_level);
+    for (int level = m_user_minlevel+1; level <= m_user_maxlevel; level++)
     {
         if (subcycle())
         {
@@ -109,8 +110,8 @@ void subcycle_manager::set_dt_minlevel(const double a_dt_minlevel)
 void subcycle_manager::set_dt_maxlevel(const double a_dt_maxlevel)
 {
     double dt_level = a_dt_maxlevel;
-    m_levels[m_maxlevel].set_dt(dt_level);
-    for (int level = m_minlevel; level <= m_maxlevel; level++)
+    m_levels[m_user_maxlevel].set_dt(dt_level);
+    for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
     {
         m_levels[level].set_dt(dt_level);
     }
@@ -120,7 +121,7 @@ void subcycle_manager::set_dt_maxlevel(const double a_dt_maxlevel)
 int subcycle_manager::minlevel_factor()
 {
     int factor = 1;
-    for (int level = 1; level <= m_minlevel; level++)
+    for (int level = 1; level <= m_user_minlevel; level++)
     {
         factor *= m_refratio;
     }
@@ -130,7 +131,7 @@ int subcycle_manager::minlevel_factor()
 int subcycle_manager::maxlevel_factor()
 {
     int factor = 1;
-    for (int level = 1; level <= m_maxlevel; level++)
+    for (int level = 1; level <= m_user_maxlevel; level++)
     {
         factor *= m_refratio;
     }
@@ -139,12 +140,12 @@ int subcycle_manager::maxlevel_factor()
 
 int subcycle_manager::minlevel()
 {
-    return m_minlevel;
+    return m_user_minlevel;
 }
 
 int subcycle_manager::maxlevel()
 {
-    return m_maxlevel;
+    return m_user_maxlevel;
 }
 
 int subcycle_manager::local_minlevel()
@@ -159,13 +160,13 @@ int subcycle_manager::local_maxlevel()
 
 int subcycle_manager::user_minlevel()
 {
-    return m_minlevel;
+    return m_user_minlevel;
 }
 
 
 int subcycle_manager::user_maxlevel()
 {
-    return m_maxlevel;
+    return m_user_maxlevel;
 }
 
 
