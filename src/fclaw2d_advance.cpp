@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
+#include <fclaw_math.h>
 
 #include <math.h>
 
@@ -173,18 +174,14 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
-    /* These are global minimum and maximum values (which might
-     not be exactly the min/max set by the user;  some levels
-     may be missing. */
-    int minlevel = a_time_stepper->minlevel();
-    int maxlevel = a_time_stepper->maxlevel();
+    /* Steps that actually need time stepping */
+    int minlevel = a_time_stepper->local_minlevel();
+    int maxlevel = a_time_stepper->local_maxlevel();
 
     /* Number of steps we need to take on the finest level to equal one
        step on the coarsest level.  In the non-subcycled case, this
-       'n_fine_steps' is equal to 1.  In either case, we have
-       n_fine_steps = 2^(maxlevel-minlevel)
-    */
-    int n_fine_steps = a_time_stepper->step_inc(minlevel);
+       'n_fine_steps' is always equal to 1. */
+    int n_fine_steps = a_time_stepper->step_inc(a_time_stepper->user_minlevel());
 
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
@@ -194,7 +191,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
                                         a_time_stepper);
         maxcfl = fmax(cfl_step,maxcfl);
         int last_step = a_time_stepper->last_step(maxlevel);
-        if (!a_time_stepper->nosubcycle() && last_step < n_fine_steps)
+        if (a_time_stepper->subcycle() && last_step < n_fine_steps)
         {
             /* Find time interpolated level and do ghost patch exchange
                and ghost cell exchange for next update. */
@@ -205,18 +202,9 @@ double advance_all_levels(fclaw2d_domain_t *domain,
                 time_interp_level--;
             }
 
-            /* This exchange includes an exchange between level
-               maxlevel-n+1 and the time interpolated patch at level
-               maxlevel-n. */
+            double sync_time = a_time_stepper->sync_time();
 
-            /* coarsest level is a time interpolated level */
             int time_interp = 1;
-#if 0
-            fclaw2d_ghost_update(domain,minlevel,maxlevel,
-                                 time_interp,FCLAW2D_TIMER_ADVANCE);
-#endif
-            double sync_time = a_time_stepper->level_time(last_step);
-
             fclaw2d_ghost_update(domain,
                                  time_interp_level+1,
                                  maxlevel,
@@ -243,7 +231,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     int time_interp = 0;
 
     /* Physical time needed for physical boundary conditions */
-    double sync_time =  a_time_stepper->level_time(n_fine_steps);
+    double sync_time =  a_time_stepper->sync_time();
     fclaw2d_ghost_update(domain,minlevel,maxlevel,sync_time,
                          time_interp,FCLAW2D_TIMER_ADVANCE);
 

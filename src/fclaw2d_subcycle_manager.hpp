@@ -59,6 +59,7 @@ public:
     void set_time(double t);
     double dt();
 
+#if 0
     bool level_exchange_done();
     bool exchanged_with_coarser();
     bool exchanged_with_finer();
@@ -66,12 +67,15 @@ public:
     void increment_level_exchange_counter();
     void increment_coarse_exchange_counter();
     void increment_fine_exchange_counter();
+#endif
 
     int m_level;
     int m_last_step;
+#if 0
     int m_last_level_exchange;
     int m_last_coarse_exchange;
     int m_last_fine_exchange;
+#endif
     int m_step_inc;
 
     double m_time;
@@ -87,21 +91,30 @@ public:
     ~subcycle_manager();
     void define(fclaw2d_domain_t *domain,
                 const amr_options_t *gparms,
-                const double a_time);
+                const double a_time,
+                const double dt_minlevel);
 
+#if 0
     bool can_advance(const int a_level, const int a_from_step);
 
     bool solution_updated(const int a_level, const int a_step);
     bool level_exchange_done(const int a_level);
     bool exchanged_with_coarser(const int a_level);
     bool exchanged_with_finer(const int a_level);
+    bool is_finest(const int a_level);
+    void increment_level_exchange_counter(const int a_level);
+    void increment_coarse_exchange_counter(const int a_level);
+    void increment_fine_exchange_counter(const int a_level);
+#endif
 
     int last_step(const int a_level);
     int step_inc(const int a_level);
     void increment_step_counter(const int a_level);
 
     bool nosubcycle();
+    bool subcycle();
     int verbosity();
+    double sync_time();
 
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
@@ -117,18 +130,21 @@ public:
     int maxlevel_factor();
 
     bool is_coarsest(const int a_level);
-    bool is_finest(const int a_level);
     int minlevel();
     int maxlevel();
 
-    void increment_level_exchange_counter(const int a_level);
-    void increment_coarse_exchange_counter(const int a_level);
-    void increment_fine_exchange_counter(const int a_level);
+    int local_minlevel();
+    int local_maxlevel();
+
+    int user_minlevel();
+    int user_maxlevel();
 
 private :
     std::vector<level_data> m_levels;
+    int m_local_maxlevel;   /* Local to this proc */
+    int m_local_minlevel;
+    int m_minlevel;    /* Set by the user and stored in parms */
     int m_maxlevel;
-    int m_minlevel;
     int m_refratio;
     double m_dt_minlevel;
     double m_initial_time;
