@@ -59,23 +59,8 @@ public:
     void set_time(double t);
     double dt();
 
-#if 0
-    bool level_exchange_done();
-    bool exchanged_with_coarser();
-    bool exchanged_with_finer();
-
-    void increment_level_exchange_counter();
-    void increment_coarse_exchange_counter();
-    void increment_fine_exchange_counter();
-#endif
-
     int m_level;
     int m_last_step;
-#if 0
-    int m_last_level_exchange;
-    int m_last_coarse_exchange;
-    int m_last_fine_exchange;
-#endif
     int m_step_inc;
 
     double m_time;
@@ -93,19 +78,6 @@ public:
                 const amr_options_t *gparms,
                 const double a_time,
                 const double dt_minlevel);
-
-#if 0
-    bool can_advance(const int a_level, const int a_from_step);
-
-    bool solution_updated(const int a_level, const int a_step);
-    bool level_exchange_done(const int a_level);
-    bool exchanged_with_coarser(const int a_level);
-    bool exchanged_with_finer(const int a_level);
-    bool is_finest(const int a_level);
-    void increment_level_exchange_counter(const int a_level);
-    void increment_coarse_exchange_counter(const int a_level);
-    void increment_fine_exchange_counter(const int a_level);
-#endif
 
     int last_step(const int a_level);
     int step_inc(const int a_level);
