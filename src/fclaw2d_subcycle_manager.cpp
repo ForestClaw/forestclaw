@@ -217,90 +217,6 @@ double subcycle_manager::initial_time()
     return m_initial_time;
 }
 
-#if 0
-fclaw_bool subcycle_manager::is_finest(const int a_level)
-{
-    return a_level == m_local_maxlevel;
-}
-
-fclaw_bool subcycle_manager::solution_updated(const int a_level, const int a_step)
-{
-    return m_levels[a_level].m_last_step >= a_step;
-}
-
-fclaw_bool subcycle_manager::level_exchange_done(const int a_level)
-{
-    return m_levels[a_level].level_exchange_done();
-}
-
-fclaw_bool subcycle_manager::exchanged_with_coarser(const int a_level)
-{
-    if (is_coarsest(a_level))
-        return true;
-    else
-        return m_levels[a_level].exchanged_with_coarser();
-}
-
-fclaw_bool subcycle_manager::exchanged_with_finer(const int a_level)
-{
-    if (is_finest(a_level))
-        return true;
-    else
-        return m_levels[a_level].exchanged_with_finer();
-}
-
-void subcycle_manager::increment_level_exchange_counter(const int a_level)
-{
-    m_levels[a_level].increment_level_exchange_counter();
-}
-
-void subcycle_manager::increment_coarse_exchange_counter(const int a_level)
-{
-    if (!is_coarsest(a_level))
-        m_levels[a_level].increment_coarse_exchange_counter();
-}
-
-void subcycle_manager::increment_fine_exchange_counter(const int a_level)
-{
-if (!is_finest(a_level))
-    m_levels[a_level].increment_fine_exchange_counter();
-}
-
-fclaw_bool subcycle_manager::can_advance(const int a_level, const int a_curr_step)
-{
-    fclaw_bool verbose = false;
-    fclaw_bool b1 = solution_updated(a_level,a_curr_step);
-    fclaw_bool b2 = level_exchange_done(a_level);
-    fclaw_bool b3 = exchanged_with_coarser(a_level);
-    fclaw_bool b4 = exchanged_with_finer(a_level);  // This may not be needed.
-    if (verbose)
-    {
-        if (!b1)
-        {
-            cout << " --> (can_advance) Solution at level " << a_level <<
-                " has not been updated at step " << a_curr_step << endl;
-        }
-        if (!b2)
-        {
-            cout << " --> (can_advance) Level exchange at level " << a_level <<
-                " has not been done at step " << a_curr_step << endl;
-        }
-        if (!b3)
-        {
-            cout << " --> (can_advance) Exchange with coarse grid at level " << a_level-1 <<
-                " not done at step " << a_curr_step << endl;
-        }
-        if (!b4)
-        {
-            cout << " --> (can_advance) Exchange with finer grid at level " << a_level+1 <<
-                " not done at step " << a_curr_step << endl;
-        }
-    }
-    return b1 && b2 && b3 && b4;
-}
-
-
-#endif
 
 int subcycle_manager::step_inc(const int a_level)
 {
@@ -325,10 +241,6 @@ void level_data::define(const int level,
 {
     m_level = level;
     m_last_step = 0;
-#if 0
-    m_last_level_exchange = 0;   // Assume that the level exchange has been done at subcycled time
-                                 // step 0.
-#endif
     m_time = time;
 
     if (subcycle)
@@ -372,38 +284,6 @@ void level_data::set_time(const double a_t_level)
     m_time = a_t_level;
 }
 
-#if 0
-void level_data::increment_level_exchange_counter()
-{
-    m_last_level_exchange += m_step_inc;
-}
-
-void level_data::increment_coarse_exchange_counter()
-{
-    m_last_coarse_exchange += m_step_inc;
-}
-
-void level_data::increment_fine_exchange_counter()
-{
-    m_last_fine_exchange += m_step_inc;
-}
-
-
-fclaw_bool level_data::level_exchange_done()
-{
-    return m_last_level_exchange == m_last_step;
-}
-
-fclaw_bool level_data::exchanged_with_coarser()
-{
-    return m_last_coarse_exchange == m_last_step;
-}
-
-fclaw_bool level_data::exchanged_with_finer()
-{
-    return m_last_fine_exchange == m_last_step;
-}
-#endif
 
 #ifdef __cplusplus
 #if 0
