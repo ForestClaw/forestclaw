@@ -44,12 +44,17 @@ public:
 
     level_data();
     ~level_data();
+    void define(const int level,
+                const double time);
 
-    void define(const int a_level,
-                const int a_refratio,
-                const int a_maxlevel,
-                const double a_time,
-                const bool a_subcycle);
+#if 0
+    void define(const int level,
+                const int refratio,
+                const int maxlevel,
+                const double time,
+                const int subcycle,
+                const int global_time_stepping);
+#endif
 
     void set_dt(const double a_dt);
 
@@ -62,6 +67,7 @@ public:
     int m_level;
     int m_last_step;
     int m_step_inc;
+    int m_total_steps;  /* Steps this level needs to take */
 
     double m_time;
     double m_dt;
@@ -76,7 +82,7 @@ public:
     ~subcycle_manager();
     void define(fclaw2d_domain_t *domain,
                 const amr_options_t *gparms,
-                const double a_time,
+                const double time,
                 const double dt_minlevel);
 
     int last_step(const int a_level);
@@ -85,9 +91,7 @@ public:
 
     bool nosubcycle();
     bool subcycle();
-    int verbosity();
     double sync_time();
-
 
     // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
     // i.e. powers of ref_ratio.
@@ -95,15 +99,14 @@ public:
     double initial_time();
     double dt(int level);
     void increment_time(const int a_level);
-    void set_dt_minlevel(const double a_dt);
-    void set_dt_maxlevel(const double a_dt);
+    int fine_steps();
+    double global_step();
+    int global_time_stepping();
 
-    int minlevel_factor();
-    int maxlevel_factor();
+    /* These are on their way out ... */
+    void set_dt_minlevel(const double a_dt);
 
     bool is_coarsest(const int a_level);
-    int minlevel();
-    int maxlevel();
 
     int local_minlevel();
     int local_maxlevel();
@@ -111,17 +114,26 @@ public:
     int user_minlevel();
     int user_maxlevel();
 
+    int global_minlevel();
+    int global_maxlevel();
+
 private :
     std::vector<level_data> m_levels;
-    int m_local_maxlevel;   /* Local to this proc */
-    int m_local_minlevel;
+    int m_refratio;
     int m_user_minlevel;    /* Set by the user and stored in parms */
     int m_user_maxlevel;
-    int m_refratio;
+    int m_local_minlevel;
+    int m_local_maxlevel;   /* Local to this proc */
+    int m_global_minlevel;    /* Set by the user and stored in parms */
+    int m_global_maxlevel;
+#if 0
     double m_dt_minlevel;
+#endif
     double m_initial_time;
-    bool m_nosubcycle;
-    int m_verbosity;
+    bool m_subcycle;
+    int m_fine_steps;
+    int m_global_time_stepping;
+    double m_global_step;
 };
 
 
