@@ -44,7 +44,6 @@ typedef struct fclaw2d_level_time_data
     double dt;
     double t_initial;
     double t_level;
-    bool fixed_dt;
 
     /* Needed for explicit CFL limited schemes */
     double maxcfl;
@@ -53,6 +52,7 @@ typedef struct fclaw2d_level_time_data
     /* Extra data that might be needed for more complicated time stepping.
      * Not always set.
      */
+    bool fixed_dt;
     double alpha;               /* Fraction of coarser dt completed. */
     double t_coarse;
     double dt_coarse;

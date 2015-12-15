@@ -143,12 +143,11 @@ void outstyle_1(fclaw2d_domain_t **domain)
     double final_time = gparms->tfinal;
     int nout = gparms->nout;
     double initial_dt = gparms->initial_dt;
+    double dt_minlevel = initial_dt;
 
     double t0 = 0;
 
     double dt_outer = (final_time-t0)/double(nout);
-    int level_factor = pow_int(2,gparms->minlevel);
-    double dt_level0 = initial_dt*level_factor;  // Get a level 0 time step
     double t_curr = t0;
 
     for(int n = 0; n < nout; n++)
@@ -159,7 +158,6 @@ void outstyle_1(fclaw2d_domain_t **domain)
         while (t_curr < tend)
         {
             subcycle_manager time_stepper;
-            double dt_minlevel = dt_level0/level_factor;
             time_stepper.define(*domain,gparms,t_curr,dt_minlevel);
 
             fclaw2d_domain_set_time(*domain,t_curr);
@@ -182,34 +180,16 @@ void outstyle_1(fclaw2d_domain_t **domain)
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             }
 
-            /* Take a stable level 0 time step (use this as the base
-               level time step even if we have no grids on level 0) and
-               reduce it. */
-            int reduce_factor;
-            if (!time_stepper.subcycle())
-            {
-                /* Take one step of a stable time step for the finest
-                   non-empty level. */
-                reduce_factor = time_stepper.maxlevel_factor();
-            }
-            else
-            {
-                /* Take one step of a stable time step for the coarsest
-                   non-empty level. */
-                reduce_factor = time_stepper.minlevel_factor();
-            }
-            double dt_minlevel_desired = dt_level0/reduce_factor;
-
             /* Use the tolerance to make sure we don't take a tiny time
                step just to hit 'tend'.   We will take a slightly larger
                time step now (dt_cfl + tol) rather than taking a time step
                of 'dt_minlevel' now, followed a time step of only 'tol' in
                the next step.  Of course if 'tend - t_curr > dt_minlevel',
                then dt_minlevel doesn't change. */
-            double tol = 1e-2*dt_minlevel_desired;
+            double tol = 1e-2*dt_minlevel;
             fclaw_bool took_small_step = false;
             fclaw_bool took_big_step = false;
-            dt_minlevel = dt_minlevel_desired;
+            double dt_minlevel_desired = dt_minlevel;
             if (!gparms->use_fixed_dt)
             {
                 double small_step = tend-t_curr-dt_minlevel;
@@ -230,8 +210,6 @@ void outstyle_1(fclaw2d_domain_t **domain)
                     }
                 }
             }
-            /* This also sets a scaled time step for all finer levels. */
-            time_stepper.set_dt_minlevel(dt_minlevel);
 
             double maxcfl_step = advance_all_levels(*domain, &time_stepper);
 
@@ -240,10 +218,14 @@ void outstyle_1(fclaw2d_domain_t **domain)
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
-            fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+
+            double tc = time_stepper.sync_time();
+            fclaw_global_productionf("Level %d (%2d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",    \
-                                     time_stepper.minlevel(),n_inner,dt_minlevel,
-                                     maxcfl_step, t_curr+dt_minlevel);
+                                     time_stepper.user_minlevel(),
+                                     time_stepper.local_minlevel(),
+                                     n_inner,dt_minlevel,
+                                     maxcfl_step, tc);
 
             if (maxcfl_step > gparms->max_cfl)
             {
@@ -254,7 +236,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
                     restore_time_step(*domain);
 
                     /* Modify dt_level0 from step used. */
-                    dt_level0 = dt_level0*gparms->desired_cfl/maxcfl_step;
+                    dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
 
                     /* Got back to start of loop, without incrementing
                        step counter or time level */
@@ -280,10 +262,10 @@ void outstyle_1(fclaw2d_domain_t **domain)
 
                 /* New time step, which should give a cfl close to the
                    desired cfl. */
-                double dt_new = dt_level0*gparms->desired_cfl/maxcfl_step;
+                double dt_new = dt_minlevel*gparms->desired_cfl/maxcfl_step;
                 if (!took_small_step)
                 {
-                    dt_level0 = dt_new;
+                    dt_minlevel = dt_new;
                 }
                 else
                 {
@@ -334,11 +316,25 @@ void outstyle_3(fclaw2d_domain_t **domain)
     double t0 = 0;
     double dt_minlevel = initial_dt;
     fclaw2d_domain_set_time(*domain,t0);
-
+    int nstep_outer = gparms->nout;
+    int nstep_inner = gparms->nstep;
+    int nregrid_interval = gparms->regrid_interval;
+    if (gparms->global_time_stepping && !gparms->subcycle)
+    {
+        /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
+           a given nout/nstep pair works for both subcycled
+           and non-subcycled cases */
+        int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
+        nstep_outer *= mf;
+#if 0
+        nstep_inner *= mf;  /* Only produce nout/nstep output files */
+        nregrid_interval *= mf;
+#endif
+    }
 
     int n = 0;
     double t_curr = t0;
-    while (n < gparms->nout)
+    while (n < nstep_outer)
     {
         /* Count only coarse grid time steps */
         subcycle_manager time_stepper;
@@ -370,11 +366,14 @@ void outstyle_3(fclaw2d_domain_t **domain)
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
-        double dt_step = time_stepper.dt(gparms->minlevel);
+        double dt_step = time_stepper.global_step();
         double tc = time_stepper.sync_time();
-        fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+        fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                  "%8.3f; Final time = %12.4f\n",
-                                 time_stepper.minlevel(),n+1,
+                                 time_stepper.user_minlevel(),
+                                 time_stepper.local_minlevel(),
+                                 time_stepper.local_maxlevel(),
+                                 n+1,
                                  dt_step,maxcfl_step, tc);
 
         if (maxcfl_step > gparms->max_cfl)
@@ -408,20 +407,22 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (gparms->regrid_interval > 0)
         {
-            if (n % gparms->regrid_interval == 0)
+            if (n % nregrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
                 fclaw2d_regrid(domain);
             }
         }
 
-        if (n % gparms->nstep == 0)
+        if (n % nstep_inner == 0)
         {
             iframe++;
             fclaw2d_output_frame(*domain,iframe);
         }
     }
 }
+
+#if 0
 
 static
 void outstyle_4(fclaw2d_domain_t **domain)
@@ -433,6 +434,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
 
+    int expand_to_fine = 1;  /* Make this an option */
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
     int nregrid_interval = gparms->regrid_interval;
@@ -443,12 +445,15 @@ void outstyle_4(fclaw2d_domain_t **domain)
            and non-subcycled cases */
         int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
         nstep_outer *= mf;
-        nstep_inner *= mf;
-        nregrid_interval *= mf;
+        if (!expand_to_fine)
+        {
+            nstep_inner *= mf;
+            nregrid_interval *= mf;
+        }
     }
 
     double t0 = 0;
-    double dt_minlevel = initial_dt;
+    double dt_minlevel_stable = initial_dt;
     fclaw2d_domain_set_time(*domain,t0);
 
     int n = 0;
@@ -456,7 +461,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         subcycle_manager time_stepper;
-        time_stepper.define(*domain,gparms,t_curr,dt_minlevel);
+        time_stepper.define(*domain,gparms,t_curr,dt_minlevel_stable);
 
         /* In case we have to reject this step */
         if (!gparms->use_fixed_dt)
@@ -486,10 +491,12 @@ void outstyle_4(fclaw2d_domain_t **domain)
 
         double dt_step = time_stepper.dt(gparms->minlevel);
         double tc = time_stepper.sync_time();
-        fclaw_global_productionf("Level %d step %5d : dt = %12.3e; maxcfl (step) = " \
+        FCLAW_ASSERT(fabs(tc-(t_curr+dt_step)) < 1e-12);
+        fclaw_global_productionf("Level %2d (%2d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                  "%8.3f; Final time = %12.4f\n",
-                                 time_stepper.minlevel(),n+1,
-                                 dt_step,maxcfl_step, tc);
+                                 time_stepper.user_minlevel(),
+                                 time_stepper.local_minlevel(),
+                                 n+1,dt_step,maxcfl_step, tc);
 
         if (maxcfl_step > gparms->max_cfl)
         {
@@ -500,7 +507,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
                 restore_time_step(*domain);
 
                 /* Modify dt_level0 from step use */
-                dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+                dt_minlevel_stable = dt_minlevel_stable*gparms->desired_cfl/maxcfl_step;
 
                 /* Got back to start of loop without incrementing step counter or
                    current time. */
@@ -515,7 +522,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
         /* New time step, which should give a cfl close to the desired cfl. */
         if (!gparms->use_fixed_dt)
         {
-            dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+            dt_minlevel_stable = dt_minlevel_stable*gparms->desired_cfl/maxcfl_step;
         }
 
         n++;  /* Increment outer counter */
@@ -538,10 +545,10 @@ void outstyle_4(fclaw2d_domain_t **domain)
 
     }
 }
-
+#endif
 
 static
-void outstyle_5(fclaw2d_domain_t **domain)
+void outstyle_4(fclaw2d_domain_t **domain)
 {
     /* Write out an initial time file */
     int iframe = 0;
@@ -582,7 +589,8 @@ void outstyle_5(fclaw2d_domain_t **domain)
         advance_all_levels(*domain, &time_stepper);
 
         fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
-                                 time_stepper.minlevel(),n+1,dt_minlevel, t_curr+dt_minlevel);
+                                 time_stepper.user_minlevel(),
+                                 n+1,dt_minlevel, t_curr+dt_minlevel);
 
         t_curr += dt_minlevel;
         n++;
@@ -637,9 +645,6 @@ void fclaw2d_run(fclaw2d_domain_t **domain)
         break;
     case 4:
         outstyle_4(domain);
-        break;
-    case 5:
-        outstyle_5(domain);
         break;
     default:
         fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);

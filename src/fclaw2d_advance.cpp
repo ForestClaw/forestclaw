@@ -64,18 +64,18 @@ double update_level_solution(fclaw2d_domain_t *domain,
 
 static
 double advance_level(fclaw2d_domain_t *domain,
-                     const int a_level,
-                     const int a_curr_fine_step,
+                     const int level,
+                     const int curr_fine_step,
                      double maxcfl,
-                     subcycle_manager* a_time_stepper)
+                     subcycle_manager* time_stepper)
 {
-    double t_level = a_time_stepper->level_time(a_level);
+    double t_level = time_stepper->level_time(level);
 
-    int this_level = a_level;
-    int coarser_level = a_level - 1;
+    int this_level = level;
+    int coarser_level = level - 1;
 
     fclaw_global_infof("Advancing level %d from step %d at time %12.6e\n",
-                       this_level,a_curr_fine_step,t_level);
+                       this_level,curr_fine_step,t_level);
 
 
     /* -- Coming into this routine, all ghost cell information
@@ -94,15 +94,15 @@ double advance_level(fclaw2d_domain_t *domain,
     fclaw2d_level_time_data_t time_data;
 
     time_data.t_level = t_level;
-    time_data.t_initial = a_time_stepper->initial_time();
-    time_data.dt = a_time_stepper->dt(this_level);
-    time_data.fixed_dt = a_time_stepper->nosubcycle();
+#if 0
+    time_data.t_initial = time_stepper->initial_time();
+#endif
+    time_data.dt = time_stepper->dt(this_level);
     time_data.maxcfl = maxcfl;
 
     /* ------------------------------------------------------------
-       Advance this level from 'a_curr_fine_step' to
-       'a_curr_fine_step + dt_level'  This returns 0 if there are
-       no grids at this level.
+       Advance this level from 'curr_fine_step' to
+       'curr_fine_step + step_inc(level)'
        ------------------------------------------------------------ */
     double cfl_step = update_level_solution(domain,this_level,
                                             &time_data);
@@ -111,8 +111,8 @@ double advance_level(fclaw2d_domain_t *domain,
     fclaw_global_infof("------ Max CFL on level %d is %12.4e " \
                        " (using dt = %12.4e)\n",this_level,cfl_step,time_data.dt);
 
-    a_time_stepper->increment_step_counter(this_level);
-    a_time_stepper->increment_time(this_level);
+    time_stepper->increment_step_counter(this_level);
+    time_stepper->increment_time(this_level);
 
 
     /* Advance coarser levels recursively.   If we are in the no-subcycle
@@ -125,25 +125,25 @@ double advance_level(fclaw2d_domain_t *domain,
        interpolated data.
     */
 
-    if (!a_time_stepper->is_coarsest(this_level))
+    if (!time_stepper->is_coarsest(this_level))
     {
         /* Advance coarser level, but only if coarse level and this
            level are time synchronized.  */
-        int last_coarse_step = a_time_stepper->last_step(coarser_level);
-        if (last_coarse_step == a_curr_fine_step)
+        int last_coarse_step = time_stepper->last_step(coarser_level);
+        if (last_coarse_step == curr_fine_step)
         {
             double cfl_step = advance_level(domain,coarser_level,
                                             last_coarse_step,
-                                            maxcfl,a_time_stepper);
+                                            maxcfl,time_stepper);
             maxcfl = fmax(maxcfl,cfl_step);
 
-            if (!a_time_stepper->nosubcycle())
+            if (time_stepper->subcycle())
             {
                 /* Time interpolate this data for a future exchange with finer grid */
                 int coarse_inc =
-                    a_time_stepper->step_inc(coarser_level);
+                    time_stepper->step_inc(coarser_level);
                 int new_curr_step =
-                    a_time_stepper->last_step(this_level);
+                    time_stepper->last_step(this_level);
                 double alpha =
                     double(new_curr_step % coarse_inc)/coarse_inc;
 
@@ -158,7 +158,7 @@ double advance_level(fclaw2d_domain_t *domain,
     }
 
     fclaw_global_infof("Advance on level %d done at time %12.6e\n\n",
-                       a_level,a_time_stepper->level_time(a_level));
+                       level,time_stepper->level_time(level));
 
     return maxcfl;  // Maximum from level iteration
 }
@@ -178,39 +178,49 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     int minlevel = a_time_stepper->local_minlevel();
     int maxlevel = a_time_stepper->local_maxlevel();
 
-    /* Number of steps we need to take on the finest level to equal one
-       step on the coarsest level.  In the non-subcycled case, this
-       'n_fine_steps' is always equal to 1. */
-    int n_fine_steps = a_time_stepper->step_inc(a_time_stepper->user_minlevel());
-
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
+    int n_fine_steps = a_time_stepper->fine_steps();
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
         double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,
                                         a_time_stepper);
         maxcfl = fmax(cfl_step,maxcfl);
         int last_step = a_time_stepper->last_step(maxlevel);
-        if (a_time_stepper->subcycle() && last_step < n_fine_steps)
+        if (last_step < n_fine_steps)
         {
-            /* Find time interpolated level and do ghost patch exchange
-               and ghost cell exchange for next update. */
-            int time_interp_level = maxlevel-1;
-            while (last_step %
-                   a_time_stepper->step_inc(time_interp_level) == 0)
+            if (a_time_stepper->subcycle())
             {
-                time_interp_level--;
+                /* Find time interpolated level and do ghost patch exchange
+                   and ghost cell exchange for next update. */
+                int time_interp_level = maxlevel-1;
+                while (last_step %
+                       a_time_stepper->step_inc(time_interp_level) == 0)
+                {
+                    time_interp_level--;
+                }
+
+                double sync_time = a_time_stepper->sync_time();
+
+                int time_interp = 1;
+                fclaw2d_ghost_update(domain,
+                                     time_interp_level+1,
+                                     maxlevel,
+                                     sync_time,
+                                     time_interp,
+                                     FCLAW2D_TIMER_ADVANCE);
             }
+            else if (!a_time_stepper->global_time_stepping())
+            {
+                double sync_time = a_time_stepper->sync_time();
 
-            double sync_time = a_time_stepper->sync_time();
-
-            int time_interp = 1;
-            fclaw2d_ghost_update(domain,
-                                 time_interp_level+1,
-                                 maxlevel,
-                                 sync_time,
-                                 time_interp,
-                                 FCLAW2D_TIMER_ADVANCE);
+                int time_interp = 0;
+                fclaw2d_ghost_update(domain,
+                                     minlevel,maxlevel,
+                                     sync_time,
+                                     time_interp,
+                                     FCLAW2D_TIMER_ADVANCE);
+            }
         }
     }
     /* Do a complete update.  This is needed even if we are regridding
