@@ -47,15 +47,6 @@ public:
     void define(const int level,
                 const double time);
 
-#if 0
-    void define(const int level,
-                const int refratio,
-                const int maxlevel,
-                const double time,
-                const int subcycle,
-                const int global_time_stepping);
-#endif
-
     void set_dt(const double a_dt);
 
     void increment_step_counter();
@@ -86,10 +77,15 @@ public:
                 const double dt_minlevel);
 
     int last_step(const int a_level);
+#if 0
+    int is_final_step(const int level);
+#endif
     int step_inc(const int a_level);
     void increment_step_counter(const int a_level);
 
+#if 0
     bool nosubcycle();
+#endif
     bool subcycle();
     double sync_time();
 
@@ -102,9 +98,6 @@ public:
     int fine_steps();
     double global_step();
     int global_time_stepping();
-
-    /* These are on their way out ... */
-    void set_dt_minlevel(const double a_dt);
 
     bool is_coarsest(const int a_level);
 

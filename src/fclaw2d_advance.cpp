@@ -94,9 +94,6 @@ double advance_level(fclaw2d_domain_t *domain,
     fclaw2d_level_time_data_t time_data;
 
     time_data.t_level = t_level;
-#if 0
-    time_data.t_initial = time_stepper->initial_time();
-#endif
     time_data.dt = time_stepper->dt(this_level);
     time_data.maxcfl = maxcfl;
 
@@ -150,8 +147,6 @@ double advance_level(fclaw2d_domain_t *domain,
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
-                /* This happens even if there are no grids at the
-                   time interp level */
                 fclaw2d_timeinterp(domain,coarser_level,alpha);
             }
         }
@@ -160,7 +155,7 @@ double advance_level(fclaw2d_domain_t *domain,
     fclaw_global_infof("Advance on level %d done at time %12.6e\n\n",
                        level,time_stepper->level_time(level));
 
-    return maxcfl;  // Maximum from level iteration
+    return maxcfl;  /* Maximum from level iteration */
 }
 
 /* -------------------------------------------------------------
@@ -174,26 +169,36 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
-    /* Steps that actually need time stepping */
-    int minlevel = a_time_stepper->local_minlevel();
-    int maxlevel = a_time_stepper->local_maxlevel();
+    /* Advance all grids that are present somewhere (on any proc) */
+    int minlevel = a_time_stepper->global_minlevel();
+    int maxlevel = a_time_stepper->global_maxlevel();
 
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
+
+    /* Take steps on the finest level grids present anywhere */
     int n_fine_steps = a_time_stepper->fine_steps();
     for(int nf = 0; nf < n_fine_steps; nf++)
     {
+        /* We have to start with the global maxlevel, even if locally,
+           this level is not present.  The reason for this is that a local
+           level< global maxlevel may be needed for time interpolation,
+           but this will on only be computed for grids coarser than
+           maxlevel. */
+
         double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,
                                         a_time_stepper);
         maxcfl = fmax(cfl_step,maxcfl);
-        int last_step = a_time_stepper->last_step(maxlevel);
-        if (last_step < n_fine_steps)
+        if (nf < n_fine_steps)
         {
+            /* Do ghost exchanges, either globally or with time interpolated
+               levels */
             if (a_time_stepper->subcycle())
             {
                 /* Find time interpolated level and do ghost patch exchange
                    and ghost cell exchange for next update. */
                 int time_interp_level = maxlevel-1;
+                int last_step = a_time_stepper->last_step(maxlevel);
                 while (last_step %
                        a_time_stepper->step_inc(time_interp_level) == 0)
                 {
@@ -210,13 +215,14 @@ double advance_all_levels(fclaw2d_domain_t *domain,
                                      time_interp,
                                      FCLAW2D_TIMER_ADVANCE);
             }
-            else if (!a_time_stepper->global_time_stepping())
+            else if (a_time_stepper->global_time_stepping())
             {
                 double sync_time = a_time_stepper->sync_time();
 
                 int time_interp = 0;
                 fclaw2d_ghost_update(domain,
-                                     minlevel,maxlevel,
+                                     minlevel,
+                                     maxlevel,
                                      sync_time,
                                      time_interp,
                                      FCLAW2D_TIMER_ADVANCE);

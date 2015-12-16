@@ -70,6 +70,7 @@ typedef struct fclaw2d_exchange_info
     fclaw_bool read_parallel_patches;   /* before we have done a parallel exchange */
     fclaw2d_exchange_type_t exchange_type;
     fclaw2d_grid_type_t grid_type;
+    int has_fine_grid_neighbor;
 } fclaw2d_exchange_info_t;
 
 void cb_corner_fill(fclaw2d_domain_t *domain,
