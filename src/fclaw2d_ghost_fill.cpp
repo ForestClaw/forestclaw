@@ -290,6 +290,7 @@ void average2ghost(fclaw2d_domain_t *domain,
     e_info.time_interp = time_interp; /* Does this matter here? */
     e_info.read_parallel_patches = read_parallel_patches;
     e_info.exchange_type = FCLAW2D_AVERAGE;
+    e_info.has_fine_grid_neighbor = 0;
 
     /* Only update ghost cells at local boundaries */
     e_info.grid_type = FCLAW2D_IS_COARSE;
@@ -305,6 +306,12 @@ void average2ghost(fclaw2d_domain_t *domain,
     parallel_mode.cb_fill = cb_corner_fill;
     patch_iterator(domain, coarse_level, cb_parallel_wrap,
                    (void *) &parallel_mode);
+
+#if 0
+    /* Used in time interpolation */
+    int y = parallel_mode.e_info.has_fine_grid_neighbor;
+    fclaw2d_clawpatch_set_finegrid_neighbors(domain,this_patch,y);
+#endif
 
     if (read_parallel_patches)
     {

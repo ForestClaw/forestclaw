@@ -319,17 +319,20 @@ void outstyle_3(fclaw2d_domain_t **domain)
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
     int nregrid_interval = gparms->regrid_interval;
-    if (gparms->global_time_stepping && !gparms->subcycle)
+    if (!gparms->subcycle)
     {
-        /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
-           a given nout/nstep pair works for both subcycled
-           and non-subcycled cases */
-        int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
-        nstep_outer *= mf;
+        if (gparms->global_time_stepping)
+        {
+            /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
+               a given nout/nstep pair works for both subcycled
+               and non-subcycled cases */
+            int mf = pow_int(2,gparms->maxlevel-gparms->minlevel);
+            nstep_outer *= mf;
 #if 0
-        nstep_inner *= mf;  /* Only produce nout/nstep output files */
-        nregrid_interval *= mf;
+            nstep_inner *= mf;  /* Only produce nout/nstep output files */
+            nregrid_interval *= mf;
 #endif
+        }
     }
 
     int n = 0;
@@ -583,8 +586,6 @@ void outstyle_4(fclaw2d_domain_t **domain)
         }
 
 
-        /* This also sets the time step on all finer levels. */
-        time_stepper.set_dt_minlevel(dt_minlevel);
 
         advance_all_levels(*domain, &time_stepper);
 

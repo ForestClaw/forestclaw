@@ -72,19 +72,10 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
     {
         m_levels[level].define(level,initial_t);
-
-#if 0
-        m_levels[level].define(level,m_refratio,
-                               m_local_maxlevel,
-                               initial_t,
-                               m_subcycle,
-                               m_global_time_stepping);
-#endif
-
     }
 
     /* Set time step and number of steps to take for each level */
-    if (m_global_time_stepping || (!m_global_time_stepping && !m_subcycle))
+    if (!m_subcycle)
     {
         int rf = pow_int(2,m_user_maxlevel-m_user_minlevel);
         double dt_level = dt_minlevel/rf;
@@ -105,37 +96,23 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
                 m_global_step = dt_minlevel;
             }
         }
-
-    }
-    else if (m_subcycle)
-    {
-        double dt_level = dt_minlevel;
-        for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
-        {
-            int rf = pow_int(2,level-m_user_minlevel);
-            m_levels[level].m_dt = dt_level/rf;
-            m_levels[level].m_total_steps = rf;
-            m_levels[level].m_step_inc = pow_int(2,m_user_maxlevel-level);
-        }
-        m_global_step = dt_minlevel;
-    }
-
-#if 0
-    /* Determine how many fine grid steps to take */
-    if (!m_global_time_stepping)
-    {
-        /* Take a full set of steps to advance, either using a multi-rate
-           scheme, or using global stepping, but without doing anything
-           in between */
-        m_fine_steps = pow_int(m_refratio,m_user_maxlevel-m_user_minlevel);
     }
     else
     {
-        /* Take one step and exit */
-        m_fine_steps = 1;
+        double dt_level = dt_minlevel;
+        int steps_inc = pow_int(2,m_user_maxlevel-m_user_minlevel);
+        int total_steps = 1;
+        for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
+        {
+            m_levels[level].m_dt = dt_level;
+            m_levels[level].m_total_steps = total_steps;
+            m_levels[level].m_step_inc = steps_inc;
+            dt_level /= 2;
+            steps_inc /= 2;
+            total_steps *= 2;
+        }
+        m_global_step = dt_minlevel;
     }
-    set_dt_minlevel(dt_minlevel);
-#endif
 }
 
 int subcycle_manager::global_time_stepping()
@@ -153,49 +130,11 @@ fclaw_bool subcycle_manager::subcycle()
     return m_subcycle;
 }
 
-void subcycle_manager::set_dt_minlevel(const double dt_minlevel)
-{
-    double dt_level;
-    int rf = pow(2,m_user_maxlevel-m_user_minlevel);
-    if (!m_subcycle)
-    {
-        dt_level = dt_minlevel/rf;
-        if (m_global_time_stepping)
-        {
-            m_global_step = dt_level;
-        }
-        else
-        {
-            m_global_step = dt_minlevel;
-        }
-    }
-    else
-    {
-        dt_level = dt_minlevel;
-        m_global_step = dt_minlevel;
-    }
-
-    m_levels[m_user_minlevel].set_dt(dt_level);
-    for (int level = m_user_minlevel+1; level <= m_user_maxlevel; level++)
-    {
-        if (m_subcycle)
-        {
-            dt_level /= m_refratio;
-        }
-        m_levels[level].set_dt(dt_level);
-    }
-    for(int level = m_user_minlevel; level <= m_user_maxlevel; level++)
-    {
-        FCLAW_ASSERT(m_levels[level].m_step_inc*m_levels[level].m_dt == dt_level);
-    }
-}
 
 int subcycle_manager::fine_steps()
 {
-    return m_levels[m_local_maxlevel].m_total_steps;
+    return m_levels[m_global_maxlevel].m_total_steps;
 }
-
-
 
 int subcycle_manager::local_minlevel()
 {
@@ -235,6 +174,14 @@ int subcycle_manager::last_step(const int a_level)
 {
     return m_levels[a_level].m_last_step;
 }
+
+#if 0
+int subcycle_manager::is_final_step(const int level)
+{
+    return m_levels[level].m_last_step == m_levels[level].m_total_steps;
+}
+#endif
+
 
 void subcycle_manager::increment_step_counter(const int level)
 {
@@ -291,30 +238,6 @@ void level_data::define(const int level,
     m_last_step = 0;
     m_time = time;
 }
-
-#if 0
-void level_data::define(const int level,
-                        const int refratio,
-                        const int user_maxlevel,
-                        const double dt_minlevel,
-                        const double time,
-                        const int subcycle,
-                        const int global_time_stepping)
-{
-    m_level = level;
-    m_last_step = 0;
-    m_time = time;
-
-    if (subcycle)
-    {
-        m_step_inc = pow_int(refratio,user_maxlevel-level);
-    }
-    else
-    {
-        m_step_inc = 1;
-    }
-}
-#endif
 
 void level_data::set_dt(const double dt_level)
 {
