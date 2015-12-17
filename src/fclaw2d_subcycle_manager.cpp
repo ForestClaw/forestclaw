@@ -50,7 +50,7 @@ subcycle_manager::~subcycle_manager() {}
 void subcycle_manager::define(fclaw2d_domain_t *domain,
                               const amr_options_t *gparms,
                               const double initial_t,
-                              const double dt_minlevel)
+                              const double dt_global_step)
 {
     m_refratio = gparms->refratio;
     m_initial_time = initial_t;
@@ -75,31 +75,31 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     }
 
     /* Set time step and number of steps to take for each level */
+    m_global_step = dt_global_step;
     if (!m_subcycle)
     {
         int rf = pow_int(2,m_user_maxlevel-m_user_minlevel);
-        double dt_level = dt_minlevel/rf;
         for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
         {
-            m_levels[level].m_dt = dt_level;
             m_levels[level].m_step_inc = 1;
             if (m_global_time_stepping)
             {
-                /* We are returning after each step */
+                /* We do something between each step */
+                m_levels[level].m_dt = dt_global_step;
                 m_levels[level].m_total_steps = 1;
-                m_global_step = dt_level;
             }
             else
             {
-                /* We do several fine grid steps before returning */
+                /* We take rf steps here without regridding or writing output
+                   files between each step.  */
+                m_levels[level].m_dt = dt_global_step/rf;
                 m_levels[level].m_total_steps = rf;
-                m_global_step = dt_minlevel;
             }
         }
     }
     else
     {
-        double dt_level = dt_minlevel;
+        double dt_level = dt_global_step;
         int steps_inc = pow_int(2,m_user_maxlevel-m_user_minlevel);
         int total_steps = 1;
         for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
@@ -111,7 +111,6 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
             steps_inc /= 2;
             total_steps *= 2;
         }
-        m_global_step = dt_minlevel;
     }
 }
 

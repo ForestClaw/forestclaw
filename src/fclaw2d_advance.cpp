@@ -169,6 +169,8 @@ double advance_all_levels(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
+
+
     /* Advance all grids that are present somewhere (on any proc) */
     int minlevel = a_time_stepper->global_minlevel();
     int maxlevel = a_time_stepper->global_maxlevel();
@@ -191,8 +193,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
         maxcfl = fmax(cfl_step,maxcfl);
         if (nf < n_fine_steps)
         {
-            /* Do ghost exchanges, either globally or with time interpolated
-               levels */
+            /* Do intermediate ghost cell exchanges */
             if (a_time_stepper->subcycle())
             {
                 /* Find time interpolated level and do ghost patch exchange
@@ -215,7 +216,7 @@ double advance_all_levels(fclaw2d_domain_t *domain,
                                      time_interp,
                                      FCLAW2D_TIMER_ADVANCE);
             }
-            else if (a_time_stepper->global_time_stepping())
+            else
             {
                 double sync_time = a_time_stepper->sync_time();
 
@@ -246,7 +247,9 @@ double advance_all_levels(fclaw2d_domain_t *domain,
 
     int time_interp = 0;
 
-    /* Physical time needed for physical boundary conditions */
+    /* Do the ghost update for all levels, even those that are not
+       on this processor, because this processor may still need to pass
+       info to other processors */
     double sync_time =  a_time_stepper->sync_time();
     fclaw2d_ghost_update(domain,minlevel,maxlevel,sync_time,
                          time_interp,FCLAW2D_TIMER_ADVANCE);
