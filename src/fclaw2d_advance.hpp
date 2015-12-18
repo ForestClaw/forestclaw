@@ -91,10 +91,10 @@ public:
 private :
     std::vector<fclaw2d_level_data> m_levels;
 #if 0
-    fclaw2d_level_data_t *m_levels;
+    fclaw2d_level_data_t *m_levels;  /* This works ... */
 #endif
 
-    int m_local_minlevel;  /* Needed for assertion in computing alpha */
+    int m_local_minlevel;
 
 };
 
