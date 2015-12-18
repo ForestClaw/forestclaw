@@ -24,12 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_subcycle_manager.hpp>
 #include <fclaw_math.h>
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
+#include <fclaw2d_subcycle_manager.hpp>
 
 using namespace std;
 
@@ -43,46 +40,50 @@ extern "C"
 #endif
 
 
+#if 0
+subcycle_manager::subcycle_manager()
+{
+    m_levels = NULL;
+}
+subcycle_manager::~subcycle_manager()
+{
+    FCLAW_FREE(m_levels);
+}
+#endif
 
-subcycle_manager::subcycle_manager() {}
-subcycle_manager::~subcycle_manager() {}
+subcycle_manager::subcycle_manager() {};
+subcycle_manager::~subcycle_manager() {};
 
 void subcycle_manager::define(fclaw2d_domain_t *domain,
                               const amr_options_t *gparms,
                               const double initial_t,
                               const double dt_global_step)
 {
-    m_refratio = gparms->refratio;
-    m_initial_time = initial_t;
+    /* Needed for assertion in computing alpha */
     m_local_minlevel = domain->local_minlevel;
-    m_local_maxlevel = domain->local_maxlevel;
 
-    m_global_minlevel = domain->global_minlevel;
-    m_global_maxlevel = domain->global_maxlevel;
+    /* Using std::vector<level_data> */
+    m_levels.resize(gparms->maxlevel + 1);
 
-    m_user_minlevel = gparms->minlevel;
-    m_user_maxlevel = gparms->maxlevel;
-
-    m_levels.resize(m_user_maxlevel + 1);
-
-    m_subcycle = gparms->subcycle;
-    m_global_time_stepping = gparms->global_time_stepping;
+#if 0
+    m_levels = FCLAW2D_ALLOC(level_data_t,gparms->maxlevel+1);
+#endif
 
     /* Set global indexing for time levels */
-    for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
+    for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
     {
-        m_levels[level].define(level,initial_t);
+        m_levels[level].m_last_step = 0;
+        m_levels[level].m_time = initial_t;
     }
 
     /* Set time step and number of steps to take for each level */
-    m_global_step = dt_global_step;
-    if (!m_subcycle)
+    if (!gparms->subcycle)
     {
-        int rf = pow_int(2,m_user_maxlevel-m_user_minlevel);
-        for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
+        int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
+        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
             m_levels[level].m_step_inc = 1;
-            if (m_global_time_stepping)
+            if (gparms->global_time_stepping)
             {
                 /* We do something between each step */
                 m_levels[level].m_dt = dt_global_step;
@@ -100,9 +101,9 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     else
     {
         double dt_level = dt_global_step;
-        int steps_inc = pow_int(2,m_user_maxlevel-m_user_minlevel);
+        int steps_inc = pow_int(2,gparms->maxlevel-gparms->minlevel);
         int total_steps = 1;
-        for (int level = m_user_minlevel; level <= m_user_maxlevel; level++)
+        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
             m_levels[level].m_dt = dt_level;
             m_levels[level].m_total_steps = total_steps;
@@ -114,109 +115,24 @@ void subcycle_manager::define(fclaw2d_domain_t *domain,
     }
 }
 
-int subcycle_manager::global_time_stepping()
+int subcycle_manager::steps(int level)
 {
-    return m_global_time_stepping;
+    return m_levels[level].m_total_steps;
 }
 
-double subcycle_manager::global_step()
+int subcycle_manager::last_step(const int level)
 {
-    return m_global_step;
+    return m_levels[level].m_last_step;
 }
-
-fclaw_bool subcycle_manager::subcycle()
-{
-    return m_subcycle;
-}
-
-
-int subcycle_manager::fine_steps()
-{
-    return m_levels[m_global_maxlevel].m_total_steps;
-}
-
-int subcycle_manager::local_minlevel()
-{
-    return m_local_minlevel;
-}
-
-int subcycle_manager::local_maxlevel()
-{
-    return m_local_maxlevel;
-}
-
-int subcycle_manager::user_minlevel()
-{
-    return m_user_minlevel;
-}
-
-
-int subcycle_manager::user_maxlevel()
-{
-    return m_user_maxlevel;
-}
-
-int subcycle_manager::global_minlevel()
-{
-    return m_global_minlevel;
-}
-
-
-int subcycle_manager::global_maxlevel()
-{
-    return m_global_maxlevel;
-}
-
-
-
-int subcycle_manager::last_step(const int a_level)
-{
-    return m_levels[a_level].m_last_step;
-}
-
-#if 0
-int subcycle_manager::is_final_step(const int level)
-{
-    return m_levels[level].m_last_step == m_levels[level].m_total_steps;
-}
-#endif
-
-
-void subcycle_manager::increment_step_counter(const int level)
-{
-    m_levels[level].increment_step_counter();
-}
-
-void subcycle_manager::increment_time(const int level)
-{
-    m_levels[level].increment_time();
-}
-
-fclaw_bool subcycle_manager::is_coarsest(const int level)
-{
-    return level == m_local_minlevel;
-}
-
 
 double subcycle_manager::dt(const int level)
 {
-    return m_levels[level].dt();
+    return m_levels[level].m_dt;
 }
-
 
 double subcycle_manager::level_time(const int level)
 {
-    return m_levels[level].current_time();
-}
-
-double subcycle_manager::sync_time()
-{
-    return m_levels[m_local_maxlevel].current_time();
-}
-
-double subcycle_manager::initial_time()
-{
-    return m_initial_time;
+    return m_levels[level].m_time;
 }
 
 
@@ -226,49 +142,43 @@ int subcycle_manager::step_inc(const int level)
 }
 
 
-
-level_data::level_data() {}
-level_data::~level_data() {}
-
-void level_data::define(const int level,
-                        const double time)
+void subcycle_manager::increment_step_counter(const int level)
 {
-    m_level = level;
-    m_last_step = 0;
-    m_time = time;
+    int step_inc = m_levels[level].m_step_inc;
+    m_levels[level].m_last_step += step_inc;
 }
 
-void level_data::set_dt(const double dt_level)
+void subcycle_manager::increment_time(const int level)
 {
-    m_dt = dt_level;
+    double dt = m_levels[level].m_dt;
+    m_levels[level].m_time += dt;
 }
 
-double level_data::dt()
+int subcycle_manager::timeinterp_level(int maxlevel)
 {
-    return m_dt;
+    int ti_level = maxlevel-1;  /* Time interpolated level */
+    int last_step = m_levels[maxlevel].m_last_step;
+    while (last_step % m_levels[ti_level].m_step_inc == 0)
+    {
+        ti_level--;
+    }
+    return ti_level;
 }
 
-
-void level_data::increment_step_counter()
+double subcycle_manager::compute_alpha(const int level)
 {
-    m_last_step += m_step_inc;
-}
+    FCLAW_ASSERT(level > m_local_minlevel);
 
-void level_data::increment_time()
-{
-    m_time += m_dt;
-}
+    /* Time interpolate this data for a future exchange with finer grid */
+    int coarse_inc =
+        m_levels[level-1].m_step_inc;
+    int new_curr_step =
+        m_levels[level].m_last_step;
+    double alpha =
+        double(new_curr_step % coarse_inc)/coarse_inc;
 
-double level_data::current_time()
-{
-    return m_time;
+    return alpha;
 }
-
-void level_data::set_time(const double t_level)
-{
-    m_time = t_level;
-}
-
 
 #ifdef __cplusplus
 #if 0
