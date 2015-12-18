@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_MATH_H
 
 #include <fclaw_base.h>
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C"

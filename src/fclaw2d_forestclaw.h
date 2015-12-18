@@ -64,6 +64,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* These still need to be cleaned up */
 #include "fclaw2d_defs.h"
 
+/* Misc */
+#include "fclaw_math.h"
+
 #ifdef __cplusplus
 extern "C"
 {
