@@ -216,10 +216,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
                     }
                 }
             }
-            subcycle_manager time_stepper;
-            time_stepper.define(*domain,gparms,t_curr,dt_step);
-
-            double maxcfl_step = advance_all_levels(*domain, &time_stepper);
+            double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
             fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL]);
@@ -227,12 +224,12 @@ void outstyle_1(fclaw2d_domain_t **domain)
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
 
-            double tc = time_stepper.sync_time();
+            double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",
-                                     time_stepper.user_minlevel(),
-                                     time_stepper.local_minlevel(),
-                                     time_stepper.local_maxlevel(),
+                                     gparms->minlevel,
+                                     (*domain)->local_minlevel,
+                                     (*domain)->local_maxlevel,
                                      n_inner,dt_step,
                                      maxcfl_step, tc);
 
@@ -355,9 +352,6 @@ void outstyle_3(fclaw2d_domain_t **domain)
             dt_step /= level_factor;
         }
 
-        subcycle_manager time_stepper;
-        time_stepper.define(*domain,gparms,t_curr,dt_step);
-
         /* In case we have to reject this step */
         if (!gparms->use_fixed_dt)
         {
@@ -376,7 +370,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
 
-        double maxcfl_step = advance_all_levels(*domain, &time_stepper);
+        double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
         fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
@@ -384,12 +378,12 @@ void outstyle_3(fclaw2d_domain_t **domain)
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
-        double tc = time_stepper.sync_time();
+        double tc = t_curr + dt_step;
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                  "%8.3f; Final time = %12.4f\n",
-                                 time_stepper.user_minlevel(),
-                                 time_stepper.local_minlevel(),
-                                 time_stepper.local_maxlevel(),
+                                 gparms->minlevel,
+                                 (*domain)->local_minlevel,
+                                 (*domain)->local_maxlevel,
                                  n+1,dt_step,maxcfl_step, tc);
 
         if (maxcfl_step > gparms->max_cfl)
@@ -424,7 +418,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
         {
             if (n % nregrid_interval == 0)
             {
-                fclaw_global_essentialf("regridding at step %d\n",n);
+                fclaw_global_infof("regridding at step %d\n",n);
                 fclaw2d_regrid(domain);
             }
         }
@@ -449,6 +443,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
+    double dt_minlevel = initial_dt;
 
     // assume fixed dt that is stable for all grids.
 
@@ -458,10 +453,6 @@ void outstyle_4(fclaw2d_domain_t **domain)
     int n = 0;
     while (n < nstep_outer)
     {
-        subcycle_manager time_stepper;
-        double dt_minlevel = initial_dt;
-        time_stepper.define(*domain,gparms,t_curr,dt_minlevel);
-
         if (gparms->run_diagnostics)
         {
             /* Get current domain data since it may change during regrid */
@@ -473,12 +464,10 @@ void outstyle_4(fclaw2d_domain_t **domain)
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         }
 
-
-
-        advance_all_levels(*domain, &time_stepper);
+        fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 
         fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
-                                 time_stepper.user_minlevel(),
+                                 gparms->minlevel,
                                  n+1,dt_minlevel, t_curr+dt_minlevel);
 
         t_curr += dt_minlevel;

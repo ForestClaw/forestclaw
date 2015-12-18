@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_ADVANCE_HPP
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_subcycle_manager.hpp>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,31 +37,8 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_level_time_data
-{
-    /* Single step data. This always has to be set. */
-    double dt;
-    double t_initial;
-    double t_level;
 
-    /* Needed for explicit CFL limited schemes */
-    double maxcfl;
-
-#if 0
-    /* Extra data that might be needed for more complicated time stepping.
-     * Not always set.
-     */
-    bool fixed_dt;
-    double alpha;               /* Fraction of coarser dt completed. */
-    double t_coarse;
-    double dt_coarse;
-    bool is_coarsest;
-#endif
-}
-fclaw2d_level_time_data_t;
-
-double advance_all_levels (fclaw2d_domain_t * domain,
-                           subcycle_manager * a_time_stepper);
+double fclaw2d_advance_all_levels (fclaw2d_domain_t * domain,double t, double dt);
 
 
 #ifdef __cplusplus

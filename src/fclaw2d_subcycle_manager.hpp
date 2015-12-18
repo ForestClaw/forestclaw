@@ -23,39 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SUBCYCLE_MANAGER_H
-#define SUBCYCLE_MANAGER_H
+#ifndef FCLAW2D_SUBCYCLE_MANAGER_H
+#define FCLAW2D_SUBCYCLE_MANAGER_H
 
-/* this header file must come first */
-#include <fclaw2d_defs.h>
-
-#include <fclaw2d_convenience.h>
 #include <fclaw2d_forestclaw.h>
-#include <fclaw_options.h>
 
-#include <iostream>
-#include <cstdlib>
+/* Needed for std::vector<> library */
 #include <vector>
-
 
 class level_data
 {
-public:
-
-    level_data();
-    ~level_data();
-    void define(const int level,
-                const double time);
-
-    void set_dt(const double a_dt);
-
-    void increment_step_counter();
-    void increment_time();
-    double current_time();
-    void set_time(double t);
-    double dt();
-
-    int m_level;
+  public:
+    level_data() {};
+    ~level_data() {};
     int m_last_step;
     int m_step_inc;
     int m_total_steps;  /* Steps this level needs to take */
@@ -64,6 +44,17 @@ public:
     double m_dt;
 };
 
+#if 0
+typedef struct level_data
+{
+    int m_last_step;
+    int m_step_inc;
+    int m_total_steps;  /* Steps this level needs to take */
+
+    double m_time;
+    double m_dt;
+} level_data_t;
+#endif
 
 
 class subcycle_manager
@@ -74,60 +65,31 @@ public:
     void define(fclaw2d_domain_t *domain,
                 const amr_options_t *gparms,
                 const double time,
-                const double dt_minlevel);
+                const double dt_step);
 
-    int last_step(const int a_level);
-#if 0
-    int is_final_step(const int level);
-#endif
-    int step_inc(const int a_level);
-    void increment_step_counter(const int a_level);
-
-#if 0
-    bool nosubcycle();
-#endif
-    bool subcycle();
-    double sync_time();
-
-    // These deal with real-valued 'time' and 'dt' value.  Most others only deal with integers,
-    // i.e. powers of ref_ratio.
-    double level_time(const int a_level);   /// time() ?
-    double initial_time();
+    /* Level access functions */
+    double level_time(const int level);   /// time() ?
     double dt(int level);
-    void increment_time(const int a_level);
-    int fine_steps();
-    double global_step();
-    int global_time_stepping();
+    int step_inc(const int level);
+    int steps(int level);
 
-    bool is_coarsest(const int a_level);
+    /* Keep track of time stepping */
+    void increment_step_counter(const int level);
+    void increment_time(const int level);
+    int last_step(const int level);  /* Most recent step taken on this level */
 
-    int local_minlevel();
-    int local_maxlevel();
-
-    int user_minlevel();
-    int user_maxlevel();
-
-    int global_minlevel();
-    int global_maxlevel();
+    /* Compute some basic things */
+    double compute_alpha(const int level);
+    int timeinterp_level(int maxlevel);
 
 private :
     std::vector<level_data> m_levels;
-    int m_refratio;
-    int m_user_minlevel;    /* Set by the user and stored in parms */
-    int m_user_maxlevel;
-    int m_local_minlevel;
-    int m_local_maxlevel;   /* Local to this proc */
-    int m_global_minlevel;    /* Set by the user and stored in parms */
-    int m_global_maxlevel;
 #if 0
-    double m_dt_minlevel;
+    level_data_t *m_levels;
 #endif
-    double m_initial_time;
-    bool m_subcycle;
-    int m_fine_steps;
-    int m_global_time_stepping;
-    double m_global_step;
-};
 
+    int m_local_minlevel;  /* Needed for assertion in computing alpha */
+
+};
 
 #endif
