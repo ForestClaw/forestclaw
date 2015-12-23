@@ -98,7 +98,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_initialize.cpp \
 	src/fclaw2d_run.cpp \
 	src/fclaw2d_finalize.cpp \
-	src/fclaw2d_timestep_counters.cpp \
 	src/fclaw2d_advance.cpp \
 	src/fclaw2d_update_single_step.cpp \
 	src/fclaw2d_convenience.c \
