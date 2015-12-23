@@ -748,6 +748,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
 
                 if not os.path.exists(rf):
                     print "File %s not found in %s" % (results_file,f)
+                    jobs[m][p][l] = None
                     continue
 
                 data = np.loadtxt(rf)

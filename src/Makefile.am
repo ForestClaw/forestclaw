@@ -15,7 +15,6 @@ libforestclaw_installed_headers = \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
 	src/ClawPatch.hpp \
-	src/fclaw2d_subcycle_manager.hpp \
 	src/fclaw2d_advance.hpp \
 	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_clawpatch.hpp \
@@ -99,7 +98,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_initialize.cpp \
 	src/fclaw2d_run.cpp \
 	src/fclaw2d_finalize.cpp \
-	src/fclaw2d_subcycle_manager.cpp \
 	src/fclaw2d_advance.cpp \
 	src/fclaw2d_update_single_step.cpp \
 	src/fclaw2d_convenience.c \
