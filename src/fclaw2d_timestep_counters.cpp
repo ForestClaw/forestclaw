@@ -36,7 +36,10 @@ extern "C"
 #endif
 
 
+
 #if 0
+
+
 fclaw2d_timestep_counters::fclaw2d_timestep_counters()
 {
     m_levels = NULL;
@@ -45,10 +48,11 @@ fclaw2d_timestep_counters::~fclaw2d_timestep_counters()
 {
     FCLAW_FREE(m_levels);
 }
-#endif
 
+#if 0
 fclaw2d_timestep_counters::fclaw2d_timestep_counters() {};
 fclaw2d_timestep_counters::~fclaw2d_timestep_counters() {};
+#endif
 
 void fclaw2d_timestep_counters::define(fclaw2d_domain_t *domain,
                               const amr_options_t *gparms,
@@ -58,18 +62,18 @@ void fclaw2d_timestep_counters::define(fclaw2d_domain_t *domain,
     /* Needed for assertion in computing alpha */
     m_local_minlevel = domain->local_minlevel;
 
+#if 0
     /* Using std::vector<level_data> */
     m_levels.resize(gparms->maxlevel + 1);
-
-#if 0
-    m_levels = FCLAW2D_ALLOC(level_data_t,gparms->maxlevel+1);
 #endif
+
+    m_levels = FCLAW2D_ALLOC(fclaw2d_level_data_t,gparms->maxlevel+1);
 
     /* Set global indexing for time levels */
     for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
     {
-        m_levels[level].m_last_step = 0;
-        m_levels[level].m_time = initial_t;
+        m_levels[level].last_step = 0;
+        m_levels[level].time = initial_t;
     }
 
     /* Set time step and number of steps to take for each level */
@@ -78,19 +82,19 @@ void fclaw2d_timestep_counters::define(fclaw2d_domain_t *domain,
         int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
         for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
-            m_levels[level].m_step_inc = 1;
+            m_levels[level].step_inc = 1;
             if (gparms->global_time_stepping)
             {
                 /* We do something between each step */
-                m_levels[level].m_dt = dt_global_step;
-                m_levels[level].m_total_steps = 1;
+                m_levels[level].dt = dt_global_step;
+                m_levels[level].total_steps = 1;
             }
             else
             {
                 /* We take rf steps here without regridding or writing output
                    files between each step.  */
-                m_levels[level].m_dt = dt_global_step/rf;
-                m_levels[level].m_total_steps = rf;
+                m_levels[level].dt = dt_global_step/rf;
+                m_levels[level].total_steps = rf;
             }
         }
     }
@@ -101,9 +105,9 @@ void fclaw2d_timestep_counters::define(fclaw2d_domain_t *domain,
         int total_steps = 1;
         for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
-            m_levels[level].m_dt = dt_level;
-            m_levels[level].m_total_steps = total_steps;
-            m_levels[level].m_step_inc = steps_inc;
+            m_levels[level].dt = dt_level;
+            m_levels[level].total_steps = total_steps;
+            m_levels[level].step_inc = steps_inc;
             dt_level /= 2;
             steps_inc /= 2;
             total_steps *= 2;
@@ -113,48 +117,48 @@ void fclaw2d_timestep_counters::define(fclaw2d_domain_t *domain,
 
 int fclaw2d_timestep_counters::steps(int level)
 {
-    return m_levels[level].m_total_steps;
+    return m_levels[level].total_steps;
 }
 
 int fclaw2d_timestep_counters::last_step(const int level)
 {
-    return m_levels[level].m_last_step;
+    return m_levels[level].last_step;
 }
 
 double fclaw2d_timestep_counters::dt(const int level)
 {
-    return m_levels[level].m_dt;
+    return m_levels[level].dt;
 }
 
 double fclaw2d_timestep_counters::level_time(const int level)
 {
-    return m_levels[level].m_time;
+    return m_levels[level].time;
 }
 
 
 int fclaw2d_timestep_counters::step_inc(const int level)
 {
-    return m_levels[level].m_step_inc;
+    return m_levels[level].step_inc;
 }
 
 
 void fclaw2d_timestep_counters::increment_step_counter(const int level)
 {
-    int step_inc = m_levels[level].m_step_inc;
-    m_levels[level].m_last_step += step_inc;
+    int step_inc = m_levels[level].step_inc;
+    m_levels[level].last_step += step_inc;
 }
 
 void fclaw2d_timestep_counters::increment_time(const int level)
 {
-    double dt = m_levels[level].m_dt;
-    m_levels[level].m_time += dt;
+    double dt = m_levels[level].dt;
+    m_levels[level].time += dt;
 }
 
 int fclaw2d_timestep_counters::timeinterp_level(int maxlevel)
 {
     int ti_level = maxlevel-1;  /* Time interpolated level */
-    int last_step = m_levels[maxlevel].m_last_step;
-    while (last_step % m_levels[ti_level].m_step_inc == 0)
+    int last_step = m_levels[maxlevel].last_step;
+    while (last_step % m_levels[ti_level].step_inc == 0)
     {
         ti_level--;
     }
@@ -167,14 +171,16 @@ double fclaw2d_timestep_counters::compute_alpha(const int level)
 
     /* Time interpolate this data for a future exchange with finer grid */
     int coarse_inc =
-        m_levels[level-1].m_step_inc;
+        m_levels[level-1].step_inc;
     int new_curr_step =
-        m_levels[level].m_last_step;
+        m_levels[level].last_step;
     double alpha =
         double(new_curr_step % coarse_inc)/coarse_inc;
 
     return alpha;
 }
+
+#endif
 
 #ifdef __cplusplus
 #if 0
