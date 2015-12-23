@@ -333,9 +333,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
             /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
                a given nout/nstep pair works for both subcycled
                and non-subcycled cases */
+#if 0
             nstep_outer *= level_factor;
             nstep_inner *= level_factor;  /* Only produce nout/nstep output files */
-#if 0
             nregrid_interval *= level_factor;
 #endif
         }
