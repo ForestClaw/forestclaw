@@ -334,9 +334,13 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
                          "Use subcycling in time [F]");
 
-    sc_options_add_bool (opt, 0, "global_time_stepping",
+    sc_options_add_bool (opt, 0, "global-time-stepping",
                          &amropt->global_time_stepping, 1,
                          "Use global time stepping (subcycle=F) in time [F]");
+
+    sc_options_add_bool (opt, 0, "outstyle-uses-maxlevel",
+                         &amropt->outstyle_uses_maxlevel, 1,
+                         "Expand nout/nstep to global (subcycle=F) [F]");
 
     sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
                            "No weighting when subcycling [F]");

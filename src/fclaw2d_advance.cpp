@@ -37,13 +37,14 @@ typedef struct fclaw2d_level_data
 {
     int last_step;
     int step_inc;
-    int total_steps;  /* Steps this level needs to take */
+    int total_steps;  /* This level takes total_steps of step_inc each */
 
     double initial_time;
     double current_time;
     double dt_step;
 } fclaw2d_level_data_t;
 
+/* Rather than over-loading operators ... */
 typedef fclaw2d_level_data_t fclaw2d_timestep_counters;
 
 static
