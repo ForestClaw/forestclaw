@@ -96,19 +96,14 @@ void save_time_step(fclaw2d_domain_t *domain)
    -------------------------------------------------------------------------------- */
 static void outstyle_0(fclaw2d_domain_t **domain)
 {
-    const amr_options_t *gparms;
     int iframe;
-
-    gparms = get_domain_parms(*domain);
-
 
     iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
 
-    if (gparms->run_diagnostics)
-    {
-        fclaw2d_run_diagnostics(*domain);
-    }
+    int init_flag = 1;
+    fclaw2d_run_diagnostics(*domain,init_flag);
+    init_flag = 0;
 
     /* Here is where we might include a call to a static solver, for, say,
        an elliptic solve. The initial grid might contain, for example, a
@@ -116,10 +111,7 @@ static void outstyle_0(fclaw2d_domain_t **domain)
 #if 0
     vt.time_indepdent_solve(domain);
 
-    if (gparms->run_diagnostics)
-    {
-        fclaw2d_diagnostics_run(domain);
-    }
+    fclaw2d_diagnostics_run(domain);
 
     iframe++;
     fclaw2d_output_frame(*domain,iframe);
@@ -135,6 +127,8 @@ static void outstyle_0(fclaw2d_domain_t **domain)
 static
 void outstyle_1(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
+
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
 
@@ -145,6 +139,11 @@ void outstyle_1(fclaw2d_domain_t **domain)
     double initial_dt = gparms->initial_dt;
     int level_factor = pow_int(2,gparms->maxlevel - gparms->minlevel);
     double dt_minlevel = initial_dt;
+
+
+    int init_flag = 1;  /* Store anything that needs to be stored */
+    fclaw2d_run_diagnostics(*domain,init_flag);
+    init_flag = 0;
 
     double t0 = 0;
 
@@ -160,17 +159,12 @@ void outstyle_1(fclaw2d_domain_t **domain)
         {
             fclaw2d_domain_set_time(*domain,t_curr);
 
-            if (gparms->run_diagnostics)
-            {
-                /* Get current domain data since it may change during
-                   regrid. */
-                fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
-                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
-
-                fclaw2d_run_diagnostics(*domain);
-
-                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
-            }
+            /* Get current domain data since it may change during
+               regrid. */
+            ddata = fclaw2d_domain_get_data(*domain);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+            fclaw2d_run_diagnostics(*domain, init_flag);
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
 
             /* In case we have to reject this step */
@@ -218,7 +212,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
             }
             double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
-            fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
+            ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL]);
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
@@ -313,8 +307,14 @@ static void outstyle_2(fclaw2d_domain_t **domain)
 static
 void outstyle_3(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
+
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
+
+    int init_flag = 1;
+    fclaw2d_run_diagnostics(*domain,init_flag);
+    init_flag = 0;
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -362,22 +362,15 @@ void outstyle_3(fclaw2d_domain_t **domain)
             save_time_step(*domain);
         }
 
-        if (gparms->run_diagnostics)
-        {
-            /* Get current domain data since it may change during regrid */
-            fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
-
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
-
-            fclaw2d_run_diagnostics(*domain);
-
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
-        }
+        /* Get current domain data since it may change during regrid */
+        ddata = fclaw2d_domain_get_data(*domain);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+        fclaw2d_run_diagnostics(*domain, init_flag);  /* Includes conservation check */
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
         double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
-        fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL]);
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
@@ -442,9 +435,14 @@ void outstyle_3(fclaw2d_domain_t **domain)
 static
 void outstyle_4(fclaw2d_domain_t **domain)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
     /* Write out an initial time file */
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
+
+    int init_flag = 1;
+    fclaw2d_run_diagnostics(*domain,init_flag);
+    init_flag = 0;
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -452,24 +450,18 @@ void outstyle_4(fclaw2d_domain_t **domain)
     int nstep_inner = gparms->nstep;
     double dt_minlevel = initial_dt;
 
-    // assume fixed dt that is stable for all grids.
-
     double t0 = 0;
     double t_curr = t0;
     fclaw2d_domain_set_time(*domain,t_curr);
     int n = 0;
     while (n < nstep_outer)
     {
-        if (gparms->run_diagnostics)
-        {
-            /* Get current domain data since it may change during regrid */
-            fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+        /* Get current domain data since it may change during regrid */
+        ddata = fclaw2d_domain_get_data(*domain);
 
-            fclaw2d_run_diagnostics(*domain);
-
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
-        }
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
+        fclaw2d_run_diagnostics(*domain, init_flag);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
         fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 
