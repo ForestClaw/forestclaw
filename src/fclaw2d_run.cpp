@@ -330,14 +330,16 @@ void outstyle_3(fclaw2d_domain_t **domain)
     {
         if (gparms->global_time_stepping)
         {
-            /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
-               a given nout/nstep pair works for both subcycled
-               and non-subcycled cases */
-#if 0
-            nstep_outer *= level_factor;
-            nstep_inner *= level_factor;  /* Only produce nout/nstep output files */
-            nregrid_interval *= level_factor;
-#endif
+            if (gparms->outstyle_uses_maxlevel)
+            {
+                /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
+                   a given nout/nstep pair works for both subcycled
+                   and non-subcycled cases.
+                   Note : Regrid_interval remains unchanged.*/
+
+                nstep_outer *= level_factor;
+                nstep_inner *= level_factor;  /* Only produce nout/nstep output files */
+            }
         }
     }
 
@@ -345,10 +347,12 @@ void outstyle_3(fclaw2d_domain_t **domain)
     double t_curr = t0;
     while (n < nstep_outer)
     {
-        /* Count only coarse grid time steps */
         double dt_step = dt_minlevel;
-        if (gparms->global_time_stepping)
+        if (!gparms->subcycle && gparms->global_time_stepping)
         {
+            /* if domain->global_maxlevel < gparms->maxlevel, this choice
+               of time step will take more steps than necessary on
+               finest level.  */
             dt_step /= level_factor;
         }
 
@@ -379,9 +383,12 @@ void outstyle_3(fclaw2d_domain_t **domain)
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
         double tc = t_curr + dt_step;
+        int level2print = (gparms->global_time_stepping && gparms->outstyle_uses_maxlevel) ?
+                          gparms->maxlevel : gparms->minlevel;
+
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                  "%8.3f; Final time = %12.4f\n",
-                                 gparms->minlevel,
+                                 level2print,
                                  (*domain)->local_minlevel,
                                  (*domain)->local_maxlevel,
                                  n+1,dt_step,maxcfl_step, tc);
@@ -466,8 +473,18 @@ void outstyle_4(fclaw2d_domain_t **domain)
 
         fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 
+        int level2print;
+        if (gparms->global_time_stepping && gparms->outstyle_uses_maxlevel)
+        {
+            level2print = gparms->maxlevel;
+        }
+        else
+        {
+            level2print = gparms->minlevel;
+        }
+
         fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
-                                 gparms->minlevel,
+                                 level2print,
                                  n+1,dt_minlevel, t_curr+dt_minlevel);
 
         t_curr += dt_minlevel;
