@@ -330,7 +330,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
     {
         if (gparms->global_time_stepping)
         {
-            if (gparms->outstyle_uses_maxlevel)
+            if (!gparms->outstyle_uses_maxlevel)
             {
                 /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
                    a given nout/nstep pair works for both subcycled
