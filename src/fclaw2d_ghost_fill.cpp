@@ -667,7 +667,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            Repeat above, but now with parallel ghost cells.
            ------------------------------------------------------------- */
 
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA2]);
         parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
         read_parallel_patches = 1;
 
