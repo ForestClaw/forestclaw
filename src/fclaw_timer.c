@@ -88,7 +88,6 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
 
     sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
-    sc_statinfo_t stats_per_cell;
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
 
