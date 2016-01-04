@@ -356,9 +356,17 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
         else
             fclaw_global_essentialf("Output Frame %4d  at time %16.8e (vtk)\n\n",
                                     iframe,time);
-    else
+    else if (gparms->serialout)
+    {
         fclaw_global_essentialf("Output Frame %d  at time %16.8e (ascii)\n\n",
                                 iframe,time);
+    }
+    else
+    {
+        fclaw_global_essentialf("Output Frame %d  at time %16.8e (none)\n\n",
+                                iframe,time);
+    }
+
     if (gparms->vtkout & 2)
     {
         char basename[BUFSIZ];
