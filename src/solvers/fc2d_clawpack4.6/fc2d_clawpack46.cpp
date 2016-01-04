@@ -512,6 +512,13 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     FCLAW_ASSERT(ierror == 0);
 
+    /* Accumulate fluxes needed for conservative fix-up */
+    if (classic_vt.fluxfun != NULL)
+    {
+        /* Accumulate fluxes */
+    }
+
+
     delete [] fp;
     delete [] fm;
     delete [] gp;

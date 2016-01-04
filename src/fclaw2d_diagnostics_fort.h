@@ -23,23 +23,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DIAGNOSTICS_H
-#define FCLAW2D_DIAGNOSTICS_H
-
-#include "forestclaw2d.h"
+#ifndef FCLAW2D_DIAGNOSTICS_FORT_H
+#define FCLAW2D_DIAGNOSTICS_FORT_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}
+}                               /* need this because indent is dumb */
 #endif
 #endif
 
-/* See forestclaw2d.h for the maximum version of this function */
-double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
+#define FCLAW2D_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_fort_conservation_check, \
+                                                FCLAW2D_FORT_CONSERVATION_CHECK)
 
-void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain, int init_flag);
+void FCLAW2D_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
+                                     double *dx, double *dy,
+                                     double* area, double *q, double* sum);
 
 
 #ifdef __cplusplus

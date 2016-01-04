@@ -170,7 +170,7 @@ struct amr_options
     double by;   /**< Only for the single block, unmapped case */
 
     /* Diagnostics */
-    int run_diagnostics;
+    int run_user_diagnostics;
     int conservation_check;
     int trapfpe;
 

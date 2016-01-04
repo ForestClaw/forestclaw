@@ -106,6 +106,10 @@ typedef void (*fc2d_clawpack46_flux2_t)(const int* ixy,const int* maxm, const in
                                         const int* mwaves, const int* mcapa,
                                         int method[], int mthlim[]);
 
+typedef void (*fc2d_clawpack46_fluxfun_t)(const int* meqn, double q[], double aux[],
+                                          double fq[]);
+
+
 typedef struct fc2d_clawpack46_vtable
 {
     fc2d_clawpack46_setprob_t setprob;
@@ -116,6 +120,7 @@ typedef struct fc2d_clawpack46_vtable
     fc2d_clawpack46_src2_t src2;
     fc2d_clawpack46_rpn2_t rpn2;
     fc2d_clawpack46_rpt2_t rpt2;
+    fc2d_clawpack46_fluxfun_t fluxfun;
 } fc2d_clawpack46_vtable_t;
 
 

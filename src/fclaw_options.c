@@ -323,11 +323,11 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
                          "Use fixed coarse grid time step [F]");
 
-    sc_options_add_bool (opt, 0, "run_diagnostics",
-                         &amropt->run_diagnostics,0,
-                         "Run diagnostics [F]");
+    sc_options_add_bool (opt, 0, "run-user-diagnostics",
+                         &amropt->run_user_diagnostics,0,
+                         "Run user diagnostics [F]");
 
-    sc_options_add_bool (opt, 0, "conservation_check",
+    sc_options_add_bool (opt, 0, "conservation-check",
                          &amropt->conservation_check,0,
                          "Conservation check [F]");
 

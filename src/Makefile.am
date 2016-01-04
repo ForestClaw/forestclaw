@@ -51,7 +51,8 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_transform.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h
+	src/fclaw2d_diagnostics.h \
+	src/fclaw2d_diagnostics_fort.h
 
 libforestclaw_internal_headers =
 
@@ -124,12 +125,12 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_regrid_fort.f \
 	src/fortran_source2d/fclaw2d_timeinterp_fort.f \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
+	src/fortran_source2d/fclaw2d_diagnostics_fort.f \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/philim.f \
 	src/fortran_source2d/average_fv1.f \
 	src/fortran_source2d/interpolate_fv1.f \
 	src/fortran_source2d/exchange_fv1.f \
-	src/fortran_source2d/diagnostics.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f
 
