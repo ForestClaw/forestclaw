@@ -496,14 +496,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
 
-    /* This works, but is much slower than just interpolating to all
-       time interpolated grids */
-    if (!time_interp)
-    {
-        /* Identify fine grid neighbors for future use */
-        fclaw2d_clawpatch_finegrid_neighbors(domain);
-    }
-
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
     patch_iterator = &fclaw2d_domain_iterate_level_mthread;

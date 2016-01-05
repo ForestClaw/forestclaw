@@ -105,37 +105,6 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
-static
-void cb_has_finegrid_neighbors(fclaw2d_domain_t* domain,
-                               fclaw2d_patch_t *this_patch,
-                               int blockno,
-                               int patchno,
-                               void* user)
-{
-
-#if 0
-    int y =
-        fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno);
-#endif
-    int y =
-        fclaw2d_timeinterp_has_finegrid_neighbors(domain,this_patch);
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->finegrid_neighbors(y);
-}
-
-void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain)
-{
-    fclaw2d_domain_iterate_patches(domain,cb_has_finegrid_neighbors,
-                                   (void*) NULL);
-}
-
-int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
-                                             fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->has_finegrid_neighbors();
-}
 
 
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
@@ -660,7 +629,6 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     {
         m_block_corner_count[m] = 0;
     }
-    m_has_finegrid_neighbors = 0;
 
     fclaw2d_map_context_t* cont =
         fclaw2d_domain_get_map_context(domain);
@@ -1226,17 +1194,6 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha,
         exit(0);
     }
 }
-
-void ClawPatch::finegrid_neighbors(int y)
-{
-    m_has_finegrid_neighbors = y;
-}
-
-int ClawPatch::has_finegrid_neighbors()
-{
-    return m_has_finegrid_neighbors;
-}
-
 
 /* ----------------------------------------------------------------
    Mapped grids
