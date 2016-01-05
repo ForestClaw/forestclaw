@@ -482,7 +482,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     {
         FCLAW_ASSERT(gparms->minlevel == minlevel);
         FCLAW_ASSERT(gparms->maxlevel == maxlevel);
+
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
         fclaw2d_face_neighbors_set_type(domain);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
+
     }
 
     /* If minlevel == maxlevel, then maxcoarse < mincoase. In this

@@ -231,9 +231,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
     fclaw_bool have_new_refinement = new_domain != NULL;
 
     /* Domain data may go out of scope now. */
