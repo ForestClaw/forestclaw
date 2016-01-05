@@ -136,6 +136,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int ftransform[],
                          fclaw2d_transform_data_t* ftransform_finegrid)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
@@ -144,6 +145,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
     fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
     fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
     fclaw_bool has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain,
                                        this_block_idx,
@@ -154,6 +156,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        &corner_patch_idx,
                                        rcornerno,
                                        &neighbor_type);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)

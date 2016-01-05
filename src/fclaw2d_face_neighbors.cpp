@@ -71,6 +71,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int ftransform[],
                         fclaw2d_transform_data_t* ftransform_finegrid)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -82,6 +83,7 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
         neighbor_patches[ir] = NULL;
     }
 
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
     fclaw2d_patch_relation_t neighbor_type =
         fclaw2d_patch_face_neighbors(domain,
                                      this_block_idx,
@@ -91,6 +93,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                                      &rblockno,
                                      rpatchno,
                                      &rfaceno);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
+
 
     /* ------------------------------
       neighbor_type is one of :
@@ -573,5 +577,8 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
 
 void fclaw2d_set_neighbor_types(fclaw2d_domain_t *domain)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
     fclaw2d_domain_iterate_patches(domain,cb_set_neighbor_types,(void*) NULL);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
 }
