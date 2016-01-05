@@ -181,7 +181,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
                then dt_minlevel doesn't change. */
 
             double dt_step = dt_minlevel;
-            if (gparms->global_time_stepping)
+            if (gparms->advance_one_step)
             {
                 dt_step /= level_factor;
             }
@@ -328,7 +328,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
     int level_factor = pow_int(2,gparms->maxlevel-gparms->minlevel);
     if (!gparms->subcycle)
     {
-        if (gparms->global_time_stepping)
+        if (gparms->advance_one_step)
         {
             if (!gparms->outstyle_uses_maxlevel)
             {
@@ -348,7 +348,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         double dt_step = dt_minlevel;
-        if (!gparms->subcycle && gparms->global_time_stepping)
+        if (!gparms->subcycle && gparms->advance_one_step)
         {
             /* if domain->global_maxlevel < gparms->maxlevel, this choice
                of time step will take more steps than necessary on
@@ -376,7 +376,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
 
         double tc = t_curr + dt_step;
-        int level2print = (gparms->global_time_stepping && gparms->outstyle_uses_maxlevel) ?
+        int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
                           gparms->maxlevel : gparms->minlevel;
 
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
@@ -465,15 +465,8 @@ void outstyle_4(fclaw2d_domain_t **domain)
 
         fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 
-        int level2print;
-        if (gparms->global_time_stepping && gparms->outstyle_uses_maxlevel)
-        {
-            level2print = gparms->maxlevel;
-        }
-        else
-        {
-            level2print = gparms->minlevel;
-        }
+        int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
+                          gparms->maxlevel : gparms->minlevel;
 
         fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
                                  level2print,

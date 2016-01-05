@@ -334,9 +334,9 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
                          "Use subcycling in time [F]");
 
-    sc_options_add_bool (opt, 0, "global-time-stepping",
-                         &amropt->global_time_stepping, 1,
-                         "Use global time stepping (subcycle=F) in time [F]");
+    sc_options_add_bool (opt, 0, "advance-one-step",
+                         &amropt->advance_one_step, 1,
+                         "Advance from t to t+dt in one global step (subcycle=F) [F]");
 
     sc_options_add_bool (opt, 0, "outstyle-uses-maxlevel",
                          &amropt->outstyle_uses_maxlevel, 1,

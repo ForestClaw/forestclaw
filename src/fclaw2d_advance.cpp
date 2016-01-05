@@ -68,28 +68,7 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
     }
 
     /* Set time step and number of steps to take for each level */
-    if (!gparms->subcycle)
-    {
-        int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
-        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
-        {
-            ts_counter[level].step_inc = 1;
-            if (gparms->global_time_stepping)
-            {
-                /* We do something between each step */
-                ts_counter[level].dt_step = dt;
-                ts_counter[level].total_steps = 1;
-            }
-            else
-            {
-                /* We take rf steps here without regridding or writing output
-                   files between each step.  */
-                ts_counter[level].dt_step = dt/rf;
-                ts_counter[level].total_steps = rf;
-            }
-        }
-    }
-    else
+    if (gparms->subcycle)
     {
         double dt_level = dt;
         int steps_inc = pow_int(2,domain->global_maxlevel-gparms->minlevel);
@@ -102,6 +81,27 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
             dt_level /= 2;
             steps_inc /= 2;
             total_steps *= 2;
+        }
+    }
+    else
+    {
+        int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
+        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
+        {
+            ts_counter[level].step_inc = 1;
+            if (gparms->advance_one_step)
+            {
+                /* We do something between each step */
+                ts_counter[level].dt_step = dt;
+                ts_counter[level].total_steps = 1;
+            }
+            else
+            {
+                /* We take rf steps here without regridding or writing output
+                   files between each step.  */
+                ts_counter[level].dt_step = dt/rf;
+                ts_counter[level].total_steps = rf;
+            }
         }
     }
 }

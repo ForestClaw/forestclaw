@@ -124,7 +124,7 @@ struct amr_options
     int nout;
     int nstep;
     int subcycle;               /**< Only relevant when subcycling. */
-    int global_time_stepping;
+    int advance_one_step;
     int outstyle_uses_maxlevel;
     int use_fixed_dt;
     double max_cfl;
