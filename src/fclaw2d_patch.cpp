@@ -102,7 +102,7 @@ int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata != NULL);
-    return pdata->corners[icorner];
+    return !pdata->corners[icorner];
 }
 
 void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
@@ -117,6 +117,13 @@ void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch)
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata != NULL);
     pdata->neighbors_set = 0;
+}
+
+int fclaw2d_patch_neighbor_type_set(fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    return pdata->neighbors_set;
 }
 
 /* -------------------------------------------------------------

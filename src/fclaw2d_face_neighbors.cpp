@@ -522,6 +522,7 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
                            int patchno,
                            void *user)
 {
+
     for (int iface = 0; iface < 4; iface++)
     {
         int rproc[2];
@@ -561,11 +562,8 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
                                            &rcornerno,
                                            &neighbor_type);
 
-        if (has_corner_neighbor)
-        {
-            fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
-        }
-        else
+        fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
+        if (!has_corner_neighbor)
         {
             fclaw2d_patch_set_missing_corner(this_patch,icorner);
         }

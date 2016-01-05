@@ -201,6 +201,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
         exit(1);
     }
+    fclaw2d_patch_neighbors_reset(new_patch);
 }
 
 /* ----------------------------------------------------------------
