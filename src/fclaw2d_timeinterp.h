@@ -40,8 +40,7 @@ void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
                        int level, double alpha);
 
 int fclaw2d_timeinterp_has_finegrid_neighbors(fclaw2d_domain_t * domain,
-                                              int blockno,
-                                              int patchno);
+                                              fclaw2d_patch_t *patch);
 
 
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \

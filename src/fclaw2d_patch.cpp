@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
+#include <forestclaw2d.h>
 #include <p4est_base.h>
 
 #include <fclaw2d_patch.hpp>
@@ -31,6 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw2d_patch_data
 {
+    fclaw2d_patch_relation_t face_neighbors[4];
+    fclaw2d_patch_relation_t corner_neighbors[4];
+    int corners[4];
+    int neighbors_set;
     ClawPatch *cp;
 };
 
@@ -49,6 +54,70 @@ fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
     return pdata->cp;
 }
 
+void fclaw2d_patch_set_face_type(fclaw2d_patch_t *patch,int iface,
+                                 fclaw2d_patch_relation_t face_type)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    pdata->face_neighbors[iface] = face_type;
+}
+
+void fclaw2d_patch_set_corner_type(fclaw2d_patch_t *patch,int icorner,
+                                   fclaw2d_patch_relation_t corner_type)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    pdata->corner_neighbors[icorner] = corner_type;
+    pdata->corners[icorner] = 1;
+}
+
+void fclaw2d_patch_set_missing_corner(fclaw2d_patch_t *patch,int icorner)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    pdata->corners[icorner] = 0;
+}
+
+fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
+                                                        int iface)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    FCLAW_ASSERT(pdata->neighbors_set != 0);
+    return pdata->face_neighbors[iface];
+}
+
+fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(fclaw2d_patch_t* patch,
+                                                          int icorner)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    FCLAW_ASSERT(pdata->corners[icorner] != 0);
+    FCLAW_ASSERT(pdata->neighbors_set != 0);
+    return pdata->corner_neighbors[icorner];
+}
+
+int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
+                                    int icorner)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    return pdata->corners[icorner];
+}
+
+void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    pdata->neighbors_set = 1;
+}
+
+void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    pdata->neighbors_set = 0;
+}
 
 /* -------------------------------------------------------------
    This should be the only place where patch user data gets
@@ -68,6 +137,7 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
     ClawPatch *cp = new ClawPatch();
     pdata->cp = cp;
     ++ddata->count_set_clawpatch;
+    pdata->neighbors_set = 0;
 }
 
 void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,

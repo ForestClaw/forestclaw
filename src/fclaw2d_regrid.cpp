@@ -135,12 +135,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         old_patch->user = NULL;
         ++ddata_old->count_delete_clawpatch;
         ++ddata_new->count_set_clawpatch;
-#if 0
-        fclaw2d_clawpatch_initialize_after_regrid(new_domain,
-                                                  new_patch,
-                                                  blockno,
-                                                  new_patchno);
-#endif
+        fclaw2d_patch_neighbors_reset(new_patch);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {

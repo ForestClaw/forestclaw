@@ -445,7 +445,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int time_interp,
                           fclaw2d_timer_names_t running)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
@@ -480,11 +479,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
     }
     else
     {
-        FCLAW_ASSERT(gparms->minlevel == minlevel);
-        FCLAW_ASSERT(gparms->maxlevel == maxlevel);
+        FCLAW_ASSERT(domain->global_minlevel == minlevel);
+        FCLAW_ASSERT(domain->global_maxlevel == maxlevel);
 
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
-        fclaw2d_face_neighbors_set_type(domain);
+        fclaw2d_set_neighbor_types(domain);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
 
     }

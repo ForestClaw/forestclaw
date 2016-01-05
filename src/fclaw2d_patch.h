@@ -85,6 +85,26 @@ void
 fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
+
+void fclaw2d_patch_set_face_type(fclaw2d_patch_t *patch,int iface,
+                                 fclaw2d_patch_relation_t face_type);
+
+void fclaw2d_patch_set_corner_type(fclaw2d_patch_t *patch,int icorner,
+                                   fclaw2d_patch_relation_t corner_type);
+
+void fclaw2d_patch_set_missing_corner(fclaw2d_patch_t *patch,int icorner);
+
+fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
+                                                        int iface);
+fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(fclaw2d_patch_t* patch,
+                                                          int icorner);
+
+int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
+                                    int icorner);
+
+void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch);
+void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch);
+
 #ifdef __cplusplus
 #if 0
 {

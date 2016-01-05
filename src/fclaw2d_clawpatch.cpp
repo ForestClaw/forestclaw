@@ -112,8 +112,14 @@ void cb_has_finegrid_neighbors(fclaw2d_domain_t* domain,
                                int patchno,
                                void* user)
 {
+
+#if 0
     int y =
         fclaw2d_timeinterp_has_finegrid_neighbors(domain,blockno,patchno);
+#endif
+    int y =
+        fclaw2d_timeinterp_has_finegrid_neighbors(domain,this_patch);
+
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->finegrid_neighbors(y);
 }
