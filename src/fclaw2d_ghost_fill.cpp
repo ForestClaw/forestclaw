@@ -445,6 +445,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                           int time_interp,
                           fclaw2d_timer_names_t running)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
@@ -476,6 +477,12 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         int time_interp_level = minlevel - 1;
         fclaw_global_infof("Time interpolated level is %d\n",   \
                            time_interp_level);
+    }
+    else
+    {
+        FCLAW_ASSERT(gparms->minlevel == minlevel);
+        FCLAW_ASSERT(gparms->maxlevel == maxlevel);
+        fclaw2d_face_neighbors_set_type(domain);
     }
 
     /* If minlevel == maxlevel, then maxcoarse < mincoase. In this
