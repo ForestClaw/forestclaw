@@ -1,4 +1,4 @@
-      subroutine tag4coarsening(mx,my,mbc,meqn,
+      subroutine tag4coarsening_dq(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -15,28 +15,29 @@
       integer i,j, mq
       double precision qmin, qmax, dq
 
-      tag_patch = 1
+      tag_patch = 0
       dq = 0
       do mq = 1,1
          call get_minmax(mx,my,mbc,meqn,mq,q0,dq,
      &         coarsen_threshold,tag_patch)
-c         if (tag_patch .eq. 0) return
+         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q1,dq,
      &         coarsen_threshold,tag_patch)
-c         if (tag_patch .eq. 0) return
+         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q2,dq,
      &         coarsen_threshold,tag_patch)
-c         if (tag_patch .eq. 0) return
+         if (tag_patch .eq. 0) return
 
          call get_minmax(mx,my,mbc,meqn,mq,q3,dq,
      &         coarsen_threshold,tag_patch)
-c         if (tag_patch .eq. 0) return
+         if (tag_patch .eq. 0) return
       enddo
-      if (dq .gt. coarsen_threshold) then
-         tag_patch = 0
-      endif
+
+c      if (dq .gt. coarsen_threshold) then
+c         tag_patch = 1
+c      endif
 
 
       end
@@ -57,10 +58,10 @@ c         if (tag_patch .eq. 0) return
             dqi = abs(q(i+1,j,mq) - q(i-1,j,mq))
             dqj = abs(q(i,j+1,mq) - q(i,j-1,mq))
             dq  = max1(dq,dqi, dqj)
-c            if (dq .gt. coarsen_threshold) then
-c               tag_patch = 0
-c               return
-c            endif
+            if (dq .gt. coarsen_threshold) then
+               tag_patch = 0
+               return
+            endif
          enddo
       enddo
 

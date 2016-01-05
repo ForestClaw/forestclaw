@@ -54,6 +54,36 @@ void SETAUX(const int* maxmx, const int* maxmy,
             const double* dx,const double* dy,
             const int* maux, double aux[]);
 
+
+#define TAG4REFINEMENT_DQ FCLAW_F77_FUNC(tag4refinement_dq,             \
+                                         TAG4REFINEMENT_DQ)
+
+void TAG4REFINEMENT_DQ(const int* mx,const int* my,
+                       const int* mbc,const int* meqn,
+                       const double* xlower, const double* ylower,
+                       const double* dx, const double* dy,
+                       const int* blockno,
+                       double q[],
+                       const double* tag_threshold,
+                       const int* init_flag,
+                       int* tag_patch);
+
+
+
+#define TAG4COARSENING_DQ FCLAW_F77_FUNC(tag4coarsening_dq, \
+                                         TAG4COARSENING_DQ)
+
+void TAG4COARSENING_DQ(const int* mx, const int* my,
+                       const int* mbc, const int* meqn,
+                       const double* xlower, const double* ylower,
+                       const double* dx, const double* dy,
+                       const int* blockno,
+                       double q0[],double q1[],
+                       double q2[],double q3[],
+                       const double* tag_threshold,
+                       int* tag_patch);
+
+
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,

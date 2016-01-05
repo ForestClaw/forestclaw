@@ -60,8 +60,11 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
 
-    vt.fort_tag4refinement = &TAG4REFINEMENT;
-    vt.fort_tag4coarsening = &TAG4COARSENING;
+#if 0
+    /* Don't use these without debugging it first ... */
+    vt.fort_tag4refinement = &TAG4REFINEMENT_DQ;
+    vt.fort_tag4coarsening = &TAG4COARSENING_DQ;
+#endif
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
     classic_claw.rpn2 = &RPN2;
