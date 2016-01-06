@@ -97,9 +97,6 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                  int maxlevel,
                                  int time_interp);
 
-void fclaw2d_set_neighbor_types(fclaw2d_domain_t *domain);
-
-
 #define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
 void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
                          int *meqn, int *mint,

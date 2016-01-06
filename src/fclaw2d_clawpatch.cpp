@@ -1023,8 +1023,9 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
     double *qthis = q_time_sync(time_interp);
     double *qcorner = cp_corner->q_time_sync(time_interp);
 
-    FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner, a_corner,
-                           &transform_data);
+    FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                                       qthis, qcorner, a_corner,
+                                       &transform_data);
 
 }
 

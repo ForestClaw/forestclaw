@@ -135,7 +135,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         old_patch->user = NULL;
         ++ddata_old->count_delete_clawpatch;
         ++ddata_new->count_set_clawpatch;
-        fclaw2d_patch_neighbors_reset(new_patch);
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -204,6 +203,71 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     fclaw2d_patch_neighbors_reset(new_patch);
 }
 
+
+static
+void cb_set_neighbor_types(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int blockno,
+                           int patchno,
+                           void *user)
+{
+
+    for (int iface = 0; iface < 4; iface++)
+    {
+        int rproc[2];
+        int rblockno;
+        int rpatchno[2];
+        int rfaceno;
+
+        fclaw2d_patch_relation_t neighbor_type =
+            fclaw2d_patch_face_neighbors(domain,
+                                         blockno,
+                                         patchno,
+                                         iface,
+                                         rproc,
+                                         &rblockno,
+                                         rpatchno,
+                                         &rfaceno);
+
+        fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
+    }
+
+    for (int icorner = 0; icorner < 4; icorner++)
+    {
+        int rproc_corner;
+        int cornerpatchno;
+        int cornerblockno;
+        int rcornerno;
+        fclaw2d_patch_relation_t neighbor_type;
+
+        int has_corner_neighbor =
+            fclaw2d_patch_corner_neighbors(domain,
+                                           blockno,
+                                           patchno,
+                                           icorner,
+                                           &rproc_corner,
+                                           &cornerblockno,
+                                           &cornerpatchno,
+                                           &rcornerno,
+                                           &neighbor_type);
+
+        fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
+        if (!has_corner_neighbor)
+        {
+            fclaw2d_patch_set_missing_corner(this_patch,icorner);
+        }
+    }
+    fclaw2d_patch_neighbors_set(this_patch);
+}
+
+void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
+    fclaw2d_domain_iterate_patches(domain,cb_set_neighbor_types,(void*) NULL);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
+}
+
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
@@ -264,6 +328,10 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
         fclaw2d_exchange_setup(*domain);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+
+        /* Get new neighbor information.  This is used to short circuit
+           ghost filling procedures in some cases */
+        fclaw2d_regrid_set_neighbor_types(*domain);
 
         /* Update ghost cells.  This is needed because we have new coarse or fine
            patches without valid ghost cells.   Time_interp = 0, since we only

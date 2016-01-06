@@ -96,6 +96,29 @@ struct fclaw2d_ghost_fill_wrap_info
     void *user;
 };
 
+static void cb_parallel_wrap(fclaw2d_domain_t* domain,
+                             fclaw2d_patch_t* this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             void *user);
+
+
+static void cb_interface_wrap(fclaw2d_domain_t* domain,
+                              fclaw2d_patch_t* this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              void *user)
+{
+    if (fclaw2d_patch_on_coarsefine_interface(this_patch))
+    {
+        cb_parallel_wrap(domain,
+                         this_patch,
+                         this_block_idx,
+                         this_patch_idx,
+                         user);
+    }
+}
+
 /* these routines filter patches according to whether we are working on
    patches on the parallel boundary only, or on interior patches.
 */
@@ -300,11 +323,11 @@ void average2ghost(fclaw2d_domain_t *domain,
 
     parallel_mode.cb_fill = cb_face_fill;
     patch_iterator(domain, coarse_level,
-                   cb_parallel_wrap, (void *) &parallel_mode);
+                   cb_interface_wrap, (void *) &parallel_mode);
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(domain, coarse_level, cb_parallel_wrap,
+    patch_iterator(domain, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
 #if 0
@@ -324,7 +347,7 @@ void average2ghost(fclaw2d_domain_t *domain,
         /* Face average */
         parallel_mode.cb_fill = cb_face_fill;
         fclaw2d_domain_iterate_level(domain, fine_level,
-                                     cb_parallel_wrap, (void *) &parallel_mode);
+                                     cb_interface_wrap, (void *) &parallel_mode);
 
         /* Corner average :
            We can skip the corner update, since we don't need the corner ghost cell
@@ -366,12 +389,12 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
 
     /* Face interpolate */
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(domain,coarse_level, cb_parallel_wrap,
+    patch_iterator(domain,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(domain,coarse_level, cb_parallel_wrap,
+    patch_iterator(domain,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
     /* -----------------------------------------------------
        Second pass - Iterate over local fine grids, looking
@@ -386,13 +409,13 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
     int fine_level = coarse_level + 1;
 
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_parallel_wrap,
+    fclaw2d_domain_iterate_level(domain, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_parallel_wrap,
+    fclaw2d_domain_iterate_level(domain, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 }
 
@@ -477,6 +500,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw_global_infof("Time interpolated level is %d\n",   \
                            time_interp_level);
     }
+#if 0
     else
     {
         FCLAW_ASSERT(domain->global_minlevel == minlevel);
@@ -484,6 +508,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
         fclaw2d_set_neighbor_types(domain);
     }
+#endif
 
     /* If minlevel == maxlevel, then maxcoarse < mincoase. In this
        case, loops involving averaging and interpolation will be

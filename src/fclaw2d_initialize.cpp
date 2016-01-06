@@ -139,10 +139,12 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     fclaw2d_exchange_setup(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
 
+    /* This is normally called from regrid */
+    fclaw2d_regrid_set_neighbor_types(*domain);
+
+#if 0
     /* Update ghost cells.  This is needed because we have new coarse or fine
        patches without valid ghost cells.   */
-    fclaw2d_set_neighbor_types(*domain);
-#if 0
     fclaw2d_ghost_update(*domain,minlevel,maxlevel,time_interp,FCLAW2D_TIMER_INIT);
 
     fclaw2d_physical_set_bc(*domain,minlevel,time_interp);
@@ -200,6 +202,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                 fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                                cb_fclaw2d_regrid_repopulate,
                                                (void *) &domain_init);
+
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
 
                 // free all memory associated with old domain
@@ -238,7 +241,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                 fclaw2d_exchange_setup(*domain);
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
 
-                fclaw2d_set_neighbor_types(*domain);
+                /* This is normally called from regrid, once the initial domain
+                   has been set up */
+                fclaw2d_regrid_set_neighbor_types(*domain);
 
 #if 0
                 /* We only need to update the physical ghost cells because we

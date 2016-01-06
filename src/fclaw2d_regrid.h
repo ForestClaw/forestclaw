@@ -55,6 +55,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                   int new_patchno,
                                   void *user);
 
+void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain);
+
+
+
 void fclaw2d_regrid(fclaw2d_domain_t **domain);
 
 

@@ -35,36 +35,6 @@ extern "C"
 #endif
 
 
-int fclaw2d_timeinterp_has_finegrid_neighbors(fclaw2d_domain_t * domain,
-                                              fclaw2d_patch_t *this_patch)
-{
-    for (int iface = 0; iface < 4; iface++)
-    {
-        fclaw2d_patch_relation_t nt;
-        nt = fclaw2d_patch_get_face_type(this_patch,iface);
-        if (nt == FCLAW2D_PATCH_HALFSIZE)
-        {
-            return 1;
-        }
-    }
-
-    for (int icorner = 0; icorner < 4; icorner++)
-    {
-        fclaw2d_patch_relation_t nt;
-        int has_corner = !fclaw2d_patch_corner_is_missing(this_patch,icorner);
-        if (has_corner)
-        {
-            nt = fclaw2d_patch_get_corner_type(this_patch,icorner);
-            if (nt == FCLAW2D_PATCH_HALFSIZE)
-            {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -72,7 +42,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           int patchno,
                           void *user)
 {
-    if (fclaw2d_timeinterp_has_finegrid_neighbors(domain,this_patch))
+    if (fclaw2d_patch_has_finegrid_neighbors(this_patch))
     {
         double &alpha = *((double*) user);
         fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);

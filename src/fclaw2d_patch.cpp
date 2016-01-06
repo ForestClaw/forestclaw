@@ -30,13 +30,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.hpp>
 #include <fclaw2d_clawpatch.hpp>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+
 struct fclaw2d_patch_data
 {
     fclaw2d_patch_relation_t face_neighbors[4];
     fclaw2d_patch_relation_t corner_neighbors[4];
     int corners[4];
+    int on_coarsefine_interface;
+    int has_finegrid_neighbors;
     int neighbors_set;
+    void *user_patch; /* Start of attempt to "virtualize" the user patch. */
+#if 0
     ClawPatch *cp;
+#endif
 };
 
 
@@ -46,13 +60,15 @@ fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
     return (fclaw2d_patch_data_t *) patch->user;
 }
 
-ClawPatch*
-fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
+void*
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* this_patch)
 
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
-    return pdata->cp;
+
+    return pdata->user_patch;
 }
+
 
 void fclaw2d_patch_set_face_type(fclaw2d_patch_t *patch,int iface,
                                  fclaw2d_patch_relation_t face_type)
@@ -88,7 +104,7 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
 }
 
 fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(fclaw2d_patch_t* patch,
-                                                          int icorner)
+                                                       int icorner)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata != NULL);
@@ -109,7 +125,43 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata != NULL);
+    FCLAW_ASSERT(pdata->neighbors_set == 0);
+
     pdata->neighbors_set = 1;
+
+    pdata->has_finegrid_neighbors = 0;
+    pdata->on_coarsefine_interface = 0;
+    for (int iface = 0; iface < 4; iface++)
+    {
+        fclaw2d_patch_relation_t nt;
+        nt = fclaw2d_patch_get_face_type(patch,iface);
+        if (nt == FCLAW2D_PATCH_HALFSIZE || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+        {
+            pdata->on_coarsefine_interface = 1;
+            if (nt == FCLAW2D_PATCH_HALFSIZE)
+            {
+                pdata->has_finegrid_neighbors = 1;
+            }
+        }
+    }
+
+    for (int icorner = 0; icorner < 4; icorner++)
+    {
+        fclaw2d_patch_relation_t nt;
+        int has_corner = !fclaw2d_patch_corner_is_missing(patch,icorner);
+        if (has_corner)
+        {
+            nt = fclaw2d_patch_get_corner_type(patch,icorner);
+            if ((nt == FCLAW2D_PATCH_HALFSIZE) || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+            {
+                pdata->on_coarsefine_interface = 1;
+                if (nt == FCLAW2D_PATCH_HALFSIZE)
+                {
+                    pdata->has_finegrid_neighbors = 1;
+                }
+            }
+        }
+    }
 }
 
 void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch)
@@ -126,42 +178,26 @@ int fclaw2d_patch_neighbor_type_set(fclaw2d_patch_t* patch)
     return pdata->neighbors_set;
 }
 
+
+int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    return pdata->has_finegrid_neighbors;
+}
+
+int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    return pdata->on_coarsefine_interface;
+}
+
+
 /* -------------------------------------------------------------
    This should be the only place where patch user data gets
    allocated or deleted.
    ------------------------------------------------------------- */
-
-void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch)
-{
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-
-    /* Initialize user data */
-    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
-    this_patch->user = (void *) pdata;
-
-    /* create new ClawPatch */
-    ClawPatch *cp = new ClawPatch();
-    pdata->cp = cp;
-    ++ddata->count_set_clawpatch;
-    pdata->neighbors_set = 0;
-}
-
-void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t *this_patch)
-{
-    fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
-
-    if (pdata != NULL)
-    {
-        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-        delete pdata->cp;
-        ++ddata->count_delete_clawpatch;
-
-        FCLAW2D_FREE(pdata);
-        this_patch->user = NULL;
-    }
-}
 
 int
 fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
@@ -196,3 +232,60 @@ fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
     fclaw_global_essentialf("fclaw2d_patch_iterator_mthread : We should not be here\n");
 #endif
 }
+
+
+/* -------------------------------------------------------
+   Relies on ClawPatch
+   To get the links to ClawPatch out, we need to set up
+   several virtual functions so that "patch" knows how to
+   interpolate, average, etc.  Right now, only ClawPatch knows
+   how to do this.
+   -------------------------------------------------------- */
+
+ClawPatch*
+fclaw2d_patch_get_cp(fclaw2d_patch_t* this_patch)
+
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
+    return (ClawPatch*) pdata->user_patch;
+}
+
+void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
+                            fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+
+    /* Initialize user data */
+    fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
+    this_patch->user = (void *) pdata;
+
+    /* create new ClawPatch */
+    ClawPatch *cp = new ClawPatch();
+    pdata->user_patch = (void*) cp;
+    ++ddata->count_set_clawpatch;
+    pdata->neighbors_set = 0;
+}
+
+void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
+                               fclaw2d_patch_t *this_patch)
+{
+    fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
+
+    if (pdata != NULL)
+    {
+        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+        delete (ClawPatch*) pdata->user_patch;
+        ++ddata->count_delete_clawpatch;
+
+        FCLAW2D_FREE(pdata);
+        this_patch->user = NULL;
+    }
+}
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
