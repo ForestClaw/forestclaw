@@ -65,7 +65,6 @@ int fclaw2d_timeinterp_has_finegrid_neighbors(fclaw2d_domain_t * domain,
 }
 
 
-
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -79,8 +78,6 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
         fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
     }
 }
-
-
 
 /* ----------------------------------------------------------------------
    Main routine in this file.  This file assumes that both coarse and
