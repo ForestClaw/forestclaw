@@ -61,11 +61,11 @@ fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
 }
 
 void*
-fclaw2d_patch_get_user_patch(fclaw2d_patch_t* this_patch)
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch)
 
 {
-    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
-
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
     return pdata->user_patch;
 }
 
@@ -74,7 +74,6 @@ void fclaw2d_patch_set_face_type(fclaw2d_patch_t *patch,int iface,
                                  fclaw2d_patch_relation_t face_type)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     pdata->face_neighbors[iface] = face_type;
 }
 
@@ -82,7 +81,6 @@ void fclaw2d_patch_set_corner_type(fclaw2d_patch_t *patch,int icorner,
                                    fclaw2d_patch_relation_t corner_type)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     pdata->corner_neighbors[icorner] = corner_type;
     pdata->corners[icorner] = 1;
 }
@@ -90,15 +88,13 @@ void fclaw2d_patch_set_corner_type(fclaw2d_patch_t *patch,int icorner,
 void fclaw2d_patch_set_missing_corner(fclaw2d_patch_t *patch,int icorner)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     pdata->corners[icorner] = 0;
 }
 
 fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
-                                                        int iface)
+                                                     int iface)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     return pdata->face_neighbors[iface];
 }
@@ -107,7 +103,6 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(fclaw2d_patch_t* patch,
                                                        int icorner)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     FCLAW_ASSERT(pdata->corners[icorner] != 0);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     return pdata->corner_neighbors[icorner];
@@ -117,14 +112,12 @@ int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
                                     int icorner)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     return !pdata->corners[icorner];
 }
 
 void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     FCLAW_ASSERT(pdata->neighbors_set == 0);
 
     pdata->has_finegrid_neighbors = 0;
@@ -166,14 +159,12 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     pdata->neighbors_set = 0;
 }
 
 int fclaw2d_patch_neighbor_type_set(fclaw2d_patch_t* patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     return pdata->neighbors_set;
 }
 
@@ -181,22 +172,15 @@ int fclaw2d_patch_neighbor_type_set(fclaw2d_patch_t* patch)
 int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     return pdata->has_finegrid_neighbors;
 }
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
     return pdata->on_coarsefine_interface;
 }
 
-
-/* -------------------------------------------------------------
-   This should be the only place where patch user data gets
-   allocated or deleted.
-   ------------------------------------------------------------- */
 
 int
 fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
