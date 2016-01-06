@@ -127,14 +127,12 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
     FCLAW_ASSERT(pdata != NULL);
     FCLAW_ASSERT(pdata->neighbors_set == 0);
 
-    pdata->neighbors_set = 1;
-
     pdata->has_finegrid_neighbors = 0;
     pdata->on_coarsefine_interface = 0;
     for (int iface = 0; iface < 4; iface++)
     {
         fclaw2d_patch_relation_t nt;
-        nt = fclaw2d_patch_get_face_type(patch,iface);
+        nt = pdata->face_neighbors[iface];
         if (nt == FCLAW2D_PATCH_HALFSIZE || (nt == FCLAW2D_PATCH_DOUBLESIZE))
         {
             pdata->on_coarsefine_interface = 1;
@@ -148,10 +146,10 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
     for (int icorner = 0; icorner < 4; icorner++)
     {
         fclaw2d_patch_relation_t nt;
-        int has_corner = !fclaw2d_patch_corner_is_missing(patch,icorner);
+        int has_corner = pdata->corners[icorner];
         if (has_corner)
         {
-            nt = fclaw2d_patch_get_corner_type(patch,icorner);
+            nt = pdata->corner_neighbors[icorner];
             if ((nt == FCLAW2D_PATCH_HALFSIZE) || (nt == FCLAW2D_PATCH_DOUBLESIZE))
             {
                 pdata->on_coarsefine_interface = 1;
@@ -162,6 +160,7 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
             }
         }
     }
+    pdata->neighbors_set = 1;
 }
 
 void fclaw2d_patch_neighbors_reset(fclaw2d_patch_t* patch)

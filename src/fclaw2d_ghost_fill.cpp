@@ -500,15 +500,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw_global_infof("Time interpolated level is %d\n",   \
                            time_interp_level);
     }
-#if 0
-    else
-    {
-        FCLAW_ASSERT(domain->global_minlevel == minlevel);
-        FCLAW_ASSERT(domain->global_maxlevel == maxlevel);
-
-        fclaw2d_set_neighbor_types(domain);
-    }
-#endif
 
     /* If minlevel == maxlevel, then maxcoarse < mincoase. In this
        case, loops involving averaging and interpolation will be
