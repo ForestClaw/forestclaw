@@ -90,8 +90,15 @@ def write_ini_files(input_file='create_run.ini'):
     # Uniform or adaptiev
     mode    = config.get('Run','mode').partition('#')[0].strip()
 
-    # weak or strong
-    scaling = config.get('Run','scaling').partition('#')[0].strip()
+    # weak or strong (always use strong)
+    try:
+        scaling = config.get('Run','scaling').partition('#')[0].strip()
+        if scaling == 'weak':
+            print "Strong scaling is now the only option;  using 'scaling=strong'"
+        scaling = 'strong'
+
+    except:
+        scaling = 'strong'
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -321,6 +328,10 @@ def write_ini_files(input_file='create_run.ini'):
                 ini_file.write("    subcycle = T\n")
             else:
                 ini_file.write("    subcycle = F\n")
+                ini_file.write("    advance-one-step = F\n")
+
+        ini_file.write("    advance-one-step = F\n")
+        ini_file.write("    outstyle-uses-maxlevel = F\n")
 
         ini_file.close()
 
@@ -505,7 +516,6 @@ def compile_results(results_dir=None,results_file='results.out',
                    'GHOSTCOMM$',
                    'Statistics for CFL',
                    'Statistics for EXTRA4$',
-                   'TIME_PER_GRID',
                    'BUILDREGRID',
                    'BUILDGHOST',
                    'TAGGING']
@@ -604,24 +614,37 @@ def compile_results(results_dir=None,results_file='results.out',
             grids_advanced_uniform = nout_uniform*(2**maxlevel)**2/pcount
             a = []
             for i,l in enumerate(lines):
-                if re.search('TIME_PER_GRID',l):
+                if re.search('GRIDS_PER_TIME',l):
                     a = i
                     break
 
             missing_value = False
             try:
                 l2 = lines[a+2].split()  # Data if two lines below "TIME_PER_GRID"
-                tpg = float(l2[5])
             except:
-                print "TIME_PER_GRID not found in %s" % f
-                missing_value = True
+                a = []
+                for i,l in enumerate(lines):
+                    if re.search('STEPS_PER_SECOND',l):
+                        a = i
+                        break
+                try:
+                    l2 = lines[a+2].split()  # Data if two lines below "TIME_PER_GRID"
+
+                except:
+                    print "GRIDS_PER_TIME (STEPS_PER_SECOND) not found in %s" % f
+                    missing_value = True
+                else:
+                    gpt = float(l2[5])
+
+            else:
+                gpt = float(l2[5])
+
 
             a = []
             for i,l in enumerate(lines):
                 if re.search('WALLTIME',l):
                     a = i
                     break
-
             try:
                 l2 = lines[a+2].split()
                 wt = float(l2[5])
@@ -630,7 +653,7 @@ def compile_results(results_dir=None,results_file='results.out',
                 missing_value = True
 
             if not missing_value:
-                grids_advanced_per_proc = wt/tpg
+                grids_advanced_per_proc = gpt*wt
                 adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
                 resultsfile.write("%12d" % np.round(grids_advanced_per_proc))
             else:
@@ -666,7 +689,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
     for d in dir_list:
         dirs.append("run_%03d" % d)
 
-    read_input = not results_in == None
+    read_input = not (results_in == None)
 
     if read_input:
         # Get data from results.in only
@@ -736,7 +759,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
             d = os.path.join(results_dir,subdir)
 
         files = os.listdir(d)
-        print files
         for f in files:
             if re.match(pattern,f):
 
@@ -748,7 +770,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
 
                 if not os.path.exists(rf):
                     print "File %s not found in %s" % (results_file,f)
-                    jobs[m][p][l] = None
                     continue
 
                 data = np.loadtxt(rf)
@@ -773,7 +794,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["tfinal"]         = row[7]
                         job["effres"]         = row[8]
                         job["grids_per_proc"] = row[9]
-                        job["walltime_est"]   = row[10]
+                        job["walltime"]   = row[10]
 
                     else:
                         p = row[1]
@@ -796,7 +817,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["ghostcomm"]     = row[12]
                         job["cfl"]           = row[13]
                         job["extra"]         = row[14]
-                        job["time_per_grid"] = row[15]
+                        job["steps_per_second"] = row[15]
                         try:
                             job["buildregrid"]   = row[16]
                             job["buildghost"]    = row[17]
@@ -884,7 +905,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     markers["exchange"] = u'h'
     markers["regrid"] = u'v'
     markers["ghostcomm"] = u'^'
-    markers["time_per_grid"] = u'o'
+    markers["grids_per_time"] = u'o'
     markers["cfl"] = u'p'
     markers["extra"] = u'd'
 
@@ -1027,8 +1048,16 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
 
         # Each job might include several runs, which must be averaged
         gpp_avg = np.append(gpp_avg,np.round(np.average(job["grids_per_proc"]/job["nout"])))
-        grids_advanced = np.append(grids_advanced,
-                                   np.round(np.average((job["walltime"]/job["time_per_grid"]))))
+
+        #grids_advanced = np.append(grids_advanced,
+        #                           np.round(np.average((job["walltime"]/job["time_per_grid"]))))
+
+        try:
+            grids_advanced = np.append(grids_advanced,
+                                       np.round(np.average((job["time_per_grid"]*job["walltime"]))))
+        except:
+            grids_advanced = np.append(grids_advanced,
+                                       np.round(np.average((job["steps_per_second"]*job["walltime"]))))
 
         try:
             data = np.average(job[v])
@@ -1037,18 +1066,16 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
                 # Call function val2plot
                 data = np.average(v(job,mx=m,proc=p,level=l,all=jobs))
             except:
-                import pdb
-                pdb.set_trace()
-
                 print "plot_results_internal : Invalid val2plot"
                 sys.exit()
 
 
         if scaling == 'weak':
-            y = grids_advanced[-1]/data
+            # y = data/grids_advanced
         else:
             y = data
 
+        y = data
         y_avg = np.append(y_avg,y)
 
     if scaling == 'weak':
