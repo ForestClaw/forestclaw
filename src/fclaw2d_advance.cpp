@@ -91,14 +91,18 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
             ts_counter[level].step_inc = 1;
             if (gparms->advance_one_step)
             {
-                /* We do something between each step */
+                /* Take exactly one step of the dt (stable or not!)
+                   that was passed into advance;
+                   The calling routine wants to do something (regrid,
+                   write output, etc) between each step */
                 ts_counter[level].dt_step = dt;
                 ts_counter[level].total_steps = 1;
             }
             else
             {
-                /* We take rf steps here without regridding or writing output
-                   files between each step.  */
+                /* Divide the dt passed into into rf smaller steps.  Take
+                   this step on all grids.  Return only rf steps have
+                   been taken. */
                 ts_counter[level].dt_step = dt/rf;
                 ts_counter[level].total_steps = rf;
             }

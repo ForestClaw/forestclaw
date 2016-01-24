@@ -54,6 +54,10 @@ extern "C"
 
 void fclaw2d_finalize(fclaw2d_domain_t **domain)
 {
+
+    fclaw_global_essentialf("Finalizing run\n");
+    fclaw2d_domain_barrier (*domain);
+
     fclaw2d_timer_report(*domain);
 
     fclaw2d_domain_reset(domain);

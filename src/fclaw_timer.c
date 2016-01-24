@@ -113,9 +113,16 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
     FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_TIME_PER_GRID],
-                   ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative/ddata->count_single_step,
-                   "TIME_PER_GRID");
+
+    fclaw2d_domain_barrier (domain);
+
+    /* Disable all exceptions so we dont' crash on a divide by 0 or something */
+    fedisableexcept(FE_ALL_EXCEPT);
+
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_TIME],
+                   ddata->count_single_step/ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative,
+                   "GRIDS_PER_TIME");
+
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                    (ddata->timers[FCLAW2D_TIMER_INIT].cumulative +
@@ -126,7 +133,15 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                     ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative +
                     ddata->timers[FCLAW2D_TIMER_CFL].cumulative),
                    "UNACCOUNTED");
+    fclaw2d_domain_barrier (domain);
+
     sc_stats_compute (domain->mpicomm, FCLAW2D_TIMER_COUNT, stats);
+
+    /* Clear any exceptions that may have occurred in computing statistics
+       (divide by 0; etc) */
+
+    feclearexcept(FE_ALL_EXCEPT);
+
     sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                     stats, 1, 0);
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
@@ -136,7 +151,8 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_EXCHANGE].average,
                           ddata->count_amr_regrid,
-                          stats[FCLAW2D_TIMER_REGRID].average);
+                          stats[FCLAW2D_TIMER_REGRID].average,
+                          ddata->count_single_step);
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
                           "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
