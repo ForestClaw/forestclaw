@@ -20,7 +20,9 @@ How do we report timing statistics?
 
 For each of the above counters each processor shall report say
 a_i = total_runtime_ghostcomm / #local_grids_advanced etc.
+
 In addition it will be helpful to report #local_grids_advanced itself.
+
 Finally we do the parallel computation of statistics.
 For weak scaling we report the average or maximum of a_i over all cores.
 For strong scaling we report the same for a straight line over cores,
