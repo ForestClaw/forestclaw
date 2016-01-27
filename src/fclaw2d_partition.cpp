@@ -76,8 +76,12 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* Question : Do all patches on this processor get packed? */
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
+void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
+                              fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+
     char basename[BUFSIZ];
 
     /* will need to access the subcyle switch */
@@ -85,6 +89,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     size_t data_size = fclaw2d_clawpatch_partition_packsize(*domain);
     void ** patch_data = NULL;
 
@@ -96,40 +101,48 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
     fclaw2d_domain_iterate_patches(*domain,
                                    cb_fclaw2d_clawpatch_partition_pack,
                                    (void *) patch_data);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
 
     /* this call creates a new domain that is valid after partitioning
        and transfers the data packed above to the new owner processors */
     int exponent = gparms->subcycle && !gparms->noweightedp ? 1 : 0;
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_stop (&ddata->timers[running]);
+    }
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
     fclaw2d_domain_t *domain_partitioned =
         fclaw2d_domain_partition (*domain, exponent);
-
     fclaw_bool have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)
     {
+        /* Do this part so we can get a pointer to the new data */
         fclaw2d_domain_setup(*domain, domain_partitioned);
+        ddata = fclaw2d_domain_get_data(domain_partitioned);
+    }
+
+    /* Stop the communication timer */
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_start (&ddata->timers[running]);
+    }
+
+    if (have_new_partition)
+    {
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
         /* update patch array to point to the numerical data that was received */
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
-
-        /* TODO: for all (patch i) { unpack numerical data from patch_data[i] } */
-        fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain_partitioned);
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
-
-#if 0
-        /* Old version */
-        fclaw2d_domain_iterate_patches(domain_partitioned,
-                                       cb_fclaw2d_clawpatch_partition_unpack,
-                                       (void *) patch_data);
-#endif
 
         /* New version? */
         fclaw2d_domain_iterate_partitioned(*domain,domain_partitioned,
                                            cb_partition_transfer,
                                            (void*) patch_data);
-
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDPARTITION]);
 
         /* then the old domain is no longer necessary */
         fclaw2d_domain_reset(domain);
@@ -155,10 +168,13 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode)
 
         /* internal clean up */
         fclaw2d_domain_complete(*domain);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     }
 
     /* free the data that was used in the parallel transfer of patches */
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
+
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
 }
 
 #ifdef __cplusplus

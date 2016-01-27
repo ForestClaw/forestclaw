@@ -90,16 +90,6 @@ def write_ini_files(input_file='create_run.ini'):
     # Uniform or adaptiev
     mode    = config.get('Run','mode').partition('#')[0].strip()
 
-    # weak or strong (always use strong)
-    try:
-        scaling = config.get('Run','scaling').partition('#')[0].strip()
-        if scaling == 'weak':
-            print "Strong scaling is now the only option;  using 'scaling=strong'"
-        scaling = 'strong'
-
-    except:
-        scaling = 'strong'
-
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
     subcycle = sc in ['T','True','1']
@@ -110,12 +100,9 @@ def write_ini_files(input_file='create_run.ini'):
     except:
         noweightedp = False
 
-    # scale-uniform : Scale uniform calculations to save time
-    try:
-        sw = config.get('Run','scale-uniform').partition('#')[0].strip()
-        scale_uniform = sw in ['T','True','1']
-    except:
-        scale_uniform = False
+    # these should eventually go away ...
+    scaling = 'strong'   # Get rid of these eventually?
+    scale_uniform = False
 
     mx0     = int(config.get('Run', 'mx').partition('#')[0].strip())
     minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
@@ -179,60 +166,26 @@ def write_ini_files(input_file='create_run.ini'):
     nstep.fill(nstep0)
 
     if mode == 'uniform':
-        if scaling == 'weak':
-            # Quadruple proc count :
-            #    -- Double effective resolution
-            #    -- cut dt in half
-            # With "scale_uniform" set:
-            #    -- cut tfinal in half
-            #    -- nout and nstep don't change
-            # If "scale_uniform" not set:
-            #    -- tfinal is constant
-            #    -- nout and nstep are doubled
-            minlevel = minlevel0 + R    # Increase minlevel=maxlevel
-            dt = dt0/2**R
-            if scale_uniform:
-                tfinal = tfinal0/2**R       # saves time
-            else:
-                tfinal.fill(tfinal0)
-                nout = nout*2**R
-                nstep = nstep*2**R
+        # Quadruple proc count --> nothing changes in problem size
+        # with "scale_uniform" set :
+        #    -- cut tfinal in half (cut nout/nstep in half as well)
+        #    -- scale time later (in plotting, for example)
+        minlevel.fill(minlevel0)
+        tfinal.fill(tfinal0)   # We will multiply by procs when plotting
 
-        elif scaling == 'strong':
-            # Quadruple proc count --> nothing changes in problem size
-            # with "scale_uniform" set :
-            #    -- cut tfinal in half (cut nout/nstep in half as well)
-            #    -- scale time later (in plotting, for example)
-            minlevel.fill(minlevel0)
-            tfinal.fill(tfinal0)   # We will multiply by procs when plotting
-            dt.fill(dt0)
-            if scale_uniform:
-                tfinal = tfinal*procs/np.max(procs)
-                nout = nout*procs/np.max(procs)
-                nstep = nstep*procs/np.max(procs)
-
+        dt.fill(dt0)
         maxlevel = minlevel   # Always true for uniform case
 
     elif mode == 'adapt':
 
         # minlevel is fixed
         minlevel.fill(minlevel0)
+        maxlevel.fill(maxlevel0)
 
         # Run entire simulation, to get true measure of adaptivity
         tfinal.fill(tfinal0)
         dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
 
-        if scaling == 'weak':
-            # Quadruple processor count
-            #   -- double effective resolution
-            #   -- dt, nout, nstep are relative to coarsest level
-            #      and so remain unchanged.
-            maxlevel = minlevel0 + R
-
-        elif scaling == 'strong':
-            # Quadruple processor count
-            #    -- run same simulation
-            maxlevel.fill(maxlevel0)
 
     nout_uniform = nout*2**(maxlevel-minlevel)
     num_grids = (2**maxlevel)**2  # Total number of uniform grids on all procs
@@ -328,7 +281,6 @@ def write_ini_files(input_file='create_run.ini'):
                 ini_file.write("    subcycle = T\n")
             else:
                 ini_file.write("    subcycle = F\n")
-                ini_file.write("    advance-one-step = F\n")
 
         ini_file.write("    advance-one-step = F\n")
         ini_file.write("    outstyle-uses-maxlevel = F\n")
@@ -525,9 +477,9 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile.write("# " + "-"*152)
     resultsfile.write("\n")
     fstr = "# %6s%8s%6s%6s%6s%8s%12s%12s" + "%12s"*11 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','grid/proc',
-                              'Wall','Advance','Exchange','Regrid','Comm','cfl',
-                              'extra','time/grid','buildregrid','buildghost','tagging'))
+    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','grids adv.',
+                              'Wall','Advance','Ghostfill','Regrid','Ghostcomm','cfl',
+                              'adapt','time/grid','buildregrid','buildghost','tagging'))
 
     resultsfile.write("# " + "-"*152)
     resultsfile.write("\n")
@@ -568,6 +520,8 @@ def compile_results(results_dir=None,results_file='results.out',
             # proc count
             resultsfile.write("%8d" % pcount)
 
+            # Get values of options
+
             # mx
             for i,l in enumerate(lines):
                 if re.search("mx",l):
@@ -606,58 +560,6 @@ def compile_results(results_dir=None,results_file='results.out',
                     l1 = lines[i].split()
                     resultsfile.write("%12.2e" % float(l1[2]))
                     break
-
-            # ratio of adaptive grids advanced to uniform grids advanced
-            # Account for the fact that nout in this case means something
-            # different than in the uniform case.
-            nout_uniform = nout*2**(maxlevel-minlevel)
-            grids_advanced_uniform = nout_uniform*(2**maxlevel)**2/pcount
-            a = []
-            for i,l in enumerate(lines):
-                if re.search('GRIDS_PER_TIME',l):
-                    a = i
-                    break
-
-            missing_value = False
-            try:
-                l2 = lines[a+2].split()  # Data if two lines below "TIME_PER_GRID"
-            except:
-                a = []
-                for i,l in enumerate(lines):
-                    if re.search('STEPS_PER_SECOND',l):
-                        a = i
-                        break
-                try:
-                    l2 = lines[a+2].split()  # Data if two lines below "TIME_PER_GRID"
-
-                except:
-                    print "GRIDS_PER_TIME (STEPS_PER_SECOND) not found in %s" % f
-                    missing_value = True
-                else:
-                    gpt = float(l2[5])
-
-            else:
-                gpt = float(l2[5])
-
-
-            a = []
-            for i,l in enumerate(lines):
-                if re.search('WALLTIME',l):
-                    a = i
-                    break
-            try:
-                l2 = lines[a+2].split()
-                wt = float(l2[5])
-            except:
-                print "WALLTIME not found in %s" % f
-                missing_value = True
-
-            if not missing_value:
-                grids_advanced_per_proc = gpt*wt
-                adapt_ratio = 100*float(grids_advanced_per_proc/grids_advanced_uniform)
-                resultsfile.write("%12d" % np.round(grids_advanced_per_proc))
-            else:
-                resultsfile.write("%12s" % np.nan)
 
             # Get everything else in list
             for k,w in enumerate(stats_list):

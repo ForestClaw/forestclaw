@@ -204,69 +204,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 }
 
 
-static
-void cb_set_neighbor_types(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int blockno,
-                           int patchno,
-                           void *user)
-{
-
-    for (int iface = 0; iface < 4; iface++)
-    {
-        int rproc[2];
-        int rblockno;
-        int rpatchno[2];
-        int rfaceno;
-
-        fclaw2d_patch_relation_t neighbor_type =
-            fclaw2d_patch_face_neighbors(domain,
-                                         blockno,
-                                         patchno,
-                                         iface,
-                                         rproc,
-                                         &rblockno,
-                                         rpatchno,
-                                         &rfaceno);
-
-        fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
-    }
-
-    for (int icorner = 0; icorner < 4; icorner++)
-    {
-        int rproc_corner;
-        int cornerpatchno;
-        int cornerblockno;
-        int rcornerno;
-        fclaw2d_patch_relation_t neighbor_type;
-
-        int has_corner_neighbor =
-            fclaw2d_patch_corner_neighbors(domain,
-                                           blockno,
-                                           patchno,
-                                           icorner,
-                                           &rproc_corner,
-                                           &cornerblockno,
-                                           &cornerpatchno,
-                                           &rcornerno,
-                                           &neighbor_type);
-
-        fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
-        if (!has_corner_neighbor)
-        {
-            fclaw2d_patch_set_missing_corner(this_patch,icorner);
-        }
-    }
-    fclaw2d_patch_neighbors_set(this_patch);
-}
-
-void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain)
-{
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
-    fclaw2d_domain_iterate_patches(domain,cb_set_neighbor_types,(void*) NULL);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA4]);
-}
 
 /* ----------------------------------------------------------------
    Public interface
@@ -279,7 +216,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     fclaw_global_infof("Regridding domain\n");
 
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_TAGGING]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
     fclaw2d_domain_iterate_families(*domain, cb_regrid_tag4coarsening,
                                     (void*) NULL);
@@ -287,31 +224,42 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     int domain_init = 0;
     fclaw2d_domain_iterate_patches(*domain, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_TAGGING]);
+
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */
-    fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
-    fclaw_bool have_new_refinement = new_domain != NULL;
 
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+
+    fclaw_bool have_new_refinement = new_domain != NULL;
     /* Domain data may go out of scope now. */
     ddata = NULL;
 
     if (have_new_refinement)
     {
-        fclaw_global_infof(" -- Have new refinement\n");
-
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        fclaw2d_domain_setup(*domain, new_domain);
+        fclaw2d_domain_setup(*domain,new_domain);
         ddata = fclaw2d_domain_get_data(new_domain);
+    }
+
+    /* Stop the new timer (copied from old timer) */
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+
+    if (have_new_refinement)
+    {
+        fclaw_global_infof(" -- Have new refinement\n");
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
         fclaw2d_domain_iterate_adapted(*domain, new_domain,
                                        cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDREGRID]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
         /* free memory associated with old domain */
         fclaw2d_domain_reset(domain);
@@ -319,15 +267,14 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(domain, -1);
+        fclaw2d_partition_domain(domain, -1,FCLAW2D_TIMER_REGRID);
+
+        /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
         /* Need a new timer */
         ddata = fclaw2d_domain_get_data(*domain);
 
-        /* Set up ghost patches. No parallel communication is done here */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
-        fclaw2d_exchange_setup(*domain);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+        fclaw2d_exchange_setup(*domain,FCLAW2D_TIMER_REGRID);
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */
@@ -353,9 +300,9 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* We updated all the ghost cells when leaving advance, so don't need to do
            it here */
         /* Set up ghost patches. No parallel communication is done here */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
         fclaw2d_exchange_setup(*domain);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_BUILDGHOST]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 #endif
     }
 

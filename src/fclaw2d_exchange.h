@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw2d_vtable.h>
+#include <fclaw_timer.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,23 +40,22 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_exchange_setup(fclaw2d_domain* domain);
-void fclaw2d_exchange_delete(fclaw2d_domain_t** domain);
+void fclaw2d_exchange_setup(fclaw2d_domain* domain,
+                            fclaw2d_timer_names_t running);
 
-void fclaw2d_exchange_ghost_patches(fclaw2d_domain_t* domain,
-                                    int minlevel,
-                                    int maxlevel,
-                                    int time_interp);
+void fclaw2d_exchange_delete(fclaw2d_domain_t** domain);
 
 void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
                                           int minlevel,
                                           int maxlevel,
-                                          int time_interp);
+                                          int time_interp,
+                                          fclaw2d_timer_names_t running);
 
 void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
                                         int minlevel,
                                         int maxlevel,
-                                        int time_interp);
+                                        int time_interp,
+                                        fclaw2d_timer_names_t running);
 
 
 #ifdef __cplusplus

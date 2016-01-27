@@ -68,8 +68,13 @@ void fclaw2d_diagnostics_compute_sum(fclaw2d_domain_t *domain,
 }
 
 static
-void fclaw2d_check_conservation(fclaw2d_domain_t *domain, const double t, int init_flag)
+void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
+                                const double t,
+                                int init_flag,
+                                fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     int meqn = gparms->meqn;
 
@@ -84,6 +89,10 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain, const double t, int in
 
     /* Report results */
     fclaw_global_productionf("Conservation check\n");
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_stop (&ddata->timers[running]);
+    }
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
     for (int i = 0; i < meqn; i++)
     {
         global_sum[i] = fclaw2d_domain_global_sum (domain, local_sum[i]);
@@ -94,6 +103,10 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain, const double t, int in
         }
         fclaw_global_productionf("sum[%d] =  %24.16e  %24.16e\n",i,global_sum[i],
                                  fabs(global_sum[i]-global_sum0[i]));
+    }
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_start (&ddata->timers[running]);
     }
 
     fclaw_global_productionf("\n");
@@ -111,6 +124,9 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain, const double t, int in
 
 void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain, int init_flag)
 {
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_vtable_t vt;
     double t;
@@ -127,7 +143,7 @@ void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain, int init_flag)
 
     if (gparms->conservation_check)
     {
-        fclaw2d_check_conservation(domain,t,init_flag);
+        fclaw2d_check_conservation(domain,t,init_flag,FCLAW2D_TIMER_DIAGNOSTICS);
     }
-
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
