@@ -87,8 +87,18 @@ def write_ini_files(input_file='create_run.ini'):
     dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
     dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
 
-    # Uniform or adaptiev
+    # Fit to model
+    try:
+        coeff_A      = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
+        coeff_B      = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
+    except:
+        coeff_A = 1.0
+        coeff_B = 0
+
+
+    # Uniform or adaptive
     mode    = config.get('Run','mode').partition('#')[0].strip()
+
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -187,11 +197,22 @@ def write_ini_files(input_file='create_run.ini'):
         dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
 
 
+    if mode == 'adapt':
+        if minlevel0 != 4:
+            # These coefficients only work for minlevel=4
+            adapt_factor = np.ones(R.shape)
+        else:
+            adapt_factor = coeff_A*np.exp(coeff_B*maxlevel)
+    else:
+        adapt_factor = np.ones(R.shape)
+
     nout_uniform = nout*2**(maxlevel-minlevel)
     num_grids = (2**maxlevel)**2  # Total number of uniform grids on all procs
-    t = (num_grids*time_per_grid*nout_uniform)/procs  # Assuming ideal scaling
+    num_advances = adapt_factor*nout_uniform*num_grids
+    t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
+
     eff_res = mx*(2**maxlevel)
-    grids_per_proc = (2**maxlevel)**2/procs
+    grids_per_proc = adapt_factor*(2**maxlevel)**2/procs
 
     # ------------------------------------------
     # Start creating files.
@@ -461,27 +482,27 @@ def compile_results(results_dir=None,results_file='results.out',
         results_dir = os.getcwd()
 
     # Stuff to grep for
-    stats_list = [ 'WALLTIME',
-                   'ADVANCE',
-                   'Statistics for EXCHANGE',
-                   'Statistics for REGRID$',
-                   'GHOSTCOMM$',
-                   'Statistics for CFL',
-                   'Statistics for EXTRA4$',
-                   'BUILDREGRID',
-                   'BUILDGHOST',
-                   'TAGGING']
+    stats_list = [ 'INIT',
+                   'ADVANCE$',
+                   'GHOSTFILL$',
+                   'REGRID$',
+                   'GHOSTPATCH_COMM',
+                   'ADAPT_COMM',
+                   'PARTITION_COMM',
+                   'CFL_COMM',
+                   'WALLTIME',
+                   'ADVANCE_STEPS_COUNTER']
 
     # Compile data to this file
     resultsfile = open(results_file,'w')
-    resultsfile.write("# " + "-"*152)
+    resultsfile.write("# " + "-"*172)
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s%12s" + "%12s"*11 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','grids adv.',
-                              'Wall','Advance','Ghostfill','Regrid','Ghostcomm','cfl',
-                              'adapt','time/grid','buildregrid','buildghost','tagging'))
+    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*10 + "\n"
+    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
+                              'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
+                              'partition','cfl','wall','adv._steps'))
 
-    resultsfile.write("# " + "-"*152)
+    resultsfile.write("# " + "-"*172)
     resultsfile.write("\n")
 
     # Look for files that look like "torus_00004.o4567".  But if execname is
@@ -696,7 +717,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["tfinal"]         = row[7]
                         job["effres"]         = row[8]
                         job["grids_per_proc"] = row[9]
-                        job["walltime"]   = row[10]
+                        job["walltime"]       = row[10]
 
                     else:
                         p = row[1]
@@ -704,30 +725,23 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         l = row[4]
 
                         job = {}
-                        job["jobid"]         = row[0]
-                        job["procs"]         = row[1]
-                        job["mx"]            = row[2]
-                        job["minlevel"]      = row[3]
-                        job["maxlevel"]      = row[4]
-                        job["nout"]          = row[5]
-                        job["tfinal"]        = row[6]
-                        job["grids_per_proc"]= row[7]
-                        job["walltime"]      = row[8]
-                        job["advance"]       = row[9]
-                        job["exchange"]      = row[10]
-                        job["regrid"]        = row[11]
-                        job["ghostcomm"]     = row[12]
-                        job["cfl"]           = row[13]
-                        job["extra"]         = row[14]
-                        job["steps_per_second"] = row[15]
-                        try:
-                            job["buildregrid"]   = row[16]
-                            job["buildghost"]    = row[17]
-                            job["tagging"]       = row[18]
-                        except:
-                            job["buildregrid"] = np.nan
-                            job["buildghost"] = np.nan
-                            job["tagging"] = np.nan
+                        job["jobid"]           = row[0]
+                        job["procs"]           = row[1]
+                        job["mx"]              = row[2]
+                        job["minlevel"]        = row[3]
+                        job["maxlevel"]        = row[4]
+                        job["nout"]            = row[5]
+                        job["tfinal"]          = row[6]
+                        job["init"]            = row[7]
+                        job["advance"]         = row[8]
+                        job["ghostfill"]       = row[9]
+                        job["regrid"]          = row[10]
+                        job["ghostpatch_comm"] = row[11]
+                        job["adapt_comm"]      = row[12]
+                        job["partition_comm"]  = row[13]
+                        job["cfl_comm"]        = row[14]
+                        job["walltime"]        = row[15]
+                        job["advance_steps"]   = row[16]
 
                     jobs[m][p][l] = job
 
@@ -737,7 +751,7 @@ def print_jobs(jobs,val2plot):
 
     mx = sorted(jobs.keys())
 
-    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'grids_per_proc',
+    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'advance_steps',
                 'rundir']
 
     for m in mx:
@@ -804,12 +818,11 @@ def plot_results(jobs,start_point,val2plot='walltime',
     markers = {}
     markers["walltime"] = r'$\clubsuit$'
     markers["advance"] = u's'
-    markers["exchange"] = u'h'
+    markers["ghostfill"] = u'h'
     markers["regrid"] = u'v'
-    markers["ghostcomm"] = u'^'
-    markers["grids_per_time"] = u'o'
-    markers["cfl"] = u'p'
-    markers["extra"] = u'd'
+    markers["ghostpatch_comm"] = u'^'
+    markers["advance_steps"] = u'o'
+    markers["cfl_comm"] = u'p'
 
     colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
 
@@ -949,17 +962,18 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
             continue
 
         # Each job might include several runs, which must be averaged
-        gpp_avg = np.append(gpp_avg,np.round(np.average(job["grids_per_proc"]/job["nout"])))
+        # gpp_avg = np.append(gpp_avg,np.round(np.average(job["grids_per_proc"]/job["nout"])))
+        gpp_avg = np.append(gpp_avg,np.round(np.average(job["advance_steps"])))
 
         #grids_advanced = np.append(grids_advanced,
         #                           np.round(np.average((job["walltime"]/job["time_per_grid"]))))
 
         try:
             grids_advanced = np.append(grids_advanced,
-                                       np.round(np.average((job["time_per_grid"]*job["walltime"]))))
+                                       np.round(np.average(job["advance_steps"])))
         except:
             grids_advanced = np.append(grids_advanced,
-                                       np.round(np.average((job["steps_per_second"]*job["walltime"]))))
+                                       np.round(np.average(job["advance_step_counter"])))
 
         try:
             data = np.average(job[v])
@@ -973,7 +987,7 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
 
 
         if scaling == 'weak':
-            # y = data/grids_advanced
+            y = data/grids_advanced
         else:
             y = data
 
@@ -1030,35 +1044,36 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
 
     # get best-fit slope
     mb = None
-    if scaling in ['strong','weak','superlinear']:
-        mb = np.polyfit(np.log(procs),np.log(y_avg),1)
+    if len(mx) > 2:
+        if scaling in ['strong','weak','superlinear']:
+            mb = np.polyfit(np.log(procs),np.log(y_avg),1)
 
-    elif scaling == 'resolution':
-        nsub = np.array(levels) - levels[0] + 1
-        pc = np.polyfit(nsub,np.log(y_avg),1)
-        mb = np.array(np.exp(pc))
-
-    elif scaling == 'block':
-        if v == 'time_per_grid':
-            mx = np.array([x[0] for x in t])
-            nsub = [i for i,te in enumerate(t)]
+        elif scaling == 'resolution':
+            nsub = np.array(levels) - levels[0] + 1
             pc = np.polyfit(nsub,np.log(y_avg),1)
             mb = np.array(np.exp(pc))
 
-    try:
-        mv = markers[v]
-    except:
-        mv = u'o'
+        elif scaling == 'block':
+            if v == 'time_per_grid':
+                mx = np.array([x[0] for x in t])
+                nsub = [i for i,te in enumerate(t)]
+                pc = np.polyfit(nsub,np.log(y_avg),1)
+                mb = np.array(np.exp(pc))
+
+        try:
+            mv = markers[v]
+        except:
+            mv = u'o'
 
 
-    if scaling == 'block':
-        ph = plt.loglog(mx,y_avg,marker=mv,markersize=10)
-    elif scaling in ['strong','superlinear']:
-        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-    elif scaling == 'weak':
-        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-    elif scaling in 'resolution':
-        ph = plt.semilogy(levels,y_avg,marker=mv,markersize=10)
+        if scaling == 'block':
+            ph = plt.loglog(mx,y_avg,marker=mv,markersize=10)
+        elif scaling in ['strong','superlinear']:
+            ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
+        elif scaling == 'weak':
+            ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
+        elif scaling in 'resolution':
+            ph = plt.semilogy(levels,y_avg,marker=mv,markersize=10)
 
     return ph[0],mb
 
