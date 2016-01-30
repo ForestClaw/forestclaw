@@ -122,8 +122,10 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXTRA3);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
-                   ddata->count_single_step,"ADVANCE_STEPS_COUNTER");
+    /* Compute the inverse harmonic mean.  */
+    ddata->count_single_step += 1;   /* Avoid division by zero */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_HMEAN],
+                   1.0/ddata->count_single_step,"ADVANCE_STEPS_HMEAN");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
