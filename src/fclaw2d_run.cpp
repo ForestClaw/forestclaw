@@ -162,9 +162,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
             fclaw2d_run_diagnostics(*domain, init_flag);
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
 
             /* In case we have to reject this step */
@@ -213,9 +211,9 @@ void outstyle_1(fclaw2d_domain_t **domain)
             double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
             ddata = fclaw2d_domain_get_data(*domain);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL]);
+            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
+            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
 
 
             double tc = t_curr + dt_step;
@@ -364,16 +362,14 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         /* Get current domain data since it may change during regrid */
         ddata = fclaw2d_domain_get_data(*domain);
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         fclaw2d_run_diagnostics(*domain, init_flag);  /* Includes conservation check */
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
         double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL]);
+        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
         maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL]);
+        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
 
         double tc = t_curr + dt_step;
         int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
@@ -435,7 +431,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
 static
 void outstyle_4(fclaw2d_domain_t **domain)
 {
+#if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
+#endif
     /* Write out an initial time file */
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
@@ -457,11 +455,11 @@ void outstyle_4(fclaw2d_domain_t **domain)
     while (n < nstep_outer)
     {
         /* Get current domain data since it may change during regrid */
+#if 0
         ddata = fclaw2d_domain_get_data(*domain);
+#endif
 
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CHECK]);
         fclaw2d_run_diagnostics(*domain, init_flag);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CHECK]);
 
         fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 

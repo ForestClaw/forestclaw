@@ -38,7 +38,8 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode);
+void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
+                              fclaw2d_timer_names_t running);
 
 void fclaw2d_partition_delete(fclaw2d_domain_t** domain);
 

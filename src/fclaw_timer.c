@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FCLAW2D_STATS_SET(stats,ddata,NAME) do {                               \
     SC_CHECK_ABORT (!(ddata)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
-                    "Timer " #NAME " still running in amrreset");              \
+                    "Timer " #NAME " still running in fclaw2d_domain_finalize");              \
     sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
                    (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
 } while (0)
@@ -92,73 +92,111 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_WALLTIME]);
 
     FCLAW2D_STATS_SET (stats, ddata, INIT);
-    FCLAW2D_STATS_SET (stats, ddata, REGRID);
     FCLAW2D_STATS_SET (stats, ddata, OUTPUT);
-    FCLAW2D_STATS_SET (stats, ddata, CHECK);
+    FCLAW2D_STATS_SET (stats, ddata, DIAGNOSTICS);
+    FCLAW2D_STATS_SET (stats, ddata, REGRID);
     FCLAW2D_STATS_SET (stats, ddata, ADVANCE);
-    FCLAW2D_STATS_SET (stats, ddata, EXCHANGE);
-    FCLAW2D_STATS_SET (stats, ddata, CFL);
-    FCLAW2D_STATS_SET (stats, ddata, BUILDREGRID);
-    FCLAW2D_STATS_SET (stats, ddata, TAGGING);
-    FCLAW2D_STATS_SET (stats, ddata, BUILDPARTITION);
-    FCLAW2D_STATS_SET (stats, ddata, BUILDGHOST);
-    FCLAW2D_STATS_SET (stats, ddata, GHOST_EXCHANGE);
-    FCLAW2D_STATS_SET (stats, ddata, GHOST_HIDE);
-    FCLAW2D_STATS_SET (stats, ddata, GHOSTCOMM);
-    FCLAW2D_STATS_SET (stats, ddata, GHOSTCOMM_BEGIN);
-    FCLAW2D_STATS_SET (stats, ddata, GHOSTCOMM_END);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL);
+    FCLAW2D_STATS_SET (stats, ddata, ADAPT_COMM);
+    FCLAW2D_STATS_SET (stats, ddata, PARTITION_COMM);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTPATCH_COMM);
+    FCLAW2D_STATS_SET (stats, ddata, DIAGNOSTICS_COMM);
+    FCLAW2D_STATS_SET (stats, ddata, CFL_COMM);
+    FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
+    FCLAW2D_STATS_SET (stats, ddata, ADVANCE_STEPS_COUNTER);
+    FCLAW2D_STATS_SET (stats, ddata, REGRID_BUILD);
+    FCLAW2D_STATS_SET (stats, ddata, REGRID_TAGGING);
+    FCLAW2D_STATS_SET (stats, ddata, PARTITION);
+    FCLAW2D_STATS_SET (stats, ddata, PARTITION_BUILD);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTPATCH_BUILD);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_COPY);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_AVERAGE);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_INTERP);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_PHYSBC);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_STEP1);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_STEP2);
+    FCLAW2D_STATS_SET (stats, ddata, GHOSTFILL_STEP3);
+    FCLAW2D_STATS_SET (stats, ddata, NEIGHBOR_SEARCH);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA1);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA2);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA3);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
-    FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
 
+    /* compute arithmetic mean of total advance steps per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
+                   ddata->count_single_step,"ADVANCE_STEPS_COUNTER");
 
-    fclaw2d_domain_barrier (domain);
+    /* Compute the inverse harmonic mean of total advance steps per processor.  */
+    int c = ddata->count_single_step;
+    ddata->count_single_step = (c > 0) ? c : 1;   /* To avoid division by 0 */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_INV_HMEAN],
+                   1.0/ddata->count_single_step,"ADVANCE_STEPS_INV_HMEAN");
 
-    /* Disable all exceptions so we dont' crash on a divide by 0 or something */
-    fedisableexcept(FE_ALL_EXCEPT);
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],
+                   ddata->count_grids_per_proc/ddata->count_amr_advance,"GRIDS_PER_PROC");
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_TIME],
-                   ddata->count_single_step/ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative,
-                   "GRIDS_PER_TIME");
+    /* Compute the inverse harmonic mean of grids per processor  */
+    int d = ddata->count_grids_per_proc;
+    ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],
+                   1.0/(ddata->count_grids_per_proc/ddata->count_amr_advance),
+                   "GRIDS_PER_PROC_INV_HMEAN");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                    (ddata->timers[FCLAW2D_TIMER_INIT].cumulative +
                     ddata->timers[FCLAW2D_TIMER_REGRID].cumulative +
                     ddata->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
-                    ddata->timers[FCLAW2D_TIMER_CHECK].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS].cumulative +
                     ddata->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
-                    ddata->timers[FCLAW2D_TIMER_EXCHANGE].cumulative +
-                    ddata->timers[FCLAW2D_TIMER_CFL].cumulative),
+                    ddata->timers[FCLAW2D_TIMER_GHOSTFILL].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
                    "UNACCOUNTED");
-    fclaw2d_domain_barrier (domain);
+
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_COMM],
+                   ddata->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_CFL_COMM].cumulative,
+                   "FCLAW2D_TIMER_COMM");
+
+    /* Just subtracting FCLAW2D_TIMER_COMM here doesn't work ... */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL],
+                   ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
+                   (ddata->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
+                   ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
+                    ddata->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
+                   "FCLAW2D_TIMER_LOCAL");
+
 
     sc_stats_compute (domain->mpicomm, FCLAW2D_TIMER_COUNT, stats);
 
-    /* Clear any exceptions that may have occurred in computing statistics
-       (divide by 0; etc) */
-
-    feclearexcept(FE_ALL_EXCEPT);
-
     sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                     stats, 1, 0);
+
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
                           "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
-                          stats[FCLAW2D_TIMER_EXCHANGE].average,
+                          stats[FCLAW2D_TIMER_GHOSTFILL].average,
                           ddata->count_amr_regrid,
-                          stats[FCLAW2D_TIMER_REGRID].average,
-                          ddata->count_single_step);
+                          stats[FCLAW2D_TIMER_REGRID].average);
+
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
                           "regrid %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,
-                          stats[FCLAW2D_TIMER_EXCHANGE].max,
+                          stats[FCLAW2D_TIMER_GHOSTFILL].max,
                           ddata->count_amr_regrid,
                           stats[FCLAW2D_TIMER_REGRID].max);
 

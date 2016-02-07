@@ -300,8 +300,8 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
 
     for(int level = domain->local_minlevel; level <= domain->global_maxlevel; level++)
     {
-        fclaw2d_level_data_t ld = ts_counter[level];
-        FCLAW_ASSERT(ld.last_step == ld.step_inc*ld.total_steps);
+        FCLAW_ASSERT(ts_counter[level].last_step ==
+                     ts_counter[level].step_inc*ts_counter[level].total_steps);
     }
 
     double sync_time =  ts_counter[maxlevel].current_time;
@@ -313,6 +313,11 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
 
     /* Stop the timer */
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+
+    /* Count total grids on this processor */
+    ddata->count_grids_per_proc +=  domain->local_num_patches;
+
+    /* Count the number of times that advance is called */
     ++ddata->count_amr_advance;
 
     return maxcfl;
