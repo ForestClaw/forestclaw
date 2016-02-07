@@ -175,34 +175,17 @@ def write_ini_files(input_file='create_run.ini'):
     nout.fill(nout0)
     nstep.fill(nstep0)
 
-    if mode == 'uniform':
-        # Quadruple proc count --> nothing changes in problem size
-        # with "scale_uniform" set :
-        #    -- cut tfinal in half (cut nout/nstep in half as well)
-        #    -- scale time later (in plotting, for example)
-        minlevel.fill(minlevel0)
-        tfinal.fill(tfinal0)   # We will multiply by procs when plotting
+    # minlevel is fixed
+    minlevel.fill(minlevel0)
+    maxlevel.fill(maxlevel0)
 
-        dt.fill(dt0)
-        maxlevel = minlevel   # Always true for uniform case
-
-    elif mode == 'adapt':
-
-        # minlevel is fixed
-        minlevel.fill(minlevel0)
-        maxlevel.fill(maxlevel0)
-
-        # Run entire simulation, to get true measure of adaptivity
-        tfinal.fill(tfinal0)
-        dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
+    # Run entire simulation, to get true measure of adaptivity
+    tfinal.fill(tfinal0)
+    dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
 
 
     if mode == 'adapt':
-        if minlevel0 != 4:
-            # These coefficients only work for minlevel=4
-            adapt_factor = np.ones(R.shape)
-        else:
-            adapt_factor = coeff_A*np.exp(coeff_B*maxlevel)
+        adapt_factor = coeff_A*np.exp(coeff_B*maxlevel)
     else:
         adapt_factor = np.ones(R.shape)
 
@@ -284,11 +267,6 @@ def write_ini_files(input_file='create_run.ini'):
             ini_file.write("    smooth-refine = T\n")
             ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
 
-        if noweightedp:
-            ini_file.write("noweightedp = T\n")
-        else:
-            ini_file.write("noweightedp = F\n")
-
         ini_file.write("\n")
         ini_file.write("    tfinal = %12.4f\n" % tfinal[i])
         ini_file.write("    use_fixed_dt = T\n")
@@ -302,9 +280,36 @@ def write_ini_files(input_file='create_run.ini'):
                 ini_file.write("    subcycle = T\n")
             else:
                 ini_file.write("    subcycle = F\n")
+        else:
+            ini_file.write("    subcycle = F\n")
+
 
         ini_file.write("    advance-one-step = F\n")
         ini_file.write("    outstyle-uses-maxlevel = F\n")
+        ini_file.write("\n")
+
+        ini_file.write("# Subcycling\n");
+        if noweightedp:
+            ini_file.write("    noweightedp = T\n")
+        else:
+            ini_file.write("    noweightedp = F\n")
+
+        ini_file.write("\n")
+
+        # Other things which should not be set of timing runs
+        ini_file.write("# File and console IO\n")
+        ini_file.write("    verbosity = essential\n")
+        ini_file.write("    serialout = F\n")
+        ini_file.write("    vtkout = 0\n")
+        ini_file.write("    tikzout = F\n")
+        ini_file.write("\n")
+
+        ini_file.write("# Debugging and diagnostics\n")
+        ini_file.write("    conservation-check = F\n")
+        ini_file.write("    run-user-diagnostics = F\n")
+        ini_file.write("    trapfpe = F\n")
+        ini_file.write("    mpi_debug = F\n")
+        ini_file.write("\n")
 
         ini_file.close()
 
@@ -491,7 +496,8 @@ def compile_results(results_dir=None,results_file='results.out',
                    'PARTITION_COMM',
                    'CFL_COMM',
                    'WALLTIME',
-                   'ADVANCE_STEPS_COUNTER']
+                   'ADVANCE_STEPS_COUNTER',
+                   'GRIDS_PER_PROC']
 
     # Compile data to this file
     resultsfile = open(results_file,'w')
@@ -500,7 +506,7 @@ def compile_results(results_dir=None,results_file='results.out',
     fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*10 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
                               'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
-                              'partition','cfl','wall','adv._steps'))
+                              'partition','cfl','wall','adv._steps','grids_per_proc'))
 
     resultsfile.write("# " + "-"*172)
     resultsfile.write("\n")
@@ -649,6 +655,9 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     continue
 
                 data = np.loadtxt(rf)
+                if data.ndim == 1:
+                    # Needed in case we only have 1 row in results file.
+                    data = np.reshape(data,(-1,len(data)))
 
                 if read_input:
                     procs1.extend(data[:,0])
@@ -696,6 +705,8 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     continue
 
                 data = np.loadtxt(rf)
+                if data.ndim == 1:
+                    data = np.reshape(data,(-1,len(data)))
 
                 for row in data:
                     if read_input:
@@ -771,15 +782,23 @@ def print_jobs(jobs,val2plot):
                     data[i,j] = np.nan
                     continue
 
-                try:
-                    d = job[val2plot]
-                    fmt_int = val2plot in int_list
-                except:
+                if isinstance(val2plot,str):
                     try:
-                        d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
+                        d = job[val2plot]
                     except:
-                        print "print_jobs : Invalid 'val2plot'"
+                        print "job[\"%s\"] not a valid variable" % (val2plot)
                         sys.exit()
+                    else:
+                        fmt_int = val2plot in int_list
+                else:
+                    import types
+                    if isinstance(val2plot,types.FunctionType):
+                        try:
+                            d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
+                        except:
+                            print "print_jobs : Problem with function 'val2plot'"
+                            sys.exit()
+
 
                 try:
                     data[i,j] = np.average(d)
@@ -810,7 +829,8 @@ def print_jobs(jobs,val2plot):
 
 
 def plot_results(jobs,start_point,val2plot='walltime',
-                 scaling='strong',scale_uniform=False):
+                 scaling='strong',scale_uniform=False,
+                 efficiency=False):
 
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
@@ -854,31 +874,17 @@ def plot_results(jobs,start_point,val2plot='walltime',
             procs_sub = [p for p in procs if p >= sp[1]]
             levels_sub = [sp[2] for p in procs if p >= sp[1]]
 
-        elif scaling == 'block':  # Work down/left and down mx
-            mx_sub = [m for m in mx if m >= sp[0]]
-            levels_sub = [l for l in levels if l <= sp[2]]
-            levels_sub.reverse()
-            procs_sub = [sp[1] for l in levels]
-
         elif scaling == 'resolution':
             # scaling as resolution is increased
             levels_sub = [l for l in levels if l >= sp[2]]
             mx_sub = [sp[0] for l in levels_sub]
             procs_sub = [sp[1] for l in levels_sub]
 
-        elif scaling == 'superlinear':
-            # Decrease grid size while increasing proc count; fixed resolution
-            mx_sub = [m for m in mx if m <= sp[0]]
-            mx_sub.reverse()
-            # This assumes that jobs[8] has the most complete list of levels.
-            levels_sub = sorted([l for l in jobs[8][1].keys() if l >= sp[2]])
-            procs_sub = [p for p in procs if p >= sp[1]]
-
         t = zip(mx_sub,procs_sub,levels_sub)
 
         # Internal plotting routine
         phandle,mb = plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
-                                           scale_uniform)
+                                           scale_uniform,efficiency)
 
         phandle.set_color(colors[i])
         plt.draw()
@@ -891,14 +897,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
     ax = plt.gca()
     ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%d'))
 
-    if scaling == 'block':
-        ax.xaxis.set_major_locator(plt.FixedLocator(mx))
-        ax.set_xlabel("Block size",fontsize=16)
-        l1 = np.log(np.min(mx))/np.log(2)
-        l2 = np.log(np.max(mx))/np.log(2)
-        plt.xlim([2**(l1-0.5),2**(l2+0.5) ])
 
-    elif scaling == 'resolution':
+    if scaling == 'resolution':
         levels = list(set([x[2] for x in tlist]))
         ax.xaxis.set_major_locator(plt.FixedLocator(levels))
         ax.set_xlabel("Levels",fontsize=16)
@@ -912,18 +912,19 @@ def plot_results(jobs,start_point,val2plot='walltime',
         p1 = np.log(np.min(procs))/np.log(4)
         p2 = np.log(np.max(procs))/np.log(4)
         plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
-        if scaling == 'weak':
-            ax.set_yscale('linear')
-            plt.ylim([0,110])
-            plt.grid(b=True,which='major')
-            plt.grid(b=True,which='minor')
-            plt.minorticks_on()
+
+    if efficiency:
+        ax.set_yscale('linear')
+        plt.ylim([0,110])
+        plt.grid(b=True,which='major')
+        plt.grid(b=True,which='minor')
+        plt.minorticks_on()
 
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
 
-    if scaling == 'weak':
-        ax.set_ylabel("%s" % ("Efficiency"),fontsize=16)
+    if efficiency:
+        ax.set_ylabel("%s" % ("Percent (%)"),fontsize=16)
     else:
         ax.set_ylabel("%s" % ("time"),fontsize=16)
 
@@ -933,7 +934,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
 
 
 def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
-                          scale_uniform=False):
+                          scale_uniform=False,efficiency=False):
 
     import matplotlib.pyplot as plt
 
@@ -943,7 +944,7 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
 
     v = val2plot
 
-    mode = 'uniform'
+    # mode = 'uniform'
     ph = []
     mx = sorted(jobs.keys())
     gpp_avg = []
@@ -961,41 +962,24 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
             y_avg = np.append(y_avg,np.nan)
             continue
 
-        # Each job might include several runs, which must be averaged
-        # gpp_avg = np.append(gpp_avg,np.round(np.average(job["grids_per_proc"]/job["nout"])))
-        gpp_avg = np.append(gpp_avg,np.round(np.average(job["advance_steps"])))
-
-        #grids_advanced = np.append(grids_advanced,
-        #                           np.round(np.average((job["walltime"]/job["time_per_grid"]))))
-
-        try:
-            grids_advanced = np.append(grids_advanced,
-                                       np.round(np.average(job["advance_steps"])))
-        except:
-            grids_advanced = np.append(grids_advanced,
-                                       np.round(np.average(job["advance_step_counter"])))
-
-        try:
-            data = np.average(job[v])
-        except:
+        if isinstance(v,str):
+            try:
+                data = np.average(job[v])  # Average multiple runs
+            except:
+                print "job[\"%s\"] not a valid variable" % (val2plot)
+                sys.exit()
+        else:
             try:
                 # Call function val2plot
-                data = np.average(v(job,mx=m,proc=p,level=l,all=jobs))
+                val,_ = v(job,mx=m,proc=p,level=l,all=jobs)
+                data = np.average(val)
             except:
-                print "plot_results_internal : Invalid val2plot"
+                print "plot_results_internal : Problem with function 'val2plot'"
                 sys.exit()
 
+        y_avg = np.append(y_avg,data)
 
-        if scaling == 'weak':
-            y = data/grids_advanced
-        else:
-            y = data
-
-        y = data
-        y_avg = np.append(y_avg,y)
-
-    if scaling == 'weak':
-        # Compute efficiency
+    if efficiency:
         y_avg = 100*y_avg/y_avg[0]
 
 
@@ -1009,42 +993,25 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
     if scaling == 'weak':
         # Ideal scaling is constant
         ideal = [y_avg[0] for x in tp if not np.isnan(x[3])]  # Constant scaling
+        R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+        ideal = y_avg[0]*2**(0*R)
         plt.loglog(procs,ideal,'k.--',markersize=15)
 
     elif scaling == 'strong':
-        # Ideal scaling should start at p = 16, not p=1
-        ideal = y_avg[0]*np.min(procs)/np.array(procs)
-        plt.loglog(procs,ideal,'k.--',markersize=15)
-
-    elif scaling == 'superlinear':
-        ideal = y_avg[0]*np.min(procs)/np.array(procs)
-        plt.loglog(procs,ideal,'k.--',markersize=15)
+        if not efficiency:
+            # Ideal scaling should start at p = 16, not p=1
+            ideal = y_avg[0]*np.min(procs)/np.array(procs)
+            plt.loglog(procs,ideal,'k.--',markersize=15)
 
     elif scaling == 'resolution':
-        if v == 'time_per_grid':
-            R = np.arange(0,len(y_avg))
-            ideal = [y_avg[0] for x in t]
-        else:
-            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
-            ideal = y_avg[0]*8**R
-
+        R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+        ideal = y_avg[0]*R**0
         plt.semilogy(levels,ideal,'k.--',markersize=15)
 
-    elif scaling == 'block':
-        if v == 'time_per_grid':
-            R = np.arange(0,len(y_avg))
-            ideal = y_avg[0]*4**R
-            plt.loglog(mx,ideal,'k.--',markersize=15)
-        else:
-            # Try a parabolic fit
-            if len(mx) > 2:
-                pc = np.polyfit(np.log(mx),np.log(y_avg),2)
-                m = np.logspace(np.log10(4),np.log10(256),40)
-                plt.loglog(m,np.exp(np.polyval(pc,np.log(m))),'k--')
 
     # get best-fit slope
     mb = None
-    if len(mx) > 2:
+    if len(mx) > 1:
         if scaling in ['strong','weak','superlinear']:
             mb = np.polyfit(np.log(procs),np.log(y_avg),1)
 
@@ -1060,20 +1027,17 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
                 pc = np.polyfit(nsub,np.log(y_avg),1)
                 mb = np.array(np.exp(pc))
 
-        try:
-            mv = markers[v]
-        except:
-            mv = u'o'
+    try:
+        mv = markers[v]
+    except:
+        mv = u'o'
 
-
-        if scaling == 'block':
-            ph = plt.loglog(mx,y_avg,marker=mv,markersize=10)
-        elif scaling in ['strong','superlinear']:
-            ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-        elif scaling == 'weak':
-            ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-        elif scaling in 'resolution':
-            ph = plt.semilogy(levels,y_avg,marker=mv,markersize=10)
+    if scaling in ['strong']:
+        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
+    elif scaling == 'weak':
+        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
+    elif scaling in 'resolution':
+        ph = plt.semilogy(levels,y_avg,marker=mv,markersize=10)
 
     return ph[0],mb
 
