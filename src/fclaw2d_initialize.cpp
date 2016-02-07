@@ -190,9 +190,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
             int have_new_refinement = new_domain != NULL;
 
-            /* Domain data may go out of scope now. */
-            ddata = NULL;
-
             if (have_new_refinement)
             {
                 /* Have to get a new ddata */

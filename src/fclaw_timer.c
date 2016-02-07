@@ -122,10 +122,26 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXTRA3);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
 
-    /* Compute the inverse harmonic mean.  */
-    ddata->count_single_step += 1;   /* Avoid division by zero */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_HMEAN],
-                   1.0/ddata->count_single_step,"ADVANCE_STEPS_HMEAN");
+    /* compute arithmetic mean of total advance steps per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
+                   ddata->count_single_step,"ADVANCE_STEPS_COUNTER");
+
+    /* Compute the inverse harmonic mean of total advance steps per processor.  */
+    int c = ddata->count_single_step;
+    ddata->count_single_step = (c > 0) ? c : 1;   /* To avoid division by 0 */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_INV_HMEAN],
+                   1.0/ddata->count_single_step,"ADVANCE_STEPS_INV_HMEAN");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],
+                   ddata->count_grids_per_proc/ddata->count_amr_advance,"GRIDS_PER_PROC");
+
+    /* Compute the inverse harmonic mean of grids per processor  */
+    int d = ddata->count_grids_per_proc;
+    ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],
+                   1.0/(ddata->count_grids_per_proc/ddata->count_amr_advance),
+                   "GRIDS_PER_PROC_INV_HMEAN");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -

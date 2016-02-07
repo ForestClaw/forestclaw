@@ -309,6 +309,11 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
 
     /* Stop the timer */
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+
+    /* Count total grids on this processor */
+    ddata->count_grids_per_proc +=  domain->local_num_patches;
+
+    /* Count the number of times that advance is called */
     ++ddata->count_amr_advance;
 
     return maxcfl;
