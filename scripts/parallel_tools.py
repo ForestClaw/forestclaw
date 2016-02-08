@@ -503,7 +503,7 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*172)
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*10 + "\n"
+    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
                               'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
                               'partition','cfl','wall','adv._steps','grids_per_proc'))
@@ -917,8 +917,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
         ax.set_yscale('linear')
         plt.ylim([0,110])
         plt.grid(b=True,which='major')
-        plt.grid(b=True,which='minor')
-        plt.minorticks_on()
+        # plt.grid(b=True,which='minor')
+        # plt.minorticks_on()
 
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
