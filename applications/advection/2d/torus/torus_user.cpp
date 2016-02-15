@@ -59,6 +59,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
+    classic_claw.b4step2 = &B4STEP2;
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 

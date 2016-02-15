@@ -47,6 +47,8 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CART:
         return 1;
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
