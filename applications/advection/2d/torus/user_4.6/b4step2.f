@@ -9,12 +9,12 @@
 
       integer i, j
       double precision tperiod, pi2, vt, xll,yll, psi, pi
-      integer blockno, clawpack_get_block
+      integer blockno, fc2d_clawpack46_get_block
 
       common /compi/ pi
 c
 
-      blockno = clawpack_get_block()
+      blockno = fc2d_clawpack46_get_block()
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc

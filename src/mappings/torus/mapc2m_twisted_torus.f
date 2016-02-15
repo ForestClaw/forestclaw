@@ -1,4 +1,4 @@
-      subroutine mapc2m_torus(blockno,xc,yc,xp,yp,zp,alpha)
+      subroutine mapc2m_twisted_torus(blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
       integer blockno

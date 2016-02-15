@@ -46,6 +46,8 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not "\

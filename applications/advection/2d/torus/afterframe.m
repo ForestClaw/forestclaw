@@ -39,10 +39,17 @@ daspect([1,1,1]);
 if (isflat)
     view(2);
 else
-    view(3);    
-    zoom(1.5);
     hidepatchborders;
-    camlight;
+    view(vtop);
+    % camlight;
+    showpatchborders;
+    hold on;
+    R = 0.5;  % revs per second
+    alpha = 0.4;
+    period = 16;
+    [xp,yp,zp] = torus_soln(t,alpha,R,period);    % camlight;
+    plot3(xp,yp,zp,'k','linewidth',2);
+    hold off;
 end
 
 setpatchborderprops('linewidth',1)
@@ -51,6 +58,7 @@ hidepatchborders(9)
 NoQuery = 0;
 prt = false;
 if (prt)
+  MaxFrames = 128;
   filename = framename(Frame,'torus0000','png');
   print('-dpng',filename);
 end
@@ -60,4 +68,5 @@ shg
 clear afterframe;
 clear mapc2m;
 clear mapc2m_torus;
+clear torus_soln;
 clear parallelpartitions;

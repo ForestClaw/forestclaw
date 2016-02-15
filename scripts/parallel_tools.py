@@ -95,6 +95,19 @@ def write_ini_files(input_file='create_run.ini'):
         coeff_A = 1.0
         coeff_B = 0
 
+    # Uniform or adaptive
+    try:
+        example    = int(config.get('Defaults','example').partition('#')[0].strip())
+    except:
+        example = 0
+
+    try:
+        mi0 = int(config.get('Problem','mi').partition('#')[0].strip())
+        mj0 = int(config.get('Problem','mj').partition('#')[0].strip())
+    except:
+        mi0 = 1
+        mj0 = 1
+
 
     # Uniform or adaptive
     mode    = config.get('Run','mode').partition('#')[0].strip()
@@ -123,13 +136,16 @@ def write_ini_files(input_file='create_run.ini'):
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
 
+    if minlevel0 == maxlevel0:
+        mode = 'uniform'
+
 
     # ----------------------------------------
     # Other inputs needed by the user
     # ----------------------------------------
 
     # Figure out dt needed for first run in this series
-    eff_res0 = mx0*2**minlevel0
+    eff_res0 = mx0*mi0*2**minlevel0
     dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
     tol = 1e-15
@@ -140,6 +156,7 @@ def write_ini_files(input_file='create_run.ini'):
     nout0 = int(nout0)
 
     nstep0 = nout0/tfinal0
+    nstep0 = nout0
     if abs(nstep0 - np.round(nstep0)) > tol:
         print "nstep is not an integer; nstep = %12.4f; nout = %12.4f\n" % (nstep0,nout0)
         print "Setting nstep to nout"
@@ -189,13 +206,15 @@ def write_ini_files(input_file='create_run.ini'):
     else:
         adapt_factor = np.ones(R.shape)
 
-    nout_uniform = nout*2**(maxlevel-minlevel)
-    num_grids = (2**maxlevel)**2  # Total number of uniform grids on all procs
+
+    nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
+    num_grids = mi0*mj0*(2**maxlevel)**2  # Total number of uniform grids on all procs, all blocks
+    grids_per_proc = adapt_factor*mi0*mj0*(2**maxlevel)**2/procs
+
     num_advances = adapt_factor*nout_uniform*num_grids
     t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
-    eff_res = mx*(2**maxlevel)
-    grids_per_proc = adapt_factor*(2**maxlevel)**2/procs
+    eff_res = mx*(2**maxlevel)*mi0
 
     # ------------------------------------------
     # Start creating files.
@@ -213,7 +232,10 @@ def write_ini_files(input_file='create_run.ini'):
 
     # Output to job files (jobs.sh)
     jobfile = open('jobs.sh','w')
-    jobfile.write("#!/usr/bin/env bash\n\n")
+    jobfile.write("#!/usr/bin/env bash\n")
+    jobfile.write("#\n")
+    jobfile.write("# Time per grid : %8.2e\n" % time_per_grid)
+    jobfile.write("#\n")
     jobfile.write(header_line)
     jobfile.write("\n")
     jobfile.write((fmt_str_header + "\n") % tuple_str)
@@ -250,7 +272,7 @@ def write_ini_files(input_file='create_run.ini'):
         inifile = "ex_%05d.ini" % p
         ini_file = open(inifile,'w')
         ini_file.write("[user]\n")
-        ini_file.write("     example = 0      # no mapping\n")
+        ini_file.write("     example = %d      # mapping\n" % example)
         ini_file.write("\n")
         ini_file.write("[Options]\n")
         ini_file.write("# Grid dimensions\n")
@@ -503,7 +525,7 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*172)
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*10 + "\n"
+    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
                               'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
                               'partition','cfl','wall','adv._steps','grids_per_proc'))
@@ -736,6 +758,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         l = row[4]
 
                         job = {}
+                        job["rundir"]          = rundir
                         job["jobid"]           = row[0]
                         job["procs"]           = row[1]
                         job["mx"]              = row[2]
@@ -753,6 +776,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["cfl_comm"]        = row[14]
                         job["walltime"]        = row[15]
                         job["advance_steps"]   = row[16]
+                        job["grids_per_proc"]  = row[17]
 
                     jobs[m][p][l] = job
 
@@ -767,8 +791,11 @@ def print_jobs(jobs,val2plot):
 
     for m in mx:
         procs = sorted(jobs[m].keys())
-        levels = sorted(jobs[m][procs[0]].keys())
+        levels = np.array(sorted(jobs[m][procs[0]].keys())).astype(int)
         data = np.empty((len(procs),len(levels)))
+
+        rundir_data = np.empty(levels.shape)
+
         for i,p in enumerate(procs):
             for j,l in enumerate(levels):
                 try:
@@ -781,6 +808,8 @@ def print_jobs(jobs,val2plot):
                     # This (m,p,l) combo doesn't exist;  p
                     data[i,j] = np.nan
                     continue
+                else:
+                    rundir_data[j] = job["rundir"]
 
                 if isinstance(val2plot,str):
                     try:
@@ -806,6 +835,10 @@ def print_jobs(jobs,val2plot):
                     print "job (mx=%d,proc=%d,level=%d) is empty" % (m,p,l)
                     data[i,j] = np.nan
 
+        # Create an array that interleaves levels and rundirs so that
+        # we can print out both in the header, e.g.
+        # 2 (10)   3 (11)    4 (12)
+        header_data = zip(levels,rundir_data.astype(int))
 
         # Header
         print ""
@@ -814,8 +847,13 @@ def print_jobs(jobs,val2plot):
         line = "-"*linelen
         print line
         mxstr = "mx = %d" % m
-        header_format = "{mxstr:>8}" + "{sep:>3}" + "{:>12}" * len(levels)
-        print header_format.format(mxstr = mxstr, sep="|",*levels)
+        # header_format = "{mxstr:>8}" + "{sep:>3}" + "{:>12d}" * len(levels)
+        # print header_format.format(mxstr = mxstr, sep="|",*header_data)
+
+        s = '{mxstr:>8}'.format(mxstr=mxstr) + '{sep:>3}'.format(sep='|')
+        for t in header_data:
+            s = s +  '{level:>7d} ({rundir:2d})'.format(level=t[0],rundir=t[1])
+        print s
         print line
         # Format integer and float values separately
         if (val2plot in int_list) or fmt_int:
@@ -844,7 +882,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     markers["advance_steps"] = u'o'
     markers["cfl_comm"] = u'p'
 
-    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
+    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
 
     mx = sorted(jobs.keys())
     ph = []
@@ -917,8 +955,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
         ax.set_yscale('linear')
         plt.ylim([0,110])
         plt.grid(b=True,which='major')
-        plt.grid(b=True,which='minor')
-        plt.minorticks_on()
+        # plt.grid(b=True,which='minor')
+        # plt.minorticks_on()
 
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
@@ -1002,6 +1040,11 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
             # Ideal scaling should start at p = 16, not p=1
             ideal = y_avg[0]*np.min(procs)/np.array(procs)
             plt.loglog(procs,ideal,'k.--',markersize=15)
+        else:
+            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+            ideal = y_avg[0]*2**(0*R)
+            plt.loglog(procs,ideal,'k-',linewidth=2)
+
 
     elif scaling == 'resolution':
         R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])

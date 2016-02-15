@@ -164,9 +164,9 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain,
     size_t data_size =  fclaw2d_clawpatch_ghost_packsize(domain);
     fclaw2d_domain_exchange_t *e;
 
-    /* we just created a grid by amrinit or regrid and we now need to
-       allocate data to store and retrieve local boundary patches and
-       remote ghost patches */
+    /* we just created a grid by fclaw2d_initialize or fclaw2d_regrid
+       and we now need to allocate data to store and retrieve local
+       boundary patches and remote ghost patches */
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* Store e so we can retrieve it later */
@@ -210,16 +210,21 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain,
     fclaw2d_domain_indirect_t *ind =
         fclaw2d_domain_indirect_begin(domain);
 
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+
     /* Do some some work that we hope to hide by communication above.  */
     set_indirect_data(domain,ind);
 
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     build_ghost_patches(domain);
+    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* ---------------------------------------------------------
        Receive ghost patch meta data from send initiated above.
        ------------------------------------------------------- */
+    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     fclaw2d_domain_indirect_end(domain,ind);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 

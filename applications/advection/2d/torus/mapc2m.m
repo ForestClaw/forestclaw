@@ -4,7 +4,7 @@ global map isflat;
 
 map = 'nomap';
 % map = 'cart';
-% map = 'torus';
+map = 'torus';
 % map = 'latlong';
 % map = 'annulus';
 
@@ -29,6 +29,7 @@ switch map
         s = 0.0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_torus(xc1,yc1);
+        
     case 'latlong'
         isflat = false;
         s = 0.0;

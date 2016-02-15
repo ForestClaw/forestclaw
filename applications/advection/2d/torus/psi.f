@@ -10,6 +10,7 @@
 
       double precision xp,yp,zp
       double precision xc1, yc1, zc1
+      double precision vt, tperiod
 
       common /compi/ pi
 
@@ -23,7 +24,10 @@
 
       revs_per_s = 0.5d0
 
+c     # this value of alpha has to agree with the value set in
+c     # the .ini file.
       alpha = 0.4d0
+
       pi2 = 2*pi
       if (iscart()) then
 c         psi = revs_per_s*(xc + pi*yc/2.d0);
@@ -36,8 +40,18 @@ c        # annulus (this is just dumb; I need to fix the queries so they are use
          psi = 0.5d0*pi2*revs_per_s*r2
       else
 c        # torus
-         psi = revs_per_s*pi2*alpha*(pi2*yc1 + alpha*sin(pi2*yc1))
+c        # Twisted torus stream function (to be used with usual torus map)
+         psi = (pi2*revs_per_s)*alpha*
+     &         (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
+
+c        # Rigid body rotation
+c         psi = (pi2*revs_per_s)*alpha*
+c     &         (pi2*yc1 + alpha*sin(pi2*yc1))
       endif
+
+      tperiod = 16.d0
+      vt = -cos(pi2*t/tperiod)
+      psi = vt*psi
 
       end
 
