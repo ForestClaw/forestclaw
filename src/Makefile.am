@@ -117,6 +117,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
 	src/mappings/fivepatch/mapc2m_fivepatch.f \
 	src/mappings/torus/mapc2m_torus.f \
+	src/mappings/torus/mapc2m_twisted_torus.f \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \

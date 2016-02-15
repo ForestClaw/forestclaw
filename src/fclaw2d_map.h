@@ -300,6 +300,10 @@ void MAPC2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
 void MAPC2M_TORUS (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp, double* alpha);
 
+#define MAPC2M_TWISTED_TORUS FCLAW_F77_FUNC (mapc2m_twisted_torus,MAPC2M_TWISTED_TORUS)
+void MAPC2M_TWISTED_TORUS (int* blockno, double *xc, double *yc,
+                   double *xp, double *yp, double *zp, double* alpha);
+
 #define MAPC2M_BRICK FCLAW_F77_FUNC (mapc2m_brick,MAPC2M_BRICK)
 void MAPC2M_BRICK (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp, int *mi, int *mj);
