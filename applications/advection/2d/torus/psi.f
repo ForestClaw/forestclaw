@@ -30,7 +30,6 @@ c     # the .ini file.
 
       pi2 = 2*pi
       if (iscart()) then
-c         psi = revs_per_s*(xc + pi*yc/2.d0);
          psi = revs_per_s*(-xp + yp)
       elseif (issphere()) then
          psi = pi2*revs_per_s*zp
@@ -51,7 +50,7 @@ c     &         (pi2*yc1 + alpha*sin(pi2*yc1))
 
 c      tperiod = 16.d0
 c      vt = -cos(pi2*t/tperiod)
-c      psi = vt*psi
+      psi = -psi
 
       end
 

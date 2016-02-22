@@ -60,6 +60,19 @@ void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
                                 int this_block_idx,
                                 int this_patch_idx);
 
+#define  QINIT_DUPLICATE FCLAW_F77_FUNC(qinit_duplicate, QINIT_DUPLICATE)
+
+void QINIT_DUPLICATE(const int* maxmx, const int* maxmy, const int* meqn,
+                     const int* mbc, const int* mx, const int* my,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy,
+                     double q[], const int* maux, double aux[]);
+
+#define SETPROB_TORUS FCLAW_F77_FUNC(setprob_torus,SETPROB_TORUS)
+void SETPROB_TORUS(const int* example);
+
+void torus_patch_setup(fclaw2d_domain_t *domain);
+
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -67,6 +80,17 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double scale[],
                                             const double shift[],
                                             const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_duplicate(fclaw2d_map_context_t* brick);
+
+
+#define  FCLAW2D_MAP_C2M_DUPLICATE_INIT FCLAW_F77_FUNC(fclaw2d_map_c2m_duplicate_init, \
+                                                       FCLAW2D_MAP_C2M_DUPLICATE_INIT)
+
+    void FCLAW2D_MAP_C2M_DUPLICATE_INIT(fclaw2d_map_context_t ** cont,
+                                        const double *xc, const double *yc,
+                                        double *xp, double *yp, double *zp);
+
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,

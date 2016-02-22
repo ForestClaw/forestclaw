@@ -21,10 +21,6 @@
             ylow = ylower + (j-1)*dy
             call cellave2(blockno,xlow,ylow,dx,dy,w)
             q(i,j,1) = w
-
-c            xc = xlow + dx/2.d0
-c            yc = ylow + dy/2.d0
-c            q(i,j,1) = q0(blockno,xc,yc)
          enddo
       enddo
 
@@ -39,36 +35,67 @@ c            q(i,j,1) = q0(blockno,xc,yc)
       integer blockno
       integer*8 cont, get_context
       double precision th, tp, r2, r0
+      double precision xloc(0:12),yloc(0:12),zloc(0:12)
       logical iscart
       logical fclaw2d_map_is_used
+      integer i, mi, mj
+      double precision xc1, yc1, zc1
 
       double precision pi
       common /compi/ pi
 
+      integer example
+      common /comm_example/ example
+
       cont = get_context()
+
+      r0 = 0.4d0
 
       if (fclaw2d_map_is_used(cont)) then
          call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
+
          if (iscart()) then
-            rp = sqrt(xp**2 + yp**2)
+            if (example == 5) then
+c              # Map each brick to a [0,1]x[0,1] domain and duplicate
+c              # initial conditions.
+               blockno = 0
+               call fclaw2d_map_brick2c(cont,
+     &               blockno,xc,yc,xc1,yc1,zc1)
+               call fclaw2d_map_brick_get_dim(cont,mi,mj)
+               xp = mi*xc1
+               yp = mj*yc1
+            endif
+            rp = sqrt((xp-0.5d0)**2 + (yp-0.5d0)**2)
             fdisc = rp-0.25d0
          else
+            do i = 0,4
+               th = 2*pi*i/5
+               xloc(i) = cos(th)
+               yloc(i) = sin(th)
+               zloc(i) = r0
+            enddo
+
 c           # Torus or annulus
             th = atan2(yp,xp)
             tp = abs(th + pi/2.d0)
             fdisc = tp - pi/8.d0
 
 c           # Sphere
-            r0 = 0.4d0
-    2       r2 = (xp - 1.0)**2 + yp**2 + (zp-0.4d0)**2
-            fdisc = r2 - r0**2
+            do i = 0,4
+               r2 = (xp - xloc(i))**2 + (yp-yloc(i))**2 +
+     &               (zp-zloc(i))**2 - r0**2
+               if (r2 < 0) then
+                  fdisc = r2
+                  return
+               endif
+            enddo
+            fdisc = 1
          endif
       else
-         xp = xc
-         yp = yc
-         rp = sqrt(xp**2 + yp**2)
-         fdisc = rp-0.25d0
+c        # No mapping.
+         rp = (xc-0.5d0)**2 + (yc-0.5d0)**2
+         fdisc = rp-(0.25d0)**2
       endif
 
       end

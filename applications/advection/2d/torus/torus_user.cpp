@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_forestclaw.h>
+#include "torus_common.h"
 #include "torus_user.h"
 
 #include <fc2d_clawpack46.h>
@@ -36,10 +38,12 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_init_vtable(&vt);
     fc2d_clawpack46_init_vtable(&classic_claw);
 
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
+    const amr_options_t *gparms = get_domain_parms(domain);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
-    classic_claw.setprob = &SETPROB;
+    vt.problem_setup            = &torus_patch_setup;
+#if 0
+    classic_claw.setprob = &SETPROB_TORUS;
+#endif
 
     if (gparms->manifold)
     {
@@ -65,7 +69,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     }
     else
     {
-        classic_claw.b4step2 = &B4STEP2;
+        /* classic_claw.b4step2 = &B4STEP2; */
     }
 
     classic_claw.rpn2 = &RPN2;
@@ -75,6 +79,15 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
 
+}
+
+void torus_patch_setup(fclaw2d_domain_t *domain)
+{
+    fclaw_app_t* app = fclaw2d_domain_get_app(domain);
+    user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+    int example = user->example;
+
+    SETPROB_TORUS(&example);
 }
 
 void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
