@@ -40,7 +40,7 @@ if (isflat)
     view(2);
 else
     hidepatchborders;
-    view(vtop);
+    view(3);
     % camlight;
     showpatchborders;
     hold on;

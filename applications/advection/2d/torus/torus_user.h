@@ -44,6 +44,15 @@ void SETAUX_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
                      const double* dx, const double* dy,
                      const int* maux, double aux[]);
 
+#define B4STEP2_MANIFOLD FCLAW_F77_FUNC(b4step2_manifold,B4STEP2_MANIFOLD)
+void B4STEP2_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
+                      const int* mx, const int* my, const int* meqn,
+                      double q[], const double* xlower, const double* ylower,
+                      const double* dx, const double* dy,
+                      const double* t, const double* dt,
+                      const int* maux, double aux[]);
+
+
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
 void torus_patch_manifold_setup(fclaw2d_domain_t *domain,

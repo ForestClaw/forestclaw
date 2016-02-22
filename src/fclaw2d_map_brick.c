@@ -53,6 +53,15 @@ fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
     return 0;
 }
 
+void
+FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
+                          int *mi, int* mj)
+{
+    fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) (*cont)->brick->user_data;
+    *mi = bv->mi;
+    *mj = bv->mj;
+}
+
 
 static void
 fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,

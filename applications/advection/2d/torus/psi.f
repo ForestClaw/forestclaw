@@ -49,9 +49,9 @@ c         psi = (pi2*revs_per_s)*alpha*
 c     &         (pi2*yc1 + alpha*sin(pi2*yc1))
       endif
 
-      tperiod = 16.d0
-      vt = -cos(pi2*t/tperiod)
-      psi = vt*psi
+c      tperiod = 16.d0
+c      vt = -cos(pi2*t/tperiod)
+c      psi = vt*psi
 
       end
 
