@@ -66,8 +66,13 @@ c              # initial conditions.
                xp = mi*xc1
                yp = mj*yc1
             endif
-            rp = sqrt((xp-0.5d0)**2 + (yp-0.5d0)**2)
-            fdisc = rp-0.25d0
+            do i = 0,4
+               rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
+               fdisc = rp-0.2d0
+               if (fdisc .lt. 0) then
+                  return
+               endif
+            enddo
          else
             do i = 0,4
                th = 2*pi*i/5
