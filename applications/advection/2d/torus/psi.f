@@ -44,8 +44,8 @@ c        # Twisted torus stream function (to be used with usual torus map)
      &         (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
 
 c        # Rigid body rotation
-c         psi = (pi2*revs_per_s)*alpha*
-c     &         (pi2*yc1 + alpha*sin(pi2*yc1))
+         psi = (pi2*revs_per_s)*alpha*
+     &         (pi2*yc1 + alpha*sin(pi2*yc1))
       endif
 
 c      tperiod = 16.d0

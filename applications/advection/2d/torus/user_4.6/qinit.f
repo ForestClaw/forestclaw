@@ -35,11 +35,14 @@
       integer blockno
       integer*8 cont, get_context
       double precision th, tp, r2, r0
-      double precision xloc(0:12),yloc(0:12),zloc(0:12)
+      double precision xloc(0:4),yloc(0:4),zloc(0:4)
       logical iscart
       logical fclaw2d_map_is_used
       integer i, mi, mj
       double precision xc1, yc1, zc1
+
+      data xloc /0, 1, 1, 0, 0.5d0/
+      data yloc /0, 0, 1, 1, 0.5d0/
 
       double precision pi
       common /compi/ pi
@@ -68,7 +71,7 @@ c              # initial conditions.
             endif
             do i = 0,4
                rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
-               fdisc = rp-0.2d0
+               fdisc = rp-0.3d0
                if (fdisc .lt. 0) then
                   return
                endif
@@ -100,7 +103,7 @@ c           # Sphere
       else
 c        # No mapping.
          rp = (xc-0.5d0)**2 + (yc-0.5d0)**2
-         fdisc = rp-(0.25d0)**2
+         fdisc = rp-(0.1d0)**2
       endif
 
       end
