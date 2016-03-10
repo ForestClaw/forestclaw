@@ -316,6 +316,8 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
 
     /* Count total grids on this processor */
     ddata->count_grids_per_proc +=  domain->local_num_patches;
+    ddata->count_grids_local_boundary +=  domain->num_exchange_patches;
+    ddata->count_grids_remote_boundary +=  domain->num_ghost_patches;
 
     /* Count the number of times that advance is called */
     ++ddata->count_amr_advance;

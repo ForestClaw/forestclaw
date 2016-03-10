@@ -51,6 +51,8 @@ typedef struct fclaw2d_domain_data
     int count_single_step;
     int count_multiproc_corner;
     int count_grids_per_proc;
+    int count_grids_remote_boundary;
+    int count_grids_local_boundary;
     int is_latest_domain;
     fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
