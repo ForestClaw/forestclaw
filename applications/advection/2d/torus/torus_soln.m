@@ -46,7 +46,7 @@ if (T > 0)
 
     f0 = [x0; y0; z0];
     opt.RelTol = 1e-12;
-    [~,pout] = ode45(@psi_rhs,[0,T],f0,opt);
+    [~,pout] = ode45(@psi_rhs_simple,[0,T],f0,opt);
 
     xp = pout(end,1:N_torus);
     yp = pout(end,(N_torus+1):(2*N_torus));
@@ -214,7 +214,7 @@ t1 = [-y; x; zeros(size(x))];
 t2 = [-z.*x./r; -z.*y./r; r - 1];
 
 t1t = t1';
-fp = (2*pi*R)*t1t(:);
+fp = -(2*pi*R)*t1t(:);
 
 if (period_torus > 0)
     vt = -cos(2*pi*t/period_torus);

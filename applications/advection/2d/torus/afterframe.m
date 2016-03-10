@@ -17,6 +17,7 @@ else
     alim = alim + [-s s];
     axis([alim alim]);
     daspect([1 1 1]);
+    view(vtop)
 end
 
 yrbcolormap;

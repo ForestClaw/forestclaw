@@ -4,10 +4,10 @@ global map isflat;
 
 % map = 'nomap';
 % map = 'cart';
-% map = 'torus';
+map = 'torus';
 % map = 'latlong';
 % map = 'annulus';
-map = 'duplicate';
+% map = 'duplicate';
 
 R = 1;
 r = 0.4;
