@@ -342,8 +342,8 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                          &amropt->outstyle_uses_maxlevel, 1,
                          "Expand nout/nstep to global (subcycle=F) [F]");
 
-    sc_options_add_bool (opt, 0, "noweightedp", &amropt->noweightedp, 0,
-                           "No weighting when subcycling [F]");
+    sc_options_add_bool (opt, 0, "weighted_partition", &amropt->weighted_partition, 0,
+                           "Weight grids when partitioning [F]");
 
     /* ---------------------- Control execution -------------------------- */
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,
