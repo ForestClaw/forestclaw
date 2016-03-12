@@ -103,9 +103,6 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, DIAGNOSTICS_COMM);
     FCLAW2D_STATS_SET (stats, ddata, CFL_COMM);
     FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
-#if 0
-    FCLAW2D_STATS_SET (stats, ddata, ADVANCE_STEPS_COUNTER);
-#endif
     FCLAW2D_STATS_SET (stats, ddata, REGRID_BUILD);
     FCLAW2D_STATS_SET (stats, ddata, REGRID_TAGGING);
     FCLAW2D_STATS_SET (stats, ddata, PARTITION);
@@ -138,22 +135,34 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],
                    ddata->count_grids_per_proc/ddata->count_amr_advance,"GRIDS_PER_PROC");
 
-    /* Compute the arithmetic mean of grids per processor */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],
-                   ddata->count_grids_local_boundary/ddata->count_amr_advance,
-                   "GRIDS_LOCAL_BOUNDARY");
-
-    /* Compute the arithmetic mean of grids per processor */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],
-                   ddata->count_grids_remote_boundary/ddata->count_amr_advance,
-                   "GRIDS_REMOTE_BOUNDARY");
-
     /* Compute the inverse harmonic mean of grids per processor  */
     int d = ddata->count_grids_per_proc;
     ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],
                    1.0/(ddata->count_grids_per_proc/ddata->count_amr_advance),
                    "GRIDS_PER_PROC_INV_HMEAN");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],
+                   ddata->count_grids_local_boundary/ddata->count_amr_advance,
+                   "GRIDS_LOCAL_BOUNDARY");
+
+    /* Compute the arithmetic mean of grids per processor */
+
+    double glb = ddata->count_grids_local_boundary/ddata->count_amr_advance;
+    double gpp = ddata->count_grids_per_proc/ddata->count_amr_advance;
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY_RATIO],glb/gpp,
+                    "GRIDS_LOCAL_BOUNDARY_RATIO");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],
+                   ddata->count_grids_remote_boundary/ddata->count_amr_advance,
+                   "GRIDS_REMOTE_BOUNDARY");
+
+    /* Compute the arithmetic mean of grids per processor */
+    double grb = ddata->count_grids_remote_boundary/ddata->count_amr_advance;
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY_RATIO],grb/gpp,
+                   "GRIDS_REMOTE_BOUNDARY_RATIO");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
