@@ -571,7 +571,9 @@ def compile_results(results_dir=None,results_file='results.out',
                          'PARTITION',
                          'GHOSTFILL_STEP1',
                          'GHOSTFILL_STEP2',
-                         'GHOSTFILL_STEP3']
+                         'GHOSTFILL_STEP3',
+                         'LOCAL_BOUNDARY_RATIO',
+                         'REMOTE_BOUNDARY_RATIO']
 
     stats_list_int = ['ADVANCE_STEPS_COUNTER$',
                       'GRIDS_PER_PROC$',
@@ -583,12 +585,13 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*(84+169))
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%4s%4s%6s%6s%8s%12s" + "%12s"*4 + "%12s"*16 + "\n"
+    fstr = "# %6s%8s%6s%4s%4s%6s%6s%8s%12s" + "%12s"*4 + "%12s"*18 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','mi','mj','min','max','nout','tfinal',
                               'adv.steps','grids/proc','local bdry','remote bdry',
                               'init','advance','ghostfill','regrid','patch_comm',
                               'adapt','partition','cfl','walltime',
-                              'gf_copy','local','comm','partition','step1','step2','step3'))
+                              'gf_copy','local','comm','partition','step1','step2','step3',
+                              'local_boundary_ratio','remote_boundary_ratio'))
 
     resultsfile.write("# " + "-"*(84+169))
     resultsfile.write("\n")
@@ -868,6 +871,12 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         m = row[2]    # Index of mx in data array
                         l = row[6]    # Index of maxlevel
 
+                        if len(row) < 31:
+                            print "read_results_file (parallel_tools.py)"
+                            print "Length of row from %s is incorrect" %(rf)
+                            print "It should be 31 instead of %d" % (len(row))
+                            sys.exit()
+
 
                         job = {}
                         job["rundir"]          = rundir
@@ -903,13 +912,15 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["step1"]           = row[26]
                         job["step2"]           = row[27]
                         job["step3"]           = row[28]
+                        job["local_ratio"]     = row[29]
+                        job["remote_ratio"]    = row[30]
 
 
                     jobs[m][p][l] = job
 
     return jobs
 
-def print_jobs(jobs,val2plot):
+def print_jobs(jobs,val2plot,fmt_int=False):
 
     mx = sorted(jobs.keys())
 
@@ -944,15 +955,13 @@ def print_jobs(jobs,val2plot):
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
                         sys.exit()
-                    else:
-                        fmt_int = val2plot in int_list
                 else:
                     import types
                     if isinstance(val2plot,types.FunctionType):
                         try:
                             d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
                         except:
-                            print "print_jobs : Problem with function 'val2plot'"
+                            print "print_jobs : Problem with function %s" % (val2plot.__name__)
                             sys.exit()
 
 
@@ -1031,8 +1040,11 @@ def plot_results(jobs,start_point,val2plot='walltime',
         try:
             job = jobs[m][p][l]
         except:
+            print "Job entry not found;  m = %d; p = %d; l = %d" % (m,p,l)
             import pdb
             pdb.set_trace()
+            job = None
+
 
         # "headers" for this mx table
         procs = sorted(jobs[m].keys())
@@ -1091,7 +1103,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
 
         xformatter = ticker.FormatStrFormatter('%d')
         ax.xaxis.set_major_formatter(xformatter)
-        ax.set_xlabel("Grids per proc",fontsize=16)
+        ax.set_xlabel("Grids per processor",fontsize=16)
 
         yformatter = ticker.FormatStrFormatter('%5.2e')
         ax.yaxis.set_major_formatter(yformatter)
@@ -1119,7 +1131,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
             if len(gpp2) > 1:
                 xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
                 ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
-                plt.plot(xs,ys,'k--')
+                plt.plot(xs,ys,'k-')
 
             plt.draw()
 
@@ -1199,7 +1211,7 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
                 val,_ = v(job,mx=m,proc=p,level=l,all=jobs)
                 data = np.average(val)
             except:
-                print "plot_results_internal : Problem with function 'val2plot'"
+                print "plot_results_internal : Problem with function '%s'" % (val2plot.__name__)
                 sys.exit()
 
         y_avg = np.append(y_avg,data)
