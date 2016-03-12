@@ -75,7 +75,7 @@ def fraction_ghostfill(job,mx=None,proc=None,level=None,all=None):
 
     gf = job["ghostfill"]
     w = job["walltime"]
-    cost_per_grid = (gf)/w
+    cost_per_grid = gf/w
     v = cost_per_grid
 
     fmt_int = False
@@ -218,3 +218,15 @@ def cost_per_grid(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v,fmt_int
+
+def ratio_surface_to_volume(job,mx=None,proc=None,level=None,all=None):
+    g = job["grids_per_proc"]
+    l = job["local_boundary"]
+    r = job["remote_boundary"]
+
+    v = l/(g-l)
+
+
+    fmt_int = False
+
+    return v, fmt_int

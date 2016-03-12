@@ -233,14 +233,20 @@ def write_ini_files(input_file='create_run.ini'):
         adapt_factor = np.ones(R.shape)
 
 
-    procs = proc0*4**R     # Key idea : Run on different processors
+    if fix_grids_per_proc:
+        G = num_grids_per_proc
+        procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
+    else:
+        procs = proc0*4**R     # Key idea : Run on different processors
+
+    print procs
 
     nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
-    num_grids_total = mi0*mj0*(2**maxlevel)**2  # total on all procs, all blocks
+    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
     if not duplicate:
-        grids_per_proc = adapt_factor*mi0*mj0*(2**maxlevel)**2/procs
+        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
     else:
-        grids_per_proc = adapt_factor*(2**maxlevel)**2/(procs/procs[0])
+        grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
 
 
     num_advances = adapt_factor*nout_uniform*num_grids_total
@@ -568,15 +574,18 @@ def compile_results(results_dir=None,results_file='results.out',
                          'GHOSTFILL_STEP3']
 
     stats_list_int = ['ADVANCE_STEPS_COUNTER$',
-                      'GRIDS_PER_PROC$']
+                      'GRIDS_PER_PROC$',
+                      'LOCAL_BOUNDARY',
+                      'REMOTE_BOUNDARY']
+
 
     # Compile data to this file
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*(84+169))
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%4s%4s%6s%6s%8s%12s" + "%12s"*2 + "%12s"*16 + "\n"
+    fstr = "# %6s%8s%6s%4s%4s%6s%6s%8s%12s" + "%12s"*4 + "%12s"*16 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','mi','mj','min','max','nout','tfinal',
-                              'adv.steps','grids/proc',
+                              'adv.steps','grids/proc','local bdry','remote bdry',
                               'init','advance','ghostfill','regrid','patch_comm',
                               'adapt','partition','cfl','walltime',
                               'gf_copy','local','comm','partition','step1','step2','step3'))
@@ -692,27 +701,33 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # Get counter values
             for k,w in enumerate(stats_list_int):
+                found = False
                 for i,l in enumerate(lines):
                     if re.search(w,l):
                         a = i
+                        found = True
                         break
-                try:
+
+                if found:
                     l2 = lines[a+2].split()
                     resultsfile.write("%12d" % np.round(float(l2[5])).astype(int))
-                except:
+                else:
                     print "%s in file %s not found" % (w,f)
                     resultsfile.write("%12f" % (np.nan))
 
             # Get timer values
             for k,w in enumerate(stats_list_float):
+                found = False
                 for i,l in enumerate(lines):
                     if re.search(w,l):
                         a = i
+                        found = True
                         break
-                try:
+
+                if found:
                     l2 = lines[a+2].split()
                     resultsfile.write("%12.4e" % float(l2[5]))
-                except:
+                else:
                     print "%s in file %s not found" % (w,f)
                     resultsfile.write("%12f" % (np.nan))
 
@@ -822,6 +837,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     continue
 
                 data = np.loadtxt(rf)
+
                 if data.ndim == 1:
                     data = np.reshape(data,(-1,len(data)))
 
@@ -869,22 +885,24 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         if job["grids_per_proc"] == 0:    # avoid log(0)
                             job["grids_per_proc"] = 0.1
 
-                        job["init"]            = row[11]
-                        job["advance"]         = row[12]
-                        job["ghostfill"]       = row[13]
-                        job["regrid"]          = row[14]
-                        job["ghostpatch_comm"] = row[15]
-                        job["adapt_comm"]      = row[16]
-                        job["partition_comm"]  = row[17]
-                        job["cfl_comm"]        = row[18]
-                        job["walltime"]        = row[19]
-                        job["ghostfill_copy"]  = row[20]
-                        job["local"]           = row[21]
-                        job["comm"]            = row[22]
-                        job["partition"]       = row[23]
-                        job["step1"]           = row[24]
-                        job["step2"]           = row[25]
-                        job["step3"]           = row[26]
+                        job["local_boundary"]  = row[11]
+                        job["remote_boundary"] = row[12]
+                        job["init"]            = row[13]
+                        job["advance"]         = row[14]
+                        job["ghostfill"]       = row[15]
+                        job["regrid"]          = row[16]
+                        job["ghostpatch_comm"] = row[17]
+                        job["adapt_comm"]      = row[18]
+                        job["partition_comm"]  = row[19]
+                        job["cfl_comm"]        = row[20]
+                        job["walltime"]        = row[21]
+                        job["ghostfill_copy"]  = row[22]
+                        job["local"]           = row[23]
+                        job["comm"]            = row[24]
+                        job["partition"]       = row[25]
+                        job["step1"]           = row[26]
+                        job["step2"]           = row[27]
+                        job["step3"]           = row[28]
 
 
                     jobs[m][p][l] = job
@@ -1094,14 +1112,14 @@ def plot_results(jobs,start_point,val2plot='walltime',
             if len(gpp1) > 2:
                 xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
                 ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
-                # plt.plot(xs,ys,'r--')
+                plt.plot(xs,ys,'r--')
 
             gpp2 = np.array([t[0] for t in z if t[2] > 16])
             y2   = np.array([t[1] for t in z if t[2] > 16])
             if len(gpp2) > 1:
                 xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
                 ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
-                # plt.plot(xs,ys,'k--')
+                plt.plot(xs,ys,'k--')
 
             plt.draw()
 
@@ -1202,14 +1220,17 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
 
     mb = None
 
-    plot_ideal = (ideal_slope is not None)
-    if plot_ideal:
-        R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
-        ideal = y_avg1[0]*2**(ideal_slope*R)
-        if scaling is not  'resolution':
-            plt.loglog(procs1,ideal,'k.--',markersize=15)
-        else:
-            plt.semilogy(levels1,ideal,'k.--',markersize=15)
+    try:
+        plot_ideal = (ideal_slope is not None)
+        if plot_ideal:
+            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+            ideal = y_avg1[0]*2**(ideal_slope*R)
+            if scaling is not  'resolution':
+                plt.loglog(procs1,ideal,'k.--',markersize=15)
+            else:
+                plt.semilogy(levels1,ideal,'k.--',markersize=15)
+    except:
+        print "plot_results_internal: Could not plot ideal curve"
 
     try:
         mv = markers[v]
