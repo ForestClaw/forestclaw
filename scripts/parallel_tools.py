@@ -4,6 +4,7 @@ import numpy as np
 from string import Template
 import re
 import ConfigParser
+import pdb
 
 def compare_runs(execname,rerun,iframe):
     import random
@@ -113,14 +114,16 @@ def write_ini_files(input_file='create_run.ini'):
         d = config.get('Run','duplicate').partition('#')[0].strip()
         duplicate  = d in ['T','True','1']
     except:
-        duplicate = F
+        duplicate = False
 
     # Duplicate problem
     try:
         d = config.get('Run','adapt_proc_count').partition('#')[0].strip()
         adapt_proc_count  = d in ['T','True','1']
+        fix_grids_per_proc = int(config.get('Run','adapt_proc_count').partition('#')[0].strip())
     except:
-        adapt_proc_count = F
+        adapt_proc_count = False
+
 
 
 
@@ -156,7 +159,7 @@ def write_ini_files(input_file='create_run.ini'):
     try:
         # Set regrid here in case we want to regrid even in the
         # uniform case
-        regrid_interval = int(config.get('Run','regrid').partition('#')[0].strip())
+        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
     except:
 
         regrid_interval = 1
@@ -233,7 +236,7 @@ def write_ini_files(input_file='create_run.ini'):
         adapt_factor = np.ones(R.shape)
 
 
-    if fix_grids_per_proc:
+    if adapt_proc_count:
         G = num_grids_per_proc
         procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
     else:
@@ -578,22 +581,60 @@ def compile_results(results_dir=None,results_file='results.out',
     stats_list_int = ['ADVANCE_STEPS_COUNTER$',
                       'GRIDS_PER_PROC$',
                       'LOCAL_BOUNDARY',
-                      'REMOTE_BOUNDARY']
+                      'REMOTE_BOUNDARY',
+                      'INTERIOR']
+
+    # ------------------------------
+    # Options : Variable field width
+    # ------------------------------
+    option_list = {'jobid'  :('jobid', '{jobid[0]:>6s}',   '{:>6d}'),
+                   'p'      :('p',     '{p[0]:>8s}',       '{:>8d}'),
+                   'mx'     :('mx',    '{mx[0]:>6s}',      '{:>6d}'),
+                   'mi'     :('mi',    '{mi[0]:>4s}',      '{:>4d}'),
+                   'mj'     :('mj',    '{mj[0]:>4s}',      '{:>4d}'),
+                   'min'    :('min',   '{min[0]:>6s}',     '{:>6d}'),
+                   'max'    :('max',   '{max[0]:>6s}',     '{:>6d}'),
+                   'nout'   :('nout',  '{nout[0]:>8s}',    '{:>8d}'),
+                   'tfinal' :('tfinal','{tfinal[0]:>12s}', '{:>12.2e}')}
+
+
+    option_list_header = "{jobid[1]:>6s}{p[1]:>8s}{mx[1]:>6s}{mi[1]:>4s}{mj[1]:>4s}" + \
+                         "{min[1]:>6s}{max[1]:>6s}{nout[1]:>8s}{tfinal[1]:>12s}"
+    option_fmt_header = option_list_header.format(**option_list)  # Process names
+
+    option_str_header = option_fmt_header.format(**option_list)
+    option_width = 60     # add up all fields widths, i.e. 6+8+6+4+... = 60
+
+    # ---------------------
+    # Ints : Field width 12
+    # ---------------------
+    int_list = ('adv.steps','grids/proc','local bdry','remote bdry','interior')
+    int_width = 12*len(int_list)
+    int_str = ("{:>12s}"*len(int_list)).format(*int_list)
+
+    # -----------------------
+    # Floats : Field width 12
+    # -----------------------
+    float_list = ('init','advance','ghostfill','regrid','patch_comm',
+                  'adapt','partition','cfl','walltime',
+                  'gf_copy','local','comm','partition','step1',
+                  'step2','step3', 'l. ratio','r. ratio')
+    float_width = 12*len(float_list)
+    float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
 
     # Compile data to this file
-    resultsfile = open(results_file,'w')
-    resultsfile.write("# " + "-"*(84+169))
-    resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%4s%4s%6s%6s%8s%12s" + "%12s"*4 + "%12s"*18 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','mi','mj','min','max','nout','tfinal',
-                              'adv.steps','grids/proc','local bdry','remote bdry',
-                              'init','advance','ghostfill','regrid','patch_comm',
-                              'adapt','partition','cfl','walltime',
-                              'gf_copy','local','comm','partition','step1','step2','step3',
-                              'local_boundary_ratio','remote_boundary_ratio'))
+    line_len = option_width + int_width + float_width
+    header_str = option_str_header + int_str + float_str
 
-    resultsfile.write("# " + "-"*(84+169))
+    # Write out header to file
+    resultsfile = open(results_file,'w')
+    resultsfile.write("# " + "-"*line_len)
+    resultsfile.write("\n")
+
+    resultsfile.write("# " + header_str + "\n")
+
+    resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
 
     # Look for files that look like "torus_00004.o4567".  But if execname is
@@ -627,7 +668,8 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # jobid
             resultsfile.write("  ")   # Make up for "# " added as comments above
-            resultsfile.write("%6d" % jobid)
+            s = "{jobid[2]:s}".format(**option_list)
+            resultsfile.write(s.format(jobid))
 
             # proc count
             resultsfile.write("%8d" % pcount)
@@ -639,7 +681,8 @@ def compile_results(results_dir=None,results_file='results.out',
                 if re.search("mx",l):
                     l1 = lines[i].split()
                     mx = int(l1[2])
-                    resultsfile.write("%6s" % l1[2])
+                    s = "{mx[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(mx))
                     break
 
             # mi (look for something distinctive;  count down from there)
@@ -660,7 +703,8 @@ def compile_results(results_dir=None,results_file='results.out',
                         mj_line = lines[i+2].split()
                         mj = int(mj_line[2])
 
-                    resultsfile.write("%4d%4d" % (mi,mj))
+                    s = "{mi[2]:s}{mj[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(mi,mj))
                     break
                     # print "mi = %d; mj = %d" %(mi,mj)
 
@@ -672,7 +716,9 @@ def compile_results(results_dir=None,results_file='results.out',
                         minlevel = int(l1[2]) + np.log(float(mi))/np.log(2.0)
                     else:
                         minlevel = int(l1[2])
-                    resultsfile.write("%6s" % minlevel)
+
+                    s = "{min[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(minlevel)))
                     break
 
             # maxlevel
@@ -684,21 +730,26 @@ def compile_results(results_dir=None,results_file='results.out',
                     else:
                         maxlevel = int(l1[2])
 
-                    resultsfile.write("%6s" % maxlevel)
+                    s = "{max[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(maxlevel)))
                     break
 
             # nout
             for i,l in enumerate(lines):
                 if re.search("nout",l):
                     l1 = lines[i].split()
-                    resultsfile.write("%8d" % int(l1[2]))
+                    nout = int(l1[2])
+                    s = "{nout[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(l1[2])))
                     break
 
             # tfinal
             for i,l in enumerate(lines):
                 if re.search("tfinal",l):
                     l1 = lines[i].split()
-                    resultsfile.write("%12.2e" % float(l1[2]))
+                    tfinal = float(l1[2])
+                    s = "{tfinal[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(float(l1[2])))
                     break
 
 
@@ -871,10 +922,10 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         m = row[2]    # Index of mx in data array
                         l = row[6]    # Index of maxlevel
 
-                        if len(row) < 31:
+                        if len(row) < 32:
                             print "read_results_file (parallel_tools.py)"
                             print "Length of row from %s is incorrect" %(rf)
-                            print "It should be 31 instead of %d" % (len(row))
+                            print "It should be 32 instead of %d" % (len(row))
                             sys.exit()
 
 
@@ -896,24 +947,25 @@ def read_results_files(dir_list, subdir = None, results_in = None,
 
                         job["local_boundary"]  = row[11]
                         job["remote_boundary"] = row[12]
-                        job["init"]            = row[13]
-                        job["advance"]         = row[14]
-                        job["ghostfill"]       = row[15]
-                        job["regrid"]          = row[16]
-                        job["ghostpatch_comm"] = row[17]
-                        job["adapt_comm"]      = row[18]
-                        job["partition_comm"]  = row[19]
-                        job["cfl_comm"]        = row[20]
-                        job["walltime"]        = row[21]
-                        job["ghostfill_copy"]  = row[22]
-                        job["local"]           = row[23]
-                        job["comm"]            = row[24]
-                        job["partition"]       = row[25]
-                        job["step1"]           = row[26]
-                        job["step2"]           = row[27]
-                        job["step3"]           = row[28]
-                        job["local_ratio"]     = row[29]
-                        job["remote_ratio"]    = row[30]
+                        job["interior"]        = row[13]
+                        job["init"]            = row[14]
+                        job["advance"]         = row[15]
+                        job["ghostfill"]       = row[16]
+                        job["regrid"]          = row[17]
+                        job["ghostpatch_comm"] = row[18]
+                        job["adapt_comm"]      = row[19]
+                        job["partition_comm"]  = row[20]
+                        job["cfl_comm"]        = row[21]
+                        job["walltime"]        = row[22]
+                        job["ghostfill_copy"]  = row[23]
+                        job["local"]           = row[24]
+                        job["comm"]            = row[25]
+                        job["partition"]       = row[26]
+                        job["step1"]           = row[27]
+                        job["step2"]           = row[28]
+                        job["step3"]           = row[29]
+                        job["local_ratio"]     = row[30]
+                        job["remote_ratio"]    = row[31]
 
 
                     jobs[m][p][l] = job
@@ -954,6 +1006,7 @@ def print_jobs(jobs,val2plot,fmt_int=False):
                         d = job[val2plot]
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
+                        pdb.set_trace()
                         sys.exit()
                 else:
                     import types
@@ -1012,6 +1065,15 @@ def plot_results(jobs,start_point,val2plot='walltime',
     import matplotlib.ticker as ticker
     from matplotlib.lines import Line2D
 
+    import seaborn.apionly as sns
+
+    ax = plt.gca()
+    # Or we can set the colormap explicitly.
+    cmap = sns.color_palette("Set1",10)
+    cm = [cmap[i] for i in [0,5,1,4,2,7,3]]
+    ax.set_color_cycle(cm)
+
+
     markers = {}
     markers["walltime"] = r'$\clubsuit$'
     markers["advance"] = u's'
@@ -1021,7 +1083,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     markers["advance_steps"] = u'o'
     markers["cfl_comm"] = u'p'
 
-    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
+    # colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
 
     mx = sorted(jobs.keys())
     ph = []
@@ -1071,12 +1133,12 @@ def plot_results(jobs,start_point,val2plot='walltime',
 
         # Internal plotting routine
         phandle,mb,gpp1,y_avg1,procs1 = plot_results_internal(val2plot,t,
-                                                              jobs,scaling,markers,colors,
+                                                              jobs,scaling,markers,
                                                               scale_uniform,efficiency,
                                                               ideal_slope,
                                                               scatter)
 
-        phandle.set_color(colors[i])
+        # phandle.set_color(colors[i])
         plt.draw()
         ph.append(phandle)
         mb_data.append(mb)
@@ -1124,7 +1186,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
             if len(gpp1) > 2:
                 xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
                 ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
-                plt.plot(xs,ys,'r--')
+                plt.plot(xs,ys,'k--')
 
             gpp2 = np.array([t[0] for t in z if t[2] > 16])
             y2   = np.array([t[1] for t in z if t[2] > 16])
@@ -1169,7 +1231,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     return ph,mb,t,A,alpha,B
 
 
-def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
+def plot_results_internal(val2plot,t,jobs,scaling,markers,
                           scale_uniform=False, efficiency=False,
                           ideal_slope=None,scatter=False):
 
@@ -1233,14 +1295,17 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
     mb = None
 
     try:
-        plot_ideal = (ideal_slope is not None)
-        if plot_ideal:
+        if ideal_slope is not None:
+            if ideal_slope == 0:
+                s = 'k--'
+            else:
+                s = 'k.--'
             R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
             ideal = y_avg1[0]*2**(ideal_slope*R)
             if scaling is not  'resolution':
-                plt.loglog(procs1,ideal,'k.--',markersize=15)
+                plt.loglog(procs1,ideal,s,markersize=15)
             else:
-                plt.semilogy(levels1,ideal,'k.--',markersize=15)
+                plt.semilogy(levels1,ideal,s,markersize=15)
     except:
         print "plot_results_internal: Could not plot ideal curve"
 

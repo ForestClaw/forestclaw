@@ -231,6 +231,7 @@ def grids_per_advance_time(job,mx=None,proc=None,level=None,all=None):
 
 
 def cost_per_grid(job,mx=None,proc=None,level=None,all=None):
+
     v = job["walltime"]/job["advance_steps"]
 
     fmt_int = False

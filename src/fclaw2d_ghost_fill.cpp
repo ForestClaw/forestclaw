@@ -613,10 +613,8 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* --------------------------------------------------------------
            Start send ...
            ------------------------------------------------------------*/
-#if 0
         fclaw2d_exchange_ghost_patches_begin(domain,minlevel,maxlevel,time_interp,
                                              FCLAW2D_TIMER_GHOSTFILL);
-#endif
 
         /* --------------------------------------------------------------
            Finish exchanges in the interior of the grid.
@@ -670,9 +668,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* -------------------------------------------------------------
            Receive ghost patches ...
            ------------------------------------------------------------- */
-
-        fclaw2d_exchange_ghost_patches_begin(domain,minlevel,maxlevel,time_interp,
-                                             FCLAW2D_TIMER_GHOSTFILL);
 
         fclaw2d_exchange_ghost_patches_end(domain,minlevel,maxlevel,time_interp,
                                            FCLAW2D_TIMER_GHOSTFILL);
