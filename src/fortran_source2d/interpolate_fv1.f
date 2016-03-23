@@ -273,7 +273,7 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
       enddo
 
 
-      mth = 5
+      mth = 0
 
       if (icorner_coarse .eq. 0) then
          ic = 1
@@ -326,6 +326,7 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
       implicit none
 
       double precision sl,sr, s, sc, philim, slim
+      double precision a,b
       integer mth
 
 c     # ------------------------------------------------
@@ -359,9 +360,10 @@ c     # ------------------------------------------------
 c        # Use minmod, superbee, etc.
          slim = philim(sl,sr,mth)
          compute_slopes = slim*sl
-      else
-c        # Use AMRClaw slopes  (use minimum in absolute value;  sign is
-c        # chosen from centered (sc) slope
+      elseif (mth .eq. 5) then
+c        # Use AMRClaw slopes
+c        # If sl,sr are the same sign : Use minimum of sl,sr or sc
+c        # If sl and sr have different signs; set slope to 0.
          sc = (sl + sr)/2.d0
          compute_slopes = min(abs(sl),abs(sr),abs(sc))*
      &         max(0.d0,sign(1.d0,sl*sr))*sign(1.d0,sc)
@@ -370,7 +372,16 @@ c        # Do this to guarantee that ghost cells are used; this is a check
 c        # on the ghost-fill procedures.  Could raise an exception if face
 c        # a patch communicates with more two or more procs.  If this
 c        # is uncommented, also uncomment warning in fclaw2d_ghost_fill.cpp
-c         compute_slopes = sc
+        compute_slopes = sc
+      elseif (mth .eq. 6) then
+c        # Harmonic mean interpolation (from PCHIP). The abs not really
+c        # not necessary, but used here to show that the harmonic average
+c        # can be seen as a convex combination of the two values, but weights
+c        # the smaller slope more heavily.
+         a = abs(sr/(sl + sr))
+         b = abs(sl/(sl + sr))
+         sc = a*sl + b*sr
+         compute_slopes = max(0.,sign(1.d0,sl*sr))*sc
 
       endif
 
