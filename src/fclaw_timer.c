@@ -209,21 +209,23 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                     stats, 1, 0);
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
-                          "regrid %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].average,
                           ddata->count_amr_regrid,
+                          ddata->count_amr_new_domain,
                           stats[FCLAW2D_TIMER_REGRID].average);
 
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
-                          "regrid %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].max,
                           ddata->count_amr_regrid,
+                          ddata->count_amr_new_domain,
                           stats[FCLAW2D_TIMER_REGRID].max);
 
 #if 0

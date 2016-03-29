@@ -48,6 +48,7 @@ typedef struct fclaw2d_domain_data
     /* Debug counters and timers */
     int count_set_clawpatch, count_delete_clawpatch;
     int count_amr_advance, count_ghost_exchange, count_amr_regrid;
+    int count_amr_new_domain;
     int count_single_step;
     int count_multiproc_corner;
     int count_grids_per_proc;
