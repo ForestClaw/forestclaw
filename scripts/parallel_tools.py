@@ -116,14 +116,12 @@ def write_ini_files(input_file='create_run.ini'):
     except:
         duplicate = False
 
-    # Duplicate problem
     try:
         d = config.get('Run','adapt_proc_count').partition('#')[0].strip()
         adapt_proc_count  = d in ['T','True','1']
         fix_grids_per_proc = int(config.get('Run','adapt_proc_count').partition('#')[0].strip())
     except:
         adapt_proc_count = False
-
 
 
 
@@ -140,6 +138,21 @@ def write_ini_files(input_file='create_run.ini'):
     except:
         noweightedp = False
 
+
+    # Advance one step?
+    try:
+        ol = config.get('Run','advance-one-step').partition('#')[0].strip()
+        one_level = ol in ['T','True','1']
+    except:
+        one_level = False
+
+    # Use Maxlevel?
+    try:
+        ml = config.get('Run','outstyle-uses-maxlevel').partition('#')[0].strip()
+        use_maxlevel = ml in ['T','True','1']
+    except:
+        use_maxlevel = False
+
     # these should eventually go away ...
     scaling = 'strong'   # Get rid of these eventually?
     scale_uniform = False
@@ -149,6 +162,9 @@ def write_ini_files(input_file='create_run.ini'):
     maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
     proc0   = int(config.get('Run','proc').partition('#')[0].strip())
     tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
+
+    if duplicate:
+        tfinal0 = tfinal0/mi0
 
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
@@ -172,6 +188,9 @@ def write_ini_files(input_file='create_run.ini'):
     # Figure out dt needed for first run in this series
     eff_res0 = mx0*mi0*2**minlevel0
     dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
+
+    if use_maxlevel:
+        dt0 = dt0/(2**(maxlevel0-minlevel0))
 
     tol = 3e-15
     nout0 = tfinal0/dt0
@@ -347,8 +366,16 @@ def write_ini_files(input_file='create_run.ini'):
                 ini_file.write("    subcycle = T\n")
             else:
                 ini_file.write("    subcycle = F\n")
+
+            if one_level:
+                ini_file.write("    advance-one-level = T\n");
+            if use_maxlevel:
+                ini_file.write("    outstyle-uses-maxlevel = T\n");
+
         else:
             ini_file.write("    subcycle = F\n")
+
+
 
 
         ini_file.write("    advance-one-step = F\n")
