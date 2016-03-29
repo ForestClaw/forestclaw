@@ -382,7 +382,7 @@ c        # the smaller slope more heavily.
          a = abs(sr/(sl + sr))
          b = abs(sl/(sl + sr))
          sc = a*sl + b*sr
-         compute_slopes = max(0.,sign(1.d0,sl*sr))*sc
+         compute_slopes = max(0.d0,sign(1.d0,sl*sr))*sc
 
       endif
 
