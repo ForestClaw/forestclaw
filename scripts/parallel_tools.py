@@ -194,9 +194,10 @@ def write_ini_files(input_file='create_run.ini'):
 
     tol = 3e-15
     if use_maxlevel:
-        nout0 = tfinal0*mi0/dt0
+        nout0 = tfinal0/(dt0/(2**(maxlevel0-minlevel0)))
     else:
         nout0 = tfinal0/dt0
+
     if abs(nout0 - np.round(nout0)) > tol:
         print "nout is not an integer; nout = %12.4e\n" % (nout0-np.round(nout0))
         sys.exit()
@@ -372,8 +373,13 @@ def write_ini_files(input_file='create_run.ini'):
 
             if one_level:
                 ini_file.write("    advance-one-level = T\n");
+            else:
+                ini_file.write("    advance-one-step = F\n")
+
             if use_maxlevel:
                 ini_file.write("    outstyle-uses-maxlevel = T\n");
+            else:
+                ini_file.write("    outstyle-uses-maxlevel = F\n")
 
         else:
             ini_file.write("    subcycle = F\n")
@@ -381,8 +387,6 @@ def write_ini_files(input_file='create_run.ini'):
 
 
 
-        ini_file.write("    advance-one-step = F\n")
-        ini_file.write("    outstyle-uses-maxlevel = F\n")
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
