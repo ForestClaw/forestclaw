@@ -273,7 +273,7 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
       enddo
 
 
-      mth = 0
+      mth = 5
 
       if (icorner_coarse .eq. 0) then
          ic = 1
