@@ -189,11 +189,14 @@ def write_ini_files(input_file='create_run.ini'):
     eff_res0 = mx0*mi0*2**minlevel0
     dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-    if use_maxlevel:
-        dt0 = dt0/(2**(maxlevel0-minlevel0))
+    #if use_maxlevel:
+    #    dt0 = dt0/(2**(maxlevel0-minlevel0))
 
     tol = 3e-15
-    nout0 = tfinal0/dt0
+    if use_maxlevel:
+        nout0 = tfinal0*mi0/dt0
+    else:
+        nout0 = tfinal0/dt0
     if abs(nout0 - np.round(nout0)) > tol:
         print "nout is not an integer; nout = %12.4e\n" % (nout0-np.round(nout0))
         sys.exit()

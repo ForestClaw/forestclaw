@@ -7,7 +7,7 @@ global map isflat;
 map = 'torus';
 % map = 'latlong';
 % map = 'annulus';
-% map = 'duplicate';
+map = 'duplicate';
 
 R = 1;
 r = 0.4;
@@ -51,9 +51,9 @@ switch map
         isflat = true;
         s = 0.0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
-        b = load('brick.dat');
-        mi = b(1,1);
-        mj = b(1,2);
+%         b = load('brick.dat');
+%         mi = b(1,1);
+%         mj = b(1,2);
         xp = -1 + 2*xc1;
         yp = -1 + 2*yc1;
 end
