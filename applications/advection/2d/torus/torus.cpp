@@ -178,10 +178,9 @@ void run_program(fclaw_app_t* app)
         break;
 
     case 5:
-        /* Duplicate initial conditions in each brick */
+        /* Duplicate initial conditions in each block */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick, gparms->scale, gparms->shift, rotate);
+        cont = fclaw2d_map_new_nomap();
         break;
 
 

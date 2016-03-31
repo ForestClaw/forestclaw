@@ -59,16 +59,6 @@
      &         blockno,xc,yc,xp,yp,zp)
 
          if (iscart()) then
-            if (example == 5) then
-c              # Map each brick to a [0,1]x[0,1] domain and duplicate
-c              # initial conditions.
-               blockno = 0
-               call fclaw2d_map_brick2c(cont,
-     &               blockno,xc,yc,xc1,yc1,zc1)
-               call fclaw2d_map_brick_get_dim(cont,mi,mj)
-               xp = mi*xc1
-               yp = mj*yc1
-            endif
             do i = 0,4
                rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
                fdisc = rp-0.3d0
@@ -101,9 +91,23 @@ c           # Sphere
             fdisc = 1
          endif
       else
-c        # No mapping.
-         rp = (xc-0.5d0)**2 + (yc-0.5d0)**2
-         fdisc = rp-(0.1d0)**2
+         if (example == 5) then
+c           # Map each brick to a [0,1]x[0,1] domain and duplicate
+c           # initial conditions.
+            xp = xc
+            yp = yc
+            do i = 0,4
+               rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
+               fdisc = rp-0.3d0
+               if (fdisc .lt. 0) then
+                  return
+               endif
+            enddo
+         else
+c           # No mapping.
+            rp = (xc-0.5d0)**2 + (yc-0.5d0)**2
+            fdisc = rp-(0.1d0)**2
+         endif
       endif
 
       end
