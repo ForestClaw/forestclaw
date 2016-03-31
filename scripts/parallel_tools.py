@@ -163,9 +163,6 @@ def write_ini_files(input_file='create_run.ini'):
     proc0   = int(config.get('Run','proc').partition('#')[0].strip())
     tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
 
-    if duplicate:
-        tfinal0 = tfinal0/mi0
-
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
 
@@ -186,15 +183,13 @@ def write_ini_files(input_file='create_run.ini'):
     # ----------------------------------------
 
     # Figure out dt needed for first run in this series
-    eff_res0 = mx0*mi0*2**minlevel0
-    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
+    eff_res0 = mx0*2**minlevel0
 
-    #if use_maxlevel:
-    #    dt0 = dt0/(2**(maxlevel0-minlevel0))
+    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
     tol = 3e-15
     if use_maxlevel:
-        nout0 = tfinal0/(dt0/(2**(maxlevel0-minlevel0)))
+        nout0 = tfinal0/(dt0/2**(maxlevel0-minlevel0))
     else:
         nout0 = tfinal0/dt0
 

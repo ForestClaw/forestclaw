@@ -2,12 +2,13 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 
 global map isflat;
 
-% map = 'nomap';
+map = 'nomap';
+map = 'brick';
 % map = 'cart';
-map = 'torus';
+% map = 'torus';
 % map = 'latlong';
 % map = 'annulus';
-map = 'duplicate';
+% map = 'duplicate';
 
 R = 1;
 r = 0.4;
@@ -18,9 +19,20 @@ switch map
         isflat = true;
         xp = xc;
         yp = yc;
-    case 'cart'
+
+    case 'brick'
         isflat = true;
         s = 0.05;
+        [xp,yp,~] = mapc2m_brick(xc,yc,s);
+         b = load('brick.dat');
+         mi = b(1,1);
+         mj = b(1,2);
+         xp = mi*xp;
+         yp = mj*yp;
+
+    case 'cart'
+        isflat = true;
+        s = 0.0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_cart(xc1,yc1);
 
