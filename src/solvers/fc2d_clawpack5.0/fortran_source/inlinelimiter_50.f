@@ -1,22 +1,21 @@
 c
 c
 c     =====================================================
-      subroutine clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,
-     &      mx,wave,s,mthlim)
+      subroutine limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
 c     =====================================================
 c
-c     # Apply a limiter to the waves.
+c     # Apply a limiter to the waves.  
 c
 c     # Version of December, 2002.
-c     # Modified from the original CLAWPACK routine to eliminate calls
+c     # Modified from the original CLAWPACK routine to eliminate calls 
 c     # to philim.  Since philim was called for every wave at each cell
 c     # interface, this was adding substantial overhead in some cases.
 c
 c     # The limiter is computed by comparing the 2-norm of each wave with
 c     # the projection of the wave from the interface to the left or
 c     # right onto the current wave.  For a linear system this would
-c     # correspond to comparing the norms of the two waves.  For a
-c     # nonlinear problem the eigenvectors are not colinear and so the
+c     # correspond to comparing the norms of the two waves.  For a 
+c     # nonlinear problem the eigenvectors are not colinear and so the 
 c     # projection is needed to provide more limiting in the case where the
 c     # neighboring wave has large norm but points in a different direction
 c     # in phase space.
@@ -32,8 +31,8 @@ c     # of wave.
 c
       implicit double precision (a-h,o-z)
       dimension mthlim(mwaves)
-      dimension wave(1-mbc:maxm+mbc,meqn,mwaves)
-      dimension    s(1-mbc:maxm+mbc,mwaves)
+      dimension wave(meqn, mwaves, 1-mbc:maxm+mbc)
+      dimension    s(mwaves, 1-mbc:maxm+mbc)
 c
 c
       do 200 mw=1,mwaves
@@ -44,13 +43,13 @@ c
             dotl = dotr
             dotr = 0.d0
             do 5 m=1,meqn
-               wnorm2 = wnorm2 + wave(i,m,mw)**2
-               dotr = dotr + wave(i,m,mw)*wave(i+1,m,mw)
+               wnorm2 = wnorm2 + wave(m,mw,i)**2
+               dotr = dotr + wave(m,mw,i)*wave(m,mw,i+1)
     5          continue
-            if (i .eq. 0) go to 190
-            if (wnorm2 .eq. 0.d0) go to 190
+            if (i.eq.0) go to 190
+            if (wnorm2.eq.0.d0) go to 190
 c
-            if (s(i,mw) .gt. 0.d0) then
+            if (s(mw,i) .gt. 0.d0) then
                 r = dotl / wnorm2
               else
                 r = dotr / wnorm2
@@ -99,7 +98,7 @@ c
 c           # apply limiter to waves:
 c
             do 180 m=1,meqn
-               wave(i,m,mw) = wlimitr * wave(i,m,mw)
+               wave(m,mw,i) = wlimitr * wave(m,mw,i)
   180          continue
 
   190       continue

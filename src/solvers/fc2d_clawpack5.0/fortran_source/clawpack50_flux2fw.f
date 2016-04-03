@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
+      subroutine clawpack50_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
      &      q1d,dtdx1d,aux1,aux2,aux3,
      &      faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
      &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
@@ -151,7 +151,7 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
-      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
+      if (limit) call clawpack50_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      fwave,s,mthlim)
 c
       do 120 i = 1, mx+1
