@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_clawpack50_options.h"
+#include "fc2d_clawpack5_options.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -33,50 +33,50 @@ extern "C"
 #endif
 #endif
 
-typedef struct fc2d_clawpack50_package
+typedef struct fc2d_clawpack5_package
 {
   int is_registered;
-  fc2d_clawpack50_options_t clawopt;
+  fc2d_clawpack5_options_t clawopt;
 }
-fc2d_clawpack50_package_t; 
+fc2d_clawpack5_package_t; 
 
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    fc2d_clawpack50_package_t *clawpkg;
-    fc2d_clawpack50_options_t *clawopt;
+    fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    clawpkg = (fc2d_clawpack50_package_t*) package;
+    clawpkg = (fc2d_clawpack5_package_t*) package;
     clawopt = &clawpkg->clawopt;
 
     FCLAW_ASSERT (clawopt != NULL);
 
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
-                               "[clawpack50] Normal and transverse orders [2 2]");
+                               "[clawpack5] Normal and transverse orders [2 2]");
 
     sc_options_add_int (opt, 0, "mcapa", &clawopt->mcapa, -1,
-                        "[clawpack50] Location of capacity function in aux array [-1]");
+                        "[clawpack5] Location of capacity function in aux array [-1]");
 
     sc_options_add_int (opt, 0, "maux", &clawopt->maux, 0,
-                        "[clawpack50] Number of auxiliary variables [0]");
+                        "[clawpack5] Number of auxiliary variables [0]");
 
     sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
-                         "[clawpack50] Source term option [F]");
+                         "[clawpack5] Source term option [F]");
 
     sc_options_add_bool (opt, 0, "use_fwaves", &clawopt->use_fwaves, 0,
-                         "[clawpack50] Use fwaves flux-form [F]");
+                         "[clawpack5] Use fwaves flux-form [F]");
 
 
     sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
-                        "[clawpack50] Number of waves [1]");
+                        "[clawpack5] Number of waves [1]");
 
     fclaw_options_add_int_array (opt, 0, "mthlim", &clawopt->mthlim_string, NULL,
                                  &clawopt->mthlim, clawopt->mwaves,
-                                 "[clawpack50] Waves limiters (one entry per wave; " \
+                                 "[clawpack5] Waves limiters (one entry per wave; " \
                                  "values 0-4) [NULL]");
 
     clawpkg->is_registered = 1;
@@ -84,7 +84,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 }
 
 fclaw_exit_type_t
-fc2d_clawpack50_postprocess (fc2d_clawpack50_options_t * clawopt)
+fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
 {
     fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
                                      clawopt->mwaves);
@@ -97,23 +97,23 @@ fc2d_clawpack50_postprocess (fc2d_clawpack50_options_t * clawopt)
 static fclaw_exit_type_t
 options_postprocess (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_clawpack50_package_t *clawpkg;
-    fc2d_clawpack50_options_t *clawopt;
+    fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    clawpkg = (fc2d_clawpack50_package_t*) package;
+    clawpkg = (fc2d_clawpack5_package_t*) package;
     FCLAW_ASSERT (clawpkg->is_registered);
 
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
-    return fc2d_clawpack50_postprocess (clawopt);
+    return fc2d_clawpack5_postprocess (clawopt);
 }
 
 fclaw_exit_type_t
-fc2d_clawpack50_check (fc2d_clawpack50_options_t * clawopt)
+fc2d_clawpack5_check (fc2d_clawpack5_options_t * clawopt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -126,13 +126,13 @@ fc2d_clawpack50_check (fc2d_clawpack50_options_t * clawopt)
 
     if (clawopt->use_fwaves)
     {
-        fclaw_global_essentialf("clawpack50 : fwaves not yet implemented\n");
+        fclaw_global_essentialf("clawpack5 : fwaves not yet implemented\n");
         return FCLAW_EXIT_QUIET;
     }
 
     if (clawopt->maux == 0 && clawopt->mcapa > 0)
     {
-        fclaw_global_essentialf("clawpack50 : bad maux/mcapa combination\n");
+        fclaw_global_essentialf("clawpack5 : bad maux/mcapa combination\n");
         return FCLAW_EXIT_ERROR;
     }
 
@@ -144,23 +144,23 @@ fc2d_clawpack50_check (fc2d_clawpack50_options_t * clawopt)
 static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_clawpack50_package_t *clawpkg;
-    fc2d_clawpack50_options_t *clawopt;
+    fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    clawpkg = (fc2d_clawpack50_package_t*) package;
+    clawpkg = (fc2d_clawpack5_package_t*) package;
     FCLAW_ASSERT (clawpkg->is_registered);
 
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
-    return fc2d_clawpack50_check (clawopt);
+    return fc2d_clawpack5_check (clawopt);
 }
 
 void
-fc2d_clawpack50_reset (fc2d_clawpack50_options_t * clawopt)
+fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt)
 {
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
@@ -169,23 +169,23 @@ fc2d_clawpack50_reset (fc2d_clawpack50_options_t * clawopt)
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_clawpack50_package_t *clawpkg;
-    fc2d_clawpack50_options_t *clawopt;
+    fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    clawpkg = (fc2d_clawpack50_package_t*) package;
+    clawpkg = (fc2d_clawpack5_package_t*) package;
     FCLAW_ASSERT (clawpkg->is_registered);
 
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
-    fc2d_clawpack50_reset (clawopt);
+    fc2d_clawpack5_reset (clawopt);
     FCLAW_FREE (clawpkg);
 }
 
-static const fclaw_app_options_vtable_t clawpack50_options_vtable = {
+static const fclaw_app_options_vtable_t clawpack5_options_vtable = {
     options_register,
     options_postprocess,
     options_check,
@@ -195,16 +195,16 @@ static const fclaw_app_options_vtable_t clawpack50_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-fc2d_clawpack50_options_t*  fc2d_clawpack50_options_register (fclaw_app_t * app,
+fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
                                                               const char *configfile)
 {
-    fc2d_clawpack50_package_t *clawpkg;
+    fc2d_clawpack5_package_t *clawpkg;
 
     FCLAW_ASSERT (app != NULL);
 
-    clawpkg = FCLAW_ALLOC (fc2d_clawpack50_package_t, 1);
-    fclaw_app_options_register (app, "clawpack50", configfile,
-                                &clawpack50_options_vtable, clawpkg);
+    clawpkg = FCLAW_ALLOC (fc2d_clawpack5_package_t, 1);
+    fclaw_app_options_register (app, "clawpack5", configfile,
+                                &clawpack5_options_vtable, clawpkg);
     return &clawpkg->clawopt;
 }
 

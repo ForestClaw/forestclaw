@@ -27,7 +27,7 @@
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #include <fc2d_dummy.h>
 
@@ -133,7 +133,7 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
 
     fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);

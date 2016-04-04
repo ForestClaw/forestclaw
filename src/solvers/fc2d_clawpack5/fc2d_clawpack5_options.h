@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK50_OPTIONS_H
-#define FCLAW2D_CLAWPACK50_OPTIONS_H
+#ifndef FCLAW2D_CLAWPACK5_OPTIONS_H
+#define FCLAW2D_CLAWPACK5_OPTIONS_H
 
 #include <fclaw_options.h>
 
@@ -36,8 +36,8 @@ extern "C"
 #endif
 #endif
 
-/* Only one copy of clawpack50_options for each run */
-typedef struct fc2d_clawpack50_options
+/* Only one copy of clawpack5_options for each run */
+typedef struct fc2d_clawpack5_options
 {
     int mwaves;
     int maux;
@@ -53,14 +53,14 @@ typedef struct fc2d_clawpack50_options
     int src_term;
     int use_fwaves;
 }
-fc2d_clawpack50_options_t;
+fc2d_clawpack5_options_t;
 
-fclaw_exit_type_t fc2d_clawpack50_postprocess (fc2d_clawpack50_options_t *
+fclaw_exit_type_t fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t *
                                                clawopt);
-fclaw_exit_type_t fc2d_clawpack50_check (fc2d_clawpack50_options_t * clawopt);
-void fc2d_clawpack50_reset (fc2d_clawpack50_options_t * clawopt);
+fclaw_exit_type_t fc2d_clawpack5_check (fc2d_clawpack5_options_t * clawopt);
+void fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt);
 
-fc2d_clawpack50_options_t *fc2d_clawpack50_options_register (fclaw_app_t *
+fc2d_clawpack5_options_t *fc2d_clawpack5_options_register (fclaw_app_t *
                                                              app,
                                                              const char
                                                              *configfile);

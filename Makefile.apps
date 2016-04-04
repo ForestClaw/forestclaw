@@ -4,7 +4,7 @@
 # Solver libraries
 # ----------------------------------
 include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5.0/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 include src/solvers/fc2d_dummy/Makefile.am
 
 # ----------------------------------
@@ -22,9 +22,6 @@ include applications/dummy/Makefile.am
 # Scalar advection on manifolds
 include applications/advection/2d/swirl_mapped/Makefile.am
 include applications/advection/2d/swirl/Makefile.am
-
-include applications/advection/2d/swirl50/Makefile.am
-
 include applications/advection/2d/torus/Makefile.am
 include applications/advection/2d/hemisphere/Makefile.am
 include applications/advection/2d/filament/Makefile.am

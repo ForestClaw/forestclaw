@@ -1,0 +1,32 @@
+# -*- Makefile -*-
+libclawpack5_generated_headers =
+libclawpack5_installed_headers = \
+	src/solvers/fc2d_clawpack5/fc2d_clawpack5.h \
+	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.h
+
+libclawpack5_compiled_sources = \
+	src/solvers/fc2d_clawpack5/fc2d_clawpack5.cpp \
+	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.c \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_inlinelimiter.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_limiter.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_set_capacity.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_block.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_bc2.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_flux2.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_flux2fw.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2_wrap.f
+
+lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la
+
+src_solvers_fc2d_clawpack5_libclawpack5_la_SOURCES = \
+  $(libclawpack5_internal_headers) \
+  $(libclawpack5_compiled_sources)
+
+src_solvers_fc2d_clawpack5_libclawpack5_la_CPPFLAGS = \
+  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+
+FCLAW_CLAWPACK5_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack5
+FCLAW_CLAWPACK5_LDADD = @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
+
+include_HEADERS += $(libclawpack5_installed_headers)

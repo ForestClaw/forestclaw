@@ -1,4 +1,4 @@
-      subroutine clawpack50_step2_wrap(maxm, meqn, maux, mbc,
+      subroutine clawpack5_step2_wrap(maxm, meqn, maux, mbc,
      &      method, mthlim, mcapa, mwaves, mx, my, qold, aux,
      &      dx, dy, dt,cfl, work, mwork,xlower,ylower,level,
      &      t, fp,fm, gp, gm, rpn2, rpt2,flux2,
@@ -79,7 +79,7 @@ c
 
 c     # Include four additional arguments to avoid need for
 c     # global array
-      call clawpack50_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
+      call clawpack5_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
      &      mx,my, qold,aux,dx,dy,dt,
      &      cfl,fm,fp,gm,gp,
      &      work(i0faddm),work(i0faddp),

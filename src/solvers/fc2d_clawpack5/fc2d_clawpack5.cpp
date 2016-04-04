@@ -28,24 +28,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
 
-#include "fc2d_clawpack50.h"
-#include "fc2d_clawpack50_options.h"
+#include "fc2d_clawpack5.h"
+#include "fc2d_clawpack5_options.h"
 
-static int s_clawpack50_package_id = -1;
+static int s_clawpack5_package_id = -1;
 
-static fc2d_clawpack50_vtable_t classic_vt;
+static fc2d_clawpack5_vtable_t classic_vt;
 
 
 
-void fc2d_clawpack50_set_vtable(const fc2d_clawpack50_vtable_t* user_vt)
+void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* user_vt)
 {
     classic_vt = *user_vt;
 }
 
-void fc2d_clawpack50_init_vtable(fc2d_clawpack50_vtable_t* vt)
+void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK50_BC2;
+    vt->bc2 = CLAWPACK5_BC2;
     vt->qinit = NULL;
     vt->rpn2 = NULL;
     vt->rpt2 = NULL;
@@ -68,20 +68,20 @@ struct patch_aux_data
     int maux;
 };
 
-fc2d_clawpack50_options_t* fc2d_clawpack50_get_options(fclaw2d_domain_t *domain)
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain)
 {
     int id;
     fclaw_app_t* app;
     app = fclaw2d_domain_get_app(domain);
-    id = fc2d_clawpack50_get_package_id();
-    return (fc2d_clawpack50_options_t*) fclaw_package_get_options(app,id);
+    id = fc2d_clawpack5_get_package_id();
+    return (fc2d_clawpack5_options_t*) fclaw_package_get_options(app,id);
 }
 
 static patch_aux_data*
 get_patch_data(ClawPatch *cp)
 {
     patch_aux_data *wp =
-        (patch_aux_data*) cp->clawpack_patch_data(s_clawpack50_package_id);
+        (patch_aux_data*) cp->clawpack_patch_data(s_clawpack5_package_id);
     return wp;
 }
 
@@ -101,7 +101,7 @@ patch_data_delete(void *data)
     delete pd;
 }
 
-static const fclaw_package_vtable_t clawpack50_patch_vtable = {
+static const fclaw_package_vtable_t clawpack5_patch_vtable = {
     patch_data_new,
     patch_data_delete
 };
@@ -111,61 +111,61 @@ static const fclaw_package_vtable_t clawpack50_patch_vtable = {
    Public interface to routines in this file
    ----------------------------------------------------------- */
 #if 0
-void fc2d_clawpack50_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack50_options_t *clawopt)
+void fc2d_clawpack5_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack5_options_t *clawopt)
 {
     int id;
 
     /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack50_package_id == -1);
+    FCLAW_ASSERT(s_clawpack5_package_id == -1);
 
     /* Register packages */
     id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack50_patch_vtable);
-    s_clawpack50_package_id = id;
+                                         &clawpack5_patch_vtable);
+    s_clawpack5_package_id = id;
 }
 #endif
 
 void
-fc2d_clawpack50_register_vtable (fclaw_package_container_t * pkg_container,
-                                 fc2d_clawpack50_options_t * clawopt)
+fc2d_clawpack5_register_vtable (fclaw_package_container_t * pkg_container,
+                                 fc2d_clawpack5_options_t * clawopt)
 {
-    FCLAW_ASSERT(s_clawpack50_package_id == -1);
+    FCLAW_ASSERT(s_clawpack5_package_id == -1);
 
-    s_clawpack50_package_id =
+    s_clawpack5_package_id =
       fclaw_package_container_add (pkg_container, clawopt,
-                                   &clawpack50_patch_vtable);
+                                   &clawpack5_patch_vtable);
 }
 
-void fc2d_clawpack50_register (fclaw_app_t* app, const char *configfile)
+void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile)
 {
-    fc2d_clawpack50_options_t* clawopt;
+    fc2d_clawpack5_options_t* clawopt;
     int id;
 
     /* Register the options */
-    clawopt = fc2d_clawpack50_options_register(app,configfile);
+    clawopt = fc2d_clawpack5_options_register(app,configfile);
 
     /* And the package */
 
     /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack50_package_id == -1);
+    FCLAW_ASSERT(s_clawpack5_package_id == -1);
 
     id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack50_patch_vtable);
+                                         &clawpack5_patch_vtable);
 
-    s_clawpack50_package_id = id;
+    s_clawpack5_package_id = id;
 }
 
-int fc2d_clawpack50_get_package_id (void)
+int fc2d_clawpack5_get_package_id (void)
 {
-    return s_clawpack50_package_id;
+    return s_clawpack5_package_id;
 }
 
 static void
-fc2d_clawpack50_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
+fc2d_clawpack5_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
 {
     int maux;
-    fc2d_clawpack50_options_t *clawpack_options;
+    fc2d_clawpack5_options_t *clawpack_options;
     const amr_options_t* gparms;
     int mx,my,mbc;
     int ll[2], ur[2];
@@ -175,7 +175,7 @@ fc2d_clawpack50_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
     my = gparms->my;
     mbc = gparms->mbc;
 
-    clawpack_options = fc2d_clawpack50_get_options(domain);
+    clawpack_options = fc2d_clawpack5_get_options(domain);
     maux = clawpack_options->maux;
 
     /* Construct an index box to hold the aux array */
@@ -190,46 +190,46 @@ fc2d_clawpack50_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
     clawpack_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
 }
 
-void fc2d_clawpack50_define_auxarray (fclaw2d_domain_t* domain,
+void fc2d_clawpack5_define_auxarray (fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp (this_patch);
-    fc2d_clawpack50_define_auxarray_cp (domain, cp);
+    fc2d_clawpack5_define_auxarray_cp (domain, cp);
 }
 
 static void
-fc2d_clawpack50_get_auxarray_cp (fclaw2d_domain_t* domain,
+fc2d_clawpack5_get_auxarray_cp (fclaw2d_domain_t* domain,
                                  ClawPatch *cp, double **aux, int* maux)
 {
-    fc2d_clawpack50_options_t* clawpack_options;
-    clawpack_options = fc2d_clawpack50_get_options(domain);
+    fc2d_clawpack5_options_t* clawpack_options;
+    clawpack_options = fc2d_clawpack5_get_options(domain);
     *maux = clawpack_options->maux;
 
     patch_aux_data *clawpack_patch_data = get_patch_data(cp);
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
 
-void fc2d_clawpack50_aux_data(fclaw2d_domain_t* domain,
+void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp (this_patch);
-    fc2d_clawpack50_get_auxarray_cp (domain,cp,aux,maux);
+    fc2d_clawpack5_get_auxarray_cp (domain,cp,aux,maux);
 }
 
-void fc2d_clawpack50_maux(fclaw2d_domain_t* domain,int* maux)
+void fc2d_clawpack5_maux(fclaw2d_domain_t* domain,int* maux)
 {
-    *maux = fc2d_clawpack50_get_maux(domain);
+    *maux = fc2d_clawpack5_get_maux(domain);
 }
 
-int fc2d_clawpack50_get_maux(fclaw2d_domain_t* domain)
+int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain)
 {
-    fc2d_clawpack50_options_t *clawpack_options;
-    clawpack_options = fc2d_clawpack50_get_options(domain);
+    fc2d_clawpack5_options_t *clawpack_options;
+    clawpack_options = fc2d_clawpack5_get_options(domain);
     return clawpack_options->maux;
 }
 
-void fc2d_clawpack50_setprob(fclaw2d_domain_t *domain)
+void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
 {
     /* Assume that if we are here, then the user has a valid setprob */
     FCLAW_ASSERT(classic_vt.setprob != NULL);
@@ -239,7 +239,7 @@ void fc2d_clawpack50_setprob(fclaw2d_domain_t *domain)
 
 
 /* This should only be called when a new ClawPatch is created. */
-void fc2d_clawpack50_setaux(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -252,21 +252,21 @@ void fc2d_clawpack50_setaux(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack50_define_auxarray (domain,this_patch);
+    fc2d_clawpack5_define_auxarray (domain,this_patch);
 
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
-    CLAWPACK50_SET_BLOCK(&this_block_idx);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
-    CLAWPACK50_UNSET_BLOCK();
+    CLAWPACK5_UNSET_BLOCK();
 }
 
 /* This should only be called when a new ClawPatch is created. */
-void fc2d_clawpack50_set_capacity(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
@@ -274,9 +274,9 @@ void fc2d_clawpack50_set_capacity(fclaw2d_domain_t *domain,
     int mx,my,mbc,maux,mcapa;
     double dx,dy,xlower,ylower;
     double *aux, *area;
-    fc2d_clawpack50_options_t *clawopt;
+    fc2d_clawpack5_options_t *clawopt;
 
-    clawopt = fc2d_clawpack50_get_options(domain);
+    clawopt = fc2d_clawpack5_get_options(domain);
     mcapa = clawopt->mcapa;
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
@@ -284,15 +284,15 @@ void fc2d_clawpack50_set_capacity(fclaw2d_domain_t *domain,
 
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
 
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
-    CLAWPACK50_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
+    CLAWPACK5_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
                             &maux,aux);
 }
 
 
-void fc2d_clawpack50_qinit(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
@@ -306,19 +306,19 @@ void fc2d_clawpack50_qinit(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-    CLAWPACK50_SET_BLOCK(&this_block_idx);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                      &maux,aux);
-    CLAWPACK50_UNSET_BLOCK();
+    CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc2d_clawpack50_b4step2(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -335,18 +335,18 @@ void fc2d_clawpack50_b4step2(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
-    CLAWPACK50_SET_BLOCK(&this_block_idx);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
-    CLAWPACK50_UNSET_BLOCK();
+    CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc2d_clawpack50_src2(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -363,20 +363,20 @@ void fc2d_clawpack50_src2(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
-    CLAWPACK50_SET_BLOCK(&this_block_idx);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.src2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
-    CLAWPACK50_UNSET_BLOCK();
+    CLAWPACK5_UNSET_BLOCK();
 }
 
 
 /* Use this to return only the right hand side of the clawpack algorithm */
-double fc2d_clawpack50_step2_rhs(fclaw2d_domain_t *domain,
+double fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -391,7 +391,7 @@ double fc2d_clawpack50_step2_rhs(fclaw2d_domain_t *domain,
 }
 
 
-void fc2d_clawpack50_bc2(fclaw2d_domain *domain,
+void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -409,7 +409,7 @@ void fc2d_clawpack50_bc2(fclaw2d_domain *domain,
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -444,22 +444,22 @@ void fc2d_clawpack50_bc2(fclaw2d_domain *domain,
 #endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
-    CLAWPACK50_SET_BLOCK(&this_block_idx);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
-    CLAWPACK50_UNSET_BLOCK();
+    CLAWPACK5_UNSET_BLOCK();
 }
 
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-double fc2d_clawpack50_step2(fclaw2d_domain_t *domain,
+double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
                              double dt)
 {
-    fc2d_clawpack50_options_t* clawpack_options;
+    fc2d_clawpack5_options_t* clawpack_options;
     ClawPatch *cp;
     int level;
     double *qold, *aux;
@@ -469,13 +469,13 @@ double fc2d_clawpack50_step2(fclaw2d_domain_t *domain,
     FCLAW_ASSERT(classic_vt.rpn2 != NULL);
     FCLAW_ASSERT(classic_vt.rpt2 != NULL);
 
-    clawpack_options = fc2d_clawpack50_get_options(domain);
+    clawpack_options = fc2d_clawpack5_get_options(domain);
 
     cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     level = this_patch->level;
 
-    fc2d_clawpack50_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     cp->save_current_step();  // Save for time interpolation
 
@@ -500,10 +500,10 @@ double fc2d_clawpack50_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     int ierror = 0;
-    fc2d_clawpack50_flux2_t flux2 = clawpack_options->use_fwaves ?
-                                    CLAWPACK50_FLUX2FW : CLAWPACK50_FLUX2;
+    fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
+                                    CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
 
-    CLAWPACK50_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
+    CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
@@ -529,32 +529,32 @@ double fc2d_clawpack50_step2(fclaw2d_domain_t *domain,
     return cflgrid;
 }
 
-double fc2d_clawpack50_update(fclaw2d_domain_t *domain,
+double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double dt)
 {
-    const fc2d_clawpack50_options_t* clawpack_options;
-    clawpack_options = fc2d_clawpack50_get_options(domain);
+    const fc2d_clawpack5_options_t* clawpack_options;
+    clawpack_options = fc2d_clawpack5_get_options(domain);
 
     if (classic_vt.b4step2 != NULL)
     {
-        fc2d_clawpack50_b4step2(domain,
+        fc2d_clawpack5_b4step2(domain,
                                 this_patch,
                                 this_block_idx,
                                 this_patch_idx,t,dt);
     }
 
-    double maxcfl = fc2d_clawpack50_step2(domain,
+    double maxcfl = fc2d_clawpack5_step2(domain,
                                           this_patch,
                                           this_block_idx,
                                           this_patch_idx,t,dt);
 
     if (clawpack_options->src_term > 0)
     {
-        fc2d_clawpack50_src2(domain,
+        fc2d_clawpack5_src2(domain,
                              this_patch,
                              this_block_idx,
                              this_patch_idx,t,dt);
