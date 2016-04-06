@@ -1,4 +1,4 @@
-subroutine step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,rpn2,rpt2)
+subroutine clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,rpn2,rpt2)
 !
 !     clawpack routine ...  modified for AMRCLAW
 !
@@ -99,7 +99,8 @@ subroutine step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
         jcom = j
 
         ! Compute modifications fadd and gadd to fluxes along this slice:
-        call flux2(1,maxm,meqn,maux,mbc,mx,q1d,dtdx1d,aux1,aux2,aux3, &
+        !!! Change from flux2 to clawpack5_flux2
+        call clawpack5_flux2(1,maxm,meqn,maux,mbc,mx,q1d,dtdx1d,aux1,aux2,aux3, &
                    faddm,faddp,gaddm,gaddp,cfl1d,wave,s, &
                    amdq,apdq,cqxx,bmadq,bpadq,rpn2,rpt2)       
                    
@@ -141,7 +142,8 @@ subroutine step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
         icom = i
         
         ! Compute modifications fadd and gadd to fluxes along this slice
-        call flux2(2,maxm,meqn,maux,mbc,my,q1d,dtdy1d,aux1,aux2,aux3, &
+        !!! Change from flux2 to clawpack5_flux2
+        call clawpack5_flux2(2,maxm,meqn,maux,mbc,my,q1d,dtdy1d,aux1,aux2,aux3, &
                    faddm,faddp,gaddm,gaddp,cfl1d,wave,s,amdq,apdq,cqxx, &
                    bmadq,bpadq,rpn2,rpt2)
 

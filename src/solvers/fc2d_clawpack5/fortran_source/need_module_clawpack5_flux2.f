@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine flux2(ixy,maxm,meqn,maux,mbc,mx,
+      subroutine clawpack5_flux2(ixy,maxm,meqn,maux,mbc,mx,
      &                 q1d,dtdx1d,aux1,aux2,aux3,
      &                 faddm,faddp,gaddm,gaddp,cfl1d,wave,s,
      &                 amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2)
@@ -127,7 +127,8 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to waves:
-      if (limit) call limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
+c     # !!! Change to call clawpack5_limiter (original:limiter)
+      if (limit) call clawpack5_limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
 c
       do 120 i = 1, mx+1
 c

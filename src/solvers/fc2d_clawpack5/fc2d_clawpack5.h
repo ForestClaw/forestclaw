@@ -41,70 +41,66 @@ extern "C"
 
 
 typedef void (*fc2d_clawpack5_setprob_t)();
-
-typedef void (*fc2d_clawpack5_bc2_t)(const int* maxmx, const int* maxmy,
-                                      const int* meqn, const int* mbc,
-                                      const int* mx, const int* my,
-                                      const double* xlower, const double* ylower,
-                                      const double* dx, const double* dy,
-                                      const double q[], const int* maux,
-                                      const double aux[], const double* t,
-                                      const double* dt, const int mthbc[]);
-
-typedef  void (*fc2d_clawpack5_qinit_t)(const int* maxmx, const int* maxmy,
-                                         const int* meqn,const int* mbc,
-                                         const int* mx, const int* my,
-                                         const double* xlower, const double* ylower,
+//!!! Modified 2016/4/5
+typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
+                                     const int* mx, const int* my,
+                                     const double* xlower, const double* ylower,
+                                     const double* dx, const double* dy,
+                                     const double q[], const int* maux,
+                                     const double aux[], const double* t,
+                                     const double* dt, const int mthbc[]);
+//!!! Modified 2016/4/5
+typedef  void (*fc2d_clawpack5_qinit_t)(const int* meqn,const int* mbc,
+                                        const int* mx, const int* my,
+                                        const double* xlower, const double* ylower,
+                                        const double* dx, const double* dy,
+                                        double q[], const int* maux, double aux[]);
+//!!! Modified 2016/4/5
+typedef void (*fc2d_clawpack5_setaux_t)(const int* mbc,
+                                        const int* mx, const int* my,
+                                        const double* xlower, const double* ylower,
+                                        const double* dx, const double* dy,
+                                        const int* maux, double aux[]);
+//!!! Modified 2016/4/5
+typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
+                                         const int* mx, const int* my, const int* meqn,
+                                         double q[], const double* xlower,
+                                         const double* ylower,
                                          const double* dx, const double* dy,
-                                         double q[], const int* maux, double aux[]);
-
-typedef void (*fc2d_clawpack5_setaux_t)(const int* maxmx, const int* maxmy, const int* mbc,
-                                         const int* mx, const int* my,
-                                         const double* xlower, const double* ylower,
-                                         const double* dx, const double* dy,
+                                         const double* t, const double* dt,
                                          const int* maux, double aux[]);
-
-typedef void (*fc2d_clawpack5_b4step2_t)(const int* maxmx, const int* maxmy,
-                                          const int* mbc,
-                                          const int* mx, const int* my, const int* meqn,
-                                          double q[], const double* xlower,
-                                          const double* ylower,
-                                          const double* dx, const double* dy,
-                                          const double* t, const double* dt,
-                                          const int* maux, double aux[]);
-
-typedef void (*fc2d_clawpack5_src2_t)(const int* maxmx, const int* maxmy, const int* meqn,
-                                       const int* mbc, const int* mx,const int* my,
-                                       const double* xlower, const double* ylower,
-                                       const double* dx, const double* dy, double q[],
-                                       const int* maux, double aux[], const double* t,
-                                       const double* dt);
-
+//!!! Modified 2016/4/5
+typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
+                                      const int* mbc, const int* mx,const int* my,
+                                      const double* xlower, const double* ylower,
+                                      const double* dx, const double* dy, double q[],
+                                      const int* maux, double aux[], const double* t,
+                                      const double* dt);
+//!!! Add maux
 typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                       const int* mwaves, const int* mbc,const int* mx,
-                                       double ql[], double qr[], double auxl[], double auxr[],
-                                       double wave[], double s[],double amdq[], double apdq[]);
+                                      const int* mwaves, const int* maux, 
+                                      const int* mbc,const int* mx,
+                                      double ql[], double qr[], double auxl[], double auxr[],
+                                      double wave[], double s[],double amdq[], double apdq[]);
 
 
-typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
-                                       const int* mwaves, const int* mbc,const int* mx,
+typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
+                                       const int* mwaves, const int* maux, const int* mbc,const int* mx,
                                        double ql[], double qr[], double aux1[], double aux2[],
-                                       double aux3[], const int* imp, double dsdq[],
+                                       double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
-
+//!!!fwave --> wave
 typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
                                         double aux1[], double aux2[], double aux3[],
                                         double faddm[],double faddp[], double gaddm[],
-                                        double gaddp[],double cfl1d[], double fwave[],
+                                        double gaddp[],double cfl1d[], double wave[],
                                         double s[], double amdq[],double apdq[],double cqxx[],
                                         double bmasdq[], double bpasdq[],
                                         fc2d_clawpack5_rpn2_t rpn2,
-                                        fc2d_clawpack5_rpt2_t rpt2,
-                                        const int* mwaves, const int* mcapa,
-                                        int method[], int mthlim[]);
+                                        fc2d_clawpack5_rpt2_t rpt2);
 
 typedef void (*fc2d_clawpack5_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
@@ -129,12 +125,13 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* vt);
 void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt);
 
 #define CLAWPACK5_BC2 FCLAW_F77_FUNC(clawpack5_bc2,CLAWPACK5_BC2)
-void CLAWPACK5_BC2(const int* maxmx, const int* maxmy, const int* meqn,
-                     const int* mbc, const int* mx, const int* my,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy, const double q[],
-                     const int* maux, const double aux[], const double* t,
-                     const double* dt, const int mthbc[]);
+void CLAWPACK5_BC2(const int* meqn, const int* mbc,
+                   const int* mx, const int* my,
+                   const double* xlower, const double* ylower,
+                   const double* dx, const double* dy,
+                   const double q[], const int* maux,
+                   const double aux[], const double* t,
+                   const double* dt, const int mthbc[]);
 
 /* --------------------------------------------------------------------
    Classic routines
@@ -156,54 +153,57 @@ void CLAWPACK5_BC2(const int* maxmx, const int* maxmy, const int* meqn,
 
 void SETPROB();
 
-void QINIT(const int* maxmx, const int* maxmy, const int* meqn,
-            const int* mbc, const int* mx, const int* my,
+void QINIT(const int* meqn,const int* mbc,
+           const int* mx, const int* my,
+           const double* xlower, const double* ylower,
+           const double* dx, const double* dy,
+           double q[], const int* maux, double aux[]);
+void SETAUX(const int* mbc,
+            const int* mx, const int* my,
             const double* xlower, const double* ylower,
             const double* dx, const double* dy,
-            double q[], const int* maux, double aux[]);
+            const int* maux, double aux[]);
 
-void SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
-             const int* mx, const int* my,
-             const double* xlower, const double* ylower,
+void BC2(const int* meqn, const int* mbc,
+         const int* mx, const int* my,
+         const double* xlower, const double* ylower,
+         const double* dx, const double* dy,
+         const double q[], const int* maux,
+         const double aux[], const double* t,
+         const double* dt, const int mthbc[]);
+
+void B4STEP2(const int* mbc,
+             const int* mx, const int* my, const int* meqn,
+             double q[], const double* xlower,
+             const double* ylower,
              const double* dx, const double* dy,
+             const double* t, const double* dt,
              const int* maux, double aux[]);
 
-void BC2(const int* maxmx, const int* maxmy, const int* meqn,
-          const int* mbc, const int* mx, const int* my,
+void SRC2(const int* meqn,
+          const int* mbc, const int* mx,const int* my,
           const double* xlower, const double* ylower,
-          const double* dx, const double* dy, const double q[],
-          const int* maux, const double aux[], const double* t,
-          const double* dt, const int mthbc[]);
-
-
-void B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
-              const int* mx, const int* my, const int* meqn,
-              double q[], const double* xlower, const double* ylower,
-              const double* dx, const double* dy,
-              const double* t, const double* dt,
-              const int* maux, double aux[]);
-
-void SRC2(const int* maxmx, const int* maxmy, const int* meqn,
-           const int* mbc, const int* mx,const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy, double q[],
-           const int* maux, double aux[], const double* t,
-           const double* dt);
+          const double* dx, const double* dy, double q[],
+          const int* maux, double aux[], const double* t,
+          const double* dt);
 
 /* Riemann solvers */
-void RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-           const int* mbc,const int* mx, double ql[], double qr[],
-           double auxl[], double auxr[], double wave[],
-           double s[], double amdq[], double apdq[]);
+void RPN2(const int* ixy,const int* maxm, const int* meqn,
+          const int* mwaves, const int* maux, 
+          const int* mbc,const int* mx,
+          double ql[], double qr[], double auxl[], double auxr[],
+          double wave[], double s[],double amdq[], double apdq[]);
 
-void RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-           const int* mbc, const int* mx, double ql[], double qr[],
-           double aux1[], double aux2[], double aux3[], const int* imp,
-           double dsdq[], double bmasdq[], double bpasdq[]);
+void RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
+          const int* mwaves, const int* maux, const int* mbc,const int* mx,
+          double ql[], double qr[], double aux1[], double aux2[],
+          double aux3[],  double asdq[],
+          double bmasdq[], double bpasdq[]);
 
 /* --------------------------------------------------------------------
    Time stepping
    -------------------------------------------------------------------- */
+/*
 #define CLAWPACK5_STEP2_WRAP FCLAW_F77_FUNC(clawpack5_step2_wrap,CLAWPACK5_STEP2_WRAP)
 void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int method[], const int mthlim[],
@@ -217,7 +217,7 @@ void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             fc2d_clawpack5_rpn2_t rpn2,
                             fc2d_clawpack5_rpt2_t rpt2,
                             fc2d_clawpack5_flux2_t flux2,
-                            int block_corner_count[],int* ierror);
+                            int block_corner_count[],int* ierror);*/
 
 #define CLAWPACK5_FLUX2 FCLAW_F77_FUNC(clawpack5_flux2,CLAWPACK5_FLUX2)
 void CLAWPACK5_FLUX2(const int* ixy,const int* maxm, const int* meqn,
@@ -225,13 +225,11 @@ void CLAWPACK5_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       double q1d[], double dtdx1d[],
                       double aux1[], double aux2[], double aux3[],
                       double faddm[],double faddp[], double gaddm[],
-                      double gaddp[],double cfl1d[], double fwave[],
+                      double gaddp[],double cfl1d[], double wave[],
                       double s[], double amdq[],double apdq[],double cqxx[],
                       double bmasdq[], double bpasdq[],
-                      fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2,
-                      const int* mwaves, const int* mcapa,
-                      int method[], int mthlim[]);
-
+                      fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2);
+/*
 #define CLAWPACK5_FLUX2FW FCLAW_F77_FUNC(clawpack5_flux2fw,CLAWPACK5_FLUX2FW)
 void CLAWPACK5_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         const int* maux,const int* mbc,const int* mx,
@@ -243,7 +241,7 @@ void CLAWPACK5_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         double bmasdq[], double bpasdq[],
                         fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2,
                         const int* mwaves, const int* mcapa,
-                        int method[], int mthlim[]);
+                        int method[], int mthlim[]);*/
 
 #define CLAWPACK5_SET_CAPACITY FCLAW_F77_FUNC(clawpack5_set_capacity,CLAWPACK5_SET_CAPACITY)
 void CLAWPACK5_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
@@ -274,7 +272,7 @@ void fc2d_clawpack5_register_vtable (fclaw_package_container_t *
    New routines
    ------------------------------------------------------------------------- */
 void fc2d_clawpack5_define_auxarray(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t* this_patch);
+                                    fclaw2d_patch_t* this_patch);
 
 void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,

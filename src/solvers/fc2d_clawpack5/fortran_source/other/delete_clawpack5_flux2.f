@@ -2,7 +2,7 @@ c
 c
 c     =====================================================
       subroutine clawpack5_flux2(ixy,maxm,meqn,maux,mbc,mx,
-     &      q1d,dtdx1d,aux1,aux2,aux3, faddm,faddp,gaddm,gaddp,
+     &      q1d,dtdx1d,aux1,aux2,aux3,faddm,faddp,gaddm,gaddp,
      &      cfl1d,wave,s,amdq,apdq,cqxx,bmasdq,bpasdq,
      &      rpn2,rpt2,mwaves,mcapa,method,mthlim)
 c     =====================================================
