@@ -199,12 +199,16 @@ fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
                                                               const char *configfile)
 {
     fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
 
     clawpkg = FCLAW_ALLOC (fc2d_clawpack5_package_t, 1);
     fclaw_app_options_register (app, "clawpack5", configfile,
                                 &clawpack5_options_vtable, clawpkg);
+    clawopt = &clawpkg->clawopt;
+    SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
+                   clawopt->mthlim, clawopt->method);
     return &clawpkg->clawopt;
 }
 

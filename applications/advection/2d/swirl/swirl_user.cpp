@@ -112,7 +112,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
     */
     maxmx = mx;
     maxmy = my;
-    QINIT(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+    QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 }
 
 

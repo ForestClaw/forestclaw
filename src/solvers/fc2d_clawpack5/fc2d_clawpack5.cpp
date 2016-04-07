@@ -514,7 +514,7 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     FCLAW_ASSERT(ierror == 0);
     */
     CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-                    fp, fm, gp, gm, classic_vt.rpn2, classic_vt.rpt2,flux2);
+                    fp, fm, gp, gm, classic_vt.rpn2, classic_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
     if (classic_vt.fluxfun != NULL)
     {

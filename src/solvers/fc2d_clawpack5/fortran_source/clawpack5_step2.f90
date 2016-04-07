@@ -160,4 +160,4 @@ subroutine clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm
     enddo
 
 
-end subroutine step2
+end subroutine clawpack5_step2

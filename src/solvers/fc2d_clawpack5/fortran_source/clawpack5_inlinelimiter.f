@@ -1,7 +1,8 @@
 c
 c
 c     =====================================================
-      subroutine clawpack5_inlinelimiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
+      subroutine clawpack5_inlinelimiter(maxm,meqn,mwaves,mbc,
+     &      mx,wave,s,mthlim)
 c     =====================================================
 c
 c     # Apply a limiter to the waves.  
