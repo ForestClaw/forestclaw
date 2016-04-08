@@ -1,13 +1,14 @@
 c     # ----------------------------------------------------------
-c     # Exchange routines - (i,j,mq) ordering
+c     # Exchange routines - (mq,i,j) ordering
 c     # ----------------------------------------------------------
 c     # exchange_face_ghost
 c     # exchange_corner_ghost
+c     # exchange_phys_corner_ghost
 c     # ----------------------------------------------------------
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine exchange_face_ghost(mx,my,mbc,meqn,qthis,
+      subroutine fclaw2d_fort_exchange_face_ghost(mx,my,mbc,meqn,qthis,
      &      qneighbor,iface,transform_ptr)
       implicit none
 
@@ -23,10 +24,10 @@ c     # Exchange edge ghost data with neighboring grid at same level.
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
-      if (idir .eq. 0) then
-         do j = 1,my
-            do ibc = 1,mbc
-               do mq = 1,meqn
+      do mq = 1,meqn
+         if (idir .eq. 0) then
+            do j = 1,my
+               do ibc = 1,mbc
 c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0)
                   if (iface .eq. 0) then
@@ -42,11 +43,9 @@ c                 # x-direction (idir == 0)
 
                enddo
             enddo
-         enddo
-      else
-         do i = 1,mx
+         else
             do jbc = 1,mbc
-               do mq = 1,meqn
+               do i = 1,mx
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
                   if (iface .eq. 2) then
@@ -62,12 +61,12 @@ c                 # y-direction (idir == 1)
 
                enddo
             enddo
-         enddo
-      endif
+         endif
+      enddo
       end
 
 
-      subroutine exchange_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_exchange_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
@@ -108,7 +107,7 @@ c              # can now be dropped in.
       end
 
 
-      subroutine exchange_phys_corner_ghost(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_exchange_phys_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, icorner, iface)
       implicit none
 

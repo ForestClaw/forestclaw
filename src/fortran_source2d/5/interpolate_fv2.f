@@ -313,7 +313,7 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
             iff = i2(0) + df(1,m)
             jff = j2(0) + df(2,m)
             value = qc + gradx*shiftx(m) + grady*shifty(m)
-            qfine(mq,   iff,jff) = value
+            qfine(mq,iff,jff) = value
          enddo
 
       enddo
