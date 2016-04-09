@@ -12,7 +12,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_mpi.h \
 	src/fclaw_math.h \
 	src/forestclaw2d.h \
-	src/fortran_source2d/5/metric_terms2.i \
+	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
 	src/ClawPatch.hpp \
 	src/fclaw2d_advance.hpp \
@@ -133,7 +133,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
-	src/fortran_source2d/philim.f \
+	src/fortran_source2d/philim.f 
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d

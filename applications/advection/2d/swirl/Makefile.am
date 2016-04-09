@@ -13,8 +13,8 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/psi.f \
 	applications/advection/2d/swirl/user_5.0/tag4refinement.f \
 	applications/advection/2d/swirl/user_5.0/bc2.f \
-	applications/advection/2d/swirl/user_5.0/rpn2ad1.f \
-	applications/advection/2d/swirl/user_5.0/rpt2ad1.f \
+	applications/advection/2d/swirl/user_5.0/rpn2_vc_advection.f90 \
+	applications/advection/2d/swirl/user_5.0/rpt2_vc_advection.f90 \
 	applications/advection/2d/swirl/user_5.0/qinit.f \
 	applications/advection/2d/swirl/user_5.0/b4step2.f \
 	applications/advection/2d/swirl/user_5.0/setaux.f \

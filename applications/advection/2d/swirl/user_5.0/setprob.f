@@ -1,20 +1,25 @@
       subroutine setprob
-      implicit none
+      implicit double precision (a-h,o-z)
+      character(len=25) fname
 
-      double precision pi, tperiod, pi2
-
-      common /compi/ pi
+      common /compsi/ pi
       common /comvt/ tperiod,pi2
 
-c      open(unit=7,file='setprob.data')
-c      read(7,*) tperiod
-c      close(7)
-      tperiod = 4.d0
-
-      call set_maptype_cart()
-
-      pi = 4.d0*atan(1.d0)
+c
+c     # compute pi, used in psi.f
+      pi = 4.d0 * datan(1.d0)
+c
+c     # save 2*pi and tperiod in common block for use in b4step2:
+c
       pi2 = 2.d0*pi
+c
+      iunit = 7
+c      fname = 'setprob.data'
+c     # open the unit with new routine from Clawpack 4.4 to skip over
+c     # comment lines starting with #:
+c      call opendatafile(iunit, fname)
 
+c      read(7,*) tperiod
 
+      return
       end
