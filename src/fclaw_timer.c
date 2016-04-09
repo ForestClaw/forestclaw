@@ -103,7 +103,6 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, DIAGNOSTICS_COMM);
     FCLAW2D_STATS_SET (stats, ddata, CFL_COMM);
     FCLAW2D_STATS_SET (stats, ddata, WALLTIME);
-    FCLAW2D_STATS_SET (stats, ddata, ADVANCE_STEPS_COUNTER);
     FCLAW2D_STATS_SET (stats, ddata, REGRID_BUILD);
     FCLAW2D_STATS_SET (stats, ddata, REGRID_TAGGING);
     FCLAW2D_STATS_SET (stats, ddata, PARTITION);
@@ -122,6 +121,14 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
     FCLAW2D_STATS_SET (stats, ddata, EXTRA3);
     FCLAW2D_STATS_SET (stats, ddata, EXTRA4);
 
+    int d = ddata->count_grids_per_proc;
+    ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
+
+    double gpp = ddata->count_grids_per_proc/       ddata->count_amr_advance;
+    double glb = ddata->count_grids_local_boundary/ ddata->count_amr_advance;
+    double grb = ddata->count_grids_remote_boundary/ddata->count_amr_advance;
+    double gint = gpp - glb;
+
     /* compute arithmetic mean of total advance steps per processor */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
                    ddata->count_single_step,"ADVANCE_STEPS_COUNTER");
@@ -133,15 +140,34 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                    1.0/ddata->count_single_step,"ADVANCE_STEPS_INV_HMEAN");
 
     /* Compute the arithmetic mean of grids per processor */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],
-                   ddata->count_grids_per_proc/ddata->count_amr_advance,"GRIDS_PER_PROC");
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],gpp,"GRIDS_PER_PROC");
 
     /* Compute the inverse harmonic mean of grids per processor  */
-    int d = ddata->count_grids_per_proc;
-    ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],
-                   1.0/(ddata->count_grids_per_proc/ddata->count_amr_advance),
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],1/gpp,
                    "GRIDS_PER_PROC_INV_HMEAN");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],glb,
+                   "GRIDS_LOCAL_BOUNDARY");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_INTERIOR],gint,
+                   "GRIDS_INTERIOR");
+
+    /* Ratio of grids on the local boundary to grids per proc */
+    glb = glb == 0 ? 1 : glb; /* This might happen in the 1-proc case. */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY_RATIO],gint/glb,
+                    "GRIDS_LOCAL_BOUNDARY_RATIO");
+
+    /* Compute the arithmetic mean of grids per processor */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],grb,
+                   "GRIDS_REMOTE_BOUNDARY");
+
+    /* Compute the arithmetic mean of grids per processor */
+    /* We might have zero processors on the remote boundary */
+    grb = grb == 0 ? 1 : grb;
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY_RATIO],gint/grb,
+                   "GRIDS_REMOTE_BOUNDARY_RATIO");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    ddata->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
@@ -183,21 +209,23 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                     stats, 1, 0);
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
-                          "regrid %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].average,
                           ddata->count_amr_regrid,
+                          ddata->count_amr_new_domain,
                           stats[FCLAW2D_TIMER_REGRID].average);
 
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
-                          "regrid %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", domain->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].max,
                           ddata->count_amr_regrid,
+                          ddata->count_amr_new_domain,
                           stats[FCLAW2D_TIMER_REGRID].max);
 
 #if 0

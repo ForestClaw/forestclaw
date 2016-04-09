@@ -291,6 +291,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
                              sync_time,
                              time_interp,
                              FCLAW2D_TIMER_REGRID);
+
+        ++ddata->count_amr_new_domain;
     }
     else
     {

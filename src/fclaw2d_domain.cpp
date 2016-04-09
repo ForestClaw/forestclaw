@@ -46,8 +46,11 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->count_amr_advance = 0;
     ddata->count_ghost_exchange = 0;
     ddata->count_amr_regrid = 0;
+    ddata->count_amr_new_domain = 0;
     ddata->count_multiproc_corner = 0;
     ddata->count_grids_per_proc = 0;
+    ddata->count_grids_remote_boundary = 0;
+    ddata->count_grids_local_boundary = 0;
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
     ddata->count_single_step = 0;
 
@@ -87,9 +90,12 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
     ddata_new->count_amr_advance = ddata_old->count_amr_advance;
     ddata_new->count_ghost_exchange = ddata_old->count_ghost_exchange;
     ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
+    ddata_new->count_amr_new_domain = ddata_old->count_amr_new_domain;
     ddata_new->count_multiproc_corner = ddata_old->count_multiproc_corner;
     ddata_new->count_single_step = ddata_old->count_single_step;
     ddata_new->count_grids_per_proc = ddata_old->count_grids_per_proc;
+    ddata_new->count_grids_remote_boundary = ddata_old->count_grids_remote_boundary;
+    ddata_new->count_grids_local_boundary = ddata_old->count_grids_local_boundary;
 
     ddata_new->curr_time = ddata_old->curr_time;
 

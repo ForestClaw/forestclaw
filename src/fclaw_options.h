@@ -194,7 +194,7 @@ struct amr_options
     double vtkspace; /**< between 0. and 1. to separate patches visually */
     int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
 
-    int noweightedp;            /**< Don't use weighted partition. */
+    int weighted_partition;            /**< Use weighted partition. */
 };
 
 #ifdef __cplusplus

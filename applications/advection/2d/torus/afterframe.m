@@ -4,7 +4,7 @@ global map isflat;
 
 alpha = 0.4;
 s = 1e-2;    
-if strcmp(map,'nomap')
+if strcmp(map,'nomap') || strcmp(map,'duplicate')
     axis([-1 1 -1 1]);
 else
     if strcmp(map,'cart')
@@ -17,6 +17,7 @@ else
     alim = alim + [-s s];
     axis([alim alim]);
     daspect([1 1 1]);
+    view(vtop)
 end
 
 yrbcolormap;
@@ -40,7 +41,7 @@ if (isflat)
     view(2);
 else
     hidepatchborders;
-    view(vtop);
+    view(3);
     % camlight;
     showpatchborders;
     hold on;

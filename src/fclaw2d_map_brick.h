@@ -34,6 +34,11 @@ extern "C"
 #endif
 #endif
 
+#define FCLAW2D_MAP_BRICK_GET_DIM FCLAW_F77_FUNC (fclaw2d_map_brick_get_dim, \
+                                                  FCLAW2D_MAP_BRICK_GET_DIM)
+
+void FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
+                               int *mi, int* mj);
 
 /* This is used for communicating with Matlab about the mapping */
 #define WRITE_BRICK_DATA FCLAW_F77_FUNC (write_brick_data,WRITE_BRICK_DATA)

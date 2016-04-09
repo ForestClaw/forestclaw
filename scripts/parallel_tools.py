@@ -4,6 +4,7 @@ import numpy as np
 from string import Template
 import re
 import ConfigParser
+import pdb
 
 def compare_runs(execname,rerun,iframe):
     import random
@@ -102,16 +103,30 @@ def write_ini_files(input_file='create_run.ini'):
         example = 0
 
     try:
-        mi0 = int(config.get('Problem','mi').partition('#')[0].strip())
-        mj0 = int(config.get('Problem','mj').partition('#')[0].strip())
+        mi0 = int(config.get('Run','mi').partition('#')[0].strip())
+        mj0 = int(config.get('Run','mj').partition('#')[0].strip())
     except:
         mi0 = 1
         mj0 = 1
 
+    # Duplicate problem
+    try:
+        d = config.get('Run','duplicate').partition('#')[0].strip()
+        duplicate  = d in ['T','True','1']
+    except:
+        duplicate = False
+
+    try:
+        d = config.get('Run','adapt_proc_count').partition('#')[0].strip()
+        adapt_proc_count  = d in ['T','True','1']
+        fix_grids_per_proc = int(config.get('Run','adapt_proc_count').partition('#')[0].strip())
+    except:
+        adapt_proc_count = False
+
+
 
     # Uniform or adaptive
     mode    = config.get('Run','mode').partition('#')[0].strip()
-
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -123,6 +138,21 @@ def write_ini_files(input_file='create_run.ini'):
     except:
         noweightedp = False
 
+
+    # Advance one step?
+    try:
+        ol = config.get('Run','advance-one-step').partition('#')[0].strip()
+        one_level = ol in ['T','True','1']
+    except:
+        one_level = False
+
+    # Use Maxlevel?
+    try:
+        ml = config.get('Run','outstyle-uses-maxlevel').partition('#')[0].strip()
+        use_maxlevel = ml in ['T','True','1']
+    except:
+        use_maxlevel = False
+
     # these should eventually go away ...
     scaling = 'strong'   # Get rid of these eventually?
     scale_uniform = False
@@ -133,11 +163,22 @@ def write_ini_files(input_file='create_run.ini'):
     proc0   = int(config.get('Run','proc').partition('#')[0].strip())
     tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
 
+    if duplicate:
+        tfinal0 = tfinal0/mi0
+
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
 
     if minlevel0 == maxlevel0:
         mode = 'uniform'
+
+    try:
+        # Set regrid here in case we want to regrid even in the
+        # uniform case
+        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
+    except:
+
+        regrid_interval = 1
 
 
     # ----------------------------------------
@@ -148,10 +189,17 @@ def write_ini_files(input_file='create_run.ini'):
     eff_res0 = mx0*mi0*2**minlevel0
     dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-    tol = 1e-15
-    nout0 = tfinal0/dt0
+    #if use_maxlevel:
+    #    dt0 = dt0/(2**(maxlevel0-minlevel0))
+
+    tol = 3e-15
+    if use_maxlevel:
+        nout0 = tfinal0/(dt0/(2**(maxlevel0-minlevel0)))
+    else:
+        nout0 = tfinal0/dt0
+
     if abs(nout0 - np.round(nout0)) > tol:
-        print "nout is not an integer; nout = %12.4f\n" % nout0
+        print "nout is not an integer; nout = %12.4e\n" % (nout0-np.round(nout0))
         sys.exit()
     nout0 = int(nout0)
 
@@ -175,7 +223,6 @@ def write_ini_files(input_file='create_run.ini'):
     # ----------------------------------------
 
     R = np.arange(0,njobs)
-    procs = proc0*4**R     # Key idea : Run on different processors
 
 
     mx       = np.empty(R.shape)
@@ -185,6 +232,8 @@ def write_ini_files(input_file='create_run.ini'):
     maxlevel = np.empty(R.shape)
     tfinal   = np.empty(R.shape)
     dt       = np.empty(R.shape)
+    mi       = np.empty(R.shape)
+    mj       = np.empty(R.shape)
 
 
     # These are fixed for all possible runs.
@@ -195,6 +244,9 @@ def write_ini_files(input_file='create_run.ini'):
     # minlevel is fixed
     minlevel.fill(minlevel0)
     maxlevel.fill(maxlevel0)
+
+    mi.fill(mi0)
+    mj.fill(mj0)
 
     # Run entire simulation, to get true measure of adaptivity
     tfinal.fill(tfinal0)
@@ -207,11 +259,23 @@ def write_ini_files(input_file='create_run.ini'):
         adapt_factor = np.ones(R.shape)
 
 
-    nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
-    num_grids = mi0*mj0*(2**maxlevel)**2  # Total number of uniform grids on all procs, all blocks
-    grids_per_proc = adapt_factor*mi0*mj0*(2**maxlevel)**2/procs
+    if adapt_proc_count:
+        G = num_grids_per_proc
+        procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
+    else:
+        procs = proc0*4**R     # Key idea : Run on different processors
 
-    num_advances = adapt_factor*nout_uniform*num_grids
+    print procs
+
+    nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
+    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
+    if not duplicate:
+        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+    else:
+        grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
+
+
+    num_advances = adapt_factor*nout_uniform*num_grids_total
     t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
     eff_res = mx*(2**maxlevel)*mi0
@@ -219,7 +283,7 @@ def write_ini_files(input_file='create_run.ini'):
     # ------------------------------------------
     # Start creating files.
     # ------------------------------------------
-    fmt_str_numeric = "# %6d %4d %7d %7d %6d %6d %12.4e %12.4e %8d %12d %8.1f"
+    fmt_str_numeric = "# %6d %4d %7d %7d %6d %6d %12.8g %12.8g %8d %12d %8.1f"
     fmt_str_header  = "# %6s %4s %7s %7s %6s %6s %12s %12s %8s %12s %8s"
     tuple_str = ('p','mx','minlev','maxlev','nout','nstep', 'dt','tfinal',
                  'eff_res','grids/proc','t')
@@ -255,7 +319,13 @@ def write_ini_files(input_file='create_run.ini'):
             print "Too few grids per proc. No more output files will be created."
             sys.exit()
 
-        prt_tuple = (p,mx[i],minlevel[i],maxlevel[i],nout[i],nstep[i],dt[i],
+        if duplicate:
+            level_inc = (np.log(float(mi0))/np.log(float(2.0))).astype(int)
+        else:
+            level_inc = 0
+
+        prt_tuple = (p,mx[i],minlevel[i]+level_inc,maxlevel[i]+level_inc,
+                     nout[i],nstep[i],dt[i],
                      tfinal[i],eff_res[i], grids_per_proc[i],t[i])
 
         # Print to console and jobs file
@@ -282,17 +352,15 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("    minlevel = %d\n" % minlevel[i])
         ini_file.write("    maxlevel = %d\n" % maxlevel[i])
 
-        if minlevel[i] == maxlevel[i]:
-            ini_file.write("    regrid_interval = 0\n")
-        else:
-            ini_file.write("    regrid_interval = 1\n")
+        ini_file.write("    regrid_interval = %d\n" % regrid_interval)
+        if regrid_interval > 0:
             ini_file.write("    smooth-refine = T\n")
             ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
 
         ini_file.write("\n")
-        ini_file.write("    tfinal = %12.4f\n" % tfinal[i])
+        ini_file.write("    tfinal = %16.8e\n" % tfinal[i])
         ini_file.write("    use_fixed_dt = T\n")
-        ini_file.write("    initial_dt = %16.8e\n" % dt[i])
+        ini_file.write("    initial_dt = %20.16e\n" % dt[i])
         ini_file.write("\n")
         ini_file.write("    outstyle = 3\n")
         ini_file.write("    nout = %d\n" % nout[i])
@@ -302,12 +370,23 @@ def write_ini_files(input_file='create_run.ini'):
                 ini_file.write("    subcycle = T\n")
             else:
                 ini_file.write("    subcycle = F\n")
+
+            if one_level:
+                ini_file.write("    advance-one-level = T\n");
+            else:
+                ini_file.write("    advance-one-step = F\n")
+
+            if use_maxlevel:
+                ini_file.write("    outstyle-uses-maxlevel = T\n");
+            else:
+                ini_file.write("    outstyle-uses-maxlevel = F\n")
+
         else:
             ini_file.write("    subcycle = F\n")
 
 
-        ini_file.write("    advance-one-step = F\n")
-        ini_file.write("    outstyle-uses-maxlevel = F\n")
+
+
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
@@ -332,6 +411,11 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("    trapfpe = F\n")
         ini_file.write("    mpi_debug = F\n")
         ini_file.write("\n")
+
+        ini_file.write("# Mapping options\n")
+        ini_file.write("    mi = %d\n" % (mi[i]))
+        ini_file.write("    mj = %d\n" % (mj[i]))
+
 
         ini_file.close()
 
@@ -368,9 +452,9 @@ def write_ini_files(input_file='create_run.ini'):
             proc_file.write("#@ queue\n")
             proc_file.write("\n")
             proc_file.write(("runjob --ranks-per-node %d --np %d : " \
-                             + "/homec/hbn26/hbn263/projects/forestclaw-build-alt/local/bin/torus " \
+                             + "/homec/hbn26/hbn263/projects/forestclaw-build-alt/local/bin/%s " \
                              + "--inifile=ex_%05d.ini\n") %
-                            (np.min([32,p]),p,p))
+                            (np.min([32,p]),p,execname,p))
             proc_file.close()
 
         elif scheduler == 'pbs':
@@ -453,13 +537,13 @@ def write_ini_files(input_file='create_run.ini'):
     jobfile.write(header_line)
     jobfile.write("\n")
     jobfile.write("# Estimated core-h (hours) : %6.2f (%4.2f%%)" % \
-                  (cpu_hours,100*cpu_hours/350000.0))
+                  (cpu_hours,100*cpu_hours/3500000.0))
     jobfile.write("\n\n");
 
     filein.write(header_line)
     filein.write("\n")
     filein.write("# Estimated core-h (hours) : %6.2f (%4.2f%%)" % \
-                  (cpu_hours,100*cpu_hours/350000.0))
+                  (cpu_hours,100*cpu_hours/3500000.0))
     filein.write("\n\n")
     filein.close()
 
@@ -503,34 +587,88 @@ def launch_jobs(N=1):
         po = subprocess.call(['bash','jobs.sh'])
 
 def compile_results(results_dir=None,results_file='results.out',
-                    execname=None):
+                    execname=None,duplicate=False):
 
     if results_dir == None:
         results_dir = os.getcwd()
 
     # Stuff to grep for
-    stats_list = [ 'INIT',
-                   'ADVANCE$',
-                   'GHOSTFILL$',
-                   'REGRID$',
-                   'GHOSTPATCH_COMM',
-                   'ADAPT_COMM',
-                   'PARTITION_COMM',
-                   'CFL_COMM',
-                   'WALLTIME',
-                   'ADVANCE_STEPS_COUNTER',
-                   'GRIDS_PER_PROC']
+    stats_list_float = [ 'INIT',
+                         'ADVANCE$',
+                         'GHOSTFILL$',
+                         'REGRID$',
+                         'GHOSTPATCH_COMM',
+                         'ADAPT_COMM',
+                         'PARTITION_COMM',
+                         'CFL_COMM',
+                         'WALLTIME',
+                         'GHOSTFILL_COPY',
+                         'LOCAL',
+                         'COMM',
+                         'PARTITION',
+                         'GHOSTFILL_STEP1',
+                         'GHOSTFILL_STEP2',
+                         'GHOSTFILL_STEP3',
+                         'LOCAL_BOUNDARY_RATIO',
+                         'REMOTE_BOUNDARY_RATIO']
+
+    stats_list_int = ['ADVANCE_STEPS_COUNTER$',
+                      'GRIDS_PER_PROC$',
+                      'LOCAL_BOUNDARY',
+                      'REMOTE_BOUNDARY',
+                      'INTERIOR']
+
+    # ------------------------------
+    # Options : Variable field width
+    # ------------------------------
+    option_list = {'jobid'  :('jobid', '{jobid[0]:>6s}',   '{:>6d}'),
+                   'p'      :('p',     '{p[0]:>8s}',       '{:>8d}'),
+                   'mx'     :('mx',    '{mx[0]:>6s}',      '{:>6d}'),
+                   'mi'     :('mi',    '{mi[0]:>4s}',      '{:>4d}'),
+                   'mj'     :('mj',    '{mj[0]:>4s}',      '{:>4d}'),
+                   'min'    :('min',   '{min[0]:>6s}',     '{:>6d}'),
+                   'max'    :('max',   '{max[0]:>6s}',     '{:>6d}'),
+                   'nout'   :('nout',  '{nout[0]:>8s}',    '{:>8d}'),
+                   'tfinal' :('tfinal','{tfinal[0]:>12s}', '{:>12.2e}')}
+
+
+    option_list_header = "{jobid[1]:>6s}{p[1]:>8s}{mx[1]:>6s}{mi[1]:>4s}{mj[1]:>4s}" + \
+                         "{min[1]:>6s}{max[1]:>6s}{nout[1]:>8s}{tfinal[1]:>12s}"
+    option_fmt_header = option_list_header.format(**option_list)  # Process names
+
+    option_str_header = option_fmt_header.format(**option_list)
+    option_width = 60     # add up all fields widths, i.e. 6+8+6+4+... = 60
+
+    # ---------------------
+    # Ints : Field width 12
+    # ---------------------
+    int_list = ('adv.steps','grids/proc','local bdry','remote bdry','interior')
+    int_width = 12*len(int_list)
+    int_str = ("{:>12s}"*len(int_list)).format(*int_list)
+
+    # -----------------------
+    # Floats : Field width 12
+    # -----------------------
+    float_list = ('init','advance','ghostfill','regrid','patch_comm',
+                  'adapt','partition','cfl','walltime',
+                  'gf_copy','local','comm','partition','step1',
+                  'step2','step3', 'l. ratio','r. ratio')
+    float_width = 12*len(float_list)
+    float_str = ("{:>12s}"*len(float_list)).format(*float_list)
+
 
     # Compile data to this file
-    resultsfile = open(results_file,'w')
-    resultsfile.write("# " + "-"*172)
-    resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
-                              'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
-                              'partition','cfl','wall','adv._steps','grids_per_proc'))
+    line_len = option_width + int_width + float_width
+    header_str = option_str_header + int_str + float_str
 
-    resultsfile.write("# " + "-"*172)
+    # Write out header to file
+    resultsfile = open(results_file,'w')
+    resultsfile.write("# " + "-"*line_len)
+    resultsfile.write("\n")
+
+    resultsfile.write("# " + header_str + "\n")
+
+    resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
 
     # Look for files that look like "torus_00004.o4567".  But if execname is
@@ -564,7 +702,8 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # jobid
             resultsfile.write("  ")   # Make up for "# " added as comments above
-            resultsfile.write("%6d" % jobid)
+            s = "{jobid[2]:s}".format(**option_list)
+            resultsfile.write(s.format(jobid))
 
             # proc count
             resultsfile.write("%8d" % pcount)
@@ -576,23 +715,57 @@ def compile_results(results_dir=None,results_file='results.out',
                 if re.search("mx",l):
                     l1 = lines[i].split()
                     mx = int(l1[2])
-                    resultsfile.write("%6s" % l1[2])
+                    s = "{mx[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(mx))
                     break
+
+            # mi (look for something distinctive;  count down from there)
+            mi = 1
+            mj = 1
+            for i,l in enumerate(lines):
+                if re.search("ghost_patch_pack_area",l):
+                    if not re.search("mi",lines[i+1]):
+                        print "Brick count mi not found in %s; setting mi=1" % f
+                        mi = 1
+                    else:
+                        mi_line = lines[i+1].split()
+                        mi = int(mi_line[2])
+                    if not re.search("mj",lines[i+2]):
+                        print "Brick count mj not found in %s; setting mj=1" % f
+                        mj = 1
+                    else:
+                        mj_line = lines[i+2].split()
+                        mj = int(mj_line[2])
+
+                    s = "{mi[2]:s}{mj[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(mi,mj))
+                    break
+                    # print "mi = %d; mj = %d" %(mi,mj)
 
             # minlevel
             for i,l in enumerate(lines):
                 if re.search("minlevel",l):
                     l1 = lines[i].split()
-                    minlevel = int(l1[2])
-                    resultsfile.write("%6s" % l1[2])
+                    if duplicate:
+                        minlevel = int(l1[2]) + np.log(float(mi))/np.log(2.0)
+                    else:
+                        minlevel = int(l1[2])
+
+                    s = "{min[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(minlevel)))
                     break
 
             # maxlevel
             for i,l in enumerate(lines):
                 if re.search("maxlevel",l):
                     l1 = lines[i].split()
-                    maxlevel = int(l1[2])
-                    resultsfile.write("%6s" % l1[2])
+                    if duplicate:
+                        maxlevel = int(l1[2]) + np.log(float(mi))/np.log(2.0)
+                    else:
+                        maxlevel = int(l1[2])
+
+                    s = "{max[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(maxlevel)))
                     break
 
             # nout
@@ -600,26 +773,49 @@ def compile_results(results_dir=None,results_file='results.out',
                 if re.search("nout",l):
                     l1 = lines[i].split()
                     nout = int(l1[2])
-                    resultsfile.write("%8s" % l1[2])
+                    s = "{nout[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(int(l1[2])))
                     break
 
             # tfinal
             for i,l in enumerate(lines):
                 if re.search("tfinal",l):
                     l1 = lines[i].split()
-                    resultsfile.write("%12.2e" % float(l1[2]))
+                    tfinal = float(l1[2])
+                    s = "{tfinal[2]:s}".format(**option_list)
+                    resultsfile.write(s.format(float(l1[2])))
                     break
 
-            # Get everything else in list
-            for k,w in enumerate(stats_list):
+
+            # Get counter values
+            for k,w in enumerate(stats_list_int):
+                found = False
                 for i,l in enumerate(lines):
                     if re.search(w,l):
                         a = i
+                        found = True
                         break
-                try:
+
+                if found:
+                    l2 = lines[a+2].split()
+                    resultsfile.write("%12d" % np.round(float(l2[5])).astype(int))
+                else:
+                    print "%s in file %s not found" % (w,f)
+                    resultsfile.write("%12f" % (np.nan))
+
+            # Get timer values
+            for k,w in enumerate(stats_list_float):
+                found = False
+                for i,l in enumerate(lines):
+                    if re.search(w,l):
+                        a = i
+                        found = True
+                        break
+
+                if found:
                     l2 = lines[a+2].split()
                     resultsfile.write("%12.4e" % float(l2[5]))
-                except:
+                else:
                     print "%s in file %s not found" % (w,f)
                     resultsfile.write("%12f" % (np.nan))
 
@@ -663,6 +859,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
         else:
             d = os.path.join(results_dir,subdir)
 
+
         files = os.listdir(d)
         for f in files:
             if re.match(pattern,f):
@@ -686,9 +883,9 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     mx1.extend(data[:,1])
                     levels1.extend(data[:,3])
                 else:
-                    procs1.extend(data[:,1])
-                    mx1.extend(data[:,2])
-                    levels1.extend(data[:,4])
+                    procs1.extend(data[:,1])    # Must be updated if results file is changed
+                    mx1.extend(data[:,2])       # Check below
+                    levels1.extend(data[:,6])   # Check  below
 
 
     t = zip(mx1,procs1,levels1)  # All possible combos
@@ -703,6 +900,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
         jobs[m] = dict.fromkeys(procs)
         for p in procs:
             jobs[m][p] = dict.fromkeys(levels)
+
 
     # Initialize dictionaries for all values
     for results_dir in dirs:
@@ -727,6 +925,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     continue
 
                 data = np.loadtxt(rf)
+
                 if data.ndim == 1:
                     data = np.reshape(data,(-1,len(data)))
 
@@ -754,40 +953,65 @@ def read_results_files(dir_list, subdir = None, results_in = None,
 
                     else:
                         p = row[1]
-                        m = row[2]
-                        l = row[4]
+                        m = row[2]    # Index of mx in data array
+                        l = row[6]    # Index of maxlevel
+
+                        if len(row) < 32:
+                            print "read_results_file (parallel_tools.py)"
+                            print "Length of row from %s is incorrect" %(rf)
+                            print "It should be 32 instead of %d" % (len(row))
+                            sys.exit()
+
 
                         job = {}
                         job["rundir"]          = rundir
                         job["jobid"]           = row[0]
                         job["procs"]           = row[1]
-                        job["mx"]              = row[2]
-                        job["minlevel"]        = row[3]
-                        job["maxlevel"]        = row[4]
-                        job["nout"]            = row[5]
-                        job["tfinal"]          = row[6]
-                        job["init"]            = row[7]
-                        job["advance"]         = row[8]
-                        job["ghostfill"]       = row[9]
-                        job["regrid"]          = row[10]
-                        job["ghostpatch_comm"] = row[11]
-                        job["adapt_comm"]      = row[12]
-                        job["partition_comm"]  = row[13]
-                        job["cfl_comm"]        = row[14]
-                        job["walltime"]        = row[15]
-                        job["advance_steps"]   = row[16]
-                        job["grids_per_proc"]  = row[17]
+                        job["mx"]              = row[2]   # Used above in computing m
+                        job["mi"]              = row[3]
+                        job["mj"]              = row[4]
+                        job["minlevel"]        = row[5]
+                        job["maxlevel"]        = row[6]   # Used above in computing l
+                        job["nout"]            = row[7]
+                        job["tfinal"]          = row[8]
+                        job["advance_steps"]   = row[9]
+                        job["grids_per_proc"]  = row[10]
+                        if job["grids_per_proc"] == 0:    # avoid log(0)
+                            job["grids_per_proc"] = 0.1
+
+                        job["local_boundary"]  = row[11]
+                        job["remote_boundary"] = row[12]
+                        job["interior"]        = row[13]
+                        job["init"]            = row[14]
+                        job["advance"]         = row[15]
+                        job["ghostfill"]       = row[16]
+                        job["regrid"]          = row[17]
+                        job["ghostpatch_comm"] = row[18]
+                        job["adapt_comm"]      = row[19]
+                        job["partition_comm"]  = row[20]
+                        job["cfl_comm"]        = row[21]
+                        job["walltime"]        = row[22]
+                        job["ghostfill_copy"]  = row[23]
+                        job["local"]           = row[24]
+                        job["comm"]            = row[25]
+                        job["partition"]       = row[26]
+                        job["step1"]           = row[27]
+                        job["step2"]           = row[28]
+                        job["step3"]           = row[29]
+                        job["local_ratio"]     = row[30]
+                        job["remote_ratio"]    = row[31]
+
 
                     jobs[m][p][l] = job
 
     return jobs
 
-def print_jobs(jobs,val2plot):
+def print_jobs(jobs,val2plot,fmt_int=False):
 
     mx = sorted(jobs.keys())
 
     int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'advance_steps',
-                'rundir']
+                'rundir','mi','mj']
 
     for m in mx:
         procs = sorted(jobs[m].keys())
@@ -816,16 +1040,15 @@ def print_jobs(jobs,val2plot):
                         d = job[val2plot]
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
+                        pdb.set_trace()
                         sys.exit()
-                    else:
-                        fmt_int = val2plot in int_list
                 else:
                     import types
                     if isinstance(val2plot,types.FunctionType):
                         try:
                             d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
                         except:
-                            print "print_jobs : Problem with function 'val2plot'"
+                            print "print_jobs : Problem with function %s" % (val2plot.__name__)
                             sys.exit()
 
 
@@ -843,23 +1066,24 @@ def print_jobs(jobs,val2plot):
         # Header
         print ""
         print val2plot
-        linelen = 8 + 3 + 12*len(levels)
+        linelen = 8 + 3 + 13*len(levels)
         line = "-"*linelen
         print line
         mxstr = "mx = %d" % m
+
         # header_format = "{mxstr:>8}" + "{sep:>3}" + "{:>12d}" * len(levels)
         # print header_format.format(mxstr = mxstr, sep="|",*header_data)
 
         s = '{mxstr:>8}'.format(mxstr=mxstr) + '{sep:>3}'.format(sep='|')
         for t in header_data:
-            s = s +  '{level:>7d} ({rundir:2d})'.format(level=t[0],rundir=t[1])
+            s = s +  '{level:>7d} ({rundir:3d})'.format(level=t[0],rundir=t[1])
         print s
         print line
         # Format integer and float values separately
         if (val2plot in int_list) or fmt_int:
-            row_format = "{:>8d}" + "{sep:>3}" + "{:>12.0f}"*len(levels)
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>13.0f}"*len(levels)
         else:
-            row_format = "{:>8d}" + "{sep:>3}" + "{:>12.2e}"*len(levels)
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>13.2e}"*len(levels)
         for p, d in zip(procs, data):
             print row_format.format(int(p), sep="|", *d)
 
@@ -868,10 +1092,21 @@ def print_jobs(jobs,val2plot):
 
 def plot_results(jobs,start_point,val2plot='walltime',
                  scaling='strong',scale_uniform=False,
-                 efficiency=False):
+                 ideal_slope = True,efficiency=False,
+                 scatter=False,model='normal'):
 
     import matplotlib.pyplot as plt
+    import matplotlib.ticker as ticker
     from matplotlib.lines import Line2D
+
+    import seaborn.apionly as sns
+
+    ax = plt.gca()
+    # Or we can set the colormap explicitly.
+    cmap = sns.color_palette("Set1",10)
+    cm = [cmap[i] for i in [0,5,1,4,2,7,3]]
+    ax.set_color_cycle(cm)
+
 
     markers = {}
     markers["walltime"] = r'$\clubsuit$'
@@ -882,7 +1117,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     markers["advance_steps"] = u'o'
     markers["cfl_comm"] = u'p'
 
-    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
+    # colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
 
     mx = sorted(jobs.keys())
     ph = []
@@ -891,11 +1126,21 @@ def plot_results(jobs,start_point,val2plot='walltime',
     # each start point generates a plot, either down a column (strong), across a
     # diagonal (weak) or from back to front (block size comparison)
     tlist = []
+    gpplist = []
+    ylist = []
+    proclist = []
     for i,sp in enumerate(start_point):
         m = sp[0]
         p = sp[1]
         l = sp[2]
-        job = jobs[m][p][l]
+        try:
+            job = jobs[m][p][l]
+        except:
+            print "Job entry not found;  m = %d; p = %d; l = %d" % (m,p,l)
+            import pdb
+            pdb.set_trace()
+            job = None
+
 
         # "headers" for this mx table
         procs = sorted(jobs[m].keys())
@@ -921,58 +1166,108 @@ def plot_results(jobs,start_point,val2plot='walltime',
         t = zip(mx_sub,procs_sub,levels_sub)
 
         # Internal plotting routine
-        phandle,mb = plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
-                                           scale_uniform,efficiency)
+        phandle,mb,gpp1,y_avg1,procs1 = plot_results_internal(val2plot,t,
+                                                              jobs,scaling,markers,
+                                                              scale_uniform,efficiency,
+                                                              ideal_slope,
+                                                              scatter)
 
-        phandle.set_color(colors[i])
+        # phandle.set_color(colors[i])
         plt.draw()
         ph.append(phandle)
         mb_data.append(mb)
 
         tlist.extend(t)
+        gpplist.extend(gpp1)
+        ylist.extend(y_avg1)
+        proclist.extend(procs1)
 
     # Set up axis
     ax = plt.gca()
     ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%d'))
 
+    A = None
+    B = None
+    alpha = None
 
-    if scaling == 'resolution':
-        levels = list(set([x[2] for x in tlist]))
-        ax.xaxis.set_major_locator(plt.FixedLocator(levels))
-        ax.set_xlabel("Levels",fontsize=16)
-        l1 = np.min(levels)
-        l2 = np.max(levels)
-        plt.xlim([l1-0.5,l2+0.5])
+    if scatter:
+        plt.xscale('log')
+        plt.xlim([2**(-0.5),1e4])
+        xticks = ticker.MultipleLocator(base=10)
+        xticks = ticker.MaxNLocator(nbins=7)
+        ax.xaxis.set_minor_locator(xticks)
+
+        xformatter = ticker.FormatStrFormatter('%d')
+        ax.xaxis.set_major_formatter(xformatter)
+        ax.set_xlabel("Grids per processor",fontsize=16)
+
+        yformatter = ticker.FormatStrFormatter('%5.2e')
+        ax.yaxis.set_major_formatter(yformatter)
+        ax.set_ylabel("Cost per grid",fontsize=16)
+
+        if len(gpplist) > 1:
+            gpp = np.array(gpplist)
+            y = np.array(ylist)
+            z = zip(gpp,y,proclist)
+            gpp      = np.array([x[0] for x in z if x[0] > 1]).astype(int)
+            y        = np.array([x[1] for x in z if x[0] > 1])
+            proclist = np.array([x[2] for x in z if x[0] > 1]).astype(int)
+
+            z = zip(gpp,y,proclist)
+            gpp1 = np.array([t[0] for t in z if t[2] <= 16])
+            y1   = np.array([t[1] for t in z if t[2] <= 16])
+
+            if len(gpp1) > 2:
+                xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
+                ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
+                plt.plot(xs,ys,'k--')
+
+            gpp2 = np.array([t[0] for t in z if t[2] > 16])
+            y2   = np.array([t[1] for t in z if t[2] > 16])
+            if len(gpp2) > 1:
+                xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
+                ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
+                plt.plot(xs,ys,'k-')
+
+            plt.draw()
 
     else:
-        ax.xaxis.set_major_locator(plt.FixedLocator(procs))
-        ax.set_xlabel("Processor count",fontsize=16)
-        p1 = np.log(np.min(procs))/np.log(4)
-        p2 = np.log(np.max(procs))/np.log(4)
-        plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
+        if scaling == 'resolution':
+            levels = list(set([x[2] for x in tlist]))
+            ax.xaxis.set_major_locator(plt.FixedLocator(levels))
+            ax.set_xlabel("Levels",fontsize=16)
+            l1 = np.min(levels)
+            l2 = np.max(levels)
+            plt.xlim([l1-0.5,l2+0.5])
 
-    if efficiency:
-        ax.set_yscale('linear')
-        plt.ylim([0,110])
-        plt.grid(b=True,which='major')
-        # plt.grid(b=True,which='minor')
-        # plt.minorticks_on()
+        else:
+            ax.xaxis.set_major_locator(plt.FixedLocator(procs))
+            ax.set_xlabel("Processor count",fontsize=16)
+            p1 = np.log(np.min(procs))/np.log(4)
+            p2 = np.log(np.max(procs))/np.log(4)
+            plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
 
+        if efficiency:
+            ax.set_yscale('linear')
+            ax.set_yticks(range(0,110,10),minor=True)
+            plt.grid(b=True,which='major')
+            plt.grid(b=True,which='minor',axis='y')
+            # plt.minorticks_on()
+            plt.ylim([0,110])
+
+    plt.grid(b=True,which='minor',axis='y')
+    plt.grid(b=True,which='major',axis='x')
     plt.setp(ax.get_xticklabels(),fontsize=14)
     plt.setp(ax.get_yticklabels(),fontsize=14)
 
-    if efficiency:
-        ax.set_ylabel("%s" % ("Percent (%)"),fontsize=16)
-    else:
-        ax.set_ylabel("%s" % ("time"),fontsize=16)
-
     plt.draw()
 
-    return ph,mb_data,t
+    return ph,mb,t,A,alpha,B
 
 
-def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
-                          scale_uniform=False,efficiency=False):
+def plot_results_internal(val2plot,t,jobs,scaling,markers,
+                          scale_uniform=False, efficiency=False,
+                          ideal_slope=None,scatter=False):
 
     import matplotlib.pyplot as plt
 
@@ -985,9 +1280,8 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
     # mode = 'uniform'
     ph = []
     mx = sorted(jobs.keys())
-    gpp_avg = []
     y_avg = []
-    grids_advanced =[]
+    gpp = []
 
     # First collect y values (which may need to be averaged)
     for idx_tuple in t:
@@ -998,6 +1292,7 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
         job = jobs[m][p][l]
         if job == None:
             y_avg = np.append(y_avg,np.nan)
+            gpp = np.append(gpp,np.nan)
             continue
 
         if isinstance(v,str):
@@ -1012,77 +1307,145 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,colors,
                 val,_ = v(job,mx=m,proc=p,level=l,all=jobs)
                 data = np.average(val)
             except:
-                print "plot_results_internal : Problem with function 'val2plot'"
+                print "plot_results_internal : Problem with function '%s'" % (val2plot.__name__)
                 sys.exit()
 
         y_avg = np.append(y_avg,data)
+        gpp = np.append(gpp,job["grids_per_proc"])
 
     if efficiency:
         y_avg = 100*y_avg/y_avg[0]
 
-
     # Plot ideal scaling
-    tp = zip([x[0] for x in t],[x[1] for x in t],[x[2] for x in t],y_avg)
+    tp = zip([x[0] for x in t],
+             [x[1] for x in t],
+             [x[2] for x in t],y_avg,gpp)
     mx     = [x[0] for x in tp if not np.isnan(x[3])]
-    procs  = [x[1] for x in tp if not np.isnan(x[3])]
-    levels = [x[2] for x in tp if not np.isnan(x[3])]
-    y_avg  = [x[3] for x in tp if not np.isnan(x[3])]
+    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
+    procs1  = [x[1] for x in tp if not np.isnan(x[3])]
+    y_avg1  = [x[3] for x in tp if not np.isnan(x[3])]
+    gpp1  = [x[4] for x in tp if not np.isnan(x[4])]
 
-    if scaling == 'weak':
-        # Ideal scaling is constant
-        ideal = [y_avg[0] for x in tp if not np.isnan(x[3])]  # Constant scaling
-        R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
-        ideal = y_avg[0]*2**(0*R)
-        plt.loglog(procs,ideal,'k.--',markersize=15)
-
-    elif scaling == 'strong':
-        if not efficiency:
-            # Ideal scaling should start at p = 16, not p=1
-            ideal = y_avg[0]*np.min(procs)/np.array(procs)
-            plt.loglog(procs,ideal,'k.--',markersize=15)
-        else:
-            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
-            ideal = y_avg[0]*2**(0*R)
-            plt.loglog(procs,ideal,'k-',linewidth=2)
-
-
-    elif scaling == 'resolution':
-        R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
-        ideal = y_avg[0]*R**0
-        plt.semilogy(levels,ideal,'k.--',markersize=15)
-
-
-    # get best-fit slope
     mb = None
-    if len(mx) > 1:
-        if scaling in ['strong','weak','superlinear']:
-            mb = np.polyfit(np.log(procs),np.log(y_avg),1)
 
-        elif scaling == 'resolution':
-            nsub = np.array(levels) - levels[0] + 1
-            pc = np.polyfit(nsub,np.log(y_avg),1)
-            mb = np.array(np.exp(pc))
-
-        elif scaling == 'block':
-            if v == 'time_per_grid':
-                mx = np.array([x[0] for x in t])
-                nsub = [i for i,te in enumerate(t)]
-                pc = np.polyfit(nsub,np.log(y_avg),1)
-                mb = np.array(np.exp(pc))
+    try:
+        if ideal_slope is not None:
+            if ideal_slope == 0:
+                s = 'k--'
+            else:
+                s = 'k.--'
+            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+            ideal = y_avg1[0]*2**(ideal_slope*R)
+            if scaling is not  'resolution':
+                plt.loglog(procs1,ideal,s,markersize=15)
+            else:
+                plt.semilogy(levels1,ideal,s,markersize=15)
+    except:
+        print "plot_results_internal: Could not plot ideal curve"
 
     try:
         mv = markers[v]
     except:
         mv = u'o'
 
-    if scaling in ['strong']:
-        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-    elif scaling == 'weak':
-        ph = plt.loglog(procs,y_avg,marker=mv,markersize=10)
-    elif scaling in 'resolution':
-        ph = plt.semilogy(levels,y_avg,marker=mv,markersize=10)
+    if not scatter:
+        # Here is where we finally plot the data
+        if scaling in ['strong','weak']:
+            ph = plt.loglog(procs1,y_avg1,marker=mv,markersize=10)
+        elif scaling in ['resolution']:
+            ph = plt.semilogy(levels1,y_avg1,marker=mv,markersize=10)
 
-    return ph[0],mb
+    else:
+        # Plot scatter of data
+        ph = plt.plot(gpp1,y_avg1,linestyle='',marker=mv,markersize=10,
+                      color='b')
+
+
+    return ph[0],mb,gpp1,y_avg1,procs1
+
+
+def scatter_fit(x,y,xs,model='normal'):
+    import scipy.optimize
+    # Fit data to a model
+    #
+    #  (normal) y = A*x^alpha + B
+    #  (invert) y = 1/(A*x^alpha + B)
+
+
+    Bmin = 1e-13
+    if model is 'normal':
+        y1 = y
+    else:
+        y1 = 1-y
+
+    Bmax = np.min(y1)
+
+
+    B_est = scipy.optimize.fminbound(f_nllsq_fminbnd,Bmin,Bmax,
+                                     args=(x,y1),
+                                     xtol=1e-13)
+
+    __,A,alpha = f_nllsq(B_est,x,y1)
+
+    yp = y1 - B_est
+    a = np.polyfit(np.log(x),np.log(yp),1)
+    p = np.polyval(a,np.log(xs))
+    ys = np.exp(p) + B_est
+
+    if model is 'invert':
+        ys = 1-ys
+
+    return ys,A,alpha,B_est
+
+
+
+def f_nllsq_fminbnd(B,*args):
+
+    fB,__,__ = f_nllsq(B,*args)
+
+    return fB
+
+def f_nllsq(B,*args):
+    import numpy.linalg as LA
+
+
+    x = args[0]
+    y = args[1]
+
+    yp = y - B
+    if np.min(yp) < 0:
+        ymin = np.min(yp)
+        yp = yp - ymin
+    else:
+        ymin = 0
+
+    a = np.polyfit(np.log(x),np.log(yp),1)
+    p_est = np.polyval(a,np.log(x))
+    fB = 0.5*LA.norm(yp+ymin - np.exp(p_est),2)**2
+
+    A = np.exp(a[1])
+    alpha = a[0]
+
+    return fB, A, alpha
+
+
+
+def run_results(execname,run_dir,duplicate):
+
+    dirs = []
+    for d in run_dir:
+        dirs.append("run_%03d" % d)
+
+    cwd = os.getcwd()
+
+    for results_dir in dirs:
+        d = results_dir
+        os.chdir(d)
+        print "Compiling results in %s" % d
+        compile_results(duplicate=duplicate)
+        os.chdir(cwd)
+
+
 
 
 if __name__ == "__main__":

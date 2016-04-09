@@ -16,15 +16,20 @@ function  [xpout,ypout,zpout] = torus_soln(T,alpha,R,period)
 global N_torus period_torus alpha_torus revs_per_second_torus;
 global r0_torus xc0_torus yc0_torus zc0_torus;
 
+if (nargin < 4)
+    period = 0;   % Won't be used.
+    if (nargin < 2)
+        alpha = 0.4;
+        R = 0.5;
+        period = 16;
+    end
+end
+
 alpha_torus = alpha;
 revs_per_second_torus = R;
 r0_torus = alpha;  % assumes outer radius == 1
 
-if (nargin < 4)
-    period_torus = 0;   % Won't be used.
-else
-    period_torus = period;
-end
+period_torus = period;
 
 N = 500;
 xc0_torus = 1;    % center of sphere used to initialize problem
@@ -41,7 +46,7 @@ if (T > 0)
 
     f0 = [x0; y0; z0];
     opt.RelTol = 1e-12;
-    [~,pout] = ode45(@psi_rhs,[0,T],f0,opt);
+    [~,pout] = ode45(@psi_rhs_simple,[0,T],f0,opt);
 
     xp = pout(end,1:N_torus);
     yp = pout(end,(N_torus+1):(2*N_torus));
@@ -63,7 +68,13 @@ end
 plot_torus(N);
 hold on
 
-plot3(xp(:),yp(:),zp(:),'k.','linewidth',3,'markersize',20);
+o = findobj('tag','torus_curve');
+if ~isempty(o)
+    delete(o)
+end
+
+pline = plot3(xp(:),yp(:),zp(:),'k-','linewidth',2,'markersize',20);
+set(pline,'tag','torus_curve')
 
 end
 
@@ -95,7 +106,7 @@ camlight
 end
 
 
-function [x0,y0,z0] = torus_init(N)
+function [xdata,ydata,zdata] = torus_init(N)
 
 xc = linspace(0,1,N);
 yc = linspace(0,1,N);
@@ -105,13 +116,28 @@ fm = torus_surface(xcm,ycm);
 
 h = contourc(xc,yc,fm,[0,0]);
 
-l1 = h(2,1);
-h(:,1) = [];
-h(:,l1+2) = [];
-xinit = [h(1,1:l1), fliplr(h(1,(l1+2):end))];
-yinit = [h(2,1:l1), fliplr(h(2,(l1+2):end))];
+st_idx = 1;
+xdata = [];
+ydata = [];
+zdata = [];
+while (1)
+  cval = h(1,st_idx);
+  next_length = h(2,st_idx);
 
-[x0,y0,z0] = mapc2m_torus(xinit(:),yinit(:));
+  xl = h(1,st_idx+1:st_idx+next_length);
+  yl = h(2,st_idx+1:st_idx+next_length);
+  
+  [x0,y0,z0] = mapc2m_torus(xl(:),yl(:));
+    
+  xdata = [xdata; x0];
+  ydata = [ydata; y0];
+  zdata = [zdata; z0];
+  st_idx = st_idx + next_length + 1;
+  if (st_idx > length(h))
+    return
+  end
+end
+  
 
 end
 
@@ -123,8 +149,13 @@ global r0_torus xc0_torus yc0_torus zc0_torus;
 
 
 r2 = (xp-xc0_torus).^2 + (yp-yc0_torus).^2 + (zp - zc0_torus).^2 - r0_torus^2;
-
 f = r2;
+
+% f = zp/r0_torus - sqrt(3)/2;
+
+% th = atan2(yp,xp);
+% tp = abs(th + pi/2);
+% f = tp - pi/8;
 
 end
 
@@ -183,7 +214,7 @@ t1 = [-y; x; zeros(size(x))];
 t2 = [-z.*x./r; -z.*y./r; r - 1];
 
 t1t = t1';
-fp = (2*pi*R)*t1t(:);
+fp = -(2*pi*R)*t1t(:);
 
 if (period_torus > 0)
     vt = -cos(2*pi*t/period_torus);

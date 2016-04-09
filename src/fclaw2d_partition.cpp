@@ -106,7 +106,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
 
     /* this call creates a new domain that is valid after partitioning
        and transfers the data packed above to the new owner processors */
-    int exponent = gparms->subcycle && !gparms->noweightedp ? 1 : 0;
+    int exponent = gparms->subcycle && gparms->weighted_partition ? 1 : 0;
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {

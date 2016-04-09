@@ -609,6 +609,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             parallel_mode);
 
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+
         /* --------------------------------------------------------------
            Start send ...
            ------------------------------------------------------------*/

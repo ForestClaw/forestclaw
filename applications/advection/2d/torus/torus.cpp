@@ -146,7 +146,7 @@ void run_program(fclaw_app_t* app)
     switch (user->example)
     {
     case 0:
-        FCLAW_ASSERT(mi == 1 && mj == 1);  /* assumes square domain */
+        FCLAW_ASSERT(mi == 1 && mj == 1);  /* assumes square domain; uses [ax,bx]x[ay,by] */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         cont = fclaw2d_map_new_nomap();
         break;
@@ -176,6 +176,14 @@ void run_program(fclaw_app_t* app)
         cont = fclaw2d_map_new_annulus(brick,gparms->scale,gparms->shift,
                                        rotate,user->beta);
         break;
+
+    case 5:
+        /* Duplicate initial conditions in each brick */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_cart(brick, gparms->scale, gparms->shift, rotate);
+        break;
+
 
     default:
         SC_ABORT_NOT_REACHED ();
