@@ -102,8 +102,7 @@ subroutine clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm
         !!! Change from flux2 to clawpack5_flux2
         call clawpack5_flux2(1,maxm,meqn,maux,mbc,mx,q1d,dtdx1d,aux1,aux2,aux3, &
                    faddm,faddp,gaddm,gaddp,cfl1d,wave,s, &
-                   amdq,apdq,cqxx,bmadq,bpadq,rpn2,rpt2)       
-                   
+                   amdq,apdq,cqxx,bmadq,bpadq,rpn2,rpt2)               
         cflgrid = max(cflgrid,cfl1d)
 
         ! Update fluxes
@@ -144,9 +143,8 @@ subroutine clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt,cflgrid,fm
         ! Compute modifications fadd and gadd to fluxes along this slice
         !!! Change from flux2 to clawpack5_flux2
         call clawpack5_flux2(2,maxm,meqn,maux,mbc,my,q1d,dtdy1d,aux1,aux2,aux3, &
-                   faddm,faddp,gaddm,gaddp,cfl1d,wave,s,amdq,apdq,cqxx, &
-                   bmadq,bpadq,rpn2,rpt2)
-
+                   faddm,faddp,gaddm,gaddp,cfl1d,wave,s, &
+                   amdq,apdq,cqxx,bmadq,bpadq,rpn2,rpt2)
         cflgrid = max(cflgrid,cfl1d)
 
         ! Update fluxes

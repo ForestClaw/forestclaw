@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
 
@@ -164,7 +163,6 @@ void outstyle_1(fclaw2d_domain_t **domain)
             ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_run_diagnostics(*domain, init_flag);
 
-
             /* In case we have to reject this step */
             if (!gparms->use_fixed_dt)
             {
@@ -209,12 +207,10 @@ void outstyle_1(fclaw2d_domain_t **domain)
                 }
             }
             double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
-
             ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
-
 
             double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
@@ -241,7 +237,6 @@ void outstyle_1(fclaw2d_domain_t **domain)
                     continue;
                 }
             }
-
             /* We are happy with this step */
             n_inner++;
             t_curr += dt_step;
@@ -506,7 +501,6 @@ void fclaw2d_run(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-
     switch (gparms->outstyle)
     {
     case 0:

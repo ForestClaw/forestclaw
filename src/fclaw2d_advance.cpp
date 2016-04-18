@@ -186,7 +186,6 @@ double advance_level(fclaw2d_domain_t *domain,
                      fclaw2d_timestep_counters* ts_counter)
 {
     const amr_options_t* gparms = get_domain_parms(domain);
-
     double t_level = ts_counter[level].current_time;
     double dt_level = ts_counter[level].dt_step;
 
@@ -195,9 +194,7 @@ double advance_level(fclaw2d_domain_t *domain,
 
     fclaw_global_infof("Advancing level %d from step %d at time %12.6e\n",
                        this_level,curr_fine_step,t_level);
-
     double cfl_step = update_level_solution(domain,this_level,t_level,dt_level);
-
     maxcfl = fmax(maxcfl,cfl_step);
 
     fclaw_global_infof("------ Max CFL on level %d is %12.4e " \
@@ -205,17 +202,17 @@ double advance_level(fclaw2d_domain_t *domain,
 
     increment_step_counter(ts_counter,this_level);
     increment_time(ts_counter,this_level);
-
     if (this_level > domain->local_minlevel)
     {
+
         int last_coarse_step = ts_counter[coarser_level].last_step;
+
         if (last_coarse_step == curr_fine_step)
         {
             double cfl_step = advance_level(domain,coarser_level,
                                             last_coarse_step,
                                             maxcfl,ts_counter);
             maxcfl = fmax(maxcfl,cfl_step);
-
             if (gparms->subcycle)
             {
                 double alpha = compute_alpha(domain,ts_counter,this_level);
@@ -263,7 +260,6 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
     {
         /* Coarser levels get updated recursively */
         double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,ts_counter);
-
         maxcfl = fmax(cfl_step,maxcfl);
         int last_step = ts_counter[maxlevel].last_step;
         if (last_step < ts_counter[maxlevel].total_steps)

@@ -47,7 +47,6 @@ static
 
     double dt = ss_data->dt;
     double t = ss_data->t;
-
     maxcfl = vt.patch_single_step_update(domain,this_patch,
                                          this_block_idx,
                                          this_patch_idx,t,dt);
@@ -90,7 +89,6 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
 
     /* If there are not grids at this level, we return CFL = 0 */
     patch_iterator(domain, level, cb_single_step,(void *) &ss_data);
-
 
     return ss_data.maxcfl;
 }

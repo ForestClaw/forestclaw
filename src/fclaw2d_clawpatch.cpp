@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 
 
-
 #if FCLAW_DEBUG
 /* This is a duplicate of the function in fclaw2d_farraybox.cpp */
 static
@@ -270,7 +269,6 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
             vt.metric_compute_area(domain,this_patch,blockno,patchno);
-
             /* Don't need any more manifold info for ghost patches */
             if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
             {

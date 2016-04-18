@@ -24,6 +24,8 @@
 */
 
 #include "swirl_user.h"
+//For debug
+#include <iostream>
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
@@ -78,22 +80,22 @@ void run_program(fclaw_app_t* app)
 
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t	     *domain;
+    fclaw2d_domain_t	       *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    amr_options_t               *gparms;
+    amr_options_t            *gparms;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
+    
     gparms->manifold = 0;
     conn = p4est_connectivity_new_unitsquare();
     cont = fclaw2d_map_new_nomap();
-
+    
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
@@ -102,18 +104,20 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app (domain,app);
-
     swirl_link_solvers(domain);
 
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
+    
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
+    std::cout<<"After run"<<std::endl;
     fclaw2d_finalize(&domain);
-
+    std::cout<<"After fclaw2d_finalize"<<std::endl;
     /* This has to be in this scope */
     fclaw2d_map_destroy(cont);
+    std::cout<<"After destroy cont"<<std::endl;
 }
 
 int
@@ -148,11 +152,12 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_link_app(app);
 
     /* Run the program */
+    
     if (!retval & !vexit)
     {
         run_program(app);
     }
-
+    
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 

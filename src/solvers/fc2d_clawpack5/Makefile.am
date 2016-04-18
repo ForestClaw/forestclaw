@@ -15,7 +15,9 @@ libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_block.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_bc2.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_flux2.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f90 
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f90 \
+	src/solvers/fc2d_clawpack5/fortran_source/philim.f \
+	src/solvers/fc2d_clawpack5/fortran_source/src2.f90 
 
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la
 

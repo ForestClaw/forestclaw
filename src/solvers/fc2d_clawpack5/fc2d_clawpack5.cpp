@@ -375,6 +375,7 @@ void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
 }
 
 
+
 /* Use this to return only the right hand side of the clawpack algorithm */
 double fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
@@ -445,6 +446,11 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
+    /*
+    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy, 
+                   level, time, xleft, xright, ybot, ytop, 
+                   &xlower, &ylower, xupper, yupper, 0,0,0);
+    */
     classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CLAWPACK5_UNSET_BLOCK();
@@ -514,7 +520,7 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     FCLAW_ASSERT(ierror == 0);
     */
     CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-                    fp, fm, gp, gm, classic_vt.rpn2, classic_vt.rpt2);
+                    fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
     if (classic_vt.fluxfun != NULL)
     {
@@ -541,7 +547,6 @@ double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
 {
     const fc2d_clawpack5_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack5_get_options(domain);
-
     if (classic_vt.b4step2 != NULL)
     {
         fc2d_clawpack5_b4step2(domain,
@@ -549,12 +554,10 @@ double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,t,dt);
     }
-
     double maxcfl = fc2d_clawpack5_step2(domain,
                                           this_patch,
                                           this_block_idx,
                                           this_patch_idx,t,dt);
-
     if (clawpack_options->src_term > 0)
     {
         fc2d_clawpack5_src2(domain,

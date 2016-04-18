@@ -128,7 +128,7 @@ c     -----------------------------------------------------------
 c
 c     # apply limiter to waves:
 c     # !!! Change to call clawpack5_limiter (original:limiter)
-      if (limit) call clawpack5_limiter(maxm,meqn,mwaves,mbc,mx,
+      if (limit) call clawpack5_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      wave,s,mthlim)
 c
       do 120 i = 1, mx+1

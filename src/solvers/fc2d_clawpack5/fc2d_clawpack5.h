@@ -76,13 +76,13 @@ typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
                                       const double* dx, const double* dy, double q[],
                                       const int* maux, double aux[], const double* t,
                                       const double* dt);
+
 //!!! Add maux
 typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
                                       const int* mwaves, const int* maux, 
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
-
 
 typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* maux, const int* mbc,const int* mx,
@@ -158,6 +158,7 @@ void QINIT(const int* meqn,const int* mbc,
            const double* xlower, const double* ylower,
            const double* dx, const double* dy,
            double q[], const int* maux, double aux[]);
+
 void SETAUX(const int* mbc,
             const int* mx, const int* my,
             const double* xlower, const double* ylower,
