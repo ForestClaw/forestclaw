@@ -44,7 +44,6 @@ c
             dotl = dotr
             dotr = 0.d0
             do 5 m=1,meqn
-               write(*,*) "wave",i,wave(m,mw,i)
                wnorm2 = wnorm2 + wave(m,mw,i)**2
                dotr = dotr + wave(m,mw,i)*wave(m,mw,i+1)
     5          continue

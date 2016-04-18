@@ -32,7 +32,7 @@ extern "C"
 }
 #endif
 #endif
-#include <stdio.h>
+
 typedef struct fc2d_clawpack5_package
 {
   int is_registered;

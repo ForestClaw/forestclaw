@@ -58,8 +58,8 @@ void cb_initialize (fclaw2d_domain_t *domain,
 {
     fclaw2d_vtable_t vt;
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_patch_data_new(domain,this_patch);
 
+    fclaw2d_patch_data_new(domain,this_patch);
     fclaw2d_clawpatch_build(domain,this_patch,
                             this_block_idx,
                             this_patch_idx,
@@ -118,6 +118,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
          gparms->coarsen_delay);
 
+    
     /* ------------------------------------------------
        Set up initial domain.
 
@@ -130,7 +131,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* Initialize patches on uniformly refined level minlevel */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-
     fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
                                  (void *) NULL);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
@@ -166,6 +166,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     /* ------------------------------------------------
        Done with initial setup.
        ------------------------------------------------ */
+
 
     /* ------------------------------------------------
        Build up an initial refinement.

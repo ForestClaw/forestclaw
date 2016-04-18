@@ -24,8 +24,6 @@
 */
 
 #include "swirl_user.h"
-//For debug
-#include <iostream>
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
@@ -112,12 +110,9 @@ void run_program(fclaw_app_t* app)
     
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
-    std::cout<<"After run"<<std::endl;
     fclaw2d_finalize(&domain);
-    std::cout<<"After fclaw2d_finalize"<<std::endl;
     /* This has to be in this scope */
     fclaw2d_map_destroy(cont);
-    std::cout<<"After destroy cont"<<std::endl;
 }
 
 int
