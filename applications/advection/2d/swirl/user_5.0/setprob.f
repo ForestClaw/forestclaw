@@ -12,6 +12,8 @@ c
 c     # save 2*pi and tperiod in common block for use in b4step2:
 c
       pi2 = 2.d0*pi
+c     # Add 2016/4/18 tperiod
+      tperiod = 4.d0
 c
       iunit = 7
 c      fname = 'setprob.data'
