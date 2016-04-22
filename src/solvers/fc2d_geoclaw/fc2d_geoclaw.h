@@ -41,7 +41,7 @@ extern "C"
 
 
 typedef void (*fc2d_geoclaw_setprob_t)();
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
                                      const double* xlower, const double* ylower,
@@ -49,19 +49,19 @@ typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
                                      const double q[], const int* maux,
                                      const double aux[], const double* t,
                                      const double* dt, const int mthbc[]);
-//!!! Modified 2016/4/5
+
 typedef  void (*fc2d_geoclaw_qinit_t)(const int* meqn,const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         double q[], const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
                                          const int* mx, const int* my, const int* meqn,
                                          double q[], const double* xlower,
@@ -69,7 +69,7 @@ typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
                                          const double* dx, const double* dy,
                                          const double* t, const double* dt,
                                          const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
                                       const int* mbc, const int* mx,const int* my,
                                       const double* xlower, const double* ylower,
@@ -77,7 +77,7 @@ typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
                                       const int* maux, double aux[], const double* t,
                                       const double* dt);
 
-//!!! Add maux
+
 typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
                                       const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
@@ -90,7 +90,7 @@ typedef void (*fc2d_geoclaw_rpt2_t)(const int* ixy, const int* imp, const int* m
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
-//!!!fwave --> wave
+
 typedef void (*fc2d_geoclaw_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
@@ -306,6 +306,7 @@ fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_domain_t *domain);
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
+void fc2d_geoclaw_setup(fclaw2d_domain_t *domain);
 void
     fc2d_geoclaw_setprob(fclaw2d_domain_t* domain);
 

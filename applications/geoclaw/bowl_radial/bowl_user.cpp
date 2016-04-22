@@ -78,7 +78,6 @@ void bowl_patch_setup(fclaw2d_domain_t *domain,
 {
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 void bowl_patch_initialize(fclaw2d_domain_t *domain,
