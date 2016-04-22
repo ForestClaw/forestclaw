@@ -22,13 +22,13 @@ switch map
 
     case 'brick'
         isflat = true;
-        s = 0.05;
+        s = 0.0;
         [xp,yp,~] = mapc2m_brick(xc,yc,s);
          b = load('brick.dat');
-         mi = b(1,1);
-         mj = b(1,2);
-         xp = mi*xp;
-         yp = mj*yp;
+%          mi = b(1,1);
+%          mj = b(1,2);
+%          xp = mi*xp;
+%          yp = mj*yp;
 
     case 'cart'
         isflat = true;

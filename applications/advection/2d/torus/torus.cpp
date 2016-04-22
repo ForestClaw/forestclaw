@@ -35,6 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.h>
 
+/* Used just so we can destroy the brick we create for example 5 */
+extern "C" {
+    void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont);
+}
+
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -180,6 +185,8 @@ void run_program(fclaw_app_t* app)
     case 5:
         /* Duplicate initial conditions in each block */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
+        fclaw2d_map_destroy_brick(brick); /* We don't really need the brick */
         cont = fclaw2d_map_new_nomap();
         break;
 
