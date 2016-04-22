@@ -27,8 +27,8 @@ c     # Refine based only on first variable in system.
       mq = 1
       qmin = q(mq,1,1)
       qmax = q(mq,1,1)
-      do j = 1,my
-         do i = 1,mx
+      do j = 1-mbc,my+mbc
+         do i = 1-mbc,mx+mbc
             qmin = min(q(mq,i,j),qmin)
             qmax = max(q(mq,i,j),qmax)
             if (qmax - qmin .gt. tag_threshold) then
@@ -263,7 +263,7 @@ c     # Get rectangle in coarse grid for fine grid.
                      sum = sum + kf*qf
                   enddo
                   kc = areacoarse(i1,j1)
-                  qcoarse(i1,j1,mq) = sum/kc
+                  qcoarse(mq,i1,j1) = sum/kc
                else
                   sum = 0
                   do m = 0,r2-1
