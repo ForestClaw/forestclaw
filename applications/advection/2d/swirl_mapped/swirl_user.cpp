@@ -59,7 +59,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_physical_bc        = &fc2d_clawpack5_bc2;
 
-    vt.patch_single_step_update = &swirl_patch_update;
+    vt.patch_single_step_update = &fc2d_clawpack5_update;
 
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
@@ -136,6 +136,7 @@ void swirl_patch_b4step2(fclaw2d_domain_t *domain,
 }
 
 
+#if 0
 double swirl_patch_update(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
@@ -150,6 +151,7 @@ double swirl_patch_update(fclaw2d_domain_t *domain,
                                          this_patch_idx,t,dt);
     return maxcfl;
 }
+#endif
 
 
 
