@@ -7,7 +7,7 @@ libgeoclaw_installed_headers = \
 libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_setup.f90
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_setup.f90
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
