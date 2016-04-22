@@ -694,7 +694,10 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
 
     // This will destroy any existing memory n m_griddata.
     m_griddata.define(box, m_meqn);
-    m_griddata_time_interpolated.define(box, m_meqn);
+    if (gparms->subcycle)
+    {
+        m_griddata_time_interpolated.define(box, m_meqn);
+    }
 
     // Set up storage for metric terms, if needed.
     if (gparms->manifold)
@@ -748,6 +751,7 @@ double* ClawPatch::q()
     return m_griddata.dataPtr();
 }
 
+#if 0
 FArrayBox ClawPatch::newGrid()
 {
     /* Create a grid based on the size of the existing grids */
@@ -757,6 +761,7 @@ FArrayBox ClawPatch::newGrid()
     A.define(b,fields);
     return A;
 }
+#endif
 
 Box ClawPatch::dataBox()
 {
