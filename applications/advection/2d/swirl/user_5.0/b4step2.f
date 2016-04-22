@@ -1,27 +1,29 @@
+c     ============================================
       subroutine b4step2(mbc,mx,my,meqn,q,
      &            xlower,ylower,dx,dy,time,dt,maux,aux)
-      implicit none
-
-      integer mbc, mx, my, meqn, maux
-      double precision xlower, ylower, dx, dy, time, dt
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-      integer i, j
-      double precision tperiod, pi2, vt, xll,yll, psi
-
+c     ============================================
+c
+c     # called before each call to step
+c     # use to set time-dependent aux arrays or perform other tasks.
+c
+c     # make velocity time dependent, reversing flow.
+c
+c     
+      implicit double precision (a-h,o-z)
+      dimension q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      dimension aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       common /comvt/ tperiod,pi2
 c
       if (tperiod .eq. 0.d0) then
-c        # special case --- indication that velocities specified in
+c        # special case --- indication that velocities specified in 
 c        # setaux should be used for all time.
          return
-      endif
+         endif
 
-      vt = cos(pi2*(time+dt/2.d0)/tperiod)
-
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
+       vt = dcos(pi2*(time+dt/2.d0)/tperiod)
+c
+       do 200 i=1-mbc,mx+mbc
+          do 100 j=1-mbc,my+mbc
 c           # coordinates of lower left corner of grid cell:
             xll = xlower + (i-1)*dx
             yll = ylower + (j-1)*dy
@@ -33,8 +35,7 @@ c
 c           # multiply by time-factor:
             aux(1,i,j) = vt * aux(1,i,j)
             aux(2,i,j) = vt * aux(2,i,j)
-         enddo
-      enddo
-
-      return
-      end
+  100        continue
+  200     continue
+       return
+       end

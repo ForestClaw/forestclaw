@@ -93,7 +93,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 #endif
     fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
 
-
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;
 
@@ -119,7 +118,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
          gparms->coarsen_delay);
 
-
+    
     /* ------------------------------------------------
        Set up initial domain.
 

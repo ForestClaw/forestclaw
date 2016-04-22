@@ -14,9 +14,9 @@ c
       double precision   asdq(meqn,1-mbc:maxm+mbc)
       double precision bmasdq(meqn,1-mbc:maxm+mbc)
       double precision bpasdq(meqn,1-mbc:maxm+mbc)
-      double precision   aux1(2,1-mbc:maxm+mbc)
-      double precision   aux2(2,1-mbc:maxm+mbc)
-      double precision   aux3(2,1-mbc:maxm+mbc)
+      double precision   aux1(maux,1-mbc:maxm+mbc)
+      double precision   aux2(maux,1-mbc:maxm+mbc)
+      double precision   aux3(maux,1-mbc:maxm+mbc)
 
       integer kv, i, i1
 

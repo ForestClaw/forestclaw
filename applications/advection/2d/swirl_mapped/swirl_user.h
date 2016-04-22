@@ -42,6 +42,7 @@ typedef struct user_options
     int example;
     double alpha;
     double tperiod;
+    int claw_version;
 
     amr_options_t* gparms;
 
