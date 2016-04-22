@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
-
+#include <iostream>
 #ifdef __cplusplus
 extern "C"
 {
@@ -129,6 +129,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
     int iframe = 0;
+
     fclaw2d_output_frame(*domain,iframe);
 
     const amr_options_t *gparms = get_domain_parms(*domain);
@@ -206,7 +207,6 @@ void outstyle_1(fclaw2d_domain_t **domain)
                     }
                 }
             }
-            
             double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
             ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);

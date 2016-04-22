@@ -505,11 +505,11 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    /*
+    
     int ierror = 0;
-    fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
-                                    CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
-
+    //fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
+    //                                CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
+    fc2d_clawpack5_flux2_t flux2 = CLAWPACK5_FLUX2;
     CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
@@ -518,9 +518,9 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
                           cp->block_corner_count(), &ierror);
 
     FCLAW_ASSERT(ierror == 0);
-    */
-    CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-                    fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
+    
+    //CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
+    //                fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
     if (classic_vt.fluxfun != NULL)
     {

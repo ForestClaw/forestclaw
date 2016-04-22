@@ -63,8 +63,8 @@ c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
       mq = 1
-      qmin = q0(1,1,mq)
-      qmax = q0(1,1,mq)
+      qmin = q0(mq,1,1)
+      qmax = q0(mq,1,1)
 
 c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then

@@ -109,8 +109,8 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
       do j = 1,my
          do i = 1,mx
             do mq = 1,meqn
-               if (abs(q(i,j,mq)) .lt. 1d-99) then
-                  q(i,j,mq) = 0.d0
+               if (abs(q(mq,i,j)) .lt. 1d-99) then
+                  q(mq,i,j) = 0.d0
                endif
             enddo
             write(matunit1,120) (q(mq,i,j),mq=1,meqn)

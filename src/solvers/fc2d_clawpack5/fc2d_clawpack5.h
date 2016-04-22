@@ -204,7 +204,7 @@ void RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
 /* --------------------------------------------------------------------
    Time stepping
    -------------------------------------------------------------------- */
-/*
+
 #define CLAWPACK5_STEP2_WRAP FCLAW_F77_FUNC(clawpack5_step2_wrap,CLAWPACK5_STEP2_WRAP)
 void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int method[], const int mthlim[],
@@ -218,7 +218,7 @@ void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             fc2d_clawpack5_rpn2_t rpn2,
                             fc2d_clawpack5_rpt2_t rpt2,
                             fc2d_clawpack5_flux2_t flux2,
-                            int block_corner_count[],int* ierror);*/
+                            int block_corner_count[],int* ierror);
 #define CLAWPACK5_STEP2 FCLAW_F77_FUNC(clawpack5_step2,CLAWPACK5_STEP2)
 void CLAWPACK5_STEP2(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int* mx,

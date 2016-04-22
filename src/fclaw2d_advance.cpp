@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_update_single_step.h>
 
 #include <fclaw2d_advance.hpp>
-
+#include <iostream>
 typedef struct fclaw2d_level_data
 {
     int last_step;
@@ -249,6 +249,9 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
     /* Advance all grids that are present somewhere (on any proc) */
     int minlevel = domain->global_minlevel;
     int maxlevel = domain->global_maxlevel;
+
+    //std::cout<<"minlevel = "<<domain->global_minlevel<<std::endl;
+    //std::cout<<"maxlevel = "<<domain->global_maxlevel<<std::endl;
 
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
