@@ -245,7 +245,7 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
                             int this_patch_idx)
 {
     FCLAW_ASSERT(classic_vt.setaux != NULL);
-    int mx,my,mbc,maux,maxmx,maxmy;
+    int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux;
 
@@ -255,10 +255,7 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
     fc2d_clawpack5_define_auxarray (domain,this_patch);
 
     fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-    /* setaux doesn't need maxmx, maxmy anymore
-    maxmx = mx;
-    maxmy = my;
-    */
+
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
@@ -298,7 +295,7 @@ void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
                            int this_patch_idx)
 {
     FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
-    int mx,my,mbc,meqn,maux,maxmx,maxmy;
+    int mx,my,mbc,meqn,maux;
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
@@ -307,10 +304,7 @@ void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-    /*
-    maxmx = mx;
-    maxmy = my;
-    */
+
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.qinit(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
@@ -327,7 +321,7 @@ void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
 {
     FCLAW_ASSERT(classic_vt.b4step2 != NULL);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
@@ -336,10 +330,7 @@ void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-    /*
-    maxmx = mx;
-    maxmy = my;
-    */
+
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
@@ -355,7 +346,7 @@ void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
 {
     FCLAW_ASSERT(classic_vt.src2 != NULL);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
@@ -364,10 +355,7 @@ void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-    /*
-    maxmx = mx;
-    maxmy = my;
-    */
+
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
@@ -403,7 +391,7 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
 {
     FCLAW_ASSERT(classic_vt.bc2 != NULL);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
@@ -411,10 +399,7 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-    /*
-    maxmx = mx;
-    maxmy = my;
-    */
+
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(this_block);
     int *block_mthbc = bdata->mthbc;
