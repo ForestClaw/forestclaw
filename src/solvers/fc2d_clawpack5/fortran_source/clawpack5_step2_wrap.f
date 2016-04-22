@@ -90,7 +90,8 @@ c     &      work(i0next),mwork1,rpn2,rpt2,flux2,
 c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 
       call clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,
-     &                     dx,dy,dt,cfl,fm,fp,gm,gp,rpn2,rpt2)
+     &      dx,dy,dt,cfl,fm,fp,gm,gp,rpn2,rpt2,
+     &      block_corner_count,ierror)
 
 c     # update q
       dtdx = dt/dx
