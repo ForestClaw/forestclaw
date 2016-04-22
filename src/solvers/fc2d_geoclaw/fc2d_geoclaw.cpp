@@ -528,6 +528,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
 
     return cflgrid;
 #endif
+    return 0.9;  /* Change this! */
 }
 
 double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
@@ -560,4 +561,5 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
     }
     return maxcfl;
 #endif
+    return 0.9;
 }

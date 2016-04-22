@@ -35,7 +35,7 @@ static fc2d_geoclaw_vtable_t geoclaw;
 void bowl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-  
+
 #if 0
     vt.problem_setup            = &fc2d_geoclaw_setprob;
     vt.patch_setup              = &bowl_patch_setup;
@@ -54,9 +54,11 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
     vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
 
     fclaw2d_set_vtable(domain,&vt);
-#endif
+
+#if 0
     /* Needed for the geoclaw package */
     geoclaw.qinit = &QINIT;
     geoclaw.bc2 = &BC2;
@@ -65,6 +67,7 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
     geoclaw.b4step2 = &B4STEP2;
     geoclaw.rpn2 = &RPN2;
     geoclaw.rpt2 = &RPT2;
+#endif
 
     fc2d_geoclaw_set_vtable(&geoclaw);
 
@@ -89,7 +92,7 @@ void bowl_patch_initialize(fclaw2d_domain_t *domain,
        This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
        entry above, or by calling fclaw2d_geoclaw_qinit(...) from here. */
 
-    int mx,my,mbc,meqn, maux, maxmx, maxmy;
+    int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *q, *aux;
 
@@ -104,10 +107,9 @@ void bowl_patch_initialize(fclaw2d_domain_t *domain,
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
     */
-    maxmx = mx;
-    maxmy = my;
-    
+#if 0
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+#endif
 }
 
 

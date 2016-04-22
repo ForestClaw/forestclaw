@@ -140,7 +140,7 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
    -------------------------------------------------------------------- */
 
 /* Macros for C/Fortran portability */
-#define SETUP   FCLAW_F77_FUNC(setup,SETUP)
+#define GEOCLAW_SETUP   FCLAW_F77_FUNC(geoclaw_setup,GEOCLAW_SETUP)
 #define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
 #define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
 #define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
