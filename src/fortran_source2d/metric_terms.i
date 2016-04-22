@@ -17,8 +17,8 @@ c     # Node based quantities
       double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
 
 c     # Edge based quantities
-      double precision     xnormals(3,-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision     ynormals(3,-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision    xtangents(3,-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision    ytangents(3,-mbc:mx+mbc+2,-mbc:my+mbc+2)
-      double precision edge_lengths(2,-mbc:mx+mbc+2,-mbc:my+mbc+2)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision    xtangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision    ytangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
