@@ -1,4 +1,4 @@
-subroutine setprob()
+SUBROUTINE geoclaw_setup()
 
     use regions_module, only: set_regions
     use gauges_module, only: set_gauges
@@ -21,4 +21,4 @@ subroutine setprob()
     call set_storm()                  ! Set storm parameters
     call setup_variable_friction()    ! Set variable friction parameters
 
-end subroutine setprob
+  END SUBROUTINE geoclaw_setup

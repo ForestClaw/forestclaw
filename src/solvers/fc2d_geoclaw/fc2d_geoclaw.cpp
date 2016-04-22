@@ -33,19 +33,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int s_geoclaw_package_id = -1;
 
-static fc2d_geoclaw_vtable_t classic_vt;
+static fc2d_geoclaw_vtable_t geoclaw_vt;
 
 
 
 void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* user_vt)
 {
-    classic_vt = *user_vt;
+    geoclaw_vt = *user_vt;
 }
 
 void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
+#if 0
     vt->bc2 = GEOCLAW_BC2;
+#endif
+    vt->bc2 = NULL;
     vt->qinit = NULL;
     vt->rpn2 = NULL;
     vt->rpt2 = NULL;
@@ -110,22 +113,6 @@ static const fclaw_package_vtable_t geoclaw_patch_vtable = {
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-#if 0
-void fc2d_geoclaw_package_register(fclaw_app_t* app,
-                                      fc2d_geoclaw_options_t *clawopt)
-{
-    int id;
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_geoclaw_package_id == -1);
-
-    /* Register packages */
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &geoclaw_patch_vtable);
-    s_geoclaw_package_id = id;
-}
-#endif
-
 void
 fc2d_geoclaw_register_vtable (fclaw_package_container_t * pkg_container,
                                  fc2d_geoclaw_options_t * clawopt)
@@ -229,12 +216,18 @@ int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain)
     return clawpack_options->maux;
 }
 
+void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
+{
+    GEOCLAW_SETUP();
+}
+
+
 void fc2d_geoclaw_setprob(fclaw2d_domain_t *domain)
 {
-    /* Assume that if we are here, then the user has a valid setprob */
-    FCLAW_ASSERT(classic_vt.setprob != NULL);
-
-    classic_vt.setprob();
+    if (geoclaw_vt.setprob != NULL)
+    {
+        geoclaw_vt.setprob();
+    }
 }
 
 
@@ -244,7 +237,8 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.setaux != NULL);
+#if 0
+    FCLAW_ASSERT(geoclaw_vt.setaux != NULL);
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux;
@@ -257,9 +251,10 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    classic_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+    geoclaw_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
     GEOCLAW_UNSET_BLOCK();
+#endif
 }
 
 /* This should only be called when a new ClawPatch is created. */
@@ -268,6 +263,7 @@ void fc2d_geoclaw_set_capacity(fclaw2d_domain_t *domain,
                                   int this_block_idx,
                                   int this_patch_idx)
 {
+#if 0
     int mx,my,mbc,maux,mcapa;
     double dx,dy,xlower,ylower;
     double *aux, *area;
@@ -286,6 +282,7 @@ void fc2d_geoclaw_set_capacity(fclaw2d_domain_t *domain,
 
     GEOCLAW_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
                             &maux,aux);
+#endif
 }
 
 
@@ -294,7 +291,8 @@ void fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
+#if 0
+    FCLAW_ASSERT(geoclaw_vt.qinit != NULL); /* Must initialized */
     int mx,my,mbc,meqn,maux;
     double dx,dy,xlower,ylower;
     double *q, *aux;
@@ -307,9 +305,10 @@ void fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    classic_vt.qinit(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
+    geoclaw_vt.qinit(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                      &maux,aux);
     GEOCLAW_UNSET_BLOCK();
+#endif
 }
 
 void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
@@ -319,7 +318,8 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
                              double t, double dt)
 
 {
-    FCLAW_ASSERT(classic_vt.b4step2 != NULL);
+#if 0
+    FCLAW_ASSERT(geoclaw_vt.b4step2 != NULL);
 
     int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
@@ -332,9 +332,10 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    classic_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
+    geoclaw_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
     GEOCLAW_UNSET_BLOCK();
+#endif
 }
 
 void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
@@ -344,7 +345,8 @@ void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-    FCLAW_ASSERT(classic_vt.src2 != NULL);
+#if 0
+    FCLAW_ASSERT(geoclaw_vt.src2 != NULL);
 
     int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
@@ -357,9 +359,10 @@ void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    classic_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
+    geoclaw_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
     GEOCLAW_UNSET_BLOCK();
+#endif
 }
 
 
@@ -389,7 +392,8 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
                          fclaw_bool intersects_phys_bdry[],
                          fclaw_bool time_interp)
 {
-    FCLAW_ASSERT(classic_vt.bc2 != NULL);
+#if 0
+    FCLAW_ASSERT(geoclaw_vt.bc2 != NULL);
 
     int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
@@ -432,13 +436,14 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
     /*
-    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy, 
-                   level, time, xleft, xright, ybot, ytop, 
+    geoclaw_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy,
+                   level, time, xleft, xright, ybot, ytop,
                    &xlower, &ylower, xupper, yupper, 0,0,0);
     */
-    classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
+    geoclaw_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     GEOCLAW_UNSET_BLOCK();
+#endif
 }
 
 
@@ -450,6 +455,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
                              double t,
                              double dt)
 {
+#if 0
     fc2d_geoclaw_options_t* clawpack_options;
     ClawPatch *cp;
     int level;
@@ -457,8 +463,8 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
 
-    FCLAW_ASSERT(classic_vt.rpn2 != NULL);
-    FCLAW_ASSERT(classic_vt.rpt2 != NULL);
+    FCLAW_ASSERT(geoclaw_vt.rpn2 != NULL);
+    FCLAW_ASSERT(geoclaw_vt.rpt2 != NULL);
 
     clawpack_options = fc2d_geoclaw_get_options(domain);
 
@@ -490,7 +496,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    
+
     int ierror = 0;
     //fc2d_geoclaw_flux2_t flux2 = clawpack_options->use_fwaves ?
     //                                GEOCLAW_FLUX2FW : GEOCLAW_FLUX2;
@@ -499,15 +505,15 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-                          classic_vt.rpn2, classic_vt.rpt2,flux2,
+                          geoclaw_vt.rpn2, geoclaw_vt.rpt2,flux2,
                           cp->block_corner_count(), &ierror);
 
     FCLAW_ASSERT(ierror == 0);
-    
+
     //GEOCLAW_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-    //                fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
+    //                fm, fp, gm, gp, geoclaw_vt.rpn2, geoclaw_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
-    if (classic_vt.fluxfun != NULL)
+    if (geoclaw_vt.fluxfun != NULL)
     {
         /* Accumulate fluxes */
     }
@@ -521,6 +527,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     delete [] work;
 
     return cflgrid;
+#endif
 }
 
 double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
@@ -530,9 +537,10 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                               double t,
                               double dt)
 {
+#if 0
     const fc2d_geoclaw_options_t* clawpack_options;
     clawpack_options = fc2d_geoclaw_get_options(domain);
-    if (classic_vt.b4step2 != NULL)
+    if (geoclaw_vt.b4step2 != NULL)
     {
         fc2d_geoclaw_b4step2(domain,
                                 this_patch,
@@ -551,4 +559,5 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
+#endif
 }

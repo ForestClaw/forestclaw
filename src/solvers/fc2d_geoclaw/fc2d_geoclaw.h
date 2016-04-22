@@ -79,7 +79,7 @@ typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
 
 //!!! Add maux
 typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                      const int* mwaves, const int* maux, 
+                                      const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
@@ -140,6 +140,7 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
    -------------------------------------------------------------------- */
 
 /* Macros for C/Fortran portability */
+#define SETUP   FCLAW_F77_FUNC(setup,SETUP)
 #define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
 #define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
 #define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
@@ -150,6 +151,8 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 #define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
 
 /* These will be converted to MACROS slowly ... */
+
+void GEOCLAW_SETUP();
 
 void SETPROB();
 
@@ -190,7 +193,7 @@ void SRC2(const int* meqn,
 
 /* Riemann solvers */
 void RPN2(const int* ixy,const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux, 
+          const int* mwaves, const int* maux,
           const int* mbc,const int* mx,
           double ql[], double qr[], double auxl[], double auxr[],
           double wave[], double s[],double amdq[], double apdq[]);
