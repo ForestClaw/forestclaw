@@ -35,6 +35,7 @@
 typedef struct user_options
 {
     double period;
+    int claw_version;
     int is_registered;
 
 } user_options_t;
@@ -45,20 +46,36 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-    sc_options_add_double (opt, 0, "period", &user->period, 0,
+    sc_options_add_double (opt, 0, "period", &user->period, 4,
                            "Period of the flow field [4]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                           "Clawpack_version (4 or 5) [5]");
 
     user->is_registered = 1;
     return NULL;
+}
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+    if (user->claw_version != 5)
+    {
+        fclaw_global_essentialf ("Option --user:claw_version must be 5\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
 }
 
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
     NULL,
-    NULL,
+    options_check_user,
     NULL
 };
+
 
 static
 void register_user_options (fclaw_app_t * app,
@@ -88,11 +105,11 @@ void run_program(fclaw_app_t* app)
     gparms = fclaw_forestclaw_get_options(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    
+
     gparms->manifold = 0;
     conn = p4est_connectivity_new_unitsquare();
     cont = fclaw2d_map_new_nomap();
-    
+
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
@@ -107,7 +124,7 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    
+
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
     fclaw2d_finalize(&domain);
@@ -130,9 +147,7 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-
     fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);
@@ -147,12 +162,12 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_link_app(app);
 
     /* Run the program */
-    
+
     if (!retval & !vexit)
     {
         run_program(app);
     }
-    
+
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 
