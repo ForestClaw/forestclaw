@@ -4,7 +4,7 @@ import numpy as np
 from string import Template
 import re
 import ConfigParser
-import pdb
+from pdb import set_trace
 
 def compare_runs(execname,rerun,iframe):
     import random
@@ -109,6 +109,12 @@ def write_ini_files(input_file='create_run.ini'):
         mi0 = 1
         mj0 = 1
 
+
+    try:
+        ranks_per_node = int(config.get('Run','ranks-per-node').partition('#')[0].strip())
+    except:
+        ranks_per_node = 32
+
     # Duplicate problem
     try:
         d = config.get('Run','duplicate').partition('#')[0].strip()
@@ -133,10 +139,10 @@ def write_ini_files(input_file='create_run.ini'):
     subcycle = sc in ['T','True','1']
 
     try:
-        nw = config.get('Run','noweightedp').partition('#')[0].strip()
-        noweightedp = nw in ['T','True','1']
+        nw = config.get('Run','weightedp').partition('#')[0].strip()
+        weightedp = nw in ['T','True','1']
     except:
-        noweightedp = False
+        weightedp = False
 
 
     # Advance one step?
@@ -385,10 +391,10 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
-        if noweightedp:
-            ini_file.write("    noweightedp = T\n")
+        if weightedp:
+            ini_file.write("    weighted_partition = T\n")
         else:
-            ini_file.write("    noweightedp = F\n")
+            ini_file.write("    weighted_partition = F\n")
 
         ini_file.write("\n")
 
@@ -441,15 +447,15 @@ def write_ini_files(input_file='create_run.ini'):
             proc_file.write("#@ notification = error\n")
             proc_file.write("#@ notify_user = donnacalhoun@boisestate.edu\n")
             proc_file.write("#@ job_type = bluegene\n")
-            rpn = np.min([32,p])
-            bgsize = np.ceil(p/(32.0*rpn))*32
+            rpn = np.min([ranks_per_node,p])
+            bgsize = np.max([32,np.ceil(p/rpn)])
             proc_file.write("#@ bg_size = %d\n" % bgsize)
             proc_file.write("#@ queue\n")
             proc_file.write("\n")
             proc_file.write(("runjob --ranks-per-node %d --np %d : " \
                              + "/homec/hbn26/hbn263/projects/forestclaw-build-alt/local/bin/%s " \
                              + "--inifile=ex_%05d.ini\n") %
-                            (np.min([32,p]),p,execname,p))
+                            (np.min([rpn,p]),p,execname,p))
             proc_file.close()
 
         elif scheduler == 'pbs':
@@ -678,6 +684,7 @@ def compile_results(results_dir=None,results_file='results.out',
         if re.match(pattern,f):
             # Extract proc count and jobid from file name, e.g. torus_00016.o45678
             s = f.partition('_')[2].partition('.o')
+
             pcount = int(s[0])
             jobid = int(s[2])
 
@@ -1315,28 +1322,31 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,
     tp = zip([x[0] for x in t],
              [x[1] for x in t],
              [x[2] for x in t],y_avg,gpp)
-    mx     = [x[0] for x in tp if not np.isnan(x[3])]
-    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
+    mx      = [x[0] for x in tp if not np.isnan(x[3])]
     procs1  = [x[1] for x in tp if not np.isnan(x[3])]
+    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
     y_avg1  = [x[3] for x in tp if not np.isnan(x[3])]
     gpp1  = [x[4] for x in tp if not np.isnan(x[4])]
 
     mb = None
 
-    try:
-        if ideal_slope is not None:
+    if ideal_slope is not None:
+        try:
             if ideal_slope == 0:
                 s = 'k--'
             else:
                 s = 'k.--'
-            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+
+            R = np.array([np.log(float(x))/np.log(4.0) for x in procs1])
+            if R[0] > 0:
+                R = R - R[0]
             ideal = y_avg1[0]*2**(ideal_slope*R)
             if scaling is not  'resolution':
                 plt.loglog(procs1,ideal,s,markersize=15)
             else:
                 plt.semilogy(levels1,ideal,s,markersize=15)
-    except:
-        print "plot_results_internal: Could not plot ideal curve"
+        except:
+            print "plot_results_internal: Could not plot ideal curve"
 
     try:
         mv = markers[v]
