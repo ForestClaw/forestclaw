@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,12 +41,12 @@ extern "C"
 /* Most of these do not use the "classic_claw" signature. */
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
+static fc2d_clawpack5_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    fc2d_clawpack5_init_vtable(&classic_claw);
 
     /* classic_claw.setprob = &SETPROB; */
     vt.problem_setup            = &swirl_problem_setup;
@@ -54,10 +54,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     /* setaux_manifold has customized signature */
     vt.patch_setup = &swirl_patch_setup;
 
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
+    vt.patch_initialize         = &fc2d_clawpack5_qinit;
     classic_claw.qinit = &QINIT;
 
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
+    vt.patch_physical_bc        = &fc2d_clawpack5_bc2;
 
     vt.patch_single_step_update = &swirl_patch_update;
 
@@ -65,7 +65,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.rpt2 = &RPT2;
 
     fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+    fc2d_clawpack5_set_vtable(&classic_claw);
 }
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
@@ -96,16 +96,16 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_define_auxarray(domain,this_patch);
+    fc2d_clawpack5_define_auxarray(domain,this_patch);
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&maux,
                     aux,&this_block_idx,xd,yd,zd);
 
     /* Use this to set the capacity, since we can check to make sure
        mcapa, etc are correctly set */
-    fc2d_clawpack46_set_capacity(domain, this_patch,this_block_idx,
+    fc2d_clawpack5_set_capacity(domain, this_patch,this_block_idx,
                                  this_patch_idx);
 
 }
@@ -128,7 +128,7 @@ void swirl_patch_b4step2(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
     /* Update the velocity field */
     B4STEP2_MANIFOLD(&mx,&my,&mbc, &dx,&dy,&this_block_idx,
@@ -146,8 +146,8 @@ double swirl_patch_update(fclaw2d_domain_t *domain,
     swirl_patch_b4step2(domain,this_patch,this_block_idx,
                         this_patch_idx,t,dt);
 
-    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
-                                          this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack5_step2(domain,this_patch,this_block_idx,
+                                         this_patch_idx,t,dt);
     return maxcfl;
 }
 
