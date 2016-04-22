@@ -9,7 +9,7 @@ c     # Cell centered quantities
       double precision          zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   curvature(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision surfnormals(3,-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
 
 c     # Node based quantities
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)
