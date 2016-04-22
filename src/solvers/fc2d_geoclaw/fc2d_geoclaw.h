@@ -23,13 +23,13 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_CLAWPACK5_H
-#define FC2D_CLAWPACK5_H
+#ifndef FC2D_GEOCLAW_H
+#define FC2D_GEOCLAW_H
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_package.h>
 
-#include "fc2d_clawpack5_options.h"
+#include "fc2d_geoclaw_options.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,9 +40,9 @@ extern "C"
 #endif
 
 
-typedef void (*fc2d_clawpack5_setprob_t)();
+typedef void (*fc2d_geoclaw_setprob_t)();
 //!!! Modified 2016/4/5
-typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
+typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
                                      const double* xlower, const double* ylower,
                                      const double* dx, const double* dy,
@@ -50,19 +50,19 @@ typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const double aux[], const double* t,
                                      const double* dt, const int mthbc[]);
 //!!! Modified 2016/4/5
-typedef  void (*fc2d_clawpack5_qinit_t)(const int* meqn,const int* mbc,
+typedef  void (*fc2d_geoclaw_qinit_t)(const int* meqn,const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         double q[], const int* maux, double aux[]);
 //!!! Modified 2016/4/5
-typedef void (*fc2d_clawpack5_setaux_t)(const int* mbc,
+typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         const int* maux, double aux[]);
 //!!! Modified 2016/4/5
-typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
+typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
                                          const int* mx, const int* my, const int* meqn,
                                          double q[], const double* xlower,
                                          const double* ylower,
@@ -70,7 +70,7 @@ typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
                                          const double* t, const double* dt,
                                          const int* maux, double aux[]);
 //!!! Modified 2016/4/5
-typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
+typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
                                       const int* mbc, const int* mx,const int* my,
                                       const double* xlower, const double* ylower,
                                       const double* dx, const double* dy, double q[],
@@ -78,20 +78,20 @@ typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
                                       const double* dt);
 
 //!!! Add maux
-typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
                                       const int* mwaves, const int* maux, 
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
 
-typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
+typedef void (*fc2d_geoclaw_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* maux, const int* mbc,const int* mx,
                                        double ql[], double qr[], double aux1[], double aux2[],
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
 //!!!fwave --> wave
-typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*fc2d_geoclaw_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
                                         double aux1[], double aux2[], double aux3[],
@@ -99,33 +99,33 @@ typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int
                                         double gaddp[],double cfl1d[], double wave[],
                                         double s[], double amdq[],double apdq[],double cqxx[],
                                         double bmasdq[], double bpasdq[],
-                                        fc2d_clawpack5_rpn2_t rpn2,
-                                        fc2d_clawpack5_rpt2_t rpt2);
+                                        fc2d_geoclaw_rpn2_t rpn2,
+                                        fc2d_geoclaw_rpt2_t rpt2);
 
-typedef void (*fc2d_clawpack5_fluxfun_t)(const int* meqn, double q[], double aux[],
+typedef void (*fc2d_geoclaw_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
 
 
-typedef struct fc2d_clawpack5_vtable
+typedef struct fc2d_geoclaw_vtable
 {
-    fc2d_clawpack5_setprob_t setprob;
-    fc2d_clawpack5_bc2_t bc2;
-    fc2d_clawpack5_qinit_t qinit;
-    fc2d_clawpack5_setaux_t setaux;
-    fc2d_clawpack5_b4step2_t b4step2;
-    fc2d_clawpack5_src2_t src2;
-    fc2d_clawpack5_rpn2_t rpn2;
-    fc2d_clawpack5_rpt2_t rpt2;
-    fc2d_clawpack5_fluxfun_t fluxfun;
-} fc2d_clawpack5_vtable_t;
+    fc2d_geoclaw_setprob_t setprob;
+    fc2d_geoclaw_bc2_t bc2;
+    fc2d_geoclaw_qinit_t qinit;
+    fc2d_geoclaw_setaux_t setaux;
+    fc2d_geoclaw_b4step2_t b4step2;
+    fc2d_geoclaw_src2_t src2;
+    fc2d_geoclaw_rpn2_t rpn2;
+    fc2d_geoclaw_rpt2_t rpt2;
+    fc2d_geoclaw_fluxfun_t fluxfun;
+} fc2d_geoclaw_vtable_t;
 
 
-void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* vt);
+void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* vt);
 
-void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt);
+void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt);
 
-#define CLAWPACK5_BC2 FCLAW_F77_FUNC(clawpack5_bc2,CLAWPACK5_BC2)
-void CLAWPACK5_BC2(const int* meqn, const int* mbc,
+#define GEOCLAW_BC2 FCLAW_F77_FUNC(geoclaw_bc2,GEOCLAW_BC2)
+void GEOCLAW_BC2(const int* meqn, const int* mbc,
                    const int* mx, const int* my,
                    const double* xlower, const double* ylower,
                    const double* dx, const double* dy,
@@ -205,8 +205,8 @@ void RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
    Time stepping
    -------------------------------------------------------------------- */
 
-#define CLAWPACK5_STEP2_WRAP FCLAW_F77_FUNC(clawpack5_step2_wrap,CLAWPACK5_STEP2_WRAP)
-void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
+#define GEOCLAW_STEP2_WRAP FCLAW_F77_FUNC(geoclaw_step2_wrap,GEOCLAW_STEP2_WRAP)
+void GEOCLAW_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int method[], const int mthlim[],
                             const int* mcapa, const int* mwaves, const int* mx,
                             const int* my, double qold[], double auxold[],
@@ -215,22 +215,22 @@ void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const double* xlower, const double* ylower, const int* level,
                             const double* t, double fp[], double fm[], double gp[],
                             double gm[],
-                            fc2d_clawpack5_rpn2_t rpn2,
-                            fc2d_clawpack5_rpt2_t rpt2,
-                            fc2d_clawpack5_flux2_t flux2,
+                            fc2d_geoclaw_rpn2_t rpn2,
+                            fc2d_geoclaw_rpt2_t rpt2,
+                            fc2d_geoclaw_flux2_t flux2,
                             int block_corner_count[],int* ierror);
-#define CLAWPACK5_STEP2 FCLAW_F77_FUNC(clawpack5_step2,CLAWPACK5_STEP2)
-void CLAWPACK5_STEP2(const int* maxm, const int* meqn, const int* maux,
+#define GEOCLAW_STEP2 FCLAW_F77_FUNC(geoclaw_step2,GEOCLAW_STEP2)
+void GEOCLAW_STEP2(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int* mx,
                             const int* my, double qold[], double aux[],
                             const double* dx, const double* dy, const double* dt,
                             const double* cflgrid, double fm[], double fp[], double gm[],
                             double gp[],
-                            fc2d_clawpack5_rpn2_t rpn2,
-                            fc2d_clawpack5_rpt2_t rpt2);
+                            fc2d_geoclaw_rpn2_t rpn2,
+                            fc2d_geoclaw_rpt2_t rpt2);
 
-#define CLAWPACK5_FLUX2 FCLAW_F77_FUNC(clawpack5_flux2,CLAWPACK5_FLUX2)
-void CLAWPACK5_FLUX2(const int* ixy,const int* maxm, const int* meqn,
+#define GEOCLAW_FLUX2 FCLAW_F77_FUNC(geoclaw_flux2,GEOCLAW_FLUX2)
+void GEOCLAW_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       const int* maux,const int* mbc,const int* mx,
                       double q1d[], double dtdx1d[],
                       double aux1[], double aux2[], double aux3[],
@@ -238,10 +238,10 @@ void CLAWPACK5_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       double gaddp[],double cfl1d[], double wave[],
                       double s[], double amdq[],double apdq[],double cqxx[],
                       double bmasdq[], double bpasdq[],
-                      fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2);
+                      fc2d_geoclaw_rpn2_t rpn2,fc2d_geoclaw_rpt2_t rpt2);
 /*
-#define CLAWPACK5_FLUX2FW FCLAW_F77_FUNC(clawpack5_flux2fw,CLAWPACK5_FLUX2FW)
-void CLAWPACK5_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
+#define geoclaw_FLUX2FW FCLAW_F77_FUNC(geoclaw_flux2fw,geoclaw_FLUX2FW)
+void GEOCLAW_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         const int* maux,const int* mbc,const int* mx,
                         double q1d[], double dtdx1d[],
                         double aux1[], double aux2[], double aux3[],
@@ -249,83 +249,83 @@ void CLAWPACK5_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         double gaddp[],double cfl1d[], double fwave[],
                         double s[], double amdq[],double apdq[],double cqxx[],
                         double bmasdq[], double bpasdq[],
-                        fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2,
+                        fc2d_geoclaw_rpn2_t rpn2,fc2d_geoclaw_rpt2_t rpt2,
                         const int* mwaves, const int* mcapa,
                         int method[], int mthlim[]);*/
 
-#define CLAWPACK5_SET_CAPACITY FCLAW_F77_FUNC(clawpack5_set_capacity,CLAWPACK5_SET_CAPACITY)
-void CLAWPACK5_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
+#define GEOCLAW_SET_CAPACITY FCLAW_F77_FUNC(geoclaw_set_capacity,GEOCLAW_SET_CAPACITY)
+void GEOCLAW_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                              const double *dx, const double* dy, double area[],
                              const int *mcapa, const int* maux, double aux[]);
 
 
-#define CLAWPACK5_SET_BLOCK FCLAW_F77_FUNC(clawpack5_set_block,CLAWPACK5_SET_BLOCK)
-void CLAWPACK5_SET_BLOCK(int* blockno);
+#define GEOCLAW_SET_BLOCK FCLAW_F77_FUNC(geoclaw_set_block,GEOCLAW_SET_BLOCK)
+void GEOCLAW_SET_BLOCK(int* blockno);
 
-#define FC2D_CLAWPACK5_GET_BLOCK FCLAW_F77_FUNC(fc2d_clawpack5_get_block, \
-                                                 FC2D_CLAWPACK5_GET_BLOCK)
-int FC2D_CLAWPACK5_GET_BLOCK();
+#define FC2D_GEOCLAW_GET_BLOCK FCLAW_F77_FUNC(fc2d_geoclaw_get_block, \
+                                                 FC2D_GEOCLAW_GET_BLOCK)
+int FC2D_GEOCLAW_GET_BLOCK();
 
 
-#define CLAWPACK5_UNSET_BLOCK FCLAW_F77_FUNC(clawpack5_unset_block, \
-                                              CLAWPACK5_UNSET_BLOCK)
-void CLAWPACK5_UNSET_BLOCK();
+#define GEOCLAW_UNSET_BLOCK FCLAW_F77_FUNC(geoclaw_unset_block, \
+                                              GEOCLAW_UNSET_BLOCK)
+void GEOCLAW_UNSET_BLOCK();
 
 /***************************** MINIMAL API ******************************/
 
-void fc2d_clawpack5_register_vtable (fclaw_package_container_t *
+void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
                                       pkg_container,
-                                      fc2d_clawpack5_options_t *
+                                      fc2d_geoclaw_options_t *
                                       clawopt);
 
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc2d_clawpack5_define_auxarray(fclaw2d_domain_t* domain,
+void fc2d_geoclaw_define_auxarray(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch);
 
-void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
+void fc2d_geoclaw_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
 
-int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain);
-void fc2d_clawpack5_maux(fclaw2d_domain_t* domain, int* maux);
+int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain);
+void fc2d_geoclaw_maux(fclaw2d_domain_t* domain, int* maux);
 
-void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile);
+void fc2d_geoclaw_register (fclaw_app_t* app, const char *configfile);
 
-void fc2d_clawpack5_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack5_options_t* clawopt);
+void fc2d_geoclaw_package_register(fclaw_app_t* app,
+                                      fc2d_geoclaw_options_t* clawopt);
 
-int fc2d_clawpack5_get_package_id (void);
+int fc2d_geoclaw_get_package_id (void);
 
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_domain_t *domain);
 
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc2d_clawpack5_setprob(fclaw2d_domain_t* domain);
+    fc2d_geoclaw_setprob(fclaw2d_domain_t* domain);
 
 void
-    fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_set_capacity(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
@@ -333,7 +333,7 @@ void
                             double dt);
 
 void
-    fc2d_clawpack5_bc2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_bc2(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
@@ -343,7 +343,7 @@ void
                         fclaw_bool time_interp);
 
 void
-    fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -354,7 +354,7 @@ void
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
 double
-    fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -363,7 +363,7 @@ double
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_step2_rhs(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -371,7 +371,7 @@ double
                               double *rhs);
 
 double
-fc2d_clawpack5_update(fclaw2d_domain_t *domain,
+fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,

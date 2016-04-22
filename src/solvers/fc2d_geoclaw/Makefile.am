@@ -1,35 +1,23 @@
 # -*- Makefile -*-
-libclawpack5_generated_headers =
-libclawpack5_installed_headers = \
-	src/solvers/fc2d_clawpack5/fc2d_clawpack5.h \
-	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.h
+libgeoclaw_generated_headers =
+libgeoclaw_installed_headers = \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw.h \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h
 
-libclawpack5_compiled_sources = \
-	src/solvers/fc2d_clawpack5/fc2d_clawpack5.cpp \
-	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.c \
-	src/solvers/fc2d_clawpack5/fortran_source/amr_module.f90 \
-	src/solvers/fc2d_clawpack5/fortran_source/set_amr_module.f90 \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_inlinelimiter.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_limiter.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_set_capacity.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_block.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_bc2.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_flux2.f \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f90 \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2_wrap.f \
-	src/solvers/fc2d_clawpack5/fortran_source/philim.f \
-	src/solvers/fc2d_clawpack5/fortran_source/src2.f90 
+libgeoclaw_compiled_sources = \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
 
-lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la
+lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
-src_solvers_fc2d_clawpack5_libclawpack5_la_SOURCES = \
-  $(libclawpack5_internal_headers) \
-  $(libclawpack5_compiled_sources)
+src_solvers_fc2d_geoclaw_libgeoclaw_la_SOURCES = \
+  $(libgeoclaw_internal_headers) \
+  $(libgeoclaw_compiled_sources)
 
-src_solvers_fc2d_clawpack5_libclawpack5_la_CPPFLAGS = \
+src_solvers_fc2d_geoclaw_libgeoclaw_la_CPPFLAGS = \
   $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
-FCLAW_CLAWPACK5_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack5
-FCLAW_CLAWPACK5_LDADD = @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
+FCLAW_GEOCLAW_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_geoclaw
+FCLAW_GEOCLAW_LDADD = @top_builddir@/src/solvers/fc2d_geoclaw/libgeoclaw.la
 
-include_HEADERS += $(libclawpack5_installed_headers)
+include_HEADERS += $(libgeoclaw_installed_headers)
