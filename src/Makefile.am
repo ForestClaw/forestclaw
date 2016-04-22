@@ -125,7 +125,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/5/fclaw2d_output_ascii_fort2.f \
 	src/fortran_source2d/5/fclaw2d_regrid_fort2.f \
 	src/fortran_source2d/5/fclaw2d_timeinterp_fort2.f \
-	src/fortran_source2d/fclaw2d_metric_default_fort2.f \
+	src/fortran_source2d/fclaw2d_metric_default_fort.f \
 	src/fortran_source2d/5/fclaw2d_diagnostics_fort2.f \
 	src/fortran_source2d/5/average_fv2.f \
 	src/fortran_source2d/5/interpolate_fv2.f \
