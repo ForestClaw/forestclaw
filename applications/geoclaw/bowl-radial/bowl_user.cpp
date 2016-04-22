@@ -23,34 +23,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "swirl_user.h"
+#include "bowl_user.h"
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack5.h>
-#include <fc2d_dummy.h>
+#include <fc2d_geoclaw.h>
 
-/* Leave these in for demonstration purposes */
-#include <fclaw2d_output_ascii.h>
-#include <fclaw2d_regrid_default.h>
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack5_vtable_t classic_claw;
+static fc2d_geoclaw_vtable_t geoclaw;
 
-void swirl_link_solvers(fclaw2d_domain_t *domain)
+void bowl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+  
+#if 0
+    vt.problem_setup            = &fc2d_geoclaw_setprob;
+    vt.patch_setup              = &bowl_patch_setup;
+    vt.patch_initialize         = &bowl_patch_initialize;
+    vt.patch_physical_bc        = &bowl_patch_physical_bc;
+    vt.patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
 
-    vt.problem_setup            = &fc2d_clawpack5_setprob;
-
-    vt.patch_setup              = &swirl_patch_setup;
-    vt.patch_initialize         = &swirl_patch_initialize;
-    vt.patch_physical_bc        = &swirl_patch_physical_bc;
-    vt.patch_single_step_update = &fc2d_clawpack5_update;  /* Includes b4step2 and src2 */
-
-    vt.regrid_tag4refinement     = &swirl_patch_tag4refinement;
+    vt.regrid_tag4refinement     = &bowl_patch_tag4refinement;
     vt.fort_tag4refinement      = &TAG4REFINEMENT;
 
-    vt.regrid_tag4coarsening     = &swirl_patch_tag4coarsening;
+    vt.regrid_tag4coarsening     = &bowl_patch_tag4coarsening;
     vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
@@ -60,39 +56,39 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
+#endif
+    /* Needed for the geoclaw package */
+    geoclaw.qinit = &QINIT;
+    geoclaw.bc2 = &BC2;
+    geoclaw.setaux = &SETAUX;
+    geoclaw.setprob = &SETPROB;
+    geoclaw.b4step2 = &B4STEP2;
+    geoclaw.rpn2 = &RPN2;
+    geoclaw.rpt2 = &RPT2;
 
-    /* Needed for the clawpack5 package */
-    classic_claw.qinit = &QINIT;
-    classic_claw.bc2 = &BC2;
-    classic_claw.setaux = &SETAUX;
-    classic_claw.setprob = &SETPROB;
-    classic_claw.b4step2 = &B4STEP2;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
-
-    fc2d_clawpack5_set_vtable(&classic_claw);
+    fc2d_geoclaw_set_vtable(&geoclaw);
 
 }
 
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
+void bowl_patch_setup(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx)
 {
     /* Dummy setup - use multiple libraries */
-    fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+void bowl_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
 {
     /* This is an example of how to call the initialization routines explicitly
        This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
-       entry above, or by calling fclaw2d_clawpack5_qinit(...) from here. */
+       entry above, or by calling fclaw2d_geoclaw_qinit(...) from here. */
 
     int mx,my,mbc,meqn, maux, maxmx, maxmy;
     double xlower,ylower,dx,dy;
@@ -104,7 +100,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
@@ -117,7 +113,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
 
 
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
+void bowl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -126,15 +122,15 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp)
 {
-    /* This calls bc2 in swirl/user_4.6;  that file isn't changed but
+    /* This calls bc2 in bowl/user_4.6;  that file isn't changed but
        is included to show that both the local version of bc2.f and the
-       clawpack5 library code can be included */
-    fc2d_clawpack5_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+       geoclaw library code can be included */
+    fc2d_geoclaw_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
 
 
-int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+int bowl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int blockno, int this_patch_idx,
                                int initflag)
@@ -164,7 +160,7 @@ int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int bowl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *fine_patches,
                                int blockno, int patchno)
 

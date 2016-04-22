@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef BOWL_USER_H
+#define BOWL_USER_H
 
 #include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack5.h>
+#include <fc2d_geoclaw.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,13 +37,13 @@ extern "C"
 #endif
 #endif
 
-#define SWIRL_WRITE_HEADER FCLAW_F77_FUNC(swirl_write_header, SWIRL_WRITE_HEADER)
+#define BOWL_WRITE_HEADER FCLAW_F77_FUNC(bowl_write_header, BOWL_WRITE_HEADER)
 
-void SWIRL_WRITE_HEADER(const int* iframe, const double* time,
+void BOWL_WRITE_HEADER(const int* iframe, const double* time,
                         const int* mfields, const int* ngrids);
 
-#define SWIRL_WRITE_FILE FCLAW_F77_FUNC(swirl_write_file, SWIRL_WRITE_FILE)
-void SWIRL_WRITE_FILE(const int* mx,        const int* my,
+#define BOWL_WRITE_FILE FCLAW_F77_FUNC(bowl_write_file, BOWL_WRITE_FILE)
+void BOWL_WRITE_FILE(const int* mx,        const int* my,
                       const int* meqn,      const int* mbc,
                       const double* xlower, const double* ylower,
                       const double* dx,     const double* dy,
@@ -51,21 +51,21 @@ void SWIRL_WRITE_FILE(const int* mx,        const int* my,
                       const int* patch_num, const int* level,
                       const int* blockno,   const int* mpirank);
 
-void swirl_link_solvers(fclaw2d_domain_t *domain);
+void bowl_link_solvers(fclaw2d_domain_t *domain);
 
-void swirl_problem_setup(fclaw2d_domain_t* domain);
+void bowl_problem_setup(fclaw2d_domain_t* domain);
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
+void bowl_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-void swirl_patch_initialize(fclaw2d_domain_t *domain,
+void bowl_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
 
-void swirl_patch_physical_bc(fclaw2d_domain *domain,
+void bowl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -74,19 +74,19 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
                              fclaw_bool intersects_bc[],
                              fclaw_bool time_interp);
 
-double swirl_patch_single_step_update(fclaw2d_domain_t *domain,
+double bowl_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
                                       double t,
                                       double dt);
 
-int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
+int bowl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx, int this_patch_idx,
                                       int initflag);
 
-int swirl_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int bowl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno);

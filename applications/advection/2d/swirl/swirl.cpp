@@ -148,7 +148,8 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");
-
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
+    
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);
 
