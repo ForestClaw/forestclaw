@@ -24,17 +24,25 @@ c     #   (i, my+jbc)  for jbc = 1,mbc,  i = 1-mbc, mx+mbc
 c     #   (1-ibc, j)   for ibc = 1,mbc,  j = 1-mbc, my+mbc
 c     #   (mx+ibc, j)  for ibc = 1,mbc,  j = 1-mbc, my+mbc
 c
-      implicit double precision (a-h,o-z)
-      dimension q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      dimension aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-      dimension mthbc(4)
 
-c
+      implicit none
+
+      integer meqn, mbc, mx, my, maux, mthbc(4)
+      double precision xlower, ylower, dx, dy, t, dt
+
+      double precision q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
+      double precision aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
+
+      integer m, i, j, ibc, jbc
+
 c
 c-------------------------------------------------------
 c     # left boundary:
 c-------------------------------------------------------
       go to (100,110,120,130) mthbc(1)+1
+c     this is how we skip over this side... if (mthbc(1)+1
+c     is not 1,2,3 or 4, then the goto above falls through to here...
+      goto 199
 c
   100 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -52,7 +60,7 @@ c     # zero-order extrapolation:
       go to 199
 
   120 continue
-c     # periodic:  
+c     # periodic:
       do 125 j = 1-mbc, my+mbc
          do 125 ibc=1,mbc
             do 125 m=1,meqn
@@ -80,6 +88,7 @@ c-------------------------------------------------------
 c     # right boundary:
 c-------------------------------------------------------
       go to (200,210,220,230) mthbc(2)+1
+      goto 299
 c
   200 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -97,7 +106,7 @@ c     # zero-order extrapolation:
       go to 299
 
   220 continue
-c     # periodic:  
+c     # periodic:
       do 225 j = 1-mbc, my+mbc
          do 225 ibc=1,mbc
             do 225 m=1,meqn
@@ -125,6 +134,7 @@ c-------------------------------------------------------
 c     # bottom boundary:
 c-------------------------------------------------------
       go to (300,310,320,330) mthbc(3)+1
+      goto 399
 c
   300 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -142,7 +152,7 @@ c     # zero-order extrapolation:
       go to 399
 
   320 continue
-c     # periodic:  
+c     # periodic:
       do 325 jbc=1,mbc
          do 325 i = 1-mbc, mx+mbc
             do 325 m=1,meqn
@@ -170,6 +180,7 @@ c-------------------------------------------------------
 c     # top boundary:
 c-------------------------------------------------------
       go to (400,410,420,430) mthbc(4)+1
+      goto 499
 c
   400 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -187,7 +198,7 @@ c     # zero-order extrapolation:
       go to 499
 
   420 continue
-c     # periodic:  
+c     # periodic:
       do 425 jbc=1,mbc
          do 425 i = 1-mbc, mx+mbc
             do 425 m=1,meqn
@@ -213,4 +224,3 @@ c     # negate the normal velocity:
 
       return
       end
-
