@@ -22,6 +22,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_bc2.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
+	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/setaux.f90 \
