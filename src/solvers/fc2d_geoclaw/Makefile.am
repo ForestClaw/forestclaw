@@ -20,10 +20,13 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/surge/storm_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/friction_module.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_bc2.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/setaux.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/src2.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/b4step2.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/qinit.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f

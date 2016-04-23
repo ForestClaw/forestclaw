@@ -45,19 +45,16 @@ void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* user_vt)
 void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
-#if 0
-    vt->bc2 = GEOCLAW_BC2;
-#endif
-    vt->bc2 = NULL;
-    vt->qinit = NULL;
+    vt->bc2 = &GEOCLAW_BC2;
+    vt->qinit = &QINIT;
     vt->rpn2 = NULL;
     vt->rpt2 = NULL;
 
     /* Optional functions - call only if non-NULL */
     vt->setprob = NULL;
-    vt->setaux = NULL;
-    vt->b4step2 = NULL;
-    vt->src2 = NULL;
+    vt->setaux = &SETAUX;
+    vt->b4step2 = &B4STEP2;
+    vt->src2 = &SRC2;
 }
 
 
@@ -222,7 +219,7 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
     const amr_options_t* gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
     GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
-                   geoclaw_options->mthlim, geoclaw_options->method, 
+                   geoclaw_options->mthlim, geoclaw_options->method,
                    &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
 }
 
@@ -328,7 +325,6 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
                              double t, double dt)
 
 {
-#if 0
     FCLAW_ASSERT(geoclaw_vt.b4step2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -345,7 +341,6 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
     geoclaw_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
     GEOCLAW_UNSET_BLOCK();
-#endif
 }
 
 void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
@@ -355,7 +350,6 @@ void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
                           double t,
                           double dt)
 {
-#if 0
     FCLAW_ASSERT(geoclaw_vt.src2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -372,7 +366,6 @@ void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
     geoclaw_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
     GEOCLAW_UNSET_BLOCK();
-#endif
 }
 
 
@@ -402,7 +395,6 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
                          fclaw_bool intersects_phys_bdry[],
                          fclaw_bool time_interp)
 {
-#if 0
     FCLAW_ASSERT(geoclaw_vt.bc2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -453,7 +445,6 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
     geoclaw_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     GEOCLAW_UNSET_BLOCK();
-#endif
 }
 
 

@@ -39,9 +39,9 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
     vt.problem_setup            = &fc2d_geoclaw_setprob;
     vt.patch_setup              = &fc2d_geoclaw_patch_setup;
     vt.patch_initialize         = &fc2d_geoclaw_qinit;
-#if 0
-    vt.patch_physical_bc        = &bowl_patch_physical_bc;
+    vt.patch_physical_bc        = &fc2d_geoclaw_bc2;
     vt.patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
+#if 0
 
     vt.regrid_tag4refinement     = &bowl_patch_tag4refinement;
     vt.fort_tag4refinement      = &TAG4REFINEMENT;
@@ -58,11 +58,14 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 
     fclaw2d_set_vtable(domain,&vt);
 
+    fc2d_geoclaw_init_vtable(&geoclaw);
+
+#if 0
     geoclaw.setaux = &SETAUX;
     geoclaw.qinit = &QINIT;
-#if 0
+    geoclaw.bc2 = &BC2;
+
     /* Needed for the geoclaw package */
-    geoclaw.bc2 = &BC2;  
     geoclaw.setprob = &SETPROB;
     geoclaw.b4step2 = &B4STEP2;
     geoclaw.rpn2 = &RPN2;
@@ -83,6 +86,7 @@ void bowl_patch_setup(fclaw2d_domain_t *domain,
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
+#if 0
 void bowl_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
@@ -111,6 +115,7 @@ void bowl_patch_initialize(fclaw2d_domain_t *domain,
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 #endif
 }
+#endif
 
 
 
@@ -131,6 +136,7 @@ void bowl_patch_physical_bc(fclaw2d_domain *domain,
 }
 
 
+#if 0
 int bowl_patch_tag4refinement(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int blockno, int this_patch_idx,
@@ -160,7 +166,9 @@ int bowl_patch_tag4refinement(fclaw2d_domain_t *domain,
                            &tag_patch);
     return tag_patch;
 }
+#endif
 
+#if 0
 int bowl_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *fine_patches,
                                int blockno, int patchno)
@@ -198,3 +206,4 @@ int bowl_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch;
 
 }
+#endif
