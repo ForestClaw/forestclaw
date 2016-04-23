@@ -301,7 +301,6 @@ void fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-#if 0
     FCLAW_ASSERT(geoclaw_vt.qinit != NULL); /* Must initialized */
     int mx,my,mbc,meqn,maux;
     double dx,dy,xlower,ylower;
@@ -318,7 +317,6 @@ void fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
     geoclaw_vt.qinit(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                      &maux,aux);
     GEOCLAW_UNSET_BLOCK();
-#endif
 }
 
 void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,

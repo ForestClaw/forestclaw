@@ -24,6 +24,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/setaux.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/qinit.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f
 

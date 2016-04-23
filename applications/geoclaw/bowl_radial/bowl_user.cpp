@@ -38,8 +38,8 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 
     vt.problem_setup            = &fc2d_geoclaw_setprob;
     vt.patch_setup              = &fc2d_geoclaw_patch_setup;
+    vt.patch_initialize         = &fc2d_geoclaw_qinit;
 #if 0
-    vt.patch_initialize         = &bowl_patch_initialize;
     vt.patch_physical_bc        = &bowl_patch_physical_bc;
     vt.patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
 
@@ -59,9 +59,9 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_set_vtable(domain,&vt);
 
     geoclaw.setaux = &SETAUX;
+    geoclaw.qinit = &QINIT;
 #if 0
     /* Needed for the geoclaw package */
-    geoclaw.qinit = &QINIT;
     geoclaw.bc2 = &BC2;  
     geoclaw.setprob = &SETPROB;
     geoclaw.b4step2 = &B4STEP2;
