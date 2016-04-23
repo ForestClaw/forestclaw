@@ -155,7 +155,9 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 #define GEOCLAW_SET_MODULES   FCLAW_F77_FUNC(geoclaw_set_modules, \
                                              GEOCLAW_SET_MODULES)
 void GEOCLAW_SET_MODULES(const int* mwaves_in, const int* mcapa_in,
-                    const int mthlim_in[], const int method_in[]);
+                         const int mthlim_in[], const int method_in[],
+                         const double *ax, const double *bx, const double *ay,
+                         const double *by);
 
 void SETPROB();
 

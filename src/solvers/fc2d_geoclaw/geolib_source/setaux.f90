@@ -132,10 +132,12 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
 
 !           ### parameter NEEDS_TO_BE_SET initialized in amr_module.f90
 !           ### saves time by otherwise copying instead of reinitializing
+#if 0
             if (aux(1,ii,jj) .ne. NEEDS_TO_BE_SET) then
                skipcount = skipcount + 1
                cycle  ! new system copies bathy where possible
             endif
+#endif
 
 
             ! Use input topography files if available

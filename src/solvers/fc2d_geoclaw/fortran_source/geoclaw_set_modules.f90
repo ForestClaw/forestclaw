@@ -1,5 +1,5 @@
-SUBROUTINE geoclaw_set_modules(mwaves_in,mcapa_in,mthlim_in,method_in)
-  USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves
+SUBROUTINE geoclaw_set_modules(mwaves_in,mcapa_in,mthlim_in,method_in, ax, bx, ay, by)
+  USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves, xlower, ylower, xupper, yupper
 
   !! These are not referenced below, but they compile.
   !!  USE regions_module, ONLY: set_regions
@@ -16,12 +16,18 @@ SUBROUTINE geoclaw_set_modules(mwaves_in,mcapa_in,mthlim_in,method_in)
   INTEGER, INTENT(in) :: mwaves_in, mcapa_in, method_in(7)
   INTEGER, INTENT(in) :: mthlim_in(mwaves_in)
 
+  REAL(KIND=8), INTENT(IN) :: ax, bx, ay, by
+
 !! Set values in amr_module
   mwaves = mwaves_in
   mcapa = mcapa_in
   method = method_in
   mthlim = mthlim_in
   use_fwaves = .FALSE.
+  xlower = ax
+  xupper = bx
+  ylower = ay
+  yupper = by
 
 !! Various modules from Geoclaw
   CALL set_geo()                    !# sets basic parameters g and coord system
