@@ -7,8 +7,10 @@ libgeoclaw_installed_headers = \
 libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
+	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
+	src/solvers/fc2d_geoclaw/amrlib_source/set_amr_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_module.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/qinit_module.f90 \  
+	src/solvers/fc2d_geoclaw/geolib_source/qinit_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_setup.f90
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la

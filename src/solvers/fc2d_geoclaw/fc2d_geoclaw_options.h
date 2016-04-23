@@ -64,9 +64,6 @@ fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t *
                                                              app,
                                                              const char
                                                              *configfile);
-#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
-void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
-                    const int mthlim_in[], const int method_in[]);
 
 #ifdef __cplusplus
 #if 0

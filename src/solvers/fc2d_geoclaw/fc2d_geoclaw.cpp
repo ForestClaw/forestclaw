@@ -218,6 +218,10 @@ int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
 {
+    fc2d_geoclaw_options_t *geoclaw;
+    geoclaw = fc2d_geoclaw_get_options(domain);
+    SET_AMR_MODULE(&geoclaw->mwaves, &geoclaw->mcapa,
+                   geoclaw->mthlim, geoclaw->method);
     GEOCLAW_SETUP();
 }
 

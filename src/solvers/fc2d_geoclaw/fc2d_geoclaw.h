@@ -152,6 +152,11 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 
 /* These will be converted to MACROS slowly ... */
 
+
+#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
+void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
+                    const int mthlim_in[], const int method_in[]);
+
 void GEOCLAW_SETUP();
 
 void SETPROB();
