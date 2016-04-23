@@ -36,8 +36,9 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
 
-#if 0
     vt.problem_setup            = &fc2d_geoclaw_setprob;
+
+#if 0
     vt.patch_setup              = &bowl_patch_setup;
     vt.patch_initialize         = &bowl_patch_initialize;
     vt.patch_physical_bc        = &bowl_patch_physical_bc;
