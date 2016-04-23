@@ -82,7 +82,7 @@ typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* m
                                       const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
-                                      double wave[], double s[],double amdq[], double apdq[]);
+                                      double fwave[], double s[],double amdq[], double apdq[]);
 
 typedef void (*fc2d_geoclaw_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* maux, const int* mbc,const int* mx,
@@ -225,8 +225,8 @@ void GEOCLAW_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             double gm[],
                             fc2d_geoclaw_rpn2_t rpn2,
                             fc2d_geoclaw_rpt2_t rpt2,
-                            fc2d_geoclaw_flux2_t flux2,
-                            int block_corner_count[],int* ierror);
+                            int block_corner_count[]);
+
 #define GEOCLAW_STEP2 FCLAW_F77_FUNC(geoclaw_step2,GEOCLAW_STEP2)
 void GEOCLAW_STEP2(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int* mx,

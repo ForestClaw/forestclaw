@@ -47,8 +47,8 @@ void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt)
     /* Required functions  - error if NULL*/
     vt->bc2 = &GEOCLAW_BC2;
     vt->qinit = &QINIT;
-    vt->rpn2 = NULL;
-    vt->rpt2 = NULL;
+    vt->rpn2 = &RPN2;
+    vt->rpt2 = &RPT2;
 
     /* Optional functions - call only if non-NULL */
     vt->setprob = NULL;
@@ -456,8 +456,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
                              double t,
                              double dt)
 {
-#if 0
-    fc2d_geoclaw_options_t* clawpack_options;
+    fc2d_geoclaw_options_t* geoclaw_options;
     ClawPatch *cp;
     int level;
     double *qold, *aux;
@@ -467,7 +466,7 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     FCLAW_ASSERT(geoclaw_vt.rpn2 != NULL);
     FCLAW_ASSERT(geoclaw_vt.rpt2 != NULL);
 
-    clawpack_options = fc2d_geoclaw_get_options(domain);
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
 
     cp = fclaw2d_clawpatch_get_cp(this_patch);
 
@@ -482,12 +481,13 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&qold,&meqn);
 
-    int mwaves = clawpack_options->mwaves;
+    int mwaves = geoclaw_options->mwaves;
 
     int maxm = fmax(mx,my);
 
     double cflgrid = 0.0;
 
+    /* This is no longer needed */
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
     double* work = new double[mwork];
 
@@ -498,21 +498,13 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
 
-    int ierror = 0;
-    //fc2d_geoclaw_flux2_t flux2 = clawpack_options->use_fwaves ?
-    //                                GEOCLAW_FLUX2FW : GEOCLAW_FLUX2;
-    fc2d_geoclaw_flux2_t flux2 = GEOCLAW_FLUX2;
-    GEOCLAW_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
-                          clawpack_options->mthlim, &clawpack_options->mcapa,
+    GEOCLAW_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, geoclaw_options->method,
+                          geoclaw_options->mthlim, &geoclaw_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-                          geoclaw_vt.rpn2, geoclaw_vt.rpt2,flux2,
-                          cp->block_corner_count(), &ierror);
+                          geoclaw_vt.rpn2, geoclaw_vt.rpt2,
+                          cp->block_corner_count());
 
-    FCLAW_ASSERT(ierror == 0);
-
-    //GEOCLAW_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-    //                fm, fp, gm, gp, geoclaw_vt.rpn2, geoclaw_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
     if (geoclaw_vt.fluxfun != NULL)
     {
@@ -528,8 +520,6 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     delete [] work;
 
     return cflgrid;
-#endif
-    return 0.9;  /* Change this! */
 }
 
 double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
@@ -539,9 +529,8 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                               double t,
                               double dt)
 {
-#if 0
-    const fc2d_geoclaw_options_t* clawpack_options;
-    clawpack_options = fc2d_geoclaw_get_options(domain);
+    const fc2d_geoclaw_options_t* geoclaw_options;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
     if (geoclaw_vt.b4step2 != NULL)
     {
         fc2d_geoclaw_b4step2(domain,
@@ -549,11 +538,12 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                                 this_block_idx,
                                 this_patch_idx,t,dt);
     }
+
     double maxcfl = fc2d_geoclaw_step2(domain,
                                           this_patch,
                                           this_block_idx,
                                           this_patch_idx,t,dt);
-    if (clawpack_options->src_term > 0)
+    if (geoclaw_options->src_term > 0)
     {
         fc2d_geoclaw_src2(domain,
                              this_patch,
@@ -561,6 +551,4 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
-#endif
-    return 0.9;
 }

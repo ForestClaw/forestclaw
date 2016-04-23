@@ -19,8 +19,16 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/surge/stommel_storm_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/surge/storm_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/friction_module.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/flux2fw.f \
+	src/solvers/fc2d_geoclaw/riemann_source/rpn2_geoclaw.f \
+	src/solvers/fc2d_geoclaw/riemann_source/rpt2_geoclaw.f \
+	src/solvers/fc2d_geoclaw/riemann_source/geoclaw_riemann_utils.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_bc2.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2_wrap.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
+	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
