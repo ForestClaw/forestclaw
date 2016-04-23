@@ -66,6 +66,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
                             (void*) &build_mode);
 
     vt = fclaw2d_get_vtable(domain);
+    FCLAW_ASSERT(vt.patch_initialize != NULL);
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -118,7 +119,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
          gparms->coarsen_delay);
 
-    
+
     /* ------------------------------------------------
        Set up initial domain.
 
