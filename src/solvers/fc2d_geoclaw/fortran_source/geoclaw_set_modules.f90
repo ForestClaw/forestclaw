@@ -1,6 +1,7 @@
 SUBROUTINE geoclaw_set_modules(mwaves_in,mcapa_in,mthlim_in,method_in)
   USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves
   USE geoclaw_module, ONLY: set_geo
+  USE topo_module, ONLY: read_topo_settings, read_dtopo_settings
 !!  USE qinit_module, ONLY: set_qinit
 
   IMPLICIT NONE
@@ -16,7 +17,8 @@ SUBROUTINE geoclaw_set_modules(mwaves_in,mcapa_in,mthlim_in,method_in)
   use_fwaves = .FALSE.
 
 !! Various modules from Geoclaw
-  !! CALL set_geo()                    !# sets basic parameters g and coord system
-!!  CALL set_qinit()                  !# specifies file with dh if this used instead
+  CALL set_geo()                    !# sets basic parameters g and coord system
+  CALL read_dtopo_settings()        !# specifies file with dtopo from earthquake
+  !!  CALL set_qinit()                  !# specifies file with dh if this used instead
 
 END SUBROUTINE geoclaw_set_modules

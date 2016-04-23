@@ -8,10 +8,14 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
-	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_module.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/utility_module.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/topo_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/qinit_module.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
+	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
+	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
+	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
