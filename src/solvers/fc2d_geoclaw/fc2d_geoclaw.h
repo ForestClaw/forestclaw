@@ -314,6 +314,10 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain);
 void
     fc2d_geoclaw_setprob(fclaw2d_domain_t* domain);
 
+void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx);
 void
     fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,

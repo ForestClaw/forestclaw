@@ -234,13 +234,21 @@ void fc2d_geoclaw_setprob(fclaw2d_domain_t *domain)
 }
 
 
+void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx)
+{
+    /* Dummy setup - use multiple libraries */
+    fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+}
+
 /* This should only be called when a new ClawPatch is created. */
 void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
 {
-#if 0
     FCLAW_ASSERT(geoclaw_vt.setaux != NULL);
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
@@ -257,7 +265,6 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     geoclaw_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
     GEOCLAW_UNSET_BLOCK();
-#endif
 }
 
 /* This should only be called when a new ClawPatch is created. */
