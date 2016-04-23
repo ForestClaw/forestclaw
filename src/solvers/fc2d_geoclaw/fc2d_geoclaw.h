@@ -140,7 +140,6 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
    -------------------------------------------------------------------- */
 
 /* Macros for C/Fortran portability */
-#define GEOCLAW_SETUP   FCLAW_F77_FUNC(geoclaw_setup,GEOCLAW_SETUP)
 #define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
 #define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
 #define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
@@ -152,12 +151,15 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 
 /* These will be converted to MACROS slowly ... */
 
-
-#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
-void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
+/* Specific to geoclaw */
+#define GEOCLAW_SET_AMR_MODULE FCLAW_F77_FUNC(geoclaw_set_amr_module, \
+                                              GEOCLAW_SET_AMR_MODULE)
+void GEOCLAW_SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
                     const int mthlim_in[], const int method_in[]);
 
-void GEOCLAW_SETUP();
+#define GEOCLAW_SET_MODULES   FCLAW_F77_FUNC(geoclaw_set_modules, \
+                                             GEOCLAW_SET_MODULES)
+void GEOCLAW_SET_MODULES();
 
 void SETPROB();
 
@@ -312,6 +314,7 @@ fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_domain_t *domain);
    Routines that won't change
    ------------------------------------------------------------------------- */
 void fc2d_geoclaw_setup(fclaw2d_domain_t *domain);
+
 void
     fc2d_geoclaw_setprob(fclaw2d_domain_t* domain);
 
