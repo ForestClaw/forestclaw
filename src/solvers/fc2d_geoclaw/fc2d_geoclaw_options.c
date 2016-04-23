@@ -134,12 +134,6 @@ fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt)
         fclaw_global_essentialf("geoclaw : bad maux/mcapa combination\n");
         return FCLAW_EXIT_ERROR;
     }
-    /// Need to do it after convert option to array
-
-#if 0
-    SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
-                   clawopt->mthlim, clawopt->method);
-#endif
     /* Should also check mthbc, mthlim, etc. */
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
