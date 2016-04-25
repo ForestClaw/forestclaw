@@ -39,58 +39,7 @@ extern "C"
 
 #define BOWL_WRITE_HEADER FCLAW_F77_FUNC(bowl_write_header, BOWL_WRITE_HEADER)
 
-void BOWL_WRITE_HEADER(const int* iframe, const double* time,
-                        const int* mfields, const int* ngrids);
-
-#define BOWL_WRITE_FILE FCLAW_F77_FUNC(bowl_write_file, BOWL_WRITE_FILE)
-void BOWL_WRITE_FILE(const int* mx,        const int* my,
-                      const int* meqn,      const int* mbc,
-                      const double* xlower, const double* ylower,
-                      const double* dx,     const double* dy,
-                      double q[],           const int* iframe,
-                      const int* patch_num, const int* level,
-                      const int* blockno,   const int* mpirank);
-
 void bowl_link_solvers(fclaw2d_domain_t *domain);
-
-void bowl_problem_setup(fclaw2d_domain_t* domain);
-
-void bowl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
-
-void bowl_patch_initialize(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx);
-
-void bowl_patch_physical_bc(fclaw2d_domain *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt,
-                             fclaw_bool intersects_bc[],
-                             fclaw_bool time_interp);
-
-double bowl_patch_single_step_update(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      double t,
-                                      double dt);
-
-int bowl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
-
-int bowl_patch_tag4coarsening(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno,
-                                      int patchno);
-
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
