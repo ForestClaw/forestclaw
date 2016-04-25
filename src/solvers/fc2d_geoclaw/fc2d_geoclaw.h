@@ -120,9 +120,12 @@ typedef struct fc2d_geoclaw_vtable
 } fc2d_geoclaw_vtable_t;
 
 
-void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* vt);
+void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t* vt,
+                               fc2d_geoclaw_vtable_t* geoclaw_vt);
 
-void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt);
+void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *doamin,
+                              fclaw2d_vtable_t *vt,
+                              fc2d_geoclaw_vtable_t* geoclaw_vt);
 
 #define GEOCLAW_BC2 FCLAW_F77_FUNC(geoclaw_bc2,GEOCLAW_BC2)
 void GEOCLAW_BC2(const int* meqn, const int* mbc,

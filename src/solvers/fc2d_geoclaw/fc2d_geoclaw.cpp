@@ -35,27 +35,59 @@ static int s_geoclaw_package_id = -1;
 
 static fc2d_geoclaw_vtable_t geoclaw_vt;
 
-
-
-void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* user_vt)
+/* This is provided as a convencience to the user, and is
+   called by the user app */
+void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
+                               fc2d_geoclaw_vtable_t* geoclaw_vt)
 {
-    geoclaw_vt = *user_vt;
+    /* vt         : Functions required by ForestClaw
+       geoclaw_vt : Specific to GeoClaw (or ClawPack) */
+
+    fclaw2d_init_vtable(vt);
+
+    vt->problem_setup            = &fc2d_geoclaw_setprob;  /* This function calls ... */
+    geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
+
+    vt->patch_setup              = &fc2d_geoclaw_patch_setup;
+    geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
+
+    vt->patch_initialize         = &fc2d_geoclaw_qinit;
+    geoclaw_vt->qinit            = &GEOCLAW_QINIT;
+
+    vt->patch_physical_bc        = &fc2d_geoclaw_bc2;
+    geoclaw_vt->bc2              = &GEOCLAW_BC2;
+
+    vt->patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
+    geoclaw_vt->b4step2          = &GEOCLAW_B4STEP2;
+    geoclaw_vt->src2             = &GEOCLAW_SRC2;
+    geoclaw_vt->rpn2             = &GEOCLAW_RPN2;
+    geoclaw_vt->rpt2             = &GEOCLAW_RPT2;
+
+#if 0
+    /* These will eventually have GeoClaw specific implementations */
+    vt->regrid_tag4refinement   = &geoclaw_patch_tag4refinement;
+    vt->fort_tag4refinement      = &TAG4REFINEMENT;
+
+    vt->regrid_tag4coarsening   = &geoclaw_patch_tag4coarsening;
+    vt->fort_tag4coarsening      = &TAG4COARSENING;
+
+    vt->write_header             = &fclaw2d_output_header_ascii;
+    vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
+
+    vt->patch_write_file         = &fclaw2d_output_patch_ascii;
+    vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
+
+
 }
 
-void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt)
-{
-    /* These are mostly supplied by GeoClaw, but could be
-       replaced by the user in special cases */
-    vt->bc2 = &GEOCLAW_BC2;
-    vt->qinit = &GEOCLAW_QINIT;
-    vt->setaux = &GEOCLAW_SETAUX;
-    vt->b4step2 = &GEOCLAW_B4STEP2;
-    vt->src2 = &GEOCLAW_SRC2;
-    vt->rpn2 = &GEOCLAW_RPN2;
-    vt->rpt2 = &GEOCLAW_RPT2;
 
-    /* This can be set by the user */
-    vt->setprob = NULL;
+void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
+                              fclaw2d_vtable_t *vt,
+                              fc2d_geoclaw_vtable_t* geoclaw)
+{
+    geoclaw_vt = *geoclaw;
+    fclaw2d_set_vtable(domain,vt);
 }
 
 
