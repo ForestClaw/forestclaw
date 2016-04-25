@@ -24,8 +24,6 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/riemann_source/rpt2_geoclaw.f \
 	src/solvers/fc2d_geoclaw/riemann_source/geoclaw_riemann_utils.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_bc2.f \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2_wrap.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
@@ -33,10 +31,12 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
-	src/solvers/fc2d_geoclaw/geolib_source/setaux.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/src2.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/b4step2.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/qinit.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_bc2.f \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_step2.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_setaux.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_src2.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_b4step2.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_qinit.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f
 
