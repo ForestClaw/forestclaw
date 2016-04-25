@@ -1,6 +1,6 @@
 c======================================================================
-       subroutine rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
-     &                 ql,qr,auxl,auxr,fwave,s,amdq,apdq)
+      subroutine geoclaw_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
+     &      ql,qr,auxl,auxr,fwave,s,amdq,apdq)
 c======================================================================
 c
 c Solves normal Riemann problems for the 2D SHALLOW WATER equations
@@ -110,14 +110,14 @@ c        !set normal direction
          endif
 
          !Riemann problem variables
-         hL = qr(1,i-1) 
-         hR = ql(1,i) 
-         huL = qr(mu,i-1) 
-         huR = ql(mu,i) 
+         hL = qr(1,i-1)
+         hR = ql(1,i)
+         huL = qr(mu,i-1)
+         huR = ql(mu,i)
          bL = auxr(1,i-1)
          bR = auxl(1,i)
 
-         hvL=qr(nv,i-1) 
+         hvL=qr(nv,i-1)
          hvR=ql(nv,i)
 
          !check for wet/dry boundary
@@ -217,7 +217,7 @@ c        !eliminate ghost fluxes for wall
          do mw=1,3
             sw(mw)=sw(mw)*wall(mw)
 
-               fw(1,mw)=fw(1,mw)*wall(mw) 
+               fw(1,mw)=fw(1,mw)*wall(mw)
                fw(2,mw)=fw(2,mw)*wall(mw)
                fw(3,mw)=fw(3,mw)*wall(mw)
          enddo

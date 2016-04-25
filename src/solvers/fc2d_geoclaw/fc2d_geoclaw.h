@@ -141,13 +141,13 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 
 /* Macros for C/Fortran portability */
 #define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
-#define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
-#define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
-#define B4STEP2 FCLAW_F77_FUNC(b4step2,B4STEP2)
-#define SRC2    FCLAW_F77_FUNC(src2,SRC2)
+#define GEOCLAW_QINIT   FCLAW_F77_FUNC(geoclaw_qinit,GEOCLAW_QINIT)
+#define GEOCLAW_SETAUX  FCLAW_F77_FUNC(geoclaw_setaux,GEOCLAW_SETAUX)
+#define GEOCLAW_B4STEP2 FCLAW_F77_FUNC(geoclaw_b4step2,GEOCLAW_B4STEP2)
+#define GEOCLAW_SRC2    FCLAW_F77_FUNC(geoclaw_src2,GEOCLAW_SRC2)
 #define BC2     FCLAW_F77_FUNC(bc2,BC2)
-#define RPN2    FCLAW_F77_FUNC(rpn2,RPN2)
-#define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
+#define GEOCLAW_RPN2    FCLAW_F77_FUNC(geoclaw_rpn2,GEOCLAW_RPN2)
+#define GEOCLAW_RPT2    FCLAW_F77_FUNC(geoclaw_rpt2,GEOCLAW_RPT2)
 
 /* These will be converted to MACROS slowly ... */
 
@@ -161,17 +161,17 @@ void GEOCLAW_SET_MODULES(const int* mwaves_in, const int* mcapa_in,
 
 void SETPROB();
 
-void QINIT(const int* meqn,const int* mbc,
-           const int* mx, const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy,
-           double q[], const int* maux, double aux[]);
+void GEOCLAW_QINIT(const int* meqn,const int* mbc,
+                   const int* mx, const int* my,
+                   const double* xlower, const double* ylower,
+                   const double* dx, const double* dy,
+                   double q[], const int* maux, double aux[]);
 
-void SETAUX(const int* mbc,
-            const int* mx, const int* my,
-            const double* xlower, const double* ylower,
-            const double* dx, const double* dy,
-            const int* maux, double aux[]);
+void GEOCLAW_SETAUX(const int* mbc,
+                    const int* mx, const int* my,
+                    const double* xlower, const double* ylower,
+                    const double* dx, const double* dy,
+                    const int* maux, double aux[]);
 
 void BC2(const int* meqn, const int* mbc,
          const int* mx, const int* my,
@@ -181,33 +181,33 @@ void BC2(const int* meqn, const int* mbc,
          const double aux[], const double* t,
          const double* dt, const int mthbc[]);
 
-void B4STEP2(const int* mbc,
-             const int* mx, const int* my, const int* meqn,
-             double q[], const double* xlower,
-             const double* ylower,
-             const double* dx, const double* dy,
-             const double* t, const double* dt,
-             const int* maux, double aux[]);
+void GEOCLAW_B4STEP2(const int* mbc,
+                     const int* mx, const int* my, const int* meqn,
+                     double q[], const double* xlower,
+                     const double* ylower,
+                     const double* dx, const double* dy,
+                     const double* t, const double* dt,
+                     const int* maux, double aux[]);
 
-void SRC2(const int* meqn,
-          const int* mbc, const int* mx,const int* my,
-          const double* xlower, const double* ylower,
-          const double* dx, const double* dy, double q[],
-          const int* maux, double aux[], const double* t,
-          const double* dt);
+void GEOCLAW_SRC2(const int* meqn,
+                  const int* mbc, const int* mx,const int* my,
+                  const double* xlower, const double* ylower,
+                  const double* dx, const double* dy, double q[],
+                  const int* maux, double aux[], const double* t,
+                  const double* dt);
 
 /* Riemann solvers */
-void RPN2(const int* ixy,const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux,
-          const int* mbc,const int* mx,
-          double ql[], double qr[], double auxl[], double auxr[],
-          double wave[], double s[],double amdq[], double apdq[]);
+void GEOCLAW_RPN2(const int* ixy,const int* maxm, const int* meqn,
+                  const int* mwaves, const int* maux,
+                  const int* mbc,const int* mx,
+                  double ql[], double qr[], double auxl[], double auxr[],
+                  double wave[], double s[],double amdq[], double apdq[]);
 
-void RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux, const int* mbc,const int* mx,
-          double ql[], double qr[], double aux1[], double aux2[],
-          double aux3[],  double asdq[],
-          double bmasdq[], double bpasdq[]);
+void GEOCLAW_RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
+                  const int* mwaves, const int* maux, const int* mbc,const int* mx,
+                  double ql[], double qr[], double aux1[], double aux2[],
+                  double aux3[],  double asdq[],
+                  double bmasdq[], double bpasdq[]);
 
 /* --------------------------------------------------------------------
    Time stepping

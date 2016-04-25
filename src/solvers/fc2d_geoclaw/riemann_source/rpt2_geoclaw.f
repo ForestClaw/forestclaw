@@ -1,6 +1,6 @@
 ! =====================================================
-      subroutine rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx,
-     &                ql,qr,aux1,aux2,aux3,asdq,bmasdq,bpasdq)
+      subroutine geoclaw_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx,
+     &      ql,qr,aux1,aux2,aux3,asdq,bmasdq,bpasdq)
 ! =====================================================
       use geoclaw_module, only: g => grav, tol => dry_tolerance
       use geoclaw_module, only: coordinate_system,earth_radius,deg2rad
@@ -46,11 +46,11 @@
 
       do i=2-mbc,mx+mbc
 
-         hl=qr(1,i-1) 
-         hr=ql(1,i) 
-         hul=qr(mu,i-1) 
-         hur=ql(mu,i) 
-         hvl=qr(mv,i-1) 
+         hl=qr(1,i-1)
+         hr=ql(1,i)
+         hul=qr(mu,i-1)
+         hur=ql(mu,i)
+         hvl=qr(mv,i-1)
          hvr=ql(mv,i)
 
 !===========determine velocity from momentum===========================

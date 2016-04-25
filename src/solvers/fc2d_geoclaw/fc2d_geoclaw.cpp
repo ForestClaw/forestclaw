@@ -44,21 +44,19 @@ void fc2d_geoclaw_set_vtable(const fc2d_geoclaw_vtable_t* user_vt)
 
 void fc2d_geoclaw_init_vtable(fc2d_geoclaw_vtable_t* vt)
 {
-    /* Required functions  - error if NULL*/
+    /* These are mostly supplied by GeoClaw, but could be
+       replaced by the user in special cases */
     vt->bc2 = &GEOCLAW_BC2;
-    vt->qinit = &QINIT;
-    vt->rpn2 = &RPN2;
-    vt->rpt2 = &RPT2;
+    vt->qinit = &GEOCLAW_QINIT;
+    vt->setaux = &GEOCLAW_SETAUX;
+    vt->b4step2 = &GEOCLAW_B4STEP2;
+    vt->src2 = &GEOCLAW_SRC2;
+    vt->rpn2 = &GEOCLAW_RPN2;
+    vt->rpt2 = &GEOCLAW_RPT2;
 
-    /* Optional functions - call only if non-NULL */
+    /* This can be set by the user */
     vt->setprob = NULL;
-    vt->setaux = &SETAUX;
-    vt->b4step2 = &B4STEP2;
-    vt->src2 = &SRC2;
 }
-
-
-
 
 
 /* Patch data is stored in each ClawPatch */
