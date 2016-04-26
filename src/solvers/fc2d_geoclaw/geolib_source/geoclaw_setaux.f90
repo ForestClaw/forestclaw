@@ -130,9 +130,10 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
         IF ((y>yupper) .OR. (y<ylower) .OR. &
              (x>xupper) .OR. (x<xlower)) CYCLE
 
+#if 0
         !! ### parameter NEEDS_TO_BE_SET initialized in amr_module.f90
         !! ### saves time by otherwise copying instead of reinitializing
-#if 0
+        !! FORESTCLAW change
         IF (aux(1,ii,jj) .NE. NEEDS_TO_BE_SET) THEN
            skipcount = skipcount + 1
            CYCLE  ! new system copies bathy where possible

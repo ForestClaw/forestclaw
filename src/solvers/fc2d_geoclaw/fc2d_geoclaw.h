@@ -282,6 +282,16 @@ int FC2D_GEOCLAW_GET_BLOCK();
                                               GEOCLAW_UNSET_BLOCK)
 void GEOCLAW_UNSET_BLOCK();
 
+/************************ Regridding ******************************/
+#define GEOCLAW_TAG4REFINEMENT FCLAW_F77_FUNC(geoclaw_tag4refinement,GEOCLAW_TAG4REFINEMENT)
+void GEOCLAW_TAG4REFINEMENT(int* mx,int* my, int* mbc, int *meqn,int*maux,
+                            double * xlower,double * ylower,
+                            double* dx,double* dy, double*t, int* blockno,
+                            double q[], double aux[], int* level,int* maxlevel,
+                            int* init_flag,int* tag_patch);
+
+
+
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -394,6 +404,17 @@ fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        double t,
                        double dt);
+
+int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *fine_patches,
+                                      int blockno, int patchno);
+
+int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno, int this_patch_idx,
+                                      int initflag);
+
+
 
 #ifdef __cplusplus
 #if 0

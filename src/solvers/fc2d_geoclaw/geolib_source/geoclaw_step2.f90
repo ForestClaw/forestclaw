@@ -91,6 +91,7 @@ SUBROUTINE geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
         ! Copy old q into 1d slice
        q1d(:,1-mbc:mx+mbc) = qold(:,1-mbc:mx+mbc,j)
 
+       !! FORESTCLAW change to handle cubed sphere
        IF (j .EQ. 0) THEN
           DO m = 1,meqn
              IF (block_corner_count(0) .EQ. 3) THEN
@@ -163,6 +164,7 @@ SUBROUTINE geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
        ! Copy data along a slice into 1d arrays:
        q1d(:,1-mbc:my+mbc) = qold(:,i,1-mbc:my+mbc)
 
+       !! FORESTCLAW change to handle cubed sphere
        IF (i .EQ. 0) THEN
           DO m = 1,meqn
              IF (block_corner_count(0) .EQ. 3) THEN
