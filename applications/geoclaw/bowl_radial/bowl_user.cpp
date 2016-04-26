@@ -42,8 +42,8 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 
 #if 0
     /* Example of a function the user can set. */
-    vt->problem_setup            = &fc2d_geoclaw_setprob;
-    geoclaw_vt->setprob          = NULL;
+    vt->problem_setup            = &bowl_problem_setup; /* Written by the user */
+    geoclaw_vt->setprob          = NULL;   /* Must be of correct type */
 
     /* etc ... */
 #endif
