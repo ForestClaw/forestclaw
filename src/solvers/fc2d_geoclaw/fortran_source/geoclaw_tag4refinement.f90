@@ -97,7 +97,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
 
         !! Check to see if refinement is forced in any other region:
         DO m=1,num_regions
-           IF (level < regions(m)%min_level .AND. &
+           IF (level <= regions(m)%max_level .AND. &
                 t >= regions(m)%t_low .AND. t <= regions(m)%t_hi) THEN
               if (x_hi > regions(m)%x_low .and. x_low < regions(m)%x_hi .and. &
                    y_hi > regions(m)%y_low .and. y_low < regions(m)%y_hi ) then
@@ -135,7 +135,8 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
         !! -----------------------------------------------------------------
         !! Refinement not forced, so check if it is allowed and if so,
         !! check if there is a reason to flag this point:
-        IF (allowflag(x_c,y_c,t,level)) THEN
+        !!        IF (allowflag(x_c,y_c,t,level)) THEN
+        IF (.FALSE.) THEN
            if (q(1,i,j) > dry_tolerance) then
               eta = q(1,i,j) + aux(1,i,j)
 
