@@ -32,7 +32,9 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
 
   !! Storm specific variables
   REAL(kind=8) :: R_eye(2), wind_speed
-  logical allowflag
+  LOGICAL allowflag
+
+  LOGICAL time_interval, space_interval
 
   tag_patch = 0
   t0 = 0
@@ -97,13 +99,17 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
 
         !! Check to see if refinement is forced in any other region:
         DO m=1,num_regions
-           IF (level <= regions(m)%max_level .AND. &
-                t >= regions(m)%t_low .AND. t <= regions(m)%t_hi) THEN
-              if (x_hi > regions(m)%x_low .and. x_low < regions(m)%x_hi .and. &
-                   y_hi > regions(m)%y_low .and. y_low < regions(m)%y_hi ) then
+           time_interval = t >= regions(m)%t_low .AND. t <= regions(m)%t_hi
+           space_interval = x_hi > regions(m)%x_low .AND. x_low < regions(m)%x_hi &
+                .AND. y_hi > regions(m)%y_low .AND. y_low < regions(m)%y_hi
+           IF (time_interval .AND. space_interval) THEN
+              IF (level < regions(m)%min_level) THEN
+                 !! Refine to at least to the minimum level
                  tag_patch = 1
-                 return
-              endif
+                 RETURN
+              ELSEIF (level >= regions(m)%max_level) THEN
+                 !! Return without refining further ??
+              ENDIF
            ENDIF
         enddo
 
@@ -123,20 +129,21 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
         !! specified and need to force refinement:
         !! This assumes that t0 = 0.d0, should really be t0 but we do
         !! not have access to that parameter in this routine
-        if (qinit_type > 0 .and. t == t0) then
-           if (level < min_level_qinit .and. &
-                x_hi > x_low_qinit .and. x_low < x_hi_qinit .and. &
-                y_hi > y_low_qinit .and. y_low < y_hi_qinit) then
-              tag_patch = 1
-              return
+        IF (qinit_type > 0 .AND. init_flag .NE. 0) THEN
+           space_interval = x_hi > x_low_qinit .and. x_low < x_hi_qinit .and. &
+                y_hi > y_low_qinit .AND. y_low < y_hi_qinit
+           IF (space_interval) THEN
+              IF (level < min_level_qinit) THEN
+                 tag_patch = 1
+                 RETURN
+              END IF
            endif
         endif
 
         !! -----------------------------------------------------------------
         !! Refinement not forced, so check if it is allowed and if so,
         !! check if there is a reason to flag this point:
-        !!        IF (allowflag(x_c,y_c,t,level)) THEN
-        IF (.FALSE.) THEN
+        IF (allowflag(x_c,y_c,t,level)) THEN
            if (q(1,i,j) > dry_tolerance) then
               eta = q(1,i,j) + aux(1,i,j)
 

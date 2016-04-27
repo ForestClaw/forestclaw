@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
 
+/* Needed for debugging */
+#include "types.h"
+
+struct region_type region_type_for_debug;
+
 static int s_geoclaw_package_id = -1;
 
 static fc2d_geoclaw_vtable_t geoclaw_vt;

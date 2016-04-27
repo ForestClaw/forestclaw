@@ -2,6 +2,7 @@
 libgeoclaw_generated_headers =
 libgeoclaw_installed_headers = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.h \
+	src/solvers/fc2d_geoclaw/types.h \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h
 
 libgeoclaw_compiled_sources = \

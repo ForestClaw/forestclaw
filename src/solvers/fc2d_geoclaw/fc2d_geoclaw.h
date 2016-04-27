@@ -39,7 +39,6 @@ extern "C"
 #endif
 #endif
 
-
 typedef void (*fc2d_geoclaw_setprob_t)();
 
 typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
