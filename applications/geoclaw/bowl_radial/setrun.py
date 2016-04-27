@@ -318,12 +318,12 @@ def setrun(claw_pkg='geoclaw'):
     #regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
     #regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
 
-    regions.append([4, 4, 0., 1.e10, -100.,100., -100.,100.])
-    regions.append([4, 5, 0., 1.e10,    0.,100.,    0.,100.])
+    regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
+    regions.append([3, 6, 0., 1.e10,    0.,100.,    0.,100.])
     regions.append([5, 6, 3., 1.e10,   52., 72.,   52., 72.])
     regions.append([5, 6, 3., 1.e10,   75., 95.,   -10.,  10.])
-    regions.append([5, 7, 3.4, 1.e10,   57., 68.,   57., 68.])
-    regions.append([5, 7, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+    regions.append([6, 6, 3.4, 1.e10,   57., 68.,   57., 68.])
+    regions.append([6, 6, 3.4, 1.e10,   83., 92.,   -4.,  4.])
 
     # == setgauges.data values ==
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
@@ -392,7 +392,7 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([2, 1, 1, 0., 1.e10, 'bowl.topotype2'])
+    topo_data.topofiles.append([2, 2, 2, 0., 1.e10, 'bowl.topotype2'])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
@@ -404,7 +404,7 @@ def setgeo(rundata):
     rundata.qinit_data.qinitfiles = []
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
-    rundata.qinit_data.qinitfiles.append([1, 2, 'hump.xyz'])
+    rundata.qinit_data.qinitfiles.append([4, 4, 'hump.xyz'])
 
     # == setfixedgrids.data values ==
     fixedgrids = rundata.fixed_grid_data.fixedgrids

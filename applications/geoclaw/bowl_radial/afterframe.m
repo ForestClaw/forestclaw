@@ -3,10 +3,13 @@ axis([-100 100 -100 100])
 daspect([1 1 1]);
 axis on;
 
-showpatchborders(5:10);
+showpatchborders(3:10);
+hidepatchborders(7)
+cv = linspace(qmin,qmax,20);
+drawcontourlines(cv);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
-caxis([-0.9,0.9])
+caxis([0,qmax])
 
 view(2);
 
