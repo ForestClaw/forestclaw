@@ -64,16 +64,6 @@ void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt)
 /* Patch data is stored in each ClawPatch */
 struct patch_aux_data
 {
-<<<<<<< Updated upstream
-=======
-    /* Buffers used for conservation */
-#if 0
-    FArrayBox fine_ghost_buffers[4];     /* Needed for qad Riemann solve */
-#endif
-
-    FArrayBox fine_flux_buffers[4];      /* Store fp/fm at each edge, after update */
-
->>>>>>> Stashed changes
     FArrayBox auxarray;
     int maux;
 };
@@ -522,35 +512,11 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     FCLAW_ASSERT(ierror == 0);
 
-<<<<<<< Updated upstream
     /* Accumulate fluxes needed for conservative fix-up */
     if (classic_vt.fluxfun != NULL)
     {
         /* Accumulate fluxes */
     }
-=======
-    /* 1. Accumulate fluxes at fine grid edges. */
-    double *qnew = qold;  /* Updated solution stored in qold */
-    double *flux_splitting[4];
-    flux_splitting[0] = fm;
-    flux_splitting[1] = fp;
-    flux_splitting[2] = gm;
-    flux_splitting[3] = gp;
-
-    patch_aux_data *clawpack_patch_data = get_patch_data(cp);
-    for(int iface = 0; iface < 4; iface++)
-    {
-        fclaw2d_patch_relation_t face_type =
-            fclaw2d_patch_get_face_type(this_patch,iface);
-        if (face_type == FCLAW2D_PATCH_DOUBLESIZE)
-        {
-            double *buffer = clawpack_patch_data->fine_flux_buffers[iface].dataPtr();
-            CLAWPACK46_FLUX_ADD(&mx,&my, &mbc, &meqn, &dx, &dy, &dt,
-                                qnew, flux_splitting[iface], &iface, buffer);
-        }
-    }
-
->>>>>>> Stashed changes
 
 
     delete [] fp;
