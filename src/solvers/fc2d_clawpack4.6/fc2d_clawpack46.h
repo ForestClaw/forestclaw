@@ -250,6 +250,14 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                              const double *dx, const double* dy, double area[],
                              const int *mcapa, const int* maux, double aux[]);
 
+#define CLAWPACK46_FLUX_ADD FCLAW_F77_FUNC(clawpack46_flux_add, CLAWPACK46_FLUX_ADD)
+void CLAWPACK46_FLUX_ADD(const int* mx, const int* my, const int *mbc,
+                         const int* meqn, const double* dx, const double *dy,
+                         const double *dt, double qnew[],
+                         double flux[], const int *iface,
+                         double buffer[]);
+
+
 
 #define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block,CLAWPACK46_SET_BLOCK)
 void CLAWPACK46_SET_BLOCK(int* blockno);

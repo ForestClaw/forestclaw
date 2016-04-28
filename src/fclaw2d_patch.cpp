@@ -96,6 +96,7 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
+    FCLAW_ASSERT(0 <= iface && iface < 4);
     return pdata->face_neighbors[iface];
 }
 
