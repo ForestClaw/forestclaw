@@ -39,7 +39,8 @@ Changes that are more than just name changes are designated with "FORESTCLAW"
         ENDIF
     #endif
 
-
+7.  Added 'types.h' file which contains definitions of F90 types used
+    in GeoClaw.  These are useful for debugging in GDB.
 
 # -----------------
 # Questions
