@@ -105,6 +105,17 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
+size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int mbc = gparms->mbc;
+    size_t size = (mx+2*mbc)*(my+2*mbc)*meqn;
+
+    return size;
+}
 
 
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
