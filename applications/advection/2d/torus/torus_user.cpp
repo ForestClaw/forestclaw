@@ -75,6 +75,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
+    vt.fort_compute_error = &torus_compute_error;
 
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);

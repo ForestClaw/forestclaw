@@ -81,16 +81,26 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
                                             const double shift[],
                                             const double rotate[]);
 
+
+#define TORUS_COMPUTE_ERROR FCLAW_F77_FUNC(torus_compute_error,TORUS_COMPUTE_ERROR)
+
+void TORUS_COMPUTE_ERROR(int *mx, int *my, int* mbc, int* meqn,
+                         double *dx, double *dy, double *xlower,
+                         double *ylower, double *t, double q[],
+                         double error[]);
+
+#if 0
 fclaw2d_map_context_t* fclaw2d_map_new_duplicate(fclaw2d_map_context_t* brick);
 
 
 #define  FCLAW2D_MAP_C2M_DUPLICATE_INIT FCLAW_F77_FUNC(fclaw2d_map_c2m_duplicate_init, \
                                                        FCLAW2D_MAP_C2M_DUPLICATE_INIT)
 
-    void FCLAW2D_MAP_C2M_DUPLICATE_INIT(fclaw2d_map_context_t ** cont,
-                                        const double *xc, const double *yc,
-                                        double *xp, double *yp, double *zp);
+void FCLAW2D_MAP_C2M_DUPLICATE_INIT(fclaw2d_map_context_t ** cont,
+                                    const double *xc, const double *yc,
+                                    double *xp, double *yp, double *zp);
 
+#endif
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
