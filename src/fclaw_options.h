@@ -171,6 +171,7 @@ struct amr_options
 
     /* Diagnostics */
     int run_user_diagnostics;
+    int compute_error;
     int conservation_check;
     int trapfpe;
 
