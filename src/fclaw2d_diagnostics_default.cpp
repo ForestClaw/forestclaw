@@ -23,41 +23,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DIAGNOSTICS_FORT_H
-#define FCLAW2D_DIAGNOSTICS_FORT_H
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_vtable.h>
 
-#ifdef __cplusplus
-extern "C"
+void fclaw2d_diagnostics_compute_error(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       int this_block_idx,
+                                       int this_patch_idx,
+                                       double *error)
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+    int mx, my, mbc, meqn;
+    double xlower,ylower,dx,dy;
+    double t;
 
-/* Not obvious that the user would want to generalize the conservation routine,
-   so they are not in a 'default' file.*/
-#define FCLAW2D_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_fort_conservation_check, \
-                                                FCLAW2D_FORT_CONSERVATION_CHECK)
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
-void FCLAW2D_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
-                                     double *dx, double *dy,
-                                     double* area, double *q, double* sum);
+    t = fclaw2d_domain_get_time(domain);
 
-/* These are only needed if the user has not supplied their own routine to compute
-   the area of the entire domain. Not obvious taht the user would want to
-   generalize these routines. */
-#define FCLAW2D_FORT_COMPUTE_AREA FCLAW_F77_FUNC(fclaw2d_fort_compute_area, \
-                                                 FCLAW2D_FORT_COMPUTE_AREA)
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-double FCLAW2D_FORT_COMPUTE_AREA(int *mx, int* my, int*mbc, double* dx,
-                                 double* dy, double area[]);
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
+    FCLAW_ASSERT(vt.fort_compute_error != NULL);
+    vt.fort_compute_error(&mx,&my,&mbc,&meqn,&dx,&dy,&xlower,&ylower,
+                          &t, q, error);
 }
-#endif
-
-#endif

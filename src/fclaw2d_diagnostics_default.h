@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DIAGNOSTICS_FORT_H
-#define FCLAW2D_DIAGNOSTICS_FORT_H
+#ifndef FCLAW2D_DIAGNOSTICS_DEFAULT_H
+#define FCLAW2D_DIAGNOSTICS_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,24 +34,11 @@ extern "C"
 #endif
 #endif
 
-/* Not obvious that the user would want to generalize the conservation routine,
-   so they are not in a 'default' file.*/
-#define FCLAW2D_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_fort_conservation_check, \
-                                                FCLAW2D_FORT_CONSERVATION_CHECK)
-
-void FCLAW2D_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
-                                     double *dx, double *dy,
-                                     double* area, double *q, double* sum);
-
-/* These are only needed if the user has not supplied their own routine to compute
-   the area of the entire domain. Not obvious taht the user would want to
-   generalize these routines. */
-#define FCLAW2D_FORT_COMPUTE_AREA FCLAW_F77_FUNC(fclaw2d_fort_compute_area, \
-                                                 FCLAW2D_FORT_COMPUTE_AREA)
-
-double FCLAW2D_FORT_COMPUTE_AREA(int *mx, int* my, int*mbc, double* dx,
-                                 double* dy, double area[]);
-
+/* This calls FORT_COMPUTE_ERROR */
+typedef void (*fclaw2d_compute_error_t)(int* mx, int* my, int *mbc, int* meqn,
+                                        double* dx, double* dy,
+                                        double *xlower, double *ylower,
+                                        double q[], double error[]);
 
 #ifdef __cplusplus
 #if 0
