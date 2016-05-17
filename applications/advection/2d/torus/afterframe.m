@@ -78,7 +78,7 @@ cm = ...
 
 %%
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
   MaxFrames = 128;
   axis([0 1 0 1]);
@@ -97,13 +97,13 @@ end
 
 %%
 prt = false;
-% NoQuery = 0;
+NoQuery = 0;
 if (prt)
     MaxFrames = 41;
     axis([0 1 0 1]);
     axis off;
     delete(get(gca,'title'));
-%     hidepatchborders;
+    hidepatchborders;
     figsize = [4,4];  % Should match size set in options
 %     set(gcf,'papersize',figsize);
 %     set(gca,'position',[0 0 1 1]);
@@ -144,7 +144,7 @@ if (prt)
         export_fig('-dpng','-transparent','-r1024',...
             '-a1','-p0','-nocrop','-native',fname_png);
         amrclaw = 0;
-        create_tikz_plot(Frame,fname_prefix,amrclaw,fname_soln_tikz);
+        create_tikz_plot(Frame,fname_prefix,amrclaw);
     end
 
 end
