@@ -11,7 +11,7 @@ Changes that are more than just name changes are designated with "FORESTCLAW"
 1. Copy clawpack5 library files (fc2d_clawpack5.{cpp,h} to
    fc2d_geoclaw.{cpp,h}.   Change names accordingly.
 
-2. Create diretorys geolib_source, amrlib_source, fortran_source,
+2. Create directories geolib_source, amrlib_source, fortran_source,
    riemann_source
    -- geolib_source : all files from clawpack/geoclaw/src/2d/shallow
    -- amrlib_source : some files from clawpack/amrclaw/src/2d;
@@ -41,6 +41,8 @@ Changes that are more than just name changes are designated with "FORESTCLAW"
 
 7.  Added 'types.h' file which contains definitions of F90 types used
     in GeoClaw.  These are useful for debugging in GDB.
+
+8.  File 'geoclaw_tag4refinement.f90' replaces 'flag2refine.f90'.
 
 # -----------------
 # Questions
