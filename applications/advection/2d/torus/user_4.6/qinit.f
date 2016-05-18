@@ -13,14 +13,24 @@
       double precision x,y,z, xlow, ylow, w,xc,yc
       double precision q0
 
+      integer example
+      common /comm_example/ example
+
       blockno = fc2d_clawpack46_get_block()
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             xlow = xlower + (i-1)*dx
             ylow = ylower + (j-1)*dy
-            call cellave2(blockno,xlow,ylow,dx,dy,w)
-            q(i,j,1) = w
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+            if (example .eq. 6) then
+c              # use this to get a smooth solution for computing the error
+               q(i,j,1) = q0(blockno,xc,yc)
+            else
+               call cellave2(blockno,xlow,ylow,dx,dy,w)
+               q(i,j,1) = w
+            endif
          enddo
       enddo
 
@@ -121,9 +131,18 @@ c           # No mapping.
       double precision r,r0
       logical fclaw2d_map_is_used
       double precision Hsmooth
+      integer i
+
+      double precision xloc(0:4),yloc(0:4),zloc(0:4)
 
       double precision pi
       common /compi/ pi
+
+      integer example
+      common /comm_example/ example
+
+      data xloc /0, 1, 1, 0, 0.5d0/
+      data yloc /0, 0, 1, 1, 0.5d0/
 
       cont = get_context()
 
@@ -135,10 +154,22 @@ c           # No mapping.
          r = sqrt((xp - 1.0)**2 + yp**2 + (zp-r0)**2)
          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
       else
-         xp = xc
-         yp = yc
-         rp = sqrt(xp**2 + yp**2)
-         q0 = rp-0.25d0
+         if (example .eq. 6) then
+            xp = xc
+            yp = yc
+            q0 = 0
+            r0 = 0.3d0
+            do i = 4,4
+               rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
+               q0 = q0 + Hsmooth(rp + r0) -
+     &               Hsmooth(rp - r0)
+            enddo
+         else
+            xp = xc
+            yp = yc
+            rp = sqrt(xp**2 + yp**2)
+            q0 = rp-0.25d0
+         endif
       endif
 
       end
@@ -148,6 +179,6 @@ c           # No mapping.
 
       double precision r
 
-      Hsmooth = (tanh(r/0.05d0) + 1)/2.0
+      Hsmooth = (tanh(r/0.01d0) + 1)/2.d0
 
       end

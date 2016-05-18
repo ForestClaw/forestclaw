@@ -80,7 +80,8 @@ c           # y-faces
 
       double precision x,y, revs_per_s
 
-      revs_per_s = 0.5d0
+      revs_per_s = 0.0d0
       psi_nomap = revs_per_s*(-x + y)
+      psi_nomap = revs_per_s*(y)
 
       end

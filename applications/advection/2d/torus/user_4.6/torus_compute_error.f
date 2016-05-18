@@ -1,8 +1,8 @@
-      subroutine torus_compute_error(mx,my,mbc,meqn,
+      subroutine torus_compute_error(blockno, mx,my,mbc,meqn,
      &      dx,dy,xlower,ylower,t, q,error)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mbc,meqn, blockno
       double precision dx, dy, xlower, ylower, t
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -15,7 +15,7 @@ c     # Assume a single field variable only
          do i = 1,mx
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            error(i,j,m) = abs(q(i,j,m) - qexact(xc,yc,t));
+            error(i,j,1) = abs(q(i,j,1) - qexact(blockno,xc,yc,t));
          enddo
       enddo
 
@@ -23,20 +23,19 @@ c     # Assume a single field variable only
       end
 
 
-      double precision function qexact(xc,yc,t)
+      double precision function qexact(blockno,xc,yc,t)
       implicit none
 
+      integer blockno
       double precision xc,yc,t
       double precision x0, y0, u0, v0
+      double precision q0
 
-      u0 = 1
-      v0 = 1
+      u0 = 0.d0
+      v0 = 0.d0
 
-      x0 = 0.5d0
-      y0 = 0.5d0
-
-
-      qexact = 0.d0
+c     # Assume velocity is horizontal;  unit speed.
+      qexact = q0(blockno, xc-t,yc)
 
 
       end

@@ -42,6 +42,14 @@ end
 daspect([1,1,1]);
 
 if (isflat)
+    u0 = 0;
+    v0 = 1;
+    r0 = 0.3;
+    cloc = [0.5, 0.5];
+    th = linspace(0,2*pi,200);
+    hold on;
+    plot(r0*cos(th) + cloc(1),r0*sin(th) + cloc(2),'linewidth',3,'color','k');
+    hold off;
     view(2);
 else
     hidepatchborders;
@@ -59,6 +67,10 @@ end
 
 setpatchborderprops('linewidth',1)
 hidepatchborders(9)
+% cv = [0.5 0.5];
+% drawcontourlines(cv);
+% setcontourlineprops('linewidth',2);
+
 
 %%
 cm = ...
