@@ -73,7 +73,6 @@ void cb_diagnostics_compute_sum(fclaw2d_domain_t *domain,
 
 static
 void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
-                                const double t,
                                 int init_flag,
                                 fclaw2d_timer_names_t running)
 {
@@ -98,16 +97,16 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
         fclaw2d_timer_stop (&ddata->timers[running]);
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
-    for (int i = 0; i < meqn; i++)
+    for (int m = 0; m < meqn; m++)
     {
-        global_sum[i] = fclaw2d_domain_global_sum (domain, local_sum[i]);
+        global_sum[m] = fclaw2d_domain_global_sum (domain, local_sum[m]);
         /* One time setting for initial sum */
         if (init_flag)
         {
-            global_sum0[i] = global_sum[i];
+            global_sum0[m] = global_sum[m];
         }
-        fclaw_global_productionf("sum[%d] =  %24.16e  %24.16e\n",i,global_sum[i],
-                                 fabs(global_sum[i]-global_sum0[i]));
+        fclaw_global_productionf("sum[%d] =  %24.16e  %24.16e\n",m,global_sum[m],
+                                 fabs(global_sum[m]-global_sum0[m]));
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
     if (running != FCLAW2D_TIMER_NONE) {
@@ -129,31 +128,16 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
    ------------------------------------------------------------- */
 
 static
-void cb_diagnostics_total_area(fclaw2d_domain_t *domain,
+void cb_diagnostics_patch_area(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
                                int this_patch_idx,
                                void *user)
 {
     double *sum = (double*) user;
-
-
-    *sum += FCLAW2D_FORT_COMPUTE_AREA(&mx,&my,&mbc,&dx,&dy,&area);
-}
-
-static
-double fclaw2d_compute_area(fclaw2d_domain_t *domain,
-                            fclaw2d_timer_names_t running)
-{
-#if 0
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-#endif
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    int mx, my, mbc, meqn;
+    int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    double local_sum;
-    double global_sum;
+    double *area;
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -161,11 +145,23 @@ double fclaw2d_compute_area(fclaw2d_domain_t *domain,
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
 
 
+    *sum += FCLAW2D_FORT_COMPUTE_PATCH_AREA(&mx,&my,&mbc,&dx,&dy,area);
+}
+
+static
+double fclaw2d_compute_total_area(fclaw2d_domain_t *domain,
+                                  fclaw2d_timer_names_t running)
+{
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+
+    double local_sum;
+    double global_sum;
+
     /* ----------------------------------------------------
        Accumulate area for all patches on this processor
        ---------------------------------------------------- */
     local_sum = 0;
-    fclaw2d_domain_iterate_patches(domain,cb_diagnostics_compute_area,
+    fclaw2d_domain_iterate_patches(domain,cb_diagnostics_patch_area,
                                    (void *) &local_sum);
 
 
@@ -197,8 +193,10 @@ double fclaw2d_compute_area(fclaw2d_domain_t *domain,
    ------------------------------------------------------------- */
 
 typedef struct {
-    double* error_norm;
-    double* error;
+    double* local_error;  /* meqn x 3 array of errors on a patch */
+#if 0
+    double* error;  /* Grid of errors, computed in user-defined routine */
+#endif
 } error_info_t;
 
 static
@@ -208,37 +206,40 @@ void cb_diagnostics_compute_error(fclaw2d_domain_t *domain,
                                   int this_patch_idx,
                                   void *user)
 {
-    error_info_t error_data = (error_info_t*) user;
-    double *area;
+    error_info_t *error_data = (error_info_t*) user;
+    double *area, *error;
     double *q;
-    double *error;
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy;
+    fclaw2d_vtable_t vt;
+
+    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(domain,this_patch); /* Might be NULL */
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    vt.compute_error(domain,this_patch,this_block_idx,this_patch_idx,
-                     error_data->error)
+    error = fclaw2d_clawpatch_get_error(domain,this_patch);
 
-    FCLAW2D_FORT_COMPUTE_ERROR(&mx, &my, &mbc, &meqn, &dx,&dy, area,
-                               error_data->error, error_data->error_norm)
+    vt.compute_patch_error(domain,this_patch,this_block_idx,this_patch_idx,
+                     error);
+
+    /* Accumulate sums and maximums needed to compute errors */
+    FCLAW2D_FORT_COMPUTE_ERROR_NORM(&mx, &my, &mbc, &meqn, &dx,&dy, area,
+                                    error, error_data->local_error);
 }
 
 static
-void fclaw2d_compute_error(fclaw2d_domain_t *domain,
-                           fclaw2d_timer_names_t running)
+void fclaw2d_compute_total_error(fclaw2d_domain_t *domain,
+                                 fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     const amr_options_t *gparms = get_domain_parms(domain);
 
     double total_area;
-    double *local_error;
     double *error_norm;
-    double *error;
     int meqn;
     error_info_t error_data;
 
@@ -246,14 +247,12 @@ void fclaw2d_compute_error(fclaw2d_domain_t *domain,
     error_norm = FCLAW_ALLOC_ZERO(double,3*meqn);
 
     /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
-    size_t size            = fclaw2d_clawpatch_size(domain);
-    error_data.error_norm  = FCLAW_ALLOC_ZERO(double,3*meqn);
-    error_data.error       = FCLAW_ALLOC(double,size)  /* Work */
+    error_data.local_error  = FCLAW_ALLOC_ZERO(double,3*meqn);
 
     /* -------------------------------------------------
        Compute error for all patches on this processor
        ------------------------------------------------- */
-    fclaw2d_domain_iterate_patches(domain,cb_diagnostics_compute_error,
+    fclaw2d_domain_iterate_patches(domain, cb_diagnostics_compute_error,
                                    (void *) &error_data);
 
     /* -------------------------------------------------
@@ -270,9 +269,9 @@ void fclaw2d_compute_error(fclaw2d_domain_t *domain,
         int i1 = m;            /* 1-norm */
         int i2 = meqn + m;     /* 2-norm */
         int iinf = 2*meqn + m; /* inf-norm */
-        error_norm[i1]   = fclaw2d_domain_global_sum     (domain, local_error[i1]);
-        error_norm[i2]   = fclaw2d_domain_global_sum     (domain, local_error[i2]);
-        error_norm[iinf] = fclaw2d_domain_global_maximum (domain, local_error[iinf);
+        error_norm[i1]   = fclaw2d_domain_global_sum     (domain, error_data.local_error[i1]);
+        error_norm[i2]   = fclaw2d_domain_global_sum     (domain, error_data.local_error[i2]);
+        error_norm[iinf] = fclaw2d_domain_global_maximum (domain, error_data.local_error[iinf]);
     }
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
@@ -284,17 +283,22 @@ void fclaw2d_compute_error(fclaw2d_domain_t *domain,
     /* -----------------------------
        Normalize errors by area
        ----------------------------- */
-    total_area = fclaw2d_diagnostics_compute_area(domain,
-                                                  FCLAW2D_TIMER_DIAGNOSTICS_COMM);
+    total_area = fclaw2d_compute_total_area(domain,
+                                            running);
     FCLAW_ASSERT(total_area != 0);
 
     for(int m = 0; m < meqn; m++)
     {
         int i1 = m;            /* 1-norm */
         int i2 = meqn + m;     /* 2-norm */
+        int iinf = 2*meqn + m; /* inf-norm */
         error_norm[i1] = error_norm[i1]/total_area;
         error_norm[i2] = sqrt(error_norm[i2]/total_area);
+        fclaw_global_productionf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
+                                 error_norm[i1], error_norm[i2],error_norm[iinf]);
     }
+    FCLAW_FREE(error_norm);
+    FCLAW_FREE(error_data.local_error);
 }
 
 /* -----------------------------------------------------------------
@@ -311,7 +315,16 @@ void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag)
 
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_vtable_t vt;
-    double t;
+
+    if (gparms->compute_error)
+    {
+        fclaw2d_compute_total_error(domain,FCLAW2D_TIMER_DIAGNOSTICS);
+    }
+
+    if (gparms->conservation_check)
+    {
+        fclaw2d_check_conservation(domain,init_flag,FCLAW2D_TIMER_DIAGNOSTICS);
+    }
 
     if (gparms->run_user_diagnostics)
     {
@@ -323,16 +336,6 @@ void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag)
 
         FCLAW_ASSERT(vt.run_user_diagnostics != NULL);
         vt.run_user_diagnostics(domain,t);
-    }
-
-    if (gparms->compute_error)
-    {
-        fclaw2d_compute_error(domain,FCLAW2D_TIMER_DIAGNOSTICS);
-    }
-
-    if (gparms->conservation_check)
-    {
-        fclaw2d_check_conservation(domain,t,init_flag,FCLAW2D_TIMER_DIAGNOSTICS);
     }
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);

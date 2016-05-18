@@ -39,9 +39,9 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->patch_setup = NULL;
 
     /* Diagnostics */
-    vt->run_user_diagnostics     = NULL;
-    vt->compute_error            = &fclaw2d_diagnostics_compute_error;
-    vt->fort_compute_error       = NULL;  /* must be set by the user */
+    vt->run_user_diagnostics      = NULL;
+    vt->compute_patch_error       = &fclaw2d_diagnostics_compute_patch_error;
+    vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
 
     /* Default metric functions */
     vt->metric_setup_mesh        = &fclaw2d_metric_setup_mesh;

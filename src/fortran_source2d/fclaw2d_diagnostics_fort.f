@@ -38,7 +38,7 @@ c    # -------------------------------------------------------------------------
       end
 
 c     # Compute area of a patch
-      double precision function fclaw2d_fort_compute_area(mx,my,
+      double precision function fclaw2d_fort_compute_patch_area(mx,my,
      &      mbc,dx,dy,area)
       implicit none
 
@@ -65,12 +65,12 @@ c     # Compute area of a patch
          sum = dx*dy*mx*my
       endif
 
-      fclaw2d_fort_compute_area = sum
+      fclaw2d_fort_compute_patch_area = sum
 
       end
 
 
-      subroutine fclaw2d_fort_compute_error(mx,my,mbc,meqn,
+      subroutine fclaw2d_fort_compute_error_norm(mx,my,mbc,meqn,
      &      dx,dy,area,error,error_norm)
       implicit none
 

@@ -127,13 +127,18 @@ typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_domain_t *domain,
 
 
 
-typedef void (*fclaw2d_run_diagnostics_t)(fclaw2d_domain_t *domain, const double t);
+typedef void (*fclaw2d_run_user_diagnostics_t)(fclaw2d_domain_t *domain, const double t);
 typedef void (*fclaw2d_diagnostics_compute_error_t)(fclaw2d_domain_t *domain,
                                                     fclaw2d_patch_t *this_patch,
                                                     int this_block_idx,
                                                     int this_patch_idx,
                                                     double *error);
 
+typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int *mbc,
+                                             int *meqn,
+                                             double *dx, double *dy, double *xlower,
+                                             double *ylower, double *t, double q[],
+                                             double error[]);
 
 typedef struct fclaw2d_vtable
 {
@@ -179,8 +184,8 @@ typedef struct fclaw2d_vtable
 
     /* diagnostic functions */
     fclaw2d_run_user_diagnostics_t       run_user_diagnostics;
-    fclaw2d_diagnostics_compute_error_t  compute_error;
-    fclaw2d_fort_compute_error_t         fort_compute_error;
+    fclaw2d_diagnostics_compute_error_t  compute_patch_error;
+    fclaw2d_fort_compute_error_t         fort_compute_patch_error;
 
 } fclaw2d_vtable_t;
 

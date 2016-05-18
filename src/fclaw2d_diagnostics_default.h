@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DIAGNOSTICS_DEFAULT_H
 #define FCLAW2D_DIAGNOSTICS_DEFAULT_H
 
+#include <fclaw2d_diagnostics_default_fort.h>
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -35,10 +38,11 @@ extern "C"
 #endif
 
 /* This calls FORT_COMPUTE_ERROR */
-typedef void (*fclaw2d_compute_error_t)(int* mx, int* my, int *mbc, int* meqn,
-                                        double* dx, double* dy,
-                                        double *xlower, double *ylower,
-                                        double q[], double error[]);
+void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
+                                             fclaw2d_patch_t *this_patch,
+                                             int this_block_idx,
+                                             int this_patch_idx,
+                                             double *error);
 
 #ifdef __cplusplus
 #if 0

@@ -37,7 +37,7 @@ extern "C"
 #define FCLAW2D_FORT_COMPUTE_ERROR FCLAW_F77_FUNC(fclaw2d_fort_compute_error, \
                                                   FCLAW2D_FORT_COMPUTE_ERROR)
 
-void FCLAW2D_FORT_COMPUTE_ERROR(int *mx, int *my, int *mbc, int *meqn,
+void FCLAW2D_FORT_COMPUTE_ERROR(int* blockno, int *mx, int *my, int *mbc, int *meqn,
                                 double *dx, double *dy, double *xlower,
                                 double *t,
                                 double *ylower, double q[], double error[]);

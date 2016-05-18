@@ -28,15 +28,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_vtable.h>
 
-void fclaw2d_diagnostics_compute_error(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx,
-                                       int this_patch_idx,
-                                       double *error)
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+/* This can be replaced with a user defined routine;
+   Set vt.compute_patch_error in an appropriate <app>_user.cpp file */
+void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
+                                             fclaw2d_patch_t *this_patch,
+                                             int this_block_idx,
+                                             int this_patch_idx,
+                                             double *error)
 {
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy;
+    double *q;
     double t;
+    fclaw2d_vtable_t vt;
+
+    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -45,7 +59,14 @@ void fclaw2d_diagnostics_compute_error(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    FCLAW_ASSERT(vt.fort_compute_error != NULL);
-    vt.fort_compute_error(&mx,&my,&mbc,&meqn,&dx,&dy,&xlower,&ylower,
-                          &t, q, error);
+    FCLAW_ASSERT(vt.fort_compute_patch_error != NULL);
+    vt.fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
+                                &xlower,&ylower, &t, q, error);
 }
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
