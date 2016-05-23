@@ -105,7 +105,7 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
         {
             global_sum0[m] = global_sum[m];
         }
-        fclaw_global_productionf("sum[%d] =  %24.16e  %24.16e\n",m,global_sum[m],
+        fclaw_global_essentialf("sum[%d] =  %24.16e  %24.16e\n",m,global_sum[m],
                                  fabs(global_sum[m]-global_sum0[m]));
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
@@ -294,7 +294,7 @@ void fclaw2d_compute_total_error(fclaw2d_domain_t *domain,
         int iinf = 2*meqn + m; /* inf-norm */
         error_norm[i1] = error_norm[i1]/total_area;
         error_norm[i2] = sqrt(error_norm[i2]/total_area);
-        fclaw_global_productionf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
+        fclaw_global_essentialf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
                                  error_norm[i1], error_norm[i2],error_norm[iinf]);
     }
     FCLAW_FREE(error_norm);

@@ -307,12 +307,13 @@ void outstyle_3(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
-    int iframe = 0;
-    fclaw2d_output_frame(*domain,iframe);
-
     int init_flag = 1;
     fclaw2d_diagnostics_run(*domain,init_flag);
     init_flag = 0;
+
+    int iframe = 0;
+    fclaw2d_output_frame(*domain,iframe);
+
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -362,7 +363,6 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         /* Get current domain data since it may change during regrid */
         ddata = fclaw2d_domain_get_data(*domain);
-        fclaw2d_diagnostics_run(*domain, init_flag);  /* Includes conservation check */
 
         double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
@@ -421,6 +421,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (n % nstep_inner == 0)
         {
+            fclaw2d_diagnostics_run(*domain, init_flag);  /* Includes conservation check */
             iframe++;
             fclaw2d_output_frame(*domain,iframe);
         }

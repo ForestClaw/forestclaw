@@ -75,7 +75,7 @@ c     # Compute area of a patch
       implicit none
 
       integer mx,my,mbc,meqn
-      double precision dx, dy, dxdy
+      double precision dx, dy, dxdy, eij
       double precision error_norm(meqn,3)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -93,21 +93,23 @@ c     # error_norm(:) comes in with values;  do not initialize it here!
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
+                  eij = abs(error(i,j,m))
                   error_norm(m,1) = error_norm(m,1) +
-     &                  error(i,j,m)*area(i,j)
+     &                  eij*area(i,j)
                   error_norm(m,2) = error_norm(m,2) +
-     &                  error(i,j,m)**2*area(i,j)
-                  error_norm(m,3) = max(error(i,j,m),error_norm(m,3))
+     &                  eij**2*area(i,j)
+                  error_norm(m,3) = max(eij,error_norm(m,3))
                enddo
             enddo
          else
             do j = 1,my
                do i = 1,mx
+                  eij = abs(error(i,j,m))
                   error_norm(m,1) = error_norm(m,1) +
-     &                  error(i,j,m)*dx*dy
+     &                  eij*dxdy
                   error_norm(m,2) = error_norm(m,2) +
-     &                  error(i,j,m)**2*dx*dy
-                  error_norm(m,3) = max(error(i,j,m),error_norm(m,3))
+     &                  eij**2*dxdy
+                  error_norm(m,3) = max(eij,error_norm(m,3))
                enddo
             enddo
          endif
