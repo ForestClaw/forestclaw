@@ -79,9 +79,14 @@ c           # y-faces
       implicit none
 
       double precision x,y, revs_per_s
+      double precision u0, v0
 
-      revs_per_s = 0.0d0
-      psi_nomap = revs_per_s*(-x + y)
-      psi_nomap = revs_per_s*(y)
+      double precision u0_comm,v0_comm,revs_comm
+      common /comm_velocity/ u0_comm,v0_comm,revs_comm
+
+      u0 = revs_comm*u0_comm
+      v0 = revs_comm*v0_comm
+
+      psi_nomap = (-v0*x + u0*y)
 
       end

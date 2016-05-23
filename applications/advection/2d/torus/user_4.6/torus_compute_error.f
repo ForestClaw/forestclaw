@@ -12,10 +12,10 @@
 
 c     # Assume a single field variable only
       do j = 1,my
+         yc = ylower + (j-0.5)*dy
          do i = 1,mx
             xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-            error(i,j,1) = abs(q(i,j,1) - qexact(blockno,xc,yc,t));
+            error(i,j,1) = q(i,j,1) - qexact(blockno,xc,yc,t);
          enddo
       enddo
 
@@ -29,13 +29,18 @@ c     # Assume a single field variable only
       integer blockno
       double precision xc,yc,t
       double precision x0, y0, u0, v0
-      double precision q0
+      double precision q0,qc
 
-      u0 = 0.d0
-      v0 = 0.d0
+      double precision u0_comm,v0_comm,revs_comm
+      common /comm_velocity/ u0_comm,v0_comm, revs_comm
+
+      u0 = revs_comm*u0_comm
+      v0 = revs_comm*v0_comm
 
 c     # Assume velocity is horizontal;  unit speed.
-      qexact = q0(blockno, xc-t,yc)
+      qc = q0(blockno, xc - u0*t,yc - v0*t)
+
+      qexact = qc
 
 
       end
