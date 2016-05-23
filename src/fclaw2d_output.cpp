@@ -73,7 +73,8 @@ static
 void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 {
     fclaw2d_vtable_t vt;
-    vt= fclaw2d_get_vtable(domain);
+    vt = fclaw2d_get_vtable(domain);
+
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
@@ -84,6 +85,7 @@ void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
         vt.write_header(domain,iframe);
     }
 
+    /* Write out each patch to fort.qXXXX */
     fclaw2d_domain_iterate_patches (domain, cb_serial_output, (void *) &iframe);
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */

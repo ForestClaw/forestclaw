@@ -23,25 +23,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DIAGNOSTICS_H
-#define FCLAW2D_DIAGNOSTICS_H
+#ifndef FCLAW2D_DIAGNOSTICS_DEFAULT_H
+#define FCLAW2D_DIAGNOSTICS_DEFAULT_H
 
-#include "forestclaw2d.h"
+#include <fclaw2d_diagnostics_default_fort.h>
+
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}
+}                               /* need this because indent is dumb */
 #endif
 #endif
 
-/* See forestclaw2d.h for the maximum version of this function */
-double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
-
-/* User diagnostics - need to rename */
-void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag);
-
+/* This calls FORT_COMPUTE_ERROR */
+void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
+                                             fclaw2d_patch_t *this_patch,
+                                             int this_block_idx,
+                                             int this_patch_idx,
+                                             double *error);
 
 #ifdef __cplusplus
 #if 0

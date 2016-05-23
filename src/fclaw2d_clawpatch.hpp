@@ -204,6 +204,7 @@ public :
     double yupper();
 
     double* q();
+    double* error();
 
     int* block_corner_count();
 
@@ -220,6 +221,7 @@ protected :
     FArrayBox m_griddata_last;
     FArrayBox m_griddata_save;
     FArrayBox m_griddata_time_interpolated;
+    FArrayBox m_griderror;
 
     /* Grid info */
     int m_mx;           /* also in amr_options_t */

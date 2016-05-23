@@ -52,7 +52,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/fclaw2d_diagnostics_fort.h
+	src/fclaw2d_diagnostics_fort.h \
+	src/fclaw2d_diagnostics_default.h \
+	src/fclaw2d_diagnostics_default_fort.h
 
 libforestclaw_internal_headers =
 
@@ -89,6 +91,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
 	src/fclaw2d_diagnostics.cpp \
+	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
 	src/fclaw2d_ghost_fill.cpp \
