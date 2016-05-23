@@ -4,6 +4,8 @@
 # Solver libraries
 # ----------------------------------
 include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_geoclaw/Makefile.am
 include src/solvers/fc2d_dummy/Makefile.am
 
 # ----------------------------------
@@ -47,3 +49,6 @@ include applications/Mountain/Makefile.am
 # include applications/amrclaw/euler/2d/quadrants/Makefile.am
 include applications/amrclaw/euler/2d/shockbubble/Makefile.am
 # include applications/amrclaw/shallow/2d/radialdam/Makefile.am
+
+# Geoclaw example
+include applications/geoclaw/bowl_radial/Makefile.am

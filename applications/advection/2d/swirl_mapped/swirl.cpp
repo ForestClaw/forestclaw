@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "swirl_user.h"
 
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #include <p4est_connectivity.h>
 #include <fclaw2d_map.h>
@@ -47,6 +47,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "tperiod", &user->tperiod, 4.0,
                            "[user] Period of the velocity field [4.0]");
 
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                           "Clawpack_version (4 or 5) [5]");
+
     user->is_registered = 1;
     return NULL;
 }
@@ -57,6 +60,11 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     user_options_t* user = (user_options_t*) package;
     if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 1, 2, or 3\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    if (user->claw_version != 5)
+    {
+        fclaw_global_essentialf ("Option --user:claw_version must be 5\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
@@ -169,7 +177,7 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);

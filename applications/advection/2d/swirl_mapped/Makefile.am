@@ -10,21 +10,19 @@ applications_advection_2d_swirl_mapped_swirl_SOURCES = \
 	applications/advection/2d/swirl_mapped/swirl_user.cpp \
 	applications/advection/2d/swirl_mapped/swirl_user.h \
 	applications/advection/2d/swirl_mapped/swirl.cpp \
-	applications/advection/2d/swirl_mapped/fclaw2d_map_nomap.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_cart.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_identity.c \
 	applications/advection/2d/swirl_mapped/fclaw2d_map_fivepatch.c \
 	applications/advection/2d/swirl_mapped/setprob.f \
 	applications/advection/2d/swirl_mapped/psi.f \
-	applications/advection/2d/swirl_mapped/user_4.6/setaux_manifold.f \
-	applications/advection/2d/swirl_mapped/user_4.6/b4step2_manifold.f \
-	applications/advection/2d/swirl_mapped/user_4.6/qinit.f \
-	applications/advection/2d/swirl_mapped/user_4.6/setaux.f \
-	applications/advection/2d/swirl_mapped/user_4.6/rpn2ad1.f \
-	applications/advection/2d/swirl_mapped/user_4.6/rpt2ad1.f
+	applications/advection/2d/swirl_mapped/user_5.0/setaux_manifold.f \
+	applications/advection/2d/swirl_mapped/user_5.0/b4step2_manifold.f \
+	applications/advection/2d/swirl_mapped/user_5.0/qinit.f \
+	applications/advection/2d/swirl_mapped/user_5.0/rpn2ad1.f \
+	applications/advection/2d/swirl_mapped/user_5.0/rpt2ad1.f
 
 applications_advection_2d_swirl_mapped_swirl_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
+        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_advection_2d_swirl_mapped_swirl_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK5_LDADD) $(LDADD)

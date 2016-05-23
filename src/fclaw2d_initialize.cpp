@@ -66,6 +66,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
                             (void*) &build_mode);
 
     vt = fclaw2d_get_vtable(domain);
+    FCLAW_ASSERT(vt.patch_initialize != NULL);
     vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -92,7 +93,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     maxthreads = omp_get_max_threads();
 #endif
     fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
-
 
     int minlevel = gparms->minlevel;
     int maxlevel = gparms->maxlevel;

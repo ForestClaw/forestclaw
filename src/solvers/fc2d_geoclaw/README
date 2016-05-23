@@ -1,0 +1,55 @@
+# ------------------------------------------
+# Notes on porting geoclaw to ForestClaw
+# Donna Calhou and Melody Shih
+# New York (Courant visit); 4/21-4/24 (2016)
+# ------------------------------------------
+
+Changes that are more than just name changes are designated with "FORESTCLAW"
+
+1. Create directory fc2d_geoclaw.
+
+1. Copy clawpack5 library files (fc2d_clawpack5.{cpp,h} to
+   fc2d_geoclaw.{cpp,h}.   Change names accordingly.
+
+2. Create directories geolib_source, amrlib_source, fortran_source,
+   riemann_source
+   -- geolib_source : all files from clawpack/geoclaw/src/2d/shallow
+   -- amrlib_source : some files from clawpack/amrclaw/src/2d;
+   -- fortran_source : additional files needed to interface with
+      ForestClaw.
+   -- Copy Riemann solvers (rpn2_geoclaw.f90, rpt2_geoclaw.f90,
+      geoclaw_riemann_utils.f
+
+3.  Change names of basic files : qinit.f90, setaux.f90, src2.f90,
+    b4step2.f90, step2.f90, bc2.f90 to geoclaw_<name>.f90.  Names
+    of subroutines also changed.
+
+4.  Change names of Riemann solvers (rpn2 -> geoclaw_rpn2; rpt2 -> geoclaw_rpt2)
+
+5.  geoclaw_step2.f : Added code to handle cubed-sphere (three corners)
+
+6.  geoclaw_setaux.f : do not do optimzation that avoids extra copying, i.e.
+    Skip this :
+    !! ### parameter NEEDS_TO_BE_SET initialized in amr_module.f90
+    !! ### saves time by otherwise copying instead of reinitializing
+    #if 0
+        IF (aux(1,ii,jj) .NE. NEEDS_TO_BE_SET) THEN
+           skipcount = skipcount + 1
+           CYCLE  ! new system copies bathy where possible
+        ENDIF
+    #endif
+
+7.  Added 'types.h' file which contains definitions of F90 types used
+    in GeoClaw.  These are useful for debugging in GDB.
+
+8.  File 'geoclaw_tag4refinement.f90' replaces 'flag2refine.f90'.
+
+# -----------------
+# Questions
+# -----------------
+
+1.  Does GeoClaw use 'auxtype'?  It is allocated and assigned in amr2.f90, but I don't see it used.
+
+2.  How do we handle the fact that AMR levels start at 1, and
+    ForestClaw levels start at 0?  This comes up for xample, in setting
+    regions.
