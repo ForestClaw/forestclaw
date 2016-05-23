@@ -1,4 +1,4 @@
-function create_tikz_plot(id,Frame,fname_prefix,amrclaw,extra_file)
+function create_tikz_plot(Frame,fname_prefix,amrclaw,extra_file)
 
 % \documentclass{standalone}
 %
