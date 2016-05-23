@@ -36,6 +36,7 @@ extern "C"
 #endif
 #endif
 
+
 #define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
 
 void SETAUX_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
@@ -106,6 +107,7 @@ void     TORUS_FORT_WRITE_FILE(char* matname1,
                                double* xlower, double* ylower,
                                double* dx,     double* dy,
                                double q[],     double *error,
+                               double *time,
                                int* patch_num, int* level,
                                int* blockno,   int* mpirank);
 

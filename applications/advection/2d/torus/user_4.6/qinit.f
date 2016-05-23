@@ -122,15 +122,16 @@ c           # No mapping.
 
       end
 
-      double precision function  q0(blockno,xc,yc)
+      double precision function  q0(blockno,xc1,yc1)
       implicit none
 
       double precision xc,yc, xp, yp, zp, rp
+      double precision xc1, yc1
       integer blockno
       integer*8 cont, get_context
       double precision r,r0
       logical fclaw2d_map_is_used
-      double precision Hsmooth
+      double precision Hsmooth,h1,h2
       integer i
 
       double precision xloc(0:4),yloc(0:4),zloc(0:4)
@@ -147,6 +148,8 @@ c           # No mapping.
       cont = get_context()
 
       if (fclaw2d_map_is_used(cont)) then
+         xc = xc1
+         yc = yc1
          call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
 
@@ -155,15 +158,21 @@ c           # No mapping.
          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
       else
          if (example .eq. 6) then
-            xp = xc
-            yp = yc
-            q0 = 0
-            r0 = 0.3d0
-            do i = 4,4
-               rp = sqrt((xp-xloc(i))**2 + (yp-yloc(i))**2)
-               q0 = q0 + Hsmooth(rp + r0) -
-     &               Hsmooth(rp - r0)
-            enddo
+            if (xc1 .lt. 0) then
+               xp = 1 - (-xc1 - int(-xc1))
+            else
+               xp = xc1 - int(xc1)
+            endif
+            if (yc1 .lt. 0) then
+               yp = 1-(-yc1 - int(-yc1))
+            else
+               yp = yc1 - int(yc1)
+            endif
+            r0 = 0.2d0
+            rp = sqrt((xp-xloc(4))**2 + (yp-yloc(4))**2)
+            h1 = Hsmooth(rp+r0)
+            h2 = Hsmooth(rp-r0)
+            q0 = h1 - h2
          else
             xp = xc
             yp = yc
@@ -179,6 +188,6 @@ c           # No mapping.
 
       double precision r
 
-      Hsmooth = (tanh(r/0.01d0) + 1)/2.d0
+      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
 
       end

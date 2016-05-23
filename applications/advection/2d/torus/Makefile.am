@@ -20,6 +20,7 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/user_4.6/rpn2noncons.f \
 	applications/advection/2d/torus/user_4.6/rpt2noncons.f \
 	applications/advection/2d/torus/user_4.6/qinit.f \
+	applications/advection/2d/torus/user_4.6/tag4refinement.f \
 	applications/advection/2d/torus/user_4.6/torus_compute_error.f \
 	applications/advection/2d/torus/user_4.6/torus_output.f \
 	applications/advection/2d/torus/user_4.6/b4step2.f \

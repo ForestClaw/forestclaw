@@ -81,6 +81,9 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
     if (example == 6)
     {
+        vt.fort_tag4refinement = &TAG4REFINEMENT;
+        vt.fort_tag4coarsening = &TAG4COARSENING;
+
         vt.write_header      = &torus_output_write_header;
         vt.patch_write_file  = &torus_output_write_file;
     }
@@ -142,10 +145,12 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
 {
     fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
+    double xlower,ylower,dx,dy,t;
     double *q, *error;
     char matname1[10];
     vt = fclaw2d_get_vtable(domain);
+
+    t = fclaw2d_domain_get_time(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -155,7 +160,7 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
 
     sprintf(matname1,"fort.q%04d",iframe);
     TORUS_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
-                          &dx,&dy,q,error,
+                          &dx,&dy,q,error,&t,
                           &patch_num,&level,&this_block_idx,
                           &domain->mpirank);
 }
