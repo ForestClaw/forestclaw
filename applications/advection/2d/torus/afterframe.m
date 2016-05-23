@@ -21,34 +21,55 @@ else
     daspect([1 1 1]);
     view(vtop)
 end
-
 if PlotParallelPartitions ~= 1
     yrbcolormap;
 end
 showpatchborders(1:10);
-caxis([0,1])
-qlo = 0;
-qhi = 1;
-under_label = sprintf('0 - %7.1e',qlo-qmin);
-over_label = sprintf('1 + %7.1e',qmax-qhi);
-fprintf('%6s %12s\n','qmin',under_label);
-fprintf('%6s %12s\n\n','qmax',over_label);
-
-if (ShowUnderOverShoots)
+if (mq == 2)
+    caxis([qmin,qmax]);
+    fprintf('%6s %12s\n\n','qmax',qmax);
+    daspect([1,1,1]);
+else
+    caxis([0,1])
     qlo = 0;
     qhi = 1;
-    colorbar_underover(under_label,over_label);
+    under_label = sprintf('0 - %7.1e',qlo-qmin);
+    over_label = sprintf('1 + %7.1e',qmax-qhi);
+    fprintf('%6s %12s\n','qmin',under_label);
+    fprintf('%6s %12s\n\n','qmax',over_label);
+
+    if (ShowUnderOverShoots)
+        qlo = 0;
+        qhi = 1;
+        colorbar_underover(under_label,over_label);
+    end
+    daspect([1,1,1]);
 end
-daspect([1,1,1]);
 
 if (isflat)
-    u0 = 0;
+    u0 = 1;
     v0 = 1;
-    r0 = 0.3;
-    cloc = [0.5, 0.5];
-    th = linspace(0,2*pi,200);
+    r0 = 0.2;
+    revs_per_sec = 0.5;
+    cloc = [0.5, 0.5] + revs_per_sec*[u0,v0]*t;
+    th = linspace(0,2*pi,500);
     hold on;
-    plot(r0*cos(th) + cloc(1),r0*sin(th) + cloc(2),'linewidth',3,'color','k');
+    xs = rem(r0*cos(th) + cloc(1),1);
+    ys = rem(r0*sin(th) + cloc(2),1);
+    if (Frame < 10)
+        plot(xs,ys,'k.','markersize',10);
+    else
+        plot(xs,ys,'k-','linewidth',3);
+    end
+    delete(get(gca,'title'));
+    axis([0.2 0.8 0.2 0.8])   
+    axis([0 1 0 1])
+    hidepatchborders;
+    set(gca,'fontsize',16,'box','on');
+    qm = max([abs(qmax),abs(qmin)]);
+    showpatchborders;
+    caxis([-qm,qm]);
+    rybcolormap
     hold off;
     view(2);
 else
@@ -65,8 +86,11 @@ else
     hold off;
 end
 
+
+
 setpatchborderprops('linewidth',1)
 hidepatchborders(9)
+showpatchborders;
 % cv = [0.5 0.5];
 % drawcontourlines(cv);
 % setcontourlineprops('linewidth',2);
@@ -111,20 +135,15 @@ end
 prt = false;
 NoQuery = 0;
 if (prt)
-    MaxFrames = 41;
+    MaxFrames = 10;
     axis([0 1 0 1]);
     axis off;
     delete(get(gca,'title'));
     hidepatchborders;
     figsize = [4,4];  % Should match size set in options
-%     set(gcf,'papersize',figsize);
-%     set(gca,'position',[0 0 1 1]);
-%     set(gcf,'paperposition',[0 0 figsize]);
-
-    % Use this with 'export_fig'
-     set(gca,'position',[0 0 1 1]);
-     set(gcf,'units','inches');
-     set(gcf,'position',[1 7 figsize]);
+    set(gca,'position',[0 0 1 1]);
+    set(gcf,'units','inches');
+    set(gcf,'position',[1 7 figsize]);
 
     % Start printing
 %     fname_soln_tikz = sprintf('torus_tikz_%04d.tex',Frame);
@@ -138,7 +157,7 @@ if (prt)
     if (PlotType == 3)
         fname_prefix = sprintf('fc_adv_schlrn',Frame);
     else
-        fname_prefix = sprintf('fc_adv',Frame);
+        fname_prefix = 'torus';
     end
     yn = 'y';
     fname_png = sprintf('%s_%04d.png',fname_prefix,Frame);
