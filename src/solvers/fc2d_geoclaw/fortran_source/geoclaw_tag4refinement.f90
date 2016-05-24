@@ -90,7 +90,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
         do m=1,mtopofiles
            if (level < minleveltopo(m) .and. t >= tlowtopo(m) .and. t <= thitopo(m)) then
               if (  x_hi > xlowtopo(m) .and. x_low < xhitopo(m) .and. &
-                   y_hi > ylowtopo(m) .AND. y_low < yhitopo(m) ) THEN
+                    y_hi > ylowtopo(m) .AND. y_low < yhitopo(m) ) THEN
                  tag_patch = 1
                  RETURN
               endif
