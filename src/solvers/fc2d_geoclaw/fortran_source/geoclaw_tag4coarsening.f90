@@ -1,22 +1,24 @@
-! c     # Template function for setting coarsening criteria.  The
-! c     # user can copy this file to their directory.  To
-! c     # indicate that this file should be used, set :
-! c     #
-! c     #      fclaw2d_vtable_t vt;
-! c     #      /* .... */
-! c     #      vt.fort_tag4coarsening = &tag4coarsening;
-! c     #      fclaw2d_set_vtable(domain,&vt);
-! c     #
-! c     # in virtual tables (typically set in <application>_user.cpp, in a
-! c     # a routine link '<application>_link_solvers(domain)'
-! c     #
-! c     # See also 'tag4refinement.f'
+!      # Template function for setting coarsening criteria.  The
+!      # user can copy this file to their directory.  To
+!      # indicate that this file should be used, set :
+!      #
+!      #      fclaw2d_vtable_t vt;
+!      #      /* .... */
+!      #      vt.fort_tag4coarsening = &tag4coarsening;
+!      #      fclaw2d_set_vtable(domain,&vt);
+!      #
+!      # in virtual tables (typically set in <application>_user.cpp, in a
+!      # a routine link '<application>_link_solvers(domain)'
+!      #
+!      # See also 'tag4refinement.f'
 
 subroutine geoclaw_tag4coarsening(mx,my,mbc,meqn,maux, &
-       xlower,ylower,dx,dy,blockno,q0,q1,q2,q3, &
-       aux0,aux1,aux2,aux3, level, maxlevel, tag_patch)
+       xlower,ylower,dx,dy,q0,q1,q2,q3, &
+       aux0,aux1,aux2,aux3,level,maxlevel, &
+       dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
+       speed_tolerance_c, tag_patch)
 
-USE geoclaw_module, ONLY:dry_tolerance, sea_level
+USE geoclaw_module, ONLY: sea_level
 USE geoclaw_module, ONLY: spherical_distance, coordinate_system
 
 USE topo_module, ONLY: tlowtopo,thitopo,xlowtopo,xhitopo,ylowtopo,yhitopo
@@ -33,24 +35,26 @@ USE storm_module, ONLY: wind_forcing, wind_index, wind_refine
 
 USE regions_module, ONLY: num_regions, regions, region_type
 USE refinement_module
+
 implicit none
 
 INTEGER mx,my, mbc, meqn, maux, tag_patch
-INTEGER blockno, level, maxlevel
-DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0
+INTEGER level, maxlevel, speed_tolerance_entries_c
+DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0, dry_tolerance_c
+DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
 
-DOUBLE PRECISION q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION, TARGET :: q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION, TARGET :: q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION, TARGET :: q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION, TARGET :: q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-REAL(kind=8), INTENT(in) :: aux0(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in) :: aux1(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in), TARGET :: aux0(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in), TARGET :: aux1(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in), TARGET :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in), TARGET :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION, POINTER :: q(:,:,:)
+REAL(kind=8), POINTER :: aux(:,:,:)
 
 INTEGER i,j,k,m
 REAL(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
@@ -66,79 +70,56 @@ tag_patch = 1
 t0 = 0
 
 level = level - 1
+
 !! # Refine based only on first variable in system.
 !! Loop over interior points on this grid
 !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
+
 q_loop: do k=1,4
    select case(k)
       case (0)
-         q = q0
-         aux = aux0
+         q => q0
+         aux => aux0
       case (1)
-         q = q1
-         aux = aux1
+         q => q1
+         aux => aux1
       case (2)
-         q = q2
-         aux = aux2
+         q => q2
+         aux => aux2
       case (3)
-         q = q3
-         aux = aux3
+         q => q3
+         aux => aux3
    end select
 
    y_loop: do j=1-mbc,my+mbc
-     y_low = ylower(k) + (j - 1) * dy
-     y_c = ylower(k) + (j - 0.5d0) * dy
-     y_hi = ylower(k) + j * dy
+      y_low = ylower(k) + (j - 1) * dy
+      y_c = ylower(k) + (j - 0.5d0) * dy
+      y_hi = ylower(k) + j * dy
 
-     x_loop: do i = 1-mbc,mx+mbc
-        x_low = xlower(k) + (i - 1) * dx
-        x_c = xlower(k) + (i - 0.5d0) * dx
-        x_hi = xlower(k) + i * dx 
+      x_loop: do i = 1-mbc,mx+mbc
+         x_low = xlower(k) + (i - 1) * dx
+         x_c = xlower(k) + (i - 0.5d0) * dx
+         x_hi = xlower(k) + i * dx 
 
-        if (allowcoarsen(x_c,y_c,t,level)) then
-           if (q(1,i,j) > dry_tolerance) then
-              eta = q(1,i,j) + aux(1,i,j)
-              speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
+         if (allowcoarsen(x_c,y_c,t,level)) then
+            if (q(1,i,j) > dry_tolerance_c) then
+               eta = q(1,i,j) + aux(1,i,j)
+               speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
 
-              if ( abs(eta - sea_level) < wave_tolerance &
-                  .and. speed < speed_tolerance(level)) then
-                  tag_patch = 1
-              else 
-                  tag_patch = 0
-                  return
-              endif
-              !! Check wave criteria
-              ! if (abs(eta - sea_level) > wave_tolerance) then
-              !    !! Check to see if we are near shore
-              !    if (q(1,i,j) < deep_depth) then
-              !       tag_patch = 0
-              !       return
-              !       !! Check if we are allowed to flag in deep water
-              !       !! anyway
-              !    else if (level < max_level_deep) then
-              !       tag_patch = 0
-              !       return
-              !    endif
-              ! endif
+               if ( abs(eta - sea_level) < wave_tolerance_c &
+                   .and. speed < speed_tolerance_c(level)) then
+                   tag_patch = 1
+               else 
+                   tag_patch = 0
+                   return
+               endif
+            endif
+         else
+             tag_patch = 0 
+             return
+         endif
 
-              !! Check speed criteria, note that it might be useful to
-              !! also have a per layer criteria since this is not
-              !! gradient based
-              !! This assumes that mxnest == maxlevel
-              ! speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
-              ! do m=1,min(size(speed_tolerance),maxlevel)
-              !    IF (speed > speed_tolerance(m) .AND. level <= m) THEN
-              !       tag_patch = 0
-              !       RETURN
-              !    endif
-              ! enddo
-           endif
-        else
-            tag_patch = 0 
-            return
-        endif
-
-     enddo x_loop
+      enddo x_loop
    enddo y_loop
 enddo q_loop
 

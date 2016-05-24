@@ -625,22 +625,24 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 {
     fclaw2d_vtable_t vt;
+    const amr_options_t *amropt;
+    fc2d_geoclaw_options_t* geoclaw_options;
 
     int mx,my,mbc,meqn,maux;
     double xlower,ylower,dx,dy;
     double *q[4], *aux[4];
     int tag_patch,igrid;
-    double coarsen_threshold;
+    //double coarsen_threshold;
     int level, maxlevel;
 
     fclaw2d_patch_t *patch0;
 
     patch0 = &fine_patches[0];
 
-    const amr_options_t *amropt;
+    
     amropt = get_domain_parms(domain);
-
-    coarsen_threshold = amropt->coarsen_threshold;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
+    //coarsen_threshold = amropt->coarsen_threshold;
 
     vt = fclaw2d_get_vtable(domain);
 
@@ -658,9 +660,11 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     tag_patch = 0;
     GEOCLAW_TAG4COARSENING(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
-                           &blockno, q[0],q[1],q[2],q[3], 
-                           aux[0],aux[1],aux[2],aux[3],&level,
-                           &maxlevel, &tag_patch);
+                           q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
+                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c, 
+                           &geoclaw_options->wave_tolerance_c, 
+                           &geoclaw_options->speed_tolerance_entries_c,
+                           geoclaw_options->speed_tolerance_c, &tag_patch);
     return tag_patch;
 
 }
