@@ -69,6 +69,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
     geoclaw_vt->rpt2             = &GEOCLAW_RPT2;
 
     vt->regrid_tag4refinement   = &fc2d_geoclaw_patch_tag4refinement;
+    vt->regrid_tag4coarsening   = &fc2d_geoclaw_patch_tag4coarsening;
 
 #if 0
     /* These will eventually have GeoClaw specific implementations */
@@ -617,7 +618,7 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-#if 0
+
 int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno, int patchno)
@@ -625,11 +626,13 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 {
     fclaw2d_vtable_t vt;
 
-    int mx,my,mbc,meqn;
+    int mx,my,mbc,meqn,maux;
     double xlower,ylower,dx,dy;
-    double *q[4];
+    double *q[4], *aux[4];
     int tag_patch,igrid;
     double coarsen_threshold;
+    int level, maxlevel;
+
     fclaw2d_patch_t *patch0;
 
     patch0 = &fine_patches[0];
@@ -647,12 +650,18 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     for (igrid = 0; igrid < 4; igrid++)
     {
         fclaw2d_clawpatch_soln_data(domain,&fine_patches[igrid],&q[igrid],&meqn);
+        fc2d_geoclaw_aux_data(domain,&fine_patches[igrid],&aux[igrid],&maux);
     }
+
+    level = fine_patches[0].level;
+    maxlevel = amropt->maxlevel;
+
     tag_patch = 0;
-    vt.fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                           &blockno, q[0],q[1],q[2],q[3],
-                           &coarsen_threshold, &tag_patch);
+    GEOCLAW_TAG4COARSENING(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
+                           &blockno, q[0],q[1],q[2],q[3], 
+                           aux[0],aux[1],aux[2],aux[3],&level,
+                           &maxlevel, &tag_patch);
     return tag_patch;
 
 }
-#endif
+
