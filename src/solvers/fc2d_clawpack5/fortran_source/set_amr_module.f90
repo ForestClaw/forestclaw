@@ -10,8 +10,4 @@ SUBROUTINE set_amr_module(mwaves_in,mcapa_in,mthlim_in,method_in)
   method = method_in
   mthlim = mthlim_in
   use_fwaves = .FALSE.
-  write(*,*) "What is the mwaves", mwaves
-  write(*,*) "What is the mcapa", mcapa
-  write(*,*) "What is the mthlim_in", mthlim_in
-  write(*,*) "What is the method_in", method_in
 END SUBROUTINE set_amr_module

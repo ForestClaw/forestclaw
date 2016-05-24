@@ -95,49 +95,6 @@ q_loop: do k=1,4
         x_c = xlower(k) + (i - 0.5d0) * dx
         x_hi = xlower(k) + i * dx 
 
-        !! (Ignore the storm refinement first.)
-
-        !! Here, t should be t + dt_coarsened (Not solved yet)
-        !! Check to see if refinement is forced in any topography file region:
-        do m=1,mtopofiles
-           if (level < minleveltopo(m) .and. t >= tlowtopo(m) .and. t <= thitopo(m)) then
-              if (  x_hi > xlowtopo(m) .and. x_low < xhitopo(m) .and. &
-                    y_hi > ylowtopo(m) .AND. y_low < yhitopo(m) ) THEN
-                 tag_patch = 0
-                 RETURN
-              endif
-           endif
-        enddo
-
-        !! Check to see if refinement is forced in any other region:
-        DO m=1,num_regions
-           time_interval = t >= regions(m)%t_low .AND. t <= regions(m)%t_hi
-           space_interval = x_hi > regions(m)%x_low .AND. x_low < regions(m)%x_hi &
-                .AND. y_hi > regions(m)%y_low .AND. y_low < regions(m)%y_hi
-           IF (time_interval .AND. space_interval) THEN
-              IF (level < regions(m)%min_level) THEN
-                 !! Refine to at least to the minimum level
-                 tag_patch = 0
-                 RETURN
-              ENDIF
-           ENDIF
-        enddo
-
-        !! Check if we're in the dtopo region and need to refine:
-        !! force refinement to level minleveldtopo
-        do m = 1,num_dtopo
-           IF (level < minleveldtopo(m).AND. &
-                t <= tfdtopo(m) .and. & !t.ge.t0dtopo(m).and.
-                x_hi > xlowdtopo(m) .and. x_low < xhidtopo(m).and. &
-                y_hi > ylowdtopo(m) .and. y_low < yhidtopo(m)) then
-              tag_patch = 0
-              RETURN
-           ENDIF
-        enddo
-
-        !! -----------------------------------------------------------------
-        !! Refinement not forced, so check if it is allowed and if so,
-        !! check if there is a reason to flag this point:
         if (allowcoarsen(x_c,y_c,t,level)) then
            if (q(1,i,j) > dry_tolerance) then
               eta = q(1,i,j) + aux(1,i,j)
@@ -176,6 +133,9 @@ q_loop: do k=1,4
               !    endif
               ! enddo
            endif
+        else
+            tag_patch = 0 
+            return
         endif
 
      enddo x_loop
@@ -224,7 +184,7 @@ logical function allowcoarsen(x,y,t,level)
         return
     endif
     do m=1,mtopofiles
-        if (level > minleveltopo(m)) then
+        if (level >= minleveltopo(m)) then
             if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
                 y > ylowtopo(m) .and. y < yhitopo(m) .and. &
                 t >= tlowtopo(m) .and. t < thitopo(m)) then
@@ -235,7 +195,7 @@ logical function allowcoarsen(x,y,t,level)
         endif
     enddo
     do m=1,num_regions
-        if (level > regions(m)%min_level) then
+        if (level >= regions(m)%min_level) then
             if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
                 y > regions(m)%y_low .and. y <  regions(m)%y_hi.and. &
                 t >= regions(m)%t_low .and. t <= regions(m)%t_hi) then
@@ -251,7 +211,7 @@ logical function allowcoarsen(x,y,t,level)
             y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
             t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
 
-            if (level > minleveldtopo(m)) then
+            if (level >= minleveldtopo(m)) then
                 allowcoarsen = .true.
                 return
             endif
