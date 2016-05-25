@@ -659,7 +659,7 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     maxlevel = amropt->maxlevel;
 
     tag_patch = 0;
-    GEOCLAW_TAG4COARSENING(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
+    GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
                            q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
                            &level,&maxlevel, &geoclaw_options->dry_tolerance_c, 
                            &geoclaw_options->wave_tolerance_c, 

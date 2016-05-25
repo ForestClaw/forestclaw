@@ -12,11 +12,61 @@
 !      #
 !      # See also 'tag4refinement.f'
 
-subroutine geoclaw_tag4coarsening(mx,my,mbc,meqn,maux, &
+subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
        xlower,ylower,dx,dy,q0,q1,q2,q3, &
        aux0,aux1,aux2,aux3,level,maxlevel, &
        dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
        speed_tolerance_c, tag_patch)
+
+implicit none
+
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
+INTEGER level, maxlevel, speed_tolerance_entries_c
+DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0
+DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
+DOUBLE PRECISION dry_tolerance_c
+
+DOUBLE PRECISION q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+DOUBLE PRECISION q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+REAL(kind=8), INTENT(in) :: aux0(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in) :: aux1(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+call check_patch(mx,my,mbc,meqn,maux,xlower(0),ylower(0), &
+                 dx,dy,q0,aux0,level,maxlevel,dry_tolerance_c, &
+                 wave_tolerance_c,speed_tolerance_entries_c, &
+                 speed_tolerance_c, tag_patch)
+if (tag_patch == 0) return
+
+call check_patch(mx,my,mbc,meqn,maux,xlower(1),ylower(1), &
+                 dx,dy,q1,aux1,level,maxlevel,dry_tolerance_c, &
+                 wave_tolerance_c,speed_tolerance_entries_c, &
+                 speed_tolerance_c, tag_patch)
+if (tag_patch == 0) return
+
+call check_patch(mx,my,mbc,meqn,maux,xlower(2),ylower(2), &
+                 dx,dy,q2,aux2,level,maxlevel,dry_tolerance_c, &
+                 wave_tolerance_c,speed_tolerance_entries_c, &
+                 speed_tolerance_c, tag_patch)
+if (tag_patch == 0) return
+
+call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
+                 dx,dy,q3,aux3,level,maxlevel,dry_tolerance_c, &
+                 wave_tolerance_c,speed_tolerance_entries_c, &
+                 speed_tolerance_c, tag_patch)
+if (tag_patch == 0) return
+
+return
+end subroutine geoclaw_tag4coarsening
+
+subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
+                       dx,dy,q,aux,level,maxlevel,dry_tolerance_c, &
+                       wave_tolerance_c,speed_tolerance_entries_c, &
+                       speed_tolerance_c,tag_patch)
 
 USE geoclaw_module, ONLY: sea_level
 USE geoclaw_module, ONLY: spherical_distance, coordinate_system
@@ -38,23 +88,14 @@ USE refinement_module
 
 implicit none
 
-INTEGER mx,my, mbc, meqn, maux, tag_patch
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
 INTEGER level, maxlevel, speed_tolerance_entries_c
-DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0, dry_tolerance_c
+DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
+DOUBLE PRECISION dry_tolerance_c
 
-DOUBLE PRECISION, TARGET :: q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION, TARGET :: q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION, TARGET :: q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-DOUBLE PRECISION, TARGET :: q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-REAL(kind=8), INTENT(in), TARGET :: aux0(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in), TARGET :: aux1(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in), TARGET :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8), INTENT(in), TARGET :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-DOUBLE PRECISION, POINTER :: q(:,:,:)
-REAL(kind=8), POINTER :: aux(:,:,:)
+DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+REAL(kind=8) aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 INTEGER i,j,k,m
 REAL(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
@@ -69,81 +110,66 @@ LOGICAL time_interval, space_interval
 tag_patch = 1
 t0 = 0
 
+!! If coarsened, level will become level - 1
 level = level - 1
 
-!! # Refine based only on first variable in system.
 !! Loop over interior points on this grid
 !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
+y_loop: do j=1-mbc,my+mbc
+  y_low = ylower + (j - 1) * dy
+  y_c   = ylower + (j - 0.5d0) * dy
+  y_hi  = ylower + j * dy
 
-q_loop: do k=1,4
-   select case(k)
-      case (0)
-         q => q0
-         aux => aux0
-      case (1)
-         q => q1
-         aux => aux1
-      case (2)
-         q => q2
-         aux => aux2
-      case (3)
-         q => q3
-         aux => aux3
-   end select
+  x_loop: do i = 1-mbc,mx+mbc
+     x_low = xlower + (i - 1) * dx
+     x_c   = xlower + (i - 0.5d0) * dx
+     x_hi  = xlower + i * dx 
+     !! Ignore the storm based refinement first
 
-   y_loop: do j=1-mbc,my+mbc
-      y_low = ylower(k) + (j - 1) * dy
-      y_c = ylower(k) + (j - 0.5d0) * dy
-      y_hi = ylower(k) + j * dy
+     !! Check that the grids is allowed to be coarsened or not
+     if (allowcoarsen(x_c,y_c,t,level)) then
+        if (q(1,i,j) > dry_tolerance_c) then
+           eta = q(1,i,j) + aux(1,i,j)
+           speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
 
-      x_loop: do i = 1-mbc,mx+mbc
-         x_low = xlower(k) + (i - 1) * dx
-         x_c = xlower(k) + (i - 0.5d0) * dx
-         x_hi = xlower(k) + i * dx 
+           if ( abs(eta - sea_level) < wave_tolerance_c &
+               .and. speed < speed_tolerance_c(level)) then
+               tag_patch = 1
+           else 
+               tag_patch = 0
+               return
+           endif
+           
+        endif
+     else
+         tag_patch = 0 
+         return
+     endif
 
-         if (allowcoarsen(x_c,y_c,t,level)) then
-            if (q(1,i,j) > dry_tolerance_c) then
-               eta = q(1,i,j) + aux(1,i,j)
-               speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
+  enddo x_loop
+enddo y_loop
 
-               if ( abs(eta - sea_level) < wave_tolerance_c &
-                   .and. speed < speed_tolerance_c(level)) then
-                   tag_patch = 1
-               else 
-                   tag_patch = 0
-                   return
-               endif
-            endif
-         else
-             tag_patch = 0 
-             return
-         endif
-
-      enddo x_loop
-   enddo y_loop
-enddo q_loop
-
-end
+end subroutine check_patch
 
 logical function allowcoarsen(x,y,t,level)
 
-    use amr_module, only: t0
-    use geoclaw_module
-    use regions_module
-    use refinement_module
-    use topo_module
-    use qinit_module
+use amr_module, only: t0
+use geoclaw_module
+use regions_module
+use refinement_module
+use topo_module
+use qinit_module
 
-    implicit none
+implicit none
 
-    ! Function arguments
-    real(kind=8), intent(in) :: x,y,t
-    integer, intent(in) :: level
+! Function arguments
+real(kind=8), intent(in) :: x,y,t
+integer, intent(in) :: level
 
-    ! Locals
-    integer :: m
+! Locals
+integer :: m
 
-    allowcoarsen = .false.
+allowcoarsen = .true.
 
 !   following commented by dlg on 10/9/08.
 !   my understanding of maxleveldeep might be differnet
@@ -159,44 +185,43 @@ logical function allowcoarsen(x,y,t,level)
 !       endif
 
 !! t should be t + dt_coarsened
-    ! Allow flagging everywhere if using test bathymetry
-    if (test_topography > 1) then
-        allowcoarsen = .true.
+! Allow flagging everywhere if using test bathymetry
+! if (test_topography > 1) then
+!     allowcoarsen = .true.
+!     return
+! endif
+do m=1,mtopofiles
+  if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
+      y > ylowtopo(m) .and. y < yhitopo(m) .and. &
+      t >= tlowtopo(m) .and. t < thitopo(m)) then
+      if (level < minleveltopo(m)) then
+        allowcoarsen = .false.
         return
+      endif
+  endif
+enddo
+
+do m=1,num_regions
+  if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
+      y > regions(m)%y_low .and. y <  regions(m)%y_hi.and. &
+      t >= regions(m)%t_low .and. t <= regions(m)%t_hi) then
+      if (level < regions(m)%min_level) then
+        allowcoarsen = .false.
+        return
+      endif
+  endif
+enddo
+
+do m=1,num_dtopo
+    if (x >  xlowdtopo(m) .and. x < xhidtopo(m).and. &
+        y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
+        t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
+
+        if (level < minleveldtopo(m)) then
+            allowcoarsen = .false.
+            return
+        endif
     endif
-    do m=1,mtopofiles
-        if (level >= minleveltopo(m)) then
-            if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
-                y > ylowtopo(m) .and. y < yhitopo(m) .and. &
-                t >= tlowtopo(m) .and. t < thitopo(m)) then
-
-                allowcoarsen = .true.
-                return
-            endif
-        endif
-    enddo
-    do m=1,num_regions
-        if (level >= regions(m)%min_level) then
-            if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
-                y > regions(m)%y_low .and. y <  regions(m)%y_hi.and. &
-                t >= regions(m)%t_low .and. t <= regions(m)%t_hi) then
-
-                allowcoarsen = .true.
-                return
-            endif
-        endif
-    enddo
-
-    do m=1,num_dtopo
-        if (x >  xlowdtopo(m) .and. x < xhidtopo(m).and. &
-            y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
-            t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
-
-            if (level >= minleveldtopo(m)) then
-                allowcoarsen = .true.
-                return
-            endif
-        endif
-    enddo
+enddo
 
 end function allowcoarsen
