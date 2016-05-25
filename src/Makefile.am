@@ -52,7 +52,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/fclaw2d_diagnostics_fort.h
+	src/fclaw2d_diagnostics_fort.h \
+	src/fclaw2d_diagnostics_default.h \
+	src/fclaw2d_diagnostics_default_fort.h
 
 libforestclaw_internal_headers =
 
@@ -89,6 +91,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
 	src/fclaw2d_diagnostics.cpp \
+	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
 	src/fclaw2d_ghost_fill.cpp \
@@ -121,19 +124,19 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/fortran_source2d/5/fclaw2d_ghost_pack2.f \
-	src/fortran_source2d/5/fclaw2d_output_ascii_fort2.f \
-	src/fortran_source2d/5/fclaw2d_regrid_fort2.f \
-	src/fortran_source2d/5/fclaw2d_timeinterp_fort2.f \
-	src/fortran_source2d/5/fclaw2d_diagnostics_fort2.f \
-	src/fortran_source2d/5/average_fv2.f \
-	src/fortran_source2d/5/interpolate_fv2.f \
-	src/fortran_source2d/5/exchange_fv2.f \
+	src/fortran_source2d/4.6/fclaw2d_ghost_pack.f \
+	src/fortran_source2d/4.6/fclaw2d_output_ascii_fort.f \
+	src/fortran_source2d/4.6/fclaw2d_regrid_fort.f \
+	src/fortran_source2d/4.6/fclaw2d_timeinterp_fort.f \
+	src/fortran_source2d/4.6/fclaw2d_diagnostics_fort.f \
+	src/fortran_source2d/4.6/average_fv1.f \
+	src/fortran_source2d/4.6/interpolate_fv1.f \
+	src/fortran_source2d/4.6/exchange_fv1.f \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
-	src/fortran_source2d/philim.f 
+	src/fortran_source2d/philim.f
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d

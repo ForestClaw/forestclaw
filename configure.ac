@@ -23,6 +23,8 @@ echo "o---------------------------------------"
 
 FCLAW_ARG_ENABLE([debug], [enable debug mode (assertions and extra checks)],
                  [DEBUG])
+FCLAW_ARG_ENABLE([geoclaw], [enable geoclaw library and applications],
+                 [GEOCLAW])
 
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"

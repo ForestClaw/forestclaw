@@ -45,6 +45,8 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
     fclaw2d_vtable_t vt;
     int meqn,ngrids;
     double time;
+    char matname1[10];
+    char matname2[10];
 
     amropt = fclaw2d_forestclaw_get_options(domain);
 
@@ -53,11 +55,11 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
 
     meqn = amropt->meqn;
 
-    vt = fclaw2d_get_vtable(domain);
-    vt.fort_write_header(&iframe,&time,&meqn,&ngrids);
+    sprintf(matname1,"fort.q%04d",iframe);
+    sprintf(matname2,"fort.t%04d",iframe);
 
-    /* Is this really necessary? */
-    /* FCLAW2D_OUTPUT_NEW_QFILE(&iframe); */
+    vt = fclaw2d_get_vtable(domain);
+    vt.fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
 }
 
 
@@ -70,6 +72,7 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
+    char fname[10];
     vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
@@ -77,8 +80,9 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    vt.fort_write_file(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
-                       &iframe,&patch_num,&level,&this_block_idx,
+    sprintf(fname,"fort.q%04d",iframe);
+    vt.fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+                       &patch_num,&level,&this_block_idx,
                        &domain->mpirank);
 }
 

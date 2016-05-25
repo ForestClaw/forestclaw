@@ -327,6 +327,10 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                          &amropt->run_user_diagnostics,0,
                          "Run user diagnostics [F]");
 
+    sc_options_add_bool (opt, 0, "compute-error",
+                         &amropt->compute_error,0,
+                         "Compute error [F]");
+
     sc_options_add_bool (opt, 0, "conservation-check",
                          &amropt->conservation_check,0,
                          "Conservation check [F]");
