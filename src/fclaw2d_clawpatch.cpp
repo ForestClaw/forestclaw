@@ -97,6 +97,14 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
     *meqn = cp->meqn();
 }
 
+double* fclaw2d_clawpatch_get_error(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->error();
+}
+
+
 double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch)
 {
@@ -104,6 +112,17 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
     return cp->q();
 }
 
+size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain)
+{
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int mx = gparms->mx;
+    int my = gparms->my;
+    int meqn = gparms->meqn;
+    int mbc = gparms->mbc;
+    size_t size = (mx+2*mbc)*(my+2*mbc)*meqn;
+
+    return size;
+}
 
 
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
@@ -696,6 +715,10 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     {
         m_griddata_time_interpolated.define(box, m_meqn);
     }
+    if (gparms->compute_error)
+    {
+        m_griderror.define(box,m_meqn);
+    }
 
     // Set up storage for metric terms, if needed.
     if (gparms->manifold)
@@ -710,6 +733,7 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
             }
         }
     }
+
 
     fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
 
@@ -748,6 +772,13 @@ double* ClawPatch::q()
 {
     return m_griddata.dataPtr();
 }
+
+// This is used by level_step.
+double* ClawPatch::error()
+{
+    return m_griderror.dataPtr();
+}
+
 
 #if 0
 FArrayBox ClawPatch::newGrid()

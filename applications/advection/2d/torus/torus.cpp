@@ -178,13 +178,13 @@ void run_program(fclaw_app_t* app)
         break;
 
     case 5:
+    case 6:
         /* Duplicate initial conditions in each block */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
         fclaw2d_map_destroy_brick(brick); /* We don't really need the brick */
         cont = fclaw2d_map_new_nomap();
         break;
-
 
     default:
         SC_ABORT_NOT_REACHED ();

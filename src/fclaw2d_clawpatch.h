@@ -80,6 +80,11 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch);
 
 
+double* fclaw2d_clawpatch_get_error(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch);
+
+size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain);
+
 void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t* this_patch,
                                      fclaw_bool time_interp,
