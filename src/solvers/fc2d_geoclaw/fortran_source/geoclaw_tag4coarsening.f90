@@ -1,16 +1,16 @@
-!      # Template function for setting coarsening criteria.  The
-!      # user can copy this file to their directory.  To
-!      # indicate that this file should be used, set :
-!      #
-!      #      fclaw2d_vtable_t vt;
-!      #      /* .... */
-!      #      vt.fort_tag4coarsening = &tag4coarsening;
-!      #      fclaw2d_set_vtable(domain,&vt);
-!      #
-!      # in virtual tables (typically set in <application>_user.cpp, in a
-!      # a routine link '<application>_link_solvers(domain)'
-!      #
-!      # See also 'tag4refinement.f'
+!  # Template function for setting coarsening criteria.  The
+!  # user can copy this file to their directory.  To
+!  # indicate that this file should be used, set :
+!  #
+!  #      fclaw2d_vtable_t vt;
+!  #      /* .... */
+!  #      vt.fort_tag4coarsening = &tag4coarsening;
+!  #      fclaw2d_set_vtable(domain,&vt);
+!  #
+!  # in virtual tables (typically set in <application>_user.cpp, in a
+!  # a routine link '<application>_link_solvers(domain)'
+!  #
+!  # See also 'tag4refinement.f'
 
 subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
        xlower,ylower,dx,dy,q0,q1,q2,q3, &
@@ -62,6 +62,7 @@ if (tag_patch == 0) return
 
 return
 end subroutine geoclaw_tag4coarsening
+
 
 subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
                        dx,dy,q,aux,level,maxlevel,dry_tolerance_c, &
@@ -131,7 +132,6 @@ y_loop: do j=1-mbc,my+mbc
         if (q(1,i,j) > dry_tolerance_c) then
            eta = q(1,i,j) + aux(1,i,j)
            speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
-
            if ( abs(eta - sea_level) < wave_tolerance_c &
                .and. speed < speed_tolerance_c(level)) then
                tag_patch = 1
@@ -150,6 +150,7 @@ y_loop: do j=1-mbc,my+mbc
 enddo y_loop
 
 end subroutine check_patch
+
 
 logical function allowcoarsen(x,y,t,level)
 
@@ -190,6 +191,7 @@ allowcoarsen = .true.
 !     allowcoarsen = .true.
 !     return
 ! endif
+
 do m=1,mtopofiles
   if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
       y > ylowtopo(m) .and. y < yhitopo(m) .and. &
@@ -202,10 +204,10 @@ do m=1,mtopofiles
 enddo
 
 do m=1,num_regions
-  if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
-      y > regions(m)%y_low .and. y <  regions(m)%y_hi.and. &
-      t >= regions(m)%t_low .and. t <= regions(m)%t_hi) then
-      if (level < regions(m)%min_level) then
+  if (level < regions(m)%min_level) then
+    if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
+        y > regions(m)%y_low .and. y <  regions(m)%y_hi.and. &
+        t >= regions(m)%t_low .and. t <= regions(m)%t_hi) then
         allowcoarsen = .false.
         return
       endif
