@@ -1,5 +1,5 @@
-SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
-     dx,dy,t, blockno, q, aux, level, maxlevel, init_flag,tag_patch)
+SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
+     dx,dy,t,blockno,q,aux,level, maxlevel,init_flag,tag_patch)
 
   USE geoclaw_module, ONLY:dry_tolerance, sea_level
   USE geoclaw_module, ONLY: spherical_distance, coordinate_system
@@ -142,11 +142,10 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc, meqn, maux, xlower,ylower, &
 
         !! -----------------------------------------------------------------
         !! Refinement not forced, so check if it is allowed and if so,
-        !! check if there is a reason to flag this point:
+        !! check if there is a reason to flag this point: 
         IF (allowflag(x_c,y_c,t,level)) THEN
            if (q(1,i,j) > dry_tolerance) then
               eta = q(1,i,j) + aux(1,i,j)
-
               !! Check wave criteria
               if (abs(eta - sea_level) > wave_tolerance) then
                  !! Check to see if we are near shore

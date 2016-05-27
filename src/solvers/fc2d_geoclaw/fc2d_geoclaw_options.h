@@ -52,6 +52,12 @@ typedef struct fc2d_geoclaw_options
     int mcapa;
     int src_term;
     int use_fwaves;
+
+    double dry_tolerance_c;
+    double wave_tolerance_c;
+    int speed_tolerance_entries_c;
+    double *speed_tolerance_c;
+    const char *speed_tolerance_c_string;
 }
 fc2d_geoclaw_options_t;
 

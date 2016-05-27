@@ -311,13 +311,19 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
-    regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
-    regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
-    regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
-    regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
-    regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
-    
+    # regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
+    # regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
+    # regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
+    # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
+    # regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
+    # regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+    regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
+    regions.append([2, 3, 0., 1.e10,    0.,100.,    0.,100.])
+    regions.append([3, 4, 3., 1.e10,   52., 72.,   52., 72.])
+    regions.append([3, 4, 3., 1.e10,   75., 95.,   -10.,  10.])
+    regions.append([3, 5, 3.4, 1.e10,   57., 68.,   57., 68.])
+    regions.append([3, 5, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+
     # regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
     # regions.append([3, 6, 0., 1.e10,    0.,100.,    0.,100.])
     # regions.append([5, 6, 3., 1.e10,   52., 72.,   52., 72.])

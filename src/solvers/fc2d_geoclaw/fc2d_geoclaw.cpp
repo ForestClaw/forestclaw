@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
-
+#include <iostream>
 /* Needed for debugging */
 #include "types.h"
 
@@ -70,6 +70,8 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
 
     vt->regrid_tag4refinement   = &fc2d_geoclaw_patch_tag4refinement;
     vt->regrid_tag4coarsening   = &fc2d_geoclaw_patch_tag4coarsening;
+
+    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;   
 
 #if 0
     /* These will eventually have GeoClaw specific implementations */
@@ -615,6 +617,7 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
     GEOCLAW_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
                            &dx,&dy,&t, &blockno,q,aux,&level,&maxlevel,
                            &initflag,&tag_patch);
+    std::cout<<"tag_patch = "<<tag_patch<<", level = "<<level<<std::endl;
     return tag_patch;
 }
 
@@ -625,22 +628,24 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 {
     fclaw2d_vtable_t vt;
+    const amr_options_t *amropt;
+    fc2d_geoclaw_options_t* geoclaw_options;
 
     int mx,my,mbc,meqn,maux;
     double xlower,ylower,dx,dy;
     double *q[4], *aux[4];
     int tag_patch,igrid;
-    double coarsen_threshold;
+    //double coarsen_threshold;
     int level, maxlevel;
 
     fclaw2d_patch_t *patch0;
 
     patch0 = &fine_patches[0];
 
-    const amr_options_t *amropt;
+    
     amropt = get_domain_parms(domain);
-
-    coarsen_threshold = amropt->coarsen_threshold;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
+    //coarsen_threshold = amropt->coarsen_threshold;
 
     vt = fclaw2d_get_vtable(domain);
 
@@ -657,11 +662,66 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     maxlevel = amropt->maxlevel;
 
     tag_patch = 0;
-    GEOCLAW_TAG4COARSENING(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
-                           &blockno, q[0],q[1],q[2],q[3], 
-                           aux[0],aux[1],aux[2],aux[3],&level,
-                           &maxlevel, &tag_patch);
+    GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
+                           q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
+                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c, 
+                           &geoclaw_options->wave_tolerance_c, 
+                           &geoclaw_options->speed_tolerance_entries_c,
+                           geoclaw_options->speed_tolerance_c, &tag_patch);
     return tag_patch;
 
 }
 
+void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   fclaw2d_patch_t *fine_patches,
+                                   int this_blockno, int coarse_patchno,
+                                   int fine0_patchno)
+
+{
+    fclaw2d_vtable_t vt;
+    int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor;
+    double *qcoarse,*qfine,*auxcoarse,*auxfine;
+    // double *areacoarse,*areafine;
+    // double *xp,*yp,*zp,*xd,*yd,*zd;
+    int igrid;
+
+    const amr_options_t* gparms;
+    fclaw2d_patch_t* fine_patch;
+
+    vt = fclaw2d_get_vtable(domain);
+
+    gparms = get_domain_parms(domain);
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    refratio = gparms->refratio;
+    p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+    // fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
+    //                               &xd,&yd,&zd,&areacoarse);
+    fclaw2d_clawpatch_soln_data(domain,coarse_patch,&qcoarse,&meqn);
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+
+    /* Loop over four siblings (z-ordering) */
+    for (igrid = 0; igrid < 4; igrid++)
+    {
+        fine_patch = &fine_patches[igrid];
+
+        fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
+        fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+        // if (gparms->manifold)
+        // {
+        //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
+        //                                   &xd,&yd,&zd,&areafine);
+        // }
+        GEOCLAW_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                 &maux,auxcoarse,auxfine,
+                                 &p4est_refineFactor,&refratio,
+                                 &igrid);
+        // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+        //                          areacoarse, areafine, &igrid,
+        //                          &gparms->manifold);
+
+    }
+}
