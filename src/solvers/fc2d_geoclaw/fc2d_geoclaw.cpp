@@ -30,7 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
-#include <iostream>
 /* Needed for debugging */
 #include "types.h"
 
@@ -617,7 +616,6 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
     GEOCLAW_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
                            &dx,&dy,&t, &blockno,q,aux,&level,&maxlevel,
                            &initflag,&tag_patch);
-    std::cout<<"tag_patch = "<<tag_patch<<", level = "<<level<<std::endl;
     return tag_patch;
 }
 
@@ -680,7 +678,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
 
 {
     fclaw2d_vtable_t vt;
-    int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor;
+    int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor,mbathy;
     double *qcoarse,*qfine,*auxcoarse,*auxfine;
     // double *areacoarse,*areafine;
     // double *xp,*yp,*zp,*xd,*yd,*zd;
@@ -697,6 +695,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
     mbc = gparms->mbc;
     refratio = gparms->refratio;
     p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+    mbathy = 1;
     // fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
     //                               &xd,&yd,&zd,&areacoarse);
     fclaw2d_clawpatch_soln_data(domain,coarse_patch,&qcoarse,&meqn);
@@ -716,7 +715,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
         //                                   &xd,&yd,&zd,&areafine);
         // }
         GEOCLAW_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                 &maux,auxcoarse,auxfine,
+                                 &maux,auxcoarse,auxfine,&mbathy,
                                  &p4est_refineFactor,&refratio,
                                  &igrid);
         // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,

@@ -301,7 +301,7 @@ void GEOCLAW_TAG4COARSENING(int* blockno,int* mx,int* my,int* mbc,int* meqn, int
 #define GEOCLAW_INTERPOLATE2FINE FCLAW_F77_FUNC(geoclaw_interpolate2fine,GEOCLAW_INTERPOLATE2FINE)
 void GEOCLAW_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
                               double qfine[], int* maux, double aux_coarse[],
-                              double aux_fine[], int* p4est_refineFactor,int* refratio,
+                              double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
                               int* igrid);
 
 /***************************** MINIMAL API ******************************/
