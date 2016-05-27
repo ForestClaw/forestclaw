@@ -1,10 +1,10 @@
       subroutine geoclaw_interpolate2fine(mx,my,mbc,meqn,qcoarse,
-     &      qfine,maux,aux_coarse,aux_fine,
+     &      qfine,maux,aux_coarse,aux_fine,mbathy,
      &      p4est_refineFactor,refratio,igrid)
       implicit none
 
       integer mx,my,mbc,meqn,p4est_refineFactor,refratio
-      integer igrid, maux
+      integer igrid, maux,mbathy
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -42,16 +42,18 @@ c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
                if (mq .eq. 1) then
 c                 # Interpolate sea surface height rather than just the
 c                 # water column height.
-                  qc = qcoarse(mq,ic,jc) + aux_coarse(19,ic,jc)
+                  qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
 
                   sl = (qc - qcoarse(mq,ic-1,jc) -
-     &                  aux_coarse(19,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc)+aux_coarse(19,ic+1,jc) - qc)
+     &                  aux_coarse(mbathy,ic-1,jc))
+                  sr = (qcoarse(mq,ic+1,jc) +
+     &                  aux_coarse(mbathy,ic+1,jc) - qc)
                   gradx = compute_slopes(sl,sr,mth)
 
                   sl = (qc - qcoarse(mq,ic,jc-1) -
-     &                  aux_coarse(ic,jc-1,19))
-                  sr = (qcoarse(mq,ic,jc+1)+aux_coarse(19,ic,jc+1) - qc)
+     &                  aux_coarse(mbathy,ic,jc-1))
+                  sr = (qcoarse(mq,ic,jc+1)+
+     &                  aux_coarse(mbathy,ic,jc+1) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
 c                 # Fill in fine grid values from coarse grid cell (ic,jc)
@@ -62,7 +64,7 @@ c                 # Fill in fine grid values from coarse grid cell (ic,jc)
                         iff = (i-1)*refratio + ii
                         jf = (j-1)*refratio + jj
                         qf = qc + shiftx*gradx + shifty*grady -
-     &                        aux_fine(19,iff,jf)
+     &                        aux_fine(mbathy,iff,jf)
                         qfine(mq,iff,jf) = qf
                      enddo
                   enddo
@@ -86,50 +88,50 @@ c                 # Fill in refined values on coarse grid cell (ic,jc)
                         shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
                         iff = (i-1)*refratio + ii
                         jf = (j-1)*refratio + jj
-                        qfine(iff,jf,mq) =
+                        qfine(mq,iff,jf) =
      &                        qc + shiftx*gradx + shifty*grady
                      enddo
                   enddo
 
-c                 # check to make sure we are not creating any new extrema
-                  do ii = -1,1
-                     do jj = -1,1
-                        uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
-     &                        qcoarse(1,ic+ii,jc+jj)
-                     enddo
-                  enddo
-
-                  coarseumax = -1d99
-                  coarseumin = 1d99
-                  do ii = -1,1
-                     do jj = -1,1
-                        coarseumax = max(coarseumax,uc(ii,jj))
-                        coarseumin = min(coarseumin,uc(ii,jj))
-                     enddo
-                  enddo
-
-                  redefine = .false.
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        iff = (i-1)*refratio + ii
-                        jf = (j-1)*refratio + jj
-                        uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
-                        if (uf .gt. coarseumax .or. uf .lt. coarseumin)
-     &                        then
-                           redefine = .true.
-                        endif
-                     enddo
-                  enddo
-
-                  if (redefine) then
-                     do ii = 1,refratio
-                        do jj = 1,refratio
-                           iff = (i-1)*refratio + ii
-                           jf = (j-1)*refratio + jj
-                           qfine(mq,iff,jf) = qfine(1,iff,jf)*uc(0,0)
-                        enddo
-                     enddo
-                  endif
+cc                 # check to make sure we are not creating any new extrema
+c                  do ii = -1,1
+c                     do jj = -1,1
+c                        uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
+c     &                        qcoarse(1,ic+ii,jc+jj)
+c                     enddo
+c                  enddo
+c
+c                  coarseumax = -1d99
+c                  coarseumin = 1d99
+c                  do ii = -1,1
+c                     do jj = -1,1
+c                        coarseumax = max(coarseumax,uc(ii,jj))
+c                        coarseumin = min(coarseumin,uc(ii,jj))
+c                     enddo
+c                  enddo
+c
+c                  redefine = .false.
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        iff = (i-1)*refratio + ii
+c                        jf = (j-1)*refratio + jj
+c                        uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
+c                        if (uf .gt. coarseumax .or. uf .lt. coarseumin)
+c     &                        then
+c                           redefine = .true.
+c                        endif
+c                     enddo
+c                  enddo
+c
+c                  if (redefine) then
+c                     do ii = 1,refratio
+c                        do jj = 1,refratio
+c                           iff = (i-1)*refratio + ii
+c                           jf = (j-1)*refratio + jj
+c                           qfine(mq,iff,jf) = qfine(1,iff,jf)*uc(0,0)
+c                        enddo
+c                     enddo
+c                  endif
 
                endif
             enddo
