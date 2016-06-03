@@ -52,3 +52,4 @@ include applications/amrclaw/euler/2d/shockbubble/Makefile.am
 
 # Geoclaw example
 include applications/geoclaw/bowl_radial/Makefile.am
+include applications/geoclaw/flat_bathymetry/Makefile.am
