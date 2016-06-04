@@ -56,10 +56,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_dim = num_dim
 
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = -100.0
+    clawdata.lower[0] = 0.0
     clawdata.upper[0] = 100.0
 
-    clawdata.lower[1] = -100.0
+    clawdata.lower[1] = 0.0
     clawdata.upper[1] = 100.0
 
 
@@ -317,12 +317,6 @@ def setrun(claw_pkg='geoclaw'):
     # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
     # regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
     # regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
-    regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
-    regions.append([2, 3, 0., 1.e10,    0.,100.,    0.,100.])
-    regions.append([3, 4, 3., 1.e10,   52., 72.,   52., 72.])
-    regions.append([3, 4, 3., 1.e10,   75., 95.,   -10.,  10.])
-    regions.append([3, 5, 3.4, 1.e10,   57., 68.,   57., 68.])
-    regions.append([3, 5, 3.4, 1.e10,   83., 92.,   -4.,  4.])
 
     # regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
     # regions.append([3, 6, 0., 1.e10,    0.,100.,    0.,100.])

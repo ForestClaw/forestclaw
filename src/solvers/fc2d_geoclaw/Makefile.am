@@ -32,6 +32,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4refinement.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4coarsening.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_interpolate2fine.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_average2coarse.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \

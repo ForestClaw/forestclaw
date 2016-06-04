@@ -70,7 +70,8 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
     vt->regrid_tag4refinement   = &fc2d_geoclaw_patch_tag4refinement;
     vt->regrid_tag4coarsening   = &fc2d_geoclaw_patch_tag4coarsening;
 
-    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;   
+    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
+    vt->regrid_average2coarse    = &fc2d_geoclaw_average2coarse;   
 
 #if 0
     /* These will eventually have GeoClaw specific implementations */
@@ -718,6 +719,61 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
                                  &maux,auxcoarse,auxfine,&mbathy,
                                  &p4est_refineFactor,&refratio,
                                  &igrid);
+        // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+        //                          areacoarse, areafine, &igrid,
+        //                          &gparms->manifold);
+
+    }
+}
+
+void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 fclaw2d_patch_t *fine_patches,
+                                 int this_blockno, int coarse_patchno,
+                                 int fine0_patchno)
+
+{
+    fclaw2d_vtable_t vt;
+    int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor,mbathy;
+    double *qcoarse,*qfine,*auxcoarse,*auxfine;
+    // double *areacoarse,*areafine;
+    // double *xp,*yp,*zp,*xd,*yd,*zd;
+    int igrid;
+
+    const amr_options_t* gparms;
+    fclaw2d_patch_t* fine_patch;
+
+    vt = fclaw2d_get_vtable(domain);
+
+    gparms = get_domain_parms(domain);
+    mx  = gparms->mx;
+    my  = gparms->my;
+    mbc = gparms->mbc;
+    refratio = gparms->refratio;
+    p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+    mbathy = 1;
+    // fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
+    //                               &xd,&yd,&zd,&areacoarse);
+    fclaw2d_clawpatch_soln_data(domain,coarse_patch,&qcoarse,&meqn);
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+
+    /* Loop over four siblings (z-ordering) */
+    for (igrid = 0; igrid < 4; igrid++)
+    {
+        fine_patch = &fine_patches[igrid];
+
+        fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
+        fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+        // if (gparms->manifold)
+        // {
+        //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
+        //                                   &xd,&yd,&zd,&areafine);
+        // }
+        GEOCLAW_AVERAGE2COARSE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                               &maux,auxcoarse,auxfine,&mbathy,
+                               &p4est_refineFactor,&refratio,
+                               &igrid);
         // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
         //                          areacoarse, areafine, &igrid,
         //                          &gparms->manifold);

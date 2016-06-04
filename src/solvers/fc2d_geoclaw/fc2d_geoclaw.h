@@ -304,6 +304,12 @@ void GEOCLAW_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse
                               double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
                               int* igrid);
 
+#define GEOCLAW_AVERAGE2COARSE FCLAW_F77_FUNC(geoclaw_average2coarse,GEOCLAW_AVERAGE2COARSE)
+void GEOCLAW_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
+                              double qfine[], int* maux, double aux_coarse[],
+                              double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
+                              int* igrid);
+
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -432,6 +438,11 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
                                    int this_blockno, int coarse_patchno,
                                    int fine0_patchno);
 
+void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   fclaw2d_patch_t *fine_patches,
+                                   int this_blockno, int coarse_patchno,
+                                   int fine0_patchno);
 
 
 #ifdef __cplusplus
