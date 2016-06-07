@@ -1,4 +1,4 @@
-function [amr,t] = readamrdata_forestclaw(dim,Frame,dir);
+function [amr,t] = readamrdata_forestclaw(dim,Frame,dir)
 
 % User-defined routine for reading in ForestClaw output.
 
