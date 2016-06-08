@@ -68,12 +68,14 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
     geoclaw_vt->rpt2             = &GEOCLAW_RPT2;
 
     vt->regrid_tag4refinement    = &fc2d_geoclaw_patch_tag4refinement;
-    // vt->regrid_tag4coarsening   = &fc2d_geoclaw_patch_tag4coarsening;
+    vt->regrid_tag4coarsening    = &fc2d_geoclaw_patch_tag4coarsening;
 
     vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
     // vt->regrid_average2coarse    = &fc2d_geoclaw_average2coarse;
+    
     vt->write_header             = &fc2d_geoclaw_output_header_ascii;
     vt->patch_write_file         = &fc2d_geoclaw_output_patch_ascii;
+
 #if 0
     /* These will eventually have GeoClaw specific implementations */
     vt->regrid_tag4coarsening   = &geoclaw_patch_tag4coarsening;

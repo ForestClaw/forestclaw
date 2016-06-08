@@ -94,7 +94,7 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
                endif
             enddo
             write(matunit1,120) (q(mq,i,j),mq=1,meqn),
-     &           (q(1,i,j)+aux(mbathy,i,j))
+     &           (aux(mbathy,i,j))
          enddo
          write(matunit1,*) ' '
       enddo

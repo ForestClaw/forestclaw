@@ -226,7 +226,6 @@ do m=1,num_dtopo
     if (x >  xlowdtopo(m) .and. x < xhidtopo(m).and. &
         y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
         t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
-
         if (level < minleveldtopo(m)) then
             allowcoarsen = .false.
             return
