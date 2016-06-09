@@ -304,6 +304,21 @@ void GEOCLAW_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse
                               double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
                               int* igrid);
 
+#define GEOCLAW_AVERAGE2COARSE FCLAW_F77_FUNC(geoclaw_average2coarse,GEOCLAW_AVERAGE2COARSE)
+void GEOCLAW_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
+                              double qfine[], int* maux, double aux_coarse[],
+                              double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
+                              int* igrid);
+
+#define GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(geoclaw_fort_write_header,GEOCLAW_FORT_WRITE_HEADER)
+void GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* ngrids);
+
+#define GEOCLAW_FORT_WRITE_FILE FCLAW_F77_FUNC(geoclaw_fort_write_file,GEOCLAW_FORT_WRITE_FILE)
+void GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux,int* mbathy,int* mbc,
+                             double* xlower,double* ylower,double* dx,double* dy,
+                             double q[],double aux[],int* iframe,int* patch_num,int* level,
+                             int* blockno,int* mpirank);
+
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -432,6 +447,19 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
                                    int this_blockno, int coarse_patchno,
                                    int fine0_patchno);
 
+void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   fclaw2d_patch_t *fine_patches,
+                                   int this_blockno, int coarse_patchno,
+                                   int fine0_patchno);
+
+void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
+                                      int iframe);
+
+void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx, int this_patch_idx,
+                                     int iframe,int patch_num,int level);
 
 
 #ifdef __cplusplus

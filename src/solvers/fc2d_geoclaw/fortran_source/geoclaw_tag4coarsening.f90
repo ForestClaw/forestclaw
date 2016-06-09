@@ -108,7 +108,7 @@ LOGICAL allowcoarsen
 
 LOGICAL time_interval, space_interval
 
-tag_patch = 1
+tag_patch = 0
 t0 = 0
 
 !! If coarsened, level will become level - 1
@@ -131,15 +131,23 @@ y_loop: do j=1-mbc,my+mbc
      if (allowcoarsen(x_c,y_c,t,level)) then
         if (q(1,i,j) > dry_tolerance_c) then
            eta = q(1,i,j) + aux(1,i,j)
-           speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
-           if ( abs(eta - sea_level) < wave_tolerance_c &
-               .and. speed < speed_tolerance_c(level)) then
-               tag_patch = 1
-           else 
-               tag_patch = 0
-               return
+           if ( abs(eta - sea_level) < wave_tolerance_c) then
+              tag_patch = 1
+           else
+              tag_patch = 0
+              return
            endif
-           
+           !! Ignore the speed criteria first
+           ! speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
+           ! if ( abs(eta - sea_level) < wave_tolerance_c &
+           !     .and. speed < speed_tolerance_c(level)) then
+           !     tag_patch = 1
+           ! else 
+           !     tag_patch = 0
+           !     return
+           ! endif
+        else
+          tag_patch = 1
         endif
      else
          tag_patch = 0 
@@ -218,7 +226,6 @@ do m=1,num_dtopo
     if (x >  xlowdtopo(m) .and. x < xhidtopo(m).and. &
         y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
         t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
-
         if (level < minleveldtopo(m)) then
             allowcoarsen = .false.
             return

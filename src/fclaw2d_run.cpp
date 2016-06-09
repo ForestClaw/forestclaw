@@ -154,11 +154,12 @@ void outstyle_1(fclaw2d_domain_t **domain)
     for(int n = 0; n < nout; n++)
     {
         double tstart = t_curr;
+        // Add June 6
+        fclaw2d_domain_set_time(*domain,t_curr);
         double tend = tstart + dt_outer;
         while (t_curr < tend)
         {
-            fclaw2d_domain_set_time(*domain,t_curr);
-
+            // fclaw2d_domain_set_time(*domain,t_curr);
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
@@ -276,6 +277,8 @@ void outstyle_1(fclaw2d_domain_t **domain)
                        not taken a small step */
                 }
             }
+            // Add June 6
+            fclaw2d_domain_set_time(*domain,t_curr);
             if (gparms->regrid_interval > 0)
             {
                 if (n_inner % gparms->regrid_interval == 0)

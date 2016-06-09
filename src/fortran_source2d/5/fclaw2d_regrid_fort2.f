@@ -194,7 +194,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
 c> \ingroup  Averaging
 c> Average fine grid siblings to parent coarse grid.
       subroutine fclaw2d_fort_average2coarse(mx,my,mbc,meqn,
-     &      qcoarse,qfine, areacoarse, areafine, igrid,manifold)
+     &      qcoarse,qfine,areacoarse,areafine,igrid,manifold)
       implicit none
 
       integer mx,my,mbc,meqn,p4est_refineFactor, refratio, igrid
