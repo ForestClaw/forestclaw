@@ -13,14 +13,24 @@
       double precision x,y,z, xlow, ylow, w,xc,yc
       double precision q0
 
+      integer example
+      common /comm_example/ example
+
       blockno = fc2d_clawpack46_get_block()
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             xlow = xlower + (i-1)*dx
             ylow = ylower + (j-1)*dy
-            call cellave2(blockno,xlow,ylow,dx,dy,w)
-            q(i,j,1) = w
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+            if (example .eq. 6) then
+c              # use this to get a smooth solution for computing the error
+               q(i,j,1) = q0(blockno,xc,yc)
+            else
+               call cellave2(blockno,xlow,ylow,dx,dy,w)
+               q(i,j,1) = w
+            endif
          enddo
       enddo
 
@@ -112,22 +122,34 @@ c           # No mapping.
 
       end
 
-      double precision function  q0(blockno,xc,yc)
+      double precision function  q0(blockno,xc1,yc1)
       implicit none
 
       double precision xc,yc, xp, yp, zp, rp
+      double precision xc1, yc1
       integer blockno
       integer*8 cont, get_context
       double precision r,r0
       logical fclaw2d_map_is_used
-      double precision Hsmooth
+      double precision Hsmooth,h1,h2
+      integer i
+
+      double precision xloc(0:4),yloc(0:4),zloc(0:4)
 
       double precision pi
       common /compi/ pi
 
+      integer example
+      common /comm_example/ example
+
+      data xloc /0, 1, 1, 0, 0.5d0/
+      data yloc /0, 0, 1, 1, 0.5d0/
+
       cont = get_context()
 
       if (fclaw2d_map_is_used(cont)) then
+         xc = xc1
+         yc = yc1
          call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
 
@@ -135,10 +157,28 @@ c           # No mapping.
          r = sqrt((xp - 1.0)**2 + yp**2 + (zp-r0)**2)
          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
       else
-         xp = xc
-         yp = yc
-         rp = sqrt(xp**2 + yp**2)
-         q0 = rp-0.25d0
+         if (example .eq. 6) then
+            if (xc1 .lt. 0) then
+               xp = 1 - (-xc1 - int(-xc1))
+            else
+               xp = xc1 - int(xc1)
+            endif
+            if (yc1 .lt. 0) then
+               yp = 1-(-yc1 - int(-yc1))
+            else
+               yp = yc1 - int(yc1)
+            endif
+            r0 = 0.2d0
+            rp = sqrt((xp-xloc(4))**2 + (yp-yloc(4))**2)
+            h1 = Hsmooth(rp+r0)
+            h2 = Hsmooth(rp-r0)
+            q0 = h1 - h2
+         else
+            xp = xc
+            yp = yc
+            rp = sqrt(xp**2 + yp**2)
+            q0 = rp-0.25d0
+         endif
       endif
 
       end
@@ -148,6 +188,6 @@ c           # No mapping.
 
       double precision r
 
-      Hsmooth = (tanh(r/0.05d0) + 1)/2.0
+      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
 
       end

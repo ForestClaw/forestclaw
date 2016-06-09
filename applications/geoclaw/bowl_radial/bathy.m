@@ -1,4 +1,4 @@
-function plotobject = surface(data)
+function plotobject = bathy(data)
 % read q data:
 mbathy = 4;
 mheight = 1;

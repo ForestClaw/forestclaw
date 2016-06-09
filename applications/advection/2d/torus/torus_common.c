@@ -41,10 +41,10 @@ torus_options_postprocess (user_options_t * user)
 fclaw_exit_type_t
 torus_options_check (user_options_t * user)
 {
-    if (user->example < 0 || user->example > 5)
+    if (user->example < 0 || user->example > 6)
     {
         fclaw_global_essentialf
-            ("Option --user:example must be between 0 and 5\n");
+            ("Option --user:example must be between 0 and 6\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

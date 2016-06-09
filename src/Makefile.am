@@ -52,7 +52,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/fclaw2d_diagnostics_fort.h
+	src/fclaw2d_diagnostics_fort.h \
+	src/fclaw2d_diagnostics_default.h \
+	src/fclaw2d_diagnostics_default_fort.h
 
 libforestclaw_internal_headers =
 
@@ -89,6 +91,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
 	src/fclaw2d_diagnostics.cpp \
+	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
 	src/fclaw2d_face_neighbors.cpp \
 	src/fclaw2d_ghost_fill.cpp \
@@ -133,7 +136,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
-	src/fortran_source2d/philim.f 
+	src/fortran_source2d/philim.f
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d

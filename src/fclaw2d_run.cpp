@@ -101,7 +101,7 @@ static void outstyle_0(fclaw2d_domain_t **domain)
     fclaw2d_output_frame(*domain,iframe);
 
     int init_flag = 1;
-    fclaw2d_run_diagnostics(*domain,init_flag);
+    fclaw2d_diagnostics_run(*domain,init_flag);
     init_flag = 0;
 
     /* Here is where we might include a call to a static solver, for, say,
@@ -142,7 +142,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
 
 
     int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_run_diagnostics(*domain,init_flag);
+    fclaw2d_diagnostics_run(*domain,init_flag);
     init_flag = 0;
 
     double t0 = 0;
@@ -163,7 +163,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
-            fclaw2d_run_diagnostics(*domain, init_flag);
+            fclaw2d_diagnostics_run(*domain, init_flag);
 
             /* In case we have to reject this step */
             if (!gparms->use_fixed_dt)
@@ -308,12 +308,13 @@ void outstyle_3(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
+    int init_flag = 1;
+    fclaw2d_diagnostics_run(*domain,init_flag);
+    init_flag = 0;
+
     int iframe = 0;
     fclaw2d_output_frame(*domain,iframe);
 
-    int init_flag = 1;
-    fclaw2d_run_diagnostics(*domain,init_flag);
-    init_flag = 0;
 
     const amr_options_t *gparms = get_domain_parms(*domain);
     double initial_dt = gparms->initial_dt;
@@ -363,7 +364,6 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         /* Get current domain data since it may change during regrid */
         ddata = fclaw2d_domain_get_data(*domain);
-        fclaw2d_run_diagnostics(*domain, init_flag);  /* Includes conservation check */
 
         double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
 
@@ -422,6 +422,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (n % nstep_inner == 0)
         {
+            fclaw2d_diagnostics_run(*domain, init_flag);  /* Includes conservation check */
             iframe++;
             fclaw2d_output_frame(*domain,iframe);
         }
@@ -440,7 +441,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
     fclaw2d_output_frame(*domain,iframe);
 
     int init_flag = 1;
-    fclaw2d_run_diagnostics(*domain,init_flag);
+    fclaw2d_diagnostics_run(*domain,init_flag);
     init_flag = 0;
 
     const amr_options_t *gparms = get_domain_parms(*domain);
@@ -460,7 +461,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
         ddata = fclaw2d_domain_get_data(*domain);
 #endif
 
-        fclaw2d_run_diagnostics(*domain, init_flag);
+        fclaw2d_diagnostics_run(*domain, init_flag);
 
         fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
 

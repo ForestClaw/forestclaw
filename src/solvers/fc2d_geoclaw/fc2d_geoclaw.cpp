@@ -647,7 +647,7 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     patch0 = &fine_patches[0];
 
-    
+
     amropt = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
     //coarsen_threshold = amropt->coarsen_threshold;
@@ -669,8 +669,8 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     tag_patch = 0;
     GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
                            q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
-                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c, 
-                           &geoclaw_options->wave_tolerance_c, 
+                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c,
+                           &geoclaw_options->wave_tolerance_c,
                            &geoclaw_options->speed_tolerance_entries_c,
                            geoclaw_options->speed_tolerance_c, &tag_patch);
     /* Print patches level, tag_patch, xlower, ylower to observe the refinement*/
@@ -724,6 +724,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
         //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
         //                                   &xd,&yd,&zd,&areafine);
         // }
+        int mbathy = 1;
         GEOCLAW_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
                                  &maux,auxcoarse,auxfine,&mbathy,
                                  &p4est_refineFactor,&refratio,

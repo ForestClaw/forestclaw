@@ -47,7 +47,7 @@ void metric_link_patch(fclaw2d_domain_t *domain)
 
     vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
 
-    vt.run_diagnostics = &metric_diagnostics;
+    vt.run_user_diagnostics = &metric_diagnostics;
 
     fclaw2d_set_vtable(domain,&vt);
 
