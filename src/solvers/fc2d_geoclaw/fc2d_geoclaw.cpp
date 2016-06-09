@@ -71,7 +71,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
     vt->regrid_tag4refinement   = &fc2d_geoclaw_patch_tag4refinement;
     vt->regrid_tag4coarsening   = &fc2d_geoclaw_patch_tag4coarsening;
 
-    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;   
+    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
 
 #if 0
     /* These will eventually have GeoClaw specific implementations */
@@ -617,7 +617,11 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
     GEOCLAW_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
                            &dx,&dy,&t, &blockno,q,aux,&level,&maxlevel,
                            &initflag,&tag_patch);
+
+    fclaw_global_essentialf("tag_patch = %d;  level = %d\n",tag_patch,level);
+    /*
     std::cout<<"tag_patch = "<<tag_patch<<", level = "<<level<<std::endl;
+    */
     return tag_patch;
 }
 
@@ -642,7 +646,7 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
     patch0 = &fine_patches[0];
 
-    
+
     amropt = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
     //coarsen_threshold = amropt->coarsen_threshold;
@@ -664,8 +668,8 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     tag_patch = 0;
     GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
                            q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
-                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c, 
-                           &geoclaw_options->wave_tolerance_c, 
+                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c,
+                           &geoclaw_options->wave_tolerance_c,
                            &geoclaw_options->speed_tolerance_entries_c,
                            geoclaw_options->speed_tolerance_c, &tag_patch);
     return tag_patch;
@@ -715,8 +719,9 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
         //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
         //                                   &xd,&yd,&zd,&areafine);
         // }
+        int mbathy = 1;
         GEOCLAW_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                 &maux,auxcoarse,auxfine,
+                                 &maux,auxcoarse,auxfine,&mbathy,
                                  &p4est_refineFactor,&refratio,
                                  &igrid);
         // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
