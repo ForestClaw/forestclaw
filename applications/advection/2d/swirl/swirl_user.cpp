@@ -94,7 +94,7 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
        This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
        entry above, or by calling fclaw2d_clawpack5_qinit(...) from here. */
 
-    int mx,my,mbc,meqn, maux, maxmx, maxmy;
+    int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *q, *aux;
 
@@ -109,9 +109,6 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
     */
-    maxmx = mx;
-    maxmy = my;
-    
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 }
 
