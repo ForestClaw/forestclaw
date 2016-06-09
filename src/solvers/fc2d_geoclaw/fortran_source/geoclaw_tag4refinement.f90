@@ -151,11 +151,14 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
                  !! Check to see if we are near shore
                  IF (q(1,i,j) < deep_depth) THEN
                     tag_patch = 1
+                    ! write (*,*) 'near shore: x_c, y_c, t, level', x_c,y_c,t,level
+                    ! write (*,*) 'perturbation, wave tolerance', abs(eta - sea_level), wave_tolerance
                     return
                     !! Check if we are allowed to flag in deep water
                     !! anyway
                  ELSE IF (level < max_level_deep) THEN
                     tag_patch = 1
+                    ! write (*,*) 'not in deep water: x_c, y_c, t, level', x_c,y_c,t,level
                     return
                  endif
               endif
@@ -168,6 +171,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
               do m=1,min(size(speed_tolerance),maxlevel)
                  IF (speed > speed_tolerance(m) .AND. level <= m) THEN
                     tag_patch = 1
+                    ! write (*,*) 'speed: x_c, y_c, t, sea_levelel', x_c,y_c,t,level
                     RETURN
                  endif
               enddo

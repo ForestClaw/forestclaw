@@ -12,10 +12,10 @@ def maketopo():
     """
     nxpoints = 201
     nypoints = 201
-    xlower = 0.e0
+    xlower = -100.e0
     xupper = 100.e0
     yupper = 100.e0
-    ylower = 0.e0
+    ylower = -100.e0
     outfile= "flatbathy.topotype2"     
     topotools.topo2writer(outfile,topo,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
@@ -25,10 +25,10 @@ def makeqinit():
     """
     nxpoints = 101
     nypoints = 101
-    xlower = 0.e0
+    xlower = -100.e0
     xupper = 100.e0
     yupper = 100.e0
-    ylower = 0.e0
+    ylower = -100.e0
     outfile= "hump.xyz"     
     topotools.topo1writer(outfile,qinit,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
@@ -46,7 +46,7 @@ def qinit(x,y):
     Gaussian hump:
     """
     from numpy import where
-    ze = -((x-15e0)**2)/8**2
+    ze = -((x+0e0)**2)/10.
     z = exp(ze)
     return z
 
