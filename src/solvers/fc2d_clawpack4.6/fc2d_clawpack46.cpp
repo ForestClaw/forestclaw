@@ -60,6 +60,9 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     /* Forestclaw files */
     fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK46_AVERAGE2COARSE;
     fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_INTERPOLATE2FINE;
+
+    fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK46_TAG4REFINEMENT;
+    fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_TAG4COARSENING;
 }
 
 

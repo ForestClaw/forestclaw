@@ -275,6 +275,7 @@ void CLAWPACK46_UNSET_BLOCK();
 
 
 /*************************** REGRIDDING ROUTINES ***************************/
+
 #define FC2D_CLAWPACK46_AVERAGE2COARSE FCLAW_F77_FUNC(fc2d_clawpack46_average2coarse, \
                                                           FC2D_CLAWPACK46_AVERAGE2COARSE)
 void FC2D_CLAWPACK46_AVERAGE2COARSE(const int* mx, const int* my,
@@ -292,6 +293,34 @@ void FC2D_CLAWPACK46_INTERPOLATE2FINE(const int* mx,const int* my,
                                       double areacoarse[], double areafine[],
                                       const int* igrid, const int* manifold);
 
+
+#define FC2D_CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(fc2d_clawpack46_tag4refinement, \
+                                                      FC2D_CLAWPACK46_TAG4REFINEMENT)
+
+void FC2D_CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
+                                    const int* mbc,const int* meqn,
+                                    const double* xlower, const double* ylower,
+                                    const double* dx, const double* dy,
+                                    const int* blockno,
+                                    double q[],
+                                    const double* tag_threshold,
+                                    const int* init_flag,
+                                    int* tag_patch);
+
+
+
+#define FC2D_CLAWPACK46_TAG4COARSENING FCLAW_F77_FUNC(fc2d_clawpack46_tag4coarsening, \
+                                                   FC2D_CLAWPACK46_TAG4COARSENING)
+
+void FC2D_CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
+                                    const int* mbc, const int* meqn,
+                                    const double* xlower, const double* ylower,
+                                    const double* dx, const double* dy,
+                                    const int* blockno,
+                                    double q0[],double q1[],
+                                    double q2[],double q3[],
+                                    const double* tag_threshold,
+                                    int* tag_patch);
 
 
 /***************************** MINIMAL API ******************************/
