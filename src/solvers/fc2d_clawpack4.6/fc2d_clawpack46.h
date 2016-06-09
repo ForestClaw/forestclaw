@@ -112,21 +112,23 @@ typedef void (*fc2d_clawpack46_fluxfun_t)(const int* meqn, double q[], double au
 
 typedef struct fc2d_clawpack46_vtable
 {
-    fc2d_clawpack46_setprob_t setprob;
-    fc2d_clawpack46_bc2_t bc2;
-    fc2d_clawpack46_qinit_t qinit;
-    fc2d_clawpack46_setaux_t setaux;
-    fc2d_clawpack46_b4step2_t b4step2;
-    fc2d_clawpack46_src2_t src2;
-    fc2d_clawpack46_rpn2_t rpn2;
-    fc2d_clawpack46_rpt2_t rpt2;
-    fc2d_clawpack46_fluxfun_t fluxfun;
-} fc2d_clawpack46_vtable_t;
+    /* Fortran routines */
+    fc2d_clawpack46_setprob_t   setprob;
+    fc2d_clawpack46_bc2_t       bc2;
+    fc2d_clawpack46_qinit_t     qinit;
+    fc2d_clawpack46_setaux_t    setaux;
+    fc2d_clawpack46_b4step2_t   b4step2;
+    fc2d_clawpack46_src2_t      src2;
+    fc2d_clawpack46_rpn2_t      rpn2;
+    fc2d_clawpack46_rpt2_t      rpt2;
+    fc2d_clawpack46_fluxfun_t   fluxfun;
 
+} fc2d_clawpack46_vtable_t;
 
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
 
-void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt);
+void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+                                 fc2d_clawpack46_vtable_t* vt);
 
 #define CLAWPACK46_BC2 FCLAW_F77_FUNC(clawpack46_bc2,CLAWPACK46_BC2)
 void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
@@ -270,6 +272,27 @@ int FC2D_CLAWPACK46_GET_BLOCK();
 #define CLAWPACK46_UNSET_BLOCK FCLAW_F77_FUNC(clawpack46_unset_block, \
                                               CLAWPACK46_UNSET_BLOCK)
 void CLAWPACK46_UNSET_BLOCK();
+
+
+/*************************** REGRIDDING ROUTINES ***************************/
+#define FC2D_CLAWPACK46_AVERAGE2COARSE FCLAW_F77_FUNC(fc2d_clawpack46_average2coarse, \
+                                                          FC2D_CLAWPACK46_AVERAGE2COARSE)
+void FC2D_CLAWPACK46_AVERAGE2COARSE(const int* mx, const int* my,
+                                    const int* mbc, const int* meqn,
+                                    double qcoarse[],double qfine[],
+                                    double areacoarse[],double areafine[],
+                                    const int* igrid, const int* manifold);
+
+
+#define FC2D_CLAWPACK46_INTERPOLATE2FINE FCLAW_F77_FUNC(fc2d_clawpack46_interpolate2fine, \
+                                                FC2D_CLAWPACK46_INTERPOLATE2FINE)
+void FC2D_CLAWPACK46_INTERPOLATE2FINE(const int* mx,const int* my,
+                                      const int* mbc, const int* meqn,
+                                      double qcoarse[], double qfine[],
+                                      double areacoarse[], double areafine[],
+                                      const int* igrid, const int* manifold);
+
+
 
 /***************************** MINIMAL API ******************************/
 

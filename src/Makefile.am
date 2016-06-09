@@ -126,7 +126,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/fclaw2d_map_nomap_brick.c \
 	src/fortran_source2d/5/fclaw2d_ghost_pack2.f \
 	src/fortran_source2d/5/fclaw2d_output_ascii_fort2.f \
-	src/fortran_source2d/5/fclaw2d_regrid_fort2.f \
 	src/fortran_source2d/5/fclaw2d_timeinterp_fort2.f \
 	src/fortran_source2d/5/fclaw2d_diagnostics_fort2.f \
 	src/fortran_source2d/5/average_fv2.f \

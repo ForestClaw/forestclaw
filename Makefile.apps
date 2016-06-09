@@ -20,15 +20,15 @@ include applications/dummy/Makefile.am
 ### include applications/test_parms/Makefile.am
 
 # Test metric terms (curvature, for example)
-include applications/metric/2d/all_mappings/Makefile.am
+# include applications/metric/2d/all_mappings/Makefile.am
 
 # Scalar advection on manifolds
-include applications/advection/2d/swirl_mapped/Makefile.am
-include applications/advection/2d/swirl/Makefile.am
-# include applications/advection/2d/torus/Makefile.am
-include applications/advection/2d/hemisphere/Makefile.am
-include applications/advection/2d/filament/Makefile.am
-include applications/advection/2d/sphere/Makefile.am
+# include applications/advection/2d/swirl_mapped/Makefile.am
+# include applications/advection/2d/swirl/Makefile.am
+include applications/advection/2d/torus/Makefile.am
+# include applications/advection/2d/hemisphere/Makefile.am
+# include applications/advection/2d/filament/Makefile.am
+# include applications/advection/2d/sphere/Makefile.am
 
 # NCAR Transport problems on the sphere
 #include applications/NCAR_transport/slotted_disk/Makefile.am
@@ -38,10 +38,10 @@ include applications/advection/2d/sphere/Makefile.am
 # include applications/euler/2d/quadrants/Makefile.am
 
 # Shallow water on the sphere
-include applications/shallow/2d/sphere/Makefile.am
+# include applications/shallow/2d/sphere/Makefile.am
 
 # Mountain problem - SSE
-include applications/Mountain/Makefile.am
+# include applications/Mountain/Makefile.am
 
 ###   # AMRClaw examples from clawpack4.x
 # include applications/amrclaw/acoustics/2d/interface/Makefile.am
@@ -49,7 +49,7 @@ include applications/Mountain/Makefile.am
 # include applications/amrclaw/burgers/2d/pwconst/Makefile.am
 # include applications/amrclaw/advection/2d/swirl/Makefile.am
 # include applications/amrclaw/euler/2d/quadrants/Makefile.am
-include applications/amrclaw/euler/2d/shockbubble/Makefile.am
+# include applications/amrclaw/euler/2d/shockbubble/Makefile.am
 # include applications/amrclaw/shallow/2d/radialdam/Makefile.am
 
 # Geoclaw examples
