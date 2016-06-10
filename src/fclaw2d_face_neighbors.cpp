@@ -198,6 +198,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
@@ -339,8 +340,12 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
+#if 0
                     this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
                                                  &transform_data);
+#endif
+                    vt.copy_face_ghost(domain,this_patch,neighbor_patch,iface,
+                                        time_interp,&transform_data);
 
                     /* We also need to copy _to_ the remote neighbor; switch contexts, but
                        use ClawPatches that are only in scope here, to avoid
@@ -352,9 +357,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         ClawPatch *neighbor_cp = this_cp;
                         ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                         int this_iface = iface_neighbor;
+#if 0
                         this_cp->exchange_face_ghost(this_iface,neighbor_cp,
                                                      time_interp,
                                                      &transform_data_finegrid);
+#endif
+                        vt.copy_face_ghost(domain,this_patch,neighbor_patch,this_iface,
+                                            time_interp,&transform_data);
                     }
                 }
             }
@@ -396,6 +405,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                  int maxlevel,
                                  int time_interp)
 {
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     const amr_options_t *gparms = get_domain_parms(domain);
     int refratio = gparms->refratio;
@@ -481,9 +491,14 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                     fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
                     ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
+#if 0
                     this_cp->exchange_face_ghost(iface,neighbor_cp,
                                                  use_timeinterp_patch,
                                                  &transform_data);
+#endif
+                    vt.copy_face_ghost(domain,this_ghost_patch,neighbor_patch,iface,
+                                        use_timeinterp_patch,&transform_data);
+
                     ++ddata->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)

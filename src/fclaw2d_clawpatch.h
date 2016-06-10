@@ -211,6 +211,24 @@ void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
 
 
 
+void fclaw2d_clawpatch_copy_face_ghost(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   fclaw2d_patch_t *neighbor_patch,
+                                   int iface,
+                                   int time_interp,
+                                   fclaw2d_transform_data_t *transform_data);
+
+void fclaw2d_clawpatch_copy_corner_ghost(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     fclaw2d_patch_t *corner_patch,
+                                     int icorner,
+                                     int time_interp,
+                                     fclaw2d_transform_data_t *transform_data);
+
+
+
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

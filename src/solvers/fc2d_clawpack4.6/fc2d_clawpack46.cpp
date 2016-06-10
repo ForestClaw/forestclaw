@@ -57,12 +57,19 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     vt->b4step2 = NULL;
     vt->src2 = NULL;
 
-    /* Forestclaw files */
+    /* Forestclaw functions */
     fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK46_AVERAGE2COARSE;
     fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_INTERPOLATE2FINE;
 
     fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK46_TAG4REFINEMENT;
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_TAG4COARSENING;
+
+    /* Patch functions */
+    fclaw_vt->copy_face_ghost        = &fclaw2d_clawpatch_copy_face_ghost;
+    fclaw_vt->fort_copy_face_ghost   = &FC2D_CLAWPACK46_COPY_FACE_GHOST;
+
+    fclaw_vt->copy_corner_ghost      = &fclaw2d_clawpatch_copy_corner_ghost;
+    fclaw_vt->fort_copy_corner_ghost = &FC2D_CLAWPACK46_COPY_CORNER_GHOST;
 }
 
 

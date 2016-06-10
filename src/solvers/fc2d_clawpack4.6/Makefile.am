@@ -17,7 +17,8 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2_wrap.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_conservation.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_regrid_fort.f
+	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_regrid_fort.f \
+	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_copy_fort.f
 
 
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack4.6/libclawpack4.6.la

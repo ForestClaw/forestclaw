@@ -8,7 +8,7 @@ c     # ----------------------------------------------------------
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine fclaw2d_fort_exchange_face_ghost(mx,my,mbc,meqn,qthis,
+      subroutine fc2d_clawpack46_copy_face_ghost(mx,my,mbc,meqn,qthis,
      &      qneighbor,iface,transform_ptr)
       implicit none
 
@@ -66,7 +66,7 @@ c                 # y-direction (idir == 1)
       end
 
 
-      subroutine fclaw2d_fort_exchange_corner_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_copy_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
@@ -116,6 +116,9 @@ c              # can now be dropped in.
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer ibc, jbc, mq
+
+      write(6,*) 'fc2d_clawpack46_copy_phys_corner_ghost : stop'
+      stop
 
 c     # Fill in corner ghost cells that overlap the physical boundary. In this
 c     case, the corner ghost cells are copied from a face neighbor.

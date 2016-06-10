@@ -323,6 +323,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
@@ -450,9 +451,14 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     }
                     else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
+#if 0
                         this_cp->exchange_corner_ghost(icorner,corner_cp,
                                                        time_interp,
                                                        &transform_data);
+#endif
+                        vt.copy_corner_ghost(domain,this_patch,corner_patch,
+                                             icorner,
+                                             time_interp,&transform_data);
                     }
                 }
                 else /* is_block_corner && ispillowsphere */

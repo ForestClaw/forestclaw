@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_regrid_default.h>
+#include <fclaw2d_clawpatch.h>
 
 /* Initialize any settings that can be set here */
 void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
@@ -75,6 +76,10 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
     vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
     vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+
+    /* Ghost filling - solver specific */
+    vt->copy_face_ghost          = fclaw2d_clawpatch_copy_face_ghost;
+    vt->copy_corner_ghost        = fclaw2d_clawpatch_copy_corner_ghost;
 
 #if 0
     vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;

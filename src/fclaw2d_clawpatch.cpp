@@ -610,6 +610,71 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
 
 
 /* ----------------------------------------------------------------
+   Ghost cell exchange operations
+   ---------------------------------------------------------------- */
+
+void fclaw2d_clawpatch_copy_face_ghost(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *this_patch,
+                                       fclaw2d_patch_t *neighbor_patch,
+                                       int iface,
+                                       int time_interp,
+                                       fclaw2d_transform_data_t *transform_data)
+
+{
+    int meqn,mx,my,mbc;
+    double *qthis, *qneighbor;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
+    fclaw2d_clawpatch_timesync_data(domain,neighbor_patch,time_interp,&qneighbor,&meqn);
+
+    vt.fort_copy_face_ghost(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+
+#if 0
+    FCLAW2D_FORT_EXCHANGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,iface,
+                                     &transform_data);
+#endif
+}
+
+
+void fclaw2d_clawpatch_copy_corner_ghost(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *this_patch,
+                                         fclaw2d_patch_t *corner_patch,
+                                         int icorner,
+                                         int time_interp,
+                                         fclaw2d_transform_data_t *transform_data)
+{
+    int meqn,mx,my,mbc;
+    double *qthis, *qcorner;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
+    fclaw2d_clawpatch_timesync_data(domain,corner_patch,time_interp,&qcorner,&meqn);
+
+    vt.fort_copy_corner_ghost(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,&transform_data);
+
+#if 0
+    FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                                       qthis, qcorner, a_corner,
+                                       &transform_data);
+#endif
+
+}
+
+
+
+
+/* ----------------------------------------------------------------
    ClawPatch member functions (previous in ClawPatch.cpp)
    ---------------------------------------------------------------- */
 
@@ -1022,7 +1087,6 @@ void ClawPatch::partition_unpack(double *q)
 /* ----------------------------------------------------------------
    Exchange/average/interpolate
    ---------------------------------------------------------------- */
-
 void ClawPatch::set_boundary_to_value(const int& time_interp,
                                       double& value)
 {
@@ -1038,6 +1102,7 @@ void ClawPatch::set_corners_to_value(const int& time_interp,
 }
 
 
+#if 0
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
                                     int time_interp,
@@ -1062,6 +1127,7 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                                        &transform_data);
 
 }
+#endif
 
 /* ----------------------------------------------------------------
    Multi-level operations
