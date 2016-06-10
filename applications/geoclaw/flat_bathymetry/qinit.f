@@ -5,12 +5,12 @@
 
 !        integer :: min_level
 !        integer :: max_level
-       
+
 !        x_low_qinit = -9.0
 !        y_low_qinit = -100.0
 !        x_hi_qinit = 9.0
 !        y_hi_qinit = 100.0
-       
+
 !        min_level_qinit = min_level
 !        max_level_qinit = max_level
 !        end
@@ -50,7 +50,6 @@ c     !            q(2,i,j) = sqrt(grav*100)* (-aux(1,i,j)+
 c     ! &                        exp(-xi**2/18.0))
              else
                 q(1,i,j) = sea_level - aux(1,i,j)
-                q(2,i,j) = 0.d0
              endif
   20         continue
        return

@@ -131,10 +131,10 @@ y_loop: do j=1-mbc,my+mbc
      if (allowcoarsen(x_c,y_c,t,level)) then
         if (q(1,i,j) > dry_tolerance_c) then
            eta = q(1,i,j) + aux(1,i,j)
+           ! write(*,*) abs(eta - sea_level)
            if ( abs(eta - sea_level) < wave_tolerance_c) then
               tag_patch = 1
            else
-              tag_patch = 0
               return
            endif
            !! Ignore the speed criteria first
@@ -150,7 +150,6 @@ y_loop: do j=1-mbc,my+mbc
           tag_patch = 1
         endif
      else
-         tag_patch = 0 
          return
      endif
 

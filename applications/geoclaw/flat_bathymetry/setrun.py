@@ -311,7 +311,7 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    # regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
+    regions.append([2, 4, 0., 1.e10, -100.,100., -100.,100.])
     # regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
     # regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
     # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
@@ -385,7 +385,7 @@ def setgeo(rundata):
     refinement_data = rundata.refinement_data
     refinement_data.wave_tolerance = 1.e-2
     refinement_data.deep_depth = 1e2
-    refinement_data.max_level_deep = 3
+    refinement_data.max_level_deep = 4
     refinement_data.variable_dt_refinement_ratios = True
 
     # == settopo.data values ==

@@ -621,8 +621,8 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
                            &dx,&dy,&t,&blockno,q,aux,&level,&maxlevel,
                            &initflag,&tag_patch);
     /* Print patches level, tag_patch, xlower, ylower to observe the refinement*/
-    fclaw_global_infof("tag_patch %d, t %f, xlower %f, ylower %f, level %d\n",
-                        tag_patch, t, xlower, ylower, level);
+    // fclaw_global_infof("tag_patch %d, t %f, xlower %f, ylower %f, level %d\n",
+    //                     tag_patch, t, xlower, ylower, level);
     return tag_patch;
 }
 
@@ -674,8 +674,8 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
                            &geoclaw_options->speed_tolerance_entries_c,
                            geoclaw_options->speed_tolerance_c, &tag_patch);
     /* Print patches level, tag_patch, xlower, ylower to observe the refinement*/
-    // fclaw_global_infof("tag_patch %d, t %f, xlower %f, ylower %f, level %d\n",
-    //                     tag_patch, t, xlower, ylower, level);
+    fclaw_global_infof("tag_patch %d, xlower %f, ylower %f, level %d\n",
+                        tag_patch, xlower, ylower, level);
     return tag_patch;
 
 }
