@@ -38,6 +38,8 @@ void flatbathy_link_solvers(fclaw2d_domain_t *domain)
     /* These are set by GeoClaw for convenience, but the user
        can set these with customized functions, if desired. */
     fc2d_geoclaw_init_vtables(&vt, &geoclaw);
+
+    vt.patch_initialize         = &flatbathy_patch_initialize;
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
 
 #if 0
@@ -48,4 +50,34 @@ void flatbathy_link_solvers(fclaw2d_domain_t *domain)
     /* etc ... */
 #endif
 
+}
+void flatbathy_patch_initialize(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
+{
+    /* This is an example of how to call the initialization routines explicitly
+       This routine can be replaced by setting the appropriate fclaw2d_vtable_t,
+       entry above, or by calling fclaw2d_clawpack5_qinit(...) from here. */
+
+    int mx,my,mbc,meqn, maux;
+    double xlower,ylower,dx,dy;
+    double *q, *aux;
+    
+    // int minlevel, maxlevel;
+    // minlevel = 4;
+    // maxlevel = 4;
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
+
+    /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
+       Header is in the Clawpack package
+    */
+    // PREQINIT(&minlevel,&maxlevel);
+    QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 }

@@ -37,7 +37,7 @@ def topo(x,y):
     Parabolic bowl
     """
     # value of z at origin:  Try zmin = 80 for shoreline or 250 for no shore
-    z = zeros(x.shape)
+    z = ones(x.shape)*-100.e0
     return z
 
 
@@ -47,7 +47,7 @@ def qinit(x,y):
     """
     from numpy import where
     ze = -((x+0e0)**2)/10.
-    z = exp(ze)
+    z = 1.0 + 0.01*exp(ze)
     return z
 
 if __name__=='__main__':

@@ -129,6 +129,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
         !! specified and need to force refinement:
         !! This assumes that t0 = 0.d0, should really be t0 but we do
         !! not have access to that parameter in this routine
+        ! IF (init_flag .NE. 0) THEN
         IF (qinit_type > 0 .AND. init_flag .NE. 0) THEN
            space_interval = x_hi > x_low_qinit .and. x_low < x_hi_qinit .and. &
                 y_hi > y_low_qinit .AND. y_low < y_hi_qinit

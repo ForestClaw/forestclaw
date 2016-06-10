@@ -9,7 +9,8 @@ applications_geoclaw_flat_bathymetry_flatbathy_SOURCES = \
 	applications/geoclaw/flat_bathymetry/flatbathy_user.cpp \
 	applications/geoclaw/flat_bathymetry/flatbathy_user.h \
 	applications/geoclaw/flat_bathymetry/flatbathy.cpp \
-	applications/geoclaw/flat_bathymetry/fclaw2d_map_nomap.c
+	applications/geoclaw/flat_bathymetry/fclaw2d_map_nomap.c \
+	applications/geoclaw/flat_bathymetry/qinit.f
 
 
 applications_geoclaw_flat_bathymetry_flatbathy_CPPFLAGS = \
