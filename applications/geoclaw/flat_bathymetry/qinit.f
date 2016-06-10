@@ -46,8 +46,8 @@ c         # (xi, yj) is the locaiton of the physical domain
              if (xi.lt.9.0 .and. xi.gt. -9.0) then
                 q(1,i,j) = sea_level - aux(1,i,j) + 
      &           exp(-xi**2/18.0)
-c     !            q(2,i,j) = sqrt(grav*100)* (-aux(1,i,j)+ 
-c     ! &                        exp(-xi**2/18.0))
+c     !            q(2,i,j) = sqrt(grav*(sea_level-aux(1,i,j)))* 
+c     ! &                     q(1,i,j)
              else
                 q(1,i,j) = sea_level - aux(1,i,j)
              endif
