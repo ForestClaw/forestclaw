@@ -13,7 +13,7 @@
 !  # See also 'tag4refinement.f'
 
 subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
-       xlower,ylower,dx,dy,q0,q1,q2,q3, &
+       xlower,ylower,dx,dy,t,q0,q1,q2,q3, &
        aux0,aux1,aux2,aux3,level,maxlevel, &
        dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
        speed_tolerance_c, tag_patch)
@@ -37,25 +37,25 @@ REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(0),ylower(0), &
-                 dx,dy,q0,aux0,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q0,aux0,level,maxlevel,dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(1),ylower(1), &
-                 dx,dy,q1,aux1,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q1,aux1,level,maxlevel,dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(2),ylower(2), &
-                 dx,dy,q2,aux2,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q2,aux2,level,maxlevel,dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
-                 dx,dy,q3,aux3,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q3,aux3,level,maxlevel,dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
@@ -65,7 +65,7 @@ end subroutine geoclaw_tag4coarsening
 
 
 subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
-                       dx,dy,q,aux,level,maxlevel,dry_tolerance_c, &
+                       dx,dy,t,q,aux,level,maxlevel,dry_tolerance_c, &
                        wave_tolerance_c,speed_tolerance_entries_c, &
                        speed_tolerance_c,tag_patch)
 

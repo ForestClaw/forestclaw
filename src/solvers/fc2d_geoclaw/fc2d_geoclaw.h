@@ -292,7 +292,7 @@ void GEOCLAW_TAG4REFINEMENT(int* mx,int* my, int* mbc, int *meqn,int*maux,
 #define GEOCLAW_TAG4COARSENING FCLAW_F77_FUNC(geoclaw_tag4coarsening,GEOCLAW_TAG4COARSENING)
 void GEOCLAW_TAG4COARSENING(int* blockno,int* mx,int* my,int* mbc,int* meqn, int* maux,
                             double xlower[],double ylower[],double* dx,double* dy,
-                            double q0[], double q1[], double q2[], double q3[],
+                            double* t, double q0[], double q1[], double q2[], double q3[],
                             double aux0[], double aux1[], double aux2[], double aux3[],
                             int* level, int* maxlevel, double* dry_tolerance_c,
                             double* wave_tolerance_c, int* speed_tolerance_entries_c,
