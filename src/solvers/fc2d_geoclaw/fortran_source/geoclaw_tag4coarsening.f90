@@ -90,7 +90,7 @@ USE refinement_module
 implicit none
 
 INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
-INTEGER level, maxlevel, speed_tolerance_entries_c
+INTEGER level, maxlevel, clevel, speed_tolerance_entries_c
 DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
 DOUBLE PRECISION dry_tolerance_c
@@ -112,7 +112,7 @@ tag_patch = 0
 t0 = 0
 
 !! If coarsened, level will become level - 1
-level = level - 1
+clevel = level - 1
 
 !! Loop over interior points on this grid
 !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
