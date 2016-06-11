@@ -330,20 +330,20 @@ def setrun(claw_pkg='geoclaw'):
     # rundata.gaugedata.add_gauge()
 
     # gauges along x-axis:
-    gaugeno = 0
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = r + .001  # shift a bit away from cell corners
-        y = .001
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
+    # gaugeno = 0
+    # for r in np.linspace(86., 93., 9):
+    #     gaugeno = gaugeno+1
+    #     x = r + .001  # shift a bit away from cell corners
+    #     y = .001
+    #     rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
 
     # gauges along diagonal:
-    gaugeno = 100
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = (r + .001) / np.sqrt(2.)
-        y = (r + .001) / np.sqrt(2.)
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
+    # gaugeno = 100
+    # for r in np.linspace(86., 93., 9):
+    #     gaugeno = gaugeno+1
+    #     x = (r + .001) / np.sqrt(2.)
+    #     y = (r + .001) / np.sqrt(2.)
+    #     rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
 
 
     return rundata

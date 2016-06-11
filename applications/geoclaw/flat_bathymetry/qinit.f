@@ -25,29 +25,32 @@ c         # (xi, yj) is the locaiton of the physical domain
           xi = xlower + (i-0.5d0)*dx
           do 20 j=1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
-             if (xi.lt.9.0 .and. xi.gt. -9.0) then
 c
-c               # Right-going wave (square wave)
-c               # q0(1,:,:) = I_([-9,9]x[-100,100])
-c               # q0(2,:,:) = (u0+sqrt(g*h0)) * I_([-95,-85]x[-100,100])
+c     # Right-going wave (square wave)
 c
-c                q(1,i,j) = 1
-c                q(2,i,j) = sqrt(grav*100) * q(1,i,j)
+c     # h0 = sea_level - aux(1,:,:)
+c     # u0 = 0
+c     # dq(1,:,:) = I_([-85,-95]x[-100,100])
+c     # dq(2,:,:) = (u0+sqrt(g*h0))*dq(1,:,:)
+c     # Therefore, q should be initialized as:
+c     # q(1,:,:) = h0 + dq(1,:,:)
+c     # q(2,:,:) = h0u0 + dq(2,:,:)
 c
-c               # Both directions (Gaussian)               
-c
-                q(1,i,j) = sea_level - aux(1,i,j) + 
-     &                     exp(-xi**2/18.0)
+             if (xi.lt.-85.0 .and. xi.gt. -95.0) then
+                q(1,i,j) = sea_level - aux(1,i,j) + 1
+                q(2,i,j) = sqrt(grav*(sea_level - aux(1,i,j)))
              else
-c
-c               # Right-going wave (square wave)
-c
-c                q(1,i,j) = sea_level
-c
-c               # Both directions (Gaussian)               
-c
-                q(1,i,j) = sea_level - aux(1,i,j)               
+                q(1,i,j) = sea_level - aux(1,i,j)              
              endif
+c
+c     # Both direction (Gaussian wave)
+c
+c             if (xi.lt.9.0 .and. xi.gt. -9.0) then            
+c                q(1,i,j) = sea_level - aux(1,i,j) + 
+c     &                     exp(-xi**2/18.0)
+c             else
+c                q(1,i,j) = sea_level - aux(1,i,j)               
+c             endif
   20         continue
        return
        end
