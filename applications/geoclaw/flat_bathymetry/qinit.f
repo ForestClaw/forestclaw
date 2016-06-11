@@ -1,21 +1,3 @@
-! c     =====================================================
-!        subroutine preqinit(min_level, max_level)
-! c     =====================================================
-!        use qinit_module
-
-!        integer :: min_level
-!        integer :: max_level
-
-!        x_low_qinit = -9.0
-!        y_low_qinit = -100.0
-!        x_hi_qinit = 9.0
-!        y_hi_qinit = 100.0
-
-!        min_level_qinit = min_level
-!        max_level_qinit = max_level
-!        end
-! c
-! c
 c
 c     =====================================================
        subroutine qinit(meqn,mbc,mx,my,xlower,ylower,
@@ -44,12 +26,27 @@ c         # (xi, yj) is the locaiton of the physical domain
           do 20 j=1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
              if (xi.lt.9.0 .and. xi.gt. -9.0) then
+c
+c               # Right-going wave (square wave)
+c               # q0(1,:,:) = I_([-9,9]x[-100,100])
+c               # q0(2,:,:) = (u0+sqrt(g*h0)) * I_([-95,-85]x[-100,100])
+c
+c                q(1,i,j) = 1
+c                q(2,i,j) = sqrt(grav*100) * q(1,i,j)
+c
+c               # Both directions (Gaussian)               
+c
                 q(1,i,j) = sea_level - aux(1,i,j) + 
-     &           exp(-xi**2/18.0)
-c     !            q(2,i,j) = sqrt(grav*(sea_level-aux(1,i,j)))* 
-c     ! &                     q(1,i,j)
+     &                     exp(-xi**2/18.0)
              else
-                q(1,i,j) = sea_level - aux(1,i,j)
+c
+c               # Right-going wave (square wave)
+c
+c                q(1,i,j) = sea_level
+c
+c               # Both directions (Gaussian)               
+c
+                q(1,i,j) = sea_level - aux(1,i,j)               
              endif
   20         continue
        return

@@ -34,10 +34,11 @@ def makeqinit():
 
 def topo(x,y):
     """
-    Parabolic bowl
+    flatbathy
     """
     # value of z at origin:  Try zmin = 80 for shoreline or 250 for no shore
     z = ones(x.shape)*-100.e0
+    #z = zeros(x.shape)
     return z
 
 
