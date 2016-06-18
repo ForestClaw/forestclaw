@@ -65,6 +65,7 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     /* Defaults for regridding */
     vt->regrid_average2coarse    = &fclaw2d_regrid_average2coarse;
     vt->regrid_interpolate2fine  = &fclaw2d_regrid_interpolate2fine;
+
     vt->regrid_tag4refinement    = &fclaw2d_regrid_tag4refinement;
     vt->regrid_tag4coarsening    = &fclaw2d_regrid_tag4coarsening;
 
@@ -72,14 +73,14 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->write_header             = &fclaw2d_output_header_ascii;
     vt->patch_write_file         = &fclaw2d_output_patch_ascii;
 
+    /* Ghost filling - solver specific */
+    vt->copy_face_ghost          = fclaw2d_clawpatch_copy_face_ghost;
+    vt->copy_corner_ghost        = fclaw2d_clawpatch_copy_corner_ghost;
+
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
     vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
     vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
-
-    /* Ghost filling - solver specific */
-    vt->copy_face_ghost          = fclaw2d_clawpatch_copy_face_ghost;
-    vt->copy_corner_ghost        = fclaw2d_clawpatch_copy_corner_ghost;
 
 #if 0
     vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
