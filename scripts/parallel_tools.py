@@ -594,7 +594,6 @@ def compile_results(results_dir=None,results_file='results.out',
         results_dir = os.getcwd()
 
     # Stuff to grep for
-<<<<<<< Updated upstream
     stats_list_float = [ 'INIT',
                          'ADVANCE$',
                          'GHOSTFILL$',
@@ -658,17 +657,7 @@ def compile_results(results_dir=None,results_file='results.out',
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
-    stats_list = [ 'INIT',
-                   'ADVANCE$',
-                   'GHOSTFILL$',
-                   'REGRID$',
-                   'GHOSTPATCH_COMM',
-                   'ADAPT_COMM',
-                   'PARTITION_COMM',
-                   'CFL_COMM',
-                   'WALLTIME',
-                   'ADVANCE_STEPS_COUNTER',
-                   'NEIGHBOR_SEARCH']
+
     # Compile data to this file
     line_len = option_width + int_width + float_width
     header_str = option_str_header + int_str + float_str
@@ -677,10 +666,7 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
-                              'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
-                              'partition','cfl','wall','adv._steps','neighbor_search'))
+
     resultsfile.write("# " + header_str + "\n")
 
     resultsfile.write("# " + "-"*line_len)
@@ -983,7 +969,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["rundir"]          = rundir
                         job["jobid"]           = row[0]
                         job["procs"]           = row[1]
-<<<<<<< Updated upstream
                         job["mx"]              = row[2]   # Used above in computing m
                         job["mi"]              = row[3]
                         job["mj"]              = row[4]
@@ -1018,23 +1003,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["local_ratio"]     = row[30]
                         job["remote_ratio"]    = row[31]
 
-=======
-                        job["mx"]              = row[2]
-                        job["minlevel"]        = row[3]
-                        job["maxlevel"]        = row[4]
-                        job["nout"]            = row[5]
-                        job["tfinal"]          = row[6]
-                        job["init"]            = row[7]
-                        job["advance"]         = row[8]
-                        job["ghostfill"]       = row[9]
-                        job["regrid"]          = row[10]
-                        job["ghostpatch_comm"] = row[11]
-                        job["adapt_comm"]      = row[12]
-                        job["partition_comm"]  = row[13]
-                        job["cfl_comm"]        = row[14]
-                        job["walltime"]        = row[15]
-                        job["advance_steps"]   = row[16]
-                        job["neighbor_search"]   = row[17]
 
                     jobs[m][p][l] = job
 
@@ -1266,7 +1234,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
             plt.draw()
 
     else:
-<<<<<<< Updated upstream
         if scaling == 'resolution':
             levels = list(set([x[2] for x in tlist]))
             ax.xaxis.set_major_locator(plt.FixedLocator(levels))
@@ -1274,18 +1241,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
             l1 = np.min(levels)
             l2 = np.max(levels)
             plt.xlim([l1-0.5,l2+0.5])
-        ax.xaxis.set_major_locator(plt.FixedLocator(procs))
-        ax.set_xlabel("Processor count",fontsize=16)
-        p1 = np.log(np.min(procs))/np.log(4)
-        p2 = np.log(np.max(procs))/np.log(4)
-        plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
-
-    if efficiency:
-        ax.set_yscale('linear')
-        plt.ylim([0,110])
-        plt.grid(b=True,which='major')
-        # plt.grid(b=True,which='minor')
-        # plt.minorticks_on()
 
         else:
             ax.xaxis.set_major_locator(plt.FixedLocator(procs))
