@@ -26,9 +26,13 @@ if PlotParallelPartitions ~= 1
 end
 showpatchborders(1:10);
 if (mq == 2)
-    caxis([qmin,qmax]);
+    % plotting error
+    qc = max(abs([qmin,qmax]));
+    caxis([-qc,qc]);
     fprintf('%6s %12s\n\n','qmax',qmax);
     daspect([1,1,1]);
+    rybcolormap
+    delete(get(gca,'title'))
 else
     caxis([0,1])
     qlo = 0;
@@ -73,10 +77,6 @@ if (isflat)
     hold off;
     view(2);
 else
-    hidepatchborders;
-    view(3);
-    % camlight;
-    showpatchborders;
     hold on;
     R = 0.5;  % revs per second
     alpha = 0.4;
@@ -84,16 +84,13 @@ else
     [xp,yp,zp] = torus_soln(t,alpha,R,period);    % camlight;
     plot3(xp,yp,zp,'k','linewidth',2);
     hold off;
+    hidepatchborders;
+    view(3)
+    camlight;
+    axis off
 end
 
 
-
-setpatchborderprops('linewidth',1)
-hidepatchborders(9)
-showpatchborders;
-% cv = [0.5 0.5];
-% drawcontourlines(cv);
-% setcontourlineprops('linewidth',2);
 
 
 %%
