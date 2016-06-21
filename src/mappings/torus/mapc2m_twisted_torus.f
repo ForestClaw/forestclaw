@@ -9,10 +9,10 @@
 
       common /compi/ pi
 
-      r = 1 + alpha*cos(2*pi*(yc + xc))
+      r = 1.d0 + alpha*cos(2.d0*pi*(yc + xc))
 
-      xp = r*cos(2*pi*xc)
-      yp = r*sin(2*pi*xc)
-      zp = alpha*sin(2*pi*(yc + xc))
+      xp = r*cos(2.d0*pi*xc)
+      yp = r*sin(2.d0*pi*xc)
+      zp = alpha*sin(2.d0*pi*(yc + xc))
 
       end
