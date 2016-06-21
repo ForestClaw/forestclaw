@@ -658,7 +658,6 @@ def compile_results(results_dir=None,results_file='results.out',
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
-=======
     stats_list = [ 'INIT',
                    'ADVANCE$',
                    'GHOSTFILL$',
@@ -670,8 +669,6 @@ def compile_results(results_dir=None,results_file='results.out',
                    'WALLTIME',
                    'ADVANCE_STEPS_COUNTER',
                    'NEIGHBOR_SEARCH']
->>>>>>> Stashed changes
-
     # Compile data to this file
     line_len = option_width + int_width + float_width
     header_str = option_str_header + int_str + float_str
@@ -680,14 +677,10 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
-<<<<<<< Updated upstream
-=======
     fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
     resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
                               'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
                               'partition','cfl','wall','adv._steps','neighbor_search'))
->>>>>>> Stashed changes
-
     resultsfile.write("# " + header_str + "\n")
 
     resultsfile.write("# " + "-"*line_len)
@@ -1042,7 +1035,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["walltime"]        = row[15]
                         job["advance_steps"]   = row[16]
                         job["neighbor_search"]   = row[17]
->>>>>>> Stashed changes
 
                     jobs[m][p][l] = job
 
@@ -1282,7 +1274,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
             l1 = np.min(levels)
             l2 = np.max(levels)
             plt.xlim([l1-0.5,l2+0.5])
-=======
         ax.xaxis.set_major_locator(plt.FixedLocator(procs))
         ax.set_xlabel("Processor count",fontsize=16)
         p1 = np.log(np.min(procs))/np.log(4)
@@ -1295,7 +1286,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
         plt.grid(b=True,which='major')
         # plt.grid(b=True,which='minor')
         # plt.minorticks_on()
->>>>>>> Stashed changes
 
         else:
             ax.xaxis.set_major_locator(plt.FixedLocator(procs))
