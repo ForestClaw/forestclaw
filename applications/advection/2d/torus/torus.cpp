@@ -191,6 +191,14 @@ void run_program(fclaw_app_t* app)
         cont = fclaw2d_map_new_nomap();
         break;
 
+    case 7:
+        /* torus */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_twisted_torus(brick,gparms->scale,
+                                             gparms->shift,rotate,user->alpha);
+        break;
+
     default:
         SC_ABORT_NOT_REACHED ();
     }

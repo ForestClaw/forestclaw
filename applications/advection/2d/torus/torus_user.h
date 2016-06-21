@@ -120,6 +120,13 @@ fclaw2d_map_context_t *
                            const double alpha);
 
 fclaw2d_map_context_t *
+    fclaw2d_map_new_twisted_torus (fclaw2d_map_context_t* brick,
+                                   const double scale[],
+                                   const double shift[],
+                                   const double rotate[],
+                                   const double alpha);
+
+fclaw2d_map_context_t *
     fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
                              const double scale[],
                              const double shift[],

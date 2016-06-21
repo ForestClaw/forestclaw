@@ -79,7 +79,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
     vt.fort_compute_patch_error = &TORUS_COMPUTE_ERROR;
 
-    if (example == 6)
+    if (example >= 6)
     {
         vt.fort_tag4refinement = &TAG4REFINEMENT;
         vt.fort_tag4coarsening = &TAG4COARSENING;

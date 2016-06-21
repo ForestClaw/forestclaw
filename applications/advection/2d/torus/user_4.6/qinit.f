@@ -11,22 +11,23 @@
       integer i,j
       integer blockno, fc2d_clawpack46_get_block
       double precision x,y,z, xlow, ylow, w,xc,yc
-      double precision q0
+      double precision q0, t0
 
       integer example
       common /comm_example/ example
 
       blockno = fc2d_clawpack46_get_block()
 
+      t0 = 0.d0
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             xlow = xlower + (i-1)*dx
             ylow = ylower + (j-1)*dy
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            if (example .eq. 6) then
+            if (example .ge. 6) then
 c              # use this to get a smooth solution for computing the error
-               q(i,j,1) = q0(blockno,xc,yc)
+               q(i,j,1) = q0(blockno,xc,yc,t0)
             else
                call cellave2(blockno,xlow,ylow,dx,dy,w)
                q(i,j,1) = w
@@ -122,16 +123,17 @@ c           # No mapping.
 
       end
 
-      double precision function  q0(blockno,xc1,yc1)
+      double precision function  q0(blockno,xc1,yc1,t)
       implicit none
 
       double precision xc,yc, xp, yp, zp, rp
-      double precision xc1, yc1
+      double precision xc1, yc1, t
       integer blockno
       integer*8 cont, get_context
       double precision r,r0
       logical fclaw2d_map_is_used
-      double precision Hsmooth,h1,h2
+      double precision Hsmooth,h1,h2, th
+      double precision xloc0, yloc0, zloc0
       integer i
 
       double precision xloc(0:4),yloc(0:4),zloc(0:4)
@@ -141,6 +143,9 @@ c           # No mapping.
 
       integer example
       common /comm_example/ example
+
+      double precision revs_per_sec_comm, r0_comm
+      common /comm_torus/ revs_per_sec_comm, r0_comm
 
       data xloc /0, 1, 1, 0, 0.5d0/
       data yloc /0, 0, 1, 1, 0.5d0/
@@ -153,9 +158,25 @@ c           # No mapping.
          call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
 
-         r0 = 0.4d0
-         r = sqrt((xp - 1.0)**2 + yp**2 + (zp-r0)**2)
-         q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+         if (example .eq. 7) then
+            r0 = r0_comm
+c           # Torus example with smooth initial conditions
+            do i = 0,4
+               th = 2*pi*i/5.d0
+               xloc(i) = cos(th)
+               yloc(i) = sin(th)
+               zloc(i) = r0
+            enddo
+            th = 2*pi*revs_per_sec_comm*t
+            xloc0 = cos(th)*xloc(0) - sin(th)*yloc(0)
+            yloc0 = sin(th)*xloc(0) + cos(th)*yloc(0)
+            zloc0 = zloc(0)
+            rp = sqrt((xp - xloc0)**2 + (yp-yloc0)**2 +
+     &            (zp - zloc0)**2)
+            h1 = Hsmooth(rp+r0)
+            h2 = Hsmooth(rp-r0)
+            q0 = h1 - h2
+         endif
       else
          if (example .eq. 6) then
             if (xc1 .lt. 0) then
@@ -188,6 +209,6 @@ c           # No mapping.
 
       double precision r
 
-      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
+      Hsmooth = (tanh(r/0.05d0) + 1)/2.d0
 
       end
