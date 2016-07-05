@@ -610,6 +610,9 @@ def compile_results(results_dir=None,results_file='results.out',
                          'GHOSTFILL_STEP1',
                          'GHOSTFILL_STEP2',
                          'GHOSTFILL_STEP3',
+                         'GHOSTFILL_COPY',
+                         'GHOSTFILL_INTERP',
+                         'GHOSTFILL_AVERAGE',
                          'LOCAL_BOUNDARY_RATIO',
                          'REMOTE_BOUNDARY_RATIO']
 
@@ -653,7 +656,8 @@ def compile_results(results_dir=None,results_file='results.out',
     float_list = ('init','advance','ghostfill','regrid','patch_comm',
                   'adapt','partition','cfl','walltime',
                   'gf_copy','local','comm','partition','step1',
-                  'step2','step3', 'l. ratio','r. ratio')
+                  'step2','step3', 'copy',
+                  'interp','average','l. ratio','r. ratio')
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
@@ -889,7 +893,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     mx1.extend(data[:,2])       # Check below
                     levels1.extend(data[:,6])   # Check  below
 
-
     t = zip(mx1,procs1,levels1)  # All possible combos
 
     # Create array of all (procs/levels).  Not every combo will have data.
@@ -1000,9 +1003,11 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["step1"]           = row[27]
                         job["step2"]           = row[28]
                         job["step3"]           = row[29]
-                        job["local_ratio"]     = row[30]
-                        job["remote_ratio"]    = row[31]
-
+                        job["copy"]            = row[30]
+                        job["interp"]          = row[31]
+                        job["average"]         = row[32]
+                        job["local_ratio"]     = row[33]
+                        job["remote_ratio"]    = row[34]
 
                     jobs[m][p][l] = job
 
@@ -1107,7 +1112,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
     # Or we can set the colormap explicitly.
     cmap = sns.color_palette("Set1",10)
     cm = [cmap[i] for i in [0,5,1,4,2,7,3]]
-    ax.set_color_cycle(cm)
+    from cycler import cycler
+    ax.set_prop_cycle(cycler('color',cm))
 
 
     markers = {}

@@ -13,6 +13,9 @@ def fraction_amr(job,mx=None,proc=None,level=None,all=None):
     c = job["cfl_comm"]
     v = (i+r+g+p+c)/w
 
+    # a = job["advance"]
+    # v = (w-a)/w
+
     fmt_int = False
 
     return v, fmt_int
@@ -92,6 +95,52 @@ def fraction_ghostfill(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v, fmt_int
+
+def fraction_copy(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    c = job["copy"]
+    v = c/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+def fraction_interp(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    i = job["interp"]
+    v = i/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+
+def fraction_average(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    a = job["average"];
+    v = a/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+def fraction_ghostcomm2(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    v = gc/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+
 
 
 def fraction_advance(job,mx=None,proc=None,level=None,all=None):
