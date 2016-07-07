@@ -71,22 +71,25 @@ def compare_runs(execname,rerun,iframe):
                 subprocess.call(arg_list)
 
 
-def write_ini_files(input_file='create_run.ini'):
+def write_ini_files(input_file='create_run.ini',problem='advection'):
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
     config.read(input_file)
 
     scheduler     = config.get('Defaults','scheduler').partition('#')[0].strip()
 
+
+    # Example number
+    try:
+        example    = int(config.get('Defaults','example').partition('#')[0].strip())
+    except:
+        example = 0
+
+
+    # Name to use in Juqueen output file
     execname      = config.get('Problem','execname').partition('#')[0].strip()
 
-    # This is for estimating total time.  Only time for the uniform calculation is
-    # estimated;  adaptive time is assumed to be much less.
+    # Estimated time per grid
     time_per_grid = float(config.get('Problem','time_per_grid').partition('#')[0].strip())
-
-    # Supply a baseline dt and associated grid resolution so we can scale the
-    # time step appropriately for different resolutions.
-    dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
-    dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
 
     # Fit to model
     try:
@@ -96,12 +99,8 @@ def write_ini_files(input_file='create_run.ini'):
         coeff_A = 1.0
         coeff_B = 0
 
-    # Uniform or adaptive
-    try:
-        example    = int(config.get('Defaults','example').partition('#')[0].strip())
-    except:
-        example = 0
 
+    # Brick dimensions
     try:
         mi0 = int(config.get('Run','mi').partition('#')[0].strip())
         mj0 = int(config.get('Run','mj').partition('#')[0].strip())
@@ -110,29 +109,39 @@ def write_ini_files(input_file='create_run.ini'):
         mj0 = 1
 
 
+    # Ranks per node
     try:
         ranks_per_node = int(config.get('Run','ranks-per-node').partition('#')[0].strip())
     except:
         ranks_per_node = 32
 
-    # Duplicate problem
-    try:
-        d = config.get('Run','duplicate').partition('#')[0].strip()
-        duplicate  = d in ['T','True','1']
-    except:
-        duplicate = False
+    if problem is 'advection':
+        # Fixed or variable time step - lots depends on this choice
+        try:
+            # Supply a baseline dt and associated grid resolution so we can scale the
+            # time step appropriately for different resolutions.
+            dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
+            dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
 
-    try:
-        d = config.get('Run','adapt_proc_count').partition('#')[0].strip()
-        adapt_proc_count  = d in ['T','True','1']
-        fix_grids_per_proc = int(config.get('Run','adapt_proc_count').partition('#')[0].strip())
-    except:
-        adapt_proc_count = False
+        # Replicated problem
+        try:
+            d = config.get('Run','duplicate').partition('#')[0].strip()
+            duplicate  = d in ['T','True','1']
+        except:
+            duplicate = False
+
+        # Uniform or adaptive
+        mode    = config.get('Run','mode').partition('#')[0].strip()
+
+    elif problem is 'shockbubble':
+        initial_dt   = float(config.get('Problem','initial_dt').partition('#')[0].strip())
+        dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
+        smooth_level  = 0   # Smooth at all levels
+        nout0         = int(config.get('Problem','nout').partition('#')[0].strip())
 
 
-
-    # Uniform or adaptive
-    mode    = config.get('Run','mode').partition('#')[0].strip()
+    # Beta : Adapt proc count
+    adapt_proc_count = False
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -143,7 +152,6 @@ def write_ini_files(input_file='create_run.ini'):
         weightedp = nw in ['T','True','1']
     except:
         weightedp = False
-
 
     # Advance one step?
     try:
@@ -180,7 +188,6 @@ def write_ini_files(input_file='create_run.ini'):
         # uniform case
         regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
     except:
-
         regrid_interval = 1
 
 
@@ -188,31 +195,31 @@ def write_ini_files(input_file='create_run.ini'):
     # Other inputs needed by the user
     # ----------------------------------------
 
-    # Figure out dt needed for first run in this series
-    eff_res0 = mx0*2**minlevel0
+    if problem is 'advection':
+        # Figure out dt needed for first run in this series
+        eff_res0 = mx0*2**minlevel0
 
-    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
+        dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-    tol = 3e-15
-    if use_maxlevel:
-        nout0 = tfinal0/(dt0/2**(maxlevel0-minlevel0))
     else:
-        nout0 = tfinal0/dt0
 
-    if abs(nout0 - np.round(nout0)) > tol:
-        print "nout is not an integer; nout = %12.4e\n" % (nout0-np.round(nout0))
-        sys.exit()
-    nout0 = int(nout0)
+        steps_coarse = tfinal0/dt0
 
-    nstep0 = nout0/tfinal0
-    nstep0 = nout0
-    if abs(nstep0 - np.round(nstep0)) > tol:
-        print "nstep is not an integer; nstep = %12.4f; nout = %12.4f\n" % (nstep0,nout0)
-        print "Setting nstep to nout"
-        nstep0 = int(nout0)
+        if use_maxlevel:
+            steps_coarse = (tfinal0/dt0)*2**(maxlevel0-minlevel0))
+
+        tol = 3e-15
+        if abs(steps_coarse - np.round(steps_coarse)) > tol:
+            print "steps_coarse is not an integer; nout = %12.4e\n" %
+            (steps_coarse-np.round(steps_coarse))
+            sys.exit()
+            steps_coarse = int(steps_coarse)
+
     else:
-        nstep0 = int(nstep0)
-
+        steps_coarse = (tfinal0/dt_coarse_est)
+        nstep = 1
+        dt0 = dt_variable   # initial dt
+        nout0 = 1
 
     # ----------------------------------------
     # Everything should be automatic from here
@@ -261,23 +268,28 @@ def write_ini_files(input_file='create_run.ini'):
 
 
     if adapt_proc_count:
+        # Doesn't work yet
         G = num_grids_per_proc
         procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
     else:
         procs = proc0*4**R     # Key idea : Run on different processors
 
-    print procs
+    if problem is 'advection':
+        nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
+        num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
+        if not duplicate:
+            grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+        else:
+            grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
 
-    nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
-    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
-    if not duplicate:
-        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
-    else:
-        grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
+        num_advances = adapt_factor*nout_uniform*num_grids_total
+        t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
+    elif problem is 'shockbubble':
+        nout_uniform = nout*2**(maxlevel-minlevel)
 
-    num_advances = adapt_factor*nout_uniform*num_grids_total
-    t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
+        grids_per_proc = mi0*mj0*(4**maxlevel)/procs
+        pass
 
     eff_res = mx*(2**maxlevel)*mi0
 
@@ -354,13 +366,21 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("    maxlevel = %d\n" % maxlevel[i])
 
         ini_file.write("    regrid_interval = %d\n" % regrid_interval)
-        if regrid_interval > 0:
+        if smooth_level >= 0:
             ini_file.write("    smooth-refine = T\n")
-            ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
+            if smooth_level > 0:
+                ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
+            else:
+                ini_file.write("    smooth-level = %d\n" % (0))
+
 
         ini_file.write("\n")
         ini_file.write("    tfinal = %16.8e\n" % tfinal[i])
-        ini_file.write("    use_fixed_dt = T\n")
+        if use_fixed_dt:
+            ini_file.write("    use_fixed_dt = T\n")
+        else:
+            ini_file.write("    use_fixed_dt = F\n")
+
         ini_file.write("    initial_dt = %20.16e\n" % dt[i])
         ini_file.write("\n")
         ini_file.write("    outstyle = 3\n")
