@@ -116,12 +116,10 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         ranks_per_node = 32
 
     if problem is 'advection':
-        # Fixed or variable time step - lots depends on this choice
-        try:
-            # Supply a baseline dt and associated grid resolution so we can scale the
-            # time step appropriately for different resolutions.
-            dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
-            dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
+        # Supply a baseline dt and associated grid resolution so we can scale the
+        # time step appropriately for different resolutions.
+        dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
+        dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
 
         # Replicated problem
         try:
@@ -131,13 +129,31 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             duplicate = False
 
         # Uniform or adaptive
-        mode    = config.get('Run','mode').partition('#')[0].strip()
+        use_fixed_dt = True
+        outstyle = 3
 
     elif problem is 'shockbubble':
-        initial_dt   = float(config.get('Problem','initial_dt').partition('#')[0].strip())
-        dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
-        smooth_level  = 0   # Smooth at all levels
-        nout0         = int(config.get('Problem','nout').partition('#')[0].strip())
+        initial_dt   = float(config.get('Run','initial_dt').partition('#')[0].strip())
+        smooth_level0  = 0   # Smooth at all levels
+        nout0         = int(config.get('Run','nout').partition('#')[0].strip())
+        use_fixed_dt = False
+        outstyle = 1
+        nstep0 = 1
+        duplicate = False
+
+        # number of time steps
+        coeff_C      = float(config.get('Problem','adapt_coeff_C').partition('#')[0].strip())
+        coeff_D      = float(config.get('Problem','adapt_coeff_D').partition('#')[0].strip())
+        # dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
+
+
+    try:
+        verbosity = config.get('Run','verbosity').partition('#')[0].strip()
+    except:
+        verbosity = 'essential'
+
+    # Mode : uniform or adaptive ?
+    mode    = config.get('Run','mode').partition('#')[0].strip()
 
 
     # Beta : Adapt proc count
@@ -195,31 +211,38 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     # Other inputs needed by the user
     # ----------------------------------------
 
+    if mode == 'adapt':
+        adapt_factor = coeff_A*np.exp(coeff_B*maxlevel0)
+    else:
+        adapt_factor = np.ones(R.shape)
+
     if problem is 'advection':
         # Figure out dt needed for first run in this series
         eff_res0 = mx0*2**minlevel0
 
         dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-    else:
-
         steps_coarse = tfinal0/dt0
 
         if use_maxlevel:
-            steps_coarse = (tfinal0/dt0)*2**(maxlevel0-minlevel0))
+            steps_coarse = steps_coarse*2**(maxlevel0-minlevel0)
 
         tol = 3e-15
         if abs(steps_coarse - np.round(steps_coarse)) > tol:
-            print "steps_coarse is not an integer; nout = %12.4e\n" %
-            (steps_coarse-np.round(steps_coarse))
+            print "steps_coarse is not an integer; nout = %12.4e\n" % \
+                (steps_coarse-np.round(steps_coarse))
             sys.exit()
             steps_coarse = int(steps_coarse)
 
-    else:
-        steps_coarse = (tfinal0/dt_coarse_est)
-        nstep = 1
-        dt0 = dt_variable   # initial dt
-        nout0 = 1
+        nout0 = steps_coarse  # Used for outstyle == 3
+        nstep0 = nout0  # Only output final time step.
+        initial_dt = dt0
+
+    elif problem is 'shockbubble':
+        steps_coarse = np.exp(coeff_D*maxlevel0 + coeff_C)
+        dt0 = tfinal0/steps_coarse   # coarse grid time step
+        nout0 = 1  # Number of output steps
+
 
     # ----------------------------------------
     # Everything should be automatic from here
@@ -242,11 +265,12 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     dt       = np.empty(R.shape)
     mi       = np.empty(R.shape)
     mj       = np.empty(R.shape)
+    smooth_level  = np.empty(R.shape)
 
 
     # These are fixed for all possible runs.
     mx.fill(mx0)
-    nout.fill(nout0)
+    nout.fill(nout0)   # set to 1 in shockbubble problem
     nstep.fill(nstep0)
 
     # minlevel is fixed
@@ -260,11 +284,11 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     tfinal.fill(tfinal0)
     dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
 
+    if problem is 'advection':
+        smooth_level = maxlevel-1
 
-    if mode == 'adapt':
-        adapt_factor = coeff_A*np.exp(coeff_B*maxlevel)
-    else:
-        adapt_factor = np.ones(R.shape)
+    if problem is 'shockbubble':
+        smooth_level.fill(smooth_level0)
 
 
     if adapt_proc_count:
@@ -274,22 +298,15 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     else:
         procs = proc0*4**R     # Key idea : Run on different processors
 
-    if problem is 'advection':
-        nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
-        num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
-        if not duplicate:
-            grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
-        else:
-            grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
+    nout_uniform = steps_coarse*2**(maxlevel-minlevel)  # Number of fine grid steps
+    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
+    if not duplicate:
+        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+    else:
+        grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
 
-        num_advances = adapt_factor*nout_uniform*num_grids_total
-        t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
-
-    elif problem is 'shockbubble':
-        nout_uniform = nout*2**(maxlevel-minlevel)
-
-        grids_per_proc = mi0*mj0*(4**maxlevel)/procs
-        pass
+    num_advances = adapt_factor*nout_uniform*num_grids_total
+    t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
     eff_res = mx*(2**maxlevel)*mi0
 
@@ -366,13 +383,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         ini_file.write("    maxlevel = %d\n" % maxlevel[i])
 
         ini_file.write("    regrid_interval = %d\n" % regrid_interval)
-        if smooth_level >= 0:
-            ini_file.write("    smooth-refine = T\n")
-            if smooth_level > 0:
-                ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
-            else:
-                ini_file.write("    smooth-level = %d\n" % (0))
-
+        ini_file.write("    smooth-level = %d\n" % (smooth_level[i]))
 
         ini_file.write("\n")
         ini_file.write("    tfinal = %16.8e\n" % tfinal[i])
@@ -381,11 +392,11 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         else:
             ini_file.write("    use_fixed_dt = F\n")
 
-        ini_file.write("    initial_dt = %20.16e\n" % dt[i])
+        ini_file.write("    initial_dt = %20.16e\n" % initial_dt)
         ini_file.write("\n")
-        ini_file.write("    outstyle = 3\n")
+        ini_file.write("    outstyle = %d\n" % outstyle)
         ini_file.write("    nout = %d\n" % nout[i])
-        ini_file.write("    nstep = %d\n" % nstep[i])
+        ini_file.write("    nstep = %d\n" % nstep[i])  # Not used if outstyle == 1
         if mode == 'adapt':
             if subcycle:
                 ini_file.write("    subcycle = T\n")
@@ -406,8 +417,6 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             ini_file.write("    subcycle = F\n")
 
 
-
-
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
@@ -420,7 +429,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
         # Other things which should not be set of timing runs
         ini_file.write("# File and console IO\n")
-        ini_file.write("    verbosity = essential\n")
+        ini_file.write("    verbosity = %s\n" % verbosity)
         ini_file.write("    serialout = F\n")
         ini_file.write("    vtkout = 0\n")
         ini_file.write("    tikzout = F\n")
@@ -722,9 +731,9 @@ def compile_results(results_dir=None,results_file='results.out',
                     found_bad_file = True
                     break
 
-            if found_bad_file:
-                print "Skipping file %s (time exceeded)" % f
-                continue
+            #if found_bad_file:
+            #    print "Skipping file %s (time exceeded)" % f
+            #    continue
 
             # jobid
             resultsfile.write("  ")   # Make up for "# " added as comments above

@@ -1,4 +1,4 @@
-function create_tikz_plot(Frame,fname_prefix,amrclaw,extra_file)
+function create_tikz_plot(Frame,fname_prefix,id,amrclaw,extra_file)
 
 % \documentclass{standalone}
 %
@@ -19,17 +19,20 @@ function create_tikz_plot(Frame,fname_prefix,amrclaw,extra_file)
 
 if nargin < 5
     extra_file = [];
-    if (nargin < 4)
-        amrclaw = 0;        
+    if nargin < 4
+        amrclaw = 0;
+        if (nargin < 3)
+            id = 999;
+        end
     end
 end
 
 for p = 0:1,
     if p == 0
-        % Basic plot with no mesh
-        fname_tex = sprintf('%s_%04d.tex',fname_prefix,Frame);
+        % Basic plot with no mesh        
+        fname_tex = sprintf('results_%03d/%s_%04d.tex',id,fname_prefix,Frame);
     else
-        fname_tex = sprintf('%s_mesh_%04d.tex',fname_prefix,Frame);
+        fname_tex = sprintf('results_%03d/%s_mesh_%04d.tex',id,fname_prefix,Frame);
     end
     fprintf('Printing %s\n',fname_tex);
     fid = fopen(fname_tex,'w');

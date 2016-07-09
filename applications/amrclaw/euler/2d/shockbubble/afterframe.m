@@ -32,7 +32,7 @@ end
 
 showpatchborders;
 
-prt = true;
+prt = false;
 NoQuery = 0;
 if (prt)
     MaxFrames = 31;
@@ -58,7 +58,10 @@ if (prt)
         fname_prefix = sprintf('fc_sb',Frame);
     end
     yn = 'y';
-    id = input('Input id : ');    
+    id = input('Input id : ');   
+    if (isempty(id))
+        id = 999;
+    end
     fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
     if (exist(fname_png,'file'))
         str = sprintf('Overwrite file %s (y/[n]) ? ',fname_png);
@@ -72,7 +75,7 @@ if (prt)
         print('-dpng','-r512',fname_png);
         %             export_fig('-dpng','-transparent','-r512',...
         %                 '-a1','-nocrop',fname_png);
-        create_tikz_plot(Frame,fname_prefix);
+        create_tikz_plot(Frame,fname_prefix,id);
     end
 end
 
