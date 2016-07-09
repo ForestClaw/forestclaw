@@ -307,8 +307,8 @@ void GEOCLAW_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse
 #define GEOCLAW_AVERAGE2COARSE FCLAW_F77_FUNC(geoclaw_average2coarse,GEOCLAW_AVERAGE2COARSE)
 void GEOCLAW_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
                               double qfine[], int* maux, double aux_coarse[],
-                              double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
-                              int* igrid);
+                              double aux_fine[], int* mcapa, int* mbathy, int* p4est_refineFactor,
+                              int* refratio, int* igrid);
 
 #define GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(geoclaw_fort_write_header,GEOCLAW_FORT_WRITE_HEADER)
 void GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* ngrids);
