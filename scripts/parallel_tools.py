@@ -222,25 +222,25 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
         dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-        steps_coarse = tfinal0/dt0
+        steps_coarse0 = tfinal0/dt0
 
         if use_maxlevel:
-            steps_coarse = steps_coarse*2**(maxlevel0-minlevel0)
+            steps_coarse = steps_coarse0*2**(maxlevel0-minlevel0)
 
         tol = 3e-15
-        if abs(steps_coarse - np.round(steps_coarse)) > tol:
+        if abs(steps_coarse - np.round(steps_coarse0)) > tol:
             print "steps_coarse is not an integer; nout = %12.4e\n" % \
-                (steps_coarse-np.round(steps_coarse))
+                (steps_coarse0-np.round(steps_coarse0))
             sys.exit()
-            steps_coarse = int(steps_coarse)
+            steps_coarse = int(steps_coarse0)
 
-        nout0 = steps_coarse  # Used for outstyle == 3
+        nout0 = steps_coarse0  # Used for outstyle == 3
         nstep0 = nout0  # Only output final time step.
         initial_dt = dt0
 
     elif problem is 'shockbubble':
-        steps_coarse = np.exp(coeff_D*maxlevel0 + coeff_C)
-        dt0 = tfinal0/steps_coarse   # coarse grid time step
+        steps_coarse0 = np.exp(coeff_D*maxlevel0 + coeff_C)
+        dt0 = tfinal0/steps_coarse0   # coarse grid time step
         nout0 = 1  # Number of output steps
 
 
@@ -266,12 +266,13 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     mi       = np.empty(R.shape)
     mj       = np.empty(R.shape)
     smooth_level  = np.empty(R.shape)
-
+    steps_coarse  = np.empty(R.shape)
 
     # These are fixed for all possible runs.
     mx.fill(mx0)
     nout.fill(nout0)   # set to 1 in shockbubble problem
     nstep.fill(nstep0)
+    steps_coarse.fill(steps_coarse0)
 
     # minlevel is fixed
     minlevel.fill(minlevel0)
@@ -355,7 +356,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             level_inc = 0
 
         prt_tuple = (p,mx[i],minlevel[i]+level_inc,maxlevel[i]+level_inc,
-                     nout[i],nstep[i],dt[i],
+                     steps_coarse[i],nstep[i],dt[i],
                      tfinal[i],eff_res[i], grids_per_proc[i],t[i])
 
         # Print to console and jobs file

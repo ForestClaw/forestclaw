@@ -220,7 +220,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
                                      gparms->minlevel,
                                      (*domain)->local_minlevel,
                                      (*domain)->local_maxlevel,
-                                     n_inner,dt_step,
+                                     n_inner+1,dt_step,
                                      maxcfl_step, tc);
 
             if (maxcfl_step > gparms->max_cfl)
@@ -505,7 +505,7 @@ void fclaw2d_run(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    
+
     switch (gparms->outstyle)
     {
     case 0:
