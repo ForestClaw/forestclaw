@@ -45,7 +45,7 @@ c     ==========================================================
       integer i0wave, i0s, i0amdq, i0apdq, i0cqxx, i0bmadq
       integer i0bpadq, iused
       double precision dtdx, dtdy, cfl1d
-      integer m,i,j, ma
+      integer m,i,j, ma, ixy
 
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
@@ -159,6 +159,7 @@ c        # variable coefficient problems)
          jcom = j
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
+         ixy = 1
          call flux2(1,maxm,meqn,maux,mbc,mx,
      &         q1d,dtdx1d,aux1,aux2,aux3,
      &         faddm,faddp,gaddm,gaddp,cfl1d,
@@ -247,6 +248,7 @@ c        # variable coefficient problems)
          icom = i
 c
 c        # compute modifications fadd and gadd to fluxes along this slice:
+         ixy = 2
          call flux2(2,maxm,meqn,maux,mbc,my,
      &         q1d,dtdy1d,aux1,aux2,aux3,
      &         faddm,faddp,gaddm,gaddp,cfl1d,

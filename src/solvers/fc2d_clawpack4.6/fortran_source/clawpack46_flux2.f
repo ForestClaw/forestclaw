@@ -81,6 +81,7 @@ c
 
       double precision cfl1d, gupdate,dtdxave
 
+      integer ilr
       logical limit
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
@@ -179,9 +180,10 @@ c      --------------------------------------------
 c
 c
 c     # split the left-going flux difference into down-going and up-going:
+      ilr = 1
       call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
      &          q1d,q1d,aux1,aux2,aux3,
-     &          1,amdq,bmasdq,bpasdq)
+     &          ilr,amdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
       do 160 m=1,meqn
@@ -195,10 +197,12 @@ c
                gaddp(i-1,m,2) = gaddp(i-1,m,2) - gupdate
   160          continue
 c
-c     # split the right-going flux difference into down-going and up-going:
+c     # split the right-going flux difference into down-going and up
+c              -going:
+      ilr = 2
       call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
      &          q1d,q1d,aux1,aux2,aux3,
-     &          2,apdq,bmasdq,bpasdq)
+     &          ilr,apdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 180 m=1,meqn
