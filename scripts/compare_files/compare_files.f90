@@ -136,13 +136,13 @@ PROGRAM compare_files
   ENDIF
 
   IF (t1 .ne. t2) THEN
-     WRITE(6,'(A)') 't1 is not exactly equal to t2'
-     WRITE(6,'(E30.20)') t1
-     WRITE(6,'(E30.20)') t2
-     WRITE(6,'(E30.16)') ABS(t1-t2)
+     WRITE(6,'(A)') 'WARNING : t1 is not exactly equal to t2'
+     WRITE(6,'(A10,E30.20)') 't1', t1
+     WRITE(6,'(A10,E30.20)') 't2',t2
+     WRITE(6,'(A10,E30.16)') 'diff',ABS(t1-t2)
      WRITE(6,*)
-     IF (ABS(t1-t2) > 1e-13) THEN
-        WRITE(6,*) 't1 and t2 are not close enough'
+     IF (ABS(t1-t2) > 1e-5) THEN
+        WRITE(6,*) 't1 and t2 are not close enough to compare files.'
         STOP
      ENDIF
   ENDIF
