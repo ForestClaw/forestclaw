@@ -35,7 +35,7 @@ c            # behind shock:
                 q(i,j,2) = rinf*vinf
                 q(i,j,3) = 0.d0
                 q(i,j,4) = einf
-                q(i,j,5) = 1.d0
+c                q(i,j,5) = 1.d0
    30        continue
           end if
 c
