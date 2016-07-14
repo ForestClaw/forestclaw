@@ -43,7 +43,7 @@ c
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
              do 40 j=1,my
-                q(i,j,5) = 2.d0*q(i,j,5)
+c                q(i,j,5) = 2.d0*q(i,j,5)
    40        continue
           end if
 
