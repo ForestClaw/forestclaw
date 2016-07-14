@@ -35,7 +35,7 @@ c            # behind shock:
                 q(i,j,2) = rinf*vinf
                 q(i,j,3) = 0.d0
                 q(i,j,4) = einf
-c                q(i,j,5) = 1.d0
+                q(i,j,5) = 1.d0
    30        continue
           end if
 c
@@ -43,7 +43,7 @@ c
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
              do 40 j=1,my
-c                q(i,j,5) = 2.d0*q(i,j,5)
+                q(i,j,5) = 2.d0*q(i,j,5)
    40        continue
           end if
 

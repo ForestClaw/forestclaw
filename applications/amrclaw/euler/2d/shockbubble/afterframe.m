@@ -13,7 +13,11 @@ fprintf('%10s : %12.4e\n','qmax',qmax);
 
 if (PlotType == 3)
     caxis([0 200]);
+elseif mq == 5
+    caxis([1 2])
+    yrbcolormap;
 else
+    colormap(jet)
     caxis([0.1 2.81]);
 end
 
@@ -32,7 +36,7 @@ end
 
 showpatchborders;
 
-prt = false;
+prt = true;
 NoQuery = 0;
 if (prt)
     MaxFrames = 31;

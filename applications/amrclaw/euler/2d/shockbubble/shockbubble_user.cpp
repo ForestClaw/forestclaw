@@ -52,8 +52,8 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
     classic_claw.src2 = &SRC2;
-    classic_claw.rpn2 = &RPN2EU4;  /* Signature is unchanged */
-    classic_claw.rpt2 = &RPT2;
+    classic_claw.rpn2 = &RPN2EU5;  /* Signature is unchanged */
+    classic_claw.rpt2 = &RPT2EU5;
 
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
