@@ -242,12 +242,12 @@ PROGRAM compare_files
            READ(10,*) (q1(i,j,m),m = 1,meqn)
            READ(20,*) (q2(i,j,m),m = 1,meqn)
            DO m = 1,meqn
-              qc(i,j,m) = ABS(q1(i,j,m)-q2(i,j,m))
-              IF (qc(i,j,m) .GT. global_max(m)) THEN
-                 global_max(m) = qc(i,j,m)  !! Largest difference on all grids
+              qc(i,j,m) = q1(i,j,m)-q2(i,j,m)
+              IF (ABS(qc(i,j,m)) .GT. global_max(m)) THEN
+                 global_max(m) = ABS(qc(i,j,m))  !! Largest difference on all grids
                  grid_max(m) = ngrid        !! max occurs on this grid
               ENDIF
-              max_grids(ngrid,m) = MAX(max_grids(ngrid,m),qc(i,j,m))
+              max_grids(ngrid,m) = MAX(max_grids(ngrid,m),ABS(qc(i,j,m)))
            ENDDO
         ENDDO
      ENDDO
