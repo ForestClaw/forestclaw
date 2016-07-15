@@ -5,12 +5,20 @@ c     =====================================================
 c
 c     # Set initial conditions for q.
 c
-       implicit double precision (a-h,o-z)
-       dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+       implicit none
+
+       integer maxmx, maxmy, meqn, mbc, mx, my, maux
+       double precision xlower, ylower, dx,dy
+       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
+
 
        integer blockno, fc2d_clawpack46_get_block
+       integer i,j, m
+       double precision xclow, yclow, qin(5), qout(5)
+       double precision rinf,vinf,einf, win
 
-       common /comic/ qin(5),qout(5)
+       common /comic/ qin,qout
        common /cominf/ rinf,vinf,einf
 c
 c
@@ -39,10 +47,10 @@ c            # behind shock:
    30        continue
           end if
 c
-          if (xlow .lt. 0.5d0) then
+          if (xclow .gt. 0.2d0 .and. xclow .lt. 0.5d0) then
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
-             do 40 j=1,my
+             do 40 j=1-mbc,my+mbc
                 q(i,j,5) = 2.d0*q(i,j,5)
    40        continue
           end if
