@@ -31,7 +31,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4refinement.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4coarsening.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_interpolate2fine.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_interpolate2fine_new.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_average2coarse.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_output_ascii_fort.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
