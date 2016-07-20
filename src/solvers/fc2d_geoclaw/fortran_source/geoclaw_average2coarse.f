@@ -14,7 +14,6 @@
       double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
-c     # Here, assume that meqn is equal to 3 
       double precision etasum, hsum, husum, hvsum, etaav, hav
       double precision hc, huc, hvc
       double precision hf, huf, hvf, bf, etaf
@@ -43,14 +42,7 @@ c     # Get rectangle in coarse grid for fine grid.
 
       r2 = refratio * refratio
 
-c      # We haven't set capacity yet, mcapa = 0
-      if (mcapa .eq. 0) then
-         capac=1.0d0
-      else
-c         capac=alloc(iaddcaux(i,j))
-         endif
-
-c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
+c     # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
       do j = 1,my/p4est_refineFactor
          do i = 1,mx/p4est_refineFactor
             i1 = i+ic_add
@@ -63,24 +55,30 @@ c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
                   m = m + 1
                enddo
             enddo
+
+            if (mcapa .eq. 0) then
+               capac=1.0d0
+            else
+               capac=aux_coarse(mcapa,i1,j1)
+            endif  
+
             etasum = 0.d0
             hsum   = 0.d0
             husum  = 0.d0
             hvsum  = 0.d0
 
             nwet   = 0
-
+c           # loop over the fine grids
             do m = 0,r2-1
-c              # We haven't set capacity yet, mcapa = 0
                if (mcapa .eq. 0) then
                   capa=1.0d0
                else
-c                 capa=alloc(iaddfaux(iff+ico-1,jff+jco-1))
-                  endif            
-               hf = qfine(1,i2(m),j2(m))
-               bf = aux_fine(mbathy,i2(m),j2(m))
-               huf= qfine(2,i2(m),j2(m)) 
-               hvf= qfine(3,i2(m),j2(m))
+                  capa=aux_fine(mcapa,i2(m),j2(m))
+                  endif
+               hf = qfine(1,i2(m),j2(m))*capa
+               bf = aux_fine(mbathy,i2(m),j2(m))*capa
+               huf= qfine(2,i2(m),j2(m))*capa 
+               hvf= qfine(3,i2(m),j2(m))*capa
                if (hf > dry_tolerance) then
                   etaf = hf+bf
                   nwet=nwet+1
@@ -96,12 +94,14 @@ c                 capa=alloc(iaddfaux(iff+ico-1,jff+jco-1))
                enddo          
             if (nwet.gt.0) then
                etaav=etasum/dble(nwet)
-               hav= hsum/dble(nwet)
+               hav=hsum/dble(nwet)
 c              hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
                hc=min(hav,(max(etaav-
      &             aux_coarse(mbathy,i1,j1)*capac,0.d0)))
-               huc=(min(hav,hc)/hsum)*husum
-               hvc=(min(hav,hc)/hsum)*hvsum
+c               huc=(min(hav,hc)/hsum)*husum
+c               hvc=(min(hav,hc)/hsum)*hvsum
+               huc=(hc/hsum)*husum
+               hvc=(hc/hsum)*hvsum
             else
                hc=0.d0
                huc=0.d0
