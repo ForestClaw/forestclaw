@@ -110,9 +110,13 @@ c                 # check to make sure we are not creating any new extrema
 
 c                 # calculate coarse cells' velocity  
                   do ii = -1,1
-                     do jj = -1,1              
-                        uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
-     &                              qcoarse(1,ic+ii,jc+jj)
+                     do jj = -1,1
+                        if (qcoarse(1,ic+ii,jc+jj) .eq. 0.d0) then
+                           uc(ii,jj) = 0.d0
+                        else              
+                           uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
+     &                                 qcoarse(1,ic+ii,jc+jj)
+                        endif
                      enddo
                   enddo
 c                 # find the maximum/minimum velocities among coarse cells
@@ -130,7 +134,11 @@ c                 # find the maximum/minimum velocities among coarse cells
                      do jj = 1,refratio
                         iff = (i-1)*refratio + ii
                         jf = (j-1)*refratio + jj
-                        uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
+                        if (qfine(1,iff,jf) .eq. 0.d0) then
+                           uf = 0.d0
+                        else              
+                           uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
+                        endif
                         if (uf .gt. coarseumax .or. uf .lt. coarseumin)
      &                        then
                            redefine = .true.
