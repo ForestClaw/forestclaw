@@ -10,6 +10,7 @@ cv = linspace(qmin,qmax,20);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
 caxis([-0.9,0.9])
+%caxis([qmin,qmax])
 
 view(2);
 colorbar
