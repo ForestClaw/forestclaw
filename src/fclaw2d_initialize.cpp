@@ -145,9 +145,12 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* We need a user option here to set ghost values after initialization */
     if (gparms->init_ghostcell){
-        fclaw2d_ghost_update(*domain,minlevel,maxlevel,0.0,time_interp,FCLAW2D_TIMER_INIT);
+        fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
+                             (*domain)->global_maxlevel,0.0,
+                             time_interp,FCLAW2D_TIMER_INIT);
     }
-    fclaw2d_physical_set_bc(*domain,minlevel,0.0,time_interp);
+    fclaw2d_physical_set_bc(*domain,(*domain)->global_minlevel,
+                            0.0,time_interp);
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {
@@ -251,7 +254,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                    has been set up */
                 fclaw2d_regrid_set_neighbor_types(*domain);
 
-// #if 0
+#if 0
                 /* We only need to update the physical ghost cells because we
                    assume the initialization procedure handles all internal
                    boundaries. */
@@ -259,11 +262,12 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
                 /* Add 2016/07/26, need here???*/
                 if (gparms->init_ghostcell){
-                    fclaw2d_ghost_update(*domain,minlevel,new_level,0.0,time_interp,FCLAW2D_TIMER_INIT);
+                    fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
+                                         (*domain)->global_maxlevel,0.0,
+                                         time_interp,FCLAW2D_TIMER_INIT);
                 }
                 fclaw2d_physical_set_bc(*domain,new_level,0.0,time_interp);
-                // fclaw2d_physical_set_bc(*domain,new_level,time_interp);
-// #endif
+#endif
             }
             else
             {
