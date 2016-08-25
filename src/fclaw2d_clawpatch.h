@@ -218,6 +218,30 @@ void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    int time_interp,
                                    fclaw2d_transform_data_t *transform_data);
 
+void fclaw2d_clawpatch_average_face(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *coarse_patch,
+                                    fclaw2d_patch_t *fine_patch,
+                                    int idir,
+                                    int iface_coarse,
+                                    int p4est_refineFactor,
+                                    int refratio,
+                                    fclaw_bool time_interp,
+                                    int igrid,
+                                    fclaw2d_transform_data_t* transform_data);
+
+void fclaw2d_clawpatch_interpolate_face(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *coarse_patch,
+                                        fclaw2d_patch_t *fine_patch,
+                                        int idir,
+                                        int iside,
+                                        int p4est_refineFactor,
+                                        int refratio,
+                                        fclaw_bool a_time_interp,
+                                        int igrid,
+                                        fclaw2d_transform_data_t* transform_data);
+
+
+
 void fclaw2d_clawpatch_copy_corner(fclaw2d_domain_t *domain,
                                      fclaw2d_patch_t *this_patch,
                                      fclaw2d_patch_t *corner_patch,
@@ -225,7 +249,21 @@ void fclaw2d_clawpatch_copy_corner(fclaw2d_domain_t *domain,
                                      int time_interp,
                                      fclaw2d_transform_data_t *transform_data);
 
+void fclaw2d_clawpatch_average_corner(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *coarse_patch,
+                                      fclaw2d_patch_t *fine_patch,
+                                      int coarse_corner,
+                                      int refratio,
+                                      fclaw_bool time_interp,
+                                      fclaw2d_transform_data_t* transform_data);
 
+void fclaw2d_clawpatch_interpolate_corner(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* coarse_patch,
+                                          fclaw2d_patch_t* fine_patch,
+                                          int coarse_corner,
+                                          int refratio,
+                                          fclaw_bool a_time_interp,
+                                          fclaw2d_transform_data_t* transform_data);
 
 
 
