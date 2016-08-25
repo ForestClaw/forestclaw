@@ -338,9 +338,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     /* Copy to same size patch */
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
-                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
 #if 0
+                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
                                                  &transform_data);
 #endif
@@ -354,10 +354,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     if (remote_neighbor)
                     {
                         /* Create a new transform so we don't mess up the original one */
-                        ClawPatch *neighbor_cp = this_cp;
-                        ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                         int this_iface = iface_neighbor;
 #if 0
+                        ClawPatch *neighbor_cp = this_cp;
+                        ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                         this_cp->exchange_face_ghost(this_iface,neighbor_cp,
                                                      time_interp,
                                                      &transform_data_finegrid);
@@ -489,9 +489,9 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                 {
                     /* Copy from same size neighbor */
                     fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
-                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     transform_data.neighbor_patch = neighbor_patch;
 #if 0
+                    ClawPatch *neighbor_cp = fclaw2d_clawpatch_get_cp(neighbor_patch);
                     this_cp->exchange_face_ghost(iface,neighbor_cp,
                                                  use_timeinterp_patch,
                                                  &transform_data);
