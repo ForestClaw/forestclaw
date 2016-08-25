@@ -1,5 +1,5 @@
       subroutine shockbubble_setprob(gamma_in,
-     &      x0_in,y0_in,r0_in,rhoin_in,pinf_in)
+     &      x0_in,y0_in,r0_in,rhoin_in,pinf_in, idisc_in)
 
       implicit none
       double precision gamma_in, x0_in, y0_in, r0_in
@@ -10,7 +10,7 @@
       double precision alf, beta
       double precision rinf,vinf,einf
       double precision rhoout, pout, pin
-      integer idisc
+      integer idisc, idisc_in
 
       common /comic/ qin,qout
       common /param/  gamma,gamma1
@@ -19,7 +19,7 @@
 c
 c
 c      # set idisc for cellave routines (see function fdisc)
-       idisc = 2
+       idisc = idisc_in
 c
 
 c      # These should be read in as options

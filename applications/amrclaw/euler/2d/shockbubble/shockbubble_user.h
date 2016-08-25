@@ -39,6 +39,7 @@ extern "C"
 
 typedef struct user_options
 {
+    int idisc;
     double gamma;
     double x0;
     double y0;
@@ -53,7 +54,7 @@ typedef struct user_options
 #define SHOCKBUBBLE_SETPROB FCLAW_F77_FUNC(shockbubble_setprob, SHOCKBUBBLE_SETPROB)
 void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0,
                          const double* r0, const double* rhoin,
-                         const double* pinf);
+                         const double* pinf, const int* idisc);
 
 void shockbubble_problem_setup(fclaw2d_domain_t* domain);
 

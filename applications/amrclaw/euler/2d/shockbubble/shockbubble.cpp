@@ -34,6 +34,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
+    sc_options_add_int (opt, 0, "idisc", &user->idisc,    2, "[user] idisc [2]");
     sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
 
     sc_options_add_double (opt, 0, "x0",    &user->x0,    0.5, "[user] x0 [0.5]");
