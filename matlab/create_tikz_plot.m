@@ -74,7 +74,7 @@ for p = 0:1,
         fprintf(fid,'\\node (mesh) {\\input{%s}};\n',extra_file);
         % fprintf(fid,'\\input{%s}\n',extra_file);
     end
-    fprintf(fid,'\\end{tikzpicture};\n');
+    fprintf(fid,'\\end{tikzpicture}\n');
     fprintf(fid,'\\end{document}\n');
     fclose(fid);
 end

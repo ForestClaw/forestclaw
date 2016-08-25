@@ -354,3 +354,13 @@ def dof_per_second(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v,fmt_int
+
+def rate(job,mx=None,proc=None,level=None,all=None):
+    # Same as dof_per_second, above.
+
+    w = job["walltime"]
+    a = job["advance_steps"]
+    v = a*mx**2*proc/w
+
+    fmt_int = False
+    return v, fmt_int

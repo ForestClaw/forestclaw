@@ -93,8 +93,8 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
     # Fit to model
     try:
-        coeff_A      = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
-        coeff_B      = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
+        coeff_A = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
+        coeff_B = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
     except:
         coeff_A = 1.0
         coeff_B = 0
@@ -107,6 +107,28 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     except:
         mi0 = 1
         mj0 = 1
+
+
+    mx0     = int(config.get('Run', 'mx').partition('#')[0].strip())
+    minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
+    maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
+    proc0   = int(config.get('Run','proc').partition('#')[0].strip())
+    tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
+
+    # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
+    njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
+
+    if minlevel0 == maxlevel0:
+        mode = 'uniform'
+
+    try:
+        # Set regrid here in case we want to regrid even in the
+        # uniform case
+        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
+    except:
+        regrid_interval = 1
+
+
 
 
     # Ranks per node
@@ -132,19 +154,38 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         use_fixed_dt = True
         outstyle = 3
 
+        # Beta : Adapt proc count
+        adapt_proc_count = False
+
     elif problem is 'shockbubble':
         initial_dt   = float(config.get('Run','initial_dt').partition('#')[0].strip())
-        smooth_level0  = 0   # Smooth at all levels
-        nout0         = int(config.get('Run','nout').partition('#')[0].strip())
-        use_fixed_dt = False
-        outstyle = 1
-        nstep0 = 1
+        # smooth_level0  = maxlevel0-1   # Smooth at all levels
+        smooth_level0    = float(config.get('Run','smooth-level').partition('#')[0].strip())
+        try:
+            nout0 = int(config.get('Run','nout').partition('#')[0].strip())
+            tfinal0 = initial_dt*nout0
+        except:
+            nout0 = 1
+
+        # Beta : adapt proc count
+        try:
+            num_grids_per_proc = int(config.get('Run','num_grids_per_proc').partition('#')[0].strip())
+            adapt_proc_count = True
+        except:
+            adapt_proc_count = False
+
+        use_fixed_dt = True
+        outstyle = 3
+        nstep0 = nout0
         duplicate = False
 
         # number of time steps
-        coeff_C      = float(config.get('Problem','adapt_coeff_C').partition('#')[0].strip())
-        coeff_D      = float(config.get('Problem','adapt_coeff_D').partition('#')[0].strip())
-        # dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
+        try:
+            coeff_C      = float(config.get('Problem','adapt_coeff_C').partition('#')[0].strip())
+            coeff_D      = float(config.get('Problem','adapt_coeff_D').partition('#')[0].strip())
+            # dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
+        except:
+            pass
 
 
     try:
@@ -155,9 +196,6 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     # Mode : uniform or adaptive ?
     mode    = config.get('Run','mode').partition('#')[0].strip()
 
-
-    # Beta : Adapt proc count
-    adapt_proc_count = False
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -187,34 +225,9 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     scaling = 'strong'   # Get rid of these eventually?
     scale_uniform = False
 
-    mx0     = int(config.get('Run', 'mx').partition('#')[0].strip())
-    minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
-    maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
-    proc0   = int(config.get('Run','proc').partition('#')[0].strip())
-    tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
-
-    # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
-    njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
-
-    if minlevel0 == maxlevel0:
-        mode = 'uniform'
-
-    try:
-        # Set regrid here in case we want to regrid even in the
-        # uniform case
-        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
-    except:
-        regrid_interval = 1
-
-
     # ----------------------------------------
     # Other inputs needed by the user
     # ----------------------------------------
-
-    if mode == 'adapt':
-        adapt_factor = coeff_A*np.exp(coeff_B*maxlevel0)
-    else:
-        adapt_factor = np.ones(R.shape)
 
     if problem is 'advection':
         # Figure out dt needed for first run in this series
@@ -239,9 +252,9 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         initial_dt = dt0
 
     elif problem is 'shockbubble':
-        steps_coarse0 = np.exp(coeff_D*maxlevel0 + coeff_C)
+        smooth_level0  = 0
+        steps_coarse0 = nout0
         dt0 = tfinal0/steps_coarse0   # coarse grid time step
-        nout0 = 1  # Number of output steps
 
 
     # ----------------------------------------
@@ -255,6 +268,10 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
     R = np.arange(0,njobs)
 
+    if mode == 'adapt':
+        adapt_factor = np.exp(coeff_B*maxlevel0 + coeff_A)
+    else:
+        adapt_factor = np.ones(R.shape)
 
     mx       = np.empty(R.shape)
     nout     = np.empty(R.shape)
@@ -292,17 +309,20 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         smooth_level.fill(smooth_level0)
 
 
+    nout_uniform = steps_coarse*2**(maxlevel-minlevel)  # Number of fine grid steps
+    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
+
     if adapt_proc_count:
         # Doesn't work yet
-        G = num_grids_per_proc
-        procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
+        proc0 = np.ceil(np.exp(coeff_B*maxlevel0 + coeff_A)*num_grids_total/num_grids_per_proc)
+        f = 4*np.exp(coeff_B)
+        procs = proc0*f**R
     else:
         procs = proc0*4**R     # Key idea : Run on different processors
 
-    nout_uniform = steps_coarse*2**(maxlevel-minlevel)  # Number of fine grid steps
-    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
     if not duplicate:
-        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+        # grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+        grids_per_proc = adapt_factor*num_grids_total/procs
     else:
         grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
 
@@ -1244,6 +1264,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
         ax.set_ylabel("Cost per grid",fontsize=16)
 
         if len(gpplist) > 1:
+            ranks_per_node = 32
             gpp = np.array(gpplist)
             y = np.array(ylist)
             z = zip(gpp,y,proclist)
@@ -1252,16 +1273,16 @@ def plot_results(jobs,start_point,val2plot='walltime',
             proclist = np.array([x[2] for x in z if x[0] > 1]).astype(int)
 
             z = zip(gpp,y,proclist)
-            gpp1 = np.array([t[0] for t in z if t[2] <= 16])
-            y1   = np.array([t[1] for t in z if t[2] <= 16])
+            gpp1 = np.array([t[0] for t in z if t[2] <= ranks_per_node])
+            y1   = np.array([t[1] for t in z if t[2] <= ranks_per_node])
 
-            if len(gpp1) > 2:
+            if len(gpp1) > 1:
                 xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
                 ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
                 plt.plot(xs,ys,'k--')
 
-            gpp2 = np.array([t[0] for t in z if t[2] > 16])
-            y2   = np.array([t[1] for t in z if t[2] > 16])
+            gpp2 = np.array([t[0] for t in z if t[2] > ranks_per_node])
+            y2   = np.array([t[1] for t in z if t[2] > ranks_per_node])
             if len(gpp2) > 1:
                 xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
                 ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
