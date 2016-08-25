@@ -148,6 +148,28 @@ typedef void (*fclaw2d_patch_copy_face_t)(fclaw2d_domain_t *domain,
                                                 int time_interp,
                                                 fclaw2d_transform_data_t *transform_data);
 
+typedef void (*fclaw2d_patch_average_face_t)(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *coarse_patch,
+                                          fclaw2d_patch_t *fine_patch,
+                                          int idir,
+                                          int iface_coarse,
+                                          int p4est_refineFactor,
+                                          int refratio,
+                                          fclaw_bool time_interp,
+                                          int igrid,
+                                          fclaw2d_transform_data_t* transform_data);
+
+typedef void (*fclaw2d_clawpatch_interpolate_face_t)(fclaw2d_domain_t *domain,
+                                                  fclaw2d_patch_t *coarse_patch,
+                                                  fclaw2d_patch_t *fine_patch,
+                                                  int idir,
+                                                  int iside,
+                                                  int p4est_refineFactor,
+                                                  int refratio,
+                                                  fclaw_bool a_time_interp,
+                                                  int igrid,
+                                                  fclaw2d_transform_data_t* transform_data);
+
 typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *this_patch,
                                                   fclaw2d_patch_t *corner_patch,
@@ -155,15 +177,61 @@ typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   int time_interp,
                                                   fclaw2d_transform_data_t *transform_data);
 
+typedef void (*fclaw2d_clawpatch_average_corner_t)(fclaw2d_domain_t *domain,
+                                                  fclaw2d_patch_t *coarse_patch,
+                                                  fclaw2d_patch_t *fine_patch,
+                                                  int coarse_corner,
+                                                  int refratio,
+                                                  fclaw_bool time_interp,
+                                                  fclaw2d_transform_data_t* transform_data);
+
+typedef void (*fclaw2d_clawpatch_interpolate_corner_t)(fclaw2d_domain_t* domain,
+                                                    fclaw2d_patch_t* coarse_patch,
+                                                    fclaw2d_patch_t* fine_patch,
+                                                    int coarse_corner,
+                                                    int refratio,
+                                                    fclaw_bool a_time_interp,
+                                                    fclaw2d_transform_data_t* transform_data);
+
 typedef void (*fclaw2d_fort_copy_face_t)(int* mx, int* my,int* mbc, int* meqn,
-                                               double qthis[],double qneighbor[],
+                                         double qthis[],double qneighbor[],
                                                int* iface,
                                                fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_average_face_t)(const int* mx, const int* my, const int* mbc,
+                                                const int* meqn,
+                                                double qcoarse[],double qfine[],
+                                                double areacoarse[], double areafine[],
+                                                const int* idir, const int* iside,
+                                                const int* num_neighbors,
+                                                const int* refratio, const int* igrid,
+                                                const int* manifold, fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, const int* mbc,
+                                                const int* meqn,
+                                                double qcoarse[],double qfine[],
+                                                const int* idir, const int* iside,
+                                                const int* num_neighbors,
+                                                const int* refratio, const int* igrid,
+                                                fclaw2d_transform_data_t** transform_cptr);
+
 
 typedef void (*fclaw2d_fort_copy_corner_t)(int* mx, int* my, int* mbc, int* meqn,
                                                  double this_q[],double neighbor_q[],
                                                  int* icorner,
                                                  fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_average_corner_t)(const int* mx, const int* my, const int* mbc,
+                                        const int* meqn, const int* a_refratio,
+                                        double qcoarse[], double qfine[],
+                                        double areacoarse[], double areafine[],
+                                        const int* manifold,
+                                        const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mbc,
+                                                  const int* meqn, const int* a_refratio, double this_q[],
+                                                  double neighbor_q[], const int* a_corner,
+                                                  fclaw2d_transform_data_t** transform_cptr);
 
 
 typedef struct fclaw2d_vtable
@@ -217,8 +285,20 @@ typedef struct fclaw2d_vtable
     fclaw2d_patch_copy_face_t    copy_face;
     fclaw2d_fort_copy_face_t     fort_copy_face;
 
+    fclaw2d_patch_average_face_t    average_face;
+    fclaw2d_fort_average_face_t     fort_average_face;
+
+    fclaw2d_patch_interpolate_face_t    interpolate_face;
+    fclaw2d_fort_interpolate_face_t     fort_interpolate_face;
+
     fclaw2d_patch_copy_corner_t  copy_corner;
     fclaw2d_fort_copy_corner_t   fort_copy_corner;
+    
+    fclaw2d_patch_average_corner_t  average_corner;
+    fclaw2d_fort_average_corner_t   fort_average_corner;
+    
+    fclaw2d_patch_interpolate_corner_t  interpolate_corner;
+    fclaw2d_fort_interpolate_corner_t   fort_interpolate_corner;
 
 
 } fclaw2d_vtable_t;
