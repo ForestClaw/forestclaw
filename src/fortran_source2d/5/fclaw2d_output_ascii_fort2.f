@@ -20,7 +20,7 @@
 
       close(matunit2)
 
-      open(unit=matunit1,file=matname1,status='replace')
+      open(unit=matunit1,file=matname1)
       close(matunit1)
 
       end

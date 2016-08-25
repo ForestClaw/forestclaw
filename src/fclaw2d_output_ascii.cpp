@@ -45,8 +45,11 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
     fclaw2d_vtable_t vt;
     int meqn,ngrids;
     double time;
-    char matname1[10];
-    char matname2[10];
+    char matname1[11];
+    char matname2[11];
+
+    sprintf(matname1,"fort.q%04d",iframe);
+    sprintf(matname2,"fort.t%04d",iframe);
 
     amropt = fclaw2d_forestclaw_get_options(domain);
 
@@ -54,9 +57,6 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
     ngrids = fclaw2d_domain_get_num_patches(domain);
 
     meqn = amropt->meqn;
-
-    sprintf(matname1,"fort.q%04d",iframe);
-    sprintf(matname2,"fort.t%04d",iframe);
 
     vt = fclaw2d_get_vtable(domain);
     vt.fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
