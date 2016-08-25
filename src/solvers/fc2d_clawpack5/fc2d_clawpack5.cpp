@@ -42,7 +42,8 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* user_vt)
     classic_vt = *user_vt;
 }
 
-void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt)
+void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+                                fc2d_clawpack5_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
     vt->bc2 = CLAWPACK5_BC2;
@@ -64,11 +65,11 @@ void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt)
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
     /* Patch functions */
-    fclaw_vt->copy_face_ghost        = &fclaw2d_clawpatch_copy_face_ghost;
-    fclaw_vt->fort_copy_face_ghost   = &FC2D_CLAWPACK5_FORT_COPY_FACE_GHOST;
+    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face;
+    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
 
-    fclaw_vt->copy_corner_ghost      = &fclaw2d_clawpatch_copy_corner_ghost;
-    fclaw_vt->fort_copy_corner_ghost = &FC2D_CLAWPACK5_FORT_COPY_CORNER_GHOST;
+    fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
+    fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
 }
 
 

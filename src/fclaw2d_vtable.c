@@ -74,8 +74,8 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->patch_write_file         = &fclaw2d_output_patch_ascii;
 
     /* Ghost filling - solver specific */
-    vt->copy_face_ghost          = fclaw2d_clawpatch_copy_face_ghost;
-    vt->copy_corner_ghost        = fclaw2d_clawpatch_copy_corner_ghost;
+    vt->copy_face          = fclaw2d_clawpatch_copy_face;
+    vt->copy_corner        = fclaw2d_clawpatch_copy_corner;
 
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */

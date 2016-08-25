@@ -456,7 +456,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                                        time_interp,
                                                        &transform_data);
 #endif
-                        vt.copy_corner_ghost(domain,this_patch,corner_patch,
+                        vt.copy_corner(domain,this_patch,corner_patch,
                                              icorner,
                                              time_interp,&transform_data);
                     }

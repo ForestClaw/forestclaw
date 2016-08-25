@@ -613,7 +613,7 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
    Ghost cell exchange operations
    ---------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_copy_face_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        fclaw2d_patch_t *neighbor_patch,
                                        int iface,
@@ -633,7 +633,7 @@ void fclaw2d_clawpatch_copy_face_ghost(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(domain,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-    vt.fort_copy_face_ghost(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+    vt.fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
 
 #if 0
     FCLAW2D_FORT_EXCHANGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,iface,
@@ -641,8 +641,33 @@ void fclaw2d_clawpatch_copy_face_ghost(fclaw2d_domain_t *domain,
 #endif
 }
 
+void fclaw2d_clawpatch_average_face(const int& a_idir,
+                                   const int& a_iface_coarse,
+                                   const int& a_p4est_refineFactor,
+                                   const int& a_refratio,
+                                   ClawPatch *neighbor_cp,
+                                   fclaw_bool a_time_interp,
+                                   const int& igrid,
+                                   fclaw2d_transform_data_t* transform_data)
+{
+    double *qcoarse = q_time_sync(a_time_interp);
 
-void fclaw2d_clawpatch_copy_corner_ghost(fclaw2d_domain_t *domain,
+    double *qfine = neighbor_cp->m_griddata.dataPtr();
+
+    /* These will be empty for non-manifolds cases */
+    double *areacoarse = m_area.dataPtr();
+    double *areafine = neighbor_cp->m_area.dataPtr();
+
+    int manifold = m_manifold ? 1 : 0;
+    FCLAW2D_FORT_AVERAGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,
+                        qcoarse,qfine,
+                        areacoarse, areafine,
+                        a_idir,a_iface_coarse,
+                        a_p4est_refineFactor,a_refratio,igrid,
+                        manifold, &transform_data);
+}
+
+void fclaw2d_clawpatch_copy_corner(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *this_patch,
                                          fclaw2d_patch_t *corner_patch,
                                          int icorner,
@@ -661,7 +686,7 @@ void fclaw2d_clawpatch_copy_corner_ghost(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(domain,corner_patch,time_interp,&qcorner,&meqn);
 
-    vt.fort_copy_corner_ghost(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,&transform_data);
+    vt.fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,&transform_data);
 
 #if 0
     FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,

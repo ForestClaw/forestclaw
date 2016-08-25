@@ -344,7 +344,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     this_cp->exchange_face_ghost(iface,neighbor_cp,time_interp,
                                                  &transform_data);
 #endif
-                    vt.copy_face_ghost(domain,this_patch,neighbor_patch,iface,
+                    vt.copy_face(domain,this_patch,neighbor_patch,iface,
                                         time_interp,&transform_data);
 
                     /* We also need to copy _to_ the remote neighbor; switch contexts, but
@@ -362,7 +362,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                                      time_interp,
                                                      &transform_data_finegrid);
 #endif
-                        vt.copy_face_ghost(domain,this_patch,neighbor_patch,this_iface,
+                        vt.copy_face(domain,this_patch,neighbor_patch,this_iface,
                                             time_interp,&transform_data);
                     }
                 }
@@ -496,7 +496,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                                  use_timeinterp_patch,
                                                  &transform_data);
 #endif
-                    vt.copy_face_ghost(domain,this_ghost_patch,neighbor_patch,iface,
+                    vt.copy_face(domain,this_ghost_patch,neighbor_patch,iface,
                                         use_timeinterp_patch,&transform_data);
 
                     ++ddata->count_multiproc_corner;

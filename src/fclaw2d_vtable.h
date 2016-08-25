@@ -141,26 +141,26 @@ typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int
                                              double *ylower, double *t, double q[],
                                              double error[]);
 
-typedef void (*fclaw2d_patch_copy_face_ghost_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_copy_face_t)(fclaw2d_domain_t *domain,
                                                 fclaw2d_patch_t *this_patch,
                                                 fclaw2d_patch_t *neighbor_patch,
                                                 int iface,
                                                 int time_interp,
                                                 fclaw2d_transform_data_t *transform_data);
 
-typedef void (*fclaw2d_patch_copy_corner_ghost_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *this_patch,
                                                   fclaw2d_patch_t *corner_patch,
                                                   int icorner,
                                                   int time_interp,
                                                   fclaw2d_transform_data_t *transform_data);
 
-typedef void (*fclaw2d_fort_copy_face_ghost_t)(int* mx, int* my,int* mbc, int* meqn,
+typedef void (*fclaw2d_fort_copy_face_t)(int* mx, int* my,int* mbc, int* meqn,
                                                double qthis[],double qneighbor[],
                                                int* iface,
                                                fclaw2d_transform_data_t** transform_cptr);
 
-typedef void (*fclaw2d_fort_copy_corner_ghost_t)(int* mx, int* my, int* mbc, int* meqn,
+typedef void (*fclaw2d_fort_copy_corner_t)(int* mx, int* my, int* mbc, int* meqn,
                                                  double this_q[],double neighbor_q[],
                                                  int* icorner,
                                                  fclaw2d_transform_data_t** transform_cptr);
@@ -214,11 +214,11 @@ typedef struct fclaw2d_vtable
     fclaw2d_fort_compute_error_t         fort_compute_patch_error;
 
     /* ghost filling functions */
-    fclaw2d_patch_copy_face_ghost_t    copy_face_ghost;
-    fclaw2d_fort_copy_face_ghost_t     fort_copy_face_ghost;
+    fclaw2d_patch_copy_face_t    copy_face;
+    fclaw2d_fort_copy_face_t     fort_copy_face;
 
-    fclaw2d_patch_copy_corner_ghost_t  copy_corner_ghost;
-    fclaw2d_fort_copy_corner_ghost_t   fort_copy_corner_ghost;
+    fclaw2d_patch_copy_corner_t  copy_corner;
+    fclaw2d_fort_copy_corner_t   fort_copy_corner;
 
 
 } fclaw2d_vtable_t;
