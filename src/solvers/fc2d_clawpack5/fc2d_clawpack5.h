@@ -325,7 +325,7 @@ void FC2D_CLAWPACK5_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* m
                                                            FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE)
 void FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const int* mbc,
                                           const int* meqn,
-                                          double qthis[],double qcoarse[],
+                                          double qcoarse[],double qfine[],
                                           const int* idir, const int* iside,
                                           const int* num_neighbors,
                                           const int* refratio, const int* igrid,
