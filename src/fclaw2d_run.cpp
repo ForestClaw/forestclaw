@@ -218,8 +218,8 @@ void outstyle_1(fclaw2d_domain_t **domain)
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",
                                      gparms->minlevel,
-                                     (*domain)->local_minlevel,
-                                     (*domain)->local_maxlevel,
+                                     (*domain)->global_minlevel,
+                                     (*domain)->global_maxlevel,
                                      n_inner+1,dt_step,
                                      maxcfl_step, tc);
 
