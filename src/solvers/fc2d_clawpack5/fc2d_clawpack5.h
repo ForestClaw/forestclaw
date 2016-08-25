@@ -258,6 +258,50 @@ void CLAWPACK5_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                              const double *dx, const double* dy, double area[],
                              const int *mcapa, const int* maux, double aux[]);
 
+#define FC2D_CLAWPACK5_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fclaw2d_fort_tag4refinement, \
+                                                   FC2D_CLAWPACK5_FORT_TAG4REFINEMENT)
+
+void FC2D_CLAWPACK5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
+                                 const int* mbc,const int* meqn,
+                                 const double* xlower, const double* ylower,
+                                 const double* dx, const double* dy,
+                                 const int* blockno,
+                                 double q[],
+                                 const double* tag_threshold,
+                                 const int* init_flag,
+                                 int* tag_patch);
+
+
+
+#define FC2D_CLAWPACK5_FORT_TAG4COARSENING FCLAW_F77_FUNC(fc2d_clawpack5_fort_tag4coarsening, \
+                                                   FC2D_CLAWPACK5_FORT_TAG4COARSENING)
+
+void FC2D_CLAWPACK5_FORT_TAG4COARSENING(const int* mx, const int* my,
+                                 const int* mbc, const int* meqn,
+                                 const double* xlower, const double* ylower,
+                                 const double* dx, const double* dy,
+                                 const int* blockno,
+                                 double q0[],double q1[],
+                                 double q2[],double q3[],
+                                 const double* tag_threshold,
+                                 int* tag_patch);
+
+#define FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC(fc2d_clawpack5_fort_interpolate2fine, \
+                                                FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE)
+void FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
+                                   const int* mbc, const int* meqn,
+                                   double qcoarse[], double qfine[],
+                                   double areacoarse[], double areafine[],
+                                   const int* igrid, const int* manifold);
+
+#define FC2D_CLAWPACK5_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fc2d_clawpack5_fort_average2coarse, \
+                                                FC2D_CLAWPACK5_FORT_AVERAGE2COARSE)
+void FC2D_CLAWPACK5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
+                                 const int* mbc, const int* meqn,
+                                 double qcoarse[],double qfine[],
+                                 double areacoarse[],double areafine[],
+                                 const int* igrid, const int* manifold);
+
 
 #define CLAWPACK5_SET_BLOCK FCLAW_F77_FUNC(clawpack5_set_block,CLAWPACK5_SET_BLOCK)
 void CLAWPACK5_SET_BLOCK(int* blockno);
