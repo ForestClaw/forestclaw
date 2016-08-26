@@ -27,6 +27,7 @@
 #define FC2D_CLAWPACK5_H
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_vtable.h>
 #include <fclaw_package.h>
 
 #include "fc2d_clawpack5_options.h"
@@ -122,7 +123,8 @@ typedef struct fc2d_clawpack5_vtable
 
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* vt);
 
-void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt);
+void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+                                fc2d_clawpack5_vtable_t* vt);
 
 #define CLAWPACK5_BC2 FCLAW_F77_FUNC(clawpack5_bc2,CLAWPACK5_BC2)
 void CLAWPACK5_BC2(const int* meqn, const int* mbc,

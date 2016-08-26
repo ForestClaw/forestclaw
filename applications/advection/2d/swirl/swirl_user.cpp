@@ -39,6 +39,8 @@ static fc2d_clawpack5_vtable_t classic_claw;
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack5_init_vtable(&vt,
+                               &classic_claw);
 
     vt.problem_setup            = &fc2d_clawpack5_setprob;
 

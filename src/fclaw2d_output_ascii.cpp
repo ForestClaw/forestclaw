@@ -72,7 +72,7 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
-    char fname[10];
+    char fname[11];
     vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
