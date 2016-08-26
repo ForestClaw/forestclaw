@@ -258,23 +258,23 @@ void CLAWPACK5_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                              const double *dx, const double* dy, double area[],
                              const int *mcapa, const int* maux, double aux[]);
 
-#define FC2D_CLAWPACK5_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fclaw2d_fort_tag4refinement, \
-                                                   FC2D_CLAWPACK5_FORT_TAG4REFINEMENT)
+#define FC2D_CLAWPACK5_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fc2d_clawpack5_fort_tag4refinement, \
+                                                          FC2D_CLAWPACK5_FORT_TAG4REFINEMENT)
 
 void FC2D_CLAWPACK5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
-                                 const int* mbc,const int* meqn,
-                                 const double* xlower, const double* ylower,
-                                 const double* dx, const double* dy,
-                                 const int* blockno,
-                                 double q[],
-                                 const double* tag_threshold,
-                                 const int* init_flag,
-                                 int* tag_patch);
+                                        const int* mbc,const int* meqn,
+                                        const double* xlower, const double* ylower,
+                                        const double* dx, const double* dy,
+                                        const int* blockno,
+                                        double q[],
+                                        const double* tag_threshold,
+                                        const int* init_flag,
+                                        int* tag_patch);
 
 
 
 #define FC2D_CLAWPACK5_FORT_TAG4COARSENING FCLAW_F77_FUNC(fc2d_clawpack5_fort_tag4coarsening, \
-                                                   FC2D_CLAWPACK5_FORT_TAG4COARSENING)
+                                                          FC2D_CLAWPACK5_FORT_TAG4COARSENING)
 
 void FC2D_CLAWPACK5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                  const int* mbc, const int* meqn,
@@ -302,16 +302,16 @@ void FC2D_CLAWPACK5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
                                  double areacoarse[],double areafine[],
                                  const int* igrid, const int* manifold);
 
-#define FC2D_CLAWPACK5_FORT_COPY_FACE FCLAW_F77_FUNC(fclaw2d_fort_exchange_face, \
-                                                       FC2D_CLAWPACK5_FORT_COPY_FACE)
+#define FC2D_CLAWPACK5_FORT_COPY_FACE FCLAW_F77_FUNC(fc2d_clawpack5_fort_copy_face, \
+                                                     FC2D_CLAWPACK5_FORT_COPY_FACE)
 
 void FC2D_CLAWPACK5_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, const int* meqn,
                                    double qthis[],double qneighbor[], const int* a_idir,
                                    fclaw2d_transform_data_t** transform_cptr);
 
 
-#define FC2D_CLAWPACK5_FORT_AVERAGE_FACE FCLAW_F77_FUNC(fclaw2d_fort_average_face, \
-                                                       FC2D_CLAWPACK5_FORT_AVERAGE_FACE)
+#define FC2D_CLAWPACK5_FORT_AVERAGE_FACE FCLAW_F77_FUNC(fc2d_clawpack5_fort_average_face, \
+                                                        FC2D_CLAWPACK5_FORT_AVERAGE_FACE)
 void FC2D_CLAWPACK5_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* mbc,
                                       const int* meqn,
                                       double qcoarse[],double qfine[],
@@ -321,8 +321,8 @@ void FC2D_CLAWPACK5_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* m
                                       const int* refratio, const int* igrid,
                                       const int* manifold, fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE FCLAW_F77_FUNC(fclaw2d_fort_interpolate_face, \
-                                                           FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE)
+#define FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE FCLAW_F77_FUNC(fc2d_clawpack5_fort_interpolate_face, \
+                                                            FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE)
 void FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const int* mbc,
                                           const int* meqn,
                                           double qcoarse[],double qfine[],
@@ -331,14 +331,14 @@ void FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const in
                                           const int* refratio, const int* igrid,
                                           fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_CLAWPACK5_FORT_COPY_CORNER FCLAW_F77_FUNC(fclaw2d_fort_exchange_corner, \
-                                                          FC2D_CLAWPACK5_FORT_COPY_CORNER)
+#define FC2D_CLAWPACK5_FORT_COPY_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_copy_corner, \
+                                                       FC2D_CLAWPACK5_FORT_COPY_CORNER)
 void FC2D_CLAWPACK5_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
                                      const int* meqn, double this_q[],double neighbor_q[],
                                      const int* a_corner,fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_CLAWPACK5_FORT_AVERAGE_CORNER FCLAW_F77_FUNC(fclaw2d_fort_average_corner, \
-                                                         FC2D_CLAWPACK5_FORT_AVERAGE_CORNER)
+#define FC2D_CLAWPACK5_FORT_AVERAGE_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_average_corner, \
+                                                          FC2D_CLAWPACK5_FORT_AVERAGE_CORNER)
 void FC2D_CLAWPACK5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int* mbc,
                                         const int* meqn, const int* a_refratio,
                                         double qcoarse[], double qfine[],
@@ -346,12 +346,50 @@ void FC2D_CLAWPACK5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int*
                                         const int* manifold,
                                         const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fclaw2d_fort_interpolate_corner, \
+#define FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_interpolate_corner, \
                                                              FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER)
 void FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
                                             const int* meqn, const int* a_refratio, double this_q[],
                                             double neighbor_q[], const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
+
+#define  FC2D_CLAWPACK5_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_file, \
+                                                       FC2D_CLAWPACK5_FORT_WRITE_FILE)
+void  FC2D_CLAWPACK5_FORT_WRITE_FILE(char* matname1,
+                                     int* mx,        int* my,
+                                     int* meqn,      int* mbc,
+                                     double* xlower, double* ylower,
+                                     double* dx,     double* dy,
+                                     double q[],
+                                     int* patch_num, int* level,
+                                     int* blockno,   int* mpirank);
+
+#define FC2D_CLAWPACK5_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_header, \
+                                                        FC2D_CLAWPACK5_FORT_WRITE_HEADER)
+void FC2D_CLAWPACK5_FORT_WRITE_HEADER(char* matname1, char* matname2,
+                                      double* time, int* meqn, int* ngrids);
+
+
+#define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
+                                                              FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
+void FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
+                                            double *dx, double *dy,
+                                            double* area, double *q, double* sum);
+
+#define FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA FCLAW_F77_FUNC(fc2d_clawpack5_fort_compute_patch_area, \
+                                                              FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA)
+
+double FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
+                                              double* dy, double area[]);
+
+
+#define FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_clawpack5_fort_compute_error_norm, \
+                                                              FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM)
+
+void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meqn,
+                                            double *dx, double *dy, double area[],
+                                            double error[], double error_norm[]);
+
 
 #define CLAWPACK5_SET_BLOCK FCLAW_F77_FUNC(clawpack5_set_block,CLAWPACK5_SET_BLOCK)
 void CLAWPACK5_SET_BLOCK(int* blockno);

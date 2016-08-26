@@ -64,12 +64,26 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK5_FORT_TAG4REFINEMENT;
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
+    /* output functions */
+    fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    fclaw_vt->fort_write_file        = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+
+    /* diagnostic functions */
+    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
+    fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
+
     /* Patch functions */
-    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face;
+    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face; // Should it be in fclaw2d_init_table?
     fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+ 
+    fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
 
     fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
     fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
+    fclaw_vt->fort_average_corner = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
+    fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;;
 }
 
 

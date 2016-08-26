@@ -184,8 +184,8 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fclaw2d_fort_fixcapaq2(mx,my,mbc,meqn,
-     &         qcoarse,qfine, areacoarse,areafine,igrid)
+         call fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+     &         qcoarse,qfine,areacoarse,areafine,igrid)
       endif
 
 

@@ -84,8 +84,10 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
 
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
+#if 0
     vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
     vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
 
 #if 0
     vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
