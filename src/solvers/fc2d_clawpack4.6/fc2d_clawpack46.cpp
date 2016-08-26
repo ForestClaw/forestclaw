@@ -65,11 +65,11 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_TAG4COARSENING;
 
     /* Patch functions */
-    fclaw_vt->copy_face_ghost        = &fclaw2d_clawpatch_copy_face_ghost;
-    fclaw_vt->fort_copy_face_ghost   = &FC2D_CLAWPACK46_COPY_FACE_GHOST;
+    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face;
+    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK46_COPY_FACE_GHOST;
 
-    fclaw_vt->copy_corner_ghost      = &fclaw2d_clawpatch_copy_corner_ghost;
-    fclaw_vt->fort_copy_corner_ghost = &FC2D_CLAWPACK46_COPY_CORNER_GHOST;
+    fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
+    fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK46_COPY_CORNER_GHOST;
 }
 
 

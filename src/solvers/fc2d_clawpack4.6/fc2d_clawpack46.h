@@ -325,16 +325,15 @@ void FC2D_CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
 
 #define FC2D_CLAWPACK46_COPY_FACE_GHOST FCLAW_F77_FUNC(fc2d_clawpack46_copy_face_ghost, \
                                                        FC2D_CLAWPACK46_COPY_FACE_GHOST)
-void FC2D_CLAWPACK46_COPY_FACE_GHOST(int* mx, int* my,int* mbc, int* meqn,
-                                     double qthis[],double qneighbor[],
-                                     int* a_iface,
-                                     fclaw2d_transform_data_t** transform_cptr);
+void FC2D_CLAWPACK46_COPY_FACE_GHOST (const int* mx, const int* my, const int* mbc, const int* meqn,
+                                   double qthis[],double qneighbor[], const int* a_idir,
+                                   fclaw2d_transform_data_t** transform_cptr);
 
 #define FC2D_CLAWPACK46_COPY_CORNER_GHOST FCLAW_F77_FUNC(fc2d_clawpack46_copy_corner_ghost, \
                                                           FC2D_CLAWPACK46_COPY_CORNER_GHOST)
-void FC2D_CLAWPACK46_COPY_CORNER_GHOST(int* mx, int* my, int* mbc, int* meqn,
-                                       double this_q[],double neighbor_q[],
-                                       int* icorner, fclaw2d_transform_data_t** transform_cptr);
+void FC2D_CLAWPACK46_COPY_CORNER_GHOST(const int* mx, const int* my, const int* mbc,
+                                     const int* meqn, double this_q[],double neighbor_q[],
+                                     const int* a_corner,fclaw2d_transform_data_t** transform_cptr);
 
 
 
