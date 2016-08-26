@@ -146,7 +146,8 @@ c     # Face 3
       end
 
 
-      subroutine fc2d_clawpack5_set_boundary_to_value(mx,my,mbc,meqn,q,val)
+      subroutine fc2d_clawpack5_set_boundary_to_value(mx,my,mbc,
+     &      meqn,q,val)
       implicit none
 
       integer mx,my,mbc,meqn

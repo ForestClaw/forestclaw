@@ -224,11 +224,15 @@ void cb_diagnostics_compute_error(fclaw2d_domain_t *domain,
     error = fclaw2d_clawpatch_get_error(domain,this_patch);
 
     vt.compute_patch_error(domain,this_patch,this_block_idx,this_patch_idx,
-                     error);
+                           error);
 
     /* Accumulate sums and maximums needed to compute errors */
+    vt.fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
+                               error, error_data->local_error);
+#if 0
     FCLAW2D_FORT_COMPUTE_ERROR_NORM(&mx, &my, &mbc, &meqn, &dx,&dy, area,
                                     error, error_data->local_error);
+#endif
 }
 
 static
