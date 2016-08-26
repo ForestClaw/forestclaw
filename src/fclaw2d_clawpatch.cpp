@@ -167,6 +167,7 @@ void fclaw2d_clawpatch_setup_for_time_interpolation(fclaw2d_domain_t* domain,
     mx = gparms->mx;
     my = gparms->my;
     mbc = gparms->mbc;
+    meqn = gparms->meqn;
 
     /* Store time interpolated data that will be use in coarse grid
        exchanges */
@@ -896,7 +897,13 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_domain_t* domain,
 {
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    meqn = gparms->meqn;
 
 
     fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
