@@ -327,8 +327,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
                             /* interpolate to igrid */
-                            vt.interpolate_face(domain,this_patch,fine_patch,idir
-                                                iside,p4est_refineFactor,refratio,
+                            vt.interpolate_face(domain,this_patch,fine_patch,idir,
+                                                iface,p4est_refineFactor,refratio,
                                                 time_interp,igrid,&transform_data);
 #if 0
                             this_cp->interpolate_face_ghost(idir,iface,p4est_refineFactor,
@@ -341,7 +341,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         {
                             /* average from igrid */
                             vt.average_face(domain,coarse_patch,fine_patch,idir,
-                                            iface_coarse,p4est_refineFactor,
+                                            iface,p4est_refineFactor,
                                             refratio,time_interp,igrid,
                                             &transform_data);
 #if 0
@@ -418,7 +418,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 {
                     /* Interpolate from remote neighbor to 'this' patch (the finer grid */
                     vt.interpolate_face(domain,coarse_patch,fine_patch,
-                                        idir_coarse,iface_coarse,time_interp,
+                                        idir_coarse,iface_coarse,
+                                        p4est_refineFactor,refratio,
+                                        time_interp,
                                         igrid,&transform_data_finegrid);
 #if 0
                     coarse_cp->interpolate_face_ghost(idir_coarse,iface_coarse,
@@ -543,10 +545,10 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                     {
                         if (rpatchno[igrid] != -1)
                         {
-                            fclaw2d_patch_t* coarse_patch = this_patch;
+                            fclaw2d_patch_t* coarse_patch = this_ghost_patch;
                             fclaw2d_patch_t *fine_patch =
                                 &domain->ghost_patches[rpatchno[igrid]];
-                            transform_data.neighbor_patch = neighbor_patch;
+                            transform_data.neighbor_patch = fine_patch;
                             vt.average_face(domain,coarse_patch,fine_patch,
                                             idir,iface,p4est_refineFactor,
                                             refratio,use_timeinterp_patch,

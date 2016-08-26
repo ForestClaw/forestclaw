@@ -383,7 +383,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
         /* This needs to be set here;  otherwise external corners
            don't get set. */
         fclaw2d_clawpatch_set_block_corner_count(domain, this_patch,
-                                                 icorner,block_corner_count);
+                                           icorner,block_corner_count);
 
         if (is_interior_corner)
         {
@@ -508,8 +508,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         this_cp->mb_exchange_block_corner_ghost(icorner,corner_cp,
                                                                 time_interp);
                     }
-                }
 #endif
+                }
             }  /* End of non-parallel patch case */
             else if (is_fine && neighbor_level == COARSER_GRID &&
                      remote_neighbor && read_parallel_patches)
@@ -533,7 +533,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                            'this' patch (fine grid) */
                         int coarse_icorner = transform_data_finegrid.icorner;
                         vt.interpolate_corner(domain,coarse_patch,fine_patch,
-                                              coarse_corner,refratio,time_interp,
+                                              coarse_icorner,refratio,time_interp,
                                               &transform_data_finegrid);
 
 #if 0
