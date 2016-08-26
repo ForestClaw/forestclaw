@@ -159,7 +159,7 @@ typedef void (*fclaw2d_patch_average_face_t)(fclaw2d_domain_t *domain,
                                           int igrid,
                                           fclaw2d_transform_data_t* transform_data);
 
-typedef void (*fclaw2d_clawpatch_interpolate_face_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_interpolate_face_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *coarse_patch,
                                                   fclaw2d_patch_t *fine_patch,
                                                   int idir,
@@ -177,7 +177,7 @@ typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   int time_interp,
                                                   fclaw2d_transform_data_t *transform_data);
 
-typedef void (*fclaw2d_clawpatch_average_corner_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_average_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *coarse_patch,
                                                   fclaw2d_patch_t *fine_patch,
                                                   int coarse_corner,
@@ -185,7 +185,7 @@ typedef void (*fclaw2d_clawpatch_average_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw_bool time_interp,
                                                   fclaw2d_transform_data_t* transform_data);
 
-typedef void (*fclaw2d_clawpatch_interpolate_corner_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_domain_t* domain,
                                                     fclaw2d_patch_t* coarse_patch,
                                                     fclaw2d_patch_t* fine_patch,
                                                     int coarse_corner,
