@@ -278,6 +278,9 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
         &amropt->mthbc, fclaw2d_NumFaces,
         "Physical boundary condition type [1 1 1 1]");
 
+    /* Initialization of ghost cell */
+    sc_options_add_bool (opt, 0, "init_ghostcell", &amropt->init_ghostcell, 1,
+                        "Initialize ghost cells [T]");
 
     /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 

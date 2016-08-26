@@ -37,7 +37,7 @@ def topo(x,y):
     Parabolic bowl
     """
     # value of z at origin:  Try zmin = 80 for shoreline or 250 for no shore
-    zmin = 80.
+    zmin = 250.
     z = 1.e-2*(x**2 + y**2) - zmin
     return z
 

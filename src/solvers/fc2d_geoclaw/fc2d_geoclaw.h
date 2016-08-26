@@ -292,7 +292,7 @@ void GEOCLAW_TAG4REFINEMENT(int* mx,int* my, int* mbc, int *meqn,int*maux,
 #define GEOCLAW_TAG4COARSENING FCLAW_F77_FUNC(geoclaw_tag4coarsening,GEOCLAW_TAG4COARSENING)
 void GEOCLAW_TAG4COARSENING(int* blockno,int* mx,int* my,int* mbc,int* meqn, int* maux,
                             double xlower[],double ylower[],double* dx,double* dy,
-                            double q0[], double q1[], double q2[], double q3[],
+                            double* t, double q0[], double q1[], double q2[], double q3[],
                             double aux0[], double aux1[], double aux2[], double aux3[],
                             int* level, int* maxlevel, double* dry_tolerance_c,
                             double* wave_tolerance_c, int* speed_tolerance_entries_c,
@@ -307,8 +307,8 @@ void GEOCLAW_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse
 #define GEOCLAW_AVERAGE2COARSE FCLAW_F77_FUNC(geoclaw_average2coarse,GEOCLAW_AVERAGE2COARSE)
 void GEOCLAW_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
                               double qfine[], int* maux, double aux_coarse[],
-                              double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
-                              int* igrid);
+                              double aux_fine[], int* mcapa, int* mbathy, int* p4est_refineFactor,
+                              int* refratio, int* igrid);
 
 #define GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(geoclaw_fort_write_header,GEOCLAW_FORT_WRITE_HEADER)
 void GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* ngrids);
