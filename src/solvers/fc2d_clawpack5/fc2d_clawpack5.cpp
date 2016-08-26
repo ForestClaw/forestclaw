@@ -42,7 +42,8 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* user_vt)
     classic_vt = *user_vt;
 }
 
-void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt)
+void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+                                fc2d_clawpack5_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
     vt->bc2 = CLAWPACK5_BC2;
@@ -55,6 +56,38 @@ void fc2d_clawpack5_init_vtable(fc2d_clawpack5_vtable_t* vt)
     vt->setaux = NULL;
     vt->b4step2 = NULL;
     vt->src2 = NULL;
+
+    /* Forestclaw functions */
+    fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK5_FORT_AVERAGE2COARSE;
+    fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE;
+
+    fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK5_FORT_TAG4REFINEMENT;
+    fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
+
+    /* output functions */
+    fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    fclaw_vt->fort_write_file        = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+
+    /* diagnostic functions */
+    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
+    fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
+
+    /* Patch functions */
+    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face; // Should it be in fclaw2d_init_table?
+    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+ 
+    fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
+
+    fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
+    fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
+    fclaw_vt->fort_average_corner = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
+    fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
+
+    fclaw_vt->fort_ghostpack = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
+    
+    fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
 

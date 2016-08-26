@@ -74,13 +74,20 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->patch_write_file         = &fclaw2d_output_patch_ascii;
 
     /* Ghost filling - solver specific */
-    vt->copy_face_ghost          = fclaw2d_clawpatch_copy_face_ghost;
-    vt->copy_corner_ghost        = fclaw2d_clawpatch_copy_corner_ghost;
+    vt->copy_face            = fclaw2d_clawpatch_copy_face;
+    vt->average_face         = fclaw2d_clawpatch_average_face;
+    vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
+    vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
+    vt->average_corner       = fclaw2d_clawpatch_average_corner;
+    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
+
 
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
+#if 0
     vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
     vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+#endif
 
 #if 0
     vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
