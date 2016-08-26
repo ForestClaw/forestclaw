@@ -108,6 +108,11 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha);
 
+void fclaw2d_clawpatch_setup_for_time_interpolation(fclaw2d_domain_t* domain,
+                                                    fclaw2d_patch_t* this_patch,
+                                                    const double alpha,
+                                                    const int psize);
+
 void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain);
 
 int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
@@ -214,6 +219,10 @@ void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
                                                 void **q);
 
 
+void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
+                                  fclaw2d_patch_t* this_patch,
+                                  double *qpack, int time_interp,
+                                  int packmode);
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,

@@ -83,7 +83,11 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
     fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     fclaw_vt->fort_average_corner = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
-    fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;;
+    fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
+
+    fclaw_vt->fort_ghostpack = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
+    
+    fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
 
