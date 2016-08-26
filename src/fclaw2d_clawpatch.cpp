@@ -186,6 +186,15 @@ int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
     return cp->block_corner_count();
 }
 
+void fclaw2d_clawpatch_set_corner_count(fclaw2d_domain_t* domain,
+                                        fclaw2d_patch_t* this_patch,
+                                        int icorner, int block_corner_count)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->set_block_corner_count(icorner,block_corner_count);
+}
+
+
 /* ------------------------------------------------------------------
    Manifold setup and access
  ------------------------------------------------------------------ */
