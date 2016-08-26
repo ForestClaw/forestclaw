@@ -141,6 +141,11 @@ typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int
                                              double *ylower, double *t, double q[],
                                              double error[]);
 
+typedef void (*fclaw2d_fort_compute_error_norm_t)(int *mx, int *my, int *mbc,
+                                                  int *meqn,
+                                                  double *dx, double *dy, double *area,
+                                                  double *error, double* error_norm);
+
 typedef void (*fclaw2d_patch_copy_face_t)(fclaw2d_domain_t *domain,
                                                 fclaw2d_patch_t *this_patch,
                                                 fclaw2d_patch_t *neighbor_patch,
@@ -278,6 +283,7 @@ typedef struct fclaw2d_vtable
     fclaw2d_run_user_diagnostics_t       run_user_diagnostics;
     fclaw2d_diagnostics_compute_error_t  compute_patch_error;
     fclaw2d_fort_compute_error_t         fort_compute_patch_error;
+    fclaw2d_fort_compute_error_norm_t    fort_compute_error_norm;
 
     /* ghost filling functions */
     fclaw2d_patch_copy_face_t    copy_face;
