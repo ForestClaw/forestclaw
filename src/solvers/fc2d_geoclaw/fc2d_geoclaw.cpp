@@ -753,7 +753,6 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
     int igrid,mcapa;
 
     const amr_options_t* gparms;
-    fc2d_geoclaw_options_t *geoclaw_options;
 
     fclaw2d_patch_t* fine_patch;
 
