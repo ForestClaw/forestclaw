@@ -8,7 +8,7 @@ c    # -------------------------------------------------------------------------
       integer mx,my,mbc,meqn
       double precision dx, dy, dxdy
       double precision sum(meqn)
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       include 'metric_terms.i'
 
@@ -23,20 +23,19 @@ c    # -------------------------------------------------------------------------
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*area(i,j)
+                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
                enddo
             enddo
          else
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*dx*dy
+                  sum(m) = sum(m) + q(i,j,m)*dx*dy
                enddo
             enddo
          endif
       enddo
 
       end
-
 
 c     # Compute area of a patch
       double precision function fclaw2d_fort_compute_patch_area(mx,my,
@@ -78,7 +77,7 @@ c     # Compute area of a patch
       integer mx,my,mbc,meqn
       double precision dx, dy, dxdy, eij
       double precision error_norm(meqn,3)
-      double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       include 'metric_terms.i'
 
@@ -94,7 +93,7 @@ c     # error_norm(:) comes in with values;  do not initialize it here!
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
-                  eij = abs(error(m,i,j))
+                  eij = abs(error(i,j,m))
                   error_norm(m,1) = error_norm(m,1) +
      &                  eij*area(i,j)
                   error_norm(m,2) = error_norm(m,2) +
@@ -105,7 +104,7 @@ c     # error_norm(:) comes in with values;  do not initialize it here!
          else
             do j = 1,my
                do i = 1,mx
-                  eij = abs(error(m,i,j))
+                  eij = abs(error(i,j,m))
                   error_norm(m,1) = error_norm(m,1) +
      &                  eij*dxdy
                   error_norm(m,2) = error_norm(m,2) +

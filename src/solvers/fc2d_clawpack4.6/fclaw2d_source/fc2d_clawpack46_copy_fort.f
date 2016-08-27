@@ -1,5 +1,5 @@
 c     # ----------------------------------------------------------
-c     # Exchange routines - (mq,i,j) ordering
+c     # Exchange routines - (i,j,mq) ordering
 c     # ----------------------------------------------------------
 c     # exchange_face_ghost
 c     # exchange_corner_ghost
@@ -8,14 +8,14 @@ c     # ----------------------------------------------------------
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine fclaw2d_fort_exchange_face_ghost(mx,my,mbc,meqn,qthis,
+      subroutine fc2d_clawpack46_copy_face_ghost(mx,my,mbc,meqn,qthis,
      &      qneighbor,iface,transform_ptr)
       implicit none
 
       integer mx,my,mbc,meqn,iface, ftransform(9)
       integer*8 transform_ptr
-      double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qneighbor(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,ibc,jbc,mq, idir
       integer i1,j1, i2, j2
@@ -39,7 +39,7 @@ c                 # x-direction (idir == 0)
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_ptr)
-                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
                enddo
             enddo
@@ -57,7 +57,7 @@ c                 # y-direction (idir == 1)
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_ptr)
-                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
 
                enddo
             enddo
@@ -66,14 +66,14 @@ c                 # y-direction (idir == 1)
       end
 
 
-      subroutine fclaw2d_fort_exchange_corner_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_copy_corner_ghost(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
       integer mx, my, mbc, meqn, this_icorner
       integer*8 transform_ptr
-      double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qneighbor(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq, ibc, jbc
       integer i1, j1, i2, j2
@@ -100,7 +100,7 @@ c              # this routine is not yet complete, but the complete one
 c              # can now be dropped in.
                call fclaw2d_transform_corner(i1,j1,i2,j2,
      &               transform_ptr)
-               qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+               qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
             enddo
          enddo
       enddo
@@ -112,10 +112,13 @@ c              # can now be dropped in.
       implicit none
 
       integer mx, my, mbc, meqn, iface, icorner
-      double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qneighbor(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer ibc, jbc, mq
+
+      write(6,*) 'fc2d_clawpack46_copy_phys_corner_ghost : stop'
+      stop
 
 c     # Fill in corner ghost cells that overlap the physical boundary. In this
 c     case, the corner ghost cells are copied from a face neighbor.
@@ -124,27 +127,27 @@ c     case, the corner ghost cells are copied from a face neighbor.
             do jbc = 1,mbc
                if (iface .eq. 1) then
                   if (icorner .eq. 1) then
-                     qthis(mq,mx+ibc,jbc-mbc) =
-     &                     qneighbor(mq,ibc,jbc-mbc)
-                     qneighbor(mq,ibc-mbc,jbc-mbc) =
-     &                     qthis(mq,mx+ibc-mbc,jbc-mbc)
+                     qthis(mx+ibc,jbc-mbc,mq) =
+     &                     qneighbor(ibc,jbc-mbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc-mbc,jbc-mbc,mq)
                   elseif (icorner .eq. 3) then
-                     qthis(mq,mx+ibc,my+jbc) =
-     &                     qneighbor(mq,ibc,my+jbc)
-                     qneighbor(mq,ibc-mbc,my+jbc) =
-     &                     qthis(mq,mx+ibc-mbc,my+jbc)
+                     qthis(mx+ibc,my+jbc,mq) =
+     &                     qneighbor(ibc,my+jbc,mq)
+                     qneighbor(ibc-mbc,my+jbc,mq) =
+     &                     qthis(mx+ibc-mbc,my+jbc,mq)
                   endif
                elseif (iface .eq. 3) then
                   if (icorner .eq. 2) then
-                     qthis(mq,ibc-mbc,my+jbc) =
-     &                     qneighbor(mq,ibc-mbc,jbc)
-                     qneighbor(mq,ibc-mbc,jbc-mbc) =
-     &                     qthis(mq,ibc-mbc,my+jbc-mbc)
+                     qthis(ibc-mbc,my+jbc,mq) =
+     &                     qneighbor(ibc-mbc,jbc,mq)
+                     qneighbor(ibc-mbc,jbc-mbc,mq) =
+     &                     qthis(ibc-mbc,my+jbc-mbc,mq)
                   elseif(icorner .eq. 3) then
-                     qthis(mq,mx+ibc,my+jbc) =
-     &                     qneighbor(mq,mx+ibc,jbc)
-                     qneighbor(mq,mx+ibc,jbc-mbc) =
-     &                     qthis(mq,mx+ibc,my+jbc-mbc)
+                     qthis(mx+ibc,my+jbc,mq) =
+     &                     qneighbor(mx+ibc,jbc,mq)
+                     qneighbor(mx+ibc,jbc-mbc,mq) =
+     &                     qthis(mx+ibc,my+jbc-mbc,mq)
                   endif
                endif
             enddo

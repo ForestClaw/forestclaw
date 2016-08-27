@@ -7,7 +7,7 @@ c     # fclaw2d_fort_interpolate2fine
 c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
-      subroutine fclaw2d_fort_tag4refinement(mx,my,mbc,
+      subroutine fc2d_clawpack5_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
@@ -42,7 +42,7 @@ c     # Refine based only on first variable in system.
 
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine fclaw2d_fort_tag4coarsening(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -114,7 +114,7 @@ c              # grid fails the coarsening test.
 
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fclaw2d_fort_interpolate2fine(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_interpolate2fine(mx,my,mbc,meqn,
      &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
@@ -184,8 +184,8 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fclaw2d_fort_fixcapaq2(mx,my,mbc,meqn,
-     &         qcoarse,qfine, areacoarse,areafine,igrid)
+         call fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+     &         qcoarse,qfine,areacoarse,areafine,igrid)
       endif
 
 
@@ -193,7 +193,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
 
 c> \ingroup  Averaging
 c> Average fine grid siblings to parent coarse grid.
-      subroutine fclaw2d_fort_average2coarse(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_average2coarse(mx,my,mbc,meqn,
      &      qcoarse,qfine,areacoarse,areafine,igrid,manifold)
       implicit none
 
@@ -282,7 +282,7 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fclaw2d_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 

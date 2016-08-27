@@ -29,8 +29,8 @@ c     # ----------------------------------------------------------
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer num_neighbors
       integer*8 transform_ptr
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2, m
       integer i, ic1, ic2, ibc, ifine,i1
@@ -105,23 +105,23 @@ c           # this ensures that we get 'hanging' corners
                   endif
                enddo
                if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
+                  qc = qcoarse(ic,jc,mq)
 c                 # Compute limited slopes in both x and y. Note we are not
 c                 # really computing slopes, but rather just differences.
 c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
+                  sl = (qc - qcoarse(ic-1,jc,mq))
+                  sr = (qcoarse(ic+1,jc,mq) - qc)
                   gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
+                  sl = (qc - qcoarse(ic,jc-1,mq))
+                  sr = (qcoarse(ic,jc+1,mq) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(mq,iff,jff) = value
+                     qfine(iff,jff,mq) = value
                   enddo
                endif
             enddo
@@ -153,21 +153,21 @@ c              # ---------------------------------------------
                   endif
                enddo
                if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
+                  qc = qcoarse(ic,jc,mq)
 
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
+                  sl = (qc - qcoarse(ic-1,jc,mq))
+                  sr = (qcoarse(ic+1,jc,mq) - qc)
                   gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
+                  sl = (qc - qcoarse(ic,jc-1,mq))
+                  sr = (qcoarse(ic,jc+1,mq) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(mq,iff,jff) = value
+                     qfine(iff,jff,mq) = value
                   enddo
 
                endif                    !! Don't skip this grid
@@ -226,8 +226,8 @@ c              # ---------------------------------------------
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
       integer*8 transform_ptr
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady
@@ -296,24 +296,24 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
      &      transform_ptr)
 
       do mq = 1,meqn
-         qc = qcoarse(mq,ic,jc)
+         qc = qcoarse(ic,jc,mq)
 
 c        # Compute limited slopes in both x and y. Note we are not
 c        # really computing slopes, but rather just differences.
 c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
-         sl = (qc - qcoarse(mq,ic-1,jc))
-         sr = (qcoarse(mq,ic+1,jc) - qc)
+         sl = (qc - qcoarse(ic-1,jc,mq))
+         sr = (qcoarse(ic+1,jc,mq) - qc)
          gradx = compute_slopes(sl,sr,mth)
 
-         sl = (qc - qcoarse(mq,ic,jc-1))
-         sr = (qcoarse(mq,ic,jc+1) - qc)
+         sl = (qc - qcoarse(ic,jc-1,mq))
+         sr = (qcoarse(ic,jc+1,mq) - qc)
          grady = compute_slopes(sl,sr,mth)
 
          do m = 0,rr2-1
             iff = i2(0) + df(1,m)
             jff = j2(0) + df(2,m)
             value = qc + gradx*shiftx(m) + grady*shifty(m)
-            qfine(mq,iff,jff) = value
+            qfine(iff,jff,mq) = value
          enddo
 
       enddo
@@ -326,6 +326,7 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
       implicit none
 
       double precision sl,sr, s, sc, philim, slim
+      double precision a,b, du
       integer mth
 
 c     # ------------------------------------------------
@@ -355,22 +356,37 @@ c     # (in Chombo/lib/src/AMRTools) for routine 'interplimit'
 c     # Good luck.
 c     # ------------------------------------------------
 
-      if (mth .le. 4) then
+      if (mth .eq. 0) then
+         return
+      elseif (0 .lt. mth .and. mth .le. 4) then
 c        # Use minmod, superbee, etc.
          slim = philim(sl,sr,mth)
          compute_slopes = slim*sl
-      else
-c        # Use AMRClaw slopes  (use minimum in absolute value;  sign is
-c        # chosen from centered (sc) slope
+      elseif (mth .eq. 5) then
+c        # Use AMRClaw slopes (?)
+c        # If sl,sr are the same sign : Use minimum of sl,sr or sc
+c        # If sl and sr have different signs; set slope to 0.
          sc = (sl + sr)/2.d0
-         compute_slopes = min(2*abs(sl),2*abs(sr),abs(sc))*
+         du = min(abs(sl),abs(sr))
+         compute_slopes = min(2*du,abs(sc))*
      &         max(0.d0,sign(1.d0,sl*sr))*sign(1.d0,sc)
 
 c        # Do this to guarantee that ghost cells are used; this is a check
 c        # on the ghost-fill procedures.  Could raise an exception if face
 c        # a patch communicates with more two or more procs.  If this
 c        # is uncommented, also uncomment warning in fclaw2d_ghost_fill.cpp
-c         compute_slopes = sc
+c        compute_slopes = sc
+
+      elseif (mth .eq. 6) then
+c        # Harmonic mean interpolation (from PCHIP). The abs not really
+c        # not necessary, but used here to show that the harmonic average
+c        # can be seen as a convex combination of the two values, but weights
+c        # the smaller slope more heavily.
+c        # WARNING : sl+sr == 0 probably not handled correctly.
+         a = abs(sr/(sl + sr))
+         b = abs(sl/(sl + sr))
+         sc = a*sl + b*sr
+         compute_slopes = max(0.d0,sign(1.d0,sl*sr))*sc
 
       endif
 

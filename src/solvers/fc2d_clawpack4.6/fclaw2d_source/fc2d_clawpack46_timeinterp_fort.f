@@ -4,9 +4,9 @@
 
       integer mx,my,mbc,meqn,psize, ierror
       double precision alpha
-      double precision   qcurr(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision   qlast(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qinterp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision   qcurr(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision   qlast(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qinterp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, m,mint,k,kfinal, ng
 
@@ -25,8 +25,8 @@ c     # set ng in fclaw2d_clawpatch_setup_timeinterp.
 c        # Face 0
          do j = 1-ng,my-mint
             do i = 1-ng,mint
-               qinterp(m,i,j) = qlast(m,i,j) +
-     &               alpha*(qcurr(m,i,j)-qlast(m,i,j))
+               qinterp(i,j,m) = qlast(i,j,m) +
+     &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
             enddo
          enddo
@@ -34,8 +34,8 @@ c        # Face 0
 c        # Face 2
          do j = 1-ng,mint
             do i = mint+1,mx+ng
-               qinterp(m,i,j) = qlast(m,i,j) +
-     &               alpha*(qcurr(m,i,j)-qlast(m,i,j))
+               qinterp(i,j,m) = qlast(i,j,m) +
+     &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
             enddo
          enddo
@@ -43,8 +43,8 @@ c        # Face 2
 c        # Face 1
          do j = mint+1,my+ng
             do i = mx-mint+1,mx+ng
-               qinterp(m,i,j) = qlast(m,i,j) +
-     &               alpha*(qcurr(m,i,j)-qlast(m,i,j))
+               qinterp(i,j,m) = qlast(i,j,m) +
+     &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
             enddo
          enddo
@@ -52,8 +52,8 @@ c        # Face 1
 c        # Face 3
          do j = my-mint+1,my+ng
             do i = 1-ng,mx-mint
-               qinterp(m,i,j) = qlast(m,i,j) +
-     &               alpha*(qcurr(m,i,j)-qlast(m,i,j))
+               qinterp(i,j,m) = qlast(i,j,m) +
+     &               alpha*(qcurr(i,j,m)-qlast(i,j,m))
                k = k + 1
             enddo
          enddo

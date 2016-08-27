@@ -1,4 +1,4 @@
-      subroutine fclaw2d_fort_write_header(matname1,matname2,
+      subroutine fc2d_clawpack5_fort_write_header(matname1,matname2,
      &      time,meqn,ngrids)
       implicit none
 
@@ -20,13 +20,13 @@
 
       close(matunit2)
 
-      open(unit=matunit1,file=matname1,status='replace')
+      open(unit=matunit1,file=matname1)
       close(matunit1)
 
       end
 
 
-      subroutine fclaw2d_fort_write_file(matname1,
+      subroutine fc2d_clawpack5_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
       implicit none
@@ -44,7 +44,7 @@
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call fclaw2d_fort_write_grid_header(matunit1,
+      call fc2d_clawpack5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
@@ -73,7 +73,7 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
 
       end
 
-      subroutine fclaw2d_fort_write_grid_header(matunit1,
+      subroutine fc2d_clawpack5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

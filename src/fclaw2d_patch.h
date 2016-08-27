@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_H
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -114,6 +115,10 @@ int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch);
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch);
 
+
+/* -----------------------------------------------------
+   Ghost exchange
+   ---------------------------------------------------- */
 #ifdef __cplusplus
 #if 0
 {

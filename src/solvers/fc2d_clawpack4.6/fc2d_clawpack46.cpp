@@ -42,7 +42,8 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
     classic_vt = *user_vt;
 }
 
-void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt)
+void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+                                 fc2d_clawpack46_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
     vt->bc2 = CLAWPACK46_BC2;
@@ -55,10 +56,21 @@ void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt)
     vt->setaux = NULL;
     vt->b4step2 = NULL;
     vt->src2 = NULL;
+
+    /* Forestclaw functions */
+    fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK46_AVERAGE2COARSE;
+    fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_INTERPOLATE2FINE;
+
+    fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK46_TAG4REFINEMENT;
+    fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_TAG4COARSENING;
+
+    /* Patch functions */
+    fclaw_vt->copy_face        = &fclaw2d_clawpatch_copy_face;
+    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK46_COPY_FACE_GHOST;
+
+    fclaw_vt->copy_corner      = &fclaw2d_clawpatch_copy_corner;
+    fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK46_COPY_CORNER_GHOST;
 }
-
-
-
 
 
 /* Patch data is stored in each ClawPatch */

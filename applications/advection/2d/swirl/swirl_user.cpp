@@ -39,6 +39,8 @@ static fc2d_clawpack5_vtable_t classic_claw;
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
+    fc2d_clawpack5_init_vtable(&vt,
+                               &classic_claw);
 
     vt.problem_setup            = &fc2d_clawpack5_setprob;
 
@@ -54,10 +56,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
+    vt.fort_write_header        = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
+    vt.fort_write_file          = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
