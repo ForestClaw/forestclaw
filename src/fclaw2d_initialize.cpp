@@ -254,20 +254,6 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
                    has been set up */
                 fclaw2d_regrid_set_neighbor_types(*domain);
 
-#if 0
-                /* We only need to update the physical ghost cells because we
-                   assume the initialization procedure handles all internal
-                   boundaries. */
-                int new_level = level + 1;
-
-                /* Add 2016/07/26, need here???*/
-                if (gparms->init_ghostcell){
-                    fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
-                                         (*domain)->global_maxlevel,0.0,
-                                         time_interp,FCLAW2D_TIMER_INIT);
-                }
-                fclaw2d_physical_set_bc(*domain,new_level,0.0,time_interp);
-#endif
             }
             else
             {
@@ -276,6 +262,22 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
             }
         }  /* Level loop (minlevel --> maxlevel) */
     }
+
+#if 1
+    /* We only need to update the physical ghost cells because we
+       assume the initialization procedure handles all internal
+       boundaries. */
+    /* int new_level = level + 1; */
+
+    /* Add 2016/07/26, need here???*/
+    if (gparms->init_ghostcell){
+        fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
+                             (*domain)->global_maxlevel,0.0,
+                             time_interp,FCLAW2D_TIMER_INIT);
+    }
+    /* fclaw2d_physical_set_bc(*domain,new_level,0.0,time_interp); */
+#endif
+
 
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",
