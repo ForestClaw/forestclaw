@@ -31,23 +31,24 @@ c     >
 c     > Average fine grid interior values to neighboring ghost cell values of
 c     > the coarse grid.
       subroutine fc2d_geoclaw_fort_average_face(mx,my,mbc,meqn,
-     &      qcoarse,qfine,areacoarse, areafine,
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,mbathy,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      manifold, transform_cptr)
+
       use geoclaw_module, only: dry_tolerance
 
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
-      integer manifold
+      integer manifold,mbathy,mcapa,maux
       integer*8 transform_cptr
       integer num_neighbors
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 c     # these will be empty if we are not on a manifold.
-      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision sum, qf, kf
       logical is_manifold
@@ -70,11 +71,6 @@ c     # This should be refratio*refratio.
       double precision hf, huf, hvf, bf, etaf
       double precision capac, capa
       integer nwet
-
-      integer mbathy,mcapa
-
-      mbathy = 1
-      mcapa = 0
 
       is_manifold = manifold .eq. 1
 
@@ -127,7 +123,7 @@ c              # ---------------------------------------------
                         do m = 0,r2-1
                            qf = qfine(mq,i2(m),j2(m))
                            qv(m) = qf
-                           kf = areafine(i2(m),j2(m))
+c                           kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
                            af_sum = af_sum + kf
                         enddo
@@ -143,6 +139,17 @@ c                       # Use areas of the fine grid mesh cells instead.
                         qcoarse(mq,ic,jc) = sum/af_sum
                      enddo
                   else
+                     if (mcapa .eq. 0) then
+                        capac=1.0d0
+                     else
+                        capac=aux_coarse(mcapa,ic,jc)
+                     endif 
+                     etasum = 0.d0
+                     hsum   = 0.d0
+                     husum  = 0.d0
+                     hvsum  = 0.d0
+
+                     nwet   = 0 
 c                    sum = 0
                      do m = 0,r2-1
 c                       sum = sum + qfine(mq,i2(m),j2(m))
@@ -219,11 +226,11 @@ c        # idir = 1 (faces 2,3)
                         af_sum = 0
                         do m = 0,r2-1
                            qf = qfine(mq,i2(m),j2(m))
-                           kf = areafine(i2(m),j2(m))
+c                           kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
                            af_sum = af_sum + kf
                         enddo
-                        kc = areacoarse(ic,jc)
+c                        kc = areacoarse(ic,jc)
 c                       qcoarse(mq,ic,jc) = sum/kc
                         qcoarse(mq,ic,jc) = sum/af_sum
                      enddo

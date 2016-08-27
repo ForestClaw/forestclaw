@@ -96,8 +96,9 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 
     /* Patch functions */
     fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    fclaw_vt->fort_average_face = &FC2D_GEOCLAW_FORT_AVERAGE_FACE;
-    fclaw_vt->fort_interpolate_face = &FC2D_GEOCLAW_FORT_INTERPOLATE_FACE;
+    // fclaw_vt->fort_average_face = &FC2D_GEOCLAW_FORT_AVERAGE_FACE;
+    fclaw_vt->average_face = &fc2d_geoclaw_average_face;
+    fclaw_vt->interpolate_face = &fc2d_geoclaw_interpolate_face;
 
     fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     fclaw_vt->fort_average_corner     = &FC2D_GEOCLAW_FORT_AVERAGE_CORNER;
@@ -811,6 +812,93 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
 
     }
 }
+
+void fc2d_geoclaw_average_face(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *coarse_patch,
+                                    fclaw2d_patch_t *fine_patch,
+                                    int idir,
+                                    int iface_coarse,
+                                    int p4est_refineFactor,
+                                    int refratio,
+                                    fclaw_bool time_interp,
+                                    int igrid,
+                                    fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc;
+    int mcapa, mbathy, maux;
+    double *qcoarse, *qfine;
+    double *auxcoarse, *auxfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    /* These will be empty for non-manifolds cases */
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+    fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+    mcapa = 0;
+    mbathy = 1;
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    int manifold = gparms->manifold;
+    FC2D_GEOCLAW_FORT_AVERAGE_FACE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                   &maux,auxcoarse,auxfine,&mcapa,&mbathy,
+                                   &idir,&iface_coarse,&p4est_refineFactor,&refratio,
+                                   &igrid,&manifold,&transform_data);
+#if 0
+    FCLAW2D_FORT_AVERAGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,
+                        qcoarse,qfine,
+                        areacoarse, areafine,
+                        a_idir,a_iface_coarse,
+                        a_p4est_refineFactor,a_refratio,igrid,
+                        manifold, &transform_data);
+#endif
+}
+
+void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *coarse_patch,
+                                        fclaw2d_patch_t *fine_patch,
+                                        int idir,
+                                        int iside,
+                                        int p4est_refineFactor,
+                                        int refratio,
+                                        fclaw_bool time_interp,
+                                        int igrid,
+                                        fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc,maux,mbathy;
+    double *qcoarse, *qfine;
+    double *auxcoarse, *auxfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+    fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+    mbathy = 1;
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    FC2D_GEOCLAW_FORT_INTERPOLATE_FACE(&mx,&my,&mbc,&meqn,qcoarse,qfine,&maux,
+                                       auxcoarse,auxfine,&mbathy,
+                                       &idir, &iside,
+                                       &p4est_refineFactor,&refratio,&igrid,
+                                       &transform_data);
+#if 0
+    FCLAW2D_FORT_INTERPOLATE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                           a_p4est_refineFactor,a_refratio,igrid,
+                           &transform_data);
+#endif
+}
+
+
 void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
                                       int iframe)
 {
@@ -853,3 +941,5 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                             &dx,&dy,q,aux,&iframe,&patch_num,&level,
                             &this_block_idx,&domain->mpirank);
 }
+
+

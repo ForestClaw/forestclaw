@@ -22,15 +22,20 @@ c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
       subroutine fc2d_geoclaw_fort_interpolate_face(mx,my,mbc,meqn,
-     &      qcoarse,qfine,
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      transform_ptr)
+
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
+      integer maux, mbathy
       integer num_neighbors
       integer*8 transform_ptr
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+      double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer mq,r2, m
       integer i, ic1, ic2, ibc, ifine,i1
@@ -105,22 +110,27 @@ c           # this ensures that we get 'hanging' corners
                   endif
                enddo
                if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
+                  qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
 c                 # Compute limited slopes in both x and y. Note we are not
 c                 # really computing slopes, but rather just differences.
 c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
+                  sl = (qc - qcoarse(mq,ic-1,jc) -
+     &                  aux_coarse(mbathy,ic-1,jc))
+                  sr = (qcoarse(mq,ic+1,jc) +
+     &                  aux_coarse(mbathy,ic+1,jc) - qc)
                   gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
+                  sl = (qc - qcoarse(mq,ic,jc-1) -
+     &                  aux_coarse(mbathy,ic,jc-1))
+                  sr = (qcoarse(mq,ic,jc+1)+
+     &                  aux_coarse(mbathy,ic,jc+1) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &                       -aux_fine(mbathy,iff,jff)
                      qfine(mq,iff,jff) = value
                   enddo
                endif
@@ -153,23 +163,29 @@ c              # ---------------------------------------------
                   endif
                enddo
                if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
-
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
+                  qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
+c                 # Compute limited slopes in both x and y. Note we are not
+c                 # really computing slopes, but rather just differences.
+c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
+                  sl = (qc - qcoarse(mq,ic-1,jc) -
+     &                  aux_coarse(mbathy,ic-1,jc))
+                  sr = (qcoarse(mq,ic+1,jc) +
+     &                  aux_coarse(mbathy,ic+1,jc) - qc)
                   gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
+                  sl = (qc - qcoarse(mq,ic,jc-1) -
+     &                  aux_coarse(mbathy,ic,jc-1))
+                  sr = (qcoarse(mq,ic,jc+1)+
+     &                  aux_coarse(mbathy,ic,jc+1) - qc)
                   grady = compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &                       -aux_fine(mbathy,iff,jff)
                      qfine(mq,iff,jff) = value
                   enddo
-
                endif                    !! Don't skip this grid
             enddo                       !! i loop
          endif                          !! end idir branch
