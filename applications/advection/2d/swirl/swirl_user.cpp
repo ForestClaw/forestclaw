@@ -55,10 +55,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    vt.fort_write_header        = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.fort_write_file          = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+    vt.fort_write_file          = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
@@ -110,7 +110,11 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
     */
+    QINIT(&mx,&my,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+#if 0
+    // for clawpack5
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+#endif
 }
 
 

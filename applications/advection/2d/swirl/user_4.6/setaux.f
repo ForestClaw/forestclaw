@@ -1,5 +1,5 @@
 c     ============================================
-      subroutine setaux(maxmx, maxmy, mbc,mx,my,xlower,ylower,dx,dy,
+      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
      &                  maux,aux)
 c     ============================================
 
@@ -12,7 +12,7 @@ c     #   aux(i,j,2) is edge velocity at "bottom" boundary of grid point (i,j)
 
       integer mbc, mx, my, maux, maxmx, maxmy
       double precision xlower, ylower, dx, dy
-      double precision  aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
+      double precision  aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc,maux)
 
       integer i, j
       double precision xll, yll, psi
@@ -34,3 +34,5 @@ c           # difference stream function psi to get normal velocities:
 
       return
       end
+
+
