@@ -21,7 +21,8 @@ c     # ----------------------------------------------------------
 c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
-      subroutine fclaw2d_fort_interpolate_face_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_interpolate_face
+     &      (mx,my,mbc,meqn,
      &      qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      transform_ptr)
@@ -219,7 +220,8 @@ c              # ---------------------------------------------
 
       end
 
-      subroutine fclaw2d_fort_interpolate_corner_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_interpolate_corner
+     &      (mx,my,mbc,meqn,
      &      refratio,
      &      qcoarse,qfine,icorner_coarse,transform_ptr)
       implicit none
