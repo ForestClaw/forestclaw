@@ -9,8 +9,9 @@ cv = linspace(qmin,qmax,20);
 % drawcontourlines(cv);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
-%caxis([-0.1,0.1])
-caxis([qmin,qmax])
+caxis([-0.1,0.1])
+% caxis([qmin,qmax])
+daspect([20,20,1]);
 
 view(2);
 colorbar
