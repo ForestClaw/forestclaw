@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
 
+#include <fc2d_clawpack5.h>
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
 /* Needed for debugging */
@@ -41,40 +42,40 @@ static fc2d_geoclaw_vtable_t geoclaw_vt;
 
 /* This is provided as a convencience to the user, and is
    called by the user app */
-void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
+void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
                                fc2d_geoclaw_vtable_t* geoclaw_vt)
 {
     /* vt         : Functions required by ForestClaw
        geoclaw_vt : Specific to GeoClaw (or ClawPack) */
 
-    fclaw2d_init_vtable(vt);
+    fclaw2d_init_vtable(fclaw_vt);
 
-    vt->problem_setup            = &fc2d_geoclaw_setprob;  /* This function calls ... */
+    fclaw_vt->problem_setup            = &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
 
-    vt->patch_setup              = &fc2d_geoclaw_patch_setup;
+    fclaw_vt->patch_setup              = &fc2d_geoclaw_patch_setup;
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
 
-    vt->patch_initialize         = &fc2d_geoclaw_qinit;
+    fclaw_vt->patch_initialize         = &fc2d_geoclaw_qinit;
     geoclaw_vt->qinit            = &GEOCLAW_QINIT;
 
-    vt->patch_physical_bc        = &fc2d_geoclaw_bc2;
+    fclaw_vt->patch_physical_bc        = &fc2d_geoclaw_bc2;
     geoclaw_vt->bc2              = &GEOCLAW_BC2;
 
-    vt->patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
+    fclaw_vt->patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
     geoclaw_vt->b4step2          = &GEOCLAW_B4STEP2;
     geoclaw_vt->src2             = &GEOCLAW_SRC2;
     geoclaw_vt->rpn2             = &GEOCLAW_RPN2;
     geoclaw_vt->rpt2             = &GEOCLAW_RPT2;
 
-    vt->regrid_tag4refinement    = &fc2d_geoclaw_patch_tag4refinement;
-    vt->regrid_tag4coarsening    = &fc2d_geoclaw_patch_tag4coarsening;
+    fclaw_vt->regrid_tag4refinement    = &fc2d_geoclaw_patch_tag4refinement;
+    fclaw_vt->regrid_tag4coarsening    = &fc2d_geoclaw_patch_tag4coarsening;
 
-    vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
-    vt->regrid_average2coarse    = &fc2d_geoclaw_average2coarse;
+    fclaw_vt->regrid_interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
+    fclaw_vt->regrid_average2coarse    = &fc2d_geoclaw_average2coarse;
 
-    vt->write_header             = &fc2d_geoclaw_output_header_ascii;
-    vt->patch_write_file         = &fc2d_geoclaw_output_patch_ascii;
+    fclaw_vt->write_header             = &fc2d_geoclaw_output_header_ascii;
+    fclaw_vt->patch_write_file         = &fc2d_geoclaw_output_patch_ascii;
 
 #if 0
     /* These will eventually have GeoClaw specific implementations */
@@ -88,7 +89,22 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *vt,
     vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
 #endif
 
+    /* diagnostic functions */
+    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
+    fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
+    /* Patch functions */
+    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+    fclaw_vt->fort_average_face = &FC2D_GEOCLAW_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_interpolate_face = &FC2D_GEOCLAW_FORT_INTERPOLATE_FACE;
+
+    fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
+    fclaw_vt->fort_average_corner     = &FC2D_GEOCLAW_FORT_AVERAGE_CORNER;
+    fclaw_vt->fort_interpolate_corner = &FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER;
+
+    fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;   
+    fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
 
