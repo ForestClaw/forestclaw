@@ -25,7 +25,7 @@ c> Average fine ghost cell values.
 c>
 c> Average fine grid interior values to neighboring ghost cell values of
 c> the coarse grid.
-      subroutine fclaw2d_fort_average_face_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_average_face(mx,my,mbc,meqn,
      &      qcoarse,qfine,areacoarse, areafine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      manifold, transform_cptr)
@@ -199,7 +199,7 @@ c                       qcoarse(ic,jc,mq) = sum/kc
 
 c> \ingroup Averaging
 c> Average across corners.
-      subroutine fclaw2d_fort_average_corner_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_average_corner(mx,my,mbc,meqn,
      &      refratio,qcoarse,qfine,areacoarse,areafine,
      &      manifold,icorner_coarse,transform_cptr)
       implicit none

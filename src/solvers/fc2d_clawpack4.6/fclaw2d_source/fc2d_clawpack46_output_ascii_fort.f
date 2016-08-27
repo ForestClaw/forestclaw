@@ -1,4 +1,5 @@
-      subroutine fclaw2d_fort_write_header(matname1,matname2,
+      subroutine fc2d_clawpack46_fort_write_header
+     &      (matname1,matname2,
      &      time,meqn,ngrids)
       implicit none
 
@@ -25,7 +26,7 @@
 
       end
 
-      subroutine fclaw2d_fort_write_file(matname1,
+      subroutine fc2d_clawpack46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
 
@@ -44,7 +45,7 @@
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call fclaw2d_fort_write_grid_header(matunit1,
+      call fc2d_clawpack46_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
@@ -75,7 +76,8 @@ c     # This statement is checked above (meqn <= 5)
       end
 
 
-      subroutine fclaw2d_fort_write_grid_header(matunit1,
+      subroutine fc2d_clawpack46_fort_write_grid_header
+     &      (matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

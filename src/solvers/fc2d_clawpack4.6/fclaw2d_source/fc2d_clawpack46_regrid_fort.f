@@ -7,7 +7,7 @@ c     # fclaw2d_fort_interpolate2fine
 c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
-      subroutine fc2d_clawpack46_tag4refinement(mx,my,mbc,
+      subroutine fc2d_clawpack46_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
@@ -42,7 +42,7 @@ c     # Refine based only on first variable in system.
 
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine fc2d_clawpack46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -70,24 +70,24 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call fc2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
      &      coarsen_threshold,tag_patch)
 
       end
 
-      subroutine fc2d_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q,
      &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none
@@ -114,7 +114,8 @@ c              # grid fails the coarsening test.
 
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fc2d_clawpack46_interpolate2fine(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_interpolate2fine
+     &     (mx,my,mbc,meqn,
      &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
@@ -184,7 +185,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fc2d_clawpack46_fixcapaq2(mx,my,mbc,meqn,
+         call fc2d_clawpack46_fort_fixcapaq2(mx,my,mbc,meqn,
      &         qcoarse,qfine, areacoarse,areafine,igrid)
       endif
 
@@ -193,7 +194,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
 
 c> \ingroup  Averaging
 c> Average fine grid siblings to parent coarse grid.
-      subroutine fc2d_clawpack46_average2coarse(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_average2coarse(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse, areafine, igrid,manifold)
       implicit none
 
@@ -282,7 +283,7 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fc2d_clawpack46_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 

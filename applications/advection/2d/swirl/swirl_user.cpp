@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "swirl_user.h"
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack46.h>
 #include <fc2d_dummy.h>
 
 /* Leave these in for demonstration purposes */
@@ -34,20 +34,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid_default.h>
 
 static fclaw2d_vtable_t vt;
-static fc2d_clawpack5_vtable_t classic_claw;
+static fc2d_clawpack46_vtable_t classic_claw;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack5_init_vtable(&vt,
-                               &classic_claw);
+    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
 
-    vt.problem_setup            = &fc2d_clawpack5_setprob;
+    vt.problem_setup            = &fc2d_clawpack46_setprob;
 
     vt.patch_setup              = &swirl_patch_setup;
     vt.patch_initialize         = &swirl_patch_initialize;
     vt.patch_physical_bc        = &swirl_patch_physical_bc;
-    vt.patch_single_step_update = &fc2d_clawpack5_update;  /* Includes b4step2 and src2 */
+    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
 
     vt.regrid_tag4refinement     = &swirl_patch_tag4refinement;
     vt.fort_tag4refinement      = &TAG4REFINEMENT;
@@ -56,10 +55,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     vt.fort_tag4coarsening      = &TAG4COARSENING;
 
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    vt.fort_write_header        = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
 
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt.fort_write_file          = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+    vt.fort_write_file          = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
@@ -72,7 +71,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     classic_claw.rpn2 = &RPN2;
     classic_claw.rpt2 = &RPT2;
 
-    fc2d_clawpack5_set_vtable(&classic_claw);
+    fc2d_clawpack46_set_vtable(&classic_claw);
 
 }
 
@@ -83,7 +82,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                           int this_patch_idx)
 {
     /* Dummy setup - use multiple libraries */
-    fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -106,12 +105,16 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
     */
+    QINIT(&mx,&my,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+#if 0
+    // for clawpack5
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+#endif
 }
 
 
@@ -128,7 +131,7 @@ void swirl_patch_physical_bc(fclaw2d_domain *domain,
     /* This calls bc2 in swirl/user_4.6;  that file isn't changed but
        is included to show that both the local version of bc2.f and the
        clawpack5 library code can be included */
-    fc2d_clawpack5_bc2(domain,this_patch,this_block_idx,this_patch_idx,
+    fc2d_clawpack46_bc2(domain,this_patch,this_block_idx,this_patch_idx,
                      t,dt,intersects_bc,time_interp);
 }
 
