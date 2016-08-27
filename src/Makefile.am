@@ -125,6 +125,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
+	src/fortran_source2d/fclaw2d_interpolate_util.f \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
