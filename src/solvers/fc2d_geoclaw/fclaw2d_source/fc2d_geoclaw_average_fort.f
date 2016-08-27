@@ -235,11 +235,68 @@ c                       qcoarse(mq,ic,jc) = sum/kc
                         qcoarse(mq,ic,jc) = sum/af_sum
                      enddo
                   else
-                     sum = 0
+                     if (mcapa .eq. 0) then
+                        capac=1.0d0
+                     else
+                        capac=aux_coarse(mcapa,ic,jc)
+                     endif 
+                     etasum = 0.d0
+                     hsum   = 0.d0
+                     husum  = 0.d0
+                     hvsum  = 0.d0
+
+                     nwet   = 0                   
                      do m = 0,r2-1
-                        sum = sum + qfine(mq,i2(m),j2(m))
+c                       sum = sum + qfine(mq,i2(m),j2(m))
+c                       qcoarse(mq,ic,jc) = sum/dble(r2)
+                        if (mcapa .eq. 0) then
+                           capa=1.0d0
+                        else
+                           capa=aux_fine(mcapa,i2(m),j2(m))
+                        endif
+                        hf = qfine(1,i2(m),j2(m))*capa
+                        bf = aux_fine(mbathy,i2(m),j2(m))*capa
+                        huf= qfine(2,i2(m),j2(m))*capa
+                        hvf= qfine(3,i2(m),j2(m))*capa
+                        if (hf > dry_tolerance) then
+                           etaf = hf+bf
+                           nwet=nwet+1
+                        else
+                           etaf = 0.d0
+                           huf=0.d0
+                           hvf=0.d0
+                        endif
+                        hsum   = hsum + hf
+                        husum  = husum + huf
+                        hvsum  = hvsum + hvf
+                        etasum = etasum + etaf
                      enddo
-                     qcoarse(mq,ic,jc) = sum/dble(r2)
+                     if (nwet.gt.0) then
+                        etaav=etasum/dble(nwet)
+                        hav=hsum/dble(nwet)
+c                       hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
+     &
+                        hc=min(hav,(max(etaav-
+     &                        aux_coarse(mbathy,ic,jc)*capac,0.d0)))
+c                       huc=(min(hav,hc)/hsum)*husum
+c                       hvc=(min(hav,hc)/hsum)*hvsum
+                        huc=(hc/hsum)*husum
+                        hvc=(hc/hsum)*hvsum
+                     else
+                        hc=0.d0
+                        huc=0.d0
+                        hvc=0.d0
+                     endif
+                     qcoarse(1,ic,jc) = hc / capac
+                     qcoarse(2,ic,jc) = huc / capac
+                     qcoarse(3,ic,jc) = hvc / capac
+
+
+c                     sum = 0
+c                     do m = 0,r2-1
+c                        sum = sum + qfine(mq,i2(m),j2(m))
+c                     enddo
+c                     qcoarse(mq,ic,jc) = sum/dble(r2)
                   endif                 !! manifold loop
                endif                    !! skip grid loop
             enddo
