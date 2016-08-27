@@ -43,7 +43,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     const amr_options_t *gparms = get_domain_parms(domain);
 
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    fc2d_clawpack46_init_vtable(&vt, &classic_claw);
 
     vt.problem_setup            = &torus_patch_setup;
 

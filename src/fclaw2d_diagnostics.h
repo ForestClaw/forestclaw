@@ -43,6 +43,8 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag);
 
 
+
+
 #ifdef __cplusplus
 #if 0
 {

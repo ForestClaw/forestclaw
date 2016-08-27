@@ -38,7 +38,6 @@ extern "C"
 #endif
 #endif
 
-
 struct fclaw2d_patch_data
 {
     fclaw2d_patch_relation_t face_neighbors[4];
@@ -47,12 +46,12 @@ struct fclaw2d_patch_data
     int on_coarsefine_interface;
     int has_finegrid_neighbors;
     int neighbors_set;
+
     void *user_patch; /* Start of attempt to "virtualize" the user patch. */
 #if 0
     ClawPatch *cp;
 #endif
 };
-
 
 fclaw2d_patch_data_t*
 fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
@@ -265,7 +264,6 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
         this_patch->user = NULL;
     }
 }
-
 
 #ifdef __cplusplus
 #if 0

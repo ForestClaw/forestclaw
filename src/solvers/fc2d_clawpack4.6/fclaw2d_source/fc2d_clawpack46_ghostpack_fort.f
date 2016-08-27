@@ -1,4 +1,4 @@
-      subroutine fclaw2d_ghost_pack(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_ghostpack(mx,my,mbc,meqn,
      &      mint,qdata,area,qpack,psize,packmode,
      &      pack_layers,ierror)
 
@@ -146,7 +146,8 @@ c     # Face 3
       end
 
 
-      subroutine fclaw2d_set_boundary_to_value(mx,my,mbc,meqn,q,val)
+      subroutine fc2d_clawpack46_set_boundary_to_value
+     &           (mx,my,mbc,meqn,q,val)
       implicit none
 
       integer mx,my,mbc,meqn
@@ -189,8 +190,8 @@ c        # Face 3
 
       end
 
-      subroutine fclaw2d_set_corners_to_value(mx,my,mbc,meqn,
-     &      q,value)
+      subroutine fc2d_clawpack46_set_corners_to_value
+     & (mx,my,mbc,meqn,q,value)
       implicit none
 
       integer mx,my,mbc,meqn

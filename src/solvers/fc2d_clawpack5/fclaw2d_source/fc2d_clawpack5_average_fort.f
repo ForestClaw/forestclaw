@@ -25,7 +25,7 @@ c> Average fine ghost cell values.
 c>
 c> Average fine grid interior values to neighboring ghost cell values of
 c> the coarse grid.
-      subroutine fclaw2d_fort_average_face_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_average_face(mx,my,mbc,meqn,
      &      qcoarse,qfine,areacoarse, areafine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      manifold, transform_cptr)
@@ -35,8 +35,8 @@ c> the coarse grid.
       integer manifold
       integer*8 transform_cptr
       integer num_neighbors
-      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 c     # these will be empty if we are not on a manifold.
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -107,7 +107,7 @@ c                 # ---------------------------------------------
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
-                           qf = qfine(i2(m),j2(m),mq)
+                           qf = qfine(mq,i2(m),j2(m))
                            qv(m) = qf
                            kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
@@ -119,16 +119,16 @@ c                       # areas may not have been computed using
 c                       # the correct metrics.
 c                       # ----------------------------------------
 c                       kc = areacoarse(ic,jc)
-c                       qcoarse(ic,jc,mq) = sum/kc
+c                       qcoarse(mq,ic,jc) = sum/kc
 
 c                       # Use areas of the fine grid mesh cells instead.
-                        qcoarse(ic,jc,mq) = sum/af_sum
+                        qcoarse(mq,ic,jc) = sum/af_sum
                      else
                         sum = 0
                         do m = 0,r2-1
-                           sum = sum + qfine(i2(m),j2(m),mq)
+                           sum = sum + qfine(mq,i2(m),j2(m))
                         enddo
-                        qcoarse(ic,jc,mq) = sum/dble(r2)
+                        qcoarse(mq,ic,jc) = sum/dble(r2)
                      endif
                   endif
                enddo
@@ -160,20 +160,20 @@ c           # idir = 1 (faces 2,3)
                         sum = 0
                         af_sum = 0
                         do m = 0,r2-1
-                           qf = qfine(i2(m),j2(m),mq)
+                           qf = qfine(mq,i2(m),j2(m))
                            kf = areafine(i2(m),j2(m))
                            sum = sum + qf*kf
                            af_sum = af_sum + kf
                         enddo
                         kc = areacoarse(ic,jc)
-c                       qcoarse(ic,jc,mq) = sum/kc
-                        qcoarse(ic,jc,mq) = sum/af_sum
+c                       qcoarse(mq,ic,jc) = sum/kc
+                        qcoarse(mq,ic,jc) = sum/af_sum
                      else
                         sum = 0
                         do m = 0,r2-1
-                           sum = sum + qfine(i2(m),j2(m),mq)
+                           sum = sum + qfine(mq,i2(m),j2(m))
                         enddo
-                        qcoarse(ic,jc,mq) = sum/dble(r2)
+                        qcoarse(mq,ic,jc) = sum/dble(r2)
                      endif              !! manifold loop
                   endif                 !! skip grid loop
                enddo
@@ -199,15 +199,15 @@ c                       qcoarse(ic,jc,mq) = sum/kc
 
 c> \ingroup Averaging
 c> Average across corners.
-      subroutine fclaw2d_fort_average_corner_ghost(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_average_corner(mx,my,mbc,meqn,
      &      refratio,qcoarse,qfine,areacoarse,areafine,
      &      manifold,icorner_coarse,transform_cptr)
       implicit none
 
       integer mx,my,mbc,meqn,refratio,icorner_coarse, manifold
       integer*8 transform_cptr
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 c     # these will be empty if we are not on a manifold.
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -265,22 +265,22 @@ c           # available (be sure to pass in (i1,j1)
                   sum = 0
                   af_sum = 0
                   do m = 0,r2-1
-                     qf = qfine(i2(m),j2(m),mq)
+                     qf = qfine(mq,i2(m),j2(m))
                      kf = areafine(i2(m),j2(m))
                      sum = sum + kf*qf
                      af_sum = af_sum + kf
                   enddo
                   kc = areacoarse(i1,j1)
-c                 qcoarse(i1,j1,mq) = sum/kc
-                  qcoarse(i1,j1,mq) = sum/af_sum
+c                 qcoarse(mq,i1,j1) = sum/kc
+                  qcoarse(mq,i1,j1) = sum/af_sum
                enddo
             else
                do mq = 1,meqn
                   sum = 0
                   do m = 0,r2-1
-                     sum = sum + qfine(i2(m),j2(m),mq)
+                     sum = sum + qfine(mq,i2(m),j2(m))
                   enddo
-                  qcoarse(i1,j1,mq) = sum/dble(r2)
+                  qcoarse(mq,i1,j1) = sum/dble(r2)
                enddo
             endif
          enddo

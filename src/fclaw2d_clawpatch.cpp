@@ -145,8 +145,43 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
     size_t psize = (wg - hole)*meqn;
     FCLAW_ASSERT(psize > 0);
 
+    fclaw2d_clawpatch_setup_for_time_interpolation(domain,
+                                                   this_patch,
+                                                   alpha,
+                                                   psize);
+#if 0
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->setup_for_time_interpolation(alpha,psize);
+#endif
+}
+
+void fclaw2d_clawpatch_setup_for_time_interpolation(fclaw2d_domain_t* domain,
+                                                    fclaw2d_patch_t* this_patch,
+                                                    const double alpha,
+                                                    const int psize)
+{
+    int meqn,mx,my,mbc;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    meqn = gparms->meqn;
+
+    /* Store time interpolated data that will be use in coarse grid
+       exchanges */
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    double *qlast = cp->q_last();
+    double *qcurr = cp->q();
+    double *qinterp = cp->q_timeinterp();
+
+    int ierror;
+
+    /* Do interpolation only on interior, since ghost cells in qcurr
+       are invalid and will lead to floating point exceptions */
+    vt.fort_timeinterp(&mx,&my,&mbc,&meqn,&psize,
+                       qcurr,qlast,qinterp,&alpha,&ierror);
 }
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
@@ -179,12 +214,21 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
 /* ------------------------------------------------------------------
    Miscellaneous
  ------------------------------------------------------------------ */
-int* fclaw2d_clawpatch_corner_count(fclaw2d_domain_t* domain,
-                                   fclaw2d_patch_t* this_patch)
+int* fclaw2d_clawpatch_block_corner_count(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->block_corner_count();
 }
+
+void fclaw2d_clawpatch_set_block_corner_count(fclaw2d_domain_t* domain,
+                                              fclaw2d_patch_t* this_patch,
+                                              int icorner, int block_corner_count)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->set_block_corner_count(icorner,block_corner_count);
+}
+
 
 /* ------------------------------------------------------------------
    Manifold setup and access
@@ -342,6 +386,7 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
 /* -------------------------------------------------
    For debugging
    ----------------------------------------------- */
+#if 0
 void cb_set_corners_to_value(fclaw2d_domain_t* domain,
                             fclaw2d_patch_t* this_patch,
                             int blockno,
@@ -458,7 +503,7 @@ void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
     cp->initialize_after_regrid();
 }
 
-
+#endif
 /* ----------------------------------------------------------
    Parallel ghost exchanges.
 
@@ -521,8 +566,11 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
     int packmode = 2*packarea;  // 0 or 2  (for pack)
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_ghost_comm(domain,this_patch,
+                                 patch_data, time_interp,packmode);
+#if 0
     cp->ghost_comm(patch_data,time_interp,packmode);
+#endif
 }
 
 
@@ -536,11 +584,64 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
     int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
 
+    fclaw2d_clawpatch_ghost_comm(domain,this_patch,
+                                 qdata, time_interp,packmode);
+
+#if 0
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->ghost_comm(qdata,time_interp,packmode);
+#endif
 }
 
+void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
+                                  fclaw2d_patch_t* this_patch,
+                                  double *qpack, int time_interp,
+                                  int packmode)
+{
+    int meqn,mx,my,mbc;
+    double *qthis;
+    double *area;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
+    int ierror;
+
+    // Number of internal layers.  At least four are needed to
+    // average fine grid ghost patches onto coarse grid (on-proc)
+    // ghost cells.
+
+    int mint = 4;
+
+    int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
+    
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
+    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    /* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
+    int wg = (mbc + mx)*(mbc + my);  // Whole grid (one layer of ghost cells)
+    int hole = (mx - 2*mint)*(my - 2*mint);  // Hole in center
+    FCLAW_ASSERT(hole >= 0);
+
+    int psize = (wg - hole)*(meqn + packarea);
+    FCLAW_ASSERT(psize > 0);
+#if 0
+    double *q = q_time_sync(time_interp);
+    double *area = m_area.dataPtr();  // Might be NULL
+#endif 
+
+    vt.fort_ghostpack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
+                        qpack,&psize,&packmode,&mint,&ierror);
+
+    if (ierror > 0)
+    {
+        fclaw_global_essentialf("ghost_pack (fclaw2d_clawpatch.cpp) : ierror = %d\n",ierror);
+        exit(0);
+    }
+}
 /* --------------------------------------------------------
    Domain partitioning.
 
@@ -607,6 +708,218 @@ void fclaw2d_clawpatch_initialize_after_partition(fclaw2d_domain_t* domain,
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->initialize_after_partition();
 }
+
+
+/* ----------------------------------------------------------------
+   Ghost cell exchange operations
+   ---------------------------------------------------------------- */
+
+void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 fclaw2d_patch_t *neighbor_patch,
+                                 int iface,
+                                 int time_interp,
+                                 fclaw2d_transform_data_t *transform_data)
+
+{
+    int meqn,mx,my,mbc;
+    double *qthis, *qneighbor;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
+    fclaw2d_clawpatch_timesync_data(domain,neighbor_patch,time_interp,&qneighbor,&meqn);
+
+    vt.fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+
+#if 0
+    FCLAW2D_FORT_EXCHANGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qthis,qneighbor,iface,
+                                     &transform_data);
+#endif
+}
+
+void fclaw2d_clawpatch_average_face(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *coarse_patch,
+                                    fclaw2d_patch_t *fine_patch,
+                                    int idir,
+                                    int iface_coarse,
+                                    int p4est_refineFactor,
+                                    int refratio,
+                                    fclaw_bool time_interp,
+                                    int igrid,
+                                    fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc;
+    double *qcoarse, *qfine;
+    double *areacoarse, *areafine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    /* These will be empty for non-manifolds cases */
+    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
+    areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    int manifold = gparms->manifold;
+    vt.fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
+                         &idir,&iface_coarse, &p4est_refineFactor, &refratio,
+                         &igrid,&manifold,&transform_data);
+
+
+#if 0
+    FCLAW2D_FORT_AVERAGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,
+                        qcoarse,qfine,
+                        areacoarse, areafine,
+                        a_idir,a_iface_coarse,
+                        a_p4est_refineFactor,a_refratio,igrid,
+                        manifold, &transform_data);
+#endif
+}
+
+void fclaw2d_clawpatch_interpolate_face(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *coarse_patch,
+                                        fclaw2d_patch_t *fine_patch,
+                                        int idir,
+                                        int iside,
+                                        int p4est_refineFactor,
+                                        int refratio,
+                                        fclaw_bool time_interp,
+                                        int igrid,
+                                        fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc;
+    double *qcoarse, *qfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    vt.fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iside,
+                             &p4est_refineFactor,&refratio,&igrid,&transform_data);
+#if 0
+    FCLAW2D_FORT_INTERPOLATE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
+                           a_p4est_refineFactor,a_refratio,igrid,
+                           &transform_data);
+#endif
+}
+
+
+void fclaw2d_clawpatch_copy_corner(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   fclaw2d_patch_t *corner_patch,
+                                   int icorner,
+                                   int time_interp,
+                                   fclaw2d_transform_data_t *transform_data)
+{
+    int meqn,mx,my,mbc;
+    double *qthis, *qcorner;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
+    fclaw2d_clawpatch_timesync_data(domain,corner_patch,time_interp,&qcorner,&meqn);
+
+    vt.fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,&transform_data);
+
+#if 0
+    FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                                       qthis, qcorner, a_corner,
+                                       &transform_data);
+#endif
+
+}
+
+void fclaw2d_clawpatch_average_corner(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *coarse_patch,
+                                      fclaw2d_patch_t *fine_patch,
+                                      int coarse_corner,
+                                      int refratio,
+                                      fclaw_bool time_interp,
+                                      fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc;
+    double *qcoarse, *qfine;
+    double *areacoarse, *areafine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
+    areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    int manifold = gparms->manifold;
+    vt.fort_average_corner(&mx,&my,&mbc,&meqn,&refratio,
+                           qcoarse,qfine,areacoarse,areafine,
+                           &manifold,&coarse_corner,&transform_data);
+#if 0
+    FCLAW2D_FORT_AVERAGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, a_refratio,
+                          qcoarse, qfine,
+                          areacoarse, areafine,
+                          manifold,
+                          a_coarse_corner,&transform_data);
+#endif
+}
+
+
+void fclaw2d_clawpatch_interpolate_corner(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* coarse_patch,
+                                          fclaw2d_patch_t* fine_patch,
+                                          int coarse_corner,
+                                          int refratio,
+                                          fclaw_bool time_interp,
+                                          fclaw2d_transform_data_t* transform_data)
+
+{
+    int meqn,mx,my,mbc;
+    double *qcoarse, *qfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    meqn = gparms->meqn;
+
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    vt.fort_interpolate_corner(&mx,&my,&mbc,&meqn,
+                               &refratio,qcoarse,qfine,
+                               &coarse_corner,&transform_data);
+#if 0
+    FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                             a_refratio, qcoarse, qfine,
+                             a_coarse_corner,&transform_data);
+#endif
+}
+
+
 
 
 /* ----------------------------------------------------------------
@@ -771,6 +1084,16 @@ void ClawPatch::copyFrom(ClawPatch *a_cp)
 double* ClawPatch::q()
 {
     return m_griddata.dataPtr();
+}
+
+double* ClawPatch::q_last()
+{
+    return m_griddata_last.dataPtr();
+}
+
+double* ClawPatch::q_timeinterp()
+{
+    return m_griddata_time_interpolated.dataPtr();
 }
 
 // This is used by level_step.
@@ -973,6 +1296,7 @@ void ClawPatch::restore_step()
     m_griddata = m_griddata_save;
 }
 
+#if 0
 void ClawPatch::ghost_comm(double *qpack, int time_interp,
                            int packmode)
 {
@@ -1006,7 +1330,7 @@ void ClawPatch::ghost_comm(double *qpack, int time_interp,
         exit(0);
     }
 }
-
+#endif
 void ClawPatch::partition_pack(double *q)
 {
     m_griddata.copyToMemory(q);
@@ -1022,7 +1346,7 @@ void ClawPatch::partition_unpack(double *q)
 /* ----------------------------------------------------------------
    Exchange/average/interpolate
    ---------------------------------------------------------------- */
-
+#if 0
 void ClawPatch::set_boundary_to_value(const int& time_interp,
                                       double& value)
 {
@@ -1037,7 +1361,8 @@ void ClawPatch::set_corners_to_value(const int& time_interp,
     FCLAW2D_SET_CORNERS_TO_VALUE(&m_mx, &m_my, &m_mbc, &m_meqn, q, &value);
 }
 
-
+#endif
+#if 0
 void ClawPatch::exchange_face_ghost(const int& a_iface,
                                     ClawPatch *neighbor_cp,
                                     int time_interp,
@@ -1062,10 +1387,12 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                                        &transform_data);
 
 }
+#endif
 
 /* ----------------------------------------------------------------
    Multi-level operations
    ---------------------------------------------------------------- */
+#if 0
 void ClawPatch::average_face_ghost(const int& a_idir,
                                    const int& a_iface_coarse,
                                    const int& a_p4est_refineFactor,
@@ -1091,7 +1418,9 @@ void ClawPatch::average_face_ghost(const int& a_idir,
                         a_p4est_refineFactor,a_refratio,igrid,
                         manifold, &transform_data);
 }
+#endif
 
+#if 0
 void ClawPatch::interpolate_face_ghost(const int& a_idir,
                                        const int& a_iside,
                                        const int& a_p4est_refineFactor,
@@ -1108,8 +1437,9 @@ void ClawPatch::interpolate_face_ghost(const int& a_idir,
                            a_p4est_refineFactor,a_refratio,igrid,
                            &transform_data);
 }
+#endif
 
-//
+#if 0
 void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
                                      const int& a_refratio,
                                      ClawPatch *cp_corner,
@@ -1129,9 +1459,11 @@ void ClawPatch::average_corner_ghost(const int& a_coarse_corner,
                           manifold,
                           a_coarse_corner,&transform_data);
 }
+#endif
 
 
 
+#if 0
 void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
                                          const int& a_refratio,
                                          ClawPatch *cp_corner,
@@ -1148,6 +1480,7 @@ void ClawPatch::interpolate_corner_ghost(const int& a_coarse_corner,
                              a_refratio, qcoarse, qfine,
                              a_coarse_corner,&transform_data);
 }
+#endif
 
 
 /* ----------------------------------------------------------------
@@ -1209,6 +1542,7 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
 /* ----------------------------------------------------------------
    Time interpolation
    ---------------------------------------------------------------- */
+#if 0
 void ClawPatch::setup_for_time_interpolation(const double& alpha,
                                              const int& psize)
 {
@@ -1223,13 +1557,15 @@ void ClawPatch::setup_for_time_interpolation(const double& alpha,
        are invalid and will lead to floating point exceptions */
     FCLAW2D_TIMEINTERP_FORT(&m_mx,&m_my,&m_mbc,&m_meqn,&psize,
                             qcurr,qlast,qinterp,&alpha,&ierror);
+#if 0
     if (ierror > 0)
     {
         fclaw_global_essentialf("fclaw2d_timeinterp : incorrect pack size\n");
         exit(0);
     }
+#endif
 }
-
+#endif
 /* ----------------------------------------------------------------
    Mapped grids
    ---------------------------------------------------------------- */

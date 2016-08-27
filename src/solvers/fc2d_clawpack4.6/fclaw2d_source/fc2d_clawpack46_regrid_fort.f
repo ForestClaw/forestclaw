@@ -7,7 +7,7 @@ c     # fclaw2d_fort_interpolate2fine
 c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
-      subroutine fclaw2d_fort_tag4refinement(mx,my,mbc,
+      subroutine fc2d_clawpack46_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
@@ -16,7 +16,7 @@ c     # --------------------------------------------
       integer blockno
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq
       double precision qmin, qmax
@@ -25,12 +25,12 @@ c     # --------------------------------------------
 
 c     # Refine based only on first variable in system.
       mq = 1
-      qmin = q(mq,1,1)
-      qmax = q(mq,1,1)
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
+      qmin = q(1,1,mq)
+      qmax = q(1,1,mq)
+      do j = 1,my
+         do i = 1,mx
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
             if (qmax - qmin .gt. tag_threshold) then
                tag_patch = 1
                return
@@ -42,7 +42,7 @@ c     # Refine based only on first variable in system.
 
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine fclaw2d_fort_tag4coarsening(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -51,10 +51,10 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       integer blockno
       double precision xlower(0:3), ylower(0:3), dx, dy
       double precision coarsen_threshold
-      double precision q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q0(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q1(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q2(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq
       double precision qmin, qmax
@@ -63,8 +63,8 @@ c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
       mq = 1
-      qmin = q0(mq,1,1)
-      qmax = q0(mq,1,1)
+      qmin = q0(1,1,mq)
+      qmax = q0(1,1,mq)
 
 c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
@@ -94,13 +94,13 @@ c     # not be coarsened.
       integer mx,my,mbc,meqn,mq,tag_patch
       double precision coarsen_threshold
       double precision qmin,qmax
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
 
       do i = 1,mx
          do j = 1,my
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
             if (qmax - qmin .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
@@ -114,15 +114,16 @@ c              # grid fails the coarsening test.
 
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fclaw2d_fort_interpolate2fine(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_interpolate2fine
+     &     (mx,my,mbc,meqn,
      &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
       integer mx,my,mbc,meqn
       integer igrid, manifold
 
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -157,17 +158,17 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
             do j = j1,j2
                ic = i + ic_add
                jc = j + jc_add
-               qc = qcoarse(mq,ic,jc)
+               qc = qcoarse(ic,jc,mq)
 
 c              # Compute limited slopes in both x and y. Note we are not
 c              # really computing slopes, but rather just differences.
 c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(mq,ic-1,jc))
-               sr = (qcoarse(mq,ic+1,jc) - qc)
+               sl = (qc - qcoarse(ic-1,jc,mq))
+               sr = (qcoarse(ic+1,jc,mq) - qc)
                gradx = compute_slopes(sl,sr,mth)
 
-               sl = (qc - qcoarse(mq,ic,jc-1))
-               sr = (qcoarse(mq,ic,jc+1) - qc)
+               sl = (qc - qcoarse(ic,jc-1,mq))
+               sr = (qcoarse(ic,jc+1,mq) - qc)
                grady = compute_slopes(sl,sr,mth)
 
 c              # Fill in refined values on coarse grid cell (ic,jc)
@@ -175,7 +176,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
                   do jj = 1,refratio
                      shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
                      shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-                     qfine(mq,(i-1)*refratio + ii,(j-1)*refratio + jj)
+                     qfine((i-1)*refratio + ii,(j-1)*refratio + jj,mq)
      &                     = qc + shiftx*gradx + shifty*grady
                   enddo
                enddo
@@ -184,7 +185,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fclaw2d_fort_fixcapaq2(mx,my,mbc,meqn,
+         call fc2d_clawpack46_fort_fixcapaq2(mx,my,mbc,meqn,
      &         qcoarse,qfine, areacoarse,areafine,igrid)
       endif
 
@@ -193,14 +194,14 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
 
 c> \ingroup  Averaging
 c> Average fine grid siblings to parent coarse grid.
-      subroutine fclaw2d_fort_average2coarse(mx,my,mbc,meqn,
-     &      qcoarse,qfine,areacoarse,areafine,igrid,manifold)
+      subroutine fc2d_clawpack46_fort_average2coarse(mx,my,mbc,meqn,
+     &      qcoarse,qfine, areacoarse, areafine, igrid,manifold)
       implicit none
 
       integer mx,my,mbc,meqn,p4est_refineFactor, refratio, igrid
       integer manifold
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
 c     # these will be empty if we are not on a manifold.
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -258,19 +259,19 @@ c     # Get rectangle in coarse grid for fine grid.
                if (is_manifold) then
                   sum = 0
                   do m = 0,r2-1
-                     qf = qfine(mq,i2(m),j2(m))
+                     qf = qfine(i2(m),j2(m),mq)
                      kf = areafine(i2(m),j2(m))
                      sum = sum + kf*qf
                   enddo
                   kc = areacoarse(i1,j1)
-                  qcoarse(mq,i1,j1) = sum/kc
+                  qcoarse(i1,j1,mq) = sum/kc
                else
                   sum = 0
                   do m = 0,r2-1
-                     qf = qfine(mq,i2(m),j2(m))
+                     qf = qfine(i2(m),j2(m),mq)
                      sum = sum + qf
                   enddo
-                  qcoarse(mq,i1,j1) = sum/r2
+                  qcoarse(i1,j1,mq) = sum/r2
                endif
             enddo
          enddo
@@ -282,15 +283,15 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fclaw2d_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 
       integer mx,my,mbc,meqn, refratio, igrid
       integer p4est_refineFactor
 
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
@@ -324,13 +325,13 @@ c     # -------------------------------------------------------
                      ifine = (i-1)*refratio + ii
                      jfine = (j-1)*refratio + jj
                      kf = areafine(ifine,jfine)
-                     qf = qfine(m,ifine,jfine)
+                     qf = qfine(ifine,jfine,m)
                      sum = sum + kf*qf
                   enddo
                enddo
 
                kc = areacoarse(i+ic_add,j+jc_add)
-               qc = qcoarse(m,i+ic_add, j+jc_add)
+               qc = qcoarse(i+ic_add, j+jc_add,m)
                cons_diff = (qc*kc - sum)/r2
 
                do ii = 1,refratio
@@ -338,7 +339,7 @@ c     # -------------------------------------------------------
                      ifine  = (i-1)*refratio + ii
                      jfine  = (j-1)*refratio + jj
                      kf = areafine(ifine,jfine)
-                     qfine(m,ifine,jfine) = qfine(m,ifine,jfine) +
+                     qfine(ifine,jfine,m) = qfine(ifine,jfine,m) +
      &                     cons_diff/kf
                   enddo
                enddo

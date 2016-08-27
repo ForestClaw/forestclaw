@@ -1,7 +1,8 @@
 c    # ----------------------------------------------------------------------------------
 c    # Output and diagnostics
 c    # ----------------------------------------------------------------------------------
-      subroutine fclaw2d_fort_conservation_check(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack46_fort_conservation_check
+     &      (mx,my,mbc,meqn,
      &      dx,dy,area,q,sum)
       implicit none
 
@@ -38,8 +39,9 @@ c    # -------------------------------------------------------------------------
       end
 
 c     # Compute area of a patch
-      double precision function fclaw2d_fort_compute_patch_area(mx,my,
-     &      mbc,dx,dy,area)
+      double precision function 
+     & fc2d_clawpack46_fort_compute_patch_area
+     &  (mx,my, mbc,dx,dy,area)
       implicit none
 
       integer mx,my, mbc
@@ -65,13 +67,13 @@ c     # Compute area of a patch
          sum = dx*dy*mx*my
       endif
 
-      fclaw2d_fort_compute_patch_area = sum
+      fc2d_clawpack46_fort_compute_patch_area = sum
 
       end
 
 
-      subroutine fclaw2d_fort_compute_error_norm(mx,my,mbc,meqn,
-     &      dx,dy,area,error,error_norm)
+      subroutine fc2d_clawpack46_fort_compute_error_norm
+     &   (mx,my,mbc,meqn,dx,dy,area,error,error_norm)
       implicit none
 
       integer mx,my,mbc,meqn
