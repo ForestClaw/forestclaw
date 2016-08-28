@@ -352,16 +352,17 @@ void FC2D_GEOCLAW_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
                                                           FC2D_GEOCLAW_FORT_AVERAGE_CORNER)
 void FC2D_GEOCLAW_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int* mbc,
                                         const int* meqn, const int* a_refratio,
-                                        double qcoarse[], double qfine[],
-                                        double areacoarse[], double areafine[],
-                                        const int* manifold,
+                                        double qcoarse[], double qfine[], const int* maux,
+                                        double auxcoarse[], double auxfine[], const int* mcapa,
+                                        const int* mbathy, const int* manifold,
                                         const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
 
 #define FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_corner, \
                                                              FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER)
 void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
-                                            const int* meqn, const int* a_refratio, double this_q[],
-                                            double neighbor_q[], const int* a_corner,
+                                            const int* meqn, const int* a_refratio, double qcoarse[],
+                                            double qfine[], const int* maux, double aux_coarse[],
+                                            double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
 /***************************** MINIMAL API ******************************/
@@ -527,6 +528,22 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
                                         fclaw_bool time_interp,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data);
+
+void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 fclaw2d_patch_t *fine_patch,
+                                 int coarse_corner,
+                                 int refratio,
+                                 fclaw_bool time_interp,
+                                 fclaw2d_transform_data_t* transform_data);
+
+void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* coarse_patch,
+                                     fclaw2d_patch_t* fine_patch,
+                                     int coarse_corner,
+                                     int refratio,
+                                     fclaw_bool time_interp,
+                                     fclaw2d_transform_data_t* transform_data);
 
 
 #ifdef __cplusplus

@@ -101,8 +101,8 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->interpolate_face = &fc2d_geoclaw_interpolate_face;
 
     fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
-    fclaw_vt->fort_average_corner     = &FC2D_GEOCLAW_FORT_AVERAGE_CORNER;
-    fclaw_vt->fort_interpolate_corner = &FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER;
+    fclaw_vt->average_corner     = &fc2d_geoclaw_average_corner;
+    fclaw_vt->interpolate_corner = &fc2d_geoclaw_interpolate_corner;
 
     fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;   
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
@@ -898,6 +898,88 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
 #endif
 }
 
+void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *coarse_patch,
+                                 fclaw2d_patch_t *fine_patch,
+                                 int coarse_corner,
+                                 int refratio,
+                                 fclaw_bool time_interp,
+                                 fclaw2d_transform_data_t* transform_data)
+{
+    int meqn,mx,my,mbc;
+    int maux,mbathy,mcapa;
+    double *qcoarse, *qfine;
+    double *auxcoarse, *auxfine;
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+    fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+
+    mcapa=0;
+    mbathy=1;
+
+    int manifold = gparms->manifold;
+    FC2D_GEOCLAW_FORT_AVERAGE_CORNER(&mx,&my,&mbc,&meqn,&refratio,
+                                     qcoarse,qfine,&maux,auxcoarse,auxfine,
+                                     &mcapa,&mbathy,&manifold,&coarse_corner,
+                                     &transform_data);
+
+#if 0
+    FCLAW2D_FORT_AVERAGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, a_refratio,
+                          qcoarse, qfine,
+                          areacoarse, areafine,
+                          manifold,
+                          a_coarse_corner,&transform_data);
+#endif
+}
+
+void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* coarse_patch,
+                                     fclaw2d_patch_t* fine_patch,
+                                     int coarse_corner,
+                                     int refratio,
+                                     fclaw_bool time_interp,
+                                     fclaw2d_transform_data_t* transform_data)
+
+{
+    int meqn,mx,my,mbc;
+    int mbathy,maux;
+    double *qcoarse, *qfine;
+    double *auxcoarse, *auxfine;
+    
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    meqn = gparms->meqn;
+
+    mbathy = 1;
+
+    fclaw2d_clawpatch_timesync_data(domain,coarse_patch,time_interp,&qcoarse,&meqn);
+    qfine = fclaw2d_clawpatch_get_q(domain,fine_patch);
+
+    fc2d_geoclaw_aux_data(domain,coarse_patch,&auxcoarse,&maux);
+    fc2d_geoclaw_aux_data(domain,fine_patch,&auxfine,&maux);
+
+    FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(&mx,&my,&mbc,&meqn,
+                                         &refratio,qcoarse,qfine,&maux,
+                                         auxcoarse,auxfine,&mbathy,
+                                         &coarse_corner,&transform_data);
+
+#if 0
+    FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
+                             a_refratio, qcoarse, qfine,
+                             a_coarse_corner,&transform_data);
+#endif
+}
 
 void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
                                       int iframe)
@@ -941,5 +1023,7 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                             &dx,&dy,q,aux,&iframe,&patch_num,&level,
                             &this_block_idx,&domain->mpirank);
 }
+
+
 
 

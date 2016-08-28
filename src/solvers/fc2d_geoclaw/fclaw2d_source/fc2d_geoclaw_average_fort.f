@@ -322,8 +322,11 @@ c                     qcoarse(mq,ic,jc) = sum/dble(r2)
 c> \ingroup Averaging
 c> Average across corners.
       subroutine fc2d_geoclaw_fort_average_corner(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,areacoarse,areafine,
-     &      manifold,icorner_coarse,transform_cptr)
+     &      refratio,qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,
+     &      mbathy,manifold,icorner_coarse,transform_cptr)
+      
+      use geoclaw_module, only: dry_tolerance
+      
       implicit none
 
       integer mx,my,mbc,meqn,refratio,icorner_coarse, manifold
@@ -332,8 +335,8 @@ c> Average across corners.
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 c     # these will be empty if we are not on a manifold.
-      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision sum
 
@@ -349,6 +352,14 @@ c     # This should be refratio*refratio.
       integer i2(0:rr2-1),j2(0:rr2-1)
 
       double precision af_sum
+
+      double precision etasum, hsum, husum, hvsum, etaav, hav
+      double precision hc, huc, hvc
+      double precision hf, huf, hvf, bf, etaf
+      double precision capac, capa
+      integer nwet
+
+      integer maux,mcapa,mbathy
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -388,22 +399,76 @@ c           # available (be sure to pass in (i1,j1)
                   af_sum = 0
                   do m = 0,r2-1
                      qf = qfine(mq,i2(m),j2(m))
-                     kf = areafine(i2(m),j2(m))
+c                     kf = areafine(i2(m),j2(m))
                      sum = sum + kf*qf
                      af_sum = af_sum + kf
                   enddo
-                  kc = areacoarse(i1,j1)
+c                  kc = areacoarse(i1,j1)
 c                 qcoarse(mq,i1,j1) = sum/kc
                   qcoarse(mq,i1,j1) = sum/af_sum
                enddo
             else
-               do mq = 1,meqn
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine(mq,i2(m),j2(m))
-                  enddo
-                  qcoarse(mq,i1,j1) = sum/dble(r2)
+               if (mcapa .eq. 0) then
+                  capac=1.0d0
+               else
+                  capac=aux_coarse(mcapa,i1,j1)
+               endif 
+               etasum = 0.d0
+               hsum   = 0.d0
+               husum  = 0.d0
+               hvsum  = 0.d0
+
+               nwet   = 0                   
+               do m = 0,r2-1
+c                       sum = sum + qfine(mq,i2(m),j2(m))
+c                       qcoarse(mq,ic,jc) = sum/dble(r2)
+                  if (mcapa .eq. 0) then
+                     capa=1.0d0
+                  else
+                     capa=aux_fine(mcapa,i2(m),j2(m))
+                  endif
+                  hf = qfine(1,i2(m),j2(m))*capa
+                  bf = aux_fine(mbathy,i2(m),j2(m))*capa
+                  huf= qfine(2,i2(m),j2(m))*capa
+                  hvf= qfine(3,i2(m),j2(m))*capa
+                  if (hf > dry_tolerance) then
+                     etaf = hf+bf
+                     nwet=nwet+1
+                  else
+                     etaf = 0.d0
+                     huf=0.d0
+                     hvf=0.d0
+                  endif
+                  hsum   = hsum + hf
+                  husum  = husum + huf
+                  hvsum  = hvsum + hvf
+                  etasum = etasum + etaf
                enddo
+               if (nwet.gt.0) then
+                  etaav=etasum/dble(nwet)
+                  hav=hsum/dble(nwet)
+c                       hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
+                  hc=min(hav,(max(etaav-
+     &                        aux_coarse(mbathy,i1,j1)*capac,0.d0)))
+c                       huc=(min(hav,hc)/hsum)*husum
+c                       hvc=(min(hav,hc)/hsum)*hvsum
+                  huc=(hc/hsum)*husum
+                  hvc=(hc/hsum)*hvsum
+               else
+                  hc=0.d0
+                  huc=0.d0
+                  hvc=0.d0
+               endif
+               qcoarse(1,i1,j1) = hc / capac
+               qcoarse(2,i1,j1) = huc / capac
+               qcoarse(3,i1,j1) = hvc / capac
+c               do mq = 1,meqn
+c                  sum = 0
+c                  do m = 0,r2-1
+c                     sum = sum + qfine(mq,i2(m),j2(m))
+c                  enddo
+c                  qcoarse(mq,i1,j1) = sum/dble(r2)
+c               enddo
             endif
          enddo
       enddo

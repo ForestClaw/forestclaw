@@ -236,14 +236,19 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
       end
 
       subroutine fc2d_geoclaw_fort_interpolate_corner(mx,my,mbc,meqn,
-     &      refratio,
-     &      qcoarse,qfine,icorner_coarse,transform_ptr)
+     &      refratio,qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
+     &      icorner_coarse,transform_ptr)
+
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
+      integer mbathy,maux
       integer*8 transform_ptr
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+      double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)      
 
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady
@@ -312,23 +317,27 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
      &      transform_ptr)
 
       do mq = 1,meqn
-         qc = qcoarse(mq,ic,jc)
-
-c        # Compute limited slopes in both x and y. Note we are not
-c        # really computing slopes, but rather just differences.
-c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
-         sl = (qc - qcoarse(mq,ic-1,jc))
-         sr = (qcoarse(mq,ic+1,jc) - qc)
+         qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
+c                 # Compute limited slopes in both x and y. Note we are not
+c                 # really computing slopes, but rather just differences.
+c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
+         sl = (qc - qcoarse(mq,ic-1,jc) -
+     &                  aux_coarse(mbathy,ic-1,jc))
+         sr = (qcoarse(mq,ic+1,jc) +
+     &         aux_coarse(mbathy,ic+1,jc) - qc)
          gradx = compute_slopes(sl,sr,mth)
 
-         sl = (qc - qcoarse(mq,ic,jc-1))
-         sr = (qcoarse(mq,ic,jc+1) - qc)
+         sl = (qc - qcoarse(mq,ic,jc-1) -
+     &         aux_coarse(mbathy,ic,jc-1))
+         sr = (qcoarse(mq,ic,jc+1)+
+     &         aux_coarse(mbathy,ic,jc+1) - qc)
          grady = compute_slopes(sl,sr,mth)
 
          do m = 0,rr2-1
             iff = i2(0) + df(1,m)
             jff = j2(0) + df(2,m)
             value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &                       -aux_fine(mbathy,iff,jff)
             qfine(mq,iff,jff) = value
          enddo
 
