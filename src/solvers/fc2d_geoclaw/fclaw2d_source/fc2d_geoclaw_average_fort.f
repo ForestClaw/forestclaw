@@ -180,7 +180,6 @@ c                       qcoarse(mq,ic,jc) = sum/dble(r2)
                         etaav=etasum/dble(nwet)
                         hav=hsum/dble(nwet)
 c                       hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
-     &
                         hc=min(hav,(max(etaav-
      &                        aux_coarse(mbathy,ic,jc)*capac,0.d0)))
 c                       huc=(min(hav,hc)/hsum)*husum

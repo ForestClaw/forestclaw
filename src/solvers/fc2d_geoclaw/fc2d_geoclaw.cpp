@@ -97,7 +97,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     /* Patch functions */
     fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
     // fclaw_vt->fort_average_face = &FC2D_GEOCLAW_FORT_AVERAGE_FACE;
-    fclaw_vt->average_face = &fc2d_geoclaw_average_face;
+    fclaw_vt->average_face     = &fc2d_geoclaw_average_face;
     fclaw_vt->interpolate_face = &fc2d_geoclaw_interpolate_face;
 
     fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
