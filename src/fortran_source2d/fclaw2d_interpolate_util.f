@@ -95,3 +95,58 @@ c     # calls to T.
       a(2,2) = mj(1) - f(2)
 
       end
+
+      logical function is_valid_average(i,j,mx,my)
+      implicit none
+
+      integer i,j,mx,my
+      logical i1, j1
+
+      i1 = 1 .le. i .and. i .le. mx
+      j1 = 1 .le. j .and. j .le. my
+
+      is_valid_average = i1 .and. j1
+
+      end
+
+      logical function check_indices(iff,jff,i2,j2)
+      implicit none
+
+      integer iff,jff,i2(0:3),j2(0:3)
+      integer m
+      logical found_iff, found_jff
+
+      found_iff = .false.
+      do m = 0,3
+         if (i2(m) .eq. iff) then
+            found_iff = .true.
+            exit
+         endif
+      enddo
+
+      found_jff = .false.
+      do m = 0,3
+         if (j2(m) .eq. jff) then
+            found_jff = .true.
+            exit
+         endif
+      enddo
+
+      check_indices = found_iff .and. found_jff
+
+
+      end
+
+      logical function is_valid_interp(i,j,mx,my,mbc)
+      implicit none
+      integer i,j,mx, my, mbc
+
+      logical i1, i2
+      logical j1, j2
+
+      i1 = 1-mbc .le. i .and. i .le. mx+mbc
+      j1 = 1-mbc .le. j .and. j .le. my+mbc
+
+      is_valid_interp = i1 .and. j1
+
+      end
