@@ -45,6 +45,7 @@ static fc2d_geoclaw_vtable_t geoclaw_vt;
 void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
                                fc2d_geoclaw_vtable_t* geoclaw_vt)
 {
+
     /* vt         : Functions required by ForestClaw
        geoclaw_vt : Specific to GeoClaw (or ClawPack) */
 
@@ -95,14 +96,17 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
-    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    // fclaw_vt->fort_average_face = &FC2D_GEOCLAW_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_copy_face    = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+    //fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    //fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
+   
     fclaw_vt->average_face     = &fc2d_geoclaw_average_face;
-    fclaw_vt->interpolate_face = &fc2d_geoclaw_interpolate_face;
+    fclaw_vt->interpolate_face  = &fc2d_geoclaw_interpolate_face;
 
-    fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
-    fclaw_vt->average_corner     = &fc2d_geoclaw_average_corner;
-    fclaw_vt->interpolate_corner = &fc2d_geoclaw_interpolate_corner;
+    fclaw_vt->fort_copy_corner   =  &FC2D_CLAWPACK5_FORT_COPY_CORNER;
+    fclaw_vt->average_corner     =  &fc2d_geoclaw_average_corner;
+    fclaw_vt->interpolate_corner =  &fc2d_geoclaw_interpolate_corner;
+    //fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;   
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;

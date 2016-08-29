@@ -42,20 +42,19 @@ c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
             do j = j1,j2
                ic = i + ic_add
                jc = j + jc_add
-c              # Calculate the modified surface variable etabar
-c              # etabar = B + h if h > 0
-c              #        = sea_level, otherwise
+               ! Calculate surface elevation eta using dry limiting
                do ii = -1, 1
                   do jj = -1, 1
                      h = qcoarse(1,ic+ii,jc+jj)
                      b = aux_coarse(mbathy,ic+ii,jc+jj)
                      if (h < dry_tolerance) then
-                         etabarc(ii,jj) = sea_level
+                        etabarc(ii,jj) = sea_level
                      else
-                         etabarc(ii,jj) = h + b
+                        etabarc(ii,jj) = h + b
                      endif
-                     enddo
-                  enddo               
+                  enddo
+               enddo
+c--------------start interpolation               
                if (mq .eq. 1) then
 c                 # Interpolate sea surface height rather than just the
 c                 # water column height.
@@ -79,8 +78,8 @@ c                 # Fill in fine grid values from coarse grid cell (ic,jc)
                         qf = qc + shiftx*gradx + shifty*grady -
      &                        aux_fine(mbathy,iff,jf)
                         qfine(mq,iff,jf) = qf
-                        enddo
                      enddo
+                  enddo
                else
 c                 # interpolate momentum components in the usual way.
 c                 # But then make sure that no new extrema are created.
@@ -104,61 +103,65 @@ c                 # Fill in refined values on coarse grid cell (ic,jc)
                         qfine(mq,iff,jf) =
      &                        qc + shiftx*gradx + shifty*grady
                         hfsum = hfsum + qfine(mq,iff,jf)
-                        enddo
                      enddo
-c                 # check to make sure we are not creating any new extrema
+                  enddo
+
+
+c------------check to make sure we are not creating any new extrema
 
 c                 # calculate coarse cells' velocity  
-                  do ii = -1,1
-                     do jj = -1,1
-                        if (qcoarse(1,ic+ii,jc+jj) .eq. 0.d0) then
-                           uc(ii,jj) = 0.d0
-                        else              
-                           uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
-     &                                 qcoarse(1,ic+ii,jc+jj)
-                        endif
-                     enddo
-                  enddo
+c                  do ii = -1,1
+c                     do jj = -1,1
+c                        if (qcoarse(1,ic+ii,jc+jj) .eq. 0.d0) then
+c                           uc(ii,jj) = 0.d0
+c                        else              
+c                           uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
+c     &                                 qcoarse(1,ic+ii,jc+jj)
+c                        endif
+c                     enddo
+c                  enddo
 c                 # find the maximum/minimum velocities among coarse cells
-                  coarseumax = -1d99
-                  coarseumin = 1d99
-                  do ii = -1,1
-                     do jj = -1,1
-                        coarseumax = max(coarseumax,uc(ii,jj))
-                        coarseumin = min(coarseumin,uc(ii,jj))
-                     enddo
-                  enddo
+c                  coarseumax = -1d99
+c                  coarseumin = 1d99
+c                  do ii = -1,1
+c                     do jj = -1,1
+c                        coarseumax = max(coarseumax,uc(ii,jj))
+c                        coarseumin = min(coarseumin,uc(ii,jj))
+c                     enddo
+c                  enddo
 
-                  redefine = .false.
-                  do ii = 1,refratio
-                     do jj = 1,refratio
-                        iff = (i-1)*refratio + ii
-                        jf = (j-1)*refratio + jj
-                        if (qfine(1,iff,jf) .eq. 0.d0) then
-                           uf = 0.d0
-                        else              
-                           uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
-                        endif
-                        if (uf .gt. coarseumax .or. uf .lt. coarseumin)
-     &                        then
-                           redefine = .true.
-                        endif
-                     enddo
-                  enddo
+c                  redefine = .false.
+c                  do ii = 1,refratio
+c                     do jj = 1,refratio
+c                        iff = (i-1)*refratio + ii
+c                        jf = (j-1)*refratio + jj
+c                        if (qfine(1,iff,jf) .eq. 0.d0) then
+c                           uf = 0.d0
+c                        else              
+c                           uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
+c                        endif
+c                        if (uf .gt. coarseumax .or. uf .lt. coarseumin)
+c     &                        then
+c                           redefine = .true.
+c                        endif
+c                     enddo
+c                  enddo
 
-                  if (redefine) then
-                     u = qcoarse(mq,ic,jc)/
-     &                 max(qcoarse(1,ic,jc), hfsum/(refratio*refratio))
-                     do ii = 1,refratio
-                        do jj = 1,refratio
-                           iff = (i-1)*refratio + ii
-                           jf = (j-1)*refratio + jj
-                           qfine(mq,iff,jf) = qfine(1,iff,jf)*u
-                        enddo
-                     enddo
-                  endif
+c                  if (redefine) then
+c                     u = qcoarse(mq,ic,jc)/
+c     &                 max(qcoarse(1,ic,jc), hfsum/(refratio*refratio))
+c                     do ii = 1,refratio
+c                        do jj = 1,refratio
+c                           iff = (i-1)*refratio + ii
+c                           jf = (j-1)*refratio + jj
+c                           qfine(mq,iff,jf) = qfine(1,iff,jf)*u
+c                        enddo
+c                     enddo
+c                  endif
+c------end of checking to make sure we are not creating any new extrema
 
                endif
+c------end of interpolation
             enddo
          enddo
       enddo
