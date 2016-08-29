@@ -1,10 +1,12 @@
-function plotobject = bathy(data)
+function eta = bathy(data)
 % read q data:
 mbathy = 4;
 mheight = 1;
-plotobject = zeros(size(data(:,1)));
-plotobject(data(:,mbathy)>0) = -1;
+h = data(:,1);
+b = data(:,4);
+eta = zeros(size(h));
+m = b > 0;
+eta(b>0) = nan;
 
-plotobject(data(:,mbathy)<=0) = data(data(:,mbathy)<=0,mheight) ...
-    + data(data(:,mbathy)<=0,mbathy);
+eta(b<=0) = h(b<=0) + b(b<=0);
 end

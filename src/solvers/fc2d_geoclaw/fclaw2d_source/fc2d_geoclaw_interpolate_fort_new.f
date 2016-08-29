@@ -26,7 +26,7 @@ c     # ----------------------------------------------------------
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      transform_ptr)
 
-      use geoclaw_module, ONLY:dry_tolerance, sea_level   
+      use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
@@ -139,7 +139,7 @@ c           # this ensures that we get 'hanging' corners
                   gradx = compute_slopes(sl,sr,mth)
 
                   sl = qc - etabarc(0,-1)
-                  sr = etabarc(1,0) - qc
+                  sr = etabarc(0,1) - qc
                   grady = compute_slopes(sl,sr,mth)
 c-----------------------------------------------------------------------------
 
@@ -151,7 +151,7 @@ c-----------------------------------------------------------------------------
      &                       -aux_fine(mbathy,iff,jff)
                       if (value .le. 0) then
                         write (*,*) 'momemtum interpolation',value
-                      endif   
+                      endif
                      qfine(mq,iff,jff) = value
                   enddo
                 else
@@ -174,7 +174,7 @@ c-----------------------------------------------------------------------------
                   enddo
                   if (value .le. 0) then
                     write (*,*) 'momemtum interpolation',value
-                  endif                  
+                  endif
                 endif
 c-----------------------------------------------------------------------------
 
@@ -251,12 +251,12 @@ c another verstion:::
                   gradx = compute_slopes(sl,sr,mth)
 
                   sl = qc - etabarc(0,-1)
-                  sr = etabarc(1,0) - qc
+                  sr = etabarc(0,1) - qc
                   grady = compute_slopes(sl,sr,mth)
 c--------------------------------------------------------------------------
 
 c--------------------------------------------------------------------------
-                  do m = 0,rr2-1 
+                  do m = 0,rr2-1
                     iff = i2(0) + df(1,m)
                     jff = j2(0) + df(2,m)
                     value = qc + gradx*shiftx(m) + grady*shifty(m)
@@ -273,7 +273,7 @@ c--------------------------------------------------------------------------
                   sl = (qc - qcoarse(mq,ic,jc-1))
                   sr = (qcoarse(mq,ic,jc+1) - qc)
                   grady = compute_slopes(sl,sr,mth)
-                  do m = 0,rr2-1 
+                  do m = 0,rr2-1
                     iff = i2(0) + df(1,m)
                     jff = j2(0) + df(2,m)
                     value = qc + gradx*shiftx(m) + grady*shifty(m)
@@ -281,8 +281,8 @@ c--------------------------------------------------------------------------
                     if (value .le. 0) then
                       write (*,*) 'momemtum interpolation',value
                     endif
-                    qfine(mq,iff,jff) = value  
-                  enddo                  
+                    qfine(mq,iff,jff) = value
+                  enddo
                 endif
               endif                    !! Don't skip this grid
             enddo                       !! i loop
@@ -294,8 +294,8 @@ c--------------------------------------------------------------------------
       subroutine fc2d_geoclaw_fort_interpolate_corner(mx,my,mbc,meqn,
      &      refratio,qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
      &      icorner_coarse,transform_ptr)
-      
-      use geoclaw_module, ONLY:dry_tolerance, sea_level  
+
+      use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
@@ -305,7 +305,7 @@ c--------------------------------------------------------------------------
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)      
+      double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady
@@ -397,7 +397,7 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
           gradx = compute_slopes(sl,sr,mth)
 
           sl = qc - etabarc(0,-1)
-          sr = etabarc(1,0) - qc
+          sr = etabarc(0,1) - qc
           grady = compute_slopes(sl,sr,mth)
         else
           qc = qcoarse(mq,ic,jc)
@@ -408,9 +408,9 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
 
           sl = (qc - qcoarse(mq,ic,jc-1))
           sr = (qcoarse(mq,ic,jc+1) - qc)
-          grady = compute_slopes(sl,sr,mth)              
+          grady = compute_slopes(sl,sr,mth)
         endif
-        do m = 0,rr2-1 
+        do m = 0,rr2-1
           iff = i2(0) + df(1,m)
           jff = j2(0) + df(2,m)
           value = qc + gradx*shiftx(m) + grady*shifty(m)
@@ -418,8 +418,8 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
           if (value .le. 0) then
             write (*,*) 'momemtum interpolation',value
           endif
-          qfine(mq,iff,jff) = value  
-        enddo    
+          qfine(mq,iff,jff) = value
+        enddo
 c         qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
 c                 # Compute limited slopes in both x and y. Note we are not
 c                 # really computing slopes, but rather just differences.

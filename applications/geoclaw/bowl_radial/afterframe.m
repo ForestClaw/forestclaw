@@ -9,7 +9,9 @@ cv = linspace(qmin,qmax,20);
 % drawcontourlines(cv);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
-caxis([-1,1])
+rybcolormap;
+tol = 1e-5;
+caxis([-tol,tol])
 % caxis([qmin,qmax])
 daspect([20,20,1]);
 

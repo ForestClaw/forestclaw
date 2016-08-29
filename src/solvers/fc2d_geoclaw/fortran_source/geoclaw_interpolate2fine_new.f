@@ -2,7 +2,7 @@
      &      qfine,maux,aux_coarse,aux_fine,mbathy,
      &      p4est_refineFactor,refratio,igrid)
 
-      use geoclaw_module, ONLY:dry_tolerance, sea_level      
+      use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
       integer mx,my,mbc,meqn,p4est_refineFactor,refratio
@@ -22,7 +22,7 @@
 
       hfsum = 0.d0
 c     # Use minmod to calculate slope.
-      mth = 1
+      mth = 5
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
@@ -35,7 +35,7 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       j1 = 1-jg
       j2 = my/p4est_refineFactor + (1-jg)
       jc_add = jg*my/p4est_refineFactor
-          
+
       do mq = 1,meqn
 c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
          do i = i1,i2
@@ -54,7 +54,7 @@ c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
                      endif
                   enddo
                enddo
-c--------------start interpolation               
+c--------------start interpolation
                if (mq .eq. 1) then
 c                 # Interpolate sea surface height rather than just the
 c                 # water column height.
@@ -65,7 +65,7 @@ c                 # water column height.
                   gradx = compute_slopes(sl,sr,mth)
 
                   sl = qc - etabarc(0,-1)
-                  sr = etabarc(1,0) - qc
+                  sr = etabarc(0,1) - qc
                   grady = compute_slopes(sl,sr,mth)
 
 c                 # Fill in fine grid values from coarse grid cell (ic,jc)
@@ -109,12 +109,12 @@ c                 # Fill in refined values on coarse grid cell (ic,jc)
 
 c------------check to make sure we are not creating any new extrema
 
-c                 # calculate coarse cells' velocity  
+c                 # calculate coarse cells' velocity
 c                  do ii = -1,1
 c                     do jj = -1,1
 c                        if (qcoarse(1,ic+ii,jc+jj) .eq. 0.d0) then
 c                           uc(ii,jj) = 0.d0
-c                        else              
+c                        else
 c                           uc(ii,jj) = qcoarse(mq,ic+ii,jc+jj)/
 c     &                                 qcoarse(1,ic+ii,jc+jj)
 c                        endif
@@ -137,7 +137,7 @@ c                        iff = (i-1)*refratio + ii
 c                        jf = (j-1)*refratio + jj
 c                        if (qfine(1,iff,jf) .eq. 0.d0) then
 c                           uf = 0.d0
-c                        else              
+c                        else
 c                           uf = qfine(mq,iff,jf)/qfine(1,iff,jf)
 c                        endif
 c                        if (uf .gt. coarseumax .or. uf .lt. coarseumin)
