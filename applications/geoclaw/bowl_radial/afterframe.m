@@ -10,7 +10,7 @@ cv = linspace(qmin,qmax,20);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
 rybcolormap;
-tol = 1e-5;
+tol = 1e-1;
 caxis([-tol,tol])
 % caxis([qmin,qmax])
 daspect([20,20,1]);
