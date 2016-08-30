@@ -51,10 +51,10 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
 	src/solvers/fc2d_geoclaw/geolib_source/allowflag.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate_fort_new.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate_fort.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp_fort.f

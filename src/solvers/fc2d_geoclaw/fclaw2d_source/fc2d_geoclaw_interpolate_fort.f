@@ -125,13 +125,12 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
                   sr = (qcoarse(mq,ic,jc+1)+
      &                  aux_coarse(mbathy,ic,jc+1) - qc)
                   grady = compute_slopes(sl,sr,mth)
-
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &                       -aux_fine(mbathy,iff,jff)
-                     qfine(mq,iff,jff) = value
+                     qfine(mq,iff,jff) = value 
+     &                                   -aux_fine(mbathy,iff,jff)
                   enddo
                endif
             enddo

@@ -51,16 +51,16 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 
     fclaw2d_init_vtable(fclaw_vt);
 
-    fclaw_vt->problem_setup            = &fc2d_geoclaw_setprob;  /* This function calls ... */
+    fclaw_vt->problem_setup      =  &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
 
-    fclaw_vt->patch_setup              = &fc2d_geoclaw_patch_setup;
+    fclaw_vt->patch_setup        = &fc2d_geoclaw_patch_setup;
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
 
-    fclaw_vt->patch_initialize         = &fc2d_geoclaw_qinit;
+    fclaw_vt->patch_initialize   = &fc2d_geoclaw_qinit;
     geoclaw_vt->qinit            = &GEOCLAW_QINIT;
 
-    fclaw_vt->patch_physical_bc        = &fc2d_geoclaw_bc2;
+    fclaw_vt->patch_physical_bc  = &fc2d_geoclaw_bc2;
     geoclaw_vt->bc2              = &GEOCLAW_BC2;
 
     fclaw_vt->patch_single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
@@ -91,22 +91,23 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 #endif
 
     /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_error_norm =&FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
     fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
     fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
-    fclaw_vt->fort_copy_face    = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    //fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
-    //fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
+    fclaw_vt->fort_copy_face     = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+    // fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    // fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
    
-    fclaw_vt->average_face     = &fc2d_geoclaw_average_face;
+    fclaw_vt->average_face       = &fc2d_geoclaw_average_face;
     fclaw_vt->interpolate_face  = &fc2d_geoclaw_interpolate_face;
 
     fclaw_vt->fort_copy_corner   =  &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     fclaw_vt->average_corner     =  &fc2d_geoclaw_average_corner;
     fclaw_vt->interpolate_corner =  &fc2d_geoclaw_interpolate_corner;
-    //fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
+    // fclaw_vt->fort_average_corner     = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
+    // fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;   
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
@@ -874,6 +875,7 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data)
 {
+    
     int meqn,mx,my,mbc,maux,mbathy;
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;

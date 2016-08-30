@@ -78,7 +78,6 @@ c     # This needs to be written for refratios .ne. 2.
 c           # Direction on coarse grid
             dc(1) = ii
             dc(2) = jj
-
 c           # Direction on fine grid (converted using metric). Divide
 c           # by refratio to scale length to unit vector
             df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2))/refratio
@@ -95,7 +94,6 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 c     # Create map :
       do mq = 1,meqn
         if (idir .eq. 0) then
-
 
 c           # this ensures that we get 'hanging' corners
             if (iface_coarse .eq. 0) then
@@ -127,7 +125,7 @@ c           # this ensures that we get 'hanging' corners
                       if (h < dry_tolerance) then
                         etabarc(iii,jjj) = sea_level
                       else
-                        etabarc(iii,jjj) = h + b
+                        etabarc(iii,jjj) = h + b                 
                       endif
                     enddo
                   enddo
@@ -141,19 +139,13 @@ c           # this ensures that we get 'hanging' corners
                   sl = qc - etabarc(0,-1)
                   sr = etabarc(0,1) - qc
                   grady = compute_slopes(sl,sr,mth)
-c-----------------------------------------------------------------------------
-
-c-----------------------------------------------------------------------------
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
                      value = qc + gradx*shiftx(m) + grady*shifty(m)
      &                       -aux_fine(mbathy,iff,jff)
-                      if (value .le. 0) then
-                        write (*,*) 'momemtum interpolation',value
-                      endif
                      qfine(mq,iff,jff) = value
-                  enddo
+                  enddo                  
                 else
                   qc = qcoarse(mq,ic,jc)
 
@@ -168,16 +160,11 @@ c-----------------------------------------------------------------------------
                   do m = 0,rr2-1
                     iff = i2(0) + df(1,m)
                     jff = j2(0) + df(2,m)
-                    value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &                      - aux_fine(mbathy,iff,jff)
+                    value = qc + gradx*shiftx(m) + grady*shifty(m)   
                     qfine(mq,iff,jff) = value
                   enddo
-                  if (value .le. 0) then
-                    write (*,*) 'momemtum interpolation',value
-                  endif
                 endif
 c-----------------------------------------------------------------------------
-
               endif
             enddo
 
@@ -212,24 +199,6 @@ c              # ---------------------------------------------
               enddo
 
               if (.not. skip_this_grid) then
-c--------------------------------------------------------------------------
-c                  qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
-c                 # Compute limited slopes in both x and y. Note we are not
-c                 # really computing slopes, but rather just differences.
-c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-c                  sl = (qc - qcoarse(mq,ic-1,jc) -
-c     &                  aux_coarse(mbathy,ic-1,jc))
-c                  sr = (qcoarse(mq,ic+1,jc) +
-c     &                  aux_coarse(mbathy,ic+1,jc) - qc)
-c                  gradx = compute_slopes(sl,sr,mth)
-
-c                  sl = (qc - qcoarse(mq,ic,jc-1) -
-c     &                  aux_coarse(mbathy,ic,jc-1))
-c                  sr = (qcoarse(mq,ic,jc+1)+
-c     &                  aux_coarse(mbathy,ic,jc+1) - qc)
-c                  grady = compute_slopes(sl,sr,mth)
-
-c another verstion:::
                ! Calculate surface elevation eta using dry limiting
                 if (mq .eq. 1) then
                   do iii = -1, 1
@@ -253,9 +222,7 @@ c another verstion:::
                   sl = qc - etabarc(0,-1)
                   sr = etabarc(0,1) - qc
                   grady = compute_slopes(sl,sr,mth)
-c--------------------------------------------------------------------------
 
-c--------------------------------------------------------------------------
                   do m = 0,rr2-1
                     iff = i2(0) + df(1,m)
                     jff = j2(0) + df(2,m)
@@ -277,10 +244,6 @@ c--------------------------------------------------------------------------
                     iff = i2(0) + df(1,m)
                     jff = j2(0) + df(2,m)
                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &                         - aux_fine(mbathy,iff,jff)
-                    if (value .le. 0) then
-                      write (*,*) 'momemtum interpolation',value
-                    endif
                     qfine(mq,iff,jff) = value
                   enddo
                 endif
@@ -399,6 +362,15 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
           sl = qc - etabarc(0,-1)
           sr = etabarc(0,1) - qc
           grady = compute_slopes(sl,sr,mth)
+          qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
+
+          do m = 0,rr2-1
+            iff = i2(0) + df(1,m)
+            jff = j2(0) + df(2,m)
+            value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &              - aux_fine(mbathy,iff,jff)
+            qfine(mq,iff,jff) = value
+          enddo  
         else
           qc = qcoarse(mq,ic,jc)
 
@@ -409,32 +381,13 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
           sl = (qc - qcoarse(mq,ic,jc-1))
           sr = (qcoarse(mq,ic,jc+1) - qc)
           grady = compute_slopes(sl,sr,mth)
+          do m = 0,rr2-1
+            iff = i2(0) + df(1,m)
+            jff = j2(0) + df(2,m)
+            value = qc + gradx*shiftx(m) + grady*shifty(m)
+            qfine(mq,iff,jff) = value
+          enddo          
         endif
-        do m = 0,rr2-1
-          iff = i2(0) + df(1,m)
-          jff = j2(0) + df(2,m)
-          value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &              - aux_fine(mbathy,iff,jff)
-          if (value .le. 0) then
-            write (*,*) 'momemtum interpolation',value
-          endif
-          qfine(mq,iff,jff) = value
-        enddo
-c         qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
-c                 # Compute limited slopes in both x and y. Note we are not
-c                 # really computing slopes, but rather just differences.
-c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-c         sl = (qc - qcoarse(mq,ic-1,jc) -
-c     &                  aux_coarse(mbathy,ic-1,jc))
-c         sr = (qcoarse(mq,ic+1,jc) +
-c     &         aux_coarse(mbathy,ic+1,jc) - qc)
-c         gradx = compute_slopes(sl,sr,mth)
-
-c         sl = (qc - qcoarse(mq,ic,jc-1) -
-c     &         aux_coarse(mbathy,ic,jc-1))
-c         sr = (qcoarse(mq,ic,jc+1)+
-c     &         aux_coarse(mbathy,ic,jc+1) - qc)
-c         grady = compute_slopes(sl,sr,mth)
 
       enddo
 
