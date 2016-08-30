@@ -36,10 +36,11 @@ void flatbathy_link_solvers(fclaw2d_domain_t *domain)
 {
 
     /* These are set by GeoClaw for convenience, but the user
-       can set these with customized functions, if desired. */
+       can set these with customized functions, if desired. */    
     fc2d_geoclaw_init_vtables(&vt, &geoclaw);
 
-    // vt.patch_initialize         = &flatbathy_patch_initialize;
+    vt.patch_initialize         = &flatbathy_patch_initialize;
+    fclaw2d_set_vtable(domain,&vt);
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
 
 #if 0

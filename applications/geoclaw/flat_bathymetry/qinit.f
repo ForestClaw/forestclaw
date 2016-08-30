@@ -36,7 +36,7 @@ c     # Therefore, q should be initialized as:
 c     # q(1,:,:) = h0 + dq(1,:,:)
 c     # q(2,:,:) = h0u0 + dq(2,:,:)
 c
-             if (xi.lt.-85.0 .and. xi.gt. -95.0) then
+             if (xi.lt.-90.0 .and. xi.gt. -95.0) then
                 q(1,i,j) = sea_level - aux(1,i,j) + 1
                 q(2,i,j) = sqrt(grav*(sea_level - aux(1,i,j)))
              else
