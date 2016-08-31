@@ -182,21 +182,4 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
      enddo x_loop
   enddo y_loop
 
-
-
-  !!  DO mq = 1,meqn
-  !!     qmin = q(1,1,mq)
-  !!     qmax = q(1,1,mq)
-  !!     DO j = 1-mbc,my+mbc
-  !!        DO i = 1-mbc,mx+mbc
-  !!           qmin = MIN(q(i,j,mq),qmin)
-  !!           qmax = MAX(q(i,j,mq),qmax)
-  !!           IF (qmax - qmin .GT. tag_threshold) THEN
-  !!              tag_patch = 1
-  !!              RETURN
-  !!           ENDIF
-  !!        ENDDO
-  !!     ENDDO
-  !!  ENDDO
-
 END SUBROUTINE geoclaw_tag4refinement
