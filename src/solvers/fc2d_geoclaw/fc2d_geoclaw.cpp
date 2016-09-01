@@ -620,7 +620,7 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       int blockno, int this_patch_idx,
                                       int initflag)
 {
-    int mx,my,mbc,meqn,maux;
+    int mx,my,mbc,meqn,maux,mbathy;
     double xlower,ylower,dx,dy, t;
     double *q, *aux;
     int tag_patch;
@@ -629,22 +629,20 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
+
     level = this_patch->level;
     maxlevel = gparms->maxlevel;
     t = fclaw2d_domain_get_time(domain);
 
+    mbathy = 1;
     tag_patch = 0;
 
     GEOCLAW_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
-                           &dx,&dy,&t,&blockno,q,aux,&level,&maxlevel,
+                           &dx,&dy,&t,&blockno,q,aux,&mbathy,&level,&maxlevel,
                            &initflag,&tag_patch);
-    /* Print patches level, tag_patch, xlower, ylower to observe the refinement*/
-    // fclaw_global_infof("tag_patch %d, t %f, xlower %f, ylower %f, level %d\n",
-    //                     tag_patch, t, xlower, ylower, level);
+
     return tag_patch;
 }
 
@@ -658,15 +656,16 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     const amr_options_t *amropt;
     fc2d_geoclaw_options_t* geoclaw_options;
 
-    int mx,my,mbc,meqn,maux;
+    int mx,my,mbc,meqn,maux,mbathy;
     double xlower,ylower,dx,dy,t;
     double *q[4], *aux[4];
     int tag_patch,igrid;
     //double coarsen_threshold;
     int level, maxlevel;
 
-    fclaw2d_patch_t *patch0;
+    mbathy = 1;
 
+    fclaw2d_patch_t *patch0;
     patch0 = &fine_patches[0];
 
 
@@ -692,7 +691,7 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     tag_patch = 0;
     GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
                            &t,q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
-                           &level,&maxlevel, &geoclaw_options->dry_tolerance_c,
+                           &mbathy,&level,&maxlevel, &geoclaw_options->dry_tolerance_c,
                            &geoclaw_options->wave_tolerance_c,
                            &geoclaw_options->speed_tolerance_entries_c,
                            geoclaw_options->speed_tolerance_c, &tag_patch);

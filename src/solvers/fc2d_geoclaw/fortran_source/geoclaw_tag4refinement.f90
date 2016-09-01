@@ -1,5 +1,5 @@
 SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
-     dx,dy,t,blockno,q,aux,level, maxlevel,init_flag,tag_patch)
+     dx,dy,t,blockno,q,aux,mbathy,level,maxlevel,init_flag,tag_patch)
 
   USE geoclaw_module, ONLY:dry_tolerance, sea_level
   USE geoclaw_module, ONLY: spherical_distance, coordinate_system
@@ -20,7 +20,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
   USE refinement_module
   IMPLICIT NONE
 
-  INTEGER mx,my, mbc, meqn, tag_patch, init_flag, maux
+  INTEGER mx,my, mbc, meqn, tag_patch, init_flag, maux, mbathy
   INTEGER blockno, level, maxlevel
   DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
   DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -146,7 +146,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
         !! check if there is a reason to flag this point: 
         IF (allowflag(x_c,y_c,t,level)) THEN
            if (q(1,i,j) > dry_tolerance) then
-              eta = q(1,i,j) + aux(1,i,j)
+              eta = q(1,i,j) + aux(mbathy,i,j)
               !! Check wave criteria
               if (abs(eta - sea_level) > wave_tolerance) then
                  !! Check to see if we are near shore
