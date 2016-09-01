@@ -10,9 +10,8 @@ cv = linspace(qmin,qmax,20);
 set(gca,'zlim',[-8,0]);   % Need so that all patchborders show up
 
 rybcolormap;
-tol = 1e-5;
-caxis([-5,5]);
-% caxis([-tol,tol])
+tol = 1e-1;
+caxis([-tol,tol])
 % caxis([qmin,qmax])
 daspect([20,20,1]);
 
@@ -22,7 +21,7 @@ ep = 0.01;
 w = sqrt(zmin/ep);
 th = linspace(0,2*pi,500);
 plot(w*cos(th),w*sin(th),'k','linewidth',2);
-
+hold off;
 
 view(2);
 colorbar

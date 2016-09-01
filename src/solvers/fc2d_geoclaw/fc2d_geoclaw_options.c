@@ -93,6 +93,9 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
                                     &clawopt->speed_tolerance_c_string, NULL,
                                     &clawopt->speed_tolerance_c, clawopt->speed_tolerance_entries_c,
                                     "[geoclaw] Coarsen criteria: speed tolerance [NULL]");
+
+    sc_options_add_int (opt, 0, "mbathy", &clawopt->mbathy, 1,
+                        "[geoclaw] Location of bathymetry in aux array [1]");
     clawpkg->is_registered = 1;
     return NULL;
 }

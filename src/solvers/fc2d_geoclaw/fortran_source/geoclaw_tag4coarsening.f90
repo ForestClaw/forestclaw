@@ -14,13 +14,13 @@
 
 subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
        xlower,ylower,dx,dy,t,q0,q1,q2,q3, &
-       aux0,aux1,aux2,aux3,level,maxlevel, &
+       aux0,aux1,aux2,aux3,mbathy,level,maxlevel, &
        dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
        speed_tolerance_c, tag_patch)
 
 implicit none
 
-INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
 INTEGER level, maxlevel, speed_tolerance_entries_c
 DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
@@ -37,25 +37,29 @@ REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(0),ylower(0), &
-                 dx,dy,t,q0,aux0,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q0,aux0,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(1),ylower(1), &
-                 dx,dy,t,q1,aux1,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q1,aux1,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(2),ylower(2), &
-                 dx,dy,t,q2,aux2,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q2,aux2,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
-                 dx,dy,t,q3,aux3,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q3,aux3,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
@@ -65,7 +69,8 @@ end subroutine geoclaw_tag4coarsening
 
 
 subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
-                       dx,dy,t,q,aux,level,maxlevel,dry_tolerance_c, &
+                       dx,dy,t,q,aux,mbathy,level,maxlevel, &
+                       dry_tolerance_c, &
                        wave_tolerance_c,speed_tolerance_entries_c, &
                        speed_tolerance_c,tag_patch)
 
@@ -89,7 +94,7 @@ USE refinement_module
 
 implicit none
 
-INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
 INTEGER level, maxlevel, clevel, speed_tolerance_entries_c
 DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
@@ -130,7 +135,7 @@ y_loop: do j=1-mbc,my+mbc
      !! Check that the grids is allowed to be coarsened or not
      if (allowcoarsen(x_c,y_c,t,level)) then
         if (q(1,i,j) > dry_tolerance_c) then
-           eta = q(1,i,j) + aux(1,i,j)
+           eta = q(1,i,j) + aux(mbathy,i,j)
            if ( abs(eta - sea_level) < wave_tolerance_c) then
               tag_patch = 1
            else
