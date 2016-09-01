@@ -12,7 +12,7 @@
 !  #
 !  # See also 'tag4refinement.f'
 
-subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
+subroutine fc2d_geoclaw_fort_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
        xlower,ylower,dx,dy,t,q0,q1,q2,q3, &
        aux0,aux1,aux2,aux3,mbathy,level,maxlevel, &
        dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
@@ -65,7 +65,7 @@ call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
 if (tag_patch == 0) return
 
 return
-end subroutine geoclaw_tag4coarsening
+end subroutine fc2d_geoclaw_fort_tag4coarsening
 
 
 subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &

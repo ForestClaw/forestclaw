@@ -30,11 +30,6 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2_wrap.f90 \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4refinement.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_tag4coarsening.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_interpolate2fine_new.f \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_average2coarse.f \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_output_ascii_fort.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
@@ -52,6 +47,11 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/allowflag.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate_fort.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_output_ascii_fort.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate2fine_fort.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \	
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \

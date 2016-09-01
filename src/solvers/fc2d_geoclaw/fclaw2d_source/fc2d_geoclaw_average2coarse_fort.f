@@ -1,5 +1,5 @@
-      subroutine geoclaw_average2coarse(mx,my,mbc,meqn,qcoarse,
-     &      qfine,maux,aux_coarse,aux_fine,mcapa,mbathy,
+      subroutine fc2d_geoclaw_fort_average2coarse(mx,my,mbc,meqn,
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,mbathy,
      &      p4est_refineFactor,refratio,igrid)
 
       use geoclaw_module, only: dry_tolerance      
