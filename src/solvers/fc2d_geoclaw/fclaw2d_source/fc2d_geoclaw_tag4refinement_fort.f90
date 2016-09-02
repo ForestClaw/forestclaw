@@ -1,4 +1,4 @@
-SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
+SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
      dx,dy,t,blockno,q,aux,mbathy,level,maxlevel,init_flag,tag_patch)
 
   USE geoclaw_module, ONLY:dry_tolerance, sea_level
@@ -182,4 +182,4 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
      enddo x_loop
   enddo y_loop
 
-END SUBROUTINE geoclaw_tag4refinement
+END SUBROUTINE fc2d_geoclaw_fort_tag4refinement

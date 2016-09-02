@@ -1,5 +1,5 @@
-      subroutine geoclaw_interpolate2fine(mx,my,mbc,meqn,qcoarse,
-     &      qfine,maux,aux_coarse,aux_fine,mbathy,
+      subroutine fc2d_geoclaw_fort_interpolate2fine(mx,my,mbc,meqn,
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
      &      p4est_refineFactor,refratio,igrid)
 
       use geoclaw_module, ONLY:dry_tolerance, sea_level

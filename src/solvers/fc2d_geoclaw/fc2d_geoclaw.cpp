@@ -642,9 +642,9 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
 
     tag_patch = 0;
 
-    GEOCLAW_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
-                           &dx,&dy,&t,&blockno,q,aux,&mbathy,&level,&maxlevel,
-                           &initflag,&tag_patch);
+    FC2D_GEOCLAW_FORT_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
+                                     &dx,&dy,&t,&blockno,q,aux,&mbathy,&level,&maxlevel,
+                                     &initflag,&tag_patch);
 
     return tag_patch;
 }
@@ -691,12 +691,12 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     maxlevel = amropt->maxlevel;
 
     tag_patch = 0;
-    GEOCLAW_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
-                           &t,q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
-                           &mbathy,&level,&maxlevel, &geoclaw_options->dry_tolerance_c,
-                           &geoclaw_options->wave_tolerance_c,
-                           &geoclaw_options->speed_tolerance_entries_c,
-                           geoclaw_options->speed_tolerance_c, &tag_patch);
+    FC2D_GEOCLAW_FORT_TAG4COARSENING(&patchno,&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,&dx,&dy,
+                                     &t,q[0],q[1],q[2],q[3],aux[0],aux[1],aux[2],aux[3],
+                                     &mbathy,&level,&maxlevel, &geoclaw_options->dry_tolerance_c,
+                                     &geoclaw_options->wave_tolerance_c,
+                                     &geoclaw_options->speed_tolerance_entries_c,
+                                     geoclaw_options->speed_tolerance_c, &tag_patch);
     /* Print patches level, tag_patch, xlower, ylower to observe the refinement*/
     // fclaw_global_infof("tag_patch %d, xlower %f, ylower %f, level %d\n",
     //                     tag_patch, xlower, ylower, level);
@@ -753,10 +753,10 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
         //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
         //                                   &xd,&yd,&zd,&areafine);
         // }
-        GEOCLAW_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                 &maux,auxcoarse,auxfine,&mbathy,
-                                 &p4est_refineFactor,&refratio,
-                                 &igrid);
+        FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                           &maux,auxcoarse,auxfine,&mbathy,
+                                           &p4est_refineFactor,&refratio,
+                                           &igrid);
         // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
         //                          areacoarse, areafine, &igrid,
         //                          &gparms->manifold);
@@ -815,10 +815,10 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
         //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
         //                                   &xd,&yd,&zd,&areafine);
         // }
-        GEOCLAW_AVERAGE2COARSE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                               &maux,auxcoarse,auxfine,&mcapa,&mbathy,
-                               &p4est_refineFactor,&refratio,
-                               &igrid);
+        FC2D_GEOCLAW_FORT_AVERAGE2COARSE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                         &maux,auxcoarse,auxfine,&mcapa,&mbathy,
+                                         &p4est_refineFactor,&refratio,
+                                         &igrid);
 
     }
 }
@@ -1014,7 +1014,7 @@ void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
 
     meqn = amropt->meqn + 1;
 
-    GEOCLAW_FORT_WRITE_HEADER(&iframe,&time,&meqn,&ngrids);
+    FC2D_GEOCLAW_FORT_WRITE_HEADER(&iframe,&time,&meqn,&ngrids);
 
     /* Is this really necessary? */
     /* FCLAW2D_OUTPUT_NEW_QFILE(&iframe); */
@@ -1041,9 +1041,9 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
-    GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
-                            &dx,&dy,q,aux,&iframe,&patch_num,&level,
-                            &this_block_idx,&domain->mpirank);
+    FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
+                                 &dx,&dy,q,aux,&iframe,&patch_num,&level,
+                                 &this_block_idx,&domain->mpirank);
 }
 
 

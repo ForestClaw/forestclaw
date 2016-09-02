@@ -247,7 +247,7 @@ c              # ---------------------------------------------
                     qfine(mq,iff,jff) = value
                   enddo
                 endif
-              endif                    !! Don't skip this grid
+              endif                     !! Don't skip this grid
             enddo                       !! i loop
          endif                          !! end idir branch
       enddo                             !! endo mq loop
