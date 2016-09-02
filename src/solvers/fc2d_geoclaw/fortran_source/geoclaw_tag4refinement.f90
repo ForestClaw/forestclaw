@@ -42,12 +42,12 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
   !! # Refine based only on first variable in system.
   !! Loop over interior points on this grid
   !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
-  y_loop: DO j=1-mbc,my+mbc
+  y_loop: DO j=1,my
      y_low = ylower + (j - 1) * dy
      y_c = ylower + (j - 0.5d0) * dy
      y_hi = ylower + j * dy
 
-     x_loop: DO i = 1-mbc,mx+mbc
+     x_loop: DO i = 1,mx
         x_low = xlower + (i - 1) * dx
         x_c = xlower + (i - 0.5d0) * dx
         x_hi = xlower + i * dx
@@ -143,7 +143,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
 
         !! -----------------------------------------------------------------
         !! Refinement not forced, so check if it is allowed and if so,
-        !! check if there is a reason to flag this point: 
+        !! check if there is a reason to flag this point:
         IF (allowflag(x_c,y_c,t,level)) THEN
            if (q(1,i,j) > dry_tolerance) then
               eta = q(1,i,j) + aux(mbathy,i,j)

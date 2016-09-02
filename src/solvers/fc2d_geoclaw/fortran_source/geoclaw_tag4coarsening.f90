@@ -121,15 +121,15 @@ clevel = level - 1
 
 !! Loop over interior points on this grid
 !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
-y_loop: do j=1-mbc,my+mbc
+y_loop: do j=1,my
   y_low = ylower + (j - 1) * dy
   y_c   = ylower + (j - 0.5d0) * dy
   y_hi  = ylower + j * dy
 
-  x_loop: do i = 1-mbc,mx+mbc
+  x_loop: do i = 1,mx
      x_low = xlower + (i - 1) * dx
      x_c   = xlower + (i - 0.5d0) * dx
-     x_hi  = xlower + i * dx 
+     x_hi  = xlower + i * dx
      !! Ignore the storm based refinement first
 
      !! Check that the grids is allowed to be coarsened or not
@@ -147,7 +147,7 @@ y_loop: do j=1-mbc,my+mbc
            ! if ( abs(eta - sea_level) < wave_tolerance_c &
            !     .and. speed < speed_tolerance_c(level)) then
            !     tag_patch = 1
-           ! else 
+           ! else
            !     tag_patch = 0
            !     return
            ! endif
