@@ -413,7 +413,7 @@ def setgeo(rundata):
     rundata.qinit_data.qinitfiles = []
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
-    rundata.qinit_data.qinitfiles.append([2, 3, 'hump.xyz'])
+    rundata.qinit_data.qinitfiles.append([3, 3, 'hump.xyz'])
 
     # == setfixedgrids.data values ==
     fixedgrids = rundata.fixed_grid_data.fixedgrids
