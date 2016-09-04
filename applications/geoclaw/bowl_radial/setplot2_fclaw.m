@@ -30,7 +30,9 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 ContourValues = [];
 
 %---------------------------------
-
+x0 = 0;
+y0 = 0;
+ScatterStyle = setplotstyle('b*','gx','r.');
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;
