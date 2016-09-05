@@ -31,7 +31,7 @@ c     # and using stream-function.
 c     # -------------------------------------------------
       call set_vflag(vflag)
 
-      kappa = 2.d0
+      kappa = 0.d0      !! set to zero for solid body rotation.
       tfinal = 5.d0
       call set_wind_parms(kappa,tfinal)
 
@@ -57,7 +57,7 @@ c     # Locations of cosine bell or Gaussian
       wc(2,2) = cos(th)*sin(lambda)
       wc(3,2) = sin(th)
 
-      n = 2
+      n = 1
 
       call set_initial_gaussian_locations(wc,n)
 
