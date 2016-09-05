@@ -381,8 +381,9 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                                      time_interp,
                                                      &transform_data_finegrid);
 #endif
-                        vt.copy_face(domain,this_patch,neighbor_patch,this_iface,
-                                            time_interp,&transform_data);
+
+                        vt.copy_face(domain,neighbor_patch,this_patch,this_iface,
+                                            time_interp,&transform_data_finegrid);
                     }
                 }
             }

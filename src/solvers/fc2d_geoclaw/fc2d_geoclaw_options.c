@@ -85,11 +85,11 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "wave_tolerance_c", &clawopt->wave_tolerance_c, 1.0,
                            "[geoclaw] Coarsen criteria: Wave tolerance [1.0]");
 
-    sc_options_add_int (opt, 0, "speed_tolerance_entries_c", 
+    sc_options_add_int (opt, 0, "speed_tolerance_entries_c",
                         &clawopt->speed_tolerance_entries_c, 1,
                         "[geoclaw] Coarsen criteria: Number of speed tolerance entries [1]");
 
-    fclaw_options_add_double_array (opt, 0, "speed_tolerance_c", 
+    fclaw_options_add_double_array (opt, 0, "speed_tolerance_c",
                                     &clawopt->speed_tolerance_c_string, NULL,
                                     &clawopt->speed_tolerance_c, clawopt->speed_tolerance_entries_c,
                                     "[geoclaw] Coarsen criteria: speed tolerance [NULL]");
@@ -107,8 +107,8 @@ fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t * clawopt)
                                      clawopt->mwaves);
     fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,
                                      2);
-    fclaw_options_convert_double_array (clawopt->speed_tolerance_c_string, 
-                                        &clawopt->speed_tolerance_c, 
+    fclaw_options_convert_double_array (clawopt->speed_tolerance_c_string,
+                                        &clawopt->speed_tolerance_c,
                                         clawopt->speed_tolerance_entries_c);
     return FCLAW_NOEXIT;
 }
@@ -182,6 +182,7 @@ fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt)
 {
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+    fclaw_options_destroy_array (clawopt->speed_tolerance_c);
 }
 
 static void
