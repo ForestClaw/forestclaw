@@ -37,7 +37,19 @@ extern "C"
 #endif
 #endif
 
+#define QINIT FCLAW_F77_FUNC(qinit,QINIT)
+void QINIT(const int* meqn,const int* mbc,
+           const int* mx, const int* my,
+           const double* xlower, const double* ylower,
+           const double* dx, const double* dy,
+           double q[], const int* maux, double aux[]);
+
 void slosh_link_solvers(fclaw2d_domain_t *domain);
+
+void slosh_patch_initialize(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+							int this_block_idx,
+                            int this_patch_idx);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
