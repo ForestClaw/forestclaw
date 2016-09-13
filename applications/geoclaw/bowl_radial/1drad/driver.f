@@ -21,7 +21,7 @@ c
       parameter (maux = 0)
 c
       dimension q(1-mbc:maxmx+mbc, meqn)
-      dimension  aux(1)   !# dummy variable since no aux arrays used
+      dimension aux(1)   !# dummy variable since no aux arrays used
       dimension work(mwork)
       dimension mthlim(mwaves)
 
