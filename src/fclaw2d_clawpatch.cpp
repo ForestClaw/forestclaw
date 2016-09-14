@@ -345,6 +345,10 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
     {
         vt.patch_setup(domain,this_patch,blockno,patchno);
     }
+    if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_COSTOM)
+    {
+        vt.patch_setup(domain,this_patch,blockno,patchno);
+    }
 }
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,

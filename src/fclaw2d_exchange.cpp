@@ -90,6 +90,9 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
     {
         build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
     }
+#ifdef FCLAW_ENABLE_GEOCLAW
+    build_mode = FCLAW2D_BUILD_COSTOM;
+#endif
 
     for(int i = 0; i < domain->num_ghost_patches; i++)
     {
