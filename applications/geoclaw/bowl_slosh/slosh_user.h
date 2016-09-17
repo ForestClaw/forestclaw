@@ -23,40 +23,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "radialdam_user.h"
+#ifndef SLOSH_USER_H
+#define SLOSH_USER_H
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
+#include <fc2d_geoclaw.h>
 
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
-
-void radialdam_link_solvers(fclaw2d_domain_t *domain)
+#ifdef __cplusplus
+extern "C"
 {
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
-
-    vt.problem_setup = &radialdam_problem_setup;
-
-    vt.patch_physical_bc = &fc2d_clawpack46_bc2;
-
-    vt.patch_initialize = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
-
-    vt.patch_single_step_update = &fc2d_clawpack46_update;
-    classic_claw.rpn2 = &RPN2SW;  /* Signature is unchanged */
-    classic_claw.rpt2 = &RPT2SW;
-
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+#if 0
 }
+#endif
+#endif
 
-void radialdam_problem_setup(fclaw2d_domain_t* domain)
+#define QINIT FCLAW_F77_FUNC(qinit,QINIT)
+void QINIT(const int* meqn,const int* mbc,
+           const int* mx, const int* my,
+           const double* xlower, const double* ylower,
+           const double* dx, const double* dy,
+           double q[], const int* maux, double aux[]);
+
+void slosh_link_solvers(fclaw2d_domain_t *domain);
+
+void slosh_patch_initialize(fclaw2d_domain_t *domain,
+                            fclaw2d_patch_t *this_patch,
+							int this_block_idx,
+                            int this_patch_idx);
+
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+#ifdef __cplusplus
+#if 0
 {
-    const user_options_t* user;
-    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
-
-    RADIALDAM_SETPROB(&user->g, &user->x0, &user->y0, &user->r0,
-                      &user->hin, &user->hout);
+#endif
 }
+#endif
+
+#endif

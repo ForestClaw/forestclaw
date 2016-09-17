@@ -65,8 +65,8 @@ c     # input parameters for clawpack routines
       read(55,*) method(3)
       read(55,*) method(4)
       read(55,*) method(5)
-      read(55,*) method(6)  
-      read(55,*) method(7) 
+      read(55,*) method(6)
+      read(55,*) method(7)
 
       read(55,*) meqn1
       read(55,*) mwaves1
@@ -104,7 +104,7 @@ c
      &    (mthbc(2).eq.2 .and. mthbc(1).ne.2)) then
          write(6,*) '*** ERROR ***  periodic boundary conditions'
          write(6,*) ' require mthbc(1) and mthbc(2) BOTH be set to 2'
-         stop 
+         stop
          endif
 
 c
@@ -148,7 +148,7 @@ c     # call user's routine setprob to set any specific parameters
 c     # or other initialization required.
 c
       call setprob
-c        
+c
 c     # set aux array:
 c
       if (maux .gt. 0)  then
@@ -202,7 +202,7 @@ c        # check to see if an error occured:
                write(6,*) '***   Too many times steps, n > nv(1)'
                endif
             if (info.eq.12) then
-               write(6,*) 
+               write(6,*)
      &          '***   The Courant number is greater than cflv(1)'
                write(6,*) '***   and dt is fixed since method(1)=0'
                endif
@@ -224,13 +224,13 @@ c        # time steps since the last output.
 
 c        # iframe is the frame number used to form file names in out1
          iframe = n/nstepout
-	 if (iframe*nstepout .eq. n) then
+         if (iframe*nstepout .eq. n) then
             call out1(maxmx,meqn,mbc,mx,xlower,dx,q,tend,iframe,
      &                aux,maux)
             write(6,601) iframe,tend
             write(10,1010) tend,info,dtv(3),dtv(4),dtv(5),
      &           cflv(3),cflv(4),nv(2)
-	    endif
+         endif
 c
 c        # formats for writing out information about this call to claw:
 c
@@ -247,5 +247,5 @@ c
 c
   999 continue
 c
-      return 
+      return
       end

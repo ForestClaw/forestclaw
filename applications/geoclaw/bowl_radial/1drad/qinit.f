@@ -1,7 +1,4 @@
-c
-c
-c =========================================================
-       subroutine qinit(maxmx,meqn,mbc,mx,xlower,dx,q,maux,aux)
+      subroutine qinit(maxmx,meqn,mbc,mx,xlower,dx,q,maux,aux)
 c =========================================================
 c
 c     # Set initial conditions for q.
