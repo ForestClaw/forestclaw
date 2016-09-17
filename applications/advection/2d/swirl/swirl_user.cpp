@@ -77,11 +77,15 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx)
 {
     /* Dummy setup - use multiple libraries */
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        return;
+    }
     fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
 }
