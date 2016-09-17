@@ -31,6 +31,7 @@ include applications/advection/2d/swirl/Makefile.am
 # include applications/advection/2d/sphere/Makefile.am
 
 # NCAR Transport problems on the sphere
+include applications/NCAR_transport/gaussian/Makefile.am
 #include applications/NCAR_transport/slotted_disk/Makefile.am
 #include applications/NCAR_transport/correlatedcb/Makefile.am
 
