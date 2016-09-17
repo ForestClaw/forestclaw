@@ -26,7 +26,7 @@ if (PlotType == 1)
     th = linspace(0,2*pi,500);
     plot(w*cos(th),w*sin(th),'k','linewidth',2);
     % axis([50,75,50,75])
-    axis([0 100 0 100]);
+    % axis([0 100 0 100]);
     
     % Plot regions
     clear hh
