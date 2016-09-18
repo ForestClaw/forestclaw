@@ -32,7 +32,7 @@ ContourValues = [];
 %---------------------------------
 x0 = 0;
 y0 = 0;
-ScatterStyle = setplotstyle('b.','k.','m.','b.','k.','m.','b.','k.','m.');
+ScatterStyle = setplotstyle('b.','r.','m.','b.','r.','m.','b.','r.','m.');
 UserMap1d = 1;
 
 ShowUnderOverShoots = 0;

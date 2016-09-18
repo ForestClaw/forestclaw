@@ -49,8 +49,16 @@ if (PlotType == 1)
     
     hold off;
     colorbar
-else
+elseif (PlotType == 4)
+    % Plot 1d solution
     hold on;
+    dir = './1drad/';
+    dim = 1;
+    [amrdata1d,t1d] = readamrdata(dim,Frame,dir);
+    userfile = 'bathy1d';  % UserVariableFile
+    [q1d,x1d] = plotframe1ez(amrdata1d,mq,'k-',userfile);
+
+    % add bathymetry
     r = linspace(0,100,500);
     r2 = r.^2;
     b = ep*r.^2 - zmin;
