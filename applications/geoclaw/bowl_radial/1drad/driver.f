@@ -21,20 +21,12 @@ c
       parameter (maux = 0)
 c
       dimension q(1-mbc:maxmx+mbc, meqn)
-<<<<<<< HEAD
-      dimension  aux(1)   !# dummy variable since no aux arrays used
-=======
       dimension aux(1)   !# dummy variable since no aux arrays used
->>>>>>> melody/geoclaw
       dimension work(mwork)
       dimension mthlim(mwaves)
 
       call claw1ez(maxmx,meqn,mwaves,mbc,maux,mwork,mthlim,
-<<<<<<< HEAD
-     &		 q,work,aux)
-=======
      &             q,work,aux)
->>>>>>> melody/geoclaw
 
-      stop 
+      stop
       end

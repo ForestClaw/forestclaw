@@ -114,7 +114,6 @@ c        # u-c in left state (cell i-1)
          s0 = qr(i-1,2)/qr(i-1,1) - dsqrt(grav*qr(i-1,1))
 
 c        # check for fully supersonic case:
-<<<<<<< HEAD
 	 if (s0.ge.0.d0 .and. s(i,1).gt.0.d0)  then
 c            # everything is right-going
 	     do 60 m=1,2
@@ -122,15 +121,6 @@ c            # everything is right-going
    60           continue
 	     go to 200
 	     endif
-=======
-	       if (s0.ge.0.d0 .and. s(i,1).gt.0.d0)  then
-c            # everything is right-going
-	           do 60 m=1,2
-		         amdq(i,m) = 0.d0
-   60           continue
-	           go to 200
-	       endif
->>>>>>> melody/geoclaw
 c
 c        # u-c to right of 1-wave
          hr1  = qr(i-1,1) + wave(i,1,1)
@@ -139,7 +129,6 @@ c        # u-c to right of 1-wave
 
          if (s0.lt.0.d0 .and. s1.gt.0.d0) then
 c            # transonic rarefaction in the 1-wave
-<<<<<<< HEAD
 	     sfract = s0 * (s1-s(i,1)) / (s1-s0)
 	   else if (s(i,1) .lt. 0.d0) then
 c	     # 1-wave is leftgoing
@@ -151,19 +140,6 @@ c	     # 1-wave is rightgoing
 
 	 do 120 m=1,2
 	    amdq(i,m) = sfract*wave(i,m,1)
-=======
-	           sfract = s0 * (s1-s(i,1)) / (s1-s0)
-	       else if (s(i,1) .lt. 0.d0) then
-c	           # 1-wave is leftgoing
-	           sfract = s(i,1)
-	       else
-c	           # 1-wave is rightgoing
-             sfract = 0.d0   !# this shouldn't happen since s0 < 0
-	       endif
-
-	       do 120 m=1,2
-	          amdq(i,m) = sfract*wave(i,m,1)
->>>>>>> melody/geoclaw
   120       continue
 
 c -------------------------------------------------------
@@ -179,7 +155,6 @@ c        # u+c to left of 2-wave
 
          if (s2 .lt. 0.d0 .and. s3.gt.0.d0) then
 c            # transonic rarefaction in the 2-wave
-<<<<<<< HEAD
 	     sfract = s2 * (s3-s(i,2)) / (s3-s2)
 	   else if (s(i,2) .lt. 0.d0) then
 c            # 2-wave is leftgoing
@@ -191,19 +166,6 @@ c            # 2-wave is rightgoing
 c
 	 do 160 m=1,2
 	    amdq(i,m) = amdq(i,m) + sfract*wave(i,m,2)
-=======
-	           sfract = s2 * (s3-s(i,2)) / (s3-s2)
-	       else if (s(i,2) .lt. 0.d0) then
-c            # 2-wave is leftgoing
-	           sfract = s(i,2)
-	       else
-c            # 2-wave is rightgoing
-	           go to 200
-	       endif
-c
-	       do 160 m=1,2
-	          amdq(i,m) = amdq(i,m) + sfract*wave(i,m,2)
->>>>>>> melody/geoclaw
   160       continue
   200    continue
 c
@@ -212,7 +174,6 @@ c     # compute the rightgoing flux differences:
 c     # df = SUM s*wave   is the total flux difference and apdq = df - amdq
 c
       do 220 m=1,2
-<<<<<<< HEAD
 	 do 220 i = 2-mbc, mx+mbc
 	    df = 0.d0
 	    do 210 mw=1,mwaves
@@ -222,16 +183,5 @@ c
   220       continue
 
   900 continue
-=======
-	       do 220 i = 2-mbc, mx+mbc
-	           df = 0.d0
-	           do 210 mw=1,mwaves
-	             df = df + s(i,mw)*wave(i,m,mw)
-  210          continue
-	           apdq(i,m) = df - amdq(i,m)
-  220        continue
-
-  900     continue
->>>>>>> melody/geoclaw
       return
       end
