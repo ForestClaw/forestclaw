@@ -385,10 +385,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (maxcfl_step > gparms->max_cfl)
         {
-            fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-
             if (!gparms->use_fixed_dt)
             {
+                fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
                 restore_time_step(*domain);
 
                 dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
@@ -396,6 +395,10 @@ void outstyle_3(fclaw2d_domain_t **domain)
                 /* Got back to start of loop without incrementing step counter or
                    current time. */
                 continue;
+            }
+            else
+            {
+                fclaw_global_productionf("   WARNING : Maximum CFL exceeded\n");
             }
         }
 
@@ -508,7 +511,7 @@ void fclaw2d_run(fclaw2d_domain_t **domain)
 {
 
     const amr_options_t *gparms = get_domain_parms(*domain);
-    
+
     switch (gparms->outstyle)
     {
     case 0:
