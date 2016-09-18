@@ -67,8 +67,9 @@ elseif (PlotType == 4)
     xlim([0,100]);
     ylim([-zmin,20]);    
     daspect([1 1 1])    
-    [h_amr, labels_amr] = getlegendinfo;
+    [h_amr, labels_amr] = getlegendinfo(0);   % Input base level
     h = legend(h_amr,labels_amr,'location','southeast');
+    set(h,'fontsize',16);
     hold off;
 end
 
