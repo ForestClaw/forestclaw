@@ -50,6 +50,7 @@ typedef struct fc2d_geoclaw_options
 
     int method[7];
     int mcapa;
+    int mbathy;
     int src_term;
     int use_fwaves;
 

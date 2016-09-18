@@ -1,5 +1,5 @@
-SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
-     dx,dy,t,blockno,q,aux,level, maxlevel,init_flag,tag_patch)
+SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
+     dx,dy,t,blockno,q,aux,mbathy,level,maxlevel,init_flag,tag_patch)
 
   USE geoclaw_module, ONLY:dry_tolerance, sea_level
   USE geoclaw_module, ONLY: spherical_distance, coordinate_system
@@ -20,7 +20,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
   USE refinement_module
   IMPLICIT NONE
 
-  INTEGER mx,my, mbc, meqn, tag_patch, init_flag, maux
+  INTEGER mx,my, mbc, meqn, tag_patch, init_flag, maux, mbathy
   INTEGER blockno, level, maxlevel
   DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
   DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -42,12 +42,12 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
   !! # Refine based only on first variable in system.
   !! Loop over interior points on this grid
   !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
-  y_loop: DO j=1-mbc,my+mbc
+  y_loop: DO j=1,my
      y_low = ylower + (j - 1) * dy
      y_c = ylower + (j - 0.5d0) * dy
      y_hi = ylower + j * dy
 
-     x_loop: DO i = 1-mbc,mx+mbc
+     x_loop: DO i = 1,mx
         x_low = xlower + (i - 1) * dx
         x_c = xlower + (i - 0.5d0) * dx
         x_hi = xlower + i * dx
@@ -129,6 +129,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
         !! specified and need to force refinement:
         !! This assumes that t0 = 0.d0, should really be t0 but we do
         !! not have access to that parameter in this routine
+        ! IF (init_flag .NE. 0) THEN
         IF (qinit_type > 0 .AND. init_flag .NE. 0) THEN
            space_interval = x_hi > x_low_qinit .and. x_low < x_hi_qinit .and. &
                 y_hi > y_low_qinit .AND. y_low < y_hi_qinit
@@ -142,20 +143,23 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
 
         !! -----------------------------------------------------------------
         !! Refinement not forced, so check if it is allowed and if so,
-        !! check if there is a reason to flag this point: 
+        !! check if there is a reason to flag this point:
         IF (allowflag(x_c,y_c,t,level)) THEN
            if (q(1,i,j) > dry_tolerance) then
-              eta = q(1,i,j) + aux(1,i,j)
+              eta = q(1,i,j) + aux(mbathy,i,j)
               !! Check wave criteria
               if (abs(eta - sea_level) > wave_tolerance) then
                  !! Check to see if we are near shore
                  IF (q(1,i,j) < deep_depth) THEN
                     tag_patch = 1
+                    ! write (*,*) 'near shore: x_c, y_c, t, level', x_c,y_c,t,level
+                    ! write (*,*) 'perturbation, wave tolerance', abs(eta - sea_level), wave_tolerance
                     return
                     !! Check if we are allowed to flag in deep water
                     !! anyway
                  ELSE IF (level < max_level_deep) THEN
                     tag_patch = 1
+                    ! write (*,*) 'not in deep water: x_c, y_c, t, level', x_c,y_c,t,level
                     return
                  endif
               endif
@@ -168,6 +172,7 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
               do m=1,min(size(speed_tolerance),maxlevel)
                  IF (speed > speed_tolerance(m) .AND. level <= m) THEN
                     tag_patch = 1
+                    ! write (*,*) 'speed: x_c, y_c, t, sea_levelel', x_c,y_c,t,level
                     RETURN
                  endif
               enddo
@@ -177,21 +182,4 @@ SUBROUTINE geoclaw_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
      enddo x_loop
   enddo y_loop
 
-
-
-  !!  DO mq = 1,meqn
-  !!     qmin = q(1,1,mq)
-  !!     qmax = q(1,1,mq)
-  !!     DO j = 1-mbc,my+mbc
-  !!        DO i = 1-mbc,mx+mbc
-  !!           qmin = MIN(q(i,j,mq),qmin)
-  !!           qmax = MAX(q(i,j,mq),qmax)
-  !!           IF (qmax - qmin .GT. tag_threshold) THEN
-  !!              tag_patch = 1
-  !!              RETURN
-  !!           ENDIF
-  !!        ENDDO
-  !!     ENDDO
-  !!  ENDDO
-
-END SUBROUTINE geoclaw_tag4refinement
+END SUBROUTINE fc2d_geoclaw_fort_tag4refinement

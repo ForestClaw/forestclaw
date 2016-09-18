@@ -341,10 +341,18 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
     }
 
     vt = fclaw2d_get_vtable(domain);
+    if (vt.patch_setup != NULL)
+    {
+        vt.patch_setup(domain,this_patch,blockno,patchno);
+    }
+
+
+#if 0
     if (vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
         vt.patch_setup(domain,this_patch,blockno,patchno);
     }
+#endif
 }
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,

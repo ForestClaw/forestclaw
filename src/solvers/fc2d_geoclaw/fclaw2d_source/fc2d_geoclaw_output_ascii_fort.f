@@ -1,4 +1,4 @@
-      subroutine geoclaw_fort_write_header(iframe,time,
+      subroutine fc2d_geoclaw_fort_write_header(iframe,time,
      &      meqn,ngrids)
       implicit none
 
@@ -34,7 +34,7 @@
 
       end
 
-      subroutine geoclaw_fort_write_file(mx,my,meqn,maux,mbathy,
+      subroutine fc2d_geoclaw_fort_write_file(mx,my,meqn,maux,mbathy,
      &      mbc,xlower,ylower,dx,dy,q,aux,iframe,patch_num,level,
      &      blockno,mpirank)
 

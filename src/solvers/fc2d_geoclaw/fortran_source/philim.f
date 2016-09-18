@@ -15,6 +15,13 @@ c     # use inlinelimiter.f, which eliminates all these function calls
 c     # to philim.  If you wish to change the limiter function and are
 c     # using inlinelimiter.f, the formulas must be changed in that routine.
 c
+
+c     # Add 2016.07.19
+      if (a .eq. 0.d0) then
+         philim = 0.d0
+         return
+         endif
+
       r = b/a
       go to (10,20,30,40,50) meth
 

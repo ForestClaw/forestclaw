@@ -62,7 +62,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     user_options_t* user = (user_options_t*) package;
     if (user->claw_version != 4)
     {
-        fclaw_global_essentialf ("Option --user:claw_version must be 5\n");
+        fclaw_global_essentialf ("Option --user:claw_version must be 4\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

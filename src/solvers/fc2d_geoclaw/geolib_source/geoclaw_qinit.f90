@@ -17,7 +17,7 @@ SUBROUTINE geoclaw_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
 
     ! Set flat state based on sea_level
     q = 0.d0
-    forall(i=1:mx, j=1:my)
+    FORALL(i=1-mbc:mx+mbc, j=1-mbc:my+mbc)
         q(1,i,j) = max(0.d0, sea_level - aux(1,i,j))
     end forall
 

@@ -183,19 +183,6 @@ c                       qcoarse(ic,jc,mq) = sum/kc
 
       end
 
-      logical function is_valid_average(i,j,mx,my)
-      implicit none
-
-      integer i,j,mx,my
-      logical i1, j1
-
-      i1 = 1 .le. i .and. i .le. mx
-      j1 = 1 .le. j .and. j .le. my
-
-      is_valid_average = i1 .and. j1
-
-      end
-
 
 c> \ingroup Averaging
 c> Average across corners.

@@ -56,10 +56,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_dim = num_dim
 
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = 0.0
+    clawdata.lower[0] = -100.0
     clawdata.upper[0] = 100.0
 
-    clawdata.lower[1] = 0.0
+    clawdata.lower[1] = -100.0
     clawdata.upper[1] = 100.0
 
 
@@ -311,7 +311,7 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    # regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
+    regions.append([2, 4, 0., 1.e10, -100.,100., -100.,100.])
     # regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
     # regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
     # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
@@ -330,20 +330,20 @@ def setrun(claw_pkg='geoclaw'):
     # rundata.gaugedata.add_gauge()
 
     # gauges along x-axis:
-    gaugeno = 0
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = r + .001  # shift a bit away from cell corners
-        y = .001
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
+    # gaugeno = 0
+    # for r in np.linspace(86., 93., 9):
+    #     gaugeno = gaugeno+1
+    #     x = r + .001  # shift a bit away from cell corners
+    #     y = .001
+    #     rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
 
     # gauges along diagonal:
-    gaugeno = 100
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = (r + .001) / np.sqrt(2.)
-        y = (r + .001) / np.sqrt(2.)
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
+    # gaugeno = 100
+    # for r in np.linspace(86., 93., 9):
+    #     gaugeno = gaugeno+1
+    #     x = (r + .001) / np.sqrt(2.)
+    #     y = (r + .001) / np.sqrt(2.)
+    #     rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
 
 
     return rundata
@@ -385,7 +385,7 @@ def setgeo(rundata):
     refinement_data = rundata.refinement_data
     refinement_data.wave_tolerance = 1.e-2
     refinement_data.deep_depth = 1e2
-    refinement_data.max_level_deep = 3
+    refinement_data.max_level_deep = 4
     refinement_data.variable_dt_refinement_ratios = True
 
     # == settopo.data values ==

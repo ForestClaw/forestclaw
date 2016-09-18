@@ -12,15 +12,15 @@
 !  #
 !  # See also 'tag4refinement.f'
 
-subroutine geoclaw_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
-       xlower,ylower,dx,dy,q0,q1,q2,q3, &
-       aux0,aux1,aux2,aux3,level,maxlevel, &
+subroutine fc2d_geoclaw_fort_tag4coarsening(blockno,mx,my,mbc,meqn,maux, &
+       xlower,ylower,dx,dy,t,q0,q1,q2,q3, &
+       aux0,aux1,aux2,aux3,mbathy,level,maxlevel, &
        dry_tolerance_c, wave_tolerance_c, speed_tolerance_entries_c, &
        speed_tolerance_c, tag_patch)
 
 implicit none
 
-INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
 INTEGER level, maxlevel, speed_tolerance_entries_c
 DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
@@ -37,35 +37,40 @@ REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(0),ylower(0), &
-                 dx,dy,q0,aux0,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q0,aux0,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(1),ylower(1), &
-                 dx,dy,q1,aux1,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q1,aux1,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(2),ylower(2), &
-                 dx,dy,q2,aux2,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q2,aux2,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
-                 dx,dy,q3,aux3,level,maxlevel,dry_tolerance_c, &
+                 dx,dy,t,q3,aux3,mbathy,level,maxlevel, &
+                 dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
 if (tag_patch == 0) return
 
 return
-end subroutine geoclaw_tag4coarsening
+end subroutine fc2d_geoclaw_fort_tag4coarsening
 
 
 subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
-                       dx,dy,q,aux,level,maxlevel,dry_tolerance_c, &
+                       dx,dy,t,q,aux,mbathy,level,maxlevel, &
+                       dry_tolerance_c, &
                        wave_tolerance_c,speed_tolerance_entries_c, &
                        speed_tolerance_c,tag_patch)
 
@@ -89,8 +94,8 @@ USE refinement_module
 
 implicit none
 
-INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno
-INTEGER level, maxlevel, speed_tolerance_entries_c
+INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
+INTEGER level, maxlevel, clevel, speed_tolerance_entries_c
 DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
 DOUBLE PRECISION dry_tolerance_c
@@ -112,25 +117,25 @@ tag_patch = 0
 t0 = 0
 
 !! If coarsened, level will become level - 1
-level = level - 1
+clevel = level - 1
 
 !! Loop over interior points on this grid
 !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
-y_loop: do j=1-mbc,my+mbc
+y_loop: do j=1,my
   y_low = ylower + (j - 1) * dy
   y_c   = ylower + (j - 0.5d0) * dy
   y_hi  = ylower + j * dy
 
-  x_loop: do i = 1-mbc,mx+mbc
+  x_loop: do i = 1,mx
      x_low = xlower + (i - 1) * dx
      x_c   = xlower + (i - 0.5d0) * dx
-     x_hi  = xlower + i * dx 
+     x_hi  = xlower + i * dx
      !! Ignore the storm based refinement first
 
      !! Check that the grids is allowed to be coarsened or not
      if (allowcoarsen(x_c,y_c,t,level)) then
         if (q(1,i,j) > dry_tolerance_c) then
-           eta = q(1,i,j) + aux(1,i,j)
+           eta = q(1,i,j) + aux(mbathy,i,j)
            if ( abs(eta - sea_level) < wave_tolerance_c) then
               tag_patch = 1
            else
@@ -142,7 +147,7 @@ y_loop: do j=1-mbc,my+mbc
            ! if ( abs(eta - sea_level) < wave_tolerance_c &
            !     .and. speed < speed_tolerance_c(level)) then
            !     tag_patch = 1
-           ! else 
+           ! else
            !     tag_patch = 0
            !     return
            ! endif
@@ -150,8 +155,8 @@ y_loop: do j=1-mbc,my+mbc
           tag_patch = 1
         endif
      else
-         tag_patch = 0 
-         return
+        tag_patch = 0
+        return
      endif
 
   enddo x_loop

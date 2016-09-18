@@ -16,7 +16,7 @@ def maketopo():
     xupper = 100.e0
     yupper = 100.e0
     ylower = -100.e0
-    outfile= "bowl.topotype2"     
+    outfile= "bowl.topotype2"
     topotools.topo2writer(outfile,topo,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
 def makeqinit():
@@ -29,7 +29,7 @@ def makeqinit():
     xupper = 50.e0
     yupper = 50.e0
     ylower = -50.e0
-    outfile= "hump.xyz"     
+    outfile= "hump.xyz"
     topotools.topo1writer(outfile,qinit,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
 def topo(x,y):
@@ -47,8 +47,9 @@ def qinit(x,y):
     Gaussian hump:
     """
     from numpy import where
-    ze = -((x+0e0)**2 + (y+0e0)**2)/10.
+    ze = -((x+0e0)**2 + (y+0e0)**2)/10
     z = where(ze>-10., 40.e0*exp(ze), 0.)
+    # z = where(ze>-10., 0, 0.)
     return z
 
 if __name__=='__main__':
