@@ -3,7 +3,7 @@ OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
-PlotType = 1;    % type of plot to produce:
+PlotType = 4;    % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
 			     % 2 = contour
 			     % 3 = Schlieren
@@ -32,7 +32,8 @@ ContourValues = [];
 %---------------------------------
 x0 = 0;
 y0 = 0;
-ScatterStyle = setplotstyle('b*','gx','r.');
+ScatterStyle = setplotstyle('b.','k.','m.','b.','k.','m.','b.','k.','m.');
+UserMap1d = 1;
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;

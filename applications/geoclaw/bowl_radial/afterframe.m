@@ -14,7 +14,7 @@ if (PlotType == 1)
     set(gca,'zlim',[-20,0]);   % Need so that all patchborders show up
     
     rybcolormap;
-    tol = 5;
+    tol = 1;
     caxis([-tol,tol])
     % caxis([qmin,qmax])
     daspect([20,20,1]);
