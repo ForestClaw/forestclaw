@@ -65,10 +65,10 @@ elseif (PlotType == 4)
     b(b >= 0) = 0;
     plot(r,b,'k','linewidth',2);  
     xlim([0,100]);
-    ylim([-zmin,20]);    
-    daspect([1 1 1])    
+    ylim([-5,5]);    
+    daspect([10 1 1])    
     [h_amr, labels_amr] = getlegendinfo(0);   % Input base level
-    h = legend(h_amr,labels_amr,'location','southeast');
+    h = legend(h_amr,labels_amr,'location','southwest');
     set(h,'fontsize',16);
     hold off;
 end
