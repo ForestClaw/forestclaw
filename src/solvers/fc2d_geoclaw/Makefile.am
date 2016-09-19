@@ -51,7 +51,8 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate2fine_fort.f \
-	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \	
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_ghostaux_fort.f90 \	
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \
