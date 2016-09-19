@@ -56,6 +56,8 @@ typedef struct fclaw2d_block_ll
     double *yv;
 } fclaw2d_block_ll_t;
 
+void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

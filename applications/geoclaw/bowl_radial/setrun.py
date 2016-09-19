@@ -65,8 +65,8 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Number of grid cells: Coarsest grid
-    clawdata.num_cells[0] = 50
-    clawdata.num_cells[1] = 50
+    clawdata.num_cells[0] = 400 # 50
+    clawdata.num_cells[1] = 400 # 50
 
 
     # ---------------
@@ -258,7 +258,7 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 4
+    amrdata.amr_levels_max = 1
 
     # List of refinement ratios at each level (length at least mxnest-1)
     amrdata.refinement_ratios_x = [2,4,4]
@@ -311,19 +311,27 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    #regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
-    #regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
-    #regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
-    #regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
-    #regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
-    #regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+    # regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
+    # regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
+    # regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
+    # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
+    # regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
+    # regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
 
-    regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
-    regions.append([3, 6, 0., 1.e10,    0.,100.,    0.,100.])
+
+    # regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
+    # regions.append([2, 3, 0., 1.e10,    0.,100.,    0.,100.])
+    # regions.append([3, 4, 3., 1.e10,   52., 72.,   52., 72.])
+    # regions.append([3, 4, 3., 1.e10,   75., 95.,   -10.,  10.])
+    # regions.append([3, 5, 3.4, 1.e10,   57., 68.,   57., 68.])
+    # regions.append([3, 5, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+
+    regions.append([3, 3, 0., 1.e10, -100.,100., -100.,100.])
+    regions.append([3, 4, 0., 1.e10,    0.,100.,    0.,100.])
     regions.append([5, 6, 3., 1.e10,   52., 72.,   52., 72.])
     regions.append([5, 6, 3., 1.e10,   75., 95.,   -10.,  10.])
-    regions.append([6, 6, 3.4, 1.e10,   57., 68.,   57., 68.])
-    regions.append([6, 6, 3.4, 1.e10,   83., 92.,   -4.,  4.])
+    regions.append([7, 8, 3.4, 1.e10,   57., 68.,   57., 68.])
+    regions.append([7, 8, 3.4, 1.e10,   83., 92.,   -4.,  4.])
 
     # == setgauges.data values ==
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
@@ -376,7 +384,7 @@ def setgeo(rundata):
 
     # == Algorithm and Initial Conditions ==
     geo_data.sea_level = 0.0
-    geo_data.dry_tolerance = 1.e-3
+    geo_data.dry_tolerance = 1e-3
     geo_data.friction_forcing = True
     geo_data.manning_coefficient = 0.025
     geo_data.friction_depth = 20.0
@@ -385,7 +393,7 @@ def setgeo(rundata):
     refinement_data = rundata.refinement_data
     refinement_data.wave_tolerance = 1.e-2
     refinement_data.deep_depth = 1e2
-    refinement_data.max_level_deep = 3
+    refinement_data.max_level_deep = 5
     refinement_data.variable_dt_refinement_ratios = True
 
     # == settopo.data values ==
@@ -393,6 +401,7 @@ def setgeo(rundata):
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([2, 2, 2, 0., 1.e10, 'bowl.topotype2'])
+    # topo_data.topofiles.append([2, 0, 0, 0., 1.e10, 'bowl.topotype2'])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
@@ -404,7 +413,7 @@ def setgeo(rundata):
     rundata.qinit_data.qinitfiles = []
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
-    rundata.qinit_data.qinitfiles.append([4, 4, 'hump.xyz'])
+    rundata.qinit_data.qinitfiles.append([3, 3, 'hump.xyz'])
 
     # == setfixedgrids.data values ==
     fixedgrids = rundata.fixed_grid_data.fixedgrids

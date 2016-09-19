@@ -204,6 +204,8 @@ public :
     double yupper();
 
     double* q();
+    double* q_last();
+    double* q_timeinterp();
     double* error();
 
     int* block_corner_count();

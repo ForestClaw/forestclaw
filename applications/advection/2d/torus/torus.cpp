@@ -30,16 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_map.h>
+#include <fclaw2d_map_brick.h>
 #include <fclaw2d_map_query.h>
 #include <p4est_connectivity.h>
 
 #include <fc2d_clawpack46.h>
-
-/* Used just so we can destroy the brick we create for example 5 */
-extern "C" {
-    void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont);
-}
-
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)

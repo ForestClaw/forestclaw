@@ -412,7 +412,7 @@ void ClawPatch::partition_unpack(double *q)
 /* ----------------------------------------------------------------
    Exchange/average/interpolate
    ---------------------------------------------------------------- */
-
+#if 0
 void ClawPatch::set_boundary_to_value(const int& time_interp,
                                       double& value)
 {
@@ -451,7 +451,7 @@ void ClawPatch::exchange_corner_ghost(const int& a_corner, ClawPatch *cp_corner,
                            &transform_data);
 
 }
-
+#endif
 /* ----------------------------------------------------------------
    Multi-level operations
    ---------------------------------------------------------------- */

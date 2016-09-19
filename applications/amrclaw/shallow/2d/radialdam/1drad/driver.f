@@ -26,7 +26,7 @@ c
       dimension mthlim(mwaves)
 
       call claw1ez(maxmx,meqn,mwaves,mbc,maux,mwork,mthlim,
-     &		 q,work,aux)
+     &             q,work,aux)
 
       stop 
       end

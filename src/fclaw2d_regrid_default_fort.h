@@ -67,49 +67,7 @@ typedef void (*fclaw2d_fort_average2coarse_t)(const int* mx, const int* my,
                                               const int* igrid, const int* manifold);
 
 
-#define FCLAW2D_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fclaw2d_fort_tag4refinement, \
-                                                   FCLAW2D_FORT_TAG4REFINEMENT)
 
-void FCLAW2D_FORT_TAG4REFINEMENT(const int* mx,const int* my,
-                                 const int* mbc,const int* meqn,
-                                 const double* xlower, const double* ylower,
-                                 const double* dx, const double* dy,
-                                 const int* blockno,
-                                 double q[],
-                                 const double* tag_threshold,
-                                 const int* init_flag,
-                                 int* tag_patch);
-
-
-
-#define FCLAW2D_FORT_TAG4COARSENING FCLAW_F77_FUNC(fclaw2d_fort_tag4coarsening, \
-                                                   FCLAW2D_FORT_TAG4COARSENING)
-
-void FCLAW2D_FORT_TAG4COARSENING(const int* mx, const int* my,
-                                 const int* mbc, const int* meqn,
-                                 const double* xlower, const double* ylower,
-                                 const double* dx, const double* dy,
-                                 const int* blockno,
-                                 double q0[],double q1[],
-                                 double q2[],double q3[],
-                                 const double* tag_threshold,
-                                 int* tag_patch);
-
-#define FCLAW2D_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC(fclaw2d_fort_interpolate2fine, \
-                                                FCLAW2D_FORT_INTERPOLATE2FINE)
-void FCLAW2D_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
-                                   const int* mbc, const int* meqn,
-                                   double qcoarse[], double qfine[],
-                                   double areacoarse[], double areafine[],
-                                   const int* igrid, const int* manifold);
-
-#define FCLAW2D_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fclaw2d_fort_average2coarse, \
-                                                FCLAW2D_FORT_AVERAGE2COARSE)
-void FCLAW2D_FORT_AVERAGE2COARSE(const int* mx, const int* my,
-                                 const int* mbc, const int* meqn,
-                                 double qcoarse[],double qfine[],
-                                 double areacoarse[],double areafine[],
-                                 const int* igrid, const int* manifold);
 
 
 #define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \

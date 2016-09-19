@@ -137,6 +137,9 @@ struct amr_options
     const char *mthbc_string;
     int *mthbc;
 
+    /* Initialization of ghost cell */
+    int init_ghostcell;
+
     /* Refinement parameters */
     int refratio;
     int minlevel;

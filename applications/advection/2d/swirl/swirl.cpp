@@ -27,7 +27,7 @@
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack46.h>
 
 #include <fc2d_dummy.h>
 
@@ -60,9 +60,9 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    if (user->claw_version != 5)
+    if (user->claw_version != 4)
     {
-        fclaw_global_essentialf ("Option --user:claw_version must be 5\n");
+        fclaw_global_essentialf ("Option --user:claw_version must be 4\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
@@ -148,8 +148,8 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack5_register(app,"fclaw_options.ini");
-    
+    fc2d_clawpack46_register(app,"fclaw_options.ini");
+
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);
 

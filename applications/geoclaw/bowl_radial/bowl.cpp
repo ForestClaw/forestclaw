@@ -53,7 +53,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
+    /*
     user_options_t* user = (user_options_t*) package;
+    */
 
     return FCLAW_NOEXIT;
 }

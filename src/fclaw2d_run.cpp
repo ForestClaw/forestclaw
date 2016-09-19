@@ -154,11 +154,12 @@ void outstyle_1(fclaw2d_domain_t **domain)
     for(int n = 0; n < nout; n++)
     {
         double tstart = t_curr;
+        // Add June 6
+        fclaw2d_domain_set_time(*domain,t_curr);
         double tend = tstart + dt_outer;
         while (t_curr < tend)
         {
-            fclaw2d_domain_set_time(*domain,t_curr);
-
+            // fclaw2d_domain_set_time(*domain,t_curr);
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
@@ -276,6 +277,8 @@ void outstyle_1(fclaw2d_domain_t **domain)
                        not taken a small step */
                 }
             }
+            // Add June 6
+            fclaw2d_domain_set_time(*domain,t_curr);
             if (gparms->regrid_interval > 0)
             {
                 if (n_inner % gparms->regrid_interval == 0)
@@ -382,10 +385,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
         if (maxcfl_step > gparms->max_cfl)
         {
-            fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-
             if (!gparms->use_fixed_dt)
             {
+                fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
                 restore_time_step(*domain);
 
                 dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
@@ -393,6 +395,10 @@ void outstyle_3(fclaw2d_domain_t **domain)
                 /* Got back to start of loop without incrementing step counter or
                    current time. */
                 continue;
+            }
+            else
+            {
+                fclaw_global_productionf("   WARNING : Maximum CFL exceeded\n");
             }
         }
 
