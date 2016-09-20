@@ -36,7 +36,7 @@ static fc2d_clawpack46_vtable_t classic_claw;
 void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
 
     vt.problem_setup             = &slotted_disk_problem_setup;
 
