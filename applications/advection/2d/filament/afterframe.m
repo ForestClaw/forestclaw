@@ -18,7 +18,7 @@ else
     yout = 0.25*sin(th) + 1;
 end
 hold on;
-plot(xout,yout,'k','linewidth',2);
+% plot(xout,yout,'k','linewidth',2);
 fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
 hold off;
 
@@ -67,7 +67,7 @@ end
 
 %%
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
   MaxFrames = 128;
   axis([0 2 0 2]);
@@ -85,7 +85,7 @@ if (prt)
 end
 
 %%
-prt = false;
+prt = true;
 % NoQuery = 0;
 if (prt)
     MaxFrames = 41;
@@ -107,9 +107,9 @@ if (prt)
     id = input('Input id to use : ');
     if (~isempty(id) | id == 999)
 
-        fname_soln_tikz = sprintf('filament_tikz_%04d.tex',Frame);
-        fname_soln_tikz_dir = sprintf('results_%03d/filament_tikz_%04d.tex',id,Frame);
-        create_filament_soln_tikz(fname_soln_tikz_dir,xout,yout,figsize,1024,1024);
+        % fname_soln_tikz = sprintf('filament_tikz_%04d.tex',Frame);
+        % fname_soln_tikz_dir = sprintf('results_%03d/filament_tikz_%04d.tex',id,Frame);
+        % create_filament_soln_tikz(fname_soln_tikz_dir,xout,yout,figsize,1024,1024);
 
 
         % No mesh
@@ -136,7 +136,8 @@ if (prt)
             export_fig('-dpng','-transparent','-r256',...
                '-a1','-p0','-nocrop',fname_png);
             amrclaw = 0;
-            create_tikz_plot(id,Frame,fname_prefix,amrclaw,fname_soln_tikz);
+            % Frame,fname_prefix,id,amrclaw,extra_file
+            create_tikz_plot(Frame,fname_prefix,id,amrclaw);
         end
 
     end

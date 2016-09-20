@@ -34,6 +34,7 @@ include applications/advection/2d/filament/Makefile.am
 include applications/NCAR_transport/gaussian/Makefile.am
 include applications/NCAR_transport/slotted_disk/Makefile.am
 #include applications/NCAR_transport/correlatedcb/Makefile.am
+# include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # Euler example
 # include applications/euler/2d/quadrants/Makefile.am

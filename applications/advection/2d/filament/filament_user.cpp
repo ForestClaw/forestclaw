@@ -37,7 +37,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
 {
     const amr_options_t* gparms;
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
 
     gparms = fclaw2d_forestclaw_get_options(domain);
 
