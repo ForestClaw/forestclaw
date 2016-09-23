@@ -52,11 +52,12 @@ if (PlotType == 1)
 elseif (PlotType == 4)
     % Plot 1d solution
     hold on;
-    dir = './1drad/';
+    dir = './1drad_pyclaw/_output';
     dim = 1;
+    [auxdata1d,] = readamrdata(dim,0,dir,'aux');
     [amrdata1d,t1d] = readamrdata(dim,Frame,dir);
     userfile = 'bathy1d';  % UserVariableFile
-    [q1d,x1d] = plotframe1ez(amrdata1d,mq,'k-',userfile);
+    [q1d,x1d] = plotframe1ez(amrdata1d,mq,'k-','','',auxdata1d);
 
     % add bathymetry
     r = linspace(0,100,500);
@@ -65,8 +66,8 @@ elseif (PlotType == 4)
     b(b >= 0) = 0;
     plot(r,b,'k','linewidth',2);  
     xlim([0,100]);
-    ylim([-5,5]);    
-    daspect([10 1 1])    
+    ylim([-80,40]);
+    daspect([10 10 1])
     [h_amr, labels_amr] = getlegendinfo(0);   % Input base level
     h = legend(h_amr,labels_amr,'location','southwest');
     set(h,'fontsize',16);
