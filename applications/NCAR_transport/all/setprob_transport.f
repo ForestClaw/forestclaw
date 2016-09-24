@@ -31,7 +31,7 @@ c     # and using stream-function.
 c     # -------------------------------------------------
       call set_vflag(vflag)
 
-      kappa = 0.d0      !! set to zero for solid body rotation.
+      kappa = 2.d0      !! 0 for solid body rotation; 2 for swirl
       tfinal = 5.d0
       call set_wind_parms(kappa,tfinal)
 
