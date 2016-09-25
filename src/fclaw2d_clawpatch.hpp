@@ -98,8 +98,6 @@ public :
                         const amr_options_t *gparms,
                         fclaw2d_build_mode_t build_mode);
 
-    void set_block_corner_count(const int icorner, const int block_corner_count);
-
     // ----------------------------------------------------------------
     // Miscellaneous
     // ----------------------------------------------------------------
@@ -143,8 +141,6 @@ public :
     double* q_last();
     double* q_timeinterp();
     double* error();
-
-    int* block_corner_count();
 
     void* clawpack_patch_data(int id);
 
@@ -193,8 +189,6 @@ protected :
 
     FArrayBox m_area;
     FArrayBox m_curvature;  // ???
-
-    int m_block_corner_count[4];
 
     /* This is an opaque pointer */
     fclaw_package_data_t *m_package_data_ptr;

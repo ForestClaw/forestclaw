@@ -216,25 +216,6 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
 }
 
 /* ------------------------------------------------------------------
-   Miscellaneous
- ------------------------------------------------------------------ */
-int* fclaw2d_clawpatch_block_corner_count(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->block_corner_count();
-}
-
-void fclaw2d_clawpatch_set_block_corner_count(fclaw2d_domain_t* domain,
-                                              fclaw2d_patch_t* this_patch,
-                                              int icorner, int block_corner_count)
-{
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->set_block_corner_count(icorner,block_corner_count);
-}
-
-
-/* ------------------------------------------------------------------
    Manifold setup and access
  ------------------------------------------------------------------ */
 
@@ -857,9 +838,9 @@ ClawPatch::~ClawPatch()
 }
 
 void ClawPatch::define(fclaw2d_domain_t* domain,
-                           fclaw2d_patch_t* this_patch,
-                           int blockno,
-                           fclaw2d_build_mode_t build_mode)
+                       fclaw2d_patch_t* this_patch,
+                       int blockno,
+                       fclaw2d_build_mode_t build_mode)
 
 {
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -869,9 +850,9 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     m_mbc = gparms->mbc;
     m_blockno = blockno;
     m_meqn = gparms->meqn;
-    for (int m=0; m < 4; m++)
+    for (int icorner=0; icorner < 4; icorner++)
     {
-        m_block_corner_count[m] = 0;
+        fclaw2d_patch_set_block_corner_count(domain,this_patch,icorner,0);
     }
 
     fclaw2d_map_context_t* cont =
@@ -1160,10 +1141,12 @@ double* ClawPatch::curvature()
     return m_curvature.dataPtr();
 }
 
+#if 0
 int* ClawPatch::block_corner_count()
 {
     return &m_block_corner_count[0];
 }
+#endif
 
 /* ----------------------------------------------------
    Solver data and functions
@@ -1263,11 +1246,6 @@ void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
 /* ----------------------------------------------------------------
    Mapped grids
    ---------------------------------------------------------------- */
-
-void ClawPatch::set_block_corner_count(const int icorner, const int block_corner_count)
-{
-    m_block_corner_count[icorner] = block_corner_count;
-}
 
 void ClawPatch::setup_area_storage()
 {

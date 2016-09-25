@@ -119,6 +119,13 @@ int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch);
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch);
 
+int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch);
+
+void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* this_patch,
+                                          int icorner, int block_corner_count);
+
 
 /* -----------------------------------------------------
    Ghost exchange

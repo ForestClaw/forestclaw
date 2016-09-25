@@ -35,6 +35,7 @@ struct fclaw2d_patch_data
     fclaw2d_patch_relation_t face_neighbors[4];
     fclaw2d_patch_relation_t corner_neighbors[4];
     int corners[4];
+    int block_corner_count[4];
     int on_coarsefine_interface;
     int has_finegrid_neighbors;
     int neighbors_set;
@@ -176,6 +177,21 @@ int
 fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
 {
     return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+}
+
+int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
+    return pdata->block_corner_count;
+}
+
+void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* this_patch,
+                                          int icorner, int block_corner_count)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
+    pdata->block_corner_count[icorner] = block_corner_count;
 }
 
 
