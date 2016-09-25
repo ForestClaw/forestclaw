@@ -414,8 +414,7 @@ void  FC2D_CLAWPACK46_FORT_GHOSTPACK(int *mx, int *my, int *mbc,
                                      int *meqn, int *mint,
                                      double qdata[], double area[],
                                      double qpack[], int *psize,
-                                     int *packmode, int *pack_layers,
-                                     int *ierror);
+                                     int *packmode, int *ierror);
 
 #define FC2D_CLAWPACK46_FORT_TIMEINTERP FCLAW_F77_FUNC (fc2d_clawpack46_fort_timeinterp, \
                                                        FC2D_CLAWPACK46_FORT_TIMEINTERP)
