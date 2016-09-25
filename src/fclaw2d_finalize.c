@@ -29,25 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_statistics.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
-#if 0
-#define FCLAW2D_STATS_SET(stats,ddata,NAME) do {                               \
-    SC_CHECK_ABORT (!(ddata)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
-                    "Timer " #NAME " still running in amrreset");              \
-    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
-                   (ddata)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
-} while (0)
-#endif
-
-
 /* ------------------------------------------------------------------
    Public interface
    ---------------------------------------------------------------- */
@@ -62,10 +43,3 @@ void fclaw2d_finalize(fclaw2d_domain_t **domain)
 
     fclaw2d_domain_reset(domain);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

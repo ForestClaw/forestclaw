@@ -83,6 +83,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_partition.c \
 	src/fclaw2d_timeinterp.c \
 	src/fclaw2d_initialize.c \
+	src/fclaw2d_finalize.c \
 	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
@@ -99,7 +100,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_run.cpp \
-	src/fclaw2d_finalize.cpp \
 	src/fclaw2d_advance.cpp \
 	src/fclaw2d_update_single_step.cpp \
 	src/fclaw2d_convenience.c \
