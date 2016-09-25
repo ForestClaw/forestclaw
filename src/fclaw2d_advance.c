@@ -53,13 +53,14 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_timestep_counters *ts_counter;
+    int level;
 
     *ts_counter_ptr = FCLAW2D_ALLOC(fclaw2d_level_data_t,gparms->maxlevel+1);
 
     ts_counter = *ts_counter_ptr;
 
     /* Set global indexing for time levels */
-    for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
+    for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
     {
         ts_counter[level].last_step = 0;
         ts_counter[level].initial_time = t_init;
@@ -72,7 +73,7 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
         double dt_level = dt;
         int steps_inc = pow_int(2,domain->global_maxlevel-gparms->minlevel);
         int total_steps = 1;
-        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
+        for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
             ts_counter[level].dt_step = dt_level;
             ts_counter[level].total_steps = total_steps;
@@ -85,7 +86,7 @@ void initialize_timestep_counters(fclaw2d_domain_t* domain,
     else
     {
         int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
-        for (int level = gparms->minlevel; level <= gparms->maxlevel; level++)
+        for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
         {
             ts_counter[level].step_inc = 1;
             if (gparms->advance_one_step)
@@ -155,7 +156,7 @@ double compute_alpha(fclaw2d_domain_t *domain,
     int new_curr_step =
         ts_counter[level].last_step;
     double alpha =
-        double(new_curr_step % coarse_inc)/coarse_inc;
+        ((double) (new_curr_step % coarse_inc))/coarse_inc;
 
     return alpha;
 }
@@ -240,6 +241,7 @@ double advance_level(fclaw2d_domain_t *domain,
 double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
                                   double t_curr, double dt)
 {
+    int level;
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
@@ -258,7 +260,8 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
     /* Step inc at maxlevel should be 1 by definition */
     FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
     int n_fine_steps = ts_counter[maxlevel].total_steps;
-    for(int nf = 0; nf < n_fine_steps; nf++)
+    int nf;
+    for(nf = 0; nf < n_fine_steps; nf++)
     {
         /* Coarser levels get updated recursively */
         double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,ts_counter);
@@ -296,7 +299,7 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
     fclaw_global_infof("Advance is done with coarse grid step at " \
                       " time %12.6e\n",t_curr);
 
-    for(int level = domain->local_minlevel; level <= domain->global_maxlevel; level++)
+    for(level = domain->local_minlevel; level <= domain->global_maxlevel; level++)
     {
         FCLAW_ASSERT(ts_counter[level].last_step ==
                      ts_counter[level].step_inc*ts_counter[level].total_steps);
