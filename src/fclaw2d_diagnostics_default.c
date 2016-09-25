@@ -25,16 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
 
 /* This can be replaced with a user defined routine;
    Set vt.compute_patch_error in an appropriate <app>_user.cpp file */
@@ -63,10 +55,3 @@ void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
     vt.fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
                                 &xlower,&ylower, &t, q, error);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

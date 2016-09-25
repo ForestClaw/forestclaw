@@ -99,10 +99,10 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_diagnostics.c \
 	src/fclaw2d_regrid_default.c \
 	src/fclaw2d_output_ascii.c \
+	src/fclaw2d_diagnostics_default.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
-	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_metric_default.cpp \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
