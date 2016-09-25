@@ -247,8 +247,7 @@ typedef void (*fclaw2d_fort_ghostpack_t)(int *mx, int *my, int *mbc,
                                        int *meqn, int *mint,
                                        double qdata[], double area[],
                                        double qpack[], int *psize,
-                                       int *packmode, int *pack_layers,
-                                       int *ierror);
+                                       int *packmode, int *ierror);
 
 typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                         const int *meqn, const int* psize,
@@ -318,10 +317,10 @@ typedef struct fclaw2d_vtable
 
     fclaw2d_patch_copy_corner_t  copy_corner;
     fclaw2d_fort_copy_corner_t   fort_copy_corner;
-    
+
     fclaw2d_patch_average_corner_t  average_corner;
     fclaw2d_fort_average_corner_t   fort_average_corner;
-    
+
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
     fclaw2d_fort_interpolate_corner_t   fort_interpolate_corner;
 

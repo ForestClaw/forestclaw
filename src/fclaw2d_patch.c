@@ -27,16 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <p4est_base.h>
 
-#include <fclaw2d_patch.hpp>
-#include <fclaw2d_clawpatch.hpp>
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
+#include <fclaw2d_patch.h>
+#include <fclaw2d_clawpatch.h>
 
 struct fclaw2d_patch_data
 {
@@ -48,9 +40,6 @@ struct fclaw2d_patch_data
     int neighbors_set;
 
     void *user_patch; /* Start of attempt to "virtualize" the user patch. */
-#if 0
-    ClawPatch *cp;
-#endif
 };
 
 fclaw2d_patch_data_t*
@@ -117,12 +106,13 @@ int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
 
 void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 {
+    int iface, icorner;
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata->neighbors_set == 0);
 
     pdata->has_finegrid_neighbors = 0;
     pdata->on_coarsefine_interface = 0;
-    for (int iface = 0; iface < 4; iface++)
+    for (iface = 0; iface < 4; iface++)
     {
         fclaw2d_patch_relation_t nt;
         nt = pdata->face_neighbors[iface];
@@ -136,7 +126,7 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
         }
     }
 
-    for (int icorner = 0; icorner < 4; icorner++)
+    for (icorner = 0; icorner < 4; icorner++)
     {
         fclaw2d_patch_relation_t nt;
         int has_corner = pdata->corners[icorner];
@@ -248,17 +238,10 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
     if (pdata != NULL)
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-        delete (ClawPatch*) pdata->user_patch;
+        fclaw2d_clawpatch_delete_patch(pdata->user_patch);
         ++ddata->count_delete_clawpatch;
 
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
     }
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
