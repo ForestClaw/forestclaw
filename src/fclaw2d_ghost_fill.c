@@ -75,26 +75,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#if 0
-}
-#endif
-#endif
-
-
 /* -------------------------------------------------
    Basic routines - operate on a single level
    ----------------------------------------------- */
 
 static fclaw2d_patch_iterator_t patch_iterator;
 
-struct fclaw2d_ghost_fill_wrap_info
+typedef struct fclaw2d_ghost_fill_wrap_info
 {
     fclaw2d_ghost_fill_parallel_mode_t ghost_mode;
     fclaw2d_patch_callback_t cb_fill;
     void *user;
-};
+} fclaw2d_ghost_fill_wrap_info_t;
 
 static void cb_parallel_wrap(fclaw2d_domain_t* domain,
                              fclaw2d_patch_t* this_patch,
@@ -129,7 +121,7 @@ static void cb_parallel_wrap(fclaw2d_domain_t* domain,
                                   int this_patch_idx,
                                   void *user)
 {
-    struct fclaw2d_ghost_fill_wrap_info w = *((fclaw2d_ghost_fill_wrap_info*) user);
+    fclaw2d_ghost_fill_wrap_info_t w = *((fclaw2d_ghost_fill_wrap_info_t*) user);
     int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
     if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
         ((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
@@ -174,7 +166,7 @@ void average2ghost(fclaw2d_domain_t *domain,
                    int read_parallel_patches,
                    fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-    struct fclaw2d_ghost_fill_wrap_info parallel_mode;
+    fclaw2d_ghost_fill_wrap_info_t parallel_mode;
 
     fclaw2d_exchange_info_t e_info;
     e_info.time_interp = time_interp; /* Does this matter here? */
@@ -351,9 +343,10 @@ static
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
+    int level;
 
     /* Copy between grids that are at the same level. */
-    for(int level = maxlevel; level >= minlevel; level--)
+    for(level = maxlevel; level >= minlevel; level--)
     {
         int time_interp = 0;
         copy2ghost(domain,level,time_interp,
@@ -384,8 +377,10 @@ void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_AVERAGE]);
 
+    int level;
+
     /* Average fine grids to coarse grid ghost cells */
-    for(int level = maxcoarse; level >= mincoarse; level--)
+    for(level = maxcoarse; level >= mincoarse; level--)
     {
         /* Don't do any time interpolation yet */
         int time_interp = 0;
@@ -414,8 +409,10 @@ void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_INTERP]);
 
+    int level;
+
     /* Interpolate from coarse grid to fine grid ghost */
-    for(int level = maxcoarse; level >= mincoarse; level--)
+    for(level = maxcoarse; level >= mincoarse; level--)
     {
         /* No need to interpolate to coarse time-interpolated grids */
         int time_interp = 0;
@@ -443,7 +440,9 @@ void fill_physical_ghost(fclaw2d_domain_t* domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_PHYSBC]);
 
-    for(int level = maxlevel; level >= minlevel; level--)
+    int level;
+
+    for(level = maxlevel; level >= minlevel; level--)
     {
         int time_interp = 0;
         setphysical(domain,level,sync_time,time_interp,ghost_mode);
@@ -744,11 +743,3 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         fclaw2d_timer_start (&ddata->timers[running]);
     }
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
