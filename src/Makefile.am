@@ -84,17 +84,16 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_timeinterp.c \
 	src/fclaw2d_initialize.c \
 	src/fclaw2d_finalize.c \
-	src/fclaw2d_output.cpp \
-	src/fclaw2d_output_ascii.cpp \
-	src/fclaw2d_regrid_default.cpp \
-	src/fclaw2d_regrid.cpp \
-	src/fclaw2d_metric.cpp \
-	src/fclaw2d_metric_default.cpp \
-	src/fclaw2d_exchange.cpp \
-	src/fclaw2d_diagnostics.cpp \
-	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
+	src/fclaw2d_convenience.c \
+	src/fclaw2d_regrid.c \
+	src/fclaw2d_exchange.c \
+	src/fp_exception_glibc_extension.c \
+	src/fclaw2d_output.cpp \
+	src/fclaw2d_output_ascii.cpp \
+	src/fclaw2d_metric.cpp \
+	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_ghost_fill.cpp \
 	src/fclaw2d_physical_bc.cpp \
 	src/fclaw2d_clawpatch.cpp \
@@ -102,8 +101,9 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_run.cpp \
 	src/fclaw2d_advance.cpp \
 	src/fclaw2d_update_single_step.cpp \
-	src/fclaw2d_convenience.c \
-	src/fp_exception_glibc_extension.c \
+	src/fclaw2d_diagnostics_default.cpp \
+	src/fclaw2d_metric_default.cpp \
+	src/fclaw2d_regrid_default.cpp \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
