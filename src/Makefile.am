@@ -98,8 +98,8 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_run.c \
 	src/fclaw2d_diagnostics.c \
 	src/fclaw2d_regrid_default.c \
+	src/fclaw2d_output_ascii.c \
 	src/fp_exception_glibc_extension.c \
-	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_diagnostics_default.cpp \
