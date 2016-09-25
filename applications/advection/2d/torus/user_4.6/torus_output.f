@@ -54,7 +54,7 @@ c     # Write out error as an extra field (why not just do this in C?)
       open(matunit1,file=matname1,position='append');
 
 
-      call fclaw2d_fort_write_grid_header(matunit1,
+      call fc2d_clawpack46_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
