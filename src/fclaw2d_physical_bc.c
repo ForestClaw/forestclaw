@@ -76,7 +76,8 @@ void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[NumFaces];
     fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
-    for(int i = 0; i < NumFaces; i++)
+    int i;
+    for(i = 0; i < NumFaces; i++)
     {
         // Physical boundary conditions
         intersects_bdry[i] = bdry[i] == 1;

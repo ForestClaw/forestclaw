@@ -37,11 +37,11 @@ extern "C"
 #endif
 
 
-struct fclaw2d_physical_time_info_t
+typedef struct fclaw2d_physical_time_info
 {
     double level_time;
     int time_interp;
-};
+} fclaw2d_physical_time_info_t;
 
 
 void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,

@@ -31,7 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
 
-#include <fclaw2d_advance.hpp>
+#include <fclaw2d_advance.h>
+
+
 typedef struct fclaw2d_level_data
 {
     int last_step;
