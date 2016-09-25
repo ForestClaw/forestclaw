@@ -80,13 +80,14 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_transform.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
+	src/fclaw2d_partition.c \
+	src/fclaw2d_timeinterp.c \
 	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_regrid_default.cpp \
 	src/fclaw2d_regrid.cpp \
 	src/fclaw2d_metric.cpp \
 	src/fclaw2d_metric_default.cpp \
-	src/fclaw2d_partition.cpp \
 	src/fclaw2d_exchange.cpp \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_diagnostics_default.cpp \
@@ -94,7 +95,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_ghost_fill.cpp \
 	src/fclaw2d_physical_bc.cpp \
-	src/fclaw2d_timeinterp.cpp \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_initialize.cpp \
