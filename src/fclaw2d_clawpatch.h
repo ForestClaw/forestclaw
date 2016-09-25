@@ -118,6 +118,12 @@ void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain);
 int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* this_patch);
 
+void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch);
+
 
 /* -----------------------------------------------------
    Define/build clawpatches

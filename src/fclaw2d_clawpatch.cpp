@@ -214,6 +214,23 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
     cp->save_current_step();
 }
 
+/* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
+void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->restore_step();
+}
+
+/* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
+void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch)
+{
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    cp->save_step();
+}
+
+
 /* ------------------------------------------------------------------
    Manifold setup and access
  ------------------------------------------------------------------ */

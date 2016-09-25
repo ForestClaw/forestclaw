@@ -95,12 +95,12 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_metric.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_update_single_step.c \
+	src/fclaw2d_run.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
-	src/fclaw2d_run.cpp \
 	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_metric_default.cpp \
 	src/fclaw2d_regrid_default.cpp \

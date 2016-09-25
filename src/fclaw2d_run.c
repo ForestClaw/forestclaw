@@ -24,13 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_advance.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
-#include <iostream>
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -56,10 +57,13 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
+#if 0
     ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     /* Copy most current time step data to grid data. (m_griddata <== m_griddata_last) */
     this_cp->restore_step();
+#endif
+    fclaw2d_clawpatch_restore_step(domain,this_patch);
 }
 
 static
@@ -75,11 +79,14 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
+#if 0
     ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     /* Copy grid data (m_griddata) on each patch to temporary storage
        (m_griddata_tmp <== m_griddata); */
     this_cp->save_step();
+#endif
+    fclaw2d_clawpatch_save_step(domain,this_patch);
 }
 
 static
@@ -147,11 +154,12 @@ void outstyle_1(fclaw2d_domain_t **domain)
 
     double t0 = 0;
 
-    double dt_outer = (final_time-t0)/double(nout);
+    double dt_outer = (final_time-t0)/((double) nout);
     double t_curr = t0;
     int n_inner = 0;
 
-    for(int n = 0; n < nout; n++)
+    int n;
+    for(n = 0; n < nout; n++)
     {
         double tstart = t_curr;
         // Add June 6
