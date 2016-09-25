@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
-
 #include <fclaw2d_ghost_fill.h>
+
 
 /* This is used to determine neighbor patch relative level
    (finer, coarser or samesize) */
