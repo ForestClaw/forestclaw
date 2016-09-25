@@ -62,7 +62,7 @@ void fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
                              double level_time,
                              int time_interp);
 
-void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
+void fclaw2d_physical_bc_default(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,

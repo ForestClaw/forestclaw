@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_vtable.h"
 #include "fclaw2d_domain.h"
 
-void fclaw2d_physical_bc_default(fclaw2d_domain *domain,
+void fclaw2d_physical_bc_default(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
