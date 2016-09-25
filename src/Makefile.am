@@ -92,7 +92,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_diagnostics_default.cpp \
 	src/fclaw2d_corner_neighbors.cpp \
-	src/fclaw2d_face_neighbors.cpp \
+	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_ghost_fill.cpp \
 	src/fclaw2d_physical_bc.cpp \
 	src/fclaw2d_timeinterp.cpp \
