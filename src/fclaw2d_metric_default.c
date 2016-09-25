@@ -31,20 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_math.h>
 #include <fclaw2d_metric_default_fort.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t* this_patch,
                                  int blockno,
                                  int patchno)
 {
-    fclaw2d_vtable_t vt;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     int level, maxlevel,refratio;
@@ -58,8 +49,6 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     double *area = fclaw2d_clawpatch_get_area(domain,this_patch);
-
-    vt = fclaw2d_get_vtable(domain);
 
     /* Could make this a virtual function, but what is the signature?
        vt.fort_compute_area(...) */
@@ -238,12 +227,3 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
     }
 
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
