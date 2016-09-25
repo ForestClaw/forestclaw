@@ -1,9 +1,8 @@
       subroutine fc2d_clawpack5_fort_ghostpack(mx,my,mbc,meqn,
-     &      mint,qdata,area,qpack,psize,packmode,
-     &      pack_layers,ierror)
+     &      mint,qdata,area,qpack,psize,packmode,ierror)
 
       implicit none
-      integer mx,my,mbc,meqn,psize, pack_layers
+      integer mx,my,mbc,meqn,psize, mint
       integer pack_area, packmode, ierror
       double precision qdata(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -13,7 +12,7 @@
       parameter(packq = 0, unpackq = 1, packarea = 2,
      &      unpackarea = 3)
 
-      integer i,j,mq,k, ibc,jbc, kfinal, mint
+      integer i,j,mq,k, ibc,jbc, kfinal
       logical packdata
 
       ierror = 0
@@ -25,7 +24,6 @@
          return
       endif
 
-      mint = pack_layers
       packdata = packmode .eq. packq .or. packmode .eq. packarea
 
       k = 1

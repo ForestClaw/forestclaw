@@ -80,7 +80,7 @@ typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
 
 //!!! Add maux
 typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                      const int* mwaves, const int* maux, 
+                                      const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
@@ -192,7 +192,7 @@ void SRC2(const int* meqn,
 
 /* Riemann solvers */
 void RPN2(const int* ixy,const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux, 
+          const int* mwaves, const int* maux,
           const int* mbc,const int* mx,
           double ql[], double qr[], double auxl[], double auxr[],
           double wave[], double s[],double amdq[], double apdq[]);
@@ -398,8 +398,7 @@ void  FC2D_CLAWPACK5_FORT_GHOSTPACK(int *mx, int *my, int *mbc,
                                      int *meqn, int *mint,
                                      double qdata[], double area[],
                                      double qpack[], int *psize,
-                                     int *packmode, int *pack_layers,
-                                     int *ierror);
+                                    int *packmode, int *ierror);
 
 #define FC2D_CLAWPACK5_FORT_TIMEINTERP FCLAW_F77_FUNC (fc2d_clawpack5_fort_timeinterp, \
                                                        FC2D_CLAWPACK5_FORT_TIMEINTERP)
