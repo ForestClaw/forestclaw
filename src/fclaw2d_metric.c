@@ -30,15 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_metric_default_fort.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
                                  fclaw2d_patch_t *fine_patches,
                                  fclaw2d_patch_t *coarse_patch,
@@ -73,12 +64,3 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
     /* Use either exact or approximate method */
     vt.metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
 }
-
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
