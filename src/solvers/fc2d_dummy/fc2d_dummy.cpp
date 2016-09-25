@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_dummy.h"
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_neighbors_fort.h>
 
 static int s_dummy_package_id = -1;
@@ -98,14 +98,14 @@ void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    fc2d_dummy_define_data(domain,cp);
+    fc2d_dummy_define_data(domain,this_patch);
 }
 
 
-void fc2d_dummy_define_data(fclaw2d_domain_t* domain, ClawPatch *cp)
+void fc2d_dummy_define_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     patch_data* pd = get_patch_data(cp);
 
     int mx = gparms->mx;
