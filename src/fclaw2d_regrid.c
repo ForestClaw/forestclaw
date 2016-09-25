@@ -35,14 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -96,7 +88,8 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                                                   blockno, fine0_patchno);
         if (family_coarsened == 1)
         {
-            for (int igrid = 0; igrid < NumSiblings; igrid++)
+            int igrid;
+            for (igrid = 0; igrid < NumSiblings; igrid++)
             {
                 int fine_patchno = fine0_patchno + igrid;
                 fclaw2d_patch_mark_coarsen(domain,blockno, fine_patchno);
@@ -141,7 +134,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *fine_siblings = new_patch;
         fclaw2d_patch_t *coarse_patch = old_patch;
 
-        for (int i = 0; i < NumSiblings; i++)
+        int i;
+        for (i = 0; i < NumSiblings; i++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
@@ -189,7 +183,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         vt.regrid_average2coarse(new_domain,fine_siblings,coarse_patch,
                                 blockno,coarse_patchno, fine_patchno);
 
-        for(int i = 0; i < 4; i++)
+        int i;
+        for(i = 0; i < 4; i++)
         {
             fclaw2d_patch_t* fine_patch = &fine_siblings[i];
             fclaw2d_patch_data_delete(old_domain,fine_patch);
