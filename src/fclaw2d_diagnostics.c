@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_diagnostics_fort.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.h>
 
 
@@ -64,7 +64,7 @@ void cb_diagnostics_compute_sum(fclaw2d_domain_t *domain,
     fclaw2d_vtable_t vt;
 
     vt = fclaw2d_get_vtable(domain);
-    
+
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
@@ -103,7 +103,8 @@ void fclaw2d_check_conservation(fclaw2d_domain_t *domain,
         fclaw2d_timer_stop (&ddata->timers[running]);
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
-    for (int m = 0; m < meqn; m++)
+    int m;
+    for (m = 0; m < meqn; m++)
     {
         global_sum[m] = fclaw2d_domain_global_sum (domain, local_sum[m]);
         /* One time setting for initial sum */
@@ -278,7 +279,8 @@ void fclaw2d_compute_total_error(fclaw2d_domain_t *domain,
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
-    for (int m = 0; m < meqn; m++)
+    int m;
+    for (m = 0; m < meqn; m++)
     {
         int i1 = m;            /* 1-norm */
         int i2 = meqn + m;     /* 2-norm */
@@ -301,7 +303,7 @@ void fclaw2d_compute_total_error(fclaw2d_domain_t *domain,
                                             running);
     FCLAW_ASSERT(total_area != 0);
 
-    for(int m = 0; m < meqn; m++)
+    for(m = 0; m < meqn; m++)
     {
         int i1 = m;            /* 1-norm */
         int i2 = meqn + m;     /* 2-norm */
