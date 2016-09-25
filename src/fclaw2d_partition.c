@@ -30,14 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_partition.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 static
 void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
                             fclaw2d_patch_t * old_patch,
@@ -176,10 +168,3 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
