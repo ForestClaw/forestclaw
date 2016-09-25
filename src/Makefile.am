@@ -93,8 +93,8 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_physical_bc.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_metric.c \
+	src/fclaw2d_output.c \
 	src/fp_exception_glibc_extension.c \
-	src/fclaw2d_output.cpp \
 	src/fclaw2d_output_ascii.cpp \
 	src/fclaw2d_diagnostics.cpp \
 	src/fclaw2d_clawpatch.cpp \

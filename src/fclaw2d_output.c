@@ -32,16 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_mpi.h>
 #include <fclaw_base.h>
 
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
 
 static void
 cb_serial_output (fclaw2d_domain_t * domain,
@@ -154,8 +146,6 @@ static
 void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
 {
     char fname[20];
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
@@ -188,14 +178,16 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
         /* Only rank 0 opens the file */
         fp = fopen(fname,"w");
         fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
-        fprintf(fp,"    \\node (forestclaw_plot) at (%3.1f,%3.1f)\n",double(mxf)/2,double(myf)/2);
+        fprintf(fp,"    \\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
+                ((double) mxf)/2,((double)myf)/2);
         fprintf(fp,"    {\\includegraphics{\\figname}};\n\n");
         fprintf(fp,"\\plotgrid{\n");
         fclose(fp);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-    for(int i = 0; i < domain->mpisize; i++)
+    int i;
+    for(i = 0; i < domain->mpisize; i++)
     {
         if (domain->mpirank == i)
         {
@@ -245,26 +237,32 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
                                   int this_block_idx, int this_patch_idx,
                                   char *a)
 {
-    // Global parameters
     const amr_options_t *gparms = get_domain_parms (domain);
     fclaw2d_map_context_t *cont;
-    const int mx = gparms->mx;
-    const int my = gparms->my;
+
+    int mx,my,mbc;
+    double dx,dy,xlower,ylower;
+
 
     cont = fclaw2d_domain_get_map_context(domain);
 
-    // Patch specific parameters
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+#if 0
+    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     const double xlower = cp->xlower ();
     const double ylower = cp->ylower ();
     const double dx = cp->dx ();
     const double dy = cp->dy ();
+#endif
 
-    // Enumerate point coordinates in the patch
+    /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
     int i, j;
-    double xp,yp,zp;
+    double xpp,ypp,zpp;
     for (j = 0; j <= my; ++j)
     {
         const double y = ylower + j * dy;
@@ -273,10 +271,10 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
             const double x = xlower + i * dx;
             if (gparms->manifold)
             {
-                FCLAW2D_MAP_C2M(&cont,&this_block_idx,&x,&y,&xp,&yp,&zp);
-                *d++ = xp;
-                *d++ = yp;
-                *d++ = zp;
+                FCLAW2D_MAP_C2M(&cont,&this_block_idx,&x,&y,&xpp,&ypp,&zpp);
+                *d++ = xpp;
+                *d++ = ypp;
+                *d++ = zpp;
             }
             else
             {
@@ -295,18 +293,17 @@ fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
                              int this_block_idx, int this_patch_idx,
                              char *a)
 {
-    // Global parameters
-    const amr_options_t *gparms = get_domain_parms (domain);
-    const int mx = gparms->mx;
-    const int my = gparms->my;
-    const int mbc = gparms->mbc;
-    const int meqn = gparms->meqn;
+    double *q;
+    double xlower,ylower,dx,dy;
+    int mx,my,mbc,meqn;
+
+    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
     const int xlane = mx + 2 * mbc;
     const int ylane = my + 2 * mbc;
-
-    // Patch specific parameters
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    const double *q = cp->q ();
 
     // Enumerate equation data in the patch
     float *f = (float *) a;
@@ -338,9 +335,7 @@ fclaw2d_output_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 void
 fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
 {
-    fclaw2d_vtable_t vt;
     double time;
-    vt = fclaw2d_get_vtable(domain);
 
     time = fclaw2d_domain_get_time(domain);
 
@@ -393,11 +388,3 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     /* Record output time */
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
