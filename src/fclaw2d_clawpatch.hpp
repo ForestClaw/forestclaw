@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_transform.h>
 #include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_patch.hpp>
+#include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>
 
 
