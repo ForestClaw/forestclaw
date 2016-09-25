@@ -83,7 +83,7 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     fclaw_vt->fort_ghostpack = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
-    
+
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
@@ -462,8 +462,8 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     /*
-    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy, 
-                   level, time, xleft, xright, ybot, ytop, 
+    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy,
+                   level, time, xleft, xright, ybot, ytop,
                    &xlower, &ylower, xupper, yupper, 0,0,0);
     */
     classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -520,20 +520,21 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    
+
     int ierror = 0;
     //fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
     //                                CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
     fc2d_clawpack5_flux2_t flux2 = CLAWPACK5_FLUX2;
+    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
     CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           classic_vt.rpn2, classic_vt.rpt2,flux2,
-                          cp->block_corner_count(), &ierror);
+                          block_corner_count, &ierror);
 
     FCLAW_ASSERT(ierror == 0);
-    
+
     //CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
     //                fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
