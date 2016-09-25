@@ -37,15 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <omp.h>
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 /* -----------------------------------------------------------------
    Initial grid
    ----------------------------------------------------------------- */
@@ -100,7 +91,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* Initialize all timers */
     ddata->is_latest_domain = 1;
-    for (int i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
+    int i;
+    for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
         fclaw2d_timer_init (&ddata->timers[i]);
     }
 
@@ -178,7 +170,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     if (minlevel < maxlevel)
     {
         int domain_init = 1;
-        for (int level = minlevel; level < maxlevel; level++)
+        int level;
+        for (level = minlevel; level < maxlevel; level++)
         {
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
             fclaw2d_domain_iterate_level(*domain, level,
@@ -263,20 +256,11 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         }  /* Level loop (minlevel --> maxlevel) */
     }
 
-#if 1
-    /* We only need to update the physical ghost cells because we
-       assume the initialization procedure handles all internal
-       boundaries. */
-    /* int new_level = level + 1; */
-
-    /* Add 2016/07/26, need here???*/
     if (gparms->init_ghostcell){
         fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    /* fclaw2d_physical_set_bc(*domain,new_level,0.0,time_interp); */
-#endif
 
 
     /* Print global minimum and maximum levels */
@@ -287,10 +271,3 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
