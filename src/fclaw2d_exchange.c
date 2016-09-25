@@ -31,14 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 
-#ifdef __cplusplus
-extern "C" {
-#if 0
-}
-#endif
-#endif
-
-
 /* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*
     get_exchange_data(fclaw2d_domain_t* domain)
@@ -91,7 +83,8 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
         build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
     }
 
-    for(int i = 0; i < domain->num_ghost_patches; i++)
+    int i;
+    for(i = 0; i < domain->num_ghost_patches; i++)
     {
         ghost_patch = &domain->ghost_patches[i];
 
@@ -111,7 +104,8 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
 static
 void delete_ghost_patches(fclaw2d_domain_t* domain)
 {
-    for(int i = 0; i < domain->num_ghost_patches; i++)
+    int i;
+    for(i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         fclaw2d_patch_data_delete(domain,ghost_patch);
@@ -126,7 +120,8 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
                      int maxlevel,
                      int time_interp)
 {
-    for(int i = 0; i < domain->num_ghost_patches; i++)
+    int i;
+    for(i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         int level = ghost_patch->level;
@@ -155,7 +150,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* This is called by rebuild_domain */
-void fclaw2d_exchange_setup(fclaw2d_domain* domain,
+void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
                             fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
@@ -178,9 +173,11 @@ void fclaw2d_exchange_setup(fclaw2d_domain* domain,
        contiguous memory block that stores qdata and area (for computations
        on manifolds).*/
     int zz = 0;
-    for (int nb = 0; nb < domain->num_blocks; ++nb)
+    int nb;
+    for (nb = 0; nb < domain->num_blocks; ++nb)
     {
-        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
+        int np;
+        for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
@@ -248,9 +245,11 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     {
         /* Delete local patches which are passed to other procs */
         int zz = 0;
-        for (int nb = 0; nb < (*domain)->num_blocks; ++nb)
+        int nb;
+        for (nb = 0; nb < (*domain)->num_blocks; ++nb)
         {
-            for (int np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
+            int np;
+            for (np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
             {
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
@@ -293,9 +292,11 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
     /* Pack local data into on-proc patches at the parallel boundary that
        will be shipped of to other processors. */
     int zz = 0;
-    for (int nb = 0; nb < domain->num_blocks; ++nb)
+    int nb;
+    for (nb = 0; nb < domain->num_blocks; ++nb)
     {
-        for (int np = 0; np < domain->blocks[nb].num_patches; ++np)
+        int np;
+        for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
