@@ -83,7 +83,7 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
 
     fclaw_vt->fort_ghostpack          = &FC2D_CLAWPACK46_FORT_GHOSTPACK;
-    
+
     fclaw_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 
 }
@@ -528,6 +528,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     int ierror = 0;
+    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
 
@@ -536,7 +537,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           classic_vt.rpn2, classic_vt.rpt2,flux2,
-                          cp->block_corner_count(), &ierror);
+                          block_corner_count, &ierror);
 
     FCLAW_ASSERT(ierror == 0);
 
