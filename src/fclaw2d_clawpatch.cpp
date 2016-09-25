@@ -80,7 +80,6 @@ ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = (ClawPatch*) fclaw2d_patch_get_user_patch(this_patch);
     return cp;
-    /* return fclaw2d_patch_get_cp(this_patch); */
 }
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
@@ -234,76 +233,6 @@ void clawpatch_metric_setup(fclaw2d_domain_t* domain,
     /* vt.patch_manifold_compute_normals(...) */
     fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
 }
-
-#if 0
-/* More work to extract the Clawpatch class. The problem is that
-   this function doesn't have direct access to m_xp, m_yp, etc. */
-static
-void clawpatch_metric_storage(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch)
-{
-    /* 24 additional field variables needed for all metric terms
-       xp,yp,zp           : 3
-       xd,yd,zd           : 3
-       surf_normals       : 3
-       curvature          : 1
-       <xy>face normals   : 6
-       <xy>face tangents  : 6
-       edge lengths       : 2
-       -----------------------
-       Total              : 24
-
-       We should come up with a way to store only what is needed */
-
-    const amr_options_t *gparms = get_domain_parms(domain);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
-
-    int *xp, *yp, *zp, *xd, *yd, *zd;
-    int
-
-    Clawpatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = -mbc;
-    }
-    ur[0] = mx + mbc + 1;
-    ur[1] = my + mbc + 1;
-
-    Box box_p(ll,ur);   /* Store cell centered values here */
-
-    /* Mesh cell centers of physical mesh */
-    m_xp().define(box_p,1);
-    m_yp.define(box_p,1);
-    m_zp.define(box_p,1);
-    m_surf_normals.define(box_p,3);
-    m_curvature.define(box_p,1);
-
-    /* Node centered values */
-    for (int idir = 0; idir < SpaceDim; idir++)
-    {
-        ll[idir] = -mbc;
-    }
-    ur[0] = mx + mbc + 2;
-    ur[1] = my + mbc + 2;
-    Box box_d(ll,ur);
-
-    m_xd.define(box_d,1);
-    m_yd.define(box_d,1);
-    m_zd.define(box_d,1);
-
-    /* Face centered values */
-    m_xface_normals.define(box_d,3);
-    m_yface_normals.define(box_d,3);
-    m_xface_tangents.define(box_d,3);
-    m_yface_tangents.define(box_d,3);
-    m_edge_lengths.define(box_d,2);
-}
-#endif
 
 
 void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
@@ -984,6 +913,12 @@ double* ClawPatch::error()
     return m_griderror.dataPtr();
 }
 
+int ClawPatch::size()
+{
+    /* Use this to create new data */
+    return m_griddata.size();
+}
+
 
 #if 0
 FArrayBox ClawPatch::newGrid()
@@ -1268,6 +1203,19 @@ void ClawPatch::setup_area_storage()
 
 void ClawPatch::setup_metric_storage()
 {
+    /* 24 additional field variables needed for all metric terms
+       xp,yp,zp           : 3
+       xd,yd,zd           : 3
+       surf_normals       : 3
+       curvature          : 1
+       <xy>face normals   : 6
+       <xy>face tangents  : 6
+       edge lengths       : 2
+       -----------------------
+       Total              : 24
+
+       We should come up with a way to store only what is needed */
+
     int mx = m_mx;
     int my = m_my;
     int mbc = m_mbc;
@@ -1309,14 +1257,4 @@ void ClawPatch::setup_metric_storage()
     m_xface_tangents.define(box_d,3);
     m_yface_tangents.define(box_d,3);
     m_edge_lengths.define(box_d,2);
-}
-
-/* ----------------------------------------------------------------
-   Output and diagnostics
-   ---------------------------------------------------------------- */
-
-int ClawPatch::size()
-{
-    /* Use this to create new data */
-    return m_griddata.size();
 }

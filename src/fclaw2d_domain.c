@@ -27,15 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_patch.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
@@ -107,6 +98,7 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
 {
     const amr_options_t *gparms;
     double t;
+    int i;
 
     if (old_domain == NULL)
     {
@@ -127,7 +119,7 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
     fclaw2d_block_data_new(new_domain);
 
     int num = new_domain->num_blocks;
-    for (int i = 0; i < num; i++)
+    for (i = 0; i < num; i++)
     {
         fclaw2d_block_t *block = &new_domain->blocks[i];
         /* This will work for rectangular domains ... */
@@ -148,13 +140,14 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
 void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
+    int i, j;
 
-    for(int i = 0; i < (*domain)->num_blocks; i++)
+    for(i = 0; i < (*domain)->num_blocks; i++)
     {
         fclaw2d_block_t *block = (*domain)->blocks + i;
         fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
 
-        for(int j = 0; j < block->num_patches; j++)
+        for(j = 0; j < block->num_patches; j++)
         {
             /* This is here to delete any patches created during
                initialization, and not through regridding */
@@ -254,10 +247,3 @@ fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain)
   FCLAW_ASSERT (cont != NULL);
   return cont;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
