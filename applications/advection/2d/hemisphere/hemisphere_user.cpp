@@ -38,18 +38,18 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
     fc2d_clawpack46_init_vtable(&vt, &classic_claw);
 
     vt.problem_setup            = &fc2d_clawpack46_setprob;
-    classic_claw.setprob = &SETPROB;
+    classic_claw.setprob        = &SETPROB;
 
     vt.patch_setup              = &hemisphere_patch_setup;
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
+    classic_claw.qinit          = &CLAWPACK46_QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Doesn't do anything */
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
+    classic_claw.rpn2 = &CLAWPACK46_RPN2;
+    classic_claw.rpt2 = &CLAWPACK46_RPT2;
 
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
@@ -65,6 +65,11 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
 
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        return;
+    }
+
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
@@ -74,6 +79,16 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     fc2d_clawpack46_define_auxarray(domain,this_patch);
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+    HEMISPHERE46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                     &maux,aux,&this_block_idx,xd,yd,zd,area);
+}
+
+void hemisphere_patch_ghostt_setup(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx,
+                                  int nghost, int mint)
+{
+
+
 }

@@ -21,6 +21,9 @@ axis off;
 
 axis([-1.1 1.1 -1.1 1.1 0 1.1]);
 
+hidepatchborders;
+camlight
+
 NoQuery = 0;
 prt = false;
 if (prt)

@@ -1,4 +1,4 @@
-      subroutine setaux_manifold(mbc,mx,my,
+      subroutine hemisphere46_setaux_manifold(mbc,mx,my,
      &      xlower,ylower,dx,dy,
      &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
@@ -15,7 +15,7 @@
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j
-      double precision dxdy, t
+      double precision dxdy, t, x
 
       dxdy = dx*dy
 

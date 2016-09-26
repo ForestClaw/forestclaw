@@ -38,14 +38,15 @@ extern "C"
 #endif
 #endif
 
-#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold, SETAUX_MANIFOLD)
-void SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy,
-                     const int* maux, double aux[],
-                     const int* blockno,
-                     double xd[], double yd[], double zd[],
-                     double area[]);
+#define HEMISPHERE46_SETAUX_MANIFOLD FCLAW_F77_FUNC(hemisphere46_setaux_manifold, \
+                                                    HEMISPHERE46_SETAUX_MANIFOLD)
+void HEMISPHERE46_SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
+                                  const double* xlower, const double* ylower,
+                                  const double* dx, const double* dy,
+                                  const int* maux, double aux[],
+                                  const int* blockno,
+                                  double xd[], double yd[], double zd[],
+                                  double area[]);
 
 
 void hemisphere_link_solvers(fclaw2d_domain_t *domain);

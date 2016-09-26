@@ -11,10 +11,10 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/fclaw2d_map_pillowsphere.c \
 	applications/advection/2d/hemisphere/fclaw2d_map_pillowsphere5.c \
 	applications/advection/2d/hemisphere/setprob.f \
-	applications/advection/2d/hemisphere/user_4.6/rpn2noncons.f \
-	applications/advection/2d/hemisphere/user_4.6/rpt2noncons.f \
-	applications/advection/2d/hemisphere/user_4.6/qinit.f \
-	applications/advection/2d/hemisphere/user_4.6/setaux_manifold.f
+	applications/advection/2d/hemisphere/user_4.6/clawpack46_rpn2.f \
+	applications/advection/2d/hemisphere/user_4.6/clawpack46_rpt2.f \
+	applications/advection/2d/hemisphere/user_4.6/clawpack46_qinit.f \
+	applications/advection/2d/hemisphere/user_4.6/hemisphere46_setaux_manifold.f
 
 applications_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
