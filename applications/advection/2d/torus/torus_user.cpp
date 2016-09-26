@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch.h"
 
 #include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>
 
 static fc2d_clawpack46_vtable_t classic_claw;
 
@@ -50,39 +51,40 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     if (gparms->manifold)
     {
         vt.patch_setup = &torus_patch_manifold_setup;
-        classic_claw.setaux = &SETAUX_MANIFOLD;
+        classic_claw.setaux = &TORUS46_SETAUX_MANIFOLD;
     }
     else
     {
         vt.patch_setup = &fc2d_clawpack46_setaux;
-        classic_claw.setaux = &SETAUX;
+        classic_claw.setaux = &CLAWPACK46_SETAUX;
     }
 
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
+    classic_claw.qinit = &CLAWPACK46_QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
     if (gparms->manifold)
     {
-        classic_claw.b4step2 = &B4STEP2_MANIFOLD;
+        classic_claw.b4step2 = &TORUS46_B4STEP2_MANIFOLD;
     }
     else
     {
-        /* classic_claw.b4step2 = &B4STEP2; */
+        /* In the flat case, the velocity field does not vary in time, so
+           no need for a b4step2 routine */
     }
 
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
+    classic_claw.rpn2 = &CLAWPACK46_RPN2;
+    classic_claw.rpt2 = &CLAWPACK46_RPT2;
 
-    vt.fort_compute_patch_error = &TORUS_COMPUTE_ERROR;
+    vt.fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
 
     if (example == 6)
     {
-        vt.fort_tag4refinement = &TAG4REFINEMENT;
-        vt.fort_tag4coarsening = &TAG4COARSENING;
+        vt.fort_tag4refinement = &TORUS46_TAG4REFINEMENT;
+        vt.fort_tag4coarsening = &TORUS46_TAG4COARSENING;
 
         vt.write_header      = &torus_output_write_header;
         vt.patch_write_file  = &torus_output_write_file;
@@ -134,7 +136,7 @@ void torus_output_write_header(fclaw2d_domain_t* domain,
     sprintf(matname2,"fort.t%04d",iframe);
 
     vt = fclaw2d_get_vtable(domain);
-    TORUS_FORT_WRITE_HEADER(matname1,matname2,&time,&meqn,&ngrids);
+    TORUS46_FORT_WRITE_HEADER(matname1,matname2,&time,&meqn,&ngrids);
 }
 
 
@@ -159,7 +161,7 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
     error = fclaw2d_clawpatch_get_error(domain,this_patch);
 
     sprintf(matname1,"fort.q%04d",iframe);
-    TORUS_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
+    TORUS46_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
                           &dx,&dy,q,error,&t,
                           &patch_num,&level,&this_block_idx,
                           &domain->mpirank);
