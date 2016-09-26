@@ -63,8 +63,7 @@ typedef struct fclaw2d_domain_data
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;
     fclaw2d_domain_indirect_t *domain_indirect;
-}
-fclaw2d_domain_data_t;
+} fclaw2d_domain_data_t;
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
 void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);

@@ -27,6 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_patch.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
@@ -247,3 +256,10 @@ fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain)
   FCLAW_ASSERT (cont != NULL);
   return cont;
 }
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif

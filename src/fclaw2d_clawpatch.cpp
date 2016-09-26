@@ -341,7 +341,6 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
         }
     }
 
-    vt = fclaw2d_get_vtable(domain);
     if (vt.patch_setup != NULL)
     {
         /* The setup routine should check to see if this is a ghost patch and
@@ -462,7 +461,7 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     int my = gparms->my;
     int mbc = gparms->mbc;
     int refratio = gparms->refratio;
-    int w = gparms->interp_stencil_width/2;
+    int w = gparms->interp_stencil_width;
 
     int mint = mbc*refratio;   /* # interior cells needed for averaging */
     int nghost = w/2;          /* # ghost values needed for interpolation */
@@ -479,6 +478,7 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     vt.fort_ghostpack(&mx,&my,&mbc,&meqn, &mint, qthis,area,
                         qpack,&psize,&packmode,&ierror);
 
+    /* FCLAW_ASSERT(ierror == 0); */
     if (ierror > 0)
     {
         fclaw_global_essentialf("ghost_pack (fclaw2d_clawpatch.cpp) : ierror = %d\n",ierror);
