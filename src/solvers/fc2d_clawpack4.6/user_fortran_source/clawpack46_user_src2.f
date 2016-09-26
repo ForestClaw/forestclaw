@@ -1,9 +1,5 @@
-c
-c
-c =========================================================
-      subroutine src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,dx,dy,
-     &             q,maux,aux,t,dt)
-c =========================================================
+      subroutine clawpack46_user_src2(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux,t,dt)
       implicit none
 
       integer maxmx, maxmy, meqn, mbc, mx, my, maux

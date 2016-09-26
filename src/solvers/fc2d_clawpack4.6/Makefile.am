@@ -24,7 +24,7 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_diagnostics_fort.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_output_ascii_fort.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_regrid_fort.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_timeinterp_fort.f 
+	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_timeinterp_fort.f
 
 
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack4.6/libclawpack4.6.la

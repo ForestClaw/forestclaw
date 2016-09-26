@@ -1,5 +1,5 @@
-      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-     &                  maux,aux)
+      subroutine clawpack46_user_setaux(maxmx,maxmy,mbc,mx,my,
+     &      xlower,ylower,dx,dy,maux,aux)
       implicit none
 
       integer maxmx, maxmy,mbc, mx, my, maux

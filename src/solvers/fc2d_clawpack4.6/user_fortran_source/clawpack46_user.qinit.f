@@ -1,6 +1,6 @@
 c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+      subroutine clawpack46_user_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
 c     =====================================================
 
 c     # Set initial conditions for q.

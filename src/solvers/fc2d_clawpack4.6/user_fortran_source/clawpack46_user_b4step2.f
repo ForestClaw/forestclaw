@@ -1,5 +1,5 @@
-      subroutine b4step2(maxmx,maxmy,mbc,mx,my,meqn,q,
-     &            xlower,ylower,dx,dy,time,dt,maux,aux)
+      subroutine clawpack46_user_b4step2(maxmx,maxmy,mbc,mx,my,
+     &      meqn,q,xlower,ylower,dx,dy,time,dt,maux,aux)
       implicit none
 
       integer maxmx, maxmy, mbc, mx, my, meqn, maux
