@@ -1,4 +1,4 @@
-      subroutine torus_compute_error(blockno, mx,my,mbc,meqn,
+      subroutine torus46_compute_error(blockno, mx,my,mbc,meqn,
      &      dx,dy,xlower,ylower,t, q,error)
       implicit none
 

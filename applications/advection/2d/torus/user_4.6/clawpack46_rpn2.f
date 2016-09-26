@@ -1,5 +1,6 @@
-      subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &                  auxl,auxr,wave,s,amdq,apdq)
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,
+     &      mbc,mx,ql,qr,
+     &      auxl,auxr,wave,s,amdq,apdq)
 c
       implicit none
 

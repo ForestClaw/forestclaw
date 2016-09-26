@@ -1,4 +1,4 @@
-      subroutine setaux_manifold(maxmx, maxmy, mbc,mx,my,
+      subroutine torus46_setaux_manifold(maxmx, maxmy, mbc,mx,my,
      &      xlower,ylower, dx,dy, maux,aux)
       implicit none
 

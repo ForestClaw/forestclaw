@@ -1,4 +1,4 @@
-      subroutine torus_fort_write_header(matname1,matname2,
+      subroutine torus46_fort_write_header(matname1,matname2,
      &      time,meqn,ngrids)
       implicit none
 
@@ -32,7 +32,7 @@ c     # Write out error as an extra field (why not just do this in C?)
       end
 
 
-      subroutine torus_fort_write_file(matname1,
+      subroutine torus46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,error,t,patch_num,level,blockno,mpirank)
 

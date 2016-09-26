@@ -1,4 +1,4 @@
-      subroutine tag4refinement(mx,my,mbc,meqn,
+      subroutine torus46_tag4refinement(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy,blockno,q,
      &      refine_threshold, init_flag,
      &      tag_for_refinement)
@@ -41,7 +41,7 @@ c               endif
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag4coarsening(mx,my,mbc,meqn,
+      subroutine torus46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none

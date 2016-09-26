@@ -1,6 +1,6 @@
 c     # This is the "classic" call to setaux.
-      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,
-     &      dx,dy,maux,aux)
+      subroutine clawpack46_setaux(maxmx,maxmy,mbc,mx,my,
+     &      xlower,ylower,dx,dy,maux,aux)
       implicit none
 
       integer mbc, mx,my, meqn, maux, maxmx, maxmy

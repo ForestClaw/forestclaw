@@ -1,4 +1,4 @@
-      subroutine b4step2_manifold(maxmx, maxmy, mbc,mx,my,
+      subroutine torus46_b4step2_manifold(maxmx, maxmy, mbc,mx,my,
      &      meqn,q,
      &      xlower,ylower,dx,dy,time,dt,maux,aux)
       implicit none
