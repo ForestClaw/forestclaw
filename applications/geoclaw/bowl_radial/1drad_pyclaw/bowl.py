@@ -35,6 +35,7 @@ def setup(kernel_language='Python',use_petsc=False, outdir='./_output', solver_t
     solver.bc_upper[0] = pyclaw.BC.wall
     solver.aux_bc_lower[0] = pyclaw.BC.wall
     solver.aux_bc_upper[0] = pyclaw.BC.wall
+    solver.step_source = stepSource
 
     # x_star = numpy.sqrt(55.0 / 1e-2)
     x_star = 85
@@ -134,6 +135,16 @@ def setplot(plotdata):
     
     return plotdata
 
+def stepSource(solver,state,dt):
+    q = state.q
+    xc = state.grid.p_centers[0]
+
+    ndim = 2
+    qstar1 = q[0,:] - 0.5*dt*(ndim-1)/xc * q[1,:]
+    qstar2 = q[1,:] - 0.5*dt*(ndim-1)/xc * q[1,:]**2 / q[0,:]
+
+    q[0,:] -= dt*(ndim-1)/xc * qstar2
+    q[1,:] -= dt*(ndim-1)/xc * qstar2**2 / qstar1
 
 if __name__=="__main__":
     from clawpack.pyclaw.util import run_app_from_main
