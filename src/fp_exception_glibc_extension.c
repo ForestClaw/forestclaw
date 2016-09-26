@@ -217,6 +217,9 @@ typedef union {
 #if DEFINED_INTEL
 
 // x87 fpu
+/* DAC (9/26/2016) : Changed 'asm' to '__asm__ volatile' so that macro expansion
+   passed -std=c99 -pedentic compiler flags */
+
 #define getx87cr(x)    __asm__ volatile ("fnstcw %0" : "=m" (x));
 #define setx87cr(x)    __asm__ volatile ("fldcw %0" : "=m" (x));
 #define getx87sr(x)    __asm__ volatile ("fnstsw %0" : "=m" (x));
