@@ -1,6 +1,6 @@
 c     ============================================
-      subroutine b4step2(mbc,mx,my,meqn,q,
-     &            xlower,ylower,dx,dy,time,dt,maux,aux)
+      subroutine clawpack5_b4step2(mbc,mx,my,meqn,q,
+     &      xlower,ylower,dx,dy,time,dt,maux,aux)
 c     ============================================
 c
 c     # called before each call to step
@@ -8,14 +8,14 @@ c     # use to set time-dependent aux arrays or perform other tasks.
 c
 c     # make velocity time dependent, reversing flow.
 c
-c     
+c
       implicit double precision (a-h,o-z)
       dimension q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       dimension aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       common /comvt/ tperiod,pi2
 c
       if (tperiod .eq. 0.d0) then
-c        # special case --- indication that velocities specified in 
+c        # special case --- indication that velocities specified in
 c        # setaux should be used for all time.
          return
          endif

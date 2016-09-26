@@ -1,16 +1,16 @@
 c     ============================================
-      subroutine setaux(mbc,mx,my,xlower,ylower,dx,dy,
-     &                  maux,aux)
+      subroutine clawpack5_setaux(mbc,mx,my,xlower,ylower,dx,dy,
+     &      maux,aux)
 c     ============================================
 c
-c     # set auxiliary arrays 
+c     # set auxiliary arrays
 
 c     #   aux(1,i,j) is edge velocity at "left" boundary of grid point (i,j)
 c     #   aux(2,i,j) is edge velocity at "bottom" boundary of grid point (i,j)
 c     #   aux(3,i,j) is kappa if a mapped grid is used.
 
 c
-c     
+c
       implicit double precision (a-h,o-z)
       dimension aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 c
