@@ -1,4 +1,5 @@
-      subroutine setaux_manifold(mx,my,mbc,xlower,ylower,dx,dy,
+      subroutine clawpack46_setaux_manifold(mx,my,mbc,
+     &      xlower,ylower,dx,dy,
      &      maux,aux,blockno,xd,yd,zd,area)
       implicit none
 

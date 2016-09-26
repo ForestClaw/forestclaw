@@ -1,5 +1,6 @@
-      subroutine tag4coarsening_dq(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
+      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
+     &      xlower,ylower,dx,dy, blockno,
+     &      q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
 

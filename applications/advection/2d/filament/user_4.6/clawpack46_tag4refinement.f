@@ -1,7 +1,3 @@
-c     # Template function for setting refinement criteria.  The
-c     # user can copy this file to their directory, and then set the
-c     # vt.fort_tag4refinement = &tag4refinement.
-
       subroutine tag4refinement_dq(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)

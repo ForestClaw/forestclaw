@@ -52,23 +52,23 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     else
     {
         vt.patch_setup = &fc2d_clawpack46_setaux;
-        classic_claw.setaux = &SETAUX; /* Uses classic signature */
+        classic_claw.setaux = &CLAWPACK46_SETAUX; /* Uses classic signature */
     }
 
     vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
+    classic_claw.qinit = &CLAWPACK46_QINIT;
 
     vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
 
 #if 0
     /* Don't use these without debugging it first ... */
-    vt.fort_tag4refinement = &TAG4REFINEMENT_DQ;
-    vt.fort_tag4coarsening = &TAG4COARSENING_DQ;
+    vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT_DQ;
+    vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING_DQ;
 #endif
 
     vt.patch_single_step_update = &fc2d_clawpack46_update;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
+    classic_claw.rpn2 = &CLAWPACK46_RPN2;
+    classic_claw.rpt2 = &CLAWPACK46_RPT2;
 
     fclaw2d_set_vtable(domain,&vt);
     fc2d_clawpack46_set_vtable(&classic_claw);
@@ -94,6 +94,7 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
 
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&maux,
-                    aux,&this_block_idx,xd,yd,zd,area);
+    CLAWPACK46_SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,
+                               &dx,&dy,&maux,
+                               aux,&this_block_idx,xd,yd,zd,area);
 }
