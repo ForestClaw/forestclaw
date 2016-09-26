@@ -37,13 +37,13 @@ extern "C"
 #endif
 #endif
 
-#define SWIRL_WRITE_HEADER FCLAW_F77_FUNC(swirl_write_header, SWIRL_WRITE_HEADER)
+#define SWIRL46_WRITE_HEADER FCLAW_F77_FUNC(swirl_write_header, SWIRL_WRITE_HEADER)
 
-void SWIRL_WRITE_HEADER(const int* iframe, const double* time,
+void SWIRL46_WRITE_HEADER(const int* iframe, const double* time,
                         const int* mfields, const int* ngrids);
 
-#define SWIRL_WRITE_FILE FCLAW_F77_FUNC(swirl_write_file, SWIRL_WRITE_FILE)
-void SWIRL_WRITE_FILE(const int* mx,        const int* my,
+#define SWIRL46_WRITE_FILE FCLAW_F77_FUNC(swirl_write_file, SWIRL_WRITE_FILE)
+void SWIRL46_WRITE_FILE(const int* mx,        const int* my,
                       const int* meqn,      const int* mbc,
                       const double* xlower, const double* ylower,
                       const double* dx,     const double* dy,

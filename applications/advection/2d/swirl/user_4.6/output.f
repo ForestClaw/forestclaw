@@ -1,4 +1,4 @@
-      subroutine swirl_write_tfile(iframe,time,mfields,ngrids)
+      subroutine swirl46_write_tfile(iframe,time,mfields,ngrids)
       implicit none
 
       integer iframe,mfields,ngrids, mpirank
@@ -33,7 +33,7 @@
 
       end
 
-      subroutine swirl_write_qfile(mx,my,meqn,mbc,
+      subroutine swirl46_write_qfile(mx,my,meqn,mbc,
      &      xlower,ylower,dx,dy,q,iframe,patch_num,
      &      level,blockno,mpirank)
 

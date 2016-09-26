@@ -1,5 +1,5 @@
-       subroutine qinit(maxmx,maxmy, meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+      subroutine swirl46_qinit(maxmx,maxmy, meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
        implicit none
 
        integer meqn, mbc, mx, my, maux, maxmx, maxmy

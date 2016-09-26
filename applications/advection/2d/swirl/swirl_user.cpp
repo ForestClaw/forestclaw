@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "swirl_user.h"
+#include "user_4.6/swirl46_user_fort.h"
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
@@ -39,37 +40,37 @@ static fc2d_clawpack46_vtable_t classic_claw;
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
-
+    vt.problem_setup            = &fc2d_clawpack46_setprob;  /* calls setprob, assigned below  */
     vt.patch_setup              = &swirl_patch_setup;
     vt.patch_initialize         = &swirl_patch_initialize;
     vt.patch_physical_bc        = &swirl_patch_physical_bc;
     vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
-
-    vt.regrid_tag4refinement     = &swirl_patch_tag4refinement;
-    vt.fort_tag4refinement      = &TAG4REFINEMENT;
-
-    vt.regrid_tag4coarsening     = &swirl_patch_tag4coarsening;
-    vt.fort_tag4coarsening      = &TAG4COARSENING;
-
+    vt.regrid_tag4refinement    = &swirl_patch_tag4refinement;
+    vt.regrid_tag4coarsening    = &swirl_patch_tag4coarsening;
     vt.write_header             = &fclaw2d_output_header_ascii;
-    vt.fort_write_header        = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
-
     vt.patch_write_file         = &fclaw2d_output_patch_ascii;
+
+
+    /* Fortran files */
+    vt.fort_tag4refinement      = &SWIRL46_TAG4REFINEMENT;
+    vt.fort_tag4coarsening      = &SWIRL46_TAG4COARSENING;
+    vt.fort_write_header        = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
     vt.fort_write_file          = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
     fclaw2d_set_vtable(domain,&vt);
 
     /* Needed for the clawpack5 package */
-    classic_claw.qinit = &QINIT;
-    classic_claw.bc2 = &BC2;
-    classic_claw.setaux = &SETAUX;
-    classic_claw.setprob = &SETPROB;
-    classic_claw.b4step2 = &B4STEP2;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
+    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
+
+    classic_claw.setprob   = &SETPROB;
+
+    classic_claw.qinit     = &SWIRL46_QINIT;
+    classic_claw.bc2       = &SWIRL46_BC2;
+    classic_claw.setaux    = &SWIRL46_SETAUX;
+    classic_claw.b4step2   = &SWIRL46_B4STEP2;
+    classic_claw.rpn2      = &SWIRL46_RPN2;
+    classic_claw.rpt2      = &SWIRL46_RPT2;
 
     fc2d_clawpack46_set_vtable(&classic_claw);
 
@@ -114,10 +115,10 @@ void swirl_patch_initialize(fclaw2d_domain_t *domain,
     /* Call to used defined, classic Clawpack (ver. 4.6)  'qinit' routine.
        Header is in the Clawpack package
     */
-    QINIT(&mx,&my,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+    SWIRL46_QINIT(&mx,&my,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 #if 0
     // for clawpack5
-    QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+    SWIRL5_QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 #endif
 }
 

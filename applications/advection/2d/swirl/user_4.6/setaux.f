@@ -1,6 +1,6 @@
 c     ============================================
-      subroutine setaux(maxmx,maxmy,mbc,mx,my,xlower,ylower,dx,dy,
-     &                  maux,aux)
+      subroutine swirl46_setaux(maxmx,maxmy,mbc,mx,my,
+     &      xlower,ylower,dx,dy,maux,aux)
 c     ============================================
 
 c     # set auxiliary arrays
@@ -34,5 +34,3 @@ c           # difference stream function psi to get normal velocities:
 
       return
       end
-
-

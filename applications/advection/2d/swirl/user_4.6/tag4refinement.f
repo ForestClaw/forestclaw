@@ -1,4 +1,4 @@
-      subroutine tag4refinement(mx,my,mbc,meqn,
+      subroutine swirl46_tag4refinement(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy,blockno,q,
      &      refine_threshold, init_flag,
      &      tag_for_refinement)
@@ -44,7 +44,7 @@ c                 # Exit immediately if the refinement criteria is met
       end
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine tag4coarsening(mx,my,mbc,meqn,
+      subroutine swirl46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_for_coarsening)
       implicit none
@@ -64,10 +64,10 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       tag_for_coarsening = 0
       qmin = 100.d0
       qmax = -100.d0
-      call tag_get_minmax(mx,my,mbc,meqn,q0,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q1,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q2,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q3,qmin,qmax)
+      call swirl46_tag_get_minmax(mx,my,mbc,meqn,q0,qmin,qmax)
+      call swirl46_tag_get_minmax(mx,my,mbc,meqn,q1,qmin,qmax)
+      call swirl46_tag_get_minmax(mx,my,mbc,meqn,q2,qmin,qmax)
+      call swirl46_tag_get_minmax(mx,my,mbc,meqn,q3,qmin,qmax)
       if (qmax - qmin .lt. coarsen_threshold) then
          tag_for_coarsening = 1
          return
@@ -75,7 +75,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 
       end
 
-      subroutine tag_get_minmax(mx,my,mbc,meqn,q,
+      subroutine swirl46_tag_get_minmax(mx,my,mbc,meqn,q,
      &      qmin,qmax)
 
       implicit none
