@@ -46,7 +46,7 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
                                  fc2d_clawpack46_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK46_BC2;
+    vt->bc2 = CLAWPACK46_BC2_DEFAULT;
     vt->qinit = NULL;
     vt->rpn2 = NULL;
     vt->rpt2 = NULL;

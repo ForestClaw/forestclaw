@@ -131,8 +131,8 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* vt);
 void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
                                  fc2d_clawpack46_vtable_t* vt);
 
-#define CLAWPACK46_BC2 FCLAW_F77_FUNC(clawpack46_bc2,CLAWPACK46_BC2)
-void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
+#define CLAWPACK46_BC2_DEFAULT FCLAW_F77_FUNC(clawpack46_bc2_default,CLAWPACK46_BC2_DEFAULT)
+void CLAWPACK46_BC2_DEFAULT(const int* maxmx, const int* maxmy, const int* meqn,
                      const int* mbc, const int* mx, const int* my,
                      const double* xlower, const double* ylower,
                      const double* dx, const double* dy, const double q[],
@@ -335,6 +335,7 @@ void FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* me
 
 double FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
                                               double* dy, double area[]);
+
 
 
 #define FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_clawpack46_fort_compute_error_norm, \

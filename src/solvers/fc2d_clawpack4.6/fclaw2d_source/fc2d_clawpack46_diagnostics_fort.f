@@ -39,9 +39,9 @@ c    # -------------------------------------------------------------------------
       end
 
 c     # Compute area of a patch
-      double precision function 
-     & fc2d_clawpack46_fort_compute_patch_area
-     &  (mx,my, mbc,dx,dy,area)
+      double precision function
+     &      fc2d_clawpack46_fort_compute_patch_area
+     &      (mx,my, mbc,dx,dy,area)
       implicit none
 
       integer mx,my, mbc
