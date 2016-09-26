@@ -30,6 +30,7 @@
 #include <fclaw_package.h>
 
 #include "fc2d_clawpack46_options.h"
+#include "clawpack46_user_fort.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -137,71 +138,6 @@ void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                      const double* dx, const double* dy, const double q[],
                      const int* maux, const double aux[], const double* t,
                      const double* dt, const int mthbc[]);
-
-/* --------------------------------------------------------------------
-   Classic routines
-   - These are provided only for convenience;  these files are not
-   compiled into the library, but will be provided by the user.
-   -------------------------------------------------------------------- */
-
-/* Macros for C/Fortran portability */
-#define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
-#define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
-#define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
-#define B4STEP2 FCLAW_F77_FUNC(b4step2,B4STEP2)
-#define SRC2    FCLAW_F77_FUNC(src2,SRC2)
-#define BC2     FCLAW_F77_FUNC(bc2,BC2)
-#define RPN2    FCLAW_F77_FUNC(rpn2,RPN2)
-#define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
-
-/* These will be converted to MACROS slowly ... */
-
-void SETPROB();
-
-void QINIT(const int* maxmx, const int* maxmy, const int* meqn,
-            const int* mbc, const int* mx, const int* my,
-            const double* xlower, const double* ylower,
-            const double* dx, const double* dy,
-            double q[], const int* maux, double aux[]);
-
-void SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
-            const int* mx, const int* my,
-            const double* xlower, const double* ylower,
-            const double* dx, const double* dy,
-            const int* maux, double aux[]);
-
-void BC2(const int* maxmx, const int* maxmy, const int* meqn,
-          const int* mbc, const int* mx, const int* my,
-          const double* xlower, const double* ylower,
-          const double* dx, const double* dy, const double q[],
-          const int* maux, const double aux[], const double* t,
-          const double* dt, const int mthbc[]);
-
-
-void B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
-              const int* mx, const int* my, const int* meqn,
-              double q[], const double* xlower, const double* ylower,
-              const double* dx, const double* dy,
-              const double* t, const double* dt,
-              const int* maux, double aux[]);
-
-void SRC2(const int* maxmx, const int* maxmy, const int* meqn,
-           const int* mbc, const int* mx,const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy, double q[],
-           const int* maux, double aux[], const double* t,
-           const double* dt);
-
-/* Riemann solvers */
-void RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-           const int* mbc,const int* mx, double ql[], double qr[],
-           double auxl[], double auxr[], double wave[],
-           double s[], double amdq[], double apdq[]);
-
-void RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-           const int* mbc, const int* mx, double ql[], double qr[],
-           double aux1[], double aux2[], double aux3[], const int* imp,
-           double dsdq[], double bmasdq[], double bpasdq[]);
 
 /* --------------------------------------------------------------------
    Time stepping

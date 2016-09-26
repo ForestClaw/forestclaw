@@ -51,6 +51,7 @@ extern "C"
    -------------------------------------------------------------------- */
 
 /* Macros for C/Fortran portability */
+#define SETPROB                 FCLAW_F77_FUNC(setprob,SETPROB)
 #define CLAWPACK46_USER_SETPROB FCLAW_F77_FUNC(clawpack46_user_setprob,CLAWPACK46_USER_SETPROB)
 #define CLAWPACK46_USER_QINIT   FCLAW_F77_FUNC(clawpack46_user_qinit,  CLAWPACK46_USER_QINIT)
 #define CLAWPACK46_USER_SETAUX  FCLAW_F77_FUNC(clawpack46_user_setaux, CLAWPACK46_USER_SETAUX)
@@ -59,6 +60,9 @@ extern "C"
 #define CLAWPACK46_USER_BC2     FCLAW_F77_FUNC(clawpack46_user_bc2,    CLAWPACK46_USER_bc2)
 #define CLAWPACK46_USER_RPN2    FCLAW_F77_FUNC(clawpack46_user_rpn2,   CLAWPACK46_USER_RPN2)
 #define CLAWPACK46_USER_RPT2    FCLAW_F77_FUNC(clawpack46_user_rpt2,   CLAWPACK46_USER_RPT2)
+
+
+void SETPROB();
 
 void CLAWPACK46_USER_SETPROB();
 
@@ -105,5 +109,12 @@ void CLAWPACK46_USER_RPT2(const int* ixy, const int* maxm, const int* meqn, cons
                           const int* mbc, const int* mx, double ql[], double qr[],
                           double aux1[], double aux2[], double aux3[], const int* imp,
                           double dsdq[], double bmasdq[], double bpasdq[]);
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
 
 #endif
