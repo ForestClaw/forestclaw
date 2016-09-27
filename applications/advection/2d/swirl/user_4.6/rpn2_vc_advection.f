@@ -1,5 +1,6 @@
 c     =====================================================
-      subroutine swirl46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,
+     &      mbc,mx,ql,qr,
      &      auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c

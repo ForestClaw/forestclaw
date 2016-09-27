@@ -1,5 +1,5 @@
 c     ============================================
-      subroutine swirl46_setaux(maxmx,maxmy,mbc,mx,my,
+      subroutine clawpack46_setaux(maxmx,maxmy,mbc,mx,my,
      &      xlower,ylower,dx,dy,maux,aux)
 c     ============================================
 
