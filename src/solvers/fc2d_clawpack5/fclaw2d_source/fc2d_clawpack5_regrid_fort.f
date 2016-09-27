@@ -70,24 +70,24 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
      &      coarsen_threshold,tag_patch)
 
       end
 
-      subroutine fclaw2d_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q,
      &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none

@@ -1,4 +1,4 @@
-      subroutine clawapck5_bc2_default(meqn,mbc,mx,my,
+      subroutine clawpack5_bc2_default(meqn,mbc,mx,my,
      &      xlower,ylower,
      &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================

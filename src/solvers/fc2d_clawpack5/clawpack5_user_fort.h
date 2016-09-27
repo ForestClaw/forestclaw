@@ -112,6 +112,36 @@ void CLAWPACK5_RPT2(const int* ixy, const int* imp,
                     double bmasdq[], double bpasdq[]);
 
 
+#define CLAWPACK5_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack5_tag4refinement, \
+                                                          CLAWPACK5_TAG4REFINEMENT)
+
+void CLAWPACK5_TAG4REFINEMENT(const int* mx,const int* my,
+                              const int* mbc,const int* meqn,
+                              const double* xlower, const double* ylower,
+                              const double* dx, const double* dy,
+                              const int* blockno,
+                              double q[],
+                              const double* tag_threshold,
+                              const int* init_flag,
+                              int* tag_patch);
+
+
+
+#define CLAWPACK5_TAG4COARSENING FCLAW_F77_FUNC(clawpack5_tag4coarsening, \
+                                                CLAWPACK5_TAG4COARSENING)
+
+void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
+                              const int* mbc, const int* meqn,
+                              const double* xlower, const double* ylower,
+                              const double* dx, const double* dy,
+                              const int* blockno,
+                              double q0[],double q1[],
+                              double q2[],double q3[],
+                              const double* tag_threshold,
+                              int* tag_patch);
+
+
+
 #ifdef __cplusplus
 #if 0
 {

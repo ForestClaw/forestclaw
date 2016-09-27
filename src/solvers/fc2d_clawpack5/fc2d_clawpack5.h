@@ -32,7 +32,7 @@
 
 #include "fc2d_clawpack5_options.h"
 
-#include <clawpack5_user_fort.h>
+#include "clawpack5_user_fort.h"
 
 
 #ifdef __cplusplus
