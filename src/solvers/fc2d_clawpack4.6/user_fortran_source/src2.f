@@ -1,4 +1,4 @@
-      subroutine clawpack46_user_src2(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine clawpack46_src2(maxmx,maxmy,meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,maux,aux,t,dt)
       implicit none
 
