@@ -1,8 +1,6 @@
-c
-c
-c     =====================================================
-      subroutine bc2(meqn,mbc,mx,my,xlower,ylower,
-     &               dx,dy,q,maux,aux,t,dt,mthbc)
+      subroutine clawapck5_bc2_default(meqn,mbc,mx,my,
+     &      xlower,ylower,
+     &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
 c
 c     # Standard boundary condition choices for claw2
@@ -52,7 +50,7 @@ c     # zero-order extrapolation:
       go to 199
 
   120 continue
-c     # periodic:  
+c     # periodic:
       do 125 j = 1-mbc, my+mbc
          do 125 ibc=1,mbc
             do 125 m=1,meqn
@@ -97,7 +95,7 @@ c     # zero-order extrapolation:
       go to 299
 
   220 continue
-c     # periodic:  
+c     # periodic:
       do 225 j = 1-mbc, my+mbc
          do 225 ibc=1,mbc
             do 225 m=1,meqn
@@ -142,7 +140,7 @@ c     # zero-order extrapolation:
       go to 399
 
   320 continue
-c     # periodic:  
+c     # periodic:
       do 325 jbc=1,mbc
          do 325 i = 1-mbc, mx+mbc
             do 325 m=1,meqn
@@ -187,7 +185,7 @@ c     # zero-order extrapolation:
       go to 499
 
   420 continue
-c     # periodic:  
+c     # periodic:
       do 425 jbc=1,mbc
          do 425 i = 1-mbc, mx+mbc
             do 425 m=1,meqn
@@ -213,4 +211,3 @@ c     # negate the normal velocity:
 
       return
       end
-
