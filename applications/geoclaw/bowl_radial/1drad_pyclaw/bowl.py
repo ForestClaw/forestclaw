@@ -36,9 +36,9 @@ def setup(kernel_language='Python',use_petsc=False, outdir='./_output', solver_t
     solver.aux_bc_lower[0] = pyclaw.BC.wall
     solver.aux_bc_upper[0] = pyclaw.BC.wall
     solver.step_source = stepSource
+    # solver.dt = 0.00001
 
-    # x_star = numpy.sqrt(55.0 / 1e-2)
-    x_star = 85
+    x_star = numpy.sqrt(80.0 / 1e-2)- 1.2
     xlower = -x_star
     xupper = x_star
     x = pyclaw.Dimension( xlower, xupper, 500, name='x')
@@ -51,7 +51,6 @@ def setup(kernel_language='Python',use_petsc=False, outdir='./_output', solver_t
     
     xc = state.grid.x.centers
     # state.aux[0, :] = 0.8 * numpy.exp(-xc**2 / 0.2**2) - 1.0
-    x_star = numpy.sqrt(80.0 / 1e-2) - 1.0
     state.aux[0, :] = 1.e-2*(xc**2) - 80
     ze = -((xc)**2)/10
     state.q[0, :] = numpy.where(ze>-10., 40.e0*numpy.exp(ze) - state.aux[0, :], numpy.where(state.aux[0, :]<=0, -state.aux[0, :], 0.))
