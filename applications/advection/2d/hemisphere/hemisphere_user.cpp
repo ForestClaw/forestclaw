@@ -27,32 +27,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
+static fclaw2d_vtable_t fclaw2d_vt;
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t classic_claw5;
 
 void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&vt, &classic_claw);
+    const user_options_t* user = hemisphere_user_get_options(domain);
+    fclaw2d_init_vtable(&fclaw2d_vt);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
-    classic_claw.setprob        = &SETPROB;
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-    vt.patch_setup              = &hemisphere_patch_setup;
+        fclaw2d_vt.patch_setup = &hemisphere_patch_setup;
 
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit          = &CLAWPACK46_QINIT;
+        classic_claw46.setprob              = &SETPROB;
 
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Doesn't do anything */
+        classic_claw46.qinit                = &CLAWPACK46_QINIT;
+        classic_claw46.rpn2                 = &CLAWPACK46_RPN2;
+        classic_claw46.rpt2                 = &CLAWPACK46_RPT2;
 
-    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
-    classic_claw.rpn2 = &CLAWPACK46_RPN2;
-    classic_claw.rpt2 = &CLAWPACK46_RPT2;
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+        fclaw2d_vt.patch_setup = &hemisphere_patch_setup;
+
+        classic_claw5.setprob              = &SETPROB;
+
+        classic_claw5.qinit                = &CLAWPACK5_QINIT;
+        classic_claw5.rpn2                 = &CLAWPACK5_RPN2;
+        classic_claw5.rpt2                 = &CLAWPACK5_RPT2;
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
+    }
+
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
+
 }
 
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,
@@ -64,6 +81,7 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
+    const user_options_t* user = hemisphere_user_get_options(domain);
 
     if (fclaw2d_patch_is_ghost(this_patch))
     {
@@ -76,14 +94,26 @@ void hemisphere_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_define_auxarray(domain,this_patch);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_define_auxarray(domain,this_patch);
+        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    HEMISPHERE46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                    &maux,aux,&this_block_idx,xd,yd,zd,area);
+        HEMISPHERE46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                                     &maux,aux,&this_block_idx,xd,yd,zd,area);
+    }
+    else if(user->claw_version == 5)
+    {
+        fc2d_clawpack5_define_auxarray(domain,this_patch);
+        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+
+        HEMISPHERE5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                                    &maux,aux,&this_block_idx,xd,yd,zd,area);
+    }
+
 }
 
-void hemisphere_patch_ghostt_setup(fclaw2d_domain_t *domain,
+void hemisphere_patch_ghost_setup(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx,

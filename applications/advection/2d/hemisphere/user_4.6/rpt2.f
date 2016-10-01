@@ -19,16 +19,10 @@
       double precision sm,sp
       integer i,i1,iface, mq
 
-c      integer icom,jcom, ii, jj, mx1
-c      double precision dtcom,dxcom,dycom,tcom
-
-c      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
-
       iface = 3-ixy
       do i = 2-mbc,mx+mbc
          i1 = i-2+imp                   !#  =  i-1 for amdq,  i for apdq
 
-c        # This assumes that coefficient matrix A is diagonal
          do mq = 1,meqn
             sm = aux2(i1,1 + iface)
             sp = aux3(i1,1 + iface)

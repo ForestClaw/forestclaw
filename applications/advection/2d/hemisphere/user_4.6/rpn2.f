@@ -18,25 +18,12 @@ c
       parameter(meqn1 = 10)
       double precision delta(meqn1)
 
-      double precision dtcom, dxcom, dycom, tcom
-      integer icom, jcom
-
       integer i,m,mw, iface, m1, m2, get_vflag, vflag
-
-      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
-
 
       if (meqn1 .lt. meqn) then
          write(6,*) 'rpn2noncons : meqn1 .lt. meqn'
          stop
       endif
-
-c     # This assumes a simple diagonal A matrix for the
-c     # velocity
-
-c     # Set wave, speed, and flux differences:
-c     ------------------------------------------
-c
 
       iface = ixy
       do i = 2-mbc, mx+mbc

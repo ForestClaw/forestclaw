@@ -26,14 +26,14 @@
       enddo
 
       t = 0
-      call compute_velocity_psi(mx,my,mbc,dx,dy,
-     &      t,blockno,xd,yd,zd,aux,maux)
+      call hemisphere46_compute_velocity_psi(mx,my,mbc,
+     &      dx,dy,t,blockno,xd,yd,zd,aux,maux)
 
       return
       end
 
 
-      subroutine compute_velocity_psi(mx,my,mbc,
+      subroutine hemisphere46_compute_velocity_psi(mx,my,mbc,
      &      dx,dy,t,blockno,xd,yd,zd,aux,maux)
       implicit none
 
@@ -95,15 +95,5 @@ c           # y-faces
             aux(i,j,3) = -vn
          enddo
       enddo
-
-      end
-
-      subroutine get_vel_psi(xd1,xd2,ds,vn,t)
-      implicit none
-
-      double precision xd1(3),xd2(3), ds, vn, psi,t
-
-      vn = (psi(xd1(1),xd1(2),xd1(3),t) -
-     &      psi(xd2(1),xd2(2),xd2(3),t))/ds
 
       end
