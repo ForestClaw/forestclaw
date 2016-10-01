@@ -37,13 +37,13 @@ static fc2d_clawpack46_vtable_t classic_vt;
 
 
 
-void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
+void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 {
-    classic_vt = *user_vt;
+    classic_vt = user_vt;
 }
 
-void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
-                                 fc2d_clawpack46_vtable_t* vt)
+void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
+                                         fc2d_clawpack46_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
     vt->bc2 = CLAWPACK46_BC2_DEFAULT;
