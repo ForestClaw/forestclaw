@@ -56,6 +56,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx);
 
+const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain);
+
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

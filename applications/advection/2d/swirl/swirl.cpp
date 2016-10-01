@@ -74,17 +74,16 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-
-#if 0
 const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain)
 {
-    int id;
     fclaw_app_t* app;
     app = fclaw2d_domain_get_app(domain);
-    id = fc2d_clawpack46_get_package_id();
-    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
 }
-#endif
+
 
 void run_program(fclaw_app_t* app)
 {
@@ -146,18 +145,15 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
-    /* User options */
-    register_user_options(app,"fclaw_options.ini",user);  /* Register user_options */
-
-    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* Register clawpack46_options */
-    fc2d_clawpack5_register(app,"fclaw_options.ini");     /* Register clawpack5_options */
-
+    /* All libraries that might be needed should be registered here */
+    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
+    fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
+    register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
 
     fclaw2d_clawpatch_link_app(app);
 

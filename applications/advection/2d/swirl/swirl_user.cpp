@@ -38,21 +38,17 @@ static fc2d_clawpack5_vtable_t classic_claw5;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw_app_t* app;
-    user_options_t* user;
-
-    app = fclaw2d_domain_get_app(domain);
-    user = (user_options_t*) fclaw_app_get_user(app);
+    const user_options_t* user = swirl_user_get_options(domain);
 
     fclaw2d_init_vtable(&fclaw2d_vt);
-
-    fclaw2d_vt.problem_setup            = &swirl_problem_setup;
-    fclaw2d_vt.patch_setup              = &swirl_patch_setup;    /* Needs to call setaux */
 
     if (user->claw_version == 4)
     {
         /* Needed for the clawpack46 package */
-        fc2d_clawpack46_init_vtable(&fclaw2d_vt,&classic_claw46);
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
+
+        fclaw2d_vt.problem_setup            = &swirl_problem_setup;
+        fclaw2d_vt.patch_setup              = &swirl_patch_setup;    /* Needs to call setaux */
 
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         classic_claw46.setaux    = &CLAWPACK46_SETAUX;
@@ -60,14 +56,14 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
         classic_claw46.rpt2      = &CLAWPACK46_RPT2;
         classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
 
-        fc2d_clawpack46_set_vtable(&classic_claw46);
+        fc2d_clawpack46_set_vtable(classic_claw46);
 
         /* Customized refinement so that initial conditions are properly tagged. */
         fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_init_vtable(&fclaw2d_vt,&classic_claw5);
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
 
         /* Customized refinement so that initial conditions are properly tagged. */
         fclaw2d_vt.fort_tag4refinement   = &CLAWPACK5_TAG4REFINEMENT;
@@ -78,22 +74,18 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
         classic_claw5.rpn2      = &CLAWPACK5_RPN2;
         classic_claw5.rpt2      = &CLAWPACK5_RPT2;
 
-        fc2d_clawpack5_set_vtable(&classic_claw5);
+        fc2d_clawpack5_set_vtable(classic_claw5);
     }
 
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    fclaw_app_t* app;
-    user_options_t* user;
+    const user_options_t* user = swirl_user_get_options(domain);
 
-    app = fclaw2d_domain_get_app(domain);
-    user = (user_options_t*) fclaw_app_get_user(app);
-
-    SWIRL_SETPROB(&user->period);
+    double period = user->period;
+    SWIRL_SETPROB(&period);
 }
 
 void swirl_patch_setup(fclaw2d_domain_t *domain,
@@ -101,12 +93,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    fclaw_app_t* app;
-    user_options_t* user;
-
-    app = fclaw2d_domain_get_app(domain);
-    user = (user_options_t*) fclaw_app_get_user(app);
-
+    const user_options_t* user = swirl_user_get_options(domain);
     if (fclaw2d_patch_is_ghost(this_patch))
     {
         return;

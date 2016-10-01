@@ -19,8 +19,8 @@ c     # Refine based only on first variable in system.
       do mq = 1,meqn
          qmin = 100.d0
          qmax = -100.d0
-         do i = 1,mx
-            do j = 1,my
+         do i = 1-mbc,mx+mbc
+            do j = 1-mbc,my+mbc
                if (init_flag .eq. 1) then
                   xc = xlower + (i-0.5)*dx
                   yc = ylower + (j-0.5)*dy
