@@ -57,6 +57,12 @@ void fc2d_clawpack46_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     vt->b4step2 = NULL;
     vt->src2 = NULL;
 
+    /* Default qinit functions */
+    fclaw_vt->patch_initialize         = &fc2d_clawpack46_qinit;
+    fclaw_vt->problem_setup            = &fc2d_clawpack46_setprob;
+    fclaw_vt->patch_physical_bc        = &fc2d_clawpack46_bc2;
+    fclaw_vt->patch_single_step_update = &fc2d_clawpack46_update;
+
     /* Forestclaw functions */
     fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
     fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
@@ -259,10 +265,10 @@ int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_clawpack46_setprob(fclaw2d_domain_t *domain)
 {
-    /* Assume that if we are here, then the user has a valid setprob */
-    FCLAW_ASSERT(classic_vt.setprob != NULL);
-
-    classic_vt.setprob();
+    if (classic_vt.setprob != NULL)
+    {
+        classic_vt.setprob();
+    }
 }
 
 
