@@ -33,14 +33,6 @@
 #include <fc2d_dummy.h>
 
 
-typedef struct user_options
-{
-    double period;
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -60,12 +52,6 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
-    user_options_t* user = (user_options_t*) package;
-    if (user->claw_version != 4)
-    {
-        fclaw_global_essentialf ("Option --user:claw_version must be 4\n");
-        return FCLAW_EXIT_QUIET;
-    }
     return FCLAW_NOEXIT;
 }
 
@@ -89,6 +75,17 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+
+#if 0
+const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain)
+{
+    int id;
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+    id = fc2d_clawpack46_get_package_id();
+    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
+}
+#endif
 
 void run_program(fclaw_app_t* app)
 {
@@ -148,17 +145,14 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    fclaw_forestclaw_register(app,"fclaw_options.ini");
+    fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
     /* User options */
-    register_user_options(app,"fclaw_options.ini",user);
+    register_user_options(app,"fclaw_options.ini",user);  /* Register user_options */
 
     fc2d_dummy_register(app);
-    fc2d_clawpack46_register(app,"fclaw_options.ini");
-
-#if 0
-    fc2d_clawpack5_register(app,"fclaw_options.ini");
-#endif
+    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* Register clawpack46_options */
+    fc2d_clawpack5_register(app,"fclaw_options.ini");     /* Register clawpack5_options */
 
 
     /* Read configuration file(s) and command line, and process options */

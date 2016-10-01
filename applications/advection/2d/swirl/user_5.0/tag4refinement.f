@@ -1,4 +1,4 @@
-      subroutine swirl5_tag4refinement(mx,my,mbc,meqn,
+      subroutine clawpack5_tag4refinement(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy,blockno,q,
      &      refine_threshold, init_flag,
      &      tag_for_refinement)
@@ -38,57 +38,6 @@ c                 # Exit immediately if the refinement criteria is met
                   endif
                endif
             enddo
-         enddo
-      enddo
-
-      end
-
-c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine swirl5_tag4coarsening(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
-     &      coarsen_threshold, tag_for_coarsening)
-      implicit none
-
-      integer mx,my, mbc, meqn, tag_for_coarsening
-      integer blockno
-      double precision xlower(0:3), ylower(0:3), dx, dy
-      double precision coarsen_threshold
-      double precision q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-      integer i,j, mq
-      double precision qmin, qmax
-
-      tag_for_coarsening = 0
-      qmin = 100.d0
-      qmax = -100.d0
-      call tag_get_minmax(mx,my,mbc,meqn,q0,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q1,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q2,qmin,qmax)
-      call tag_get_minmax(mx,my,mbc,meqn,q3,qmin,qmax)
-      if (qmax - qmin .lt. coarsen_threshold) then
-         tag_for_coarsening = 1
-         return
-      endif
-
-      end
-
-      subroutine tag_get_minmax(mx,my,mbc,meqn,q,
-     &      qmin,qmax)
-
-      implicit none
-      integer mx,my,mbc,meqn
-      double precision qmin,qmax
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      integer i,j,mq
-
-      mq = 1
-      do i = 1,mx
-         do j = 1,my
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
          enddo
       enddo
 

@@ -58,4 +58,4 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
     30 END DO
 
     return
-    end subroutine rpn2
+  END SUBROUTINE clawpack5_rpn2
