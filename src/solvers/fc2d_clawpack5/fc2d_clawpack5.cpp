@@ -57,6 +57,13 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     vt->b4step2 = NULL;
     vt->src2 = NULL;
 
+    /* Default qinit functions */
+    fclaw_vt->patch_initialize         = &fc2d_clawpack5_qinit;
+    fclaw_vt->problem_setup            = &fc2d_clawpack5_setprob;
+    fclaw_vt->patch_physical_bc        = &fc2d_clawpack5_bc2;
+    fclaw_vt->patch_single_step_update = &fc2d_clawpack5_update;
+
+
     /* Forestclaw functions */
     fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK5_FORT_AVERAGE2COARSE;
     fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE;
@@ -261,10 +268,10 @@ int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
 {
-    /* Assume that if we are here, then the user has a valid setprob */
-    FCLAW_ASSERT(classic_vt.setprob != NULL);
-
-    classic_vt.setprob();
+    if (classic_vt.setprob != NULL)
+    {
+        classic_vt.setprob();
+    }
 }
 
 
@@ -454,18 +461,9 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-#if 0
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    q = cp->q_time_sync(time_interp);
-#endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
-    /*
-    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy,
-                   level, time, xleft, xright, ybot, ytop,
-                   &xlower, &ylower, xupper, yupper, 0,0,0);
-    */
     classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CLAWPACK5_UNSET_BLOCK();

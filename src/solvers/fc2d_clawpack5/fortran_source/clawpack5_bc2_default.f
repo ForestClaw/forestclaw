@@ -1,6 +1,5 @@
       subroutine clawpack5_bc2_default(meqn,mbc,mx,my,
-     &      xlower,ylower,
-     &      dx,dy,q,maux,aux,t,dt,mthbc)
+     &      xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
 c
 c     # Standard boundary condition choices for claw2
@@ -33,6 +32,9 @@ c-------------------------------------------------------
 c     # left boundary:
 c-------------------------------------------------------
       go to (100,110,120,130) mthbc(1)+1
+c     this is how we skip over this side... if (mthbc(1)+1
+c     is not 1,2,3 or 4, then the goto above falls through to here...
+      goto 199
 c
   100 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -78,6 +80,9 @@ c-------------------------------------------------------
 c     # right boundary:
 c-------------------------------------------------------
       go to (200,210,220,230) mthbc(2)+1
+c     this is how we skip over this side... if (mthbc(1)+1
+c     is not 1,2,3 or 4, then the goto above falls through to here...
+      goto 299
 c
   200 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -123,6 +128,9 @@ c-------------------------------------------------------
 c     # bottom boundary:
 c-------------------------------------------------------
       go to (300,310,320,330) mthbc(3)+1
+c     this is how we skip over this side... if (mthbc(1)+1
+c     is not 1,2,3 or 4, then the goto above falls through to here...
+      goto 399
 c
   300 continue
 c     # user-specified boundary conditions go here in place of error output
@@ -168,6 +176,9 @@ c-------------------------------------------------------
 c     # top boundary:
 c-------------------------------------------------------
       go to (400,410,420,430) mthbc(4)+1
+c     this is how we skip over this side... if (mthbc(1)+1
+c     is not 1,2,3 or 4, then the goto above falls through to here...
+      goto 499
 c
   400 continue
 c     # user-specified boundary conditions go here in place of error output
