@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SWIRL_USER_H
 
 #include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack46.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -56,11 +55,6 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
-
-int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx, int this_patch_idx,
-                                      int initflag);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();

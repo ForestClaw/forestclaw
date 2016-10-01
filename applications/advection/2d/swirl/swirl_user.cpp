@@ -26,9 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "swirl_user.h"
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
+
+
+/* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
-#include <fc2d_dummy.h>
 
 static fclaw2d_vtable_t fclaw2d_vt;
 static fc2d_clawpack46_vtable_t classic_claw46;
@@ -52,9 +54,6 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
         /* Needed for the clawpack46 package */
         fc2d_clawpack46_init_vtable(&fclaw2d_vt,&classic_claw46);
 
-        /* Customized refinement so that initial conditions are properly tagged. */
-        fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT;
-
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         classic_claw46.setaux    = &CLAWPACK46_SETAUX;
         classic_claw46.rpn2      = &CLAWPACK46_RPN2;
@@ -63,6 +62,8 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
         fc2d_clawpack46_set_vtable(&classic_claw46);
 
+        /* Customized refinement so that initial conditions are properly tagged. */
+        fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT;
     }
     else if (user->claw_version == 5)
     {
@@ -118,36 +119,4 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
     {
         fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
     }
-    /* Dummy setup - use multiple libraries */
-    fc2d_dummy_setup_patch(domain,this_patch,this_block_idx,this_patch_idx);
-}
-
-int swirl_patch_tag4refinement(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int blockno, int this_patch_idx,
-                               int initflag)
-{
-    fclaw2d_vtable_t vt;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    int tag_patch;
-    const amr_options_t *amropt;
-    double rt;
-
-    amropt = get_domain_parms(domain);
-    rt = amropt->refine_threshold;
-
-    vt = fclaw2d_get_vtable(domain);
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    tag_patch = 0;
-    vt.fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
-                           &dx,&dy,&blockno, q,&rt,&initflag,
-                           &tag_patch);
-    return tag_patch;
 }

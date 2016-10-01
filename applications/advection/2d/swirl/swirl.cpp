@@ -30,7 +30,6 @@
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include <fc2d_dummy.h>
 
 
 static void *
@@ -150,7 +149,6 @@ main (int argc, char **argv)
     /* User options */
     register_user_options(app,"fclaw_options.ini",user);  /* Register user_options */
 
-    fc2d_dummy_register(app);
     fc2d_clawpack46_register(app,"fclaw_options.ini");    /* Register clawpack46_options */
     fc2d_clawpack5_register(app,"fclaw_options.ini");     /* Register clawpack5_options */
 
