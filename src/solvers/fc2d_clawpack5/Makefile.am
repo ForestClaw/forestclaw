@@ -18,14 +18,15 @@ libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f90 \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2_wrap.f \
 	src/solvers/fc2d_clawpack5/fortran_source/philim.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_output_ascii_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_regrid_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp_fort.f
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_tag4refinement.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_tag4coarsening.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_output_ascii.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
 
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la
 

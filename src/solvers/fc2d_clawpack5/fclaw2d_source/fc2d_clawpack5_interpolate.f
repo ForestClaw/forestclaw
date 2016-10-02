@@ -277,3 +277,153 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
       enddo
 
       end
+
+c     # Conservative intepolation to fine grid patch
+      subroutine fc2d_clawpack5_fort_interpolate2fine(mx,my,mbc,meqn,
+     &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
+      implicit none
+
+      integer mx,my,mbc,meqn
+      integer igrid, manifold
+
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
+      integer ic,jc,ic_add, jc_add
+      double precision qc, shiftx, shifty, sl, sr, gradx, grady
+      double precision compute_slopes
+
+      integer p4est_refineFactor,refratio
+
+      p4est_refineFactor = 2
+      refratio = 2
+
+c     # Use limiting done in AMRClaw.
+      mth = 5
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(igrid,refratio)
+      jg = (igrid-ig)/refratio
+
+      i1 = 1-ig
+      i2 = mx/p4est_refineFactor + (1-ig)
+      ic_add = ig*mx/p4est_refineFactor
+
+      j1 = 1-jg
+      j2 = my/p4est_refineFactor + (1-jg)
+      jc_add = jg*my/p4est_refineFactor
+
+      do mq = 1,meqn
+         do i = i1,i2
+            do j = j1,j2
+               ic = i + ic_add
+               jc = j + jc_add
+               qc = qcoarse(mq,ic,jc)
+
+c              # Compute limited slopes in both x and y. Note we are not
+c              # really computing slopes, but rather just differences.
+c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
+               sl = (qc - qcoarse(mq,ic-1,jc))
+               sr = (qcoarse(mq,ic+1,jc) - qc)
+               gradx = compute_slopes(sl,sr,mth)
+
+               sl = (qc - qcoarse(mq,ic,jc-1))
+               sr = (qcoarse(mq,ic,jc+1) - qc)
+               grady = compute_slopes(sl,sr,mth)
+
+c              # Fill in refined values on coarse grid cell (ic,jc)
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+                     qfine(mq,(i-1)*refratio + ii,(j-1)*refratio + jj)
+     &                     = qc + shiftx*gradx + shifty*grady
+                  enddo
+               enddo
+            enddo
+         enddo
+      enddo
+
+      if (manifold .ne. 0) then
+         call fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+     &         qcoarse,qfine,areacoarse,areafine,igrid)
+      endif
+
+
+      end
+
+
+c     # ------------------------------------------------------
+c     # So far, this is only used by the interpolation from
+c     # coarse to fine when regridding.  But maybe it should
+c     # be used by the ghost cell routines as well?
+c     # ------------------------------------------------------
+      subroutine fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+     &      qcoarse,qfine, areacoarse,areafine,igrid)
+      implicit none
+
+      integer mx,my,mbc,meqn, refratio, igrid
+      integer p4est_refineFactor
+
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
+      double precision kf, kc, r2, sum, cons_diff, qf, qc
+
+      p4est_refineFactor = 2
+      refratio = 2
+
+c     # Get (ig,jg) for grid from linear (igrid) coordinates
+      ig = mod(igrid,refratio)
+      jg = (igrid-ig)/refratio
+
+c     # Get rectangle in coarse grid for fine grid.
+      ic_add = ig*mx/p4est_refineFactor
+      jc_add = jg*my/p4est_refineFactor
+
+c     # ------------------------------------------------------
+c     # This routine ensures that the interpolated solution
+c     # has the same mass as the coarse grid solution
+c     # -------------------------------------------------------
+
+
+      r2 = refratio*refratio
+      do m = 1,meqn
+         do i = 1,mx/p4est_refineFactor
+            do j = 1,my/p4est_refineFactor
+               sum = 0.d0
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     ifine = (i-1)*refratio + ii
+                     jfine = (j-1)*refratio + jj
+                     kf = areafine(ifine,jfine)
+                     qf = qfine(m,ifine,jfine)
+                     sum = sum + kf*qf
+                  enddo
+               enddo
+
+               kc = areacoarse(i+ic_add,j+jc_add)
+               qc = qcoarse(m,i+ic_add, j+jc_add)
+               cons_diff = (qc*kc - sum)/r2
+
+               do ii = 1,refratio
+                  do jj = 1,refratio
+                     ifine  = (i-1)*refratio + ii
+                     jfine  = (j-1)*refratio + jj
+                     kf = areafine(ifine,jfine)
+                     qfine(m,ifine,jfine) = qfine(m,ifine,jfine) +
+     &                     cons_diff/kf
+                  enddo
+               enddo
+            enddo  !! end of meqn
+         enddo
+      enddo
+
+      end
