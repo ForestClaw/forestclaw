@@ -1,5 +1,5 @@
 !
-SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
+SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,mint)
   !!     ============================================
   !!
   !!     # set auxiliary arrays
@@ -32,12 +32,15 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
   INTEGER, INTENT(in) :: mbc,mx,my,maux
   REAL(kind=8), INTENT(in) :: xlow,ylow,dx,dy
   REAL(kind=8), INTENT(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+  integer, intent(in) :: nghost, mint
+  logical*1, intent(in) :: is_ghost
 
   !! Locals
   INTEGER :: ii,jj,m, iint,jint
   REAL(kind=8) :: x,y,xm,ym,xp,yp,topo_integral
   CHARACTER(len=*), PARAMETER :: aux_format = "(2i4,4d15.3)"
   INTEGER :: skipcount,iaux,ilo,jlo
+  logical ghost_invalid
 
   !! Lat-Long coordinate system in use, check input variables
   IF (coordinate_system == 2) THEN
@@ -60,32 +63,65 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
      ELSE IF (maux > 1) THEN
         !! Should not need to set aux(2,:,:) in this case, but
         !! for some reason it bombs, e.g. in bowl-radial if maux>1.
-        aux(2,:,:) = 1.d0
-        !!aux(3,:,:) = 1.d0
+        do jj = 1-mbc,my+mbc
+          do ii = 1-mbc,mx+mbc
+            if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+              cycle
+            endif
+            aux(2,ii,jj) = 1.d0
+          enddo
+        enddo
      ENDIF
   ENDIF
 
 
   !! If using a variable friction field initialize the coefficients to 0
   IF (variable_friction) THEN
-     aux(friction_index,:,:) = 0.d0
+    do jj = 1-mbc,my+mbc
+      do ii = 1-mbc,mx+mbc
+        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+          cycle
+        endif
+        aux(friction_index,ii,jj) = 0.d0
+      enddo
+    enddo
   ENDIF
 
     !! Storm fields if used
   IF (wind_forcing) THEN
-     aux(wind_index, :, :) = 0.d0
-     aux(wind_index + 1, :, :) = 0.d0
+    do jj = 1-mbc,my+mbc
+      do ii = 1-mbc,mx+mbc
+        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+          cycle
+        endif
+        aux(wind_index,ii,jj) = 0.d0
+        aux(wind_index + 1,ii,jj) = 0.d0
+      enddo
+    enddo
   ENDIF
+
   IF (pressure_forcing) THEN
-     aux(pressure_index, :, :) = ambient_pressure
+    do jj = 1-mbc,my+mbc
+      do ii = 1-mbc,mx+mbc
+        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+          cycle
+        endif
+        aux(pressure_index,ii,jj) = ambient_pressure
+      enddo
+    enddo
   ENDIF
 
   !! Set analytical bathymetry here if requested
   IF (test_topography > 0) THEN
-     FORALL (ii=1-mbc:mx+mbc,jj=1-mbc:my+mbc)
+    do jj = 1-mbc,my+mbc
+      do ii = 1-mbc,mx+mbc
+        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+          cycle
+        endif
         aux(1,ii,jj) = test_topo(xlow + (ii - 0.5d0) * dx,       &
-             ylow + (jj - 0.5d0) * dy)
-     END FORALL
+            ylow + (jj - 0.5d0) * dy)
+      enddo
+    enddo
   ENDIF
 
   !! test:  compute integer indices based off same corner of domain
@@ -118,6 +154,10 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
         !!write(*,444)ii,jj,aux(1,ii,jj)
 444     FORMAT("in setaux ",2i4,e12.5)
 
+        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+          cycle
+        endif
+        
         !! Set lat-long cell info
         IF (coordinate_system == 2) THEN
            aux(2,ii,jj) = deg2rad * earth_radius**2 * (SIN(yp * deg2rad) - SIN(ym * deg2rad)) / dy
@@ -165,6 +205,9 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
      y = ylower + (jlo+jj-.5d0) * dy
      IF ((y < ylower) .OR. (y>yupper)) THEN
         DO ii=1-mbc,mx+mbc
+           if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+             cycle
+           endif
            x = xlower + (ilo+ii-.5d0) * dx
            iint = ii + MAX(0, CEILING((xlower-x)/dx)) &
                 - MAX(0, CEILING((x-xupper)/dx))
@@ -180,6 +223,9 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
      x =  xlower + (ilo+ii-.5d0) * dx
      IF ((x < xlower) .OR. (x > xupper)) THEN
         DO jj=1-mbc,my+mbc
+           if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
+             cycle
+           endif
            y = ylower + (jlo+jj-.5d0) * dy
            iint = ii + MAX(0, CEILING((xlower-x)/dx)) &
                 - MAX(0, CEILING((x-xupper)/dx))
@@ -193,7 +239,8 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
 
   !! Set friction coefficient based on a set of depth levels
   IF (friction_index > 0) THEN
-     CALL set_friction_field(mx,my,mbc,maux,xlow,ylow,dx,dy,aux)
+     CALL set_friction_field(mx,my,mbc,maux,xlow,ylow,dx,dy,aux &
+                             ,is_ghost,nghost,mint)
   ENDIF
 
   !! Output for debugging to fort.23
@@ -215,3 +262,18 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
   ENDIF
 
 END SUBROUTINE geoclaw_setaux
+
+logical function ghost_invalid(i,j,mx,my,nghost,mint)
+  implicit none
+  integer, intent(in) :: i,j,nghost,mint,mx,my
+  logical :: inner, outer
+
+  inner = (i .gt. mint .and. i .lt. mx-mint+1) .and. &
+          (j .gt. mint .and. j .lt. my-mint+1)
+
+  outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
+          (j .lt. 1-nghost) .or. (j .gt. my+nghost)
+  
+  ghost_invalid = (inner .or. outer)
+end function ghost_invalid
+

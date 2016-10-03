@@ -316,6 +316,8 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     double *aux;
 
     int mint = 4;
+    int nghost = 1;
+    fclaw_bool is_ghost = fclaw2d_patch_is_ghost(this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -323,18 +325,10 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     fc2d_geoclaw_define_auxarray (domain,this_patch);
 
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
-        GEOCLAW_SET_BLOCK(&this_block_idx);
-        FC2D_GEOCLAW_FORT_GHOSTAUX(&mbc,&mx,&my,&mint,&xlower,&ylower,&dx,&dy,
-                          &maux,aux);
-        GEOCLAW_UNSET_BLOCK();
-    }else{
-        GEOCLAW_SET_BLOCK(&this_block_idx);
-        geoclaw_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                          &maux,aux);
-        GEOCLAW_UNSET_BLOCK();
-    }
+    GEOCLAW_SET_BLOCK(&this_block_idx);
+    geoclaw_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                      &maux,aux,&is_ghost,&nghost,&mint);
+    GEOCLAW_UNSET_BLOCK();
 }
 
 /* This should only be called when a new ClawPatch is created. */

@@ -59,7 +59,9 @@ typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
-                                        const int* maux, double aux[]);
+                                        const int* maux, double aux[], 
+                                        const fclaw_bool* is_ghost, const int* nghost, 
+                                        const int* mint);
 
 typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
                                          const int* mx, const int* my, const int* meqn,
@@ -173,7 +175,9 @@ void GEOCLAW_SETAUX(const int* mbc,
                     const int* mx, const int* my,
                     const double* xlower, const double* ylower,
                     const double* dx, const double* dy,
-                    const int* maux, double aux[]);
+                    const int* maux, double aux[],
+                    const fclaw_bool* is_ghost, const int* nghost, 
+                    const int* mint);
 
 void BC2(const int* meqn, const int* mbc,
          const int* mx, const int* my,
@@ -371,14 +375,6 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_GEOCLAW_FORT_GHOSTAUX  FCLAW_F77_FUNC(fc2d_geoclaw_fort_ghostaux, \
-                                                   FC2D_GEOCLAW_FORT_GHOSTAUX)
-void FC2D_GEOCLAW_FORT_GHOSTAUX(const int* mbc,
-                                const int* mx, const int* my,
-                                const int* mint,
-                                const double* xlower, const double* ylower,
-                                const double* dx, const double* dy,
-                                const int* maux, double aux[]);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *

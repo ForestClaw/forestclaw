@@ -119,7 +119,7 @@ contains
     !  set_friction_field - 
     ! ==========================================================================
     subroutine set_friction_field(mx, my, num_ghost, num_aux, xlower, ylower, &
-                                  dx, dy, aux)
+                                  dx, dy, aux, is_ghost, nghost, mint)
 
         use geoclaw_module, only: sea_level
 
@@ -135,12 +135,17 @@ contains
         ! Locals
         integer :: m,i,j,k
         real(kind=8) :: x, y
+        logical*1, intent(in) :: is_ghost
+        integer, intent(in) :: nghost, mint
 
         if (variable_friction) then
             ! Set region based coefficients
             do m=1, num_friction_regions
                 do i=1 - num_ghost, mx + num_ghost
-                    do j=1 - num_ghost, my + num_ghost                        
+                    do j=1 - num_ghost, my + num_ghost
+                        if (is_ghost .and. ghost_invalid(i,j,mx,my,nghost,mint)) then
+                            cycle
+                        endif                        
                         x = xlower + (i-0.5d0) * dx
                         y = ylower + (j-0.5d0) * dy
                         if (friction_regions(m)%lower(1) < x .and.   &
@@ -169,134 +174,20 @@ contains
         end if
 
     end subroutine set_friction_field
-
-    ! ==========================================================================
-    !  set_friction_field_for_ghost_patch- 
-    ! ==========================================================================   
-    subroutine set_ghost_friction_field(mx, my, mint, num_ghost, num_aux, xlower, ylower, &
-                                        dx, dy, aux)
-
-        use geoclaw_module, only: sea_level
-
+    
+    logical function ghost_invalid(i,j,mx,my,nghost,mint)
         implicit none
+        integer, intent(in) :: i,j,nghost,mint,mx,my
+        logical :: inner, outer
 
-        ! Input
-        integer, intent(in) :: mx, my, num_ghost, num_aux
-        integer, intent(in) :: mint
-        real(kind=8), intent(in) :: xlower, ylower, dx, dy
-        real(kind=8), intent(in out) :: aux(num_aux,                           &
-                                            1-num_ghost:mx+num_ghost,&
-                                            1-num_ghost:my+num_ghost)
+        inner = (i .gt. mint .and. i .lt. mx-mint+1) .and. &
+                (j .gt. mint .and. j .lt. my-mint+1)
 
-        ! Locals
-        integer :: m,i,j,k
-        real(kind=8) :: x, y
-
-        if (variable_friction) then
-            ! Set region based coefficients
-            do m=1, num_friction_regions
-                ! face 0
-                do i=0,mint
-                    do j=0,my-mint                        
-                        x = xlower + (i-0.5d0) * dx
-                        y = ylower + (j-0.5d0) * dy
-                        if (friction_regions(m)%lower(1) < x .and.   &
-                            friction_regions(m)%lower(2) < y .and.   &
-                            friction_regions(m)%upper(1) >= x .and.  &
-                            friction_regions(m)%upper(2) >= y) then
-
-                            do k=1,size(friction_regions(m)%depths) - 1
-                                if (friction_regions(m)%depths(k+1)            &
-                                                <= aux(1,i,j) - sea_level.and. &
-                                    friction_regions(m)%depths(k)              &
-                                                 > aux(1,i,j) - sea_level) then
-
-                                    aux(friction_index,i,j) = &
-                                     friction_regions(m)%manning_coefficients(k)
-                                endif
-                            enddo
-                        endif
-                    enddo
-                enddo
-                ! face 2
-                do i=mint+1,mx+1
-                    do j=0,mint                        
-                        x = xlower + (i-0.5d0) * dx
-                        y = ylower + (j-0.5d0) * dy
-                        if (friction_regions(m)%lower(1) < x .and.   &
-                            friction_regions(m)%lower(2) < y .and.   &
-                            friction_regions(m)%upper(1) >= x .and.  &
-                            friction_regions(m)%upper(2) >= y) then
-
-                            do k=1,size(friction_regions(m)%depths) - 1
-                                if (friction_regions(m)%depths(k+1)            &
-                                                <= aux(1,i,j) - sea_level.and. &
-                                    friction_regions(m)%depths(k)              &
-                                                 > aux(1,i,j) - sea_level) then
-
-                                    aux(friction_index,i,j) = &
-                                     friction_regions(m)%manning_coefficients(k)
-                                endif
-                            enddo
-                        endif
-                    enddo
-                enddo
-                ! face 1
-                do i=mx-mint+1,mx+1
-                    do j=mint+1,my+1                        
-                        x = xlower + (i-0.5d0) * dx
-                        y = ylower + (j-0.5d0) * dy
-                        if (friction_regions(m)%lower(1) < x .and.   &
-                            friction_regions(m)%lower(2) < y .and.   &
-                            friction_regions(m)%upper(1) >= x .and.  &
-                            friction_regions(m)%upper(2) >= y) then
-
-                            do k=1,size(friction_regions(m)%depths) - 1
-                                if (friction_regions(m)%depths(k+1)            &
-                                                <= aux(1,i,j) - sea_level.and. &
-                                    friction_regions(m)%depths(k)              &
-                                                 > aux(1,i,j) - sea_level) then
-
-                                    aux(friction_index,i,j) = &
-                                     friction_regions(m)%manning_coefficients(k)
-                                endif
-                            enddo
-                        endif
-                    enddo
-                enddo
-                ! face 3
-                do i=0,mx-mint
-                    do j=my-mint+1,my+1                        
-                        x = xlower + (i-0.5d0) * dx
-                        y = ylower + (j-0.5d0) * dy
-                        if (friction_regions(m)%lower(1) < x .and.   &
-                            friction_regions(m)%lower(2) < y .and.   &
-                            friction_regions(m)%upper(1) >= x .and.  &
-                            friction_regions(m)%upper(2) >= y) then
-
-                            do k=1,size(friction_regions(m)%depths) - 1
-                                if (friction_regions(m)%depths(k+1)            &
-                                                <= aux(1,i,j) - sea_level.and. &
-                                    friction_regions(m)%depths(k)              &
-                                                 > aux(1,i,j) - sea_level) then
-
-                                    aux(friction_index,i,j) = &
-                                     friction_regions(m)%manning_coefficients(k)
-                                endif
-                            enddo
-                        endif
-                    enddo
-                enddo
-            enddo
-
-            if (num_friction_files > 0) then
-                stop "*** ERROR *** File based friction specification not implemented."
-            endif
-        end if
-
-    end subroutine set_ghost_friction_field
-
-
+        outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
+                (j .lt. 1-nghost) .or. (j .gt. my+nghost)
+  
+        ghost_invalid = (inner .or. outer)
+    end function ghost_invalid
 
 
     ! ==========================================================================
