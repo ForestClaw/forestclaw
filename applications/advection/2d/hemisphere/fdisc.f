@@ -11,5 +11,5 @@
      &      blockno,xc,yc,xp,yp,zp)
 
 
-      fdisc = -xp
+      fdisc = abs(xp) - 0.25d0
       end

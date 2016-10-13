@@ -22,7 +22,7 @@ switch map
         xc = (xp + 1)/2;
         yc = (yp + 1)/2;
         [xp,yp,zp] = mapc2m_pillowsphere(xc,yc);
-        s = 0.02;
+        s = 0.0;
         xp = xp + s*v(1);
         yp = yp + s*v(2);
         zp = zp + s*v(3);
