@@ -3,7 +3,7 @@
 
       double precision pi, tperiod, pi2, period_in
 
-      common /compsi/ pi
+      common /compi/ pi
       common /comvt/ tperiod,pi2
 
       tperiod = period_in

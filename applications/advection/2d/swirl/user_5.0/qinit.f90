@@ -19,7 +19,6 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
            q(1,i,j) = 0.d0
         ENDIF
      ENDDO
-     RETURN
   END DO
 
 END SUBROUTINE clawpack5_qinit

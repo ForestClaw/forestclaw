@@ -52,27 +52,29 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         classic_claw46.setaux    = &CLAWPACK46_SETAUX;
-        classic_claw46.rpn2      = &CLAWPACK46_RPN2;
-        classic_claw46.rpt2      = &CLAWPACK46_RPT2;
+        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV;
+        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV;
         classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
 
         fc2d_clawpack46_set_vtable(classic_claw46);
 
         /* Customized refinement so that initial conditions are properly tagged. */
-        fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT;
+        /* fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT; */
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
 
         /* Customized refinement so that initial conditions are properly tagged. */
-        fclaw2d_vt.fort_tag4refinement   = &CLAWPACK5_TAG4REFINEMENT;
+        fclaw2d_vt.problem_setup            = &swirl_problem_setup;
+        fclaw2d_vt.patch_setup              = &swirl_patch_setup;    /* Needs to call setaux */
+        /* fclaw2d_vt.fort_tag4refinement      = &CLAWPACK5_TAG4REFINEMENT; */
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         classic_claw5.setaux    = &CLAWPACK5_SETAUX;
         classic_claw5.b4step2   = &CLAWPACK5_B4STEP2;
-        classic_claw5.rpn2      = &CLAWPACK5_RPN2;
-        classic_claw5.rpt2      = &CLAWPACK5_RPT2;
+        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV;
+        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV;
 
         fc2d_clawpack5_set_vtable(classic_claw5);
     }
