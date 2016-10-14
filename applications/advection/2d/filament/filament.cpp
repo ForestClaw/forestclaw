@@ -35,17 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_math.h>
 
-typedef struct user_options
-{
-    int example;
-    double alpha;
-
-    amr_options_t* gparms;   /* Need to check mx */
-
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -53,8 +42,10 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = nomap; 1 = cart; 2 = pillowdisk; " \
-                        "3 = squareddisk; 4 = pillowdisk5 [2]");
+                        "[user] 0 = nomap; 1 = cart; 2 = five patch square [0]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
                            "[user] Ratio used for squared- and pillow-disk [0.5]");
@@ -69,26 +60,15 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    if (user->example < 0 || user->example > 5) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1, 2, 3, 4 or 5\n");
+    if (user->example < 0 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 0, 1, or 2\n");
         return FCLAW_EXIT_QUIET;
     }
     if (user->example == 2)
     {
-        if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 16)
-        {
-            fclaw_global_essentialf("The pillowdisk requires mx*2^minlevel >= 16\n");
-            return FCLAW_EXIT_QUIET;
-        }
-    }
-    else if (user->example == 3 || user->example == 4 || user->example == 5)
-    {
         if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
         {
-            fclaw_global_essentialf("The five patch mapping " \
-                                    "is inadmissable:  " \
-                                    "mx*2^minlevel must be greater than " \
-                                    "or equal to 32.\n");
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel > 32");
             return FCLAW_EXIT_QUIET;
         }
     }
@@ -114,6 +94,17 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+const user_options_t* filament_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
+
 static
 void run_program(fclaw_app_t* app)
 {
@@ -135,18 +126,17 @@ void run_program(fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Domain geometry
        -------------------------------------------------------------- */
-    double pi = M_PI;
+    int mi, mj;
     double rotate[2];
-    int mi, mj, a,b;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
-    rotate[0] = pi*gparms->theta/180.0;
-    rotate[1] = pi*gparms->phi/180.0;
+    rotate[0] = 0;
+    rotate[1] = 0;
     mi = gparms->mi;
     mj = gparms->mj;
-    a = gparms->periodic_x;
-    b = gparms->periodic_y;
+    int a = 0; /* non-periodic */
+    int b = 0;
 
     switch (user->example) {
     case 0:
@@ -156,7 +146,7 @@ void run_program(fclaw_app_t* app)
         break;
 
     case 1:
-        /* in [-1,1]x[-1,1] */
+        /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_cart(brick,gparms->scale,
@@ -164,22 +154,7 @@ void run_program(fclaw_app_t* app)
                                     rotate);
         break;
     case 2:
-        /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_pillowdisk(gparms->scale,gparms->shift,rotate);
-        break;
-    case 3:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_squareddisk (gparms->scale,gparms->shift,
-                                            rotate,user->alpha);
-        break;
-    case 4:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
-                                            rotate,user->alpha);
-        break;
-
-    case 5:
+        /* Five patch square domain */
         conn = p4est_connectivity_new_disk ();
         cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
                                           rotate,user->alpha);
@@ -231,6 +206,7 @@ main (int argc, char **argv)
   /* Register packages */
   fclaw_forestclaw_register(app,"fclaw_options.ini");
   fc2d_clawpack46_register(app,"fclaw_options.ini");
+  fc2d_clawpack5_register(app,"fclaw_options.ini");
 
   /* User defined options (defined above) */
   gparms = fclaw_forestclaw_get_options(app);
