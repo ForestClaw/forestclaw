@@ -8,7 +8,7 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/setprob.f \
 	applications/advection/2d/torus/psi.f \
 	applications/advection/2d/torus/qexact.f \
-	applications/advection/2d/torus/output.f \
+	applications/advection/2d/torus/output_header.f \
 	applications/advection/2d/torus/fdisc.f \
 	applications/advection/2d/torus/user_4.6/qinit.f \
 	applications/advection/2d/torus/user_4.6/setaux_manifold.f \
