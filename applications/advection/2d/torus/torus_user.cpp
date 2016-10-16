@@ -23,134 +23,118 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-#include "torus_common.h"
 #include "torus_user.h"
+
+#include <fclaw2d_forestclaw.h>
 #include "fclaw2d_clawpatch.h"
 
-#include <fc2d_clawpack46.h>
-#include <clawpack46_user_fort.h>
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t classic_claw5;
 
-static fc2d_clawpack46_vtable_t classic_claw;
-
-static fclaw2d_vtable_t vt;
+static fclaw2d_vtable_t fclaw2d_vt;
 
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
+    const user_options_t *user =  torus_user_get_options(domain);
 
-    fclaw_app_t* app = fclaw2d_domain_get_app(domain);
-    user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
-    int example = user->example;
-    const amr_options_t *gparms = get_domain_parms(domain);
-
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&vt, &classic_claw);
-
-    vt.problem_setup            = &torus_patch_setup;
-
-    if (gparms->manifold)
+    if (user->claw_version == 4)
     {
-        vt.patch_setup = &torus_patch_manifold_setup;
-        classic_claw.setaux = &TORUS46_SETAUX_MANIFOLD;
+        fclaw2d_init_vtable(&fclaw2d_vt);
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
+
+        fclaw2d_vt.problem_setup = &torus_problem_setup;
+        fclaw2d_vt.patch_setup   = &torus_patch_setup;
+
+        classic_claw46.qinit     = &CLAWPACK46_QINIT;
+        classic_claw46.setaux    = &TORUS46_SETAUX;  /* Not really a mapped setaux */
+        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+
+        if (user->example == 1)
+        {
+            /* Accuracy problem : Used divided differences for tagging */
+            fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+
+            /* Write out error */
+            fclaw2d_vt.fort_write_header   = &TORUS_FORT_WRITE_HEADER;
+            fclaw2d_vt.patch_write_file    = &torus_output_write_file;
+        }
+
+        fc2d_clawpack46_set_vtable(classic_claw46);
     }
-    else
+    else if (user->claw_version == 5)
     {
-        vt.patch_setup = &fc2d_clawpack46_setaux;
-        classic_claw.setaux = &CLAWPACK46_SETAUX;
+        fclaw2d_init_vtable(&fclaw2d_vt);
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+
+        fclaw2d_vt.problem_setup = &torus_problem_setup;
+        fclaw2d_vt.patch_setup   = &torus_patch_setup;
+
+        classic_claw5.qinit     = &CLAWPACK5_QINIT;
+        classic_claw5.setaux    = &TORUS5_SETAUX;
+        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+
+        if (user->example == 1)
+        {
+            /* Accuracy problem : Used divided differences for tagging */
+            fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+
+            /* Write out error */
+            fclaw2d_vt.fort_write_header      = &TORUS_FORT_WRITE_HEADER;
+            fclaw2d_vt.patch_write_file    = &torus_output_write_file;
+        }
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
     }
-
-
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &CLAWPACK46_QINIT;
-
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;     /* Needed for lat-long grid */
-
-    vt.patch_single_step_update = &fc2d_clawpack46_update;  /* Includes b4step2 and src2 */
-    if (gparms->manifold)
-    {
-        classic_claw.b4step2 = &TORUS46_B4STEP2_MANIFOLD;
-    }
-    else
-    {
-        /* In the flat case, the velocity field does not vary in time, so
-           no need for a b4step2 routine */
-    }
-
-    classic_claw.rpn2 = &CLAWPACK46_RPN2;
-    classic_claw.rpt2 = &CLAWPACK46_RPT2;
-
-    vt.fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
-
-    if (example == 6)
-    {
-        vt.fort_tag4refinement = &TORUS46_TAG4REFINEMENT;
-        vt.fort_tag4coarsening = &TORUS46_TAG4COARSENING;
-
-        vt.write_header      = &torus_output_write_header;
-        vt.patch_write_file  = &torus_output_write_file;
-    }
-
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
-
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void torus_patch_setup(fclaw2d_domain_t *domain)
+void torus_problem_setup(fclaw2d_domain_t *domain)
 {
-    fclaw_app_t* app = fclaw2d_domain_get_app(domain);
-    user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
-    int example = user->example;
-
-    SETPROB_TORUS(&example);
+    const user_options_t* user = torus_user_get_options(domain);
+    TORUS_SETPROB(&user->example,&user->alpha);
 }
 
-void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
+void torus_patch_setup(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
+    const user_options_t* user = torus_user_get_options(domain);
 
-    fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    fc2d_clawpack46_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        return;
+    }
+
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack46_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack5_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
+    }
 }
-
-
-void torus_output_write_header(fclaw2d_domain_t* domain,
-                               int iframe)
-{
-    const amr_options_t *amropt;
-    fclaw2d_vtable_t vt;
-    int meqn,ngrids;
-    double time;
-    char matname1[10];
-    char matname2[10];
-
-    amropt = fclaw2d_forestclaw_get_options(domain);
-
-    time = fclaw2d_domain_get_time(domain);
-    ngrids = fclaw2d_domain_get_num_patches(domain);
-
-    meqn = amropt->meqn;
-
-    sprintf(matname1,"fort.q%04d",iframe);
-    sprintf(matname2,"fort.t%04d",iframe);
-
-    vt = fclaw2d_get_vtable(domain);
-    TORUS46_FORT_WRITE_HEADER(matname1,matname2,&time,&meqn,&ngrids);
-}
-
 
 void torus_output_write_file(fclaw2d_domain_t *domain,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx, int this_patch_idx,
                              int iframe, int patch_num,int level)
 {
-    fclaw2d_vtable_t vt;
+    /* This new wrapper is needed because we are passing both q
+       and the error into the FORT file.  */
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy,t;
     double *q, *error;
-    char matname1[10];
-    vt = fclaw2d_get_vtable(domain);
+    char matname1[11];
+
+    const user_options_t *user = torus_user_get_options(domain);
 
     t = fclaw2d_domain_get_time(domain);
 
@@ -161,8 +145,20 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
     error = fclaw2d_clawpatch_get_error(domain,this_patch);
 
     sprintf(matname1,"fort.q%04d",iframe);
-    TORUS46_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
-                          &dx,&dy,q,error,&t,
-                          &patch_num,&level,&this_block_idx,
-                          &domain->mpirank);
+
+    /* Here, we pass in q and the error, so need special headers and files */
+    if (user->claw_version == 4)
+    {
+        TORUS46_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
+                                &dx,&dy,q,error,&t,
+                                &patch_num,&level,&this_block_idx,
+                                &domain->mpirank);
+    }
+    else if (user->claw_version == 5)
+    {
+        TORUS5_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
+                               &dx,&dy,q,error,&t,
+                               &patch_num,&level,&this_block_idx,
+                               &domain->mpirank);
+    }
 }

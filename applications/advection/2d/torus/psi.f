@@ -1,95 +1,58 @@
       double precision function psi(blockno,xc,yc,t)
       implicit none
 
-      double precision xc, yc, t,r
+      double precision xc, yc, t
       integer blockno
-      double precision pi, r2, phi, pi2, alpha
-      logical iscart, issphere, isflat
+      double precision pi, alpha
       double precision revs_per_s
       integer*8 cont, get_context
 
-      double precision xp,yp,zp
-      double precision xc1, yc1, zc1
-      double precision vt, tperiod
+      double precision xc1, yc1, zc1, pi2
+      integer example
 
       common /compi/ pi
+      common /toruscomm/ alpha
+      common /excomm_example/ example
 
       cont = get_context()
+
+c     # (xc,yc) in each block is in [0,1]x[0,1].  This call maps
+c     # maps that point to subregion of this unit domain, according
+c     # to what brick the point occupies.  For example, in a 2x2 brick
+c     # arrangement, the point (0.5,0.5) in brick 0 gets mapped to (0.25
+c     #(0.25,0.25).  The same point in brick 2 gets mapped to
+c     # (0.25,0.75).
 
       call fclaw2d_map_brick2c(cont,
      &      blockno,xc,yc,xc1,yc1,zc1)
 
-      call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
-
       revs_per_s = 0.5d0
 
-c     # this value of alpha has to agree with the value set in
-c     # the .ini file.
-      alpha = 0.4d0
-
       pi2 = 2*pi
-      if (iscart()) then
-         psi = revs_per_s*(-xp + yp)
-      elseif (issphere()) then
-         psi = pi2*revs_per_s*zp
-      elseif (isflat()) then
-c        # annulus (this is just dumb; I need to fix the queries so they are useful)
-         r2 = xp**2 + yp**2
-         psi = 0.5d0*pi2*revs_per_s*r2
-      else
-c        # torus
-c        # Twisted torus stream function (to be used with usual torus map)
-         psi = (pi2*revs_per_s)*alpha*
-     &         (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
 
+      if (example .eq. 0) then
 c        # Rigid body rotation
          psi = (pi2*revs_per_s)*alpha*
      &         (pi2*yc1 + alpha*sin(pi2*yc1))
+      elseif (example .eq. 1) then
+c        # Twisted torus stream function (to be used with usual torus map)
+         psi = (pi2*revs_per_s)*alpha*
+     &         (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
       endif
 
-c      tperiod = 16.d0
-c      vt = -cos(pi2*t/tperiod)
-      psi = -psi
+c      psi = psi
 
       end
 
 
-      subroutine get_vel(x,y,vvec,t)
+
+      subroutine get_vel_psi_comp(blockno,xd1,xd2,ds,vn,t)
       implicit none
 
-      double precision x,y,vvec(3), t
-      double precision cx,sx,cy,sy,r,pi
-      double precision alpha, v, pi2
-      double precision u_cart(3)
-      double precision revs_per_s
-      integer m
+      double precision xd1(2),xd2(2), ds, vn, psi,t
+      integer blockno
 
-      common /compi/ pi
+      vn = (psi(blockno,xd1(1),xd1(2),t) -
+     &      psi(blockno,xd2(1),xd2(2),t))/ds
 
-      alpha = 0.4d0
-      pi2 = 2.d0*pi
-
-c     # revs_per_s : revolutions/second
-      revs_per_s = 1d0
-
-      cx = cos(pi2*x)
-      sx = sin(pi2*x)
-      cy = cos(pi2*y)
-      sy = sin(pi2*y)
-
-      r = 1 + alpha*cy
-
-c     # The Cartesian components of the velocity
-      vvec(1) = -revs_per_s*r*pi2*sx
-      vvec(2) = revs_per_s*r*pi2*cx
-      vvec(3) = 0
-
-      end
-
-      double precision function torus_dot(u,v)
-      implicit none
-      double precision u(3),v(3)
-
-      torus_dot = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
       end

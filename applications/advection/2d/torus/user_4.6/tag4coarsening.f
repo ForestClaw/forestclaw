@@ -1,47 +1,5 @@
-      subroutine torus46_tag4refinement(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,blockno,q,
-     &      refine_threshold, init_flag,
-     &      tag_for_refinement)
-      implicit none
-
-      integer mx,my, mbc, meqn, tag_for_refinement, init_flag
-      integer blockno
-      double precision xlower, ylower, dx, dy
-      double precision refine_threshold
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
-      integer i,j, mq
-      double precision xc,yc, qmin, qmax,qx,qy
-
-      tag_for_refinement = 0
-
-c     # Refine based only on first variable in system.
-      qmin = 0.025d0
-      qmax = 0.975d0
-      do mq = 1,meqn
-         do i = 1,mx
-            do j = 1,my
-               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
-               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
-               if (abs(qx) .gt. refine_threshold .or.
-     &               abs(qy) .gt. refine_threshold) then
-                  tag_for_refinement = 1
-                  return
-               endif
-c              # Tag grid if at least one value is in [qmin,qmax]
-c               if (q(i,j,1) .gt. qmin
-c     &               .and. q(i,j,1) .lt. qmax) then
-c                  tag_for_refinement = 1
-c                  return
-c               endif
-            enddo
-         enddo
-      enddo
-
-      end
-
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine torus46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -61,22 +19,22 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       qmin = 0.025d0
       qmax = 0.975d0
       tag_patch = 1
-      call tag_get_minmax(mx,my,mbc,meqn,q0,dx,dy,
+      call torus46_tag_get_minmax(mx,my,mbc,meqn,q0,dx,dy,
      &      qmin,qmax,coarsen_threshold,tag_patch)
       if (tag_patch .eq. 0) then
          return
       endif
-      call tag_get_minmax(mx,my,mbc,meqn,q1,dx,dy,
+      call torus46_tag_get_minmax(mx,my,mbc,meqn,q1,dx,dy,
      &      qmin,qmax,coarsen_threshold,tag_patch)
       if (tag_patch .eq. 0) then
          return
       endif
-      call tag_get_minmax(mx,my,mbc,meqn,q2,dx,dy,
+      call torus46_tag_get_minmax(mx,my,mbc,meqn,q2,dx,dy,
      &      qmin,qmax,coarsen_threshold,tag_patch)
       if (tag_patch .eq. 0) then
          return
       endif
-      call tag_get_minmax(mx,my,mbc,meqn,q3,dx,dy,
+      call torus46_tag_get_minmax(mx,my,mbc,meqn,q3,dx,dy,
      &      qmin,qmax,coarsen_threshold,tag_patch)
       if (tag_patch .eq. 0) then
          return
@@ -85,7 +43,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 
       end
 
-      subroutine tag_get_minmax(mx,my,mbc,meqn,q,
+      subroutine torus46_tag_get_minmax(mx,my,mbc,meqn,q,
      &      dx,dy,qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none

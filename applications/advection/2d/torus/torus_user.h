@@ -27,6 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TORUS_USER_H
 
 #include <fclaw2d_domain.h>
+#include "../all/clawpack_user.h"
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,28 +40,19 @@ extern "C"
 #endif
 #endif
 
+/* --------------------------
+   Headers for both versions
+   -------------------------- */
 
-#define TORUS46_SETAUX_MANIFOLD FCLAW_F77_FUNC(torus46_setaux_manifold, \
-                                               TORUS46_SETAUX_MANIFOLD)
+typedef struct user_options
+{
+    int example;
+    double alpha;  /* Ratio of inner radius to outer radius */
+    int claw_version;
 
-void TORUS46_SETAUX_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
-                             const int* mx, const int* my,
-                             const double* xlower, const double* ylower,
-                             const double* dx, const double* dy,
-                             const int* maux, double aux[]);
-
-#define TORUS46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(torus46_b4step2_manifold, \
-                                                TORUS46_B4STEP2_MANIFOLD)
-void TORUS46_B4STEP2_MANIFOLD(const int* maxmx, const int* maxmy, const int* mbc,
-                              const int* mx, const int* my, const int* meqn,
-                              double q[], const double* xlower, const double* ylower,
-                              const double* dx, const double* dy,
-                              const double* t, const double* dt,
-                              const int* maux, double aux[]);
-
-
-void torus_output_write_header(fclaw2d_domain_t* domain,
-                                 int iframe);
+    int is_registered;
+}
+user_options_t;
 
 void torus_output_write_file(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
@@ -65,41 +60,52 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
                                int iframe, int patch_num,int level);
 
 
+#define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
+void TORUS_SETPROB(const int* example, const double* alpha);
+
+#define  TORUS_FORT_WRITE_HEADER FCLAW_F77_FUNC(torus_fort_write_header, \
+                                                TORUS_FORT_WRITE_HEADER)
+
+void     TORUS_FORT_WRITE_HEADER(char* matname1, char* matname2,
+                                 double* time, int* meqn, int* ngrids);
+
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
-void torus_patch_manifold_setup(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx);
+void torus_problem_setup(fclaw2d_domain_t *domain);
 
-#define SETPROB_TORUS FCLAW_F77_FUNC(setprob_torus,SETPROB_TORUS)
-void SETPROB_TORUS(const int* example);
-
-void torus_patch_setup(fclaw2d_domain_t *domain);
+void torus_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
-                                            const double scale[],
-                                            const double shift[],
-                                            const double rotate[]);
+fclaw2d_map_context_t *
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double shift[],
+                           const double rotate[],
+                           const double alpha,
+                           const int example);
 
-
+/* ----------------------
+   Clawpack 4.6 headers
+   ---------------------- */
 #define TORUS46_COMPUTE_ERROR FCLAW_F77_FUNC(torus46_compute_error,TORUS46_COMPUTE_ERROR)
 
 void TORUS46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
-                         double *dx, double *dy, double *xlower,
-                         double *ylower, double *t, double q[],
-                         double error[]);
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[]);
 
 
-#define  TORUS46_FORT_WRITE_HEADER FCLAW_F77_FUNC(torus46_fort_write_header, \
-                                                TORUS46_FORT_WRITE_HEADER)
-
-void     TORUS46_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                 double* time, int* meqn, int* ngrids);
-
+#define TORUS46_SETAUX  FCLAW_F77_FUNC(torus46_setaux, TORUS46_SETAUX)
+void TORUS46_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
+                    const int* mx, const int* my,
+                    const double* xlower, const double* ylower,
+                    const double* dx, const double* dy,
+                    const int* maux, double aux[]);
 
 #define  TORUS46_FORT_WRITE_FILE FCLAW_F77_FUNC(torus46_fort_write_file,  \
                                                 TORUS46_FORT_WRITE_FILE)
@@ -139,30 +145,60 @@ void  TORUS46_TAG4COARSENING(const int* mx, const int* my,
 
 
 
+/* ----------------------
+   Clawpack 5.x headers
+   ---------------------- */
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
-                           const double scale[],
-                           const double shift[],
-                           const double rotate[],
-                           const double alpha);
+#define TORUS5_COMPUTE_ERROR FCLAW_F77_FUNC(torus5_compute_error,TORUS5_COMPUTE_ERROR)
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double shift[],
-                             const double rotate[],
-                             const double alpha);
+void TORUS5_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                          double *dx, double *dy, double *xlower,
+                          double *ylower, double *t, double q[],
+                          double error[]);
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double shift[],
-                             const double rotate[],
-                             const double lat[],
-                             const double longitude[],
-                             const int a, const int b);
+#define TORUS5_SETAUX  FCLAW_F77_FUNC(torus5_setaux,  TORUS5_SETAUX)
+void TORUS5_SETAUX(const int* mbc,
+                   const int* mx, const int* my,
+                   const double* xlower, const double* ylower,
+                   const double* dx, const double* dy,
+                   const int* maux, double aux[]);
 
+
+#define  TORUS5_FORT_WRITE_FILE FCLAW_F77_FUNC(torus5_fort_write_file,  \
+                                                TORUS5_FORT_WRITE_FILE)
+void     TORUS5_FORT_WRITE_FILE(char* matname1,
+                                int* mx,        int* my,
+                                int* meqn,      int* mbc,
+                                double* xlower, double* ylower,
+                                double* dx,     double* dy,
+                                double q[],     double *error,
+                                double *time,
+                                int* patch_num, int* level,
+                                int* blockno,   int* mpirank);
+
+#define TORUS5_TAG4REFINEMENT FCLAW_F77_FUNC(torus5_tag4refinement, \
+                                              TORUS5_TAG4REFINEMENT)
+void  TORUS5_TAG4REFINEMENT(const int* mx,const int* my,
+                             const int* mbc,const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q[],
+                             const double* tag_threshold,
+                             const int* init_flag,
+                             int* tag_patch);
+
+#define  TORUS5_TAG4COARSENING FCLAW_F77_FUNC(torus5_tag4coarsening, \
+                                              TORUS5_TAG4COARSENING)
+void  TORUS5_TAG4COARSENING(const int* mx, const int* my,
+                             const int* mbc, const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q0[],double q1[],
+                             double q2[],double q3[],
+                             const double* tag_threshold,
+                             int* tag_patch);
 
 
 #ifdef __cplusplus
