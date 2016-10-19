@@ -4,8 +4,8 @@
 
       integer iframe,meqn,ngrids
 
-      character*10 matname1
-      character*10 matname2
+      character*11 matname1
+      character*11 matname2
       double precision time
       integer matunit1, matunit2, nstp,ipos,idigit
 
@@ -20,7 +20,7 @@
 
       close(matunit2)
 
-      open(unit=matunit1,file=matname1)
+      open(unit=matunit1,file=matname1,status='replace')
       close(matunit1)
 
       end
@@ -31,7 +31,7 @@
      &      q,patch_num,level,blockno,mpirank)
       implicit none
 
-      character*10 matname1
+      character*11 matname1
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy
