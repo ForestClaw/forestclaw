@@ -5,8 +5,8 @@
 
       integer iframe,meqn,ngrids
 
-      character*10 matname1
-      character*10 matname2
+      character*11 matname1
+      character*11 matname2
       double precision time
       integer matunit1, matunit2, nstp,ipos,idigit
 
@@ -32,7 +32,7 @@
 
       implicit none
 
-      character*10 matname1
+      character*11 matname1
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy

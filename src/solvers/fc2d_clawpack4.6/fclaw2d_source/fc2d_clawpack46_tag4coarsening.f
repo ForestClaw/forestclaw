@@ -53,8 +53,8 @@ c     # not be coarsened.
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
 
-      do i = 1,mx
-         do j = 1,my
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
             if (qmax - qmin .gt. coarsen_threshold) then

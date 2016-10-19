@@ -43,19 +43,19 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 }
 
 void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                         fc2d_clawpack46_vtable_t* vt)
+                                         fc2d_clawpack46_vtable_t* claw_vt)
 {
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK46_BC2_DEFAULT;
-    vt->qinit = NULL;
-    vt->rpn2 = NULL;
-    vt->rpt2 = NULL;
+    claw_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
+    claw_vt->qinit = NULL;
+    claw_vt->rpn2 = NULL;
+    claw_vt->rpt2 = NULL;
 
     /* Optional functions - call only if non-NULL */
-    vt->setprob = NULL;
-    vt->setaux = NULL;
-    vt->b4step2 = NULL;
-    vt->src2 = NULL;
+    claw_vt->setprob = NULL;
+    claw_vt->setaux = NULL;
+    claw_vt->b4step2 = NULL;
+    claw_vt->src2 = NULL;
 
     /* Default qinit functions */
     fclaw_vt->patch_initialize         = &fc2d_clawpack46_qinit;
