@@ -350,8 +350,10 @@ void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag)
 
         vt = fclaw2d_get_vtable(domain);
 
-        FCLAW_ASSERT(vt.run_user_diagnostics != NULL);
-        vt.run_user_diagnostics(domain,t);
+        if (vt.run_user_diagnostics != NULL)
+        {
+            vt.run_user_diagnostics(domain,t);
+        }
     }
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
