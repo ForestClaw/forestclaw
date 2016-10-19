@@ -1,10 +1,6 @@
-
-c
-c
-c
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,
+     &      dx,dy,q,maux,aux)
 c     =====================================================
 c
 c     # Set initial conditions for q.
@@ -13,7 +9,7 @@ c      # Data is piecewise constant with 4 values in 4 quadrants
 c      # 2D Riemann problem from Figure 4 of
 c        @article{csr-col-glaz,
 c          author="C. W. Schulz-Rinne and J. P. Collins and H. M. Glaz",
-c          title="Numerical Solution of the {R}iemann Problem for 
+c          title="Numerical Solution of the {R}iemann Problem for
 c                 Two-Dimensional Gas Dynamics",
 c          journal="SIAM J. Sci. Comput.",
 c          volume="14",
@@ -66,7 +62,7 @@ c
              q(i,j,1) = rpr(iq)
              q(i,j,2) = rpr(iq)*rpu(iq)
              q(i,j,3) = rpr(iq)*rpv(iq)
-             q(i,j,4) = rpp(iq)/gamma1 + 0.5d0*rpr(iq)*(rpu(iq)**2 + 
+             q(i,j,4) = rpp(iq)/gamma1 + 0.5d0*rpr(iq)*(rpu(iq)**2 +
      &                                  rpv(iq)**2)
    15        continue
        return

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -37,6 +38,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "0 no map; 1 id. map; 2 cart. map; 3 5-patch");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
 
     /* [user] User options */
     sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
@@ -85,6 +89,17 @@ void register_user_options (fclaw_app_t * app,
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 }
+
+const user_options_t* quadrants_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
 
 void run_program(fclaw_app_t* app)
 {
@@ -178,6 +193,7 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);
