@@ -59,7 +59,13 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
 
     /* Default qinit functions */
     fclaw_vt->patch_initialize         = &fc2d_clawpack46_qinit;
-    fclaw_vt->problem_setup            = &fc2d_clawpack46_setprob;
+    if (fclaw_vt->problem_setup == NULL)
+    {
+        /* This call shouldn't override a version-independent setting
+           for this function */
+        fclaw_vt->problem_setup        = &fc2d_clawpack46_setprob;
+    }
+    fclaw_vt->patch_setup              = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
     fclaw_vt->patch_physical_bc        = &fc2d_clawpack46_bc2;
     fclaw_vt->patch_single_step_update = &fc2d_clawpack46_update;
 
@@ -91,7 +97,6 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_ghostpack          = &FC2D_CLAWPACK46_FORT_GHOSTPACK;
 
     fclaw_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
-
 }
 
 
@@ -278,7 +283,21 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.setaux != NULL);
+    if (classic_vt.setaux == NULL)
+    {
+        /* For consistency, class_vt.patch_setup is set to
+           fc2d_clawpack46_setaux by default.  We
+           check here that the user has actually set a
+           SETAUX routine */
+        return;
+    }
+
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        /* This is going to be removed at some point */
+        return;
+    }
+
     int mx,my,mbc,maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
     double *aux;
@@ -331,7 +350,7 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
+    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must be initialized */
     int mx,my,mbc,meqn,maux,maxmx,maxmy;
     double dx,dy,xlower,ylower;
     double *q, *aux;
@@ -472,10 +491,6 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-#if 0
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    q = cp->q_time_sync(time_interp);
-#endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
