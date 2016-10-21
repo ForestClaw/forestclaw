@@ -1,9 +1,5 @@
-c
-c
-c     =====================================================
-      subroutine rpt2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &                   aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
-c     =====================================================
+      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+     &      aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
       implicit double precision (a-h,o-z)
 c
 c     # Riemann solver in the transverse direction for the acoustics equations
@@ -44,7 +40,7 @@ c
 c        # imp is used to flag whether wave is going to left or right,
 c        # since material properties are different on the two sides
 c
-         if (imp.eq.1) then 
+         if (imp.eq.1) then
 c            # asdq = amdq, moving to left
              i1 = i-1
            else
