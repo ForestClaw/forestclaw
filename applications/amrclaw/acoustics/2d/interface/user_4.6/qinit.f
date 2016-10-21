@@ -1,15 +1,5 @@
-
-c
-c
-c
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
-c     =====================================================
-c
-c     # Set initial conditions for q.
-c     # radially-symmetric pressure disturbance
-c
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
        implicit double precision (a-h,o-z)
        dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
 c
