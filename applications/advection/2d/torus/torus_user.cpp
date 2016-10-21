@@ -37,12 +37,13 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  torus_user_get_options(domain);
 
+    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_vt.problem_setup = &torus_problem_setup;
+
     if (user->claw_version == 4)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.problem_setup = &torus_problem_setup;
         fclaw2d_vt.patch_setup   = &torus_patch_setup;
 
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
@@ -65,10 +66,8 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     }
     else if (user->claw_version == 5)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.problem_setup = &torus_problem_setup;
         fclaw2d_vt.patch_setup   = &torus_patch_setup;
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
@@ -99,9 +98,9 @@ void torus_problem_setup(fclaw2d_domain_t *domain)
 }
 
 void torus_patch_setup(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx)
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx)
 {
     const user_options_t* user = torus_user_get_options(domain);
 

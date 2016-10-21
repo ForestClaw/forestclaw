@@ -42,7 +42,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
+                        "[user] 0 = torus; 1 = twisted torus [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -64,7 +64,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     if (user->example < 0 || user->example > 1)
     {
         fclaw_global_essentialf
-            ("Option --user:example must be between 0 and 6\n");
+            ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
