@@ -66,7 +66,7 @@ void interface_link_solvers(fclaw2d_domain_t *domain)
     }
 
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
-};
+}
 
 void interface_setup_problem(fclaw2d_domain_t* domain)
 {
