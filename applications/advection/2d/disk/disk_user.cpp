@@ -44,9 +44,9 @@ void disk_link_solvers(fclaw2d_domain_t *domain)
 
         fclaw2d_vt.patch_setup = &disk_patch_setup;
 
-        /* this is needed to avoid tagging block corners in 5 patch example*/
         if (user->example == 0)
         {
+            /* Avoid tagging block corners in 5 patch example*/
             fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
             fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
         }
@@ -64,9 +64,9 @@ void disk_link_solvers(fclaw2d_domain_t *domain)
 
         fclaw2d_vt.patch_setup  = &disk_patch_setup;
 
-        /* this is needed to avoid tagging block corners in 5 patch example*/
         if (user->example == 0)
         {
+            /* Avoid tagging block corners in 5 patch example*/
             fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
             fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
         }
