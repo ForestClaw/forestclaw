@@ -39,57 +39,42 @@ void latlong_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  latlong_user_get_options(domain);
 
+    fclaw2d_init_vtable(&fclaw2d_vt);
+
     if (user->claw_version == 4)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.problem_setup       = &latlong_problem_setup;
-        classic_claw46.setprob         = &SETPROB;
+        fclaw2d_vt.patch_setup = &latlong_patch_setup_manifold;
 
-        fclaw2d_vt.patch_initialize    = &fc2d_clawpack46_qinit;
-        classic_claw46.qinit           = &CLAWPACK46_QINIT;
-
-        fclaw2d_vt.patch_setup         = &latlong_patch_setup;
-
-        classic_claw46.rpn2 = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        classic_claw46.rpt2 = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        classic_claw46.setprob = &SETPROB;
+        classic_claw46.qinit   = &CLAWPACK46_QINIT;
+        classic_claw46.rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        classic_claw46.rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
         fc2d_clawpack46_set_vtable(classic_claw46);
 
     }
     else if (user->claw_version == 5)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.problem_setup       = &latlong_problem_setup;
-        classic_claw5.setprob          = &SETPROB;
+        fclaw2d_vt.patch_setup = &latlong_patch_setup_manifold;
 
-        fclaw2d_vt.patch_initialize    = &fc2d_clawpack5_qinit;
-        classic_claw5.qinit            = &CLAWPACK5_QINIT;
-
-        fclaw2d_vt.patch_setup         = &latlong_patch_setup;
-
-        classic_claw5.rpn2 = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        classic_claw5.rpt2 = &CLAWPACK5_RPT2ADV_MANIFOLD;
+        classic_claw5.setprob  = &SETPROB;
+        classic_claw5.qinit    = &CLAWPACK5_QINIT;
+        classic_claw5.rpn2     = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        classic_claw5.rpt2     = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
         fc2d_clawpack5_set_vtable(classic_claw5);
     }
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-
-
-void latlong_problem_setup(fclaw2d_domain_t *domain)
-{
-    SETPROB();
-}
-
-void latlong_patch_setup(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx)
+void latlong_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx)
 {
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;

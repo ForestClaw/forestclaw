@@ -54,12 +54,10 @@ user_options_t;
 
 void latlong_link_solvers(fclaw2d_domain_t *domain);
 
-void latlong_problem_setup(fclaw2d_domain_t *domain);
-
-void latlong_patch_setup(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx);
+void latlong_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx);
 
 
 const user_options_t* latlong_user_get_options(fclaw2d_domain_t* domain);
