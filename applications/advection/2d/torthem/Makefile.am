@@ -15,9 +15,3 @@ applications_advection_2d_torthem_torthem_LDADD = \
 
 ## Due to C++ libraries we need to force C++ linking for a C main program
 nodist_EXTRA_applications_advection_2d_torthem_torthem_SOURCES = dummy.cxx
-
-applications_advection_2d_torthem_torthem_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
-
-applications_advection_2d_torthem_torthem_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
