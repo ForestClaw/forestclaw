@@ -41,14 +41,11 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     const user_options_t* user = swirl_user_get_options(domain);
 
     fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_vt.problem_setup = &swirl_problem_setup;  /* Version-independent */
 
     if (user->claw_version == 4)
     {
-        /* Needed for the clawpack46 package */
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
-
-        fclaw2d_vt.problem_setup            = &swirl_problem_setup;
-        fclaw2d_vt.patch_setup              = &swirl_patch_setup;    /* Needs to call setaux */
 
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         classic_claw46.setaux    = &CLAWPACK46_SETAUX;
@@ -57,18 +54,10 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
         classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
 
         fc2d_clawpack46_set_vtable(classic_claw46);
-
-        /* Customized refinement so that initial conditions are properly tagged. */
-        /* fclaw2d_vt.fort_tag4refinement      = &CLAWPACK46_TAG4REFINEMENT; */
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
-
-        /* Customized refinement so that initial conditions are properly tagged. */
-        fclaw2d_vt.problem_setup            = &swirl_problem_setup;
-        fclaw2d_vt.patch_setup              = &swirl_patch_setup;    /* Needs to call setaux */
-        /* fclaw2d_vt.fort_tag4refinement      = &CLAWPACK5_TAG4REFINEMENT; */
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         classic_claw5.setaux    = &CLAWPACK5_SETAUX;
@@ -88,24 +77,4 @@ void swirl_problem_setup(fclaw2d_domain_t* domain)
 
     double period = user->period;
     SWIRL_SETPROB(&period);
-}
-
-void swirl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
-{
-    const user_options_t* user = swirl_user_get_options(domain);
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
-        return;
-    }
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    }
 }
