@@ -39,35 +39,31 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  annulus_user_get_options(domain);
 
+    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_vt.problem_setup       = &annulus_problem_setup;
+
     if (user->claw_version == 4)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.problem_setup       = &annulus_problem_setup;
+        fclaw2d_vt.patch_setup = &annulus_patch_setup;
 
-        fclaw2d_vt.patch_setup         = &annulus_patch_setup;
-
-        classic_claw46.qinit           = &CLAWPACK46_QINIT;
-
-        classic_claw46.rpn2 = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        classic_claw46.rpt2 = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        classic_claw46.qinit   = &CLAWPACK46_QINIT;
+        classic_claw46.rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        classic_claw46.rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
         fc2d_clawpack46_set_vtable(classic_claw46);
 
     }
     else if (user->claw_version == 5)
     {
-        fclaw2d_init_vtable(&fclaw2d_vt);
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.problem_setup       = &annulus_problem_setup;
-        fclaw2d_vt.patch_setup         = &annulus_patch_setup;
+        fclaw2d_vt.patch_setup  = &annulus_patch_setup;
 
-        classic_claw5.qinit            = &CLAWPACK5_QINIT;
-
-        classic_claw5.rpn2 = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        classic_claw5.rpt2 = &CLAWPACK5_RPT2ADV_MANIFOLD;
+        classic_claw5.qinit     = &CLAWPACK5_QINIT;
+        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
         fc2d_clawpack5_set_vtable(classic_claw5);
     }
