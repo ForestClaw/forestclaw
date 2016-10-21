@@ -59,7 +59,13 @@ void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
 
     /* Default qinit functions */
     fclaw_vt->patch_initialize         = &fc2d_clawpack5_qinit;
-    fclaw_vt->problem_setup            = &fc2d_clawpack5_setprob;
+    if (fclaw_vt->problem_setup == NULL)
+    {
+        /* This call shouldn't override a version-independent setting
+           for this function */
+        fclaw_vt->problem_setup        = &fc2d_clawpack5_setprob;
+    }
+    fclaw_vt->patch_setup              = &fc2d_clawpack5_setaux;
     fclaw_vt->patch_physical_bc        = &fc2d_clawpack5_bc2;
     fclaw_vt->patch_single_step_update = &fc2d_clawpack5_update;
 
@@ -281,10 +287,27 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.setaux != NULL);
+    if (classic_vt.setaux == NULL)
+    {
+        /* For consistency, class_vt.patch_setup is set to
+           fc2d_clawpack5_setaux by default.  We
+           check here that the user has actually set a
+           SETAUX routine. If they haven't, we assume that
+           they didn't really want a setaux routine. */
+        return;
+    }
+
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        /* This is going to be removed at some point */
+        return;
+    }
+
+
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux;
+
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
