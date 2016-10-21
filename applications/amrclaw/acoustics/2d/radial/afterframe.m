@@ -1,8 +1,8 @@
 if (PlotType == 1)
   daspect([1 1 1]);
   rybcolormap;
-  showgridlines(1:2);
   showpatchborders;
+  setpatchborderprops('linewidth',1);
 
   caxis([-2 2]);
   colorbar;

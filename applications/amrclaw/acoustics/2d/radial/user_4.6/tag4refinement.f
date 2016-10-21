@@ -1,4 +1,4 @@
-      subroutine tag4refinement(mx,my,mbc,meqn,
+      subroutine clawpack46_tag4refinement(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy,blockno, q,refine_threshold,
      &      init_flag, tag_patch)
       implicit none

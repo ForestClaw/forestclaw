@@ -1,11 +1,5 @@
-
-c
-c
-c
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
-c     =====================================================
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
 c
 c     # Set initial conditions for q.
 c     # Acoustics with smooth radially symmetric profile to test accuracy

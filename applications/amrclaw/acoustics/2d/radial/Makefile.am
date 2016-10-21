@@ -11,14 +11,18 @@ applications_amrclaw_acoustics_2d_radial_radial_SOURCES = \
 	applications/amrclaw/acoustics/2d/radial/fclaw2d_map_nomap.c \
 	applications/amrclaw/acoustics/2d/radial/fclaw2d_map_squareddisk.c \
 	applications/amrclaw/acoustics/2d/radial/setprob.f \
-	applications/amrclaw/acoustics/2d/radial/user_4.x/tag4refinement.f \
-	applications/amrclaw/acoustics/2d/radial/user_4.x/qinit.f \
+	applications/amrclaw/acoustics/2d/radial/user_4.6/tag4refinement.f \
+	applications/amrclaw/acoustics/2d/radial/user_4.6/qinit.f \
+	applications/amrclaw/acoustics/2d/radial/user_5.0/tag4refinement.f90 \
+	applications/amrclaw/acoustics/2d/radial/user_5.0/qinit.f90 \
 	applications/amrclaw/acoustics/2d/rp/rpn2ac.f \
-	applications/amrclaw/acoustics/2d/rp/rpt2ac.f
+	applications/amrclaw/acoustics/2d/rp/rpt2ac.f \
+	applications/amrclaw/acoustics/2d/rp/rpn2_acoustics.f90 \
+	applications/amrclaw/acoustics/2d/rp/rpt2_acoustics.f90
 
 
 applications_amrclaw_acoustics_2d_radial_radial_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
+        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_amrclaw_acoustics_2d_radial_radial_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
