@@ -85,10 +85,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
 
 void filament_link_solvers(fclaw2d_domain_t *domain);
 
-void filament_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx);
+void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx);
 
 
 #ifdef __cplusplus

@@ -42,7 +42,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = nomap; 1 = cart; 2 = five patch square [0]");
+                        "[user] 0 = nomap; 1 = brick; 2 = five patch square [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");

@@ -43,18 +43,18 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.patch_setup = &filament_patch_setup;
-
         classic_claw46.setprob   = &SETPROB;
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         if (gparms->manifold)
         {
+            fclaw2d_vt.patch_setup   = &filament_patch_setup_manifold;
+
             classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
             classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
-            /* this is needed to avoid tagging block corners in 5 patch example*/
             if (user->example == 2)
             {
+                /* Avoid tagging block corners in 5 patch example*/
                 fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
                 fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
             }
@@ -72,22 +72,20 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.patch_setup  = &filament_patch_setup;
-
         classic_claw5.setprob   = &SETPROB;
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         if (gparms->manifold)
         {
+            fclaw2d_vt.patch_setup  = &filament_patch_setup_manifold;
             classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
             classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
-            /* this is needed to avoid tagging block corners in 5 patch example*/
             if (user->example == 2)
             {
+                /* Avoid tagging block corners in 5 patch example*/
                 fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
                 fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
             }
-
         }
         else
         {
@@ -101,13 +99,12 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void filament_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
+void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx)
 {
     const user_options_t* user = filament_user_get_options(domain);
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
 
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
@@ -127,34 +124,18 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
 
     if (user->claw_version == 4)
     {
-        if (gparms->manifold)
-        {
-            fc2d_clawpack46_define_auxarray(domain,this_patch);
-            fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-            USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                   &dx,&dy,&maux,aux,&this_block_idx,
-                                   xd,yd,zd,area);
-        }
-        else
-        {
-            /* Calls clawpack46_setaux */
-            fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-        }
+        fc2d_clawpack46_define_auxarray(domain,this_patch);
+        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                               &dx,&dy,&maux,aux,&this_block_idx,
+                               xd,yd,zd,area);
     }
     else if (user->claw_version == 5)
     {
-        if (gparms->manifold)
-        {
-            fc2d_clawpack5_define_auxarray(domain,this_patch);
-            fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-            USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                  &dx,&dy,&maux,aux,&this_block_idx,
-                                  xd,yd,zd,area);
-        }
-        else
-        {
-            /* Calls clawpack5_setaux */
-            fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-        }
+        fc2d_clawpack5_define_auxarray(domain,this_patch);
+        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                              &dx,&dy,&maux,aux,&this_block_idx,
+                              xd,yd,zd,area);
     }
 }
