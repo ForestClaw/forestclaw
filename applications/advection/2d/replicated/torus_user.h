@@ -42,37 +42,15 @@ extern "C"
 
 typedef struct user_options
 {
-    int example;
-    double alpha;
-    double beta;
     int claw_version;
-
-    const char *latitude_string;
-    double *latitude;
-
-    const char *longitude_string;
-    double *longitude;
 
     int is_registered;
 } user_options_t;
 
 
-#define SETPROB_TORUS FCLAW_F77_FUNC(setprob_torus,SETPROB_TORUS)
-void SETPROB_TORUS(const int* example);
-
-
 void torus_link_solvers(fclaw2d_domain_t *domain);
 
-void torus_problem_setup(fclaw2d_domain_t *domain);
-
-void torus_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
-
-
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-
 
 const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
 

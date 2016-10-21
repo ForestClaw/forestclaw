@@ -24,14 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "torus_user.h"
-
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_map_query.h>
-#include <p4est_connectivity.h>
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -44,32 +37,6 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user->is_registered = 1;
     return NULL;
 }
-
-#if 0
-static fclaw_exit_type_t
-options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-
-    return torus_options_postprocess (user);
-}
-
-static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-
-    return torus_options_check (user);
-}
-
-static void
-options_destroy_user (fclaw_app_t * a, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-
-    torus_options_reset (user);
-}
-#endif
 
 static const
 fclaw_app_options_vtable_t options_vtable_user =
