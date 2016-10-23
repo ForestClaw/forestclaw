@@ -1,21 +1,9 @@
-
-c
-c
-c
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
-c     =====================================================
-c
-c     # Set initial conditions for q.
-c     # Sample scalar equation with data that is piecewise constant with
-c     # q = 1.0  if  0.1 < x < 0.6   and   0.1 < y < 0.6
-c     #     0.1  otherwise
-c
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
        implicit double precision (a-h,o-z)
        dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
 c
-       do 20 i=1-mbc,mx+mbc
+       do 20 i = 1-mbc,mx+mbc
           xi = xlower + (i-0.5d0)*dx
           do 20 j=1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
