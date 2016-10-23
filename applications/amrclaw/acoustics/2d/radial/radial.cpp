@@ -31,9 +31,10 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] 0 - cart; 1 - disk [0]");
+    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
     sc_options_add_double (opt, 0, "rho", &user->rho, 1, "[user] rho [1]");
     sc_options_add_double (opt, 0, "bulk", &user->bulk, 4, "[user] bulk modulus [4]");
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5, "[user] alpha (for 5-patch map) [0.5]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -62,11 +63,12 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example == 1)
+    if (user->example == 1 && user->claw_version == 4)
     {
-        fclaw_global_essentialf("Example 1 (disk) still needs mapped Riemann solvers\n");
+        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
         return FCLAW_EXIT_QUIET;
     }
+#endif
     return FCLAW_NOEXIT;
 }
 
@@ -109,12 +111,11 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    amr_options_t              *gparms;
-    user_options_t             *user;
+    amr_options_t            *gparms;
+    user_options_t           *user;
 
     /* Local variables */
     double rotate[2];
-    double alpha = 0.4;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
@@ -132,8 +133,8 @@ void run_program(fclaw_app_t* app)
         break;
     case 1:
         conn = p4est_connectivity_new_disk();
-        cont = fclaw2d_map_new_squareddisk (gparms->scale,gparms->shift,
-                                            rotate,alpha);
+        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
+                                            rotate,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED ();

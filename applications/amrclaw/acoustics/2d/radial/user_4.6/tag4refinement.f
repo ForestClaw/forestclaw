@@ -17,8 +17,8 @@
 
 c     # Refine based only on first variable in system.
       mq = 1
-      do i = 1,mx
-         do j = 1,my
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
             if (abs(q(i,j,mq)) .gt. refine_threshold) then
                tag_patch = 1
                return

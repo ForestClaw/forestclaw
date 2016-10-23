@@ -7,7 +7,7 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
   INTEGER blockno
   DOUBLE PRECISION xlower, ylower, dx, dy
   DOUBLE PRECISION refine_threshold
-  DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+  DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
   INTEGER i,j, mq,m
   DOUBLE PRECISION xc,yc, qmin, qmax
@@ -19,7 +19,7 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
   mq = 1
   DO i = 1,mx
      DO j = 1,my
-        IF (ABS(q(i,j,mq)) .GT. refine_threshold) THEN
+        IF (ABS(q(mq,i,j)) .GT. refine_threshold) THEN
            tag_patch = 1
            RETURN
         ENDIF
