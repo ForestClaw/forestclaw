@@ -1,18 +1,14 @@
-
-c
-c
-c     =====================================================
-      subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
-     &                  wave,s,amdq,apdq)
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx,
+     &      ql,qr,auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Riemann solver for Burgers' equation in 2d:
 c     #  u_t + 0.5*(u^2)_x + 0.5*(u^2)_y = 0
-c     
+c
 c     # On input, ql contains the state vector at the left edge of each cell
 c     #           qr contains the state vector at the right edge of each cell
 c
-c     # This data is along a slice in the x-direction if ixy=1 
+c     # This data is along a slice in the x-direction if ixy=1
 c     #                            or the y-direction if ixy=2.
 c     # On output, wave contains the waves,
 c     #            s the speeds,
