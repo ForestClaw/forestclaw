@@ -1,12 +1,7 @@
-c     =====================================================
-      subroutine rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &                  ql,qr,aux1,aux2,aux3,
-     &                  imp,asdq,bmasdq,bpasdq)
-c     =====================================================
+      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,
+     &      mbc,mx,ql,qr,aux1,aux2,aux3,
+     &      imp,asdq,bmasdq,bpasdq)
       implicit none
-c
-c     # Riemann solver in the transverse direction for the advection equation.
-c
 
       integer ixy,maxm, meqn, mwaves, mbc, mx, imp, m
       double precision     ql(1-mbc:maxm+mbc, meqn)
