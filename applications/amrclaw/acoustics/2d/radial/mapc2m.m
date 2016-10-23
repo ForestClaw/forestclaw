@@ -1,9 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 map = 'nomap';
-% map = 'squareddisk';
-
-% This domain should be in [0,2],[0,2]
+% map = 'pillowdisk5';
 
 switch map
     case 'nomap'
@@ -11,24 +9,9 @@ switch map
         % This is what is stored in the fort.q files.
         xp = xc;
         yp = yc;
-    case 'squareddisk'
-        [xp,yp,zp] = mapc2m_squareddisk(xc,yc);
-        s = 0.0;
-        b = getblocknumber();
-        switch b
-            case 0
-                yp = yp - s;
-            case 1
-                xp = xp - s;
-            case 3
-                xp = xp + s;
-            case 4
-                yp = yp + s;
-        end
+    case 'pillowdisk5'
+        [xp,yp,zp] = mapc2m_pillowdisk5(xc,yc);
 end
 zp = 0*xp;
-
-
-
 
 end

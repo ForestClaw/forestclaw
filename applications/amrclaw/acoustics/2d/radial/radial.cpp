@@ -68,7 +68,6 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
         return FCLAW_EXIT_QUIET;
     }
-#endif
     return FCLAW_NOEXIT;
 }
 

@@ -50,6 +50,6 @@ function [r,p] = map1d(xgrid,ygrid,qgrid)
 
 [mx,my] = size(qgrid);
 
-
-r = reshape(sqrt(xgrid.^2 + ygrid.^2),mx*my,1);
-p = reshape(qrid,mx*my,1);
+[xp,yp,~] = mapc2m(xgrid,ygrid);
+r = reshape(sqrt(xp.^2 + yp.^2),mx*my,1);
+p = reshape(qgrid,mx*my,1);
