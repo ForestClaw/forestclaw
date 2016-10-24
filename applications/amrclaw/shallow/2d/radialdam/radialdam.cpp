@@ -33,6 +33,8 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
+
     sc_options_add_double (opt, 0, "g",     &user->g,     1.0, "[user] g [1.0]");
     sc_options_add_double (opt, 0, "x0",    &user->x0,    0.0, "[user] x0 [0.0]");
     sc_options_add_double (opt, 0, "y0",    &user->y0,    0.0, "[user] y0 [0.0]");
@@ -40,15 +42,38 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "hin",   &user->hin,   2.0, "[user] hin [2.0]");
     sc_options_add_double (opt, 0, "hout",  &user->hout,  1.0, "[user] hout [1.0]");
 
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, "[user] alpha (for 5-patch map) [0.4]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                           "Clawpack_version (4 or 5) [5]");
+
     user->is_registered = 1;
     return NULL;
 }
+
+static fclaw_exit_type_t
+options_check_user (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t* user = (user_options_t*) package;
+
+    if (user->example < 0 || user->example > 1) {
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    if (user->example == 1 && user->claw_version == 4)
+    {
+        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
+}
+
 
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
     NULL,
-    NULL,
+    options_check_user,
     NULL
 };
 
@@ -63,6 +88,17 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+user_options_t* radialdam_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
+
 static
 void run_program(fclaw_app_t* app)
 {
@@ -74,14 +110,33 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t              *gparms;
+    user_options_t           *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
-    /* Use [ax,bx]x[ay,by] */
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    double rotate[2];
+
+    rotate[0] = 0;
+    rotate[1] = 0;
+
+    switch (user->example)
+    {
+    case 0:
+        /* Use [ax,bx]x[ay,by] */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_nomap();
+        break;
+    case 1:
+        conn = p4est_connectivity_new_disk();
+        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
+                                            rotate,user->alpha);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
@@ -120,13 +175,14 @@ main (int argc, char **argv)
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     register_user_options(app,"fclaw_options.ini",user);
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    retval  = fclaw_options_read_from_file(options);
+    vexit   =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     fclaw2d_clawpatch_link_app(app);
 
