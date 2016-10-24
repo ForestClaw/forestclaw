@@ -1,9 +1,5 @@
-
-c
-c
-c     =====================================================
-      subroutine rpn2sw(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
-     &			wave,s,amdq,apdq)
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx,
+     &      ql,qr,auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Roe-solver for the 2D shallow water equations
@@ -42,7 +38,7 @@ c     ------------
       parameter (maxm2 = 603)  !# assumes at most 600x600 grid with mbc=3
       dimension delta(3)
       logical efix
-      common /param/  g    !# gravitational parameter
+      common /cparam/ grav    !# gravitational parameter
       common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),h(-2:maxm2)
 c
       data efix /.true./    !# use entropy fix for transonic rarefactions
@@ -83,7 +79,7 @@ c
          hsq2 = hsqrtl + hsqrtr
          u(i) = (qr(i-1,mu)/hsqrtl + ql(i,mu)/hsqrtr) / hsq2
          v(i) = (qr(i-1,mv)/hsqrtl + ql(i,mv)/hsqrtr) / hsq2
-         a(i) = dsqrt(g*h(i))
+         a(i) = dsqrt(grav*h(i))
    10    continue
 c
 c
@@ -157,7 +153,7 @@ c
          do 200 i=2-mbc,mx+mbc
 c           check 1-wave
             him1 = qr(i-1,1)
-            s0 =  qr(i-1,mu)/him1 - dsqrt(g*him1)
+            s0 =  qr(i-1,mu)/him1 - dsqrt(grav*him1)
 c           check for fully supersonic case :
             if (s0.gt.0.0d0.and.s(i,1).gt.0.0d0) then
                do 60 m=1,3
@@ -168,7 +164,7 @@ c           check for fully supersonic case :
 c
             h1 = qr(i-1,1)+wave(i,1,1)
             hu1= qr(i-1,mu)+wave(i,mu,1)
-            s1 = hu1/h1 - dsqrt(g*h1) !speed just to right of 1-wave
+            s1 = hu1/h1 - dsqrt(grav*h1) !speed just to right of 1-wave
             if (s0.lt.0.0d0.and.s1.gt.0.0d0) then
 c              transonic rarefaction in 1-wave
                sfract = s0*((s1-s(i,1))/(s1-s0))
@@ -196,10 +192,10 @@ c
 c           check 3-wave
 c
             hi = ql(i,1)
-            s03 = ql(i,mu)/hi + dsqrt(g*hi)
+            s03 = ql(i,mu)/hi + dsqrt(grav*hi)
             h3=ql(i,1)-wave(i,1,3)
             hu3=ql(i,mu)-wave(i,mu,3)
-            s3=hu3/h3 + dsqrt(g*h3)
+            s3=hu3/h3 + dsqrt(grav*h3)
             if (s3.lt.0.0d0.and.s03.gt.0.0d0) then
 c              transonic rarefaction in 3-wave
                sfract = s3*((s03-s(i,3))/(s03-s3))

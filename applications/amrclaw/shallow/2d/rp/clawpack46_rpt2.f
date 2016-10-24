@@ -1,9 +1,5 @@
-c
-c
-c     =====================================================
-      subroutine rpt2sw(ixy,maxm,meqn,mwaves,mbc,mx,
-     &                  ql,qr,aux1,aux2,aux3,
-     &			ilr,asdq,bmasdq,bpasdq)
+      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
+     &      ql,qr,aux1,aux2,aux3,ilr,asdq,bmasdq,bpasdq)
 c     =====================================================
       implicit double precision (a-h,o-z)
 c
@@ -22,7 +18,7 @@ c
       dimension bmasdq(1-mbc:maxm+mbc, meqn)
       dimension bpasdq(1-mbc:maxm+mbc, meqn)
 c
-      common /param/  g    !# gravitational parameter
+      common /cparam/  grav    !# gravitational parameter
       dimension waveb(3,3),sb(3)
       parameter (maxm2 = 603)  !# assumes at most 600x600 grid with mbc=3
       common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),hl(-2:maxm2),
