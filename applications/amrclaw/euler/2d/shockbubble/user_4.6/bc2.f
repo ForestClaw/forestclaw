@@ -1,9 +1,6 @@
-
-c
-c
-c     =====================================================
-      subroutine bc2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &               dx,dy,q,maux,aux,t,dt,mthbc)
+      subroutine clawpack46_bc2(maxmx,maxmy,meqn,mbc,
+     &      mx,my,xlower,ylower,
+     &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
 c
 c     # Standard boundary condition choices for claw2

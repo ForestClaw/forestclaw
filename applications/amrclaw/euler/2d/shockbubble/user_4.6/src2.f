@@ -1,8 +1,5 @@
-c
-c
-c =========================================================
-      subroutine src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                 dx,dy,q,maux,aux,t,dt)
+      subroutine clawpack46_src2(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux,t,dt)
 c =========================================================
       implicit double precision(a-h,o-z)
       dimension    q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
@@ -33,11 +30,11 @@ c
          if (rho.eq.0.d0) write(6,*) 'rho = 0 in q'
 
          qstar(1) = q(i,j,1) - dt2*(ndim-1)/rad * q(i,j,3)
-         qstar(2) = q(i,j,2) - dt2*(ndim-1)/rad * 
+         qstar(2) = q(i,j,2) - dt2*(ndim-1)/rad *
      &                          (rho*u*v)
-         qstar(3) = q(i,j,3) - dt2*(ndim-1)/rad * 
+         qstar(3) = q(i,j,3) - dt2*(ndim-1)/rad *
      &                          (rho*v*v)
-         qstar(4) = q(i,j,4) - dt2*(ndim-1)/rad * 
+         qstar(4) = q(i,j,4) - dt2*(ndim-1)/rad *
      &                          v*(q(i,j,4) + press)
 c
 c        # second stage
@@ -49,11 +46,11 @@ c
          if (rho.eq.0.d0) write(6,*) 'rho = 0 in qstar'
 
          q(i,j,1) = q(i,j,1) - dt*(ndim-1)/rad * qstar(3)
-         q(i,j,2) = q(i,j,2) - dt*(ndim-1)/rad * 
+         q(i,j,2) = q(i,j,2) - dt*(ndim-1)/rad *
      &                          (rho*u*v)
-         q(i,j,3) = q(i,j,3) - dt*(ndim-1)/rad * 
+         q(i,j,3) = q(i,j,3) - dt*(ndim-1)/rad *
      &                          (rho*v*v)
-         q(i,j,4) = q(i,j,4) - dt*(ndim-1)/rad * 
+         q(i,j,4) = q(i,j,4) - dt*(ndim-1)/rad *
      &                          v*(qstar(4) + press)
    10    continue
 

@@ -1,12 +1,11 @@
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,
+     &      mx,my,xlower,ylower,dx,dy,q,maux,aux)
 c     =====================================================
 c
 c     # Set initial conditions for q.
 c
-       implicit double precision (a-h,o-z)
-       dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      implicit double precision (a-h,o-z)
+      dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
 
        integer blockno, fc2d_clawpack46_get_block
 
@@ -39,7 +38,7 @@ c            # behind shock:
    30        continue
           end if
 c
-          if (xlow .lt. 0.5d0) then
+          if (xclow .lt. 0.5d0) then
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
              do 40 j=1,my

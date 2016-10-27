@@ -12,20 +12,28 @@ applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/shockbubble_user.cpp \
 	applications/amrclaw/euler/2d/shockbubble/fdisc.f \
 	applications/amrclaw/euler/2d/shockbubble/setprob.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/qinit.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/setaux.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/bc2.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/src2.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/tag4coarsening.f \
-	applications/amrclaw/euler/2d/shockbubble/user_4.x/tag4refinement.f \
-	applications/amrclaw/euler/2d/rp/rpn2eu3.f \
-	applications/amrclaw/euler/2d/rp/rpn2eu4.f \
-	applications/amrclaw/euler/2d/rp/rpn2eu5.f \
-	applications/amrclaw/euler/2d/rp/rpt2eu.f \
-	applications/amrclaw/euler/2d/rp/rpt2eu5.f
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/qinit.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/setaux.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/bc2.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/src2.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/tag4coarsening.f \
+	applications/amrclaw/euler/2d/shockbubble/user_4.6/tag4refinement.f \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/qinit.f90 \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/setaux.f90 \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/bc2.f90 \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/src2.f90 \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
+	applications/amrclaw/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpn2_euler3.f \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpn2_euler4.f \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpn2_euler5.f \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpt2.f \
+	applications/amrclaw/euler/2d/rp/clawpack5_rpn2_euler4.f90 \
+	applications/amrclaw/euler/2d/rp/clawpack5_rpn2_euler5.f90 \
+	applications/amrclaw/euler/2d/rp/clawpack5_rpt2.f90
 
 applications_amrclaw_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
+        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_amrclaw_euler_2d_shockbubble_shockbubble_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)

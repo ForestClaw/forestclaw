@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
-#include "fclaw2d_clawpatch.h"
 #include "fc2d_clawpack46.h"
+#include "fc2d_clawpack5.h"
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -41,6 +41,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "r0",    &user->r0,    0.2, "[user] r0 [0.2]");
     sc_options_add_double (opt, 0, "rhoin", &user->rhoin, 0.1, "[user] rhoin [0.1]");
     sc_options_add_double (opt, 0, "pinf",  &user->pinf,  5.0, "[user] pinf [5.0x]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                           "Clawpack_version (4 or 5) [5]");
 
     user->is_registered = 1;
     return NULL;
@@ -63,6 +66,13 @@ void register_user_options (fclaw_app_t * app,
 
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+}
+
+user_options_t* shockbubble_user_get_options(fclaw2d_domain_t* domain)
+{
+    const user_options_t* user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
+
+    return (user_options_t*) user;
 }
 
 
@@ -130,6 +140,8 @@ main (int argc, char **argv)
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
+
     register_user_options(app,"fclaw_options.ini",user);
 
     /* Read configuration file(s) */

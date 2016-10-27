@@ -1,4 +1,4 @@
-      subroutine tag4coarsening(mx,my,mbc,meqn,
+      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -18,10 +18,10 @@
       tag_patch = 0
       dq = 0
       do mq = 1,1
-         call get_minmax(mx,my,mbc,meqn,mq,q0,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q1,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q2,dq)
-         call get_minmax(mx,my,mbc,meqn,mq,q3,dq)
+         call clawpack46_get_minmax(mx,my,mbc,meqn,mq,q0,dq)
+         call clawpack46_get_minmax(mx,my,mbc,meqn,mq,q1,dq)
+         call clawpack46_get_minmax(mx,my,mbc,meqn,mq,q2,dq)
+         call clawpack46_get_minmax(mx,my,mbc,meqn,mq,q3,dq)
       enddo
       if (dq .lt. coarsen_threshold) then
          tag_patch = 1
@@ -30,7 +30,7 @@
 
       end
 
-      subroutine get_minmax(mx,my,mbc,meqn,mq,q,dq)
+      subroutine clawpack46_get_minmax(mx,my,mbc,meqn,mq,q,dq)
 
       implicit none
       integer mx,my,mbc,meqn,mq
