@@ -24,8 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "radialdam_user.h"
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
