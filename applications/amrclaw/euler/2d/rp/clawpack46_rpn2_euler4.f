@@ -1,12 +1,11 @@
-
-c
-c
-c     =====================================================
-      subroutine rpn2eu3(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
+      subroutine clawpack46_rpn2_euler4(ixy,maxm,meqn,
+     &      mwaves,mbc,mx,ql,qr,auxl,auxr,
      &      wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Roe-solver for the Euler equations
+c     # mwaves = 4:  separate shear and entropy waves.
+c
 c     # solve Riemann problems along one slice of data.
 c
 c     # On input, ql contains the state vector at the left edge of each cell
@@ -42,7 +41,7 @@ c     ------------
       parameter (maxm2 = 602)  !# assumes at most 200x200 grid with mbc=2
       dimension delta(4)
       logical efix
-      common /param/  gamma,gamma1
+      common /cparam/  gamma,gamma1
       common /comroe/ u2v2(-1:maxm2),
      &       u(-1:maxm2),v(-1:maxm2),enth(-1:maxm2),a(-1:maxm2),
      &       g1a2(-1:maxm2),euv(-1:maxm2)
@@ -117,23 +116,34 @@ c        # Note that the 2-wave and 3-wave travel at the same speed and
 c        # are lumped together in wave(.,.,2).  The 4-wave is then stored in
 c        # wave(.,.,3).
 c
+c        # acoustic:
          wave(i,1,1) = a1
          wave(i,mu,1) = a1*(u(i)-a(i))
          wave(i,mv,1) = a1*v(i)
          wave(i,4,1) = a1*(enth(i) - u(i)*a(i))
          s(i,1) = u(i)-a(i)
 c
-         wave(i,1,2) = a3
-         wave(i,mu,2) = a3*u(i)
-         wave(i,mv,2) = a3*v(i)          + a2
-         wave(i,4,2) = a3*0.5d0*u2v2(i)  + a2*v(i)
+c        # shear:
+         wave(i,1,2) = 0.d0
+         wave(i,mu,2) = 0.d0
+         wave(i,mv,2) = a2
+         wave(i,4,2) = a2*v(i)
          s(i,2) = u(i)
 c
-         wave(i,1,3) = a4
-         wave(i,mu,3) = a4*(u(i)+a(i))
-         wave(i,mv,3) = a4*v(i)
-         wave(i,4,3) = a4*(enth(i)+u(i)*a(i))
-         s(i,3) = u(i)+a(i)
+c        # entropy:
+         wave(i,1,3) = a3
+         wave(i,mu,3) = a3*u(i)
+         wave(i,mv,3) = a3*v(i)
+         wave(i,4,3) = a3*0.5d0*u2v2(i)
+         s(i,3) = u(i)
+c
+c        # acoustic:
+         wave(i,1,4) = a4
+         wave(i,mu,4) = a4*(u(i)+a(i))
+         wave(i,mv,4) = a4*v(i)
+         wave(i,4,4) = a4*(enth(i)+u(i)*a(i))
+         s(i,4) = u(i)+a(i)
+c
    20    continue
 c
 c
@@ -188,7 +198,7 @@ c
 c        # check for fully supersonic case:
          if (s0.ge.0.d0 .and. s(i,1).gt.0.d0)  then
 c            # everything is right-going
-             do 60 m=1,4
+             do 60 m=1,meqn
                 amdq(i,m) = 0.d0
    60           continue
              go to 200
@@ -211,19 +221,20 @@ c            # 1-wave is leftgoing
 c            # 1-wave is rightgoing
              sfract = 0.d0   !# this shouldn't happen since s0 < 0
            endif
-         do 120 m=1,4
+         do 120 m=1,meqn
             amdq(i,m) = sfract*wave(i,m,1)
   120       continue
 c
-c        # check 2-wave:
-c        ---------------
+c        # check contact discontinuity:
+c        ------------------------------
 c
-         if (s(i,2) .ge. 0.d0) go to 200  !# 2- and 3- waves are rightgoing
-         do 140 m=1,4
+         if (s(i,2) .ge. 0.d0) go to 200  !# 2- and 3-waves are rightgoing
+         do 140 m=1,meqn
             amdq(i,m) = amdq(i,m) + s(i,2)*wave(i,m,2)
+            amdq(i,m) = amdq(i,m) + s(i,3)*wave(i,m,3)
   140       continue
 c
-c        # check 3-wave:
+c        # check 4-wave:
 c        ---------------
 c
          rhoi = ql(i,1)
@@ -232,33 +243,33 @@ c
          ci = dsqrt(gamma*pi/rhoi)
          s3 = ql(i,mu)/rhoi + ci     !# u+c in right state  (cell i)
 c
-         rho2 = ql(i,1) - wave(i,1,3)
-         rhou2 = ql(i,mu) - wave(i,mu,3)
-         rhov2 = ql(i,mv) - wave(i,mv,3)
-         en2 = ql(i,4) - wave(i,4,3)
+         rho2 = ql(i,1) - wave(i,1,4)
+         rhou2 = ql(i,mu) - wave(i,mu,4)
+         rhov2 = ql(i,mv) - wave(i,mv,4)
+         en2 = ql(i,4) - wave(i,4,4)
          p2 = gamma1*(en2 - 0.5d0*(rhou2**2 + rhov2**2)/rho2)
          c2 = dsqrt(gamma*p2/rho2)
-         s2 = rhou2/rho2 + c2   !# u+c to left of 3-wave
+         s2 = rhou2/rho2 + c2   !# u+c to left of 4-wave
          if (s2 .lt. 0.d0 .and. s3.gt.0.d0) then
-c            # transonic rarefaction in the 3-wave
-             sfract = s2 * (s3-s(i,3)) / (s3-s2)
-           else if (s(i,3) .lt. 0.d0) then
-c            # 3-wave is leftgoing
-             sfract = s(i,3)
+c            # transonic rarefaction in the 4-wave
+             sfract = s2 * (s3-s(i,4)) / (s3-s2)
+           else if (s(i,4) .lt. 0.d0) then
+c            # 4-wave is leftgoing
+             sfract = s(i,4)
            else
-c            # 3-wave is rightgoing
+c            # 4-wave is rightgoing
              go to 200
            endif
 c
-         do 160 m=1,4
-            amdq(i,m) = amdq(i,m) + sfract*wave(i,m,3)
+         do 160 m=1,meqn
+            amdq(i,m) = amdq(i,m) + sfract*wave(i,m,4)
   160       continue
   200    continue
 c
 c     # compute the rightgoing flux differences:
 c     # df = SUM s*wave   is the total flux difference and apdq = df - amdq
 c
-      do 220 m=1,4
+      do 220 m=1,meqn
          do 220 i = 2-mbc, mx+mbc
             df = 0.d0
             do 210 mw=1,mwaves

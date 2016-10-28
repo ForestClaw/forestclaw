@@ -1,6 +1,5 @@
-      subroutine rpt2eu5(ixy,maxm,meqn,mwaves,mbc,mx,
-     &      ql,qr,aux1,aux2,aux3,
-     &      ilr,asdq,bmasdq,bpasdq,maux)
+      subroutine clawpack46_rpt2_euler5(ixy,maxm,meqn,mwaves,mbc,mx,
+     &      ql,qr,aux1,aux2,aux3,ilr,asdq,bmasdq,bpasdq,maux)
 
       implicit none
 
@@ -18,7 +17,7 @@
       double precision delta(4), gamma, gamma1
       double precision rhsqrtl, rhsqrtr, pl,pr,rhsq2
       double precision a1,a2,a3,a4
-      double precision waveb(4,3),sb(3)
+      double precision waveb(5,4),sb(4)
 
       integer mu,mv,i, mw, m
 
@@ -30,7 +29,7 @@
      &      a(-1:maxm2),
      &      g1a2(-1:maxm2),euv(-1:maxm2)
 
-      common /param/  gamma,gamma1
+      common /cparam/  gamma,gamma1
 
 
       if (-1 .gt. 1-mbc .or. maxm2 .lt. maxm+mbc) then
@@ -78,26 +77,37 @@ c
          waveb(mu,1) = a1*u(i)
          waveb(mv,1) = a1*(v(i)-a(i))
          waveb(4,1) = a1*(enth(i) - v(i)*a(i))
+         waveb(5,1) = 0.d0
          sb(1) = v(i) - a(i)
 c
          waveb(1,2) = a3
          waveb(mu,2) = a3*u(i) + a2
          waveb(mv,2) = a3*v(i)
          waveb(4,2) = a3*0.5d0*u2v2(i) + a2*u(i)
+         waveb(5,2) = 0.d0
          sb(2) = v(i)
 c
          waveb(1,3) = a4
          waveb(mu,3) = a4*u(i)
          waveb(mv,3) = a4*(v(i)+a(i))
          waveb(4,3) = a4*(enth(i)+v(i)*a(i))
+         waveb(5,3) = 0.d0
          sb(3) = v(i) + a(i)
+
+         waveb(1,4) = 0.d0
+         waveb(mu,4) = 0.d0
+         waveb(mv,4) = 0.d0
+         waveb(4,4) = 0.d0
+         waveb(5,4) = asdq(i,5)
+         sb(4) = v(i)
+
 c
 c        # compute the flux differences bmasdq and bpasdq
 c
          do 10 m=1,meqn
             bmasdq(i,m) = 0.d0
             bpasdq(i,m) = 0.d0
-            do 10 mw=1,mwaves
+            do 10 mw=1,4
                if (sb(mw) .lt. 0.d0) then
                   bmasdq(i,m) = bmasdq(i,m) + sb(mw) * waveb(m,mw)
                else
