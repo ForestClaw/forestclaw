@@ -34,11 +34,13 @@ c            # behind shock:
                 q(i,j,2) = rinf*vinf
                 q(i,j,3) = 0.d0
                 q(i,j,4) = einf
-                q(i,j,5) = 1.d0
+                if (meqn .eq. 5) then
+                   q(i,j,5) = 1.d0
+                endif
    30        continue
           end if
 c
-          if (xclow .lt. 0.5d0) then
+          if (xclow .lt. 0.5d0 .and. meqn .eq. 5) then
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
              do 40 j=1,my

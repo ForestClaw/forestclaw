@@ -9,7 +9,7 @@ SUBROUTINE clawpack5_src2(meqn,mbc,mx,my,xlower,ylower, &
 
   DOUBLE PRECISION qstar(4)
   DOUBLE PRECISION gamma,gamma1
-  COMMON /param/  gamma,gamma1
+  COMMON /cparam/  gamma,gamma1
 
   INTEGER i,j,ndim
   DOUBLE PRECISION dt2,press,rad,rho,u,v

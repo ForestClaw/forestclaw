@@ -10,7 +10,7 @@ c     # about y = 0, so radius = y
 c     # y value at cell center is stored in aux(i,j,1)
 c
       dimension qstar(4)
-      common /param/  gamma,gamma1
+      common /cparam/  gamma,gamma1
 c
 c     # 2-stage Runge-Kutta method
 c

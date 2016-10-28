@@ -34,7 +34,9 @@ SUBROUTINE clawpack5_qinit(meqn,mbc, &
            q(2,i,j) = rinf*vinf
            q(3,i,j) = 0.d0
            q(4,i,j) = einf
-           q(5,i,j) = 1.d0
+           IF (meqn .EQ. 5) THEN
+              q(5,i,j) = 1.d0
+           ENDIF
         ENDDO
      END IF
 
