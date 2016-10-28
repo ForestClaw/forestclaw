@@ -45,10 +45,6 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
         fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(domain);
 
-#if 0
-        fclaw2d_vt.patch_setup = &shockbubble_patch_setup;
-#endif
-
         classic_claw46.qinit  = &CLAWPACK46_QINIT;
         classic_claw46.setaux = &CLAWPACK46_SETAUX;
         classic_claw46.bc2    = &CLAWPACK46_BC2;  /* Special input BCs */
@@ -56,14 +52,15 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 
         switch (clawopt->mwaves)
         {
-        case 3:
         case 4:
-            fclaw_global_essentialf("3-wave and 4-wave solvers not implemented for Clawpack 4.6\n");
-            exit(0);
+            /* Requires meqn=4 */
+            classic_claw46.rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
+            classic_claw46.rpt2   = &CLAWPACK46_RPT2_EULER4;
             break;
         case 5:
+            /* Requires meqn=5 */
             classic_claw46.rpn2   = &CLAWPACK46_RPN2_EULER5;  /* Includes a tracer */
-            classic_claw46.rpt2   = &CLAWPACK46_RPT2_EULER5;  /* Includes a tracer */
+            classic_claw46.rpt2   = &CLAWPACK46_RPT2_EULER5;
             break;
         default:
             SC_ABORT_NOT_REACHED ();
@@ -87,12 +84,13 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 
         switch (clawopt->mwaves)
         {
-        case 3:
         case 4:
-            fclaw_global_essentialf("3-wave and 4-wave solvers not implemented for Clawpack 5.0\n");
-            exit(0);
+            /* Requires meqn=4 */
+            classic_claw5.rpn2   = &CLAWPACK5_RPN2_EULER4;  /* no tracer */
+            classic_claw5.rpt2   = &CLAWPACK5_RPT2_EULER4;
             break;
         case 5:
+            /* Requires meqn=5 */
             classic_claw5.rpn2   = &CLAWPACK5_RPN2_EULER5;  /* Includes a tracer */
             classic_claw5.rpt2   = &CLAWPACK5_RPT2_EULER5;
             break;
@@ -108,11 +106,6 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
     }
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
 
-#if 0
-    classic_claw.src2 = &SRC2;
-    classic_claw.rpn2 = &RPN2EU5;  /* Signature is unchanged */
-    classic_claw.rpt2 = &RPT2EU5;
-#endif
 }
 
 void shockbubble_problem_setup(fclaw2d_domain_t* domain)

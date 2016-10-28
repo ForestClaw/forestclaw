@@ -24,8 +24,12 @@ applications_amrclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/amrclaw/euler/2d/shockbubble/user_5.0/src2.f90 \
 	applications/amrclaw/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
 	applications/amrclaw/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpn2_euler4.f \
+	applications/amrclaw/euler/2d/rp/clawpack46_rpt2_euler4.f \
 	applications/amrclaw/euler/2d/rp/clawpack46_rpn2_euler5.f \
 	applications/amrclaw/euler/2d/rp/clawpack46_rpt2_euler5.f \
+	applications/amrclaw/euler/2d/rp/clawpack5_rpn2_euler4.f90 \
+	applications/amrclaw/euler/2d/rp/clawpack5_rpt2_euler4.f90 \
 	applications/amrclaw/euler/2d/rp/clawpack5_rpn2_euler5.f90 \
 	applications/amrclaw/euler/2d/rp/clawpack5_rpt2_euler5.f90
 
