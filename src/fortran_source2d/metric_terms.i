@@ -21,4 +21,4 @@ c     # Edge based quantities
       double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision    xtangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision    ytangents(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision edge_lengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
