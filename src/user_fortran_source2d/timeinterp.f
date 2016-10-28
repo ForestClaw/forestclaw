@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack46_fort_timeinterp
+      subroutine user_fort_timeinterp
      &      (mx,my,mbc,meqn,psize,
      &      qcurr,qlast,qinterp,alpha,ierror)
       implicit none
