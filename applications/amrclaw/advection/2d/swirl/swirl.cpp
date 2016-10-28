@@ -29,8 +29,6 @@
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -123,6 +121,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
     fclaw2d_finalize(&domain);
+
     /* This has to be in this scope */
     fclaw2d_map_destroy(cont);
 }
@@ -145,8 +144,8 @@ main (int argc, char **argv)
     fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
     /* All libraries that might be needed should be registered here */
-    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
-    fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
+    fc2d_clawpack46_register(app,"fclaw_options.ini");       /* [clawpack46] */
+    fc2d_clawpack5_register (app,"fclaw_options.ini");       /* [clawpack5] */
     register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
