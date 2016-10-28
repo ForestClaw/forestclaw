@@ -1,10 +1,5 @@
-
-c
-c
-c
-c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
-     &                   dx,dy,q,maux,aux)
+      subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
+     &      xlower,ylower,dx,dy,q,maux,aux)
 c     =====================================================
 c
 c     # Set initial conditions for q.
@@ -24,7 +19,7 @@ c
        implicit double precision (a-h,o-z)
        dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
        dimension rpp(4),rpr(4),rpu(4),rpv(4)
-       common /param/  gamma,gamma1
+       common /cparam/  gamma,gamma1
 c
 c
 c      # First quadrant:

@@ -26,8 +26,9 @@
 #ifndef QUADRANTS_USER_H
 #define QUADRANTS_USER_H
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_forestclaw.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,31 +40,23 @@ extern "C"
 
 typedef struct user_options
 {
+    int example;
+    double alpha;
     double gamma;
+    int claw_version;
 
     int is_registered;
-} user_options_t;
 
+} user_options_t;
 
 #define QUADRANTS_SETPROB FCLAW_F77_FUNC(quadrants_setprob, QUADRANTS_SETPROB)
 void QUADRANTS_SETPROB(const double* gamma);
 
+const user_options_t* quadrants_user_get_options(fclaw2d_domain_t* domain);
 
-#define RPN2EU3 FCLAW_F77_FUNC(rpn2eu3,RPN2EU3)
-void RPN2EU3(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc,const int* mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
-
-#define RPN2EU4 FCLAW_F77_FUNC(rpn2eu4,RPN2EU4)
-void RPN2EU4(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc,const int* mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
-
+void quadrants_link_solvers(fclaw2d_domain_t *domain);
 
 void quadrants_problem_setup(fclaw2d_domain_t* domain);
-void quadrants_link_solvers(fclaw2d_domain_t *domain);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
