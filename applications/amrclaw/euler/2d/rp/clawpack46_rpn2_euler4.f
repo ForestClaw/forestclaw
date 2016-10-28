@@ -1,32 +1,5 @@
-      subroutine clawpack46_rpn2_euler4(ixy,maxm,meqn,
-     &      mwaves,mbc,mx,ql,qr,auxl,auxr,
-     &      wave,s,amdq,apdq)
-c     =====================================================
-c
-c     # Roe-solver for the Euler equations
-c     # mwaves = 4:  separate shear and entropy waves.
-c
-c     # solve Riemann problems along one slice of data.
-c
-c     # On input, ql contains the state vector at the left edge of each cell
-c     #           qr contains the state vector at the right edge of each cell
-c
-c     # This data is along a slice in the x-direction if ixy=1
-c     #                            or the y-direction if ixy=2.
-c     # On output, wave contains the waves, s the speeds,
-c     # and amdq, apdq the decomposition of the flux difference
-c     #   f(qr(i-1)) - f(ql(i))
-c     # into leftgoing and rightgoing parts respectively.
-c     # With the Roe solver we have
-c     #    amdq  =  A^- \Delta q    and    apdq  =  A^+ \Delta q
-c     # where A is the Roe matrix.  An entropy fix can also be incorporated
-c     # into the flux differences.
-c
-c     # Note that the i'th Riemann problem has left state qr(i-1,:)
-c     #                                    and right state ql(i,:)
-c     # From the basic clawpack routines, this routine is called with ql = qr
-c
-c
+      subroutine clawpack46_rpn2_euler4(ixy,maxm,meqn,mwaves,
+     &      mbc,mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
       implicit double precision (a-h,o-z)
 c
       dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
@@ -51,7 +24,13 @@ c
       if (-1.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
          write(6,*) 'need to increase maxm2 in rpn2'
          stop
-         endif
+      endif
+
+      if (meqn .ne. 4) then
+         write(6,*) 'clawpack46_rpn2_euler4.f : meqn must equal to 4'
+         stop
+      endif
+
 c
 c     # set mu to point to  the component of the system that corresponds
 c     # to momentum in the direction of this slice, mv to the orthogonal
@@ -77,6 +56,7 @@ c     # compute the Roe-averaged variables needed in the Roe solver.
 c     # These are stored in the common block comroe since they are
 c     # later used in routine rpt2eu to do the transverse wave splitting.
 c
+
       do 10 i = 2-mbc, mx+mbc
          rhsqrtl = dsqrt(qr(i-1,1))
          rhsqrtr = dsqrt(ql(i,1))
