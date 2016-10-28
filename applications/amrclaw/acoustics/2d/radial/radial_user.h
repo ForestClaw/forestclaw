@@ -62,6 +62,18 @@ void radial_problem_setup(fclaw2d_domain_t* domain);
 void RADIAL_SETPROB(const double* rho, const double *bulk,
                     double* cc, double*zz);
 
+#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
+                                             USER5_SETAUX_MANIFOLD)
+
+void USER5_SETAUX_MANIFOLD(const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const int* maux, double aux[],
+                           double xnormals[], double ynormals[],
+                           double edgelengths[],
+                           double area[]);
+
 void radial_patch_setup(fclaw2d_domain_t *domain,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,

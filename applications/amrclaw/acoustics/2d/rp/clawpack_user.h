@@ -39,19 +39,6 @@ extern "C"
 #endif
 #endif
 
-#define CLAWPACK46_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpn2_manifold,CLAWPACK46_RPN2_MANIFOLD)
-void CLAWPACK46_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                              const int* mbc,const int* mx, double ql[], double qr[],
-                              double auxl[], double auxr[], double wave[],
-                              double s[], double amdq[], double apdq[]);
-
-#define CLAWPACK46_RPT2_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpt2_manifold, CLAWPACK46_RPT2_MANIFOLD)
-void CLAWPACK46_RPT2_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                              const int* mbc, const int* mx, double ql[], double qr[],
-                              double aux1[], double aux2[], double aux3[], const int* imp,
-                              double dsdq[], double bmasdq[], double bpasdq[]);
-
-
 #define CLAWPACK5_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2_manifold, \
                                                CLAWPACK5_RPN2_MANIFOLD)
 void CLAWPACK5_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
@@ -70,34 +57,6 @@ void CLAWPACK5_RPT2_MANIFOLD(const int* ixy, const int* imp,
                              double aux1[], double aux2[],
                              double aux3[],  double asdq[],
                              double bmasdq[], double bpasdq[]);
-
-#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
-                                               USER46_SETAUX_MANIFOLD)
-
-void USER46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
-                            const double* xlower, const double* ylower,
-                            const double* dx, const double* dy,
-                            const int* maux, double aux[],
-                            double xnormals[], double ynormals[],
-                            double edgelengths[],
-                            double area[]);
-
-
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
-
-void USER5_SETAUX_MANIFOLD(const int* mbc,
-                           const int* mx, const int* my,
-                           const double* xlower, const double* ylower,
-                           const double* dx, const double* dy,
-                           const int* maux, double aux[],
-                           double xnormals[], double ynormals[],
-                           double edgelengths[],
-                           double area[]);
-
-
-
 
 #ifdef __cplusplus
 #if 0

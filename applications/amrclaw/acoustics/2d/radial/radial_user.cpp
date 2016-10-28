@@ -56,15 +56,11 @@ void radial_link_solvers(fclaw2d_domain_t *domain)
             exit(0);
         }
 
-        fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;  /* User defined */
-        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;  /* User defined */
-
         fc2d_clawpack46_set_vtable(classic_claw46);
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-        fclaw2d_vt.patch_setup = &radial_patch_setup;
 
         classic_claw5.qinit = &CLAWPACK5_QINIT;
         if (user->example == 0)
@@ -76,10 +72,11 @@ void radial_link_solvers(fclaw2d_domain_t *domain)
         {
             classic_claw5.rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
             classic_claw5.rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
-        }
 
-        fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;  /* User defined */
-        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;  /* User defined */
+            /* Needed as work-around for corner tagging bug ... */
+            fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;  /* User defined */
+            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;  /* User defined */
+        }
 
         fc2d_clawpack5_set_vtable(classic_claw5);
     }
@@ -101,20 +98,12 @@ void radial_patch_setup(fclaw2d_domain_t *domain,
                         int this_block_idx,
                         int this_patch_idx)
 {
-    const user_options_t* user = radial_user_get_options(domain);
-
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
     double *xnormals,*ynormals,*xtangents,*ytangents;
     double *surfnormals,*edgelengths,*curvature;
-
-    if (user->example == 0)
-    {
-        /* Not mapped */
-        return;
-    }
 
     if (fclaw2d_patch_is_ghost(this_patch))
     {
@@ -134,20 +123,9 @@ void radial_patch_setup(fclaw2d_domain_t *domain,
                                    &surfnormals,&edgelengths,
                                    &curvature);
 
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_define_auxarray(domain,this_patch);
-        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                               &dx,&dy,&maux,aux,
-                               xnormals,ynormals,edgelengths,area);
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_define_auxarray(domain,this_patch);
-        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                              &dx,&dy,&maux,aux,
-                              xnormals,ynormals,edgelengths,area);
-    }
+    fc2d_clawpack5_define_auxarray(domain,this_patch);
+    fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+    USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                          &dx,&dy,&maux,aux,
+                          xnormals,ynormals,edgelengths,area);
 }
