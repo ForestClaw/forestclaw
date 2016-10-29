@@ -25,13 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-static fclaw2d_vtable_t fclaw2d_vt;
+static fclaw2d_vtable_t         fclaw2d_vt;
 static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
+static fc2d_clawpack5_vtable_t  classic_claw5;
 
 void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -79,8 +75,8 @@ void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 
         classic_claw5.qinit  = &CLAWPACK5_QINIT;
         classic_claw5.setaux = &CLAWPACK5_SETAUX;
-        classic_claw5.bc2    = &CLAWPACK5_BC2;  /* Special input BCs */
-        classic_claw5.src2   = &CLAWPACK5_SRC2;  /* To simulate axis-symmetric */
+        classic_claw5.bc2    = &CLAWPACK5_BC2;   /* Special input at left edge */
+        classic_claw5.src2   = &CLAWPACK5_SRC2;  /* To simulate axis-symmetric flow */
 
         switch (clawopt->mwaves)
         {
@@ -115,17 +111,3 @@ void shockbubble_problem_setup(fclaw2d_domain_t* domain)
     SHOCKBUBBLE_SETPROB(&user->gamma, &user->x0, &user->y0, &user->r0,
                         &user->rhoin, &user->pinf);
 }
-
-#if 0
-void shockbubble_patch_setup(fclaw2d_domain_t* domain,
-                             fclaw2d_patch_t* this_patch,
-                             int blockno,
-                             int patchno)
-{
-    /* I don't have the scaling right on this problem, and just setting
-       mcapa doesn't really fix the issue.   I need a way to set [ax,ay,bx,by]
-       inside of ClawPatch */
-    fc2d_clawpack46_setaux(domain,this_patch,blockno,patchno);
-    fc2d_clawpack46_set_capacity(domain,this_patch,blockno,patchno);
-}
-#endif
