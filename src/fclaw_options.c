@@ -112,6 +112,14 @@ fclaw_options_check (fclaw_options_t * gparms)
         }
     }
 
+    if (gparms->interp_stencil_width/2 > gparms->mbc)
+    {
+        fclaw_global_essentialf("Interpolation width is too large for number of " \
+                                "ghost cells (mbc) specifed.  We should have " \
+                                "(width)/2 <= mbc");
+    }
+
+
     /* Could also do basic sanity checks on mx,my,... */
 
     if (gparms->mpi_debug)
@@ -296,6 +304,10 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_int (opt, 0, "refratio", &amropt->refratio,
                         2, "Refinement ratio [2]");
 
+    sc_options_add_int (opt, 0, "interp_stencil_width",
+                        &amropt->interp_stencil_width,
+                        3, "Interpolation stencil width [3]");
+
     sc_options_add_bool (opt, 0, "smooth-refine", &amropt->smooth_refine,
                          0, "Refinement smoothing[F]");
     sc_options_add_int (opt, 0, "smooth-level", &amropt->smooth_refine_level,
@@ -337,6 +349,10 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "conservation-check",
                          &amropt->conservation_check,0,
                          "Conservation check [F]");
+
+    sc_options_add_bool (opt, 0, "report-timing",
+                         &amropt->report_timing,1,
+                         "Report timing results [T]");
 
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
                          "Use subcycling in time [F]");

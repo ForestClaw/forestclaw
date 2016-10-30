@@ -28,5 +28,5 @@ c
       call claw1ez(maxmx,meqn,mwaves,mbc,maux,mwork,mthlim,
      &             q,work,aux)
 
-      stop 
+      stop
       end

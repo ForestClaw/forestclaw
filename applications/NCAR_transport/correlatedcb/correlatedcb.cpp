@@ -25,9 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "correlatedcb_user.h"
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_clawpatch.h"
-#include "fc2d_clawpack46.h"
 
 
 static void *
@@ -39,8 +36,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "2 for pillowgrid ");
 
-    sc_options_add_int (opt, 0, "vflag", &user->vflag, 1, "vflag [1]");
-    sc_options_add_int (opt, 0, "init_choice", &user->init_choice, 4, "init_choice [4]");
+    sc_options_add_double (opt, 0, "kappa", &user->kappa, 1, "kappa (0 or 2.0) [2]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4, "claw-version [4]");
 
     user->is_registered = 1;
     return NULL;
@@ -50,19 +48,14 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-    const amr_options_t* gparms = fclaw_forestclaw_get_options(app);
-
-    if (user->init_choice == 2)
-    {
-        FCLAW_ASSERT(user->init_choice == 2 && gparms->meqn == 1);
-    }
-    else if (user->init_choice == 3)
-    {
-        FCLAW_ASSERT(user->init_choice == 3 && gparms->meqn == 2);
-    }
 
     if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
+        return FCLAW_EXIT_ERROR;
+    }
+    if (user->example == 2)
+    {
+        fclaw_global_essentialf("Option --user:example == 2 : Pillowgrid not yet implemented\n");
         return FCLAW_EXIT_ERROR;
     }
     return FCLAW_NOEXIT;
@@ -86,6 +79,20 @@ register_user_options (fclaw_app_t * app,
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 }
+
+const user_options_t* correlatedcb_user_get_options(fclaw2d_domain_t* domain)
+{
+#if 0
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+#endif
+
+    const user_options *user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
+
+    return user;
+}
+
 
 static
     void run_program(fclaw_app_t* app)
@@ -165,6 +172,7 @@ int main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     register_user_options (app, "fclaw_options.ini", user);
 

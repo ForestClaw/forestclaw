@@ -31,7 +31,7 @@ end
 
 showpatchborders;
 
-prt = true;
+prt = false;
 NoQuery = 0;
 if (prt)
     MaxFrames = 31;

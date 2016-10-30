@@ -25,21 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hemisphere_user.h"
 
-#include <fc2d_clawpack46.h>
-#include <fclaw2d_clawpatch.h>
-
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_map_query.h>
-
-
-typedef struct user_options
-{
-    int example;
-    double alpha;
-    int is_registered;
-
-} user_options_t;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -53,6 +41,9 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "Ratio of outer square to inner square [0.4]");
 
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                           "Clawpack_version (4 or 5) [4]");
+
     user->is_registered = 1;
     return NULL;
 }
@@ -65,6 +56,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
+
     return FCLAW_NOEXIT;
 }
 
@@ -85,6 +77,17 @@ register_user_options (fclaw_app_t * app,
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 }
+
+const user_options_t* hemisphere_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
 
 static
     void run_program(fclaw_app_t* app)
@@ -175,6 +178,7 @@ int main (int argc, char **argv)
 
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     register_user_options (app, "fclaw_options.ini", user);
 

@@ -1,6 +1,3 @@
-c
-c
-c =========================================================
       subroutine qinit(maxmx,meqn,mbc,mx,xlower,dx,q,maux,aux)
 c =========================================================
 c
@@ -17,14 +14,15 @@ c
       width = 0.2d0
 c
       do 150 i=1,mx
-            xcell = xlower + (i-0.5d0)*dx
-            if (xcell .lt. r0) then
-              h = 40*exp(-xcell*xcell/10.d0) + 80
-            else
-              h = 0.d0 + 80
-            endif
-            q(i,1) = h
-            q(i,2) = 0.d0
+	 xcell = xlower + (i-0.5d0)*dx
+         ze = -(xcell**2)/10.d0
+	 if (ze .gt. -10) then
+	     h = 40.*exp(ze)
+	   else
+	     h = 0
+	   endif
+	 q(i,1) = h
+	 q(i,2) = 0.d0
   150    continue
 c
       return

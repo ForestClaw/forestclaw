@@ -2,21 +2,21 @@
 c
 c
 c     =====================================================
-      subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &                  auxl,auxr,wave,s,amdq,apdq)
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx,
+     &      ql,qr,auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Riemann solver for the acoustics equations in 2d,
 c
 c     # Note that although there are 3 eigenvectors, the second eigenvalue
-c     # is always zero and so we only need to compute 2 waves.  
-c     # 
+c     # is always zero and so we only need to compute 2 waves.
+c     #
 c     # solve Riemann problems along one slice of data.
 c
 c     # On input, ql contains the state vector at the left edge of each cell
 c     #           qr contains the state vector at the right edge of each cell
 c
-c     # This data is along a slice in the x-direction if ixy=1 
+c     # This data is along a slice in the x-direction if ixy=1
 c     #                            or the y-direction if ixy=2.
 c     # On output, wave contains the waves,
 c     #            s the speeds,
@@ -61,11 +61,11 @@ c
           mv = 2
         endif
 c
-c     # note that notation for u and v reflects assumption that the 
+c     # note that notation for u and v reflects assumption that the
 c     # Riemann problems are in the x-direction with u in the normal
 c     # direciton and v in the orthogonal direcion, but with the above
 c     # definitions of mu and mv the routine also works with ixy=2
-c     # in which case waves come from the 
+c     # in which case waves come from the
 c     # Riemann problems u_t + g(u)_y = 0 in the y-direction.
 c
 c

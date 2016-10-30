@@ -32,21 +32,21 @@
 #include <fclaw2d_map_query.h>
 #include <p4est_connectivity.h>
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
 static void *
     options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0,1 for pillow grid, "    \
-                        "2 for cubed sphere ");
+                        "[user] 0 for cubed sphere, "    \
+                        "2 for pillow sphere ");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
+
+    sc_options_add_double (opt, 0, "revs-per-second", &user->revs_per_second, 2,
+                        "[user] Revolutions per second [2]");
+
     user->is_registered = 1;
     return NULL;
 }
@@ -56,12 +56,13 @@ static fclaw_exit_type_t
 {
     user_options_t* user = (user_options_t*) package;
     if (user->example < 0 || user->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_ERROR;
     }
     return FCLAW_NOEXIT;
 }
 
+#if 0
 static void
     options_destroy_user(fclaw_app_t* app, void* package, void *registered)
 {
@@ -69,29 +70,40 @@ static void
     FCLAW_ASSERT(user != NULL);
     FCLAW_FREE(user);
 };
+#endif
 
 static const fclaw_app_options_vtable_t options_vtable_user = {
     options_register_user,
     NULL,      /* options_postprocess_user */
     options_check_user,
-    options_destroy_user       /* options_destroy_user */
+    NULL
 };
 
 
-void static
-    register_user_options (fclaw_app_t * app,
-                           const char *configfile)
+static
+void register_user_options (fclaw_app_t * app,
+                            const char *configfile,
+                            user_options_t* user)
 {
-    user_options_t* user;
-
     FCLAW_ASSERT (app != NULL);
 
-    user = FCLAW_ALLOC(user_options_t,1);
-
+    /* sneaking the version string into the package pointer */
+    /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
-    fclaw_app_set_attribute(app,"user",user);
 }
+
+
+const user_options_t* sphere_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
 
 static
     void run_program(fclaw_app_t* app)
@@ -110,23 +122,22 @@ static
         double pi = M_PI;
         double rotate[2];
 
-        gparms = fclaw_forestclaw_get_options(app);
-        user = (user_options_t*) fclaw_app_get_attribute(app,"user",NULL);
-
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+        gparms = fclaw_forestclaw_get_options(app);
+        user = (user_options_t*) fclaw_app_get_user(app);
 
         rotate[0] = pi*gparms->theta/180.0;
         rotate[1] = pi*gparms->phi/180.0;
 
         switch (user->example) {
         case 0:
+            conn = p4est_connectivity_new_cubed();
+            cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
+            break;
         case 1:
             conn = p4est_connectivity_new_pillow();
             cont = fclaw2d_map_new_pillowsphere(gparms->scale,gparms->shift,rotate);
-            break;
-        case 2:
-            conn = p4est_connectivity_new_cubed();
-            cont = fclaw2d_map_new_cubedsphere(gparms->scale,gparms->shift,rotate);
             break;
         default:
             SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
@@ -162,28 +173,32 @@ static
 
 int main (int argc, char **argv)
 {
-    fclaw_app_t *app;
     int first_arg;
+    fclaw_app_t *app;
     fclaw_exit_type_t vexit;
-    sc_options_t             *options;
+
+    /* options */
+    sc_options_t    *options;
+    user_options_t    suser_options, *user = &suser_options;
+
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    app = fclaw_app_new (&argc, &argv, user);
+    fclaw2d_clawpatch_link_app (app);
 
     /* Register packages */
     fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
 
     /* User options */
-    register_user_options (app, "fclaw_options.ini");
+    register_user_options (app, "fclaw_options.ini",user);
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
-    fclaw2d_clawpatch_link_app(app);
 
     /* Run program */
     if (!retval & !vexit)

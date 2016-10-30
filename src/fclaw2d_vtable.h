@@ -53,6 +53,11 @@ typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       int this_block_idx,
                                       int this_patch_idx);
 
+typedef void (*fclaw2d_ghostpatch_setup_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx);
+
 typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
@@ -247,8 +252,7 @@ typedef void (*fclaw2d_fort_ghostpack_t)(int *mx, int *my, int *mbc,
                                        int *meqn, int *mint,
                                        double qdata[], double area[],
                                        double qpack[], int *psize,
-                                       int *packmode, int *pack_layers,
-                                       int *ierror);
+                                       int *packmode, int *ierror);
 
 typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                         const int *meqn, const int* psize,
@@ -261,6 +265,7 @@ typedef struct fclaw2d_vtable
     fclaw2d_problem_setup_t            problem_setup;
 
     fclaw2d_patch_setup_t              patch_setup;
+    fclaw2d_ghostpatch_setup_t         ghostpatch_setup;
     fclaw2d_patch_initialize_t         patch_initialize;
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;
@@ -318,10 +323,10 @@ typedef struct fclaw2d_vtable
 
     fclaw2d_patch_copy_corner_t  copy_corner;
     fclaw2d_fort_copy_corner_t   fort_copy_corner;
-    
+
     fclaw2d_patch_average_corner_t  average_corner;
     fclaw2d_fort_average_corner_t   fort_average_corner;
-    
+
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
     fclaw2d_fort_interpolate_corner_t   fort_interpolate_corner;
 

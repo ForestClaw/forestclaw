@@ -1,23 +1,20 @@
-c
-c
-c     =====================================================
-      subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &                  auxl,auxr,wave,s,amdq,apdq)
+      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,
+     &      mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Riemann solver for the acoustics equations in 2d, with varying
 c     # material properties rho and kappa
 c
 c     # Note that although there are 3 eigenvectors, the second eigenvalue
-c     # is always zero and so we only need to compute 2 waves.  
-c     # 
+c     # is always zero and so we only need to compute 2 waves.
+c     #
 c     # solve Riemann problems along one slice of data.
 c
 c     # On input, ql contains the state vector at the left edge of each cell
 c     #           qr contains the state vector at the right edge of each cell
 c
-c     # auxl(i,1) holds rho, 
-c     # auxl(i,2) holds sound speed c, 
+c     # auxl(i,1) holds rho,
+c     # auxl(i,2) holds sound speed c,
 c     #   Here it is assumed that auxl=auxr gives the cell values.
 c
 c
@@ -27,7 +24,7 @@ c     #            amdq the  left-going flux difference  A^- \Delta q
 c     #            apdq the right-going flux difference  A^+ \Delta q
 c
 c
-c     # This data is along a slice in the x-direction if ixy=1 
+c     # This data is along a slice in the x-direction if ixy=1
 c     #                            or the y-direction if ixy=2.
 c
 c     # Note that the i'th Riemann problem has left state qr(i-1,:)
@@ -65,7 +62,7 @@ c
           mv = 2
         endif
 c
-c     # note that notation for u and v reflects assumption that the 
+c     # note that notation for u and v reflects assumption that the
 c     # Riemann problems are in the x-direction with u in the normal
 c     # direciton and v in the orthogonal direcion, but with the above
 c     # definitions of mu and mv the routine also works with ixy=2
