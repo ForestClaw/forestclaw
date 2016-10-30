@@ -43,6 +43,11 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
 
         fclaw2d_vt.patch_setup = &hemisphere_patch_setup;
 
+        /* Needed to avoid triggering refinement around block corners */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+
+
         classic_claw46.setprob = &SETPROB;
         classic_claw46.qinit   = &CLAWPACK46_QINIT;
         classic_claw46.rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
@@ -55,6 +60,10 @@ void hemisphere_link_solvers(fclaw2d_domain_t *domain)
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
         fclaw2d_vt.patch_setup = &hemisphere_patch_setup;
+
+        /* Avoid triggering refinement around block corners */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
 
         classic_claw5.setprob  = &SETPROB;
         classic_claw5.qinit    = &CLAWPACK5_QINIT;

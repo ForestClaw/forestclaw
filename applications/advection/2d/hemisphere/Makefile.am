@@ -14,6 +14,10 @@ applications_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/advection/2d/hemisphere/psi.f \
 	applications/advection/2d/hemisphere/user_4.6/qinit.f \
 	applications/advection/2d/hemisphere/user_5.0/qinit.f90 \
+	applications/advection/2d/hemisphere/user_4.6/tag4refinement.f \
+	applications/advection/2d/hemisphere/user_4.6/tag4coarsening.f \
+	applications/advection/2d/hemisphere/user_5.0/tag4refinement.f \
+	applications/advection/2d/hemisphere/user_5.0/tag4coarsening.f \
 	applications/advection/2d/all/user46_setaux_manifold.f \
 	applications/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/advection/2d/all/clawpack46_rpn2adv_manifold.f \
