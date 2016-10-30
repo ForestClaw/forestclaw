@@ -55,6 +55,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
 
     fclaw_vt->patch_setup        = &fc2d_geoclaw_patch_setup;
+    fclaw_vt->ghostpatch_setup   = &fc2d_geoclaw_patch_setup;
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
 
     fclaw_vt->patch_initialize   = &fc2d_geoclaw_qinit;

@@ -402,13 +402,6 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
             vt.metric_compute_area(domain,this_patch,blockno,patchno);
-#if 0
-            /* Don't need any more manifold info for ghost patches */
-            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-            {
-                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
-            }
-#endif
         }
     }
 
