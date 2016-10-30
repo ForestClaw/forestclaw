@@ -18,8 +18,9 @@ endif
 include applications/dummy/Makefile.am
 include applications/no_solver/Makefile.am
 
-# Test metric terms (curvature, for example)
-# include applications/metric/2d/all_mappings/Makefile.am
+# Test metric terms. Useful for checking accuracy of metric terms
+# (curvature, area and so on)
+include applications/metric/2d/all_mappings/Makefile.am
 
 # Scalar advection on manifolds
 # include applications/advection/2d/swirl_mapped/Makefile.am
@@ -44,9 +45,6 @@ include applications/euler/2d/quadrants/Makefile.am
 
 # Shallow water on the sphere
 # include applications/shallow/2d/sphere/Makefile.am
-
-# Mountain problem - SSE
-# include applications/Mountain/Makefile.am
 
 ###   # AMRClaw examples from clawpack4.6
 include applications/amrclaw/acoustics/2d/interface/Makefile.am
