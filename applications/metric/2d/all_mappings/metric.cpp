@@ -29,15 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "metric_user.h"
 
 
-typedef struct user_options
-{
-    int example;
-    double alpha;
-
-    int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -49,8 +40,14 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
                         "4 pillow disk; 5 pillowdisk5; 6 pillow sphere " \
                         "7 cubed sphere; 8 torus");
 
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
-                           "[user] Ratio used for squared- and pillow-disk [0.5]");
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "[user] Ratio used for squared- and pillow-disk [0.4]");
+
+    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
+                           "[user] Ratio of inner to outer radii in torus [0.4]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                           "Clawpack_version (4 or 5) [4]");
 
     user->is_registered = 1;
     return NULL;
@@ -62,7 +59,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    if (user->example < 1 || user->example > 8) {
+    if (user->example < 0 || user->example > 8) {
         fclaw_global_essentialf ("Option --user:example must be 1-8\n");
         return FCLAW_EXIT_QUIET;
     }
@@ -87,6 +84,15 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+const user_options_t* metric_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
 
 void run_program(fclaw_app_t* app)
 {
@@ -117,6 +123,7 @@ void run_program(fclaw_app_t* app)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     switch (user->example) {
+    case 0:
     case 1:
         /* Map [0,1]x[0,1] to [-1,1],[-1,1] */
         conn = p4est_connectivity_new_unitsquare();
@@ -159,7 +166,7 @@ void run_program(fclaw_app_t* app)
         /* Map [0,1]x[0,1] to five patch --> pillow disk */
         conn = p4est_connectivity_new_periodic ();
         cont = fclaw2d_map_new_torus (gparms->scale,gparms->shift,
-                                      rotate,user->alpha);
+                                      rotate,user->beta);
         break;
     default:
         SC_ABORT_NOT_REACHED ();
@@ -217,6 +224,7 @@ main (int argc, char **argv)
 
   /* User defined options (defined above) */
   register_user_options (app, "fclaw_options.ini", user);
+  fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
 
 
   /* Read configuration file(s) */

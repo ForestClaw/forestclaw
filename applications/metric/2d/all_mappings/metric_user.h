@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef METRIC_USER_H
 #define METRIC_USER_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_clawpatch.h"
+#include <fclaw2d_forestclaw.h>
+#include <fc2d_clawpack46.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,9 +37,22 @@ extern "C"
 #endif
 #endif
 
+typedef struct user_options
+{
+    int example;
+    double alpha;
+    double beta;
+    int claw_version;
 
-#define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
-void SETPROB();
+    int is_registered;
+
+} user_options_t;
+
+#define METRIC_SETPROB FCLAW_F77_FUNC(metric_setprob, METRIC_SETPROB)
+void METRIC_SETPROB(const double* beta);
+
+const user_options_t* metric_user_get_options(fclaw2d_domain_t* domain);
+
 
 void metric_problem_setup(fclaw2d_domain_t* domain);
 
@@ -53,17 +66,17 @@ void metric_check_(const int& mbc,const int& mx, const int& my,
                    const double xd[], double yd[],const double zd[],
                    const double area[], const int& mpirank);
 
-void compute_error(const int& meqn,const int& mbc,const int& mx,const int& my,
-                   fclaw2d_map_context_t** cont,const int& blockno,
-                   const double& xlower,const double& ylower,
-                   const double& dx,const double& dy,
-                   const double curvature[],const double error_ptr[]);
+void compute_error(int* blockno, int* mx, int* my,
+                   int* mbc, int* meqn,
+                   double* dx, double* dy,
+                   double* xlower, double* ylower,
+                   double *t, double q[],double error[]);
 
 void initialize(const int& mx, const int& my,
                 const int& meqn, const int& mbc,
                 const double& xlower, const double& ylower,
                 const double& dx, const double& dy,
-                double q[], const double error[],
+                double q[],
                 const double curvature[], const double area[]);
 
 double total_area_(const int& mx, const int& my, const int& mbc,
@@ -83,11 +96,6 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
                              int this_patch_idx);
 
 void metric_link_patch(fclaw2d_domain_t *domain);
-
-void metric_qinit(fclaw2d_domain_t *domain,
-                  fclaw2d_patch_t *this_patch,
-                  int this_block_idx,
-                  int this_patch_idx);
 
 void metric_diagnostics(fclaw2d_domain_t *domain, const double t);
 

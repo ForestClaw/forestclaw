@@ -1,5 +1,5 @@
       subroutine initialize(mx,my,meqn,mbc,
-     &      xlower,ylower,dx,dy,q,error,curvature,area)
+     &      xlower,ylower,dx,dy,q,curvature,area)
      &      bind(c,name="initialize")
       implicit none
 
@@ -7,9 +7,7 @@
       double precision xlower, ylower, dx, dy, dxdy
       integer*8 cont
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
-      double precision error(1-mbc:mx+mbc, 1-mbc:my+mbc)
       integer i, j
-      logical fclaw2d_map_is_flat, isflat
 
       include 'metric_terms.i'
 
@@ -18,7 +16,6 @@
          do i = 1-mbc,mx+mbc
             q(i,j,1) = area(i,j)/dxdy
             q(i,j,2) = curvature(i,j)
-            q(i,j,3) = error(i,j)
          enddo
       enddo
 

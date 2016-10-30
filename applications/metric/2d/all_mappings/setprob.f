@@ -1,12 +1,14 @@
-      subroutine setprob()
+      subroutine metric_setprob(beta_in)
       implicit none
 
-      double precision kappa,tfinal
-      double precision rot_angle(2), scale
+      double precision beta_in, beta
+      common /comtorus/ beta
 
       double precision pi
       common /compi/ pi
 
       pi = 4.d0*atan(1.d0)
+
+      beta = beta_in
 
       end
