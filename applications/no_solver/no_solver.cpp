@@ -39,23 +39,11 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     return NULL;
 }
 
-static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-    if (user->example < 0 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
-}
-
-
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
     NULL,
-    options_check_user,
+    NULL,
     NULL
 };
 
