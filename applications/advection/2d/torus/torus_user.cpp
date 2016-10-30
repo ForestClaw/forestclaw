@@ -104,11 +104,6 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
 {
     const user_options_t* user = torus_user_get_options(domain);
 
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
-        return;
-    }
-
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);

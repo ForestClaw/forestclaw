@@ -42,7 +42,7 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = pillowdisk5; 1 = pillowdisk [0]");
+                        "[user] 0 = pillowdisk;  1 = pillowdisk5;  [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -64,7 +64,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf ("Option --user:example must be 0, 1 or 2\n");
         return FCLAW_EXIT_QUIET;
     }
-    else if (user->example == 0)
+    else if (user->example == 1)
     {
         if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
         {
@@ -136,15 +136,15 @@ void run_program(fclaw_app_t* app)
 
     switch (user->example) {
     case 0:
+        /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_pillowdisk(gparms->scale,gparms->shift,rotate);
+        break;
+    case 1:
         /* Map five-patch square to pillow disk. */
         conn = p4est_connectivity_new_disk ();
         cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
                                             rotate,user->alpha);
-        break;
-    case 1:
-        /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_pillowdisk(gparms->scale,gparms->shift,rotate);
         break;
 
     default:
