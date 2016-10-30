@@ -1,6 +1,6 @@
-bin_PROGRAMS += applications/advection/2d/replicated/torus
+bin_PROGRAMS += applications/advection/2d/replicated/replicated
 
-applications_advection_2d_replicated_torus_SOURCES = \
+applications_advection_2d_replicated_replicated_SOURCES = \
 	applications/advection/2d/replicated/torus.cpp \
 	applications/advection/2d/replicated/torus_user.h \
 	applications/advection/2d/replicated/torus_user.cpp \
@@ -17,8 +17,8 @@ applications_advection_2d_replicated_torus_SOURCES = \
 	applications/advection/2d/all/clawpack46_setaux.f \
 	applications/advection/2d/all/clawpack5_setaux.f90
 
-applications_advection_2d_replicated_torus_CPPFLAGS = \
+applications_advection_2d_replicated_replicated_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
-applications_advection_2d_replicated_torus_LDADD = \
+applications_advection_2d_replicated_replicated_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
