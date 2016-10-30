@@ -3,7 +3,7 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 global map isflat;
 
 map = 'torus';
-map = 'twisted_torus';
+% map = 'twisted_torus';
 
 
 R = 1;
@@ -39,8 +39,8 @@ switch map
         s = 0.0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,zp] = mapc2m_twisted_torus(xc1,yc1);
-        
-        
+
+
 end
 
 if (isflat)
