@@ -15,9 +15,8 @@ endif
 # ----------------------------------
 
 # Simple examples to test options handling, etc, but no solvers.
-# include applications/dummy/Makefile.am
-### include applications/no_solver/Makefile.am
-### include applications/test_parms/Makefile.am
+include applications/dummy/Makefile.am
+include applications/no_solver/Makefile.am
 
 # Test metric terms (curvature, for example)
 # include applications/metric/2d/all_mappings/Makefile.am
