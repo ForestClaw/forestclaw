@@ -12,21 +12,26 @@ SUBROUTINE clawpack5_rpn2adv_manifold(ixy,maxm,meqn, &
   DOUBLE PRECISION auxl(maux,1-mbc:maxm+mbc)
   DOUBLE PRECISION auxr(maux,1-mbc:maxm+mbc)
 
-  INTEGER iface, i, i1
+  INTEGER iface, i, i1, m
 
-  IF (meqn .NE. 1) THEN
-     WRITE(6,*) 'clawpack5_rpn2 : meqn should be equal to 1'
+  IF (mwaves .NE. 1) THEN
+     WRITE(6,*) 'clawpack5_rpn2 : mwaves should be equal to 1'
      STOP
   ENDIF
 
-!! # Velocities stored in iface+1 (mcapa is stored in aux(1,:,:)
-
   iface = ixy
   DO i = 2-mbc, mx+mbc
-     wave(1,1,i) = ql(1,i) - qr(1,i-1)
+     DO m = 1,meqn
+        wave(m,1,i) = ql(m,i) - qr(m,i-1)
+     ENDDO
+
+     !! # Only one wave
      s(1,i) = auxl(iface+1,i)
-     amdq(1,i) = dmin1(auxl(1+iface,i), 0.d0) * wave(1,1,i)
-     apdq(1,i) = dmax1(auxl(1+iface,i), 0.d0) * wave(1,1,i)
+
+     DO m = 1,meqn
+        amdq(m,i) = MIN(s(1,i), 0.d0) * wave(m,1,i)
+        apdq(m,i) = MAX(s(1,i), 0.d0) * wave(m,1,i)
+     ENDDO
   END DO
 
   RETURN

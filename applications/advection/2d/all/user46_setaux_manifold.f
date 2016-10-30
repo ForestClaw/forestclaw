@@ -1,5 +1,6 @@
       subroutine user46_setaux_manifold(mbc,mx,my,
-     &      xlower,ylower,dx,dy,maux,aux,blockno,xd,yd,zd,area)
+     &      xlower,ylower,dx,dy,maux,aux,blockno,
+     &      xd,yd,zd,area)
       implicit none
 
       integer mbc, mx,my, meqn, maux
@@ -48,8 +49,6 @@
       integer i,j
       double precision vn
       logical ispillowsphere
-
-
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
