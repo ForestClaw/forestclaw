@@ -1,8 +1,8 @@
 ## Makefile.am in applications/dummy
 
-bin_PROGRAMS += applications/dummy/fclaw2d_dummy
+bin_PROGRAMS += applications/dummy/dummy
 
-applications_dummy_fclaw2d_dummy_SOURCES = \
+applications_dummy_dummy_SOURCES = \
         applications/dummy/fclaw2d_dummy.c \
         applications/dummy/dummy_blackbox.c \
         applications/dummy/dummy_blackbox.h
