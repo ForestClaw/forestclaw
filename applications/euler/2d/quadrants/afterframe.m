@@ -7,7 +7,8 @@ colormap(jet);
 cv = linspace(qmin,qmax,21);
 cv([1 end]) = [];
 drawcontourlines(cv);
-setcontourlineprops('linewidth',2);
+setcontourlineprops('linewidth',1);
+setpatchborderprops('linewidth',1);
 showpatchborders;
 colorbar;
 

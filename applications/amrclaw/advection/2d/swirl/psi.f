@@ -1,17 +1,10 @@
-c     =================================================
-      double precision function psi(x,y)
-c     =================================================
-
-c     # stream function
-
+      double precision function psi(xp,yp)
       implicit none
 
-      double precision x,y,pi
+      double precision xp,yp,pi
       common /compi/ pi
 
-      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
-
-c      psi = x - y
+      psi = ((sin(pi*xp))**2 * (sin(pi*yp))**2) / pi
 
       return
       end

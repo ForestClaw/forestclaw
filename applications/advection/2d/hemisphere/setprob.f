@@ -1,15 +1,14 @@
       subroutine setprob()
       implicit none
 
-      double precision kappa,tfinal
-
       double precision pi
       common /compi/ pi
 
+      double precision revs_per_second
+      common /spherecomm/ revs_per_second
+
       pi = 4.d0*atan(1.d0)
 
-      kappa = 0
-      tfinal = 5.0
-      call set_wind_parms(kappa,tfinal);
+      revs_per_second = 0.5d0
 
       end

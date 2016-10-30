@@ -1,6 +1,0 @@
-{
-   sc_options_save
-   Memcheck:Leak
-   ...
-   fun:sc_options_save
-}

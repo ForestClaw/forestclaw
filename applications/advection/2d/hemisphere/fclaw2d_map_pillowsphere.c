@@ -51,6 +51,8 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
         return 0;
     case FCLAW2D_MAP_QUERY_IS_HEMISPHERE:
         return 1;
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_pillowsphere (fclaw2d_map.c) : Query id not "\

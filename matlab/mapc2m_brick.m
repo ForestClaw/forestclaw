@@ -1,5 +1,8 @@
 function [xp,yp,zp] = mapc2m_brick(xc,yc,s)
 
+% This assumes that (xc,yc) is in [0,1]x[0,1]. The blockno then
+% tells us how to map to the correct brick position
+
 if (nargin < 3)
    s = 0;
 end

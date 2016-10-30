@@ -1,26 +1,27 @@
-      subroutine radialdam_setprob(g,x0,y0,r0,
-     &      hin,hout)
+      subroutine radialdam_setprob(grav_in,x0_in,y0_in,r0_in,
+     &      hin_in,hout_in,example)
       implicit none
 
-      double precision g,x0,y0,r0,hin,hout
-      double precision g_com,x0_com,y0_com
-      double precision r0_com,hin_com,hout_com
-      double precision alf,beta
+      double precision grav_in, x0_in, y0_in, r0_in, hin_in,hout_in
+      integer example
+      double precision grav,x0,y0,r0,hin,hout
       integer idisc
 
-      common /param/  g_com    !# gravitational parameter
-      common/cdisc/ x0_com,y0_com,alf,beta,r0_com,idisc
-      common /comic/ hin_com,hout_com
+      common /cparam/grav    !# gravitational parameter
+      common/cdisc/ x0,y0,r0
+      common /comic/ hin,hout
+      common /comex/ idisc
 
 c     # These should be read in as options.
-      idisc = 2
+      idisc = example
 
-      g_com = g
-      x0_com = x0
-      y0_com = y0
-      r0_com = r0
-      hin_com = hin
-      hout_com = hout
+      grav = grav_in
+
+      x0 = x0_in
+      y0 = y0_in
+      r0 = r0_in
+      hin = hin_in
+      hout = hout_in
 
       return
       end

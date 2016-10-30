@@ -1,4 +1,4 @@
-      subroutine setaux_manifold(maxmx, maxmy, mbc,mx,my,
+      subroutine torus46_setaux(maxmx, maxmy, mbc,mx,my,
      &      xlower,ylower, dx,dy, maux,aux)
       implicit none
 
@@ -11,26 +11,26 @@
 
       blockno = fc2d_clawpack46_get_block()
 
-      call compute_velocity_psi_comp(mx,my,mbc,dx,dy,
-     &      t,blockno,xlower,ylower,aux,maux)
+      call torus46_velocity_psi_comp(mx,my,mbc,dx,dy,
+     &      blockno,xlower,ylower,aux,maux)
 
       return
       end
 
-
-      subroutine compute_velocity_psi_comp(mx,my,mbc,
-     &      dx,dy,t,blockno,xlower,ylower,aux,maux)
+      subroutine torus46_velocity_psi_comp(mx,my,mbc,
+     &      dx,dy,blockno,xlower,ylower,aux,maux)
       implicit none
 
       integer mx,my,mbc,maux,blockno
-      double precision dx,dy, t, xlower,ylower
+      double precision dx,dy, xlower,ylower
 
-      double precision xd1(2),xd2(2)
+      double precision xd1(2),xd2(2), t
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
       integer i,j
       double precision vn
 
+      t = 0.d0  !! not used
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # x-faces
@@ -58,16 +58,5 @@ c           # y-faces
             aux(i,j,3) = -vn
          enddo
       enddo
-
-      end
-
-      subroutine get_vel_psi_comp(blockno,xd1,xd2,ds,vn,t)
-      implicit none
-
-      double precision xd1(2),xd2(2), ds, vn, psi,t
-      integer blockno
-
-      vn = (psi(blockno,xd1(1),xd1(2),t) -
-     &      psi(blockno,xd2(1),xd2(2),t))/ds
 
       end

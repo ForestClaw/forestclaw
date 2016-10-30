@@ -9,17 +9,10 @@ applications_no_solver_no_solver_SOURCES = \
 	applications/no_solver/no_solver.cpp \
 	applications/no_solver/no_solver_user.cpp \
 	applications/no_solver/fclaw2d_map_nomap.c \
-	applications/no_solver/fclaw2d_map_cart.c \
-	applications/no_solver/fclaw2d_map_fivepatch.c \
-	applications/no_solver/fclaw2d_map_pillowdisk.c \
-	applications/no_solver/fclaw2d_map_pillowdisk5.c \
-	applications/no_solver/tag4refinement.f \
 	applications/no_solver/initialize.f
 
 applications_no_solver_no_solver_CPPFLAGS = \
-	       $(AM_CPPFLAGS)
-
-# applications_no_solver_no_solver_LDADD = $(LDADD) $(FLIBS)
+	       $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
 # Not needed, but included to check compile
 applications_no_solver_no_solver_LDADD = \

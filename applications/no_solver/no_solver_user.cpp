@@ -23,27 +23,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "no_solver_user.H"
-
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_clawpatch.hpp"
-#include "ClawPatch.H"
+#include "no_solver_user.h"
 
 #include "fclaw2d_physical_bc.h"
+#include "fclaw2d_clawpatch.hpp"
+#include <fc2d_clawpack46.h>
 
 
-static fclaw2d_vtable_t vt;
+static fclaw2d_vtable_t fclaw2d_vt;
+
+/* Want to write this so clawpack isn't needed */
+static fc2d_clawpack46_vtable_t classic_claw46;
 
 
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
-    fclaw2d_init_vtable(&vt);
+    fclaw2d_init_vtable(&fclaw2d_vt);
 
-    vt.patch_initialize         = &no_solver_patch_initialize;
-    vt.patch_physical_bc        = &fclaw2d_physical_bc_default;  /* No BCs are imposed */
-    vt.patch_single_step_update = &no_solver_update;
+    const user_options_t* user = no_solver_user_get_options(domain);
 
-    fclaw2d_set_vtable(domain,&vt);
+    fclaw2d_init_vtable(&fclaw2d_vt);
+
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
+
+        fclaw2d_vt.patch_initialize         = &no_solver_patch_initialize;
+        fclaw2d_vt.patch_single_step_update = &no_solver_update;
+
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
+
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
 void no_solver_patch_initialize(fclaw2d_domain_t *domain,

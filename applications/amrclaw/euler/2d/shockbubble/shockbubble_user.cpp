@@ -25,57 +25,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
+static fclaw2d_vtable_t         fclaw2d_vt;
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t  classic_claw5;
 
 void shockbubble_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    const user_options_t* user = shockbubble_user_get_options(domain);
 
-    vt.problem_setup = &shockbubble_problem_setup;
+    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_vt.problem_setup = &shockbubble_problem_setup;
 
-    vt.patch_setup = &fc2d_clawpack46_setaux;
-    classic_claw.setaux = &SETAUX;
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
+        fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(domain);
 
-    vt.patch_initialize = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
+        classic_claw46.qinit  = &CLAWPACK46_QINIT;
+        classic_claw46.setaux = &CLAWPACK46_SETAUX;
+        classic_claw46.bc2    = &CLAWPACK46_BC2;  /* Special input BCs */
+        classic_claw46.src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
 
-    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */
-    classic_claw.bc2 = &BC2;
+        switch (clawopt->mwaves)
+        {
+        case 4:
+            /* Requires meqn=4 */
+            classic_claw46.rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
+            classic_claw46.rpt2   = &CLAWPACK46_RPT2_EULER4;
+            break;
+        case 5:
+            /* Requires meqn=5 */
+            classic_claw46.rpn2   = &CLAWPACK46_RPN2_EULER5;  /* Includes a tracer */
+            classic_claw46.rpt2   = &CLAWPACK46_RPT2_EULER5;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
 
-    vt.fort_tag4refinement = &TAG4REFINEMENT;
-    vt.fort_tag4coarsening = &TAG4COARSENING;
+        /* Use divided differences to tag grids */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
-    vt.patch_single_step_update = &fc2d_clawpack46_update;
-    classic_claw.src2 = &SRC2;
-    classic_claw.rpn2 = &RPN2EU5;  /* Signature is unchanged */
-    classic_claw.rpt2 = &RPT2EU5;
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+        fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(domain);
 
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+        classic_claw5.qinit  = &CLAWPACK5_QINIT;
+        classic_claw5.setaux = &CLAWPACK5_SETAUX;
+        classic_claw5.bc2    = &CLAWPACK5_BC2;   /* Special input at left edge */
+        classic_claw5.src2   = &CLAWPACK5_SRC2;  /* To simulate axis-symmetric flow */
+
+        switch (clawopt->mwaves)
+        {
+        case 4:
+            /* Requires meqn=4 */
+            classic_claw5.rpn2   = &CLAWPACK5_RPN2_EULER4;  /* no tracer */
+            classic_claw5.rpt2   = &CLAWPACK5_RPT2_EULER4;
+            break;
+        case 5:
+            /* Requires meqn=5 */
+            classic_claw5.rpn2   = &CLAWPACK5_RPN2_EULER5;  /* Includes a tracer */
+            classic_claw5.rpt2   = &CLAWPACK5_RPT2_EULER5;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
+
+        /* Use divided differences to tag grids */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
+    }
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
+
 }
 
 void shockbubble_problem_setup(fclaw2d_domain_t* domain)
 {
-    const user_options_t* user;
-    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
+    const user_options_t* user = shockbubble_user_get_options(domain);
 
     SHOCKBUBBLE_SETPROB(&user->gamma, &user->x0, &user->y0, &user->r0,
                         &user->rhoin, &user->pinf);
-}
-
-void shockbubble_patch_setup(fclaw2d_domain_t* domain,
-                             fclaw2d_patch_t* this_patch,
-                             int blockno,
-                             int patchno)
-{
-    /* I don't have the scaling right on this problem, and just setting
-       mcapa doesn't really fix the issue.   I need a way to set [ax,ay,bx,by]
-       inside of ClawPatch */
-    fc2d_clawpack46_setaux(domain,this_patch,blockno,patchno);
-    fc2d_clawpack46_set_capacity(domain,this_patch,blockno,patchno);
 }

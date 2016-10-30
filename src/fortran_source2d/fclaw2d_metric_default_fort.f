@@ -163,6 +163,8 @@ c     # than in the rest of the mesh.
       end
 
 
+c     # If the mapping is affine, (e.g. Ax + b) then we don't need to sum
+c     # the finer level areas.
       subroutine fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area,ghost_only)
       implicit none

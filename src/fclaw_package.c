@@ -82,13 +82,13 @@ fclaw_package_container_new (void)
     pkg_container->max_packages = FCLAW_MAX_PACKAGES;
 
     return pkg_container;
-};
+}
 
 void fclaw_package_container_new_app (fclaw_app_t* app)
 {
     fclaw_app_set_attribute(app,"packages",
                             fclaw_package_container_new ());
-};
+}
 
 void
 fclaw_package_container_destroy (fclaw_package_container_t * pkg_container)

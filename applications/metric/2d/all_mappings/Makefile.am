@@ -25,7 +25,7 @@ applications_metric_2d_all_mappings_metric_SOURCES = \
 	applications/metric/2d/all_mappings/fclaw2d_map_torus.c
 
 applications_metric_2d_all_mappings_metric_CPPFLAGS = \
-	        $(AM_CPPFLAGS)
+	        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS)
 
 # This isn't used;  it is just included here to make sure that we are not
 # relying on any clawpack features that are not available.

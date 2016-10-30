@@ -26,19 +26,8 @@
 #include "swirl_user.h"
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-
-#include <fc2d_dummy.h>
 
 
-typedef struct user_options
-{
-    double period;
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -59,12 +48,6 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
-    user_options_t* user = (user_options_t*) package;
-    if (user->claw_version != 4)
-    {
-        fclaw_global_essentialf ("Option --user:claw_version must be 4\n");
-        return FCLAW_EXIT_QUIET;
-    }
     return FCLAW_NOEXIT;
 }
 
@@ -86,6 +69,16 @@ void register_user_options (fclaw_app_t * app,
 
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+}
+
+const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
 }
 
 
@@ -147,18 +140,17 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
-    /* User options */
-    register_user_options(app,"fclaw_options.ini",user);
+    /* All libraries that might be needed should be registered here */
+    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
+    fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
+    register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
-    fc2d_dummy_register(app);
 
     fclaw2d_clawpatch_link_app(app);
 

@@ -26,8 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INTERFACE_USER_H
 #define INTERFACE_USER_H
 
-#include "fclaw2d_clawpatch.h"
-#include "fc2d_clawpack46.h"
+#include <fclaw2d_forestclaw.h>
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -45,12 +46,15 @@ typedef struct user_options
     double rhor;
     double cr;
 
+    int claw_version;
+
     int is_registered;
 
 } user_options_t;
 
 void interface_setup_problem(fclaw2d_domain_t* domain);
 
+const user_options_t* interface_user_get_options(fclaw2d_domain_t* domain);
 
 #define INTERFACE_SETPROB FCLAW_F77_FUNC(interface_setprob,INTERFACE_SETPROB)
 

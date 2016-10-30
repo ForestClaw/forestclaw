@@ -1,3 +1,4 @@
+axis([0 1 0 1]);
 if PlotType==1
   rybcolormap
   caxis([-.1 .1])
@@ -5,6 +6,7 @@ if PlotType==1
 end
 
 showpatchborders
+setpatchborderprops('linewidth',1);
 
 hold on
 plot([0.5 0.5],[0 1],'w','linewidth',3);

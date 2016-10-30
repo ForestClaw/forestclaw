@@ -25,88 +25,103 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "correlatedcb_user.h"
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_clawpatch.h"
-#include "fc2d_clawpack46.h"
-
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
+static fclaw2d_vtable_t fclaw2d_vt;
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t classic_claw5;
 
 void correlatedcb_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
+    const user_options_t* user = correlatedcb_user_get_options(domain);
 
-    vt.problem_setup             = &correlatedcb_problem_setup;
+    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_vt.problem_setup = &correlatedcb_problem_setup;
 
-    vt.patch_setup               = &correlatedcb_patch_setup;
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-    vt.patch_initialize          = &correlatedcb_qinit;
-    vt.patch_physical_bc         = &fc2d_clawpack46_bc2;
+        fclaw2d_vt.patch_setup   = &correlatedcb_patch_setup;
+        fclaw2d_vt.patch_single_step_update = &correlatedcb_update;
 
-    vt.patch_single_step_update  = &correlatedcb_update;
-    classic_claw.rpn2            = &RPN2;
-    classic_claw.rpt2            = &RPT2;
+        /* Needed to avoid triggering refinement around block corners */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+        classic_claw46.qinit = &CLAWPACK46_QINIT;
+        classic_claw46.rpn2  = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        classic_claw46.rpt2  = &CLAWPACK46_RPT2ADV_MANIFOLD;
+
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+
+        fclaw2d_vt.patch_setup   = &correlatedcb_patch_setup;
+        fclaw2d_vt.patch_single_step_update = &correlatedcb_update;
+
+        /* Avoid triggering refinement around block corners */
+        fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+
+        classic_claw5.qinit   = &CLAWPACK5_QINIT;
+        classic_claw5.rpn2    = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        classic_claw5.rpt2    = &CLAWPACK5_RPT2ADV_MANIFOLD;
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
+    }
+
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
 
 void correlatedcb_problem_setup(fclaw2d_domain_t* domain)
 {
-    const user_options_t *user;
-    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
-    SETPROB_TRANSPORT(&user->vflag,&user->init_choice);
+    const user_options_t* user = correlatedcb_user_get_options(domain);
+    const amr_options_t* gparms = get_domain_parms(domain);
+    CORRELATEDCB_SETPROB(&user->kappa, &gparms->tfinal);
 }
+
 
 void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx)
 {
-    int mx, my, mbc, maux;
-    double xlower,ylower, dx,dy;
-    double *xp,*yp,*zp,*xd,*yd,*zd;
-    double *aux, *area;
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux,*xd,*yd,*zd,*area;
+    double *xp,*yp,*zp;
+    const user_options_t* user = correlatedcb_user_get_options(domain);
+
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        return;
+    }
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-
-    fc2d_clawpack46_define_auxarray(domain,this_patch);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    SETAUX_TRANSPORT(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,
-                      &maux,aux,&this_block_idx,xd,yd,zd,area);
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_define_auxarray(domain,this_patch);
+        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+
+        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                               &maux,aux,&this_block_idx,xd,yd,zd,area);
+    }
+    else if(user->claw_version == 5)
+    {
+        fc2d_clawpack5_define_auxarray(domain,this_patch);
+        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+
+        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                              &maux,aux,&this_block_idx,xd,yd,zd,area);
+    }
 }
-
-
-void correlatedcb_qinit(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx)
-{
-    int mx, my, mbc, meqn, maux;
-    double xlower,ylower, dx,dy;
-    double *xp,*yp,*zp,*xd,*yd,*zd;
-    double *aux, *area;
-    double *q;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-
-    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    QINIT_TRANSPORT(&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,&maux,aux,
-                     &this_block_idx,xp,yp,zp);
-}
-
 
 void correlatedcb_b4step2(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -119,15 +134,23 @@ void correlatedcb_b4step2(fclaw2d_domain_t *domain,
     double xlower,ylower, dx,dy;
     double *xp,*yp,*zp,*xd,*yd,*zd;
     double *aux, *area;
+    const user_options_t* user = correlatedcb_user_get_options(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    B4STEP2_TRANSPORT(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+        USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+        USER5_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
+    }
 }
 
 double correlatedcb_update(fclaw2d_domain_t *domain,
@@ -137,11 +160,22 @@ double correlatedcb_update(fclaw2d_domain_t *domain,
                            double t,
                            double dt)
 {
+    const user_options_t* user = correlatedcb_user_get_options(domain);
+
     correlatedcb_b4step2(domain,this_patch,this_block_idx,
                          this_patch_idx,t,dt);
 
-    double maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
-                                           this_patch_idx,t,dt);
+    double maxcfl;
+    if (user->claw_version == 4)
+    {
+        maxcfl = fc2d_clawpack46_step2(domain,this_patch,this_block_idx,
+                                       this_patch_idx,t,dt);
+    }
+    else
+    {
+        maxcfl = fc2d_clawpack5_step2(domain,this_patch,this_block_idx,
+                                      this_patch_idx,t,dt);
+    }
 
     return maxcfl;
 }
