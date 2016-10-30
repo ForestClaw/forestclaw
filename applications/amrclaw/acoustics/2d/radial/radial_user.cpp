@@ -42,7 +42,6 @@ void radial_link_solvers(fclaw2d_domain_t *domain)
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-        fclaw2d_vt.patch_setup = &radial_patch_setup;
 
         classic_claw46.qinit = &CLAWPACK46_QINIT;
         if (user->example == 0)
