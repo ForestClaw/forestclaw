@@ -13,8 +13,8 @@ view([65.5,12]);
 setviews;
 % set(gcf,'visible','off');
 
-NoQuery = 1;
-prt = true;
+NoQuery = 0;
+prt = false;
 if (prt)
   MaxFrames = 41;
   filename = framename(Frame,'sdisk000','png');
