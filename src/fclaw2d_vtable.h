@@ -53,6 +53,11 @@ typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       int this_block_idx,
                                       int this_patch_idx);
 
+typedef void (*fclaw2d_ghostpatch_setup_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx);
+
 typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
@@ -260,6 +265,7 @@ typedef struct fclaw2d_vtable
     fclaw2d_problem_setup_t            problem_setup;
 
     fclaw2d_patch_setup_t              patch_setup;
+    fclaw2d_ghostpatch_setup_t         ghostpatch_setup;
     fclaw2d_patch_initialize_t         patch_initialize;
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;

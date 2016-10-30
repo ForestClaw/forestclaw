@@ -330,17 +330,14 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
 
     if (gparms->manifold)
     {
-        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-        {
-            vt.metric_compute_area(domain,this_patch,blockno,patchno);
-            /* Ghost patches do not generally need normals, tangents, etc  */
-            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-            {
-                clawpatch_metric_setup(domain,this_patch,blockno,patchno);
-            }
-        }
+        vt.metric_compute_area(domain,this_patch,blockno,patchno);
+        fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
     }
 
+    /* This routine is used for patches that will be updated, and so need
+       everything */
+
+    vt = fclaw2d_get_vtable(domain);
     if (vt.patch_setup != NULL)
     {
         /* The setup routine should check to see if this is a ghost patch and
@@ -386,6 +383,41 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
     }
 }
 
+void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int blockno,
+                                   int patchno,
+                                   void *user)
+{
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
+
+    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
+
+    if (gparms->manifold)
+    {
+        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        {
+            vt.metric_compute_area(domain,this_patch,blockno,patchno);
+#if 0
+            /* Don't need any more manifold info for ghost patches */
+            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+            {
+                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
+            }
+#endif
+        }
+    }
+
+    vt = fclaw2d_get_vtable(domain);
+    if (vt.ghostpatch_setup != NULL)
+    {
+        vt.ghostpatch_setup(domain,this_patch,blockno,patchno);
+    }
+}
 
 /* --------------------------------------------------------------
    Parallel ghost exchanges.
@@ -474,6 +506,13 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
 
     int psize = (wg - hole)*(meqn + packarea);
     FCLAW_ASSERT(psize > 0);
+<<<<<<< Updated upstream
+=======
+#if 0
+    double *q = q_time_sync(time_interp);
+    double *area = m_area.dataPtr();  // Might be NULL
+#endif
+>>>>>>> Stashed changes
 
     vt.fort_ghostpack(&mx,&my,&mbc,&meqn, &mint, qthis,area,
                         qpack,&psize,&packmode,&ierror);

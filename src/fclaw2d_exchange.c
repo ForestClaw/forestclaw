@@ -96,8 +96,8 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
         patchno = i;
 
         fclaw2d_patch_data_new(domain,ghost_patch);
-        fclaw2d_clawpatch_build(domain,ghost_patch,blockno,
-                                patchno,(void*) &build_mode);
+        fclaw2d_clawpatch_build_ghost(domain,ghost_patch,blockno,
+                                      patchno,(void*) &build_mode);
     }
 }
 

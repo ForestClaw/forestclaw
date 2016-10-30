@@ -57,6 +57,7 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     /* Problem setup */
     vt->problem_setup = NULL;
     vt->patch_setup = NULL;
+    vt->ghostpatch_setup = NULL;
 
     /* Diagnostics */
     vt->run_user_diagnostics      = NULL;
