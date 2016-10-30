@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "quadrants_user.h"
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 #include "../rp/clawpack_user.h"
 
 static fclaw2d_vtable_t fclaw2d_vt;
