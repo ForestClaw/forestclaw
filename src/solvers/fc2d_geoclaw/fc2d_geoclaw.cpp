@@ -99,7 +99,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_copy_face     = &FC2D_CLAWPACK5_FORT_COPY_FACE;
     // fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
     // fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
-   
+
     fclaw_vt->average_face       = &fc2d_geoclaw_average_face;
     fclaw_vt->interpolate_face  = &fc2d_geoclaw_interpolate_face;
 
@@ -109,7 +109,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     // fclaw_vt->fort_average_corner     = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
     // fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
-    fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;   
+    fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
@@ -562,13 +562,14 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
+    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
 
     GEOCLAW_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, geoclaw_options->method,
-                          geoclaw_options->mthlim, &geoclaw_options->mcapa,
-                          &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-                          work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-                          geoclaw_vt.rpn2, geoclaw_vt.rpt2,
-                          cp->block_corner_count());
+                       geoclaw_options->mthlim, &geoclaw_options->mcapa,
+                       &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
+                       work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
+                       geoclaw_vt.rpn2, geoclaw_vt.rpt2,
+                       block_corner_count);
 
     /* Accumulate fluxes needed for conservative fix-up */
     if (geoclaw_vt.fluxfun != NULL)
@@ -790,7 +791,7 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
 
     gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
-    
+
     mcapa = geoclaw_options->mcapa;
     mx  = gparms->mx;
     my  = gparms->my;
@@ -885,7 +886,7 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data)
 {
-    
+
     int meqn,mx,my,mbc,maux,mbathy;
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
@@ -973,7 +974,7 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
     int mbathy,maux;
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
-    
+
     const amr_options_t *gparms = get_domain_parms(domain);
     const fc2d_geoclaw_options_t *geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(domain);
@@ -1048,7 +1049,3 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                  &dx,&dy,q,aux,&iframe,&patch_num,&level,
                                  &this_block_idx,&domain->mpirank);
 }
-
-
-
-

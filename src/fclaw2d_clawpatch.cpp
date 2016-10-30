@@ -329,15 +329,8 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
 
     if (gparms->manifold)
     {
-        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
-        {
-            vt.metric_compute_area(domain,this_patch,blockno,patchno);
-            /* Don't need any more manifold info for ghost patches */
-            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-            {
-                fclaw2d_clawpatch_metric_setup(domain,this_patch,blockno,patchno);
-            }
-        }
+        vt.metric_compute_area(domain,this_patch,blockno,patchno);
+        clawpatch_metric_setup(domain,this_patch,blockno,patchno);
     }
 
     vt = fclaw2d_get_vtable(domain);
@@ -621,7 +614,7 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     int mint = 4;
 
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
-    
+
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&qthis,&meqn);
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
 
@@ -639,7 +632,7 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
 #if 0
     double *q = q_time_sync(time_interp);
     double *area = m_area.dataPtr();  // Might be NULL
-#endif 
+#endif
 
     vt.fort_ghostpack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
                         qpack,&psize,&packmode,&mint,&ierror);

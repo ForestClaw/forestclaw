@@ -136,6 +136,13 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
                              int this_patch_idx,
                              void *user);
 
+void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int blockno,
+                                   int patchno,
+                                   void *user);
+
+
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *fine_patches,
                                        fclaw2d_patch_t *coarse_patch,
