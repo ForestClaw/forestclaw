@@ -13,7 +13,7 @@
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq
-      double precision qmin, qmax
+      double precision qmin, qmax,dq, dq1, dq2
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.

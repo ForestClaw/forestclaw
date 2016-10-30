@@ -14,7 +14,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i,j, mq
-      double precision qmin, qmax
+      double precision qmin, qmax, dq, dq1, dq2
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
@@ -50,13 +50,13 @@ c     # not be coarsened.
       implicit none
       integer mx,my,mbc,meqn,mq,tag_patch
       double precision coarsen_threshold
-      double precision qmin,qmax
+      double precision qmin,qmax,dq, dq1, dq2
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       integer i,j
 
       do i = 1,mx
          do j = 1,my
-            dq1 = abs(q(mq,i+1,j) - q(mq,i-1,j)
+            dq1 = abs(q(mq,i+1,j) - q(mq,i-1,j))
             dq2 = abs(q(mq,i,j+1) - q(mq,i,j-1))
             dq = max(dq1,dq2)
             if (dq .gt. coarsen_threshold) then
