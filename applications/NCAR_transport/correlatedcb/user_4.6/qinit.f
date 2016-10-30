@@ -23,9 +23,9 @@
       b = 0.9d0
 
       do j = 1-mbc,my+mbc
-         xc = xlower + (i-0.5d0)*dx
+         yc = ylower + (j-0.5d0)*dy
          do i = 1-mbc,mx+mbc
-            yc = ylower + (j-0.5d0)*dy
+            xc = xlower + (i-0.5d0)*dx
             call fclaw2d_map_c2m(cont,
      &            blockno,xc,yc,xp,yp,zp)
             q(i,j,1) = cosine_bell_sum(xp,yp,zp)

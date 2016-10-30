@@ -21,9 +21,9 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
   b = 0.9d0
 
   DO j = 1-mbc,my+mbc
-     xc = xlower + (i-0.5d0)*dx
-     DO i = 1-mbc,mx+mbc
         yc = ylower + (j-0.5d0)*dy
+     DO i = 1-mbc,mx+mbc
+        xc = xlower + (i-0.5d0)*dx
         CALL fclaw2d_map_c2m(cont, &
              blockno,xc,yc,xp,yp,zp)
         q(1,i,j) = cosine_bell_sum(xp,yp,zp)
