@@ -33,11 +33,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_finalize(fclaw2d_domain_t **domain)
 {
+    const amr_options_t *gparms = get_domain_parms(*domain);
 
     fclaw_global_essentialf("Finalizing run\n");
     fclaw2d_domain_barrier (*domain);
 
-    fclaw2d_timer_report(*domain);
+    if (gparms->report_timing)
+    {
+        if (gparms->outstyle > 0)
+        {
+            /* Only call this if we have taken time steps.  For time-independent problems, we
+               probably need a different report (no "amr_advance_steps") */
+            fclaw2d_timer_report(*domain);
+        }
+        else
+        {
+            fclaw_global_essentialf("Timing reports not generated for outstyle=0\n");
+        }
+    }
 
     fclaw2d_domain_reset(domain);
 }

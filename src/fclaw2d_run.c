@@ -115,7 +115,7 @@ static void outstyle_0(fclaw2d_domain_t **domain)
        an elliptic solve. The initial grid might contain, for example, a
        right hand side. */
 #if 0
-    vt.time_indepdent_solve(domain);
+    vt.time_independent_solve(domain);
 
     fclaw2d_diagnostics_run(domain);
 

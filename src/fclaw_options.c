@@ -350,6 +350,10 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                          &amropt->conservation_check,0,
                          "Conservation check [F]");
 
+    sc_options_add_bool (opt, 0, "report-timing",
+                         &amropt->report_timing,1,
+                         "Report timing results [T]");
+
     sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
                          "Use subcycling in time [F]");
 

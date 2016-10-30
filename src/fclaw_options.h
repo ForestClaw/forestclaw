@@ -177,6 +177,7 @@ struct amr_options
     int compute_error;
     int conservation_check;
     int trapfpe;
+    int report_timing;
 
     /* Parallel options */
     int mpi_debug;
