@@ -3,7 +3,7 @@ OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
-PlotType = 4;                % type of plot to produce:
+PlotType = 1;                % type of plot to produce:
                              % - 1 = pcolor on slices (with optional contours)
                              % - 2 = contour lines in 2d on white slices
                              % - 3 = Schlieren plot on slices
