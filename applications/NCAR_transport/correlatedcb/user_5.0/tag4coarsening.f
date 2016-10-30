@@ -56,9 +56,10 @@ c     # not be coarsened.
 
       do i = 1,mx
          do j = 1,my
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
-            if (qmax - qmin .gt. coarsen_threshold) then
+            dq1 = abs(q(mq,i+1,j) - q(mq,i-1,j)
+            dq2 = abs(q(mq,i,j+1) - q(mq,i,j-1))
+            dq = max(dq1,dq2)
+            if (dq .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0
