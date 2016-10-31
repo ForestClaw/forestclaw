@@ -6,6 +6,7 @@
 include src/solvers/fc2d_dummy/Makefile.am
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
+
 if FCLAW_ENABLE_GEOCLAW
 include src/solvers/fc2d_geoclaw/Makefile.am
 endif
@@ -18,12 +19,10 @@ endif
 #include applications/dummy/Makefile.am
 #include applications/no_solver/Makefile.am
 
-# Test metric terms. Useful for checking accuracy of metric terms
-# (curvature, area and so on)
-#include applications/metric/2d/all_mappings/Makefile.am
+# Test metric terms used for problems on manifolds
+include applications/metric/2d/all_mappings/Makefile.am
 
 # Scalar advection on manifolds
-# include applications/advection/2d/swirl_mapped/Makefile.am
 #include applications/advection/2d/swirl/Makefile.am
 #include applications/advection/2d/torus/Makefile.am
 #include applications/advection/2d/torthem/Makefile.am
@@ -46,7 +45,7 @@ endif
 # Shallow water on the sphere
 # include applications/shallow/2d/sphere/Makefile.am
 
-###   # AMRClaw examples from clawpack4.6
+# AMRClaw examples from Clawpack/AMRClaw
 #include applications/amrclaw/acoustics/2d/interface/Makefile.am
 #include applications/amrclaw/acoustics/2d/radial/Makefile.am
 #include applications/amrclaw/advection/2d/swirl/Makefile.am
@@ -55,7 +54,7 @@ endif
 #include applications/amrclaw/euler/2d/quadrants/Makefile.am
 #include applications/amrclaw/euler/2d/shockbubble/Makefile.am
 
-# Geoclaw examples
+# GeoClaw examples
 if FCLAW_ENABLE_GEOCLAW
 include applications/geoclaw/bowl_radial/Makefile.am
 include applications/geoclaw/bowl_slosh/Makefile.am
