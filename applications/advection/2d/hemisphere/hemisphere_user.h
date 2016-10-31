@@ -28,6 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+
+#include "../all/clawpack_user.h"
 
 
 #ifdef __cplusplus
@@ -38,17 +41,57 @@ extern "C"
 #endif
 #endif
 
-#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold, SETAUX_MANIFOLD)
-void SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy,
-                     const int* maux, double aux[],
-                     const int* blockno,
-                     double xd[], double yd[], double zd[],
-                     double area[]);
 
+typedef struct user_options
+{
+    int example;
+    int claw_version;
+    double alpha;
+    int is_registered;
+
+} user_options_t;
+
+
+#if 0
+
+#define HEMISPHERE46_SETAUX_MANIFOLD FCLAW_F77_FUNC(hemisphere46_setaux_manifold,   \
+                                                    HEMISPHERE46_SETAUX_MANIFOLD)
+void HEMISPHERE46_SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
+                                  const double* xlower, const double* ylower,
+                                  const double* dx, const double* dy,
+                                  const int* maux, double aux[],
+                                  const int* blockno,
+                                  double xd[], double yd[], double zd[],
+                                  double area[]);
+
+
+
+#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold,   \
+                                              USER46_SETAUX_MANIFOLD)
+void USER46_SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
+                                  const double* xlower, const double* ylower,
+                                  const double* dx, const double* dy,
+                                  const int* maux, double aux[],
+                                  const int* blockno,
+                                  double xd[], double yd[], double zd[],
+                                  double area[]);
+
+
+#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold,     \
+                                             USER5_SETAUX_MANIFOLD)
+void USER5_SETAUX_MANIFOLD(const int* mbc, const int* mx, const int* my,
+                                  const double* xlower, const double* ylower,
+                                  const double* dx, const double* dy,
+                                  const int* maux, double aux[],
+                                  const int* blockno,
+                                  double xd[], double yd[], double zd[],
+                                  double area[]);
+#endif
 
 void hemisphere_link_solvers(fclaw2d_domain_t *domain);
+
+const user_options_t* hemisphere_user_get_options(fclaw2d_domain_t* domain);
+
 
 void hemisphere_patch_setup(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,

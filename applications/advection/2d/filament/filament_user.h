@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+#include "../all/clawpack_user.h"
 
 
 #ifdef __cplusplus
@@ -38,51 +40,21 @@ extern "C"
 #endif
 #endif
 
-#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
-void SETAUX_MANIFOLD(const int* mx, const int* my,const int* mbc,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy,
-                     const int* maux, double aux[],
-                     const int* blockno,
-                     double xd[], double yd[], double zd[],
-                     double area[]);
+typedef struct user_options
+{
+    int example;
+    double alpha;
+    int claw_version;
 
-#define SETAUX_NOMAP FCLAW_F77_FUNC(setaux_nomap,SETAUX_NOMAP)
-void SETAUX(const int* maxmx, const int* maxmy,
-            const int* mbc,const int* mx, const int* my,
-            const double* xlower,const double* ylower,
-            const double* dx,const double* dy,
-            const int* maux, double aux[]);
+    amr_options_t* gparms;   /* Need to check mx */
 
+    int is_registered;
 
-#define TAG4REFINEMENT_DQ FCLAW_F77_FUNC(tag4refinement_dq,             \
-                                         TAG4REFINEMENT_DQ)
-
-void TAG4REFINEMENT_DQ(const int* mx,const int* my,
-                       const int* mbc,const int* meqn,
-                       const double* xlower, const double* ylower,
-                       const double* dx, const double* dy,
-                       const int* blockno,
-                       double q[],
-                       const double* tag_threshold,
-                       const int* init_flag,
-                       int* tag_patch);
+} user_options_t;
 
 
 
-#define TAG4COARSENING_DQ FCLAW_F77_FUNC(tag4coarsening_dq, \
-                                         TAG4COARSENING_DQ)
-
-void TAG4COARSENING_DQ(const int* mx, const int* my,
-                       const int* mbc, const int* meqn,
-                       const double* xlower, const double* ylower,
-                       const double* dx, const double* dy,
-                       const int* blockno,
-                       double q0[],double q1[],
-                       double q2[],double q3[],
-                       const double* tag_threshold,
-                       int* tag_patch);
-
+const user_options_t* filament_user_get_options(fclaw2d_domain_t* domain);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -113,10 +85,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
 
 void filament_link_solvers(fclaw2d_domain_t *domain);
 
-void filament_patch_setup(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx);
+void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx);
 
 
 #ifdef __cplusplus

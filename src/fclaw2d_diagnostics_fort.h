@@ -34,6 +34,8 @@ extern "C"
 #endif
 #endif
 
+/* Not obvious that the user would want to generalize the conservation routine,
+   so they are not in a 'default' file.*/
 #define FCLAW2D_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_fort_conservation_check, \
                                                 FCLAW2D_FORT_CONSERVATION_CHECK)
 
@@ -41,6 +43,22 @@ void FCLAW2D_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                      double *dx, double *dy,
                                      double* area, double *q, double* sum);
 
+/* These are only needed if the user has not supplied their own routine to compute
+   the area of the entire domain. Not obvious taht the user would want to
+   generalize these routines. */
+#define FCLAW2D_FORT_COMPUTE_PATCH_AREA FCLAW_F77_FUNC(fclaw2d_fort_compute_patch_area, \
+                                                       FCLAW2D_FORT_COMPUTE_PATCH_AREA)
+
+double FCLAW2D_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
+                                       double* dy, double area[]);
+
+
+#define FCLAW2D_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fclaw2d_fort_compute_error_norm, \
+                                                  FCLAW2D_FORT_COMPUTE_ERROR_NORM)
+
+void FCLAW2D_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meqn,
+                                     double *dx, double *dy, double area[],
+                                     double error[], double error_norm[]);
 
 #ifdef __cplusplus
 #if 0

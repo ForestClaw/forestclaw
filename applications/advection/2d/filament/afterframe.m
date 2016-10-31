@@ -24,7 +24,7 @@ hold off;
 
 % colormap(white);
 
-str = sprintf('ForestClaw : t = %6.2f',t);
+str = sprintf('ForestClaw : t = %8.2e',t);
 title(str,'fontsize',14);
 
 
@@ -50,7 +50,7 @@ showpatchborders;
 % showgridlines(4);
 setpatchborderprops('linewidth',1)
 % setpatchborderprops(4,'linewidth',3)
-hidepatchborders(9)
+% hidepatchborders(9)
 
 view(2);
 axis off
@@ -65,7 +65,26 @@ if (prt)
   print('-dpng',filename);
 end
 
+%%
+NoQuery = 0;
+prt = false;
+if (prt)
+  MaxFrames = 128;
+  axis([0 2 0 2]);
+  axis off;
+  figsize = [4,4];  % Should match size set in options
+  delete(get(gca,'title'));
+  fname_png = sprintf('filament_%04d.png',Frame);
+  % print('-dpng',filename);
+  set(gca,'position',[0 0 1 1]);
+  set(gcf,'units','inches');
+  figsize = [4,4];  % Should match size set in options
+  set(gcf,'position',[1 7 figsize]);
+  export_fig('-dpng','-r256',...
+      '-a1','-p0','-nocrop',fname_png);
+end
 
+%%
 prt = false;
 % NoQuery = 0;
 if (prt)

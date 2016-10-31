@@ -137,6 +137,9 @@ struct amr_options
     const char *mthbc_string;
     int *mthbc;
 
+    /* Initialization of ghost cell */
+    int init_ghostcell;
+
     /* Refinement parameters */
     int refratio;
     int minlevel;
@@ -171,8 +174,10 @@ struct amr_options
 
     /* Diagnostics */
     int run_user_diagnostics;
+    int compute_error;
     int conservation_check;
     int trapfpe;
+    int report_timing;
 
     /* Parallel options */
     int mpi_debug;
@@ -195,6 +200,9 @@ struct amr_options
     int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
 
     int weighted_partition;            /**< Use weighted partition. */
+
+    /* Advanced options */
+    int interp_stencil_width;
 };
 
 #ifdef __cplusplus

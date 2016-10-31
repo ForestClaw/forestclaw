@@ -39,7 +39,10 @@ extern "C"
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
-void fclaw2d_run_diagnostics(fclaw2d_domain_t *domain, int init_flag);
+/* User diagnostics - need to rename */
+void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag);
+
+
 
 
 #ifdef __cplusplus

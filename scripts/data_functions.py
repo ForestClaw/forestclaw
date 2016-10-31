@@ -46,13 +46,14 @@ def fraction_advance(job,mx=None,proc=None,level=None,all=None):
 def fraction_regrid(job,mx=None,proc=None,level=None,all=None):
 
     p = job["partition_comm"]
-    r = job["regrid"] + job["adapt_comm"]
+    a = job["adapt_comm"]
+    r = job["regrid"]
     w = job["walltime"]
     if (r) == 0:
         print "fraction_regrid : Zero regrid time"
         print "mx = %d: proc : %d; level = %d" % (mx,proc,level)
         sys.exit()
-    v = (r + p)/w
+    v = (a+r+p)/w
 
     fmt_int = False
 
@@ -232,6 +233,12 @@ def grids_per_advance_time(job,mx=None,proc=None,level=None,all=None):
 
 def cost_per_grid(job,mx=None,proc=None,level=None,all=None):
 
+    print "This function has been renamed ''time_per_grid''"
+    sys.exit()
+
+
+def time_per_grid(job,mx=None,proc=None,level=None,all=None):
+
     v = job["walltime"]/job["advance_steps"]
 
     fmt_int = False
@@ -281,3 +288,20 @@ def boundary_ratio(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v, fmt_int
+
+
+def effres(job,mx=None,proc=None,level=None,all=None):
+    mx = job["mx"]
+    maxlevel = job["maxlevel"]
+
+    v = mx*2**maxlevel
+    fmt_int = True
+
+    return v,fmt_int
+
+def dof_per_second(job,mx=None,proc=None,level=None,all=None):
+    w = job["advance_steps"]*job["mx"]**2*proc/job["walltime"]
+    v = w
+    fmt_int = False
+
+    return v,fmt_int

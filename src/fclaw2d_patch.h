@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_H
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -64,7 +65,9 @@ extern "C"
 typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_domain_t * domain, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
 
-struct fclaw2d_patch_data;
+
+/* Opaque pointer */
+typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
 
 void
 fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
@@ -81,6 +84,8 @@ void
 fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
+void*
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
 
 /* --------------------------------------------------------------
    Routines that return information about connectivity.
@@ -114,6 +119,17 @@ int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch);
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch);
 
+int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* this_patch);
+
+void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* this_patch,
+                                          int icorner, int block_corner_count);
+
+
+/* -----------------------------------------------------
+   Ghost exchange
+   ---------------------------------------------------- */
 #ifdef __cplusplus
 #if 0
 {

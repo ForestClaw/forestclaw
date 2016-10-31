@@ -23,78 +23,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "quadrants_user.H"
+#include "quadrants_user.h"
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
+#include "../all/clawpack_user.h"
 
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
-
-void quadrants_link_solvers(fclaw2d_domain_t *domain)
-{
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&classic_claw);
-
-    vt.problem_setup = &quadrants_problem_setup;
-    /* Don't explicitly set a "setprob" function unless it has the same
-       signature as the default (i.e. no arguments).  */
-    /* classic_claw.setprob = &SETPROB; */
-
-    vt.patch_initialize = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
-
-    vt.patch_physical_bc = &fc2d_clawpack46_bc2;  /* Set to bc2 by default */
-
-    vt.patch_single_step_update = &fc2d_clawpack46_update;
-    classic_claw.rpn2 = &RPN2EU3;  /* Signature is unchanged */
-    classic_claw.rpt2 = &RPT2;
-
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
-}
-
-#if 0
-static const fc2d_clawpack46_vtable_t classic_user =
-{
-    setprob_,
-    NULL,  /* bc2 */
-    qinit_,
-    NULL,
-    NULL,
-    NULL,  /* src2 */
-    rpn2eu3_,
-    rpt2_
-};
-
+static fclaw2d_vtable_t fclaw2d_vt;
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t classic_claw5;
 
 void quadrants_link_solvers(fclaw2d_domain_t *domain)
 {
-    fclaw2d_solver_functions_t* sf = get_solver_functions(domain);
+    const user_options_t *user =  quadrants_user_get_options(domain);
 
-    sf->use_single_step_update = fclaw_true;
-    sf->use_mol_update = fclaw_false;
+    if (user->claw_version == 4)
+    {
+        fclaw2d_init_vtable(&fclaw2d_vt);
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-    // sf->f_patch_setup              = &fc2d_clawpack46_setaux;  /* Not needed for quadrants */
-    sf->f_patch_initialize         = &fc2d_clawpack46_qinit;
-    sf->f_patch_physical_bc        = &fc2d_clawpack46_bc2;
-    sf->f_patch_single_step_update = &fc2d_clawpack46_update;
+        fclaw2d_vt.problem_setup = &quadrants_problem_setup;
 
-    fclaw2d_output_functions_t* of = get_output_functions(domain);
-    of->f_patch_write_header = &quadrants_parallel_write_header;
-    of->f_patch_write_output = &quadrants_parallel_write_output;
+        classic_claw46.qinit = &CLAWPACK46_QINIT;
 
-    fc2d_clawpack46_set_vtable(&classic_user);
+        classic_claw46.rpn2 = &CLAWPACK46_RPN2EU4;
+        classic_claw46.rpt2 = &CLAWPACK46_RPT2EU;
 
-    fc2d_clawpack46_link_to_clawpatch();
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
+    else if (user->claw_version == 5)
+    {
+        fclaw2d_init_vtable(&fclaw2d_vt);
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+
+        fclaw2d_vt.problem_setup = &quadrants_problem_setup;
+
+        classic_claw5.qinit = &CLAWPACK5_QINIT;
+
+        classic_claw5.rpn2 = &CLAWPACK5_RPN2EU4;  /* Signature is unchanged */
+        classic_claw5.rpt2 = &CLAWPACK5_RPT2EU;
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
+    }
+
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
-#endif
 
 void quadrants_problem_setup(fclaw2d_domain_t* domain)
 {
-    const user_options_t* user;
-    user = (user_options_t*) fclaw2d_domain_get_user_options(domain);
+    const user_options_t* user = quadrants_user_get_options(domain);
 
-    QUADRANTS_SETPROB(&user->gamma);
+    QUADRANTS_SETPROB(&user->gamma,&user->alpha);
 }

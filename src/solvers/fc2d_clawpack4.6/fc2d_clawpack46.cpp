@@ -37,28 +37,67 @@ static fc2d_clawpack46_vtable_t classic_vt;
 
 
 
-void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t* user_vt)
+void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 {
-    classic_vt = *user_vt;
+    classic_vt = user_vt;
 }
 
-void fc2d_clawpack46_init_vtable(fc2d_clawpack46_vtable_t* vt)
+void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
+                                         fc2d_clawpack46_vtable_t* claw_vt)
 {
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK46_BC2;
-    vt->qinit = NULL;
-    vt->rpn2 = NULL;
-    vt->rpt2 = NULL;
+    claw_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
+    claw_vt->qinit = NULL;
+    claw_vt->rpn2 = NULL;
+    claw_vt->rpt2 = NULL;
 
     /* Optional functions - call only if non-NULL */
-    vt->setprob = NULL;
-    vt->setaux = NULL;
-    vt->b4step2 = NULL;
-    vt->src2 = NULL;
+    claw_vt->setprob = NULL;
+    claw_vt->setaux = NULL;
+    claw_vt->b4step2 = NULL;
+    claw_vt->src2 = NULL;
+
+    /* Default qinit functions */
+    fclaw_vt->patch_initialize         = &fc2d_clawpack46_qinit;
+    if (fclaw_vt->problem_setup == NULL)
+    {
+        /* This call shouldn't override a version-independent setting
+           for this function */
+        fclaw_vt->problem_setup        = &fc2d_clawpack46_setprob;
+    }
+    fclaw_vt->patch_setup              = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
+    fclaw_vt->patch_physical_bc        = &fc2d_clawpack46_bc2;
+    fclaw_vt->patch_single_step_update = &fc2d_clawpack46_update;
+
+    /* Forestclaw functions */
+    fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
+    fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
+
+    fclaw_vt->fort_tag4refinement    = &FC2D_CLAWPACK46_FORT_TAG4REFINEMENT;
+    fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_FORT_TAG4COARSENING;
+
+    /* output functions */
+    fclaw_vt->fort_write_header      = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
+    fclaw_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
+
+    /* diagnostic functions */
+    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+
+    /* Patch functions */
+    fclaw_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;
+    fclaw_vt->fort_average_face       = &FC2D_CLAWPACK46_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_interpolate_face   = &FC2D_CLAWPACK46_FORT_INTERPOLATE_FACE;
+
+    fclaw_vt->fort_copy_corner        = &FC2D_CLAWPACK46_FORT_COPY_CORNER;
+    fclaw_vt->fort_average_corner     = &FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
+    fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
+
+    fclaw_vt->fort_ghostpack          = &FC2D_CLAWPACK46_FORT_GHOSTPACK;
+
+    fclaw_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 }
-
-
-
 
 
 /* Patch data is stored in each ClawPatch */
@@ -231,10 +270,10 @@ int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_clawpack46_setprob(fclaw2d_domain_t *domain)
 {
-    /* Assume that if we are here, then the user has a valid setprob */
-    FCLAW_ASSERT(classic_vt.setprob != NULL);
-
-    classic_vt.setprob();
+    if (classic_vt.setprob != NULL)
+    {
+        classic_vt.setprob();
+    }
 }
 
 
@@ -244,7 +283,21 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.setaux != NULL);
+    if (classic_vt.setaux == NULL)
+    {
+        /* For consistency, class_vt.patch_setup is set to
+           fc2d_clawpack46_setaux by default.  We
+           check here that the user has actually set a
+           SETAUX routine */
+        return;
+    }
+
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        /* This is going to be removed at some point */
+        return;
+    }
+
     int mx,my,mbc,maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
     double *aux;
@@ -297,7 +350,7 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                            int this_block_idx,
                            int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must initialized */
+    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must be initialized */
     int mx,my,mbc,meqn,maux,maxmx,maxmy;
     double dx,dy,xlower,ylower;
     double *q, *aux;
@@ -438,10 +491,6 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-#if 0
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    q = cp->q_time_sync(time_interp);
-#endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
@@ -500,6 +549,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     int ierror = 0;
+    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
 
@@ -508,7 +558,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           classic_vt.rpn2, classic_vt.rpt2,flux2,
-                          cp->block_corner_count(), &ierror);
+                          block_corner_count, &ierror);
 
     FCLAW_ASSERT(ierror == 0);
 

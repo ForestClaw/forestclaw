@@ -10,6 +10,7 @@ c     #          g(x,y,z;xi,yi,zi,a,hmax) = hmax*exp(-a*r2)
 c     #
 c     #          r2 = (x-xi)**2 + (y-yi)**2 + (z-zi)**2
 c     #
+c     # Note : 'td' means "time dependent"
 c     # -----------------------------------------------------
 
       double precision function gaussian_sum(xp,yp,zp)

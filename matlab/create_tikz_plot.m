@@ -1,4 +1,4 @@
-function create_tikz_plot(id,Frame,fname_prefix,amrclaw,extra_file)
+function create_tikz_plot(Frame,fname_prefix,amrclaw,extra_file)
 
 % \documentclass{standalone}
 %
@@ -27,9 +27,9 @@ end
 for p = 0:1,
     if p == 0
         % Basic plot with no mesh
-        fname_tex = sprintf('results_%03d/%s_%04d.tex',id,fname_prefix,Frame);
+        fname_tex = sprintf('%s_%04d.tex',fname_prefix,Frame);
     else
-        fname_tex = sprintf('results_%03d/%s_mesh_%04d.tex',id,fname_prefix,Frame);
+        fname_tex = sprintf('%s_mesh_%04d.tex',fname_prefix,Frame);
     end
     fprintf('Printing %s\n',fname_tex);
     fid = fopen(fname_tex,'w');
@@ -66,7 +66,7 @@ for p = 0:1,
     fprintf(fid,'\\begin{tikzpicture}\n');
     fprintf(fid,'\\node (mesh) {\\input{tikz.%04d.tex}};\n',Frame);
     %fprintf(fid,'\\input{tikz.%04d.tex}\n',Frame);
-    efile = sprintf('results_%03d/%s',id,extra_file);
+    efile = sprintf('%s',extra_file);
     if (exist(efile,'file'))
         fprintf(fid,'\\node (mesh) {\\input{%s}};\n',extra_file);
         % fprintf(fid,'\\input{%s}\n',extra_file);

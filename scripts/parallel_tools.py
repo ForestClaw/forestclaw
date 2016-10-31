@@ -4,7 +4,7 @@ import numpy as np
 from string import Template
 import re
 import ConfigParser
-import pdb
+from pdb import set_trace
 
 def compare_runs(execname,rerun,iframe):
     import random
@@ -109,6 +109,12 @@ def write_ini_files(input_file='create_run.ini'):
         mi0 = 1
         mj0 = 1
 
+
+    try:
+        ranks_per_node = int(config.get('Run','ranks-per-node').partition('#')[0].strip())
+    except:
+        ranks_per_node = 32
+
     # Duplicate problem
     try:
         d = config.get('Run','duplicate').partition('#')[0].strip()
@@ -133,10 +139,10 @@ def write_ini_files(input_file='create_run.ini'):
     subcycle = sc in ['T','True','1']
 
     try:
-        nw = config.get('Run','noweightedp').partition('#')[0].strip()
-        noweightedp = nw in ['T','True','1']
+        nw = config.get('Run','weightedp').partition('#')[0].strip()
+        weightedp = nw in ['T','True','1']
     except:
-        noweightedp = False
+        weightedp = False
 
 
     # Advance one step?
@@ -163,9 +169,6 @@ def write_ini_files(input_file='create_run.ini'):
     proc0   = int(config.get('Run','proc').partition('#')[0].strip())
     tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
 
-    if duplicate:
-        tfinal0 = tfinal0/mi0
-
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
 
@@ -186,15 +189,13 @@ def write_ini_files(input_file='create_run.ini'):
     # ----------------------------------------
 
     # Figure out dt needed for first run in this series
-    eff_res0 = mx0*mi0*2**minlevel0
-    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
+    eff_res0 = mx0*2**minlevel0
 
-    #if use_maxlevel:
-    #    dt0 = dt0/(2**(maxlevel0-minlevel0))
+    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
     tol = 3e-15
     if use_maxlevel:
-        nout0 = tfinal0/(dt0/(2**(maxlevel0-minlevel0)))
+        nout0 = tfinal0/(dt0/2**(maxlevel0-minlevel0))
     else:
         nout0 = tfinal0/dt0
 
@@ -390,10 +391,10 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
-        if noweightedp:
-            ini_file.write("    noweightedp = T\n")
+        if weightedp:
+            ini_file.write("    weighted_partition = T\n")
         else:
-            ini_file.write("    noweightedp = F\n")
+            ini_file.write("    weighted_partition = F\n")
 
         ini_file.write("\n")
 
@@ -446,15 +447,15 @@ def write_ini_files(input_file='create_run.ini'):
             proc_file.write("#@ notification = error\n")
             proc_file.write("#@ notify_user = donnacalhoun@boisestate.edu\n")
             proc_file.write("#@ job_type = bluegene\n")
-            rpn = np.min([32,p])
-            bgsize = np.ceil(p/(32.0*rpn))*32
+            rpn = np.min([ranks_per_node,p])
+            bgsize = np.max([32,np.ceil(p/rpn)])
             proc_file.write("#@ bg_size = %d\n" % bgsize)
             proc_file.write("#@ queue\n")
             proc_file.write("\n")
             proc_file.write(("runjob --ranks-per-node %d --np %d : " \
                              + "/homec/hbn26/hbn263/projects/forestclaw-build-alt/local/bin/%s " \
                              + "--inifile=ex_%05d.ini\n") %
-                            (np.min([32,p]),p,execname,p))
+                            (np.min([rpn,p]),p,execname,p))
             proc_file.close()
 
         elif scheduler == 'pbs':
@@ -593,6 +594,7 @@ def compile_results(results_dir=None,results_file='results.out',
         results_dir = os.getcwd()
 
     # Stuff to grep for
+<<<<<<< Updated upstream
     stats_list_float = [ 'INIT',
                          'ADVANCE$',
                          'GHOSTFILL$',
@@ -656,6 +658,19 @@ def compile_results(results_dir=None,results_file='results.out',
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
+=======
+    stats_list = [ 'INIT',
+                   'ADVANCE$',
+                   'GHOSTFILL$',
+                   'REGRID$',
+                   'GHOSTPATCH_COMM',
+                   'ADAPT_COMM',
+                   'PARTITION_COMM',
+                   'CFL_COMM',
+                   'WALLTIME',
+                   'ADVANCE_STEPS_COUNTER',
+                   'NEIGHBOR_SEARCH']
+>>>>>>> Stashed changes
 
     # Compile data to this file
     line_len = option_width + int_width + float_width
@@ -665,6 +680,13 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
+<<<<<<< Updated upstream
+=======
+    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
+    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
+                              'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
+                              'partition','cfl','wall','adv._steps','neighbor_search'))
+>>>>>>> Stashed changes
 
     resultsfile.write("# " + header_str + "\n")
 
@@ -683,6 +705,7 @@ def compile_results(results_dir=None,results_file='results.out',
         if re.match(pattern,f):
             # Extract proc count and jobid from file name, e.g. torus_00016.o45678
             s = f.partition('_')[2].partition('.o')
+
             pcount = int(s[0])
             jobid = int(s[2])
 
@@ -967,6 +990,7 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["rundir"]          = rundir
                         job["jobid"]           = row[0]
                         job["procs"]           = row[1]
+<<<<<<< Updated upstream
                         job["mx"]              = row[2]   # Used above in computing m
                         job["mi"]              = row[3]
                         job["mj"]              = row[4]
@@ -1001,6 +1025,24 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["local_ratio"]     = row[30]
                         job["remote_ratio"]    = row[31]
 
+=======
+                        job["mx"]              = row[2]
+                        job["minlevel"]        = row[3]
+                        job["maxlevel"]        = row[4]
+                        job["nout"]            = row[5]
+                        job["tfinal"]          = row[6]
+                        job["init"]            = row[7]
+                        job["advance"]         = row[8]
+                        job["ghostfill"]       = row[9]
+                        job["regrid"]          = row[10]
+                        job["ghostpatch_comm"] = row[11]
+                        job["adapt_comm"]      = row[12]
+                        job["partition_comm"]  = row[13]
+                        job["cfl_comm"]        = row[14]
+                        job["walltime"]        = row[15]
+                        job["advance_steps"]   = row[16]
+                        job["neighbor_search"]   = row[17]
+>>>>>>> Stashed changes
 
                     jobs[m][p][l] = job
 
@@ -1232,6 +1274,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
             plt.draw()
 
     else:
+<<<<<<< Updated upstream
         if scaling == 'resolution':
             levels = list(set([x[2] for x in tlist]))
             ax.xaxis.set_major_locator(plt.FixedLocator(levels))
@@ -1239,6 +1282,20 @@ def plot_results(jobs,start_point,val2plot='walltime',
             l1 = np.min(levels)
             l2 = np.max(levels)
             plt.xlim([l1-0.5,l2+0.5])
+=======
+        ax.xaxis.set_major_locator(plt.FixedLocator(procs))
+        ax.set_xlabel("Processor count",fontsize=16)
+        p1 = np.log(np.min(procs))/np.log(4)
+        p2 = np.log(np.max(procs))/np.log(4)
+        plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
+
+    if efficiency:
+        ax.set_yscale('linear')
+        plt.ylim([0,110])
+        plt.grid(b=True,which='major')
+        # plt.grid(b=True,which='minor')
+        # plt.minorticks_on()
+>>>>>>> Stashed changes
 
         else:
             ax.xaxis.set_major_locator(plt.FixedLocator(procs))
@@ -1320,28 +1377,31 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,
     tp = zip([x[0] for x in t],
              [x[1] for x in t],
              [x[2] for x in t],y_avg,gpp)
-    mx     = [x[0] for x in tp if not np.isnan(x[3])]
-    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
+    mx      = [x[0] for x in tp if not np.isnan(x[3])]
     procs1  = [x[1] for x in tp if not np.isnan(x[3])]
+    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
     y_avg1  = [x[3] for x in tp if not np.isnan(x[3])]
     gpp1  = [x[4] for x in tp if not np.isnan(x[4])]
 
     mb = None
 
-    try:
-        if ideal_slope is not None:
+    if ideal_slope is not None:
+        try:
             if ideal_slope == 0:
                 s = 'k--'
             else:
                 s = 'k.--'
-            R = np.array([i for i,x in enumerate(tp) if not np.isnan(x[3])])
+
+            R = np.array([np.log(float(x))/np.log(4.0) for x in procs1])
+            if R[0] > 0:
+                R = R - R[0]
             ideal = y_avg1[0]*2**(ideal_slope*R)
             if scaling is not  'resolution':
                 plt.loglog(procs1,ideal,s,markersize=15)
             else:
                 plt.semilogy(levels1,ideal,s,markersize=15)
-    except:
-        print "plot_results_internal: Could not plot ideal curve"
+        except:
+            print "plot_results_internal: Could not plot ideal curve"
 
     try:
         mv = markers[v]

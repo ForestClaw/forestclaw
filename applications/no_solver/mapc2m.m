@@ -1,10 +1,10 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'nomap';
+map = 'nomap';
 % map = 'cart';
-map = 'fivepatch';
-map = 'pillowdisk';
-map = 'pillowdisk5';
+% map = 'fivepatch';
+% map = 'pillowdisk';
+% map = 'pillowdisk5';
 
 alpha = 0.5;
 

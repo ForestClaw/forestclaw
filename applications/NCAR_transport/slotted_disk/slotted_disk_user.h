@@ -26,9 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SLOTTED_DISK_USER_H
 #define SLOTTED_DISK_USER_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_clawpatch.h"
-#include "fc2d_clawpack46.h"
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+
+#include "../all/transport_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -42,58 +43,24 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int vflag;       /* specify edge normal velocities */
-    int init_choice; /* for slotted disk */
+    double kappa;
+    int claw_version;
     int is_registered;
 
 } user_options_t;
 
 void slotted_disk_problem_setup(fclaw2d_domain_t *domain);
 
-#define SETPROB_TRANSPORT FCLAW_F77_FUNC(setprob_transport,SETPROB_TRANSPORT)
-void SETPROB_TRANSPORT(const int* vflag, const int* ichoice);
+#define SLOTTED_DISK_SETPROB FCLAW_F77_FUNC(slotted_disk_setprob,SLOTTED_DISK_SETPROB)
+void SLOTTED_DISK_SETPROB(const double* kappa, const double* tfinal);
 
-/* Initialization */
-void slotted_disk_qinit(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx);
-
-#define QINIT_TRANSPORT FCLAW_F77_FUNC(qinit_transport,QINIT_TRANSPORT)
-void QINIT_TRANSPORT(const int* mx, const int* my, const int* meqn,
-                     const int* mbc,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy,
-                     double q[], const int* maux, double aux[],
-                     const int* blockno,
-                     double xp[], double yp[], double zp[]);
 
 void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx);
 
-#define SETAUX_TRANSPORT FCLAW_F77_FUNC(setaux_transport,SETAUX_TRANSPORT)
-void SETAUX_TRANSPORT(const int* mx, const int* my, const int* mbc,
-                      const double* xlower, const double* ylower,
-                      const double* dx, const double* dy,
-                      const int* maux, double aux[],
-                      const int* blockno,
-                      double xd[], double yd[], double zd[],double area[]);
-
-void slotted_disk_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
-
-#define B4STEP2_TRANSPORT FCLAW_F77_FUNC(b4step2_transport,B4STEP2_TRANSPORT)
-void B4STEP2_TRANSPORT(const int* mx, const int* my, const int* mbc,
-                       const double* dx, const double* dy,
-                       const double* t, const int* maux, double aux[],
-                       const int* blockno,
-                       double xd[], double yd[], double zd[]);
+const user_options_t* slotted_disk_user_get_options(fclaw2d_domain_t* domain);
 
 double slotted_disk_update(fclaw2d_domain_t *domain,
                            fclaw2d_patch_t *this_patch,
@@ -101,6 +68,13 @@ double slotted_disk_update(fclaw2d_domain_t *domain,
                            int this_patch_idx,
                            double t,
                            double dt);
+
+void slotted_disk_b4step2(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt);
 
 void slotted_disk_link_solvers(fclaw2d_domain_t *domain);
 
@@ -112,8 +86,6 @@ fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double shfit[],
                                                       const double rotate[]);
-
-
 
 #ifdef __cplusplus
 #if 0

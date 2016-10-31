@@ -13,7 +13,7 @@
       integer idisc
 
       common /comic/ qin,qout
-      common /param/  gamma,gamma1
+      common /cparam/  gamma,gamma1
       common/cdisc/ x0,y0,alf,beta,r0,idisc
       common /cominf/ rinf,vinf,einf
 c

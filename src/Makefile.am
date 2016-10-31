@@ -14,17 +14,16 @@ libforestclaw_installed_headers = \
 	src/forestclaw2d.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
-	src/ClawPatch.hpp \
-	src/fclaw2d_advance.hpp \
+	src/fclaw2d_advance.h \
 	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_clawpatch.hpp \
-	src/fclaw2d_patch.hpp \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_base.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_block.h \
+	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
 	src/fclaw2d_output_ascii.h \
@@ -46,13 +45,14 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_exchange.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_clawpatch.h \
-	src/fclaw2d_patch.h \
 	src/fclaw2d_neighbors_fort.h \
 	src/fclaw2d_transform.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/fclaw2d_diagnostics_fort.h
+	src/fclaw2d_diagnostics_fort.h \
+	src/fclaw2d_diagnostics_default.h \
+	src/fclaw2d_diagnostics_default_fort.h
 
 libforestclaw_internal_headers =
 
@@ -61,6 +61,7 @@ libforestclaw_internal_headers =
 # -------------------------------------------------------------------
 
 libforestclaw_compiled_sources = \
+	src/fclaw2d_block.c \
 	src/fclaw_base.c \
 	src/fclaw_options.c \
 	src/fclaw_package.c \
@@ -70,9 +71,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_mpi.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_base.c \
-	src/fclaw2d_domain.cpp \
-	src/fclaw2d_block.c \
-	src/fclaw2d_patch.cpp \
 	src/forestclaw2d.c \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
@@ -80,29 +78,32 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_transform.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
-	src/fclaw2d_output.cpp \
-	src/fclaw2d_output_ascii.cpp \
-	src/fclaw2d_regrid_default.cpp \
-	src/fclaw2d_regrid.cpp \
-	src/fclaw2d_metric.cpp \
-	src/fclaw2d_metric_default.cpp \
-	src/fclaw2d_partition.cpp \
-	src/fclaw2d_exchange.cpp \
-	src/fclaw2d_diagnostics.cpp \
-	src/fclaw2d_corner_neighbors.cpp \
-	src/fclaw2d_face_neighbors.cpp \
-	src/fclaw2d_ghost_fill.cpp \
-	src/fclaw2d_physical_bc.cpp \
-	src/fclaw2d_timeinterp.cpp \
+	src/fclaw2d_convenience.c \
+	src/fclaw2d_exchange.c \
+	src/fclaw2d_advance.c \
+	src/fclaw2d_physical_bc.c \
+	src/fclaw2d_ghost_fill.c \
+	src/fclaw2d_metric.c \
+	src/fclaw2d_output.c \
+	src/fclaw2d_update_single_step.c \
+	src/fclaw2d_run.c \
+	src/fclaw2d_diagnostics.c \
+	src/fclaw2d_regrid_default.c \
+	src/fclaw2d_output_ascii.c \
+	src/fclaw2d_diagnostics_default.c \
+	src/fclaw2d_metric_default.c \
+	src/fp_exception_glibc_extension.c \
+	src/fclaw2d_domain.c \
+	src/fclaw2d_regrid.c \
+	src/fclaw2d_patch.c \
+	src/fclaw2d_partition.c \
+	src/fclaw2d_timeinterp.c \
+	src/fclaw2d_initialize.c \
+	src/fclaw2d_finalize.c \
+	src/fclaw2d_corner_neighbors.c \
+	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
-	src/fclaw2d_initialize.cpp \
-	src/fclaw2d_run.cpp \
-	src/fclaw2d_finalize.cpp \
-	src/fclaw2d_advance.cpp \
-	src/fclaw2d_update_single_step.cpp \
-	src/fclaw2d_convenience.c \
-	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -121,19 +122,12 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/fortran_source2d/fclaw2d_ghost_pack.f \
-	src/fortran_source2d/fclaw2d_output_ascii_fort.f \
-	src/fortran_source2d/fclaw2d_regrid_fort.f \
-	src/fortran_source2d/fclaw2d_timeinterp_fort.f \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
-	src/fortran_source2d/fclaw2d_diagnostics_fort.f \
+	src/fortran_source2d/fclaw2d_interpolate_util.f \
 	src/fortran_source2d/fclaw2d_metric_integrate_exact.f \
-	src/fortran_source2d/philim.f \
-	src/fortran_source2d/average_fv1.f \
-	src/fortran_source2d/interpolate_fv1.f \
-	src/fortran_source2d/exchange_fv1.f \
 	src/fortran_source2d/cellave2.f \
-	src/fortran_source2d/fdisc.f
+	src/fortran_source2d/fdisc.f \
+	src/fortran_source2d/philim.f
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d

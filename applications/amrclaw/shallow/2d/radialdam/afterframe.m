@@ -1,9 +1,12 @@
 if PlotType ~= 4
     cv = [0.61 : 0.02 : 1.31];
-    drawcontourlines(cv);
+    mblock = true;
+    drawcontourlines(cv,mblock);
     caxis([0.5 1.2])
     axis([-2.5 2.5 -2.5 2.5])
     showpatchborders;    
+    setpatchborderprops('linewidth',1);
+    set(gca,'fontsize',16);
     axis square
     colormap(jet);
     colorbar;
@@ -30,5 +33,6 @@ if PlotType==4
 end
 
 
-shg;
-clear afterframe;
+shg
+clear afterframe
+clear mapc2m

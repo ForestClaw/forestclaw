@@ -1,15 +1,18 @@
-      subroutine setprob_torus(example)
+      subroutine torus_setprob(example_in,alpha_in)
       implicit none
-
-      double precision kappa,tfinal
-      integer example, ex_comm
 
       double precision pi
       common /compi/ pi
-      common /comm_example/ ex_comm
+
+      double precision alpha_in, alpha
+      common /toruscomm/ alpha
+
+      integer example_in, example
+      common /excomm_example/ example
 
       pi = 4.d0*atan(1.d0)
 
-      ex_comm = example
+      example = example_in
+      alpha = alpha_in
 
       end

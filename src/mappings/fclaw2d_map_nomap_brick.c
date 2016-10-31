@@ -49,9 +49,9 @@ fclaw2d_map_query_nomap_brick (fclaw2d_map_context_t * cont, int query_identifie
         return 1;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_cart (fclaw2d_map_cart.h) : "\
+        printf("fclaw2d_map_query_nomap_brick (fclaw2d_map_nomap_brick.h) : "\
                "Query id not identified;  Maybe the query is not up to "\
-               "date?\nSee fclaw2d_map_cart.h.\n");
+               "date?\nSee fclaw2d_map_nomap_brick.h.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
     }

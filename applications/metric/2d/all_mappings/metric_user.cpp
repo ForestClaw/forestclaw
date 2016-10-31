@@ -24,39 +24,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "metric_user.h"
+#include <fclaw2d_farraybox.hpp>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <ClawPatch.hpp>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_physical_bc.h>
-#include <fclaw2d_regrid.h>
+static fclaw2d_vtable_t fclaw2d_vt;
 
-static fclaw2d_vtable_t vt;
+/* Want to write this so clawpack isn't needed */
+static fc2d_clawpack46_vtable_t classic_claw46;
 
 void metric_link_patch(fclaw2d_domain_t *domain)
 {
-    fclaw2d_init_vtable(&vt);
+    fclaw2d_init_vtable(&fclaw2d_vt);
+    const user_options_t* user = metric_user_get_options(domain);
 
-    vt.problem_setup = &metric_problem_setup;
+    fclaw2d_vt.problem_setup = &metric_problem_setup;
 
-    vt.patch_initialize = &metric_patch_initialize;
-    vt.patch_physical_bc = &fclaw2d_physical_bc_default;  /* Doesn't do anything */
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
 
-    vt.fort_tag4refinement = &TAG4REFINEMENT;
+        fclaw2d_vt.patch_initialize = &metric_patch_initialize;
+        fclaw2d_vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
 
-    vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
+        fclaw2d_vt.run_user_diagnostics = &metric_diagnostics;
+        fclaw2d_vt.fort_compute_patch_error  = &compute_error;
 
-    vt.run_diagnostics = &metric_diagnostics;
+        fc2d_clawpack46_set_vtable(classic_claw46);
+    }
 
-    fclaw2d_set_vtable(domain,&vt);
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 
 }
 
 void metric_problem_setup(fclaw2d_domain_t* domain)
 {
+    const user_options_t* user = metric_user_get_options(domain);
+
     /* Any general problem set up here */
-    SETPROB();  /* Set value of pi */
+    METRIC_SETPROB(&user->beta);  /* Set value of pi */
 }
 
 void metric_patch_initialize(fclaw2d_domain_t *domain,
@@ -66,30 +70,31 @@ void metric_patch_initialize(fclaw2d_domain_t *domain,
 {
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
-    double *q, *area, *curvature, *error_ptr;
-    ClawPatch *cp;
-    int blockno;
-
-    cp = fclaw2d_clawpatch_get_cp(this_patch);
+    double *xnormals, *ynormals, *xtangents, *ytangents;
+    double *surfnormals, *edgelengths;
+    double *q, *area, *curvature;
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    area = cp->area();
-    curvature = cp->curvature();
+    fclaw2d_clawpatch_metric_data2(domain, this_patch,
+                                   &xnormals, &ynormals,
+                                   &xtangents, &ytangents,
+                                   &surfnormals, &edgelengths,
+                                   &curvature);
 
-    /* Create an array with same dimensions as q, and one field */
-    FArrayBox error;
-    error.define(cp->dataBox(),1);
-    error_ptr = error.dataPtr();
+    area =  fclaw2d_clawpatch_get_area(domain, this_patch);
 
-    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
-
+#if 0
+    error = fclaw2d_clawpatch_get_error(domain, this_patch);
     blockno = this_block_idx;
-    compute_error(meqn,mbc,mx,my,&cont,blockno,xlower,ylower,dx,dy,
-                  curvature,error_ptr);
+    compute_error(meqn,mbc,mx,my,blockno,xlower,ylower,dx,dy,
+                  curvature,error);
+#endif
+
+
     initialize(mx,my,meqn,mbc,xlower,ylower,dx,dy,q,
-               error_ptr,curvature,area);
+               curvature,area);
 }
