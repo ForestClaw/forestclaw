@@ -15,7 +15,7 @@
       logical fclaw2d_map_is_sphere
       integer i,j
 
-c     # Copied from 'metric_terms.i' (which, unfortunately, also includes xp,yp,zp,...
+c     # Copied from 'metric_terms.i'
 
       double precision beta
       common /comtorus/ beta
@@ -29,17 +29,21 @@ c     # Copied from 'metric_terms.i' (which, unfortunately, also includes xp,yp,
          do j = 1,mx
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-c           # Error in Jacobian (not correct here;  figure this out later)
-            error(i,j,1) = 0
+
+c           # Error in Jacobian, i.e. area(i,j)
+            error(i,j,1) = 0  !! Not yet figured out
 
 c           # Error in curvature
             if (fclaw2d_map_is_sphere(cont)) then
+c              # --user:example=6 (pillowdisk); --user:example=7 (cubedsphere)
                error(i,j,2) = abs(q(i,j,2)-1.d0)
             elseif (fclaw2d_map_is_torus(cont)) then
+c              # --user:example=8 (torus)
                kappa = (1 + 2*beta*cos(2*pi*yc))/
      &               (2*beta*(1 + beta*cos(2*pi*yc)))
                error(i,j,2) = abs(q(i,j,2) - kappa)
             else
+c              # --user:example=0-5  (flat;  curvature = 0)
                error(i,j,2) = 0
             endif
          enddo
