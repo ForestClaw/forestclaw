@@ -282,8 +282,9 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
     const amr_options_t* gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
     GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
-                   geoclaw_options->mthlim, geoclaw_options->method,
-                   &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
+                        &gparms->meqn, &geoclaw_options->maux,
+                        geoclaw_options->mthlim, geoclaw_options->method,
+                        &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
 }
 
 
