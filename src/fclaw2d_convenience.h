@@ -143,6 +143,26 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
                                   fclaw2d_domain_t * new_domain,
                                   int log_priority);
 
+/** Search triples of (block number, x coordinate, y coordinate) in the mesh.
+ * The x, y coordinates must be in [0, 1]^2.
+ * \param [in] domain           Must be valid domain structure.  Will not be changed.
+ * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
+ *                              The points to search in block t in [0, num_blocks)
+ *                              have indices [block_offsets[t], block_offsets[t + 1])
+ *                              in the \b coordinates and results arrays.
+ * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
+ *                              entries (x, y) in [0, 1]^2.  Of these entries,
+ *                              there are \b block_offsets[num_blocks] many.
+ * \param [in,out] results      On input, an array of type int and
+ *                              \b block_offsets[num_blocks] many entries.
+ *                              On output, each entry will be -1 if the point has
+ *                              not been found, or the patch number within its block.
+ */
+void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
+                                   sc_array_t * block_offsets,
+                                   sc_array_t * coordinates,
+                                   sc_array_t * results);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

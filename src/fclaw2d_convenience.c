@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
+#include <p4est_search.h>
 #include <p4est_wrap.h>
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -827,4 +828,98 @@ fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
     fclaw2d_domain_iterate_adapted (old_domain, new_domain,
                                     fclaw2d_domain_list_adapted_callback,
                                     (void *) &log_priority);
+}
+
+static int
+search_quadrant_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                    p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                    void *point)
+{
+    FCLAW_ASSERT (point == NULL);
+    return 0;
+}
+
+static int
+search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                 p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                 void *point)
+{
+    FCLAW_ASSERT (point != NULL);
+    return 0;
+}
+
+void
+fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
+                              sc_array_t * block_offsets,
+                              sc_array_t * coordinates, sc_array_t * results)
+{
+    int ip, jb;
+    int num_blocks;
+    int num_points;
+    int pbegin, pend;
+    int *pentry;
+    sc_array_t *points;
+
+    p4est_t *p4est;
+    p4est_wrap_t *wrap;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (block_offsets != NULL);
+    FCLAW_ASSERT (coordinates != NULL);
+    FCLAW_ASSERT (results != NULL);
+
+    num_blocks = domain->num_blocks;
+    FCLAW_ASSERT (0 <= num_blocks);
+
+    FCLAW_ASSERT (block_offsets->elem_size == sizeof (int));
+    FCLAW_ASSERT (coordinates->elem_size == 2 * sizeof (double));
+    FCLAW_ASSERT (results->elem_size == sizeof (int));
+
+    FCLAW_ASSERT (num_blocks + 1 == (int) block_offsets->elem_count);
+    FCLAW_ASSERT (0 == *(int *) sc_array_index_int (block_offsets, 0));
+    num_points = *(int *) sc_array_index_int (block_offsets, num_blocks);
+
+    FCLAW_ASSERT (num_points == (int) coordinates->elem_count);
+    FCLAW_ASSERT (num_points == (int) results->elem_count);
+
+    /* prepare results array */
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        *(int *) sc_array_index_int (results, ip) = -1;
+    }
+
+    /* construct input set for p4est search */
+    points = sc_array_new_size (2 * sizeof (int), num_points);
+    pbegin = 0;
+    for (jb = 0; jb < num_blocks; ++jb)
+    {
+        pend = *(int *) sc_array_index_int (block_offsets, jb + 1);
+        FCLAW_ASSERT (pbegin <= pend);
+
+        /* managemant data used internal to the p4est search */
+        for (ip = pbegin; ip < pend; ++ip)
+        {
+            pentry = (int *) sc_array_index (points, ip);
+            pentry[0] = jb;
+            pentry[1] = ip;
+        }
+        pbegin = pend;
+    }
+    FCLAW_ASSERT (pbegin == num_points);
+
+    /* process-local search through p4est */
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    p4est = wrap->p4est;
+    FCLAW_ASSERT (p4est != NULL);
+    FCLAW_ASSERT (p4est->connectivity != NULL);
+    FCLAW_ASSERT (p4est->connectivity->num_trees ==
+                  (p4est_topidx_t) num_blocks);
+    p4est_search (p4est, search_quadrant_fn, search_point_fn, points);
+
+    /* synchronize results in parallel */
+
+    /* tidy up memory */
+    sc_array_destroy (points);
 }
