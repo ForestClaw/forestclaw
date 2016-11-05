@@ -31,20 +31,15 @@
 
 
 
-typedef struct user_options
-{
-
-  int is_registered;
-
-} user_options_t;
-
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-
+    /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "[user] 0 = nomap; 1 = brick [0]");
 
     user->is_registered = 1;
     return NULL;
@@ -53,9 +48,12 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
-    /*
     user_options_t* user = (user_options_t*) package;
-    */
+
+    if (user->example < 0 || user->example > 1) {
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
+        return FCLAW_EXIT_QUIET;
+    }
 
     return FCLAW_NOEXIT;
 }
@@ -91,15 +89,31 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t            *gparms;
+    user_options_t             *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
 
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    switch (user->example) {
+    case 0:
+        /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+        conn = p4est_connectivity_new_unitsquare();
+        cont = fclaw2d_map_new_nomap();
+        break;
+
+    case 1:
+        /* Square brick domain */
+        conn = p4est_connectivity_new_brick(gparms->mi,gparms->mj,0,0);
+        cont = fclaw2d_map_new_brick(conn,gparms->mi,gparms->mj);
+        break;
+
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
