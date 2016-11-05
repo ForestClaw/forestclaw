@@ -92,7 +92,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 #endif
 
     /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm =&FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
     fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
     fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
@@ -102,7 +102,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     // fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
 
     fclaw_vt->average_face       = &fc2d_geoclaw_average_face;
-    fclaw_vt->interpolate_face  = &fc2d_geoclaw_interpolate_face;
+    fclaw_vt->interpolate_face   = &fc2d_geoclaw_interpolate_face;
 
     fclaw_vt->fort_copy_corner   =  &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     fclaw_vt->average_corner     =  &fc2d_geoclaw_average_corner;
@@ -112,6 +112,8 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 
     fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
+
+    // fclaw_vt->locate_gauge = &fc2d_geoclaw_locate_gauge;
 }
 
 
@@ -282,8 +284,10 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
     const amr_options_t* gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
     GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
-                   geoclaw_options->mthlim, geoclaw_options->method,
-                   &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
+                        geoclaw_options->mthlim, geoclaw_options->method,
+                        &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
+    FC2D_GEOCLAW_FORT_GETGAUGEDATA(geoclaw_options->gauges.xc, geoclaw_options->gauges.yc, 
+                                   geoclaw_options->gauges.t1, geoclaw_options->gauges.t2);
 }
 
 
@@ -877,15 +881,15 @@ void fc2d_geoclaw_average_face(fclaw2d_domain_t *domain,
 }
 
 void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
-                                        fclaw2d_patch_t *coarse_patch,
-                                        fclaw2d_patch_t *fine_patch,
-                                        int idir,
-                                        int iside,
-                                        int p4est_refineFactor,
-                                        int refratio,
-                                        fclaw_bool time_interp,
-                                        int igrid,
-                                        fclaw2d_transform_data_t* transform_data)
+                                   fclaw2d_patch_t *coarse_patch,
+                                   fclaw2d_patch_t *fine_patch,
+                                   int idir,
+                                   int iside,
+                                   int p4est_refineFactor,
+                                   int refratio,
+                                   fclaw_bool time_interp,
+                                   int igrid,
+                                   fclaw2d_transform_data_t* transform_data)
 {
 
     int meqn,mx,my,mbc,maux,mbathy;
@@ -1049,4 +1053,21 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
     FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
                                  &dx,&dy,q,aux,&iframe,&patch_num,&level,
                                  &this_block_idx,&domain->mpirank);
+}
+
+void fc2d_geoclaw_gauge_locate(){
+  // int numgauge = 1;
+  // int igauge;
+  // double xc, yc, t1, t2;
+  // for (int i = 0; i < numgauge; ++i)
+  // {
+  //   igauge = i+1;
+  //   FC2D_GEOCLAW_FORT_GETGAUGEDATA(&igauge, &xc, &yc, &t1, &t2);
+  //   fclaw_global_infof("xc %f, yc %f, t1 %f, t2 %f\n",
+  //                       xc, yc, t1, t2);
+  // }
+}
+
+void fc2d_geoclaw_gauge_write(){
+  
 }

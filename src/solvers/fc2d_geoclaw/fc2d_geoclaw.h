@@ -375,6 +375,12 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
+#define FC2D_GEOCLAW_FORT_GETGAUGEDATA FCLAW_F77_FUNC(fc2d_geoclaw_fort_getgaugedata, \
+                                                      FC2D_GEOCLAW_FORT_GETGAUGEDATA)
+// void FC2D_GEOCLAW_FORT_GETGAUGEDATA(const int* igauge, double* xc, double* yc, double* t1, double* t2);
+void FC2D_GEOCLAW_FORT_GETGAUGEDATA(double xc[], double yc[], double t1[], double t2[]);
+
+
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -554,6 +560,9 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      int refratio,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
+
+void fc2d_geoclaw_gauge_locate();
+void fc2d_geoclaw_gauge_write();
 
 
 #ifdef __cplusplus

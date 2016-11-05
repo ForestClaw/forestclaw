@@ -213,7 +213,7 @@ void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
    ---------------------------------------------------- */
 size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain);
 
-    void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t* this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         double *qdata, fclaw_bool time_interp);

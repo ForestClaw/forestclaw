@@ -57,7 +57,8 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_gauges_fort.f90 
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 

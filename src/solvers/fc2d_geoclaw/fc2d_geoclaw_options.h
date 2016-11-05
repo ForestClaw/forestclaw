@@ -36,7 +36,17 @@ extern "C"
 #endif
 #endif
 
+typedef struct gauge_info
+{
+  int n;
+  double* xc;
+  double* yc;
+  double* t1;
+  double* t2;
+  int* num;
+}gauge_info_t;
 /* Only one copy of GEOCLAW_options for each run */
+
 typedef struct fc2d_geoclaw_options
 {
     int mwaves;
@@ -59,6 +69,9 @@ typedef struct fc2d_geoclaw_options
     int speed_tolerance_entries_c;
     double *speed_tolerance_c;
     const char *speed_tolerance_c_string;
+
+    /* gauges */ 
+    gauge_info_t gauges;
 }
 fc2d_geoclaw_options_t;
 
@@ -67,10 +80,8 @@ fclaw_exit_type_t fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t *
 fclaw_exit_type_t fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt);
 void fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt);
 
-fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t *
-                                                             app,
-                                                             const char
-                                                             *configfile);
+fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
+                                                       const char *configfile);
 
 #ifdef __cplusplus
 #if 0
