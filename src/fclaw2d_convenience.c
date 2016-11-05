@@ -830,22 +830,97 @@ fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
                                     (void *) &log_priority);
 }
 
-static int
-search_quadrant_fn (p4est_t * p4est, p4est_topidx_t which_tree,
-                    p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
-                    void *point)
+typedef struct fclaw2d_search_data
 {
-    FCLAW_ASSERT (point == NULL);
-    return 0;
+    fclaw2d_domain_t *domain;
+    sc_array_t *coordinates;
+    sc_array_t *results;
 }
+fclaw2d_search_data_t;
 
 static int
 search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                  p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
                  void *point)
 {
+    int ip, jb;
+    int earlier, now;
+    int *pentry;
+    double x, y;
+    double *xyentry;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+    fclaw2d_search_data_t *sd = (fclaw2d_search_data_t *) p4est->user_pointer;
+    p4est_qcoord_t qh;
+
+    FCLAW_ASSERT (sd != NULL);
+    FCLAW_ASSERT (sd->domain != NULL);
+    FCLAW_ASSERT (sd->coordinates != NULL);
+    FCLAW_ASSERT (sd->results != NULL);
     FCLAW_ASSERT (point != NULL);
-    return 0;
+
+    /* access point data */
+    pentry = (int *) point;
+    jb = pentry[0];
+    if (jb != (int) which_tree)
+    {
+        /* this is the wrong tree entirely */
+        return 0;
+    }
+    ip = pentry[1];
+    xyentry = (double *) sc_array_index_int (sd->coordinates, ip);
+
+    /* compare quadrant coordinates with point coordinates */
+    qh = P4EST_QUADRANT_LEN (quadrant->level);
+    x = xyentry[0];
+    if (x < quadrant->x * fclaw2d_smallest_h ||
+        x > (quadrant->x + qh) * fclaw2d_smallest_h)
+    {
+        return 0;
+    }
+    y = xyentry[1];
+    if (y < quadrant->y * fclaw2d_smallest_h ||
+        y > (quadrant->y + qh) * fclaw2d_smallest_h)
+    {
+        return 0;
+    }
+    /* now we know that the point is contained in the search quadrant */
+
+    if (local_num < 0)
+    {
+        FCLAW_ASSERT (local_num == -1);
+        /* this is not a leaf */
+        return 1;
+    }
+    /* new we know that we have found the point in a leaf */
+
+    FCLAW_ASSERT (0 <= jb && jb < sd->domain->num_blocks);
+    block = sd->domain->blocks + jb;
+    FCLAW_ASSERT (block != NULL);
+    now = (int) local_num - block->num_patches_before;
+    FCLAW_ASSERT (0 <= now && now < block->num_patches);
+    patch = block->patches + now;
+    FCLAW_ASSERT (patch != NULL);
+
+    /* do the check a second time with the patch data */
+    FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
+    FCLAW_ASSERT (y >= patch->ylower && y <= patch->yupper);
+
+    /* remember the smallest local quadrant number as result */
+    earlier = *(int *) sc_array_index_int (sd->results, ip);
+    FCLAW_ASSERT (-1 <= earlier && earlier < block->num_patches);
+    if (earlier >= 0)
+    {
+        now = SC_MIN (earlier, now);
+    }
+    if (now != earlier)
+    {
+        P4EST_ASSERT (earlier == -1 || now < earlier);
+        *(int *) sc_array_index_int (sd->results, ip) = now;
+    }
+
+    /* for leaves the return value is irrelevant */
+    return 1;
 }
 
 void
@@ -862,6 +937,9 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
 
     p4est_t *p4est;
     p4est_wrap_t *wrap;
+    void *user_save;
+
+    fclaw2d_search_data_t search_data, *sd = &search_data;
 
     /* assert validity of parameters */
     FCLAW_ASSERT (domain != NULL);
@@ -908,6 +986,11 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     }
     FCLAW_ASSERT (pbegin == num_points);
 
+    /* stash relevant information to pass to search */
+    sd->domain = domain;
+    sd->coordinates = coordinates;
+    sd->results = results;
+
     /* process-local search through p4est */
     wrap = (p4est_wrap_t *) domain->pp;
     FCLAW_ASSERT (wrap != NULL);
@@ -916,7 +999,10 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (p4est->connectivity != NULL);
     FCLAW_ASSERT (p4est->connectivity->num_trees ==
                   (p4est_topidx_t) num_blocks);
-    p4est_search (p4est, search_quadrant_fn, search_point_fn, points);
+    user_save = p4est->user_pointer;
+    p4est->user_pointer = sd;
+    p4est_search (p4est, NULL, search_point_fn, points);
+    p4est->user_pointer = user_save;
 
     /* synchronize results in parallel */
 
