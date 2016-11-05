@@ -44,7 +44,7 @@ SUBROUTINE geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in, mthlim_in,
 !! Various modules from Geoclaw
   CALL set_geo()                    !# sets basic parameters g and coord system
   CALL set_regions()
-  CALL set_gauges(restart,meqn,fname)
+  ! CALL set_gauges(restart,meqn,fname)
   CALL set_refinement()             !# sets refinement control parameters
   CALL read_dtopo_settings()        !# specifies file with dtopo from earthquake
   CALL read_topo_settings()         !# specifies topography (bathymetry) files
@@ -52,5 +52,7 @@ SUBROUTINE geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in, mthlim_in,
   CALL set_fixed_grids()            !# Fixed grid settings
   CALL set_storm()                  ! Set storm parameters
   CALL setup_variable_friction()    ! Set variable friction parameters
+
+  
 
 END SUBROUTINE geoclaw_set_modules

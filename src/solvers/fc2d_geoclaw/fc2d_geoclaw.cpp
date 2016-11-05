@@ -280,6 +280,7 @@ int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
 {
+    char fname[] = "gauges.data";
     fc2d_geoclaw_options_t *geoclaw_options;
     const amr_options_t* gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
@@ -287,8 +288,12 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
                         &gparms->meqn, &geoclaw_options->maux,
                         geoclaw_options->mthlim, geoclaw_options->method,
                         &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
-    FC2D_GEOCLAW_FORT_GETGAUGEDATA(geoclaw_options->gauges.xc, geoclaw_options->gauges.yc, 
-                                   geoclaw_options->gauges.t1, geoclaw_options->gauges.t2);
+    
+    int num = FC2D_GEOCLAW_FORT_GAUGES_GETNUM(fname);
+    int restart = 0;
+    
+    geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
+    FC2D_GEOCLAW_FORT_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
 }
 
 
@@ -1056,19 +1061,8 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                  &this_block_idx,&domain->mpirank);
 }
 
-void fc2d_geoclaw_gauge_locate(){
-  // int numgauge = 1;
-  // int igauge;
-  // double xc, yc, t1, t2;
-  // for (int i = 0; i < numgauge; ++i)
-  // {
-  //   igauge = i+1;
-  //   FC2D_GEOCLAW_FORT_GETGAUGEDATA(&igauge, &xc, &yc, &t1, &t2);
-  //   fclaw_global_infof("xc %f, yc %f, t1 %f, t2 %f\n",
-  //                       xc, yc, t1, t2);
-  // }
-}
-
-void fc2d_geoclaw_gauge_write(){
-  
-}
+// void fc2d_geoclaw_gauge_init()
+// void fc2d_geoclaw_gauge_locate(){
+//   // Create domain, block_offsets, coordinates, results)
+// {
+// }

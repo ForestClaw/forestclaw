@@ -36,15 +36,17 @@ extern "C"
 #endif
 #endif
 
-typedef struct gauge_info
+typedef struct geoclaw_gauge
 {
-  int n;
-  double* xc;
-  double* yc;
-  double* t1;
-  double* t2;
-  int* num;
-}gauge_info_t;
+  int blockno;
+  double xc;
+  double yc;
+  double t1;
+  double t2;
+  int num;
+  double* buffer;
+
+}geoclaw_gauge_t;
 /* Only one copy of GEOCLAW_options for each run */
 
 typedef struct fc2d_geoclaw_options
@@ -71,7 +73,7 @@ typedef struct fc2d_geoclaw_options
     const char *speed_tolerance_c_string;
 
     /* gauges */ 
-    gauge_info_t gauges;
+    geoclaw_gauge_t *gauges;
 }
 fc2d_geoclaw_options_t;
 

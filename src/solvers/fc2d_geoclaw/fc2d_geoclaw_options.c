@@ -97,10 +97,6 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mbathy", &clawopt->mbathy, 1,
                         "[geoclaw] Location of bathymetry in aux array [1]");
 
-    /* gauges */ 
-    sc_options_add_int (opt, 0, "mgauges", &clawopt->gauges.n, 0,
-                        "[geoclaw] Number of gauges [0]");
-
     clawpkg->is_registered = 1;
     return NULL;
 }
@@ -115,13 +111,6 @@ fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t * clawopt)
     fclaw_options_convert_double_array (clawopt->speed_tolerance_c_string,
                                         &clawopt->speed_tolerance_c,
                                         clawopt->speed_tolerance_entries_c);
-    /* Postprocess for gauges */
-    clawopt->gauges.xc  = FCLAW_ALLOC(double, clawopt->gauges.n);
-    clawopt->gauges.yc  = FCLAW_ALLOC(double, clawopt->gauges.n);
-    clawopt->gauges.t1  = FCLAW_ALLOC(double, clawopt->gauges.n);
-    clawopt->gauges.t2  = FCLAW_ALLOC(double, clawopt->gauges.n);    
-    clawopt->gauges.num = FCLAW_ALLOC(int,    clawopt->gauges.n);
-
 
     return FCLAW_NOEXIT;
 }
@@ -196,13 +185,6 @@ fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
     fclaw_options_destroy_array (clawopt->speed_tolerance_c);
-
-    /* gauges */
-    fclaw_options_destroy_array (clawopt->gauges.xc);
-    fclaw_options_destroy_array (clawopt->gauges.yc);
-    fclaw_options_destroy_array (clawopt->gauges.t1);
-    fclaw_options_destroy_array (clawopt->gauges.t2);
-    fclaw_options_destroy_array (clawopt->gauges.num);
 }
 
 static void
