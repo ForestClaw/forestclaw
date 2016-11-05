@@ -376,6 +376,9 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
+
+void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
+
 #define GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(geoclaw_gauges_getnum, \
                                              GEOCLAW_GAUGES_GETNUM)
 int GEOCLAW_GAUGES_GETNUM(char fname[]);

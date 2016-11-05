@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
+#include "fclaw2d_map_brick.h"
+
 /* Needed for debugging */
 #include "types.h"
 
@@ -39,6 +41,14 @@ struct region_type region_type_for_debug;
 static int s_geoclaw_package_id = -1;
 
 static fc2d_geoclaw_vtable_t geoclaw_vt;
+
+typedef struct fc2d_geoclaw_gauge_info
+{
+    sc_array_t *block_offsets;
+    sc_array_t *coordinates;
+} fc2d_geoclaw_gauge_info_t;
+
+static fc2d_geoclaw_gauge_info_t gauge_info;
 
 /* This is provided as a convencience to the user, and is
    called by the user app */
@@ -294,7 +304,76 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
 
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
     GEOCLAW_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
+    fc2d_geoclaw_set_gauge_info(domain,geoclaw_options->gauges,num);
 }
+
+void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num)
+{
+    const amr_options_t * gparms = get_domain_parms(domain);
+    fclaw2d_map_context_t* cont =
+        fclaw2d_domain_get_map_context(domain);
+
+    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+
+    if (is_brick)
+    {
+        int nb,mi,mj;
+        double x,y;
+        double z;
+        double xll,yll;
+        double xur,yur;
+
+        double *xc_block;
+        double *yc_block;
+        int *blocknos;
+
+        xc_block = FCLAW_ALLOC(double,num);
+        yc_block = FCLAW_ALLOC(double,num);
+        blocknos = FCLAW_ALLOC(int,num);
+
+        double x0,y0,x1,y1;
+        x0 = 0;
+        y0 = 0;
+        x1 = 1;
+        y1 = 1;
+
+        FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
+
+        for(int i = 0; i < num; i++)
+        {
+            /* Map gauge to global [0,1]x[0,1] space */
+            x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
+            y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
+
+            for (nb = 0; nb < domain->num_blocks; ++nb)
+            {
+                /* Scale to [0,1]x[0,1], based on blockno */
+                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
+                if (xll <= x && x <= xur && yll <= y && y <= yur)
+                {
+                    gauges[i].blockno = nb;
+                    blocknos[i] = nb;
+                    xc_block[i] = mi*(x - xll);
+                    yc_block[i] = mj*(y - yll);
+                    break;
+                }
+            }
+        }
+        /* post process gauge info to get block offsets, etc */
+
+    }
+    else
+    {
+        for(int i = 0; i < num; i++)
+        {
+            gauges[i].blockno = 0;
+        }
+
+    }
+}
+
+
 
 
 void fc2d_geoclaw_setprob(fclaw2d_domain_t *domain)
