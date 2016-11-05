@@ -849,7 +849,9 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     double x, y;
     double *xyentry;
     fclaw2d_block_t *block;
+#ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_patch_t *patch;
+#endif
     fclaw2d_search_data_t *sd = (fclaw2d_search_data_t *) p4est->user_pointer;
     p4est_qcoord_t qh;
 
@@ -899,8 +901,10 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     FCLAW_ASSERT (block != NULL);
     now = (int) local_num - block->num_patches_before;
     FCLAW_ASSERT (0 <= now && now < block->num_patches);
+#ifdef FCLAW_ENABLE_DEBUG
     patch = block->patches + now;
     FCLAW_ASSERT (patch != NULL);
+#endif
 
     /* do the check a second time with the patch data */
     FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
