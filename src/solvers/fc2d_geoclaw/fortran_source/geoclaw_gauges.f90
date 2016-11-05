@@ -1,4 +1,4 @@
-integer function fc2d_geoclaw_fort_gauges_getnum(fname)
+integer function geoclaw_gauges_getnum(fname)
 
     implicit none
 
@@ -19,11 +19,11 @@ integer function fc2d_geoclaw_fort_gauges_getnum(fname)
     endif
 
     read(iunit,*) num_gauges
-    fc2d_geoclaw_fort_gauges_getnum = num_gauges
+    geoclaw_gauges_getnum = num_gauges
     close(iunit)
 end function
 
-subroutine fc2d_geoclaw_fort_gauges_init(restart, meqn, num_gauges, gauges, fname)
+SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
 
     ! use amr_module
     implicit none
@@ -100,4 +100,4 @@ subroutine fc2d_geoclaw_fort_gauges_init(restart, meqn, num_gauges, gauges, fnam
 
 end do
 
-end subroutine fc2d_geoclaw_fort_gauges_init
+END SUBROUTINE geoclaw_gauges_init

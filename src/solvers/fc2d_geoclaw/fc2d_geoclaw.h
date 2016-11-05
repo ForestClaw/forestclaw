@@ -376,14 +376,14 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
-#define FC2D_GEOCLAW_FORT_GAUGES_GETNUM FCLAW_F77_FUNC(fc2d_geoclaw_fort_gauges_getnum, \
-                                                       FC2D_GEOCLAW_FORT_GAUGES_GETNUM)
-int FC2D_GEOCLAW_FORT_GAUGES_GETNUM(char fname[]);
+#define GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(geoclaw_gauges_getnum, \
+                                             GEOCLAW_GAUGES_GETNUM)
+int GEOCLAW_GAUGES_GETNUM(char fname[]);
 
-#define FC2D_GEOCLAW_FORT_GAUGES_INIT FCLAW_F77_FUNC(fc2d_geoclaw_fort_gauges_init, \
-                                                     FC2D_GEOCLAW_FORT_GAUGES_INIT)
-void FC2D_GEOCLAW_FORT_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges, 
-                                   geoclaw_gauge_t gauges[], char fname[]);
+#define GEOCLAW_GAUGES_INIT FCLAW_F77_FUNC(geoclaw_gauges_init,         \
+                                           GEOCLAW_GAUGES_INIT)
+void GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
+                         geoclaw_gauge_t gauges[], char fname[]);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *

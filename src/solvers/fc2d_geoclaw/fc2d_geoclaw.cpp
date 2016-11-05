@@ -288,12 +288,12 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
                         &gparms->meqn, &geoclaw_options->maux,
                         geoclaw_options->mthlim, geoclaw_options->method,
                         &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
-    
-    int num = FC2D_GEOCLAW_FORT_GAUGES_GETNUM(fname);
+
+    int num = GEOCLAW_GAUGES_GETNUM(fname);
     int restart = 0;
-    
+
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
-    FC2D_GEOCLAW_FORT_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
+    GEOCLAW_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
 }
 
 

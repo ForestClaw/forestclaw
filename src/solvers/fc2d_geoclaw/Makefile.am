@@ -32,6 +32,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_gauges.f90  \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/quick_sort1.f \
@@ -57,8 +58,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f \
-	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_gauges_fort.f90 
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
