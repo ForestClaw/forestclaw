@@ -44,7 +44,6 @@ typedef struct user_options
 
 } user_options_t;
 
-
 #define BOWL_WRITE_HEADER FCLAW_F77_FUNC(bowl_write_header, BOWL_WRITE_HEADER)
 
 void bowl_link_solvers(fclaw2d_domain_t *domain);

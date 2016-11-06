@@ -3,7 +3,7 @@ OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
-PlotType = 4;    % type of plot to produce:
+PlotType = 1;    % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
 			     % 2 = contour
 			     % 3 = Schlieren
@@ -13,7 +13,7 @@ mq = 1;                      % which component of q to plot
 UserVariable = 1;            % set to 1 to specify a user-defined variable
 UserVariableFile = 'bathy';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
-Manifold = 0;
+Manifold = 1;
 ReadBlockNumber = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;

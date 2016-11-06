@@ -37,7 +37,6 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
-    /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 = nomap; 1 = brick [0]");
 
@@ -49,12 +48,11 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
-
-    if (user->example < 0 || user->example > 1) {
+    if (user->example < 0 || user->example > 1)
+    {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-
     return FCLAW_NOEXIT;
 }
 
@@ -86,7 +84,7 @@ void run_program(fclaw_app_t* app)
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t	       *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     amr_options_t            *gparms;
     user_options_t             *user;
@@ -97,6 +95,22 @@ void run_program(fclaw_app_t* app)
     user = (user_options_t*) fclaw_app_get_user(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
+    int rotate[2];
+    int mi,mj;
+
+
+    rotate[0] = 0;
+    rotate[1] = 0;
+    mi = gparms->mi;
+    mj = gparms->mj;
+    int a = 0; /* non-periodic */
+    int b = 0;
+
+#if 0
+    conn = p4est_connectivity_new_unitsquare();
+    cont = fclaw2d_map_new_nomap();
+#endif
+
 
     switch (user->example) {
     case 0:
@@ -107,8 +121,9 @@ void run_program(fclaw_app_t* app)
 
     case 1:
         /* Square brick domain */
-        conn = p4est_connectivity_new_brick(gparms->mi,gparms->mj,0,0);
-        cont = fclaw2d_map_new_brick(conn,gparms->mi,gparms->mj);
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_nomap_brick(brick);
         break;
 
     default:
