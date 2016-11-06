@@ -137,6 +137,7 @@ SUBROUTINE geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
       h(2) = q(1,iindex+1,jindex) 
       h(3) = q(1,iindex,jindex+1)
       h(4) = q(1,iindex+1,jindex+1) 
+
         
       if ((h(1) < drytol2) .or.  &
           (h(2) < drytol2) .or.  &

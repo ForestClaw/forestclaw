@@ -316,7 +316,7 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
         geoclaw_gauge_t g = geoclaw_options->gauges[i];
         sprintf(filename,"gauge%05d.txt",g.num);
         fp = fopen(filename, "w");
-        fprintf(fp, "# gauge= %5d, location=( %15.7e, %15.7e ) num_eqn= %2d\n",
+        fprintf(fp, "# gauge_id= %5d location=( %15.7e %15.7e ) num_eqn= %2d\n",
                 g.num, g.xc, g.yc, gparms->meqn+1);
         fprintf(fp, "# Columns: level time h    hu    hv    eta\n");
         fclose(fp);        
@@ -1230,7 +1230,7 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
                                       q,&maux,aux,&g.xc,&g.yc,var,&eta);
                 sprintf(filename,"gauge%05d.txt",g.num);
                 fp = fopen(filename, "a");
-                fprintf(fp, "%5d, %15.7e, %15.7e, %15.7e, %15.7e, %15.7e\n", 
+                fprintf(fp, "%5d %15.7e %15.7e %15.7e %15.7e %15.7e\n", 
                         patch->level,tcurr,var[0],var[1],var[2],eta);
                 fclose(fp);
             }
