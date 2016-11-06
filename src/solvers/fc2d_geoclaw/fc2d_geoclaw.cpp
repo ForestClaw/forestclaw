@@ -414,12 +414,13 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
     sc_array_t *results = sc_array_new_size(sizeof(int), (size_t) geoclaw_options->num_gauges);
     fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
-#if 0
     for (int i = 0; i < geoclaw_options->num_gauges; ++i)
     {
-        // geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
+        geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
+        printf("%5d %5d %8d\n",domain->mpirank, geoclaw_options->gauges[i].num,
+               geoclaw_options->gauges[i].patchno);
+
     }
-#endif
     sc_array_destroy(results);
 }
 
