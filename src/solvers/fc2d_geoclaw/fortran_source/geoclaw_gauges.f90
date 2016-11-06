@@ -29,6 +29,7 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
     implicit none
     type gauge_type
       integer:: blockno
+      integer:: patchno
       double precision :: xc, yc, t1, t2
       integer num;
       double precision, pointer :: buffer

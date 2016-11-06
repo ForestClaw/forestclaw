@@ -39,6 +39,8 @@ extern "C"
 typedef struct geoclaw_gauge
 {
     int blockno;
+    int patchno;
+
     double xc;
     double yc;
     double t1;
@@ -73,6 +75,7 @@ typedef struct fc2d_geoclaw_options
     const char *speed_tolerance_c_string;
 
     /* gauges */
+    int num_gauges;
     geoclaw_gauge_t *gauges;
 }
 fc2d_geoclaw_options_t;

@@ -302,6 +302,7 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
     int num = GEOCLAW_GAUGES_GETNUM(fname);
     int restart = 0;
 
+    geoclaw_options->num_gauges = num;
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
     GEOCLAW_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
     fc2d_geoclaw_set_gauge_info(domain,geoclaw_options->gauges,num);
@@ -369,7 +370,21 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         {
             gauges[i].blockno = 0;
         }
+        /* We are assuming block num = 1 here */
+        int *block_offsets = FCLAW_ALLOC(int, 2);
+        double *coordinates = FCLAW_ALLOC(double, 2*num);
+        
+        block_offsets[0] = 0;
+        block_offsets[1] = num;
+        
+        for (int i = 0; i < num; ++i)
+        {
+            coordinates[2*i] = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
+            coordinates[2*i+1] = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
+        }
 
+        gauge_info.block_offsets = sc_array_new_data((void*)block_offsets,sizeof(int), 2);
+        gauge_info.coordinates = sc_array_new_data((void*)coordinates, sizeof(double), 2*num);
     }
 }
 
@@ -390,8 +405,19 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
                               int this_block_idx,
                               int this_patch_idx)
 {
+    fc2d_geoclaw_options_t *geoclaw_options;
+
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    
+    sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
+    fclaw2d_domain_search_points(domain, gauge_info.block_offsets, 
+                                 gauge_info.coordinates, results);
+    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
+    {
+        // geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
+    }
+    sc_array_destroy(results);
 }
 
 /* This should only be called when a new ClawPatch is created. */
@@ -1140,8 +1166,6 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                  &this_block_idx,&domain->mpirank);
 }
 
-// void fc2d_geoclaw_gauge_init()
-// void fc2d_geoclaw_gauge_locate(){
-//   // Create domain, block_offsets, coordinates, results)
-// {
-// }
+void fc2d_geoclaw_gauge_locate(){
+  // Create domain, block_offsets, coordinates, results)
+}
