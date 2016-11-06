@@ -10,8 +10,6 @@ integer function geoclaw_gauges_getnum(fname)
     ! Locals
     integer, parameter :: iunit = 7
 
-    write(*,*) "writing fname"
-    write(*,*) fname
     ! Open file
     if (present(fname)) then
       call opendatafile(iunit,fname)

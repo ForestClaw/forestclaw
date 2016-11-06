@@ -291,10 +291,14 @@ int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
 {
+    char filename[14];
+    FILE *fp;
+
     char fname[] = "gauges.data";
     fc2d_geoclaw_options_t *geoclaw_options;
     const amr_options_t* gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
+    
     GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
                         &gparms->meqn, &geoclaw_options->maux,
                         geoclaw_options->mthlim, geoclaw_options->method,
@@ -305,7 +309,18 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
 
     geoclaw_options->num_gauges = num;
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
+    
     GEOCLAW_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
+    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
+    {
+        geoclaw_gauge_t g = geoclaw_options->gauges[i];
+        sprintf(filename,"gauge%05d.txt",g.num);
+        fp = fopen(filename, "w");
+        fprintf(fp, "# gauge= %5d, location=( %15.7e, %15.7e ) num_eqn= %2d\n",
+                g.num, g.xc, g.yc, gparms->meqn+1);
+        fprintf(fp, "# Columns: level time h    hu    hv    eta\n");
+        fclose(fp);        
+    }
     fc2d_geoclaw_set_gauge_info(domain,geoclaw_options->gauges,num);
 }
 
@@ -1180,6 +1195,8 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
     double dx,dy,xlower,ylower,eta;
     double *q, *aux;
     double *var;
+    char filename[14];
+    FILE *fp;
     
     const fc2d_geoclaw_options_t *geoclaw_options;
     const amr_options_t* gparms;
@@ -1211,7 +1228,11 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
             {
                 GEOCLAW_UPDATE_GAUGE(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                                       q,&maux,aux,&g.xc,&g.yc,var,&eta);
-                printf("%12.4e, %12.4e, %12.4e, %12.4e\n", var[0], var[1], var[2], eta);
+                sprintf(filename,"gauge%05d.txt",g.num);
+                fp = fopen(filename, "a");
+                fprintf(fp, "%5d, %15.7e, %15.7e, %15.7e, %15.7e, %15.7e\n", 
+                        patch->level,tcurr,var[0],var[1],var[2],eta);
+                fclose(fp);
             }
         }
     }
