@@ -406,14 +406,15 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
                               int this_patch_idx)
 {
     fc2d_geoclaw_options_t *geoclaw_options;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
 
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
     sc_array_t *results = sc_array_new_size(sizeof(int), (size_t) geoclaw_options->num_gauges);
-#if 0
     fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
+#if 0
     for (int i = 0; i < geoclaw_options->num_gauges; ++i)
     {
         // geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));

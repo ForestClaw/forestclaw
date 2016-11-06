@@ -3,7 +3,7 @@ integer function geoclaw_gauges_getnum(fname)
     implicit none
 
     ! Input
-    character(len=20), intent(in), optional :: fname
+    character(len=12), intent(in), optional :: fname
     integer :: num_gauges
 
     ! Locals
