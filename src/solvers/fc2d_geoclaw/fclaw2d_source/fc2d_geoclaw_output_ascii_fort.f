@@ -1,8 +1,8 @@
       subroutine fc2d_geoclaw_fort_write_header(iframe,time,
-     &      meqn,ngrids)
+     &      meqn,maux,ngrids)
       implicit none
 
-      integer iframe,meqn,ngrids
+      integer iframe,meqn,maux,ngrids
 
       character*10 matname1
       character*10 matname2
@@ -22,10 +22,12 @@
       enddo
 
       open(unit=matunit2,file=matname2)
-      write(matunit2,1000) time,meqn,ngrids
+      write(matunit2,1000) time,meqn + 1,ngrids,maux,2
  1000 format(e30.20,'    time', /,
      &      i5,'                 meqn'/,
-     &      i5,'                 ngrids')
+     &      i5,'                 ngrids'/,
+     &      i5,'                 num_aux'/,
+     &      i5,'                 num_dim')
 
       close(matunit2)
 
@@ -51,6 +53,7 @@
       integer matunit1
       integer nstp,ipos,idigit
       integer i,j,mq
+      double precision eta
 
       matname1 = 'fort.qxxxx'
       matunit1 = 10
@@ -93,8 +96,12 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
                   q(mq,i,j) = 0.d0
                endif
             enddo
-            write(matunit1,120) (q(mq,i,j),mq=1,meqn),
-     &           (aux(mbathy,i,j))
+            eta = q(1, i, j) + aux(mbathy, i, j)
+            
+            if (abs(eta) .lt. 1d-99) then
+               eta = 0.d0
+            endif
+            write(matunit1,120) (q(mq,i,j),mq=1,meqn), eta
          enddo
          write(matunit1,*) ' '
       enddo
