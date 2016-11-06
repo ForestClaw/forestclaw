@@ -123,6 +123,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 
+    fclaw_vt->run_user_diagnostics = &fc2d_geoclaw_update_gauges;
     // fclaw_vt->locate_gauge = &fc2d_geoclaw_locate_gauge;
 }
 
@@ -417,8 +418,8 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
     for (int i = 0; i < geoclaw_options->num_gauges; ++i)
     {
         geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
-        printf("%5d %5d %8d\n",domain->mpirank, geoclaw_options->gauges[i].num,
-               geoclaw_options->gauges[i].patchno);
+        // printf("%5d %5d %8d\n",domain->mpirank, geoclaw_options->gauges[i].num,
+        //        geoclaw_options->gauges[i].patchno);
 
     }
     sc_array_destroy(results);
@@ -1173,6 +1174,46 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                  &this_block_idx,&domain->mpirank);
 }
 
-void fc2d_geoclaw_gauge_locate(){
-  // Create domain, block_offsets, coordinates, results)
+void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
+{
+    int mx,my,mbc,meqn,maux;
+    double dx,dy,xlower,ylower,eta;
+    double *q, *aux;
+    double *var;
+    
+    const fc2d_geoclaw_options_t *geoclaw_options;
+    const amr_options_t* gparms;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
+    gparms = get_domain_parms(domain);
+
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+    
+    var = FCLAW_ALLOC(double, gparms->meqn);
+    geoclaw_gauge_t *gauges = geoclaw_options->gauges; 
+    geoclaw_gauge_t g;
+    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
+    {
+        g = gauges[i];
+        block = &domain->blocks[g.blockno];
+        if (g.patchno > 0)
+        {
+            patch = &block->patches[g.patchno];
+            fclaw2d_clawpatch_grid_data(domain,patch,&mx,&my,&mbc,
+                                        &xlower,&ylower,&dx,&dy);
+
+            fclaw2d_clawpatch_soln_data(domain,patch,&q,&meqn);
+            fc2d_geoclaw_aux_data(domain,patch,&aux,&maux);
+
+            FCLAW_ASSERT(g.xc >= xlower && g.xc <= xlower+mx*dx);
+            FCLAW_ASSERT(g.yc >= ylower && g.yc <= ylower+my*dy);
+            if (tcurr >= g.t1 && tcurr <= g.t2)
+            {
+                GEOCLAW_UPDATE_GAUGE(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                      q,&maux,aux,&g.xc,&g.yc,var,&eta);
+                printf("%12.4e, %12.4e, %12.4e, %12.4e\n", var[0], var[1], var[2], eta);
+            }
+        }
+    }
+    FCLAW_FREE(var);
 }

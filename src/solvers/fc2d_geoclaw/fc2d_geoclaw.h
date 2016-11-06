@@ -387,6 +387,13 @@ int GEOCLAW_GAUGES_GETNUM(char fname[]);
                                            GEOCLAW_GAUGES_INIT)
 void GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
                          geoclaw_gauge_t gauges[], char fname[]);
+
+#define GEOCLAW_UPDATE_GAUGE FCLAW_F77_FUNC(geoclaw_update_gauge, \
+                                            GEOCLAW_UPDATE_GAUGE)
+void GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
+                           double* ylower,double* dx,double* dy,double q[],
+                           int* maux,double aux[],double* xc,double* yc,double var[],
+                           double* eta);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -567,7 +574,7 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
 
-void fc2d_geoclaw_gauge_locate();
+void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);
 
 
 #ifdef __cplusplus
