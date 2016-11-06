@@ -2,8 +2,9 @@ integer function geoclaw_gauges_getnum(fname)
 
     implicit none
 
-    ! Input
-    character(len=20), intent(in), optional :: fname
+    !! Input
+    !! NOTE : Length specified must match exact length of file name.
+    CHARACTER(len=12), INTENT(in), OPTIONAL :: fname
     integer :: num_gauges
 
     ! Locals
