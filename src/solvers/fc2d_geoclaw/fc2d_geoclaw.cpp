@@ -1010,17 +1010,20 @@ void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
                                       int iframe)
 {
     const amr_options_t *amropt;
-    int meqn,ngrids;
+    const fc2d_geoclaw_options_t *geoclaw_options;
+    int meqn,maux,ngrids;
     double time;
 
     amropt = fclaw2d_forestclaw_get_options(domain);
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
 
     time = fclaw2d_domain_get_time(domain);
     ngrids = fclaw2d_domain_get_num_patches(domain);
 
-    meqn = amropt->meqn + 1;
+    meqn = amropt->meqn;
+    maux = geoclaw_options->maux;
 
-    FC2D_GEOCLAW_FORT_WRITE_HEADER(&iframe,&time,&meqn,&ngrids);
+    FC2D_GEOCLAW_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);
 
     /* Is this really necessary? */
     /* FCLAW2D_OUTPUT_NEW_QFILE(&iframe); */

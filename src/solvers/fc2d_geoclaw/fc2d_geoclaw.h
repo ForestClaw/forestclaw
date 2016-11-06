@@ -321,7 +321,7 @@ void FC2D_GEOCLAW_FORT_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double
 
 #define FC2D_GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_header,\
                                                       FC2D_GEOCLAW_FORT_WRITE_HEADER)
-void FC2D_GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* ngrids);
+void FC2D_GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* maux,int* ngrids);
 
 #define FC2D_GEOCLAW_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_file, \
                                                     FC2D_GEOCLAW_FORT_WRITE_FILE)

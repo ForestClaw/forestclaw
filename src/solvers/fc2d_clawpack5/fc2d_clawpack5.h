@@ -306,8 +306,7 @@ void  FC2D_CLAWPACK5_FORT_WRITE_FILE(char* matname1,
 
 #define FC2D_CLAWPACK5_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_header, \
                                                         FC2D_CLAWPACK5_FORT_WRITE_HEADER)
-void FC2D_CLAWPACK5_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                      double* time, int* meqn, int* ngrids);
+void FC2D_CLAWPACK5_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, int* maux,int* ngrids);
 
 
 #define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
@@ -384,6 +383,9 @@ void fc2d_clawpack5_package_register(fclaw_app_t* app,
                                       fc2d_clawpack5_options_t* clawopt);
 
 int fc2d_clawpack5_get_package_id (void);
+
+void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
+                                        int iframe);
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
 
