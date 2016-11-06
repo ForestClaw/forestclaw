@@ -373,10 +373,10 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         /* We are assuming block num = 1 here */
         int *block_offsets = FCLAW_ALLOC(int, 2);
         double *coordinates = FCLAW_ALLOC(double, 2*num);
-        
+
         block_offsets[0] = 0;
         block_offsets[1] = num;
-        
+
         for (int i = 0; i < num; ++i)
         {
             coordinates[2*i] = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
@@ -409,14 +409,16 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
 
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-    
-    sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
-    fclaw2d_domain_search_points(domain, gauge_info.block_offsets, 
+
+    sc_array_t *results = sc_array_new_size(sizeof(int), (size_t) geoclaw_options->num_gauges);
+#if 0
+    fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
     for (int i = 0; i < geoclaw_options->num_gauges; ++i)
     {
         // geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
     }
+#endif
     sc_array_destroy(results);
 }
 
