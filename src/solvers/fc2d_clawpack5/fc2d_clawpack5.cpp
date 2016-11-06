@@ -78,7 +78,8 @@ void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
     /* output functions */
-    fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    fclaw_vt->write_header           = &fc2d_clawpack5_output_header_ascii;
+    // fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
     fclaw_vt->fort_write_file        = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
 
     /* diagnostic functions */
@@ -603,4 +604,24 @@ double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
+}
+
+void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
+                                        int iframe)
+{
+    const amr_options_t *amropt;
+    const fc2d_clawpack5_options_t *clawpack_opt;
+    int meqn,maux,ngrids;
+    double time;
+
+    amropt = fclaw2d_forestclaw_get_options(domain);
+    clawpack_opt = fc2d_clawpack5_get_options(domain);
+
+    time = fclaw2d_domain_get_time(domain);
+    ngrids = fclaw2d_domain_get_num_patches(domain);
+
+    meqn = amropt->meqn;
+    maux = clawpack_opt->maux;
+
+    FC2D_CLAWPACK5_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);
 }
