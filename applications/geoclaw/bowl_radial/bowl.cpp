@@ -95,22 +95,13 @@ void run_program(fclaw_app_t* app)
     user = (user_options_t*) fclaw_app_get_user(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    int rotate[2];
     int mi,mj;
 
 
-    rotate[0] = 0;
-    rotate[1] = 0;
     mi = gparms->mi;
     mj = gparms->mj;
     int a = 0; /* non-periodic */
     int b = 0;
-
-#if 0
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
-#endif
-
 
     switch (user->example) {
     case 0:
