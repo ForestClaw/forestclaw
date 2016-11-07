@@ -41,13 +41,13 @@ typedef struct geoclaw_gauge
     int blockno;
     int patchno;
     int location_in_results;
-    
+
     double xc;
     double yc;
     double t1;
     double t2;
     int num;
-    double* buffer;
+    /* double* buffer; */  /* Not yet used */
 
 } geoclaw_gauge_t;
 /* Only one copy of GEOCLAW_options for each run */

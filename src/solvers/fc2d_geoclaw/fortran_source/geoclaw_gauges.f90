@@ -32,7 +32,7 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
       integer:: location_in_results
       double precision :: xc, yc, t1, t2
       integer num;
-      double precision, pointer :: buffer
+      !! DOUBLE PRECISION, POINTER :: buffer
     end type gauge_type
 
     ! Input
@@ -68,7 +68,10 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
     ! allocate(levelArray(MAXDATA,num_gauges))
 
     do i=1,num_gauges
-      read(iunit,*) gauges(i)%num,gauges(i)%xc,gauges(i)%yc,gauges(i)%t1,gauges(i)%t2
+       READ(iunit,*) gauges(i)%num,gauges(i)%xc,gauges(i)%yc,gauges(i)%t1,gauges(i)%t2
+       gauges(i)%location_in_results = -1
+       gauges(i)%blockno = -1
+       gauges(i)%patchno = -1
     enddo
 
     close(iunit)
@@ -134,23 +137,23 @@ SUBROUTINE geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
 
       drytol2 = 0.1d0 * dry_tolerance
 
-      h(1) = q(1,iindex,jindex) 
-      h(2) = q(1,iindex+1,jindex) 
+      h(1) = q(1,iindex,jindex)
+      h(2) = q(1,iindex+1,jindex)
       h(3) = q(1,iindex,jindex+1)
-      h(4) = q(1,iindex+1,jindex+1) 
+      h(4) = q(1,iindex+1,jindex+1)
 
-        
+
       if ((h(1) < drytol2) .or.  &
           (h(2) < drytol2) .or.  &
           (h(3) < drytol2) .or.  &
           (h(4) < drytol2)) then
           !! One of the cells is dry, so just use value from grid cell
           !! that contains gauge rather than interpolating
-            
+
           ! icell = int(1.d0 + (xc - xlower) / hx)
           ! jcell = int(1.d0 + (yc - ylower) / hy)
           do mq=1,3
-              var(mq) = q(mq,iindex,jindex) 
+              var(mq) = q(mq,iindex,jindex)
           enddo
           !! This is the bottom layer and we should figure out the
           !! topography
@@ -180,20 +183,20 @@ SUBROUTINE geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
            if (abs(var(mq)) < 1d-90) var(mq) = 0.d0
            end do
         if (abs(eta) < 1d-90) eta = 0.d0
-       
-        ! ! save info for this time 
+
+        ! ! save info for this time
         ! index = nextLoc(ii)
- 
+
         ! levelArray(index,ii) = level
         ! gaugeArray(1,index,ii) = tgrid
         ! gaugeArray(2,index,ii) = var(1)
         ! gaugeArray(3,index,ii) = var(2)
         ! gaugeArray(4,index,ii) = var(3)
         ! gaugeArray(5,index,ii) = eta
-        
+
         ! nextLoc(ii) = nextLoc(ii) + 1
         ! if (nextLoc(ii) .gt. MAXDATA) then
-        !   call print_gauges_and_reset_nextLoc(ii, nvar)  
+        !   call print_gauges_and_reset_nextLoc(ii, nvar)
         ! endif
 
 END SUBROUTINE geoclaw_update_gauge
