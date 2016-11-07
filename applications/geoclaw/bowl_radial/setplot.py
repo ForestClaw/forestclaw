@@ -328,7 +328,7 @@ def setplot(plotdata):
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = 'all' # list of frames to print
-    plotdata.print_gaugenos = [104]  # list of gauges to print
+    plotdata.print_gaugenos = [1,2,3,101,102,103]  # list of gauges to print
     plotdata.print_fignos = [300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
