@@ -341,13 +341,6 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         double xll,yll;
         double xur,yur;
 
-        double *xc_block;
-        double *yc_block;
-        int *blocknos;
-
-        xc_block = FCLAW_ALLOC(double,num);
-        yc_block = FCLAW_ALLOC(double,num);
-        blocknos = FCLAW_ALLOC(int,num);
 
         double x0,y0,x1,y1;
         x0 = 0;
@@ -356,30 +349,6 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         y1 = 1;
 
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
-
-#if 0
-        for(int i = 0; i < num; i++)
-        {
-            /* Map gauge to global [0,1]x[0,1] space */
-            x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
-            y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
-
-            for (nb = 0; nb < domain->num_blocks; ++nb)
-            {
-                /* Scale to [0,1]x[0,1], based on blockno */
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
-                if (xll <= x && x <= xur && yll <= y && y <= yur)
-                {
-                    gauges[i].blockno = nb;
-                    blocknos[i] = nb;
-                    xc_block[i] = mi*(x - xll);
-                    yc_block[i] = mj*(y - yll);
-                    break;
-                }
-            }
-        }
-#endif
 
         numblockgauge = 0;
         numgaugeset = 0;
@@ -397,12 +366,8 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
                 if (xll <= x && x <= xur && yll <= y && y <= yur)
                 {
                     gauges[i].blockno = nb;
-                    blocknos[i] = nb;
-                    xc_block[i] = mi*(x - xll);
-                    yc_block[i] = mj*(y - yll);
-
-                    coordinates[2*numgaugeset] = xc_block[i];
-                    coordinates[2*numgaugeset+1] = yc_block[i];
+                    coordinates[2*numgaugeset] = mi*(x - xll);
+                    coordinates[2*numgaugeset+1] = mj*(y - yll);
                     gauges[i].location_in_results = numgaugeset;
                     numblockgauge++;
                     numgaugeset++;
@@ -411,8 +376,6 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
             block_offsets[nb+1] = numblockgauge;
             numblockgauge = 0;
         }
-
-        /* post process gauge info to get block offsets, etc */
 
     }
     else
@@ -433,7 +396,7 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         }
     }
     gauge_info.block_offsets = sc_array_new_data((void*)block_offsets,sizeof(int), domain->num_blocks+1);
-    gauge_info.coordinates = sc_array_new_data((void*)coordinates, sizeof(double), 2*num);
+    gauge_info.coordinates = sc_array_new_data((void*)coordinates, 2*sizeof(double), num);
 }
 
 
@@ -466,9 +429,6 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
     {
         int index = geoclaw_options->gauges[i].location_in_results;
         geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, index));
-        // printf("%5d %5d %8d\n",domain->mpirank, geoclaw_options->gauges[i].num,
-        //        geoclaw_options->gauges[i].patchno);
-
     }
     sc_array_destroy(results);
 }
@@ -1271,4 +1231,8 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
         }
     }
     FCLAW_FREE(var);
+}
+void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain){
+    sc_array_destroy(gauge_info.block_offsets);
+    sc_array_destroy(gauge_info.coordinates);
 }

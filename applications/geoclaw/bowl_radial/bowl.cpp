@@ -138,6 +138,7 @@ void run_program(fclaw_app_t* app)
     fc2d_geoclaw_setup(domain);
     fclaw2d_initialize(&domain);
     fclaw2d_run(&domain);
+    fc2d_geoclaw_finalize(domain);
     fclaw2d_finalize(&domain);
     /* This has to be in this scope */
     fclaw2d_map_destroy(cont);
