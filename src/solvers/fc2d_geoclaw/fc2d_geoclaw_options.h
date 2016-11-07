@@ -40,7 +40,8 @@ typedef struct geoclaw_gauge
 {
     int blockno;
     int patchno;
-
+    int location_in_results;
+    
     double xc;
     double yc;
     double t1;
