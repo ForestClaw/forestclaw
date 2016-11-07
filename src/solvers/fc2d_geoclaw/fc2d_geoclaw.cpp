@@ -124,7 +124,6 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 
     fclaw_vt->run_user_diagnostics = &fc2d_geoclaw_update_gauges;
-    // fclaw_vt->locate_gauge = &fc2d_geoclaw_locate_gauge;
 }
 
 
@@ -331,10 +330,12 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         fclaw2d_domain_get_map_context(domain);
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
-
+    int *block_offsets = FCLAW_ALLOC(int, domain->num_blocks+1);
+    double *coordinates = FCLAW_ALLOC(double, 2*num);
+    
     if (is_brick)
     {
-        int nb,mi,mj;
+        int nb,mi,mj,numblockgauge = 0,numgaugeset = 0;
         double x,y;
         double z;
         double xll,yll;
@@ -356,27 +357,58 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
 
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
-        for(int i = 0; i < num; i++)
-        {
-            /* Map gauge to global [0,1]x[0,1] space */
-            x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
-            y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
+        // for(int i = 0; i < num; i++)
+        // {
+        //     /* Map gauge to global [0,1]x[0,1] space */
+        //     x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
+        //     y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
 
-            for (nb = 0; nb < domain->num_blocks; ++nb)
+        //     for (nb = 0; nb < domain->num_blocks; ++nb)
+        //     {
+        //         /* Scale to [0,1]x[0,1], based on blockno */
+        //         fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+        //         fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
+        //         if (xll <= x && x <= xur && yll <= y && y <= yur)
+        //         {
+        //             gauges[i].blockno = nb;
+        //             blocknos[i] = nb;
+        //             xc_block[i] = mi*(x - xll);
+        //             yc_block[i] = mj*(y - yll);
+        //             break;
+        //         }
+        //     }
+        // }
+
+        block_offsets[0] = 0;
+        for (nb = 0; nb < domain->num_blocks; ++nb)
+        {
+            /* Scale to [0,1]x[0,1], based on blockno */
+            fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+            fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
+            for(int i = 0; i < num; i++)
             {
-                /* Scale to [0,1]x[0,1], based on blockno */
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
+                /* Map gauge to global [0,1]x[0,1] space */
+                x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
+                y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
                 if (xll <= x && x <= xur && yll <= y && y <= yur)
                 {
                     gauges[i].blockno = nb;
                     blocknos[i] = nb;
                     xc_block[i] = mi*(x - xll);
                     yc_block[i] = mj*(y - yll);
+
+                    coordinates[2*numgaugeset] = xc_block[i];
+                    coordinates[2*numgaugeset+1] = yc_block[i];
+                    gauges[i].location_in_results = numgaugeset;
+                    numblockgauge++;
+                    numgaugeset++;
                     break;
                 }
             }
+            block_offsets[nb+1] = numblockgauge;
+            numblockgauge = 0;
         }
+
         /* post process gauge info to get block offsets, etc */
 
     }
@@ -385,10 +417,8 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
         for(int i = 0; i < num; i++)
         {
             gauges[i].blockno = 0;
+            gauges[i].location_in_results = i;
         }
-        /* We are assuming block num = 1 here */
-        int *block_offsets = FCLAW_ALLOC(int, 2);
-        double *coordinates = FCLAW_ALLOC(double, 2*num);
 
         block_offsets[0] = 0;
         block_offsets[1] = num;
@@ -398,10 +428,9 @@ void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauge
             coordinates[2*i] = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
             coordinates[2*i+1] = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
         }
-
-        gauge_info.block_offsets = sc_array_new_data((void*)block_offsets,sizeof(int), 2);
-        gauge_info.coordinates = sc_array_new_data((void*)coordinates, sizeof(double), 2*num);
     }
+    gauge_info.block_offsets = sc_array_new_data((void*)block_offsets,sizeof(int), domain->num_blocks+1);
+    gauge_info.coordinates = sc_array_new_data((void*)coordinates, sizeof(double), 2*num);
 }
 
 
@@ -427,12 +456,13 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
-    sc_array_t *results = sc_array_new_size(sizeof(int), (size_t) geoclaw_options->num_gauges);
+    sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
     fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
     for (int i = 0; i < geoclaw_options->num_gauges; ++i)
     {
-        geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, i));
+        int index = geoclaw_options->gauges[i].location_in_results;
+        geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, index));
         // printf("%5d %5d %8d\n",domain->mpirank, geoclaw_options->gauges[i].num,
         //        geoclaw_options->gauges[i].patchno);
 
@@ -1216,6 +1246,7 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
         if (g.patchno > 0)
         {
             patch = &block->patches[g.patchno];
+            FCLAW_ASSERT(patch != NULL);
             fclaw2d_clawpatch_grid_data(domain,patch,&mx,&my,&mbc,
                                         &xlower,&ylower,&dx,&dy);
 
@@ -1226,6 +1257,7 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
             FCLAW_ASSERT(g.yc >= ylower && g.yc <= ylower+my*dy);
             if (tcurr >= g.t1 && tcurr <= g.t2)
             {
+                printf("gauge_id = %d\n", g.num);
                 GEOCLAW_UPDATE_GAUGE(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                                       q,&maux,aux,&g.xc,&g.yc,var,&eta);
                 sprintf(filename,"gauge%05d.txt",g.num);
