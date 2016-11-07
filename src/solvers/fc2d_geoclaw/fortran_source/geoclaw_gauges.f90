@@ -29,13 +29,14 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
     type gauge_type
       integer:: blockno
       integer:: patchno
+      integer:: location_in_results
       double precision :: xc, yc, t1, t2
       integer num;
       double precision, pointer :: buffer
     end type gauge_type
 
     ! Input
-    character(len=20), intent(in), optional :: fname
+    character(len=12), intent(in), optional :: fname
     logical, intent(in)  :: restart
     integer, intent(in) :: meqn, num_gauges
     integer :: num_gauges_not_use
