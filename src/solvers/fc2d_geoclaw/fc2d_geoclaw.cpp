@@ -1232,7 +1232,10 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
     }
     FCLAW_FREE(var);
 }
-void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain){
+void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain)
+{
+    FCLAW_FREE(gauge_info.block_offsets->array);
+    FCLAW_FREE(gauge_info.coordinates->array);
     sc_array_destroy(gauge_info.block_offsets);
     sc_array_destroy(gauge_info.coordinates);
 }
