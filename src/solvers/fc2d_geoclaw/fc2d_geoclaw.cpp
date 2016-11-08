@@ -422,15 +422,18 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
     /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
 
-    sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
-    fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
-                                 gauge_info.coordinates, results);
-    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
+    if (!fclaw2d_patch_is_ghost (this_patch))
     {
-        int index = geoclaw_options->gauges[i].location_in_results;
-        geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, index));
+        sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
+        fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
+                                     gauge_info.coordinates, results);
+        for (int i = 0; i < geoclaw_options->num_gauges; ++i)
+        {
+            int index = geoclaw_options->gauges[i].location_in_results;
+            geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, index));
+        }
+        sc_array_destroy(results);
     }
-    sc_array_destroy(results);
 }
 
 /* This should only be called when a new ClawPatch is created. */
