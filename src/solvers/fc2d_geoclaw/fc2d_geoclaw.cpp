@@ -317,12 +317,13 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux;
 
-    int mint = 4;
-    int nghost = 1;
     fclaw_bool is_ghost = fclaw2d_patch_is_ghost(this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
+
+    int mint = 2*mbc;
+    int nghost = mbc;
 
     fc2d_geoclaw_define_auxarray (domain,this_patch);
 
