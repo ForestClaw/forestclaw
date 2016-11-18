@@ -27,8 +27,8 @@ For the parallel version, you will also need a working version of MPI.
     * Fork/clone the repository forestclaw.git.
 
         -- For the instructions below, assume that you have an environment variable $FCLAW that
-	   points to your newly cloned directory 'forestclaw'.  This variable isn't needed to
-	   run ForestClaw, though.
+	   points to your newly cloned directory 'forestclaw'.  (This variable isn't needed to
+	   run ForestClaw, though)
 
     * Initialize p4est and sc submodules, and create configuration file
 
@@ -58,9 +58,11 @@ For the parallel version, you will also need a working version of MPI.
 
         %> cd $FCLAW/applications/advection/2d/swirl
 	%> ln -s $FCLAW/../forestclaw-build/applications/advection/2d/swirl/swirl
-	%> swirl
+	%> mpirun -n 4 swirl
 
     * You should see several files created.  If you'd like to see VTK output, which you can
       visualize in ViSit for example, run with this argument
 
-        %> swirl --vtkout=2      # Note use of digit '2' here;   'T' doesn't work
+        %> mpirun -n 4 swirl --vtkout=2  --serialout=F    # Note use of digit '2' here;   'T' doesn't work
+
+    * Default parameters are set in application files 'fclaw_options.ini'.  These can be set either on the command line, or in the options file.
