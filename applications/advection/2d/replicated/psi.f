@@ -11,6 +11,6 @@
       u0 = u0_comm
       v0 = v0_comm
 
-      psi = revs_per_s*(u0*xc - v0*yc)
+      psi = -revs_per_s*(u0*xc - v0*yc)
 
       end

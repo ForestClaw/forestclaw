@@ -97,11 +97,18 @@ void run_program(fclaw_app_t* app)
     a = gparms->periodic_x;
     b = gparms->periodic_y;
 
+    /* Expand domain to get replicated behavior */
+    gparms->ax = 0;
+    gparms->bx = mi;
+    gparms->ay = 0;
+    gparms->by = mj;
+
+
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
-    fclaw2d_map_destroy_brick(brick); /* We don't really need the brick */
-    cont = fclaw2d_map_new_nomap();
+    // fclaw2d_map_destroy_brick(brick); /* We don't really need the brick */
+    cont = fclaw2d_map_new_nomap_brick(brick);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
