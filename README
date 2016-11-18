@@ -16,3 +16,51 @@ differ in any fundamental way from that proposed by Berger and Oliger (JCP,
 ForestClaw is free software under a BSD-style license (see COPYING).
 The p4est library is released under the GPL 2.0 (or later).  As it is generally
 linked with the forestclaw code, binary distribution falls under GPL as well.
+
+# Install instructions
+
+Before you can install, be sure that you have a working version of 'automake' tools.  You may
+also need to symlink 'glibtoolize' to 'glibtoolize', if you have GNU libtools.
+
+For the parallel version, you will also need a working version of MPI.
+
+    * Fork/clone the repository forestclaw.git.
+
+        -- For the instructions below, assume that you have an environment variable $FCLAW that
+	   points to your newly cloned directory 'forestclaw'.  This variable isn't needed to
+	   run ForestClaw, though.
+
+    * Initialize p4est and sc submodules, and create configuration file
+
+	%> cd $FCLAW
+	%> git submodule init
+	%> git submodule update
+	%> bootstrap
+
+    * Create build directory and configure/build/make forestclaw.   Customize your
+    configure options and compiler flags as desired
+
+        %> cd $FCLAW/..
+	%> mkdir forestclaw-build
+	%> cd forestclaw-build
+	%> ../forestclaw/configure --enable-mpi --enable-debug --without-blas \
+	    CXXFLAGS="-O3  -Wall" \
+    	    CFLAGS="-O3  -Wall -std=c99 -pedantic" \
+    	    FFLAGS="-O3  -cpp" \
+    	    FCFLAGS="-O3  -cpp" \
+	    --disable-shared \
+            FC=gfortran
+
+	%> gmake -j4 V=0      # uses four processors, no verbose output
+
+
+    * Test your installation :
+
+        %> cd $FCLAW/applications/advection/2d/swirl
+	%> ln -s $FCLAW/../forestclaw-build/applications/advection/2d/swirl/swirl
+	%> swirl
+
+    * You should see several files created.  If you'd like to see VTK output, which you can
+      visualize in ViSit for example, run with this argument
+
+        %> swirl --vtkout=2      # Note use of digit '2' here;   'T' doesn't work
