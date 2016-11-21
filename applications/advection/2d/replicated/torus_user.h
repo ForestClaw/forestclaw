@@ -43,6 +43,7 @@ extern "C"
 typedef struct user_options
 {
     int claw_version;
+    int replicate_factor;
 
     int is_registered;
 } user_options_t;

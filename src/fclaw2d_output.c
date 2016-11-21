@@ -211,6 +211,7 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
 
     /* END OF NON-SCALABLE CODE */
 #else
+#if 0
     FILE *fp;
     sprintf(fname,"tikz.%04d.tex",iframe);  /* fname[20] */
     /* Only rank 0 opens the file */
@@ -227,6 +228,7 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
     fprintf(fp,"} %% end plotgrid\n");
     fprintf(fp,"\\end{tikzpicture}\n");
     fclose(fp);
+#endif
 #endif
 }
 
