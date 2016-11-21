@@ -34,6 +34,10 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
+    sc_options_add_int (opt, 0, "replicate-factor", &user->replicate_factor, 2,
+                        "[user] Replication factor [2]");
+
+
     user->is_registered = 1;
     return NULL;
 }
@@ -81,6 +85,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     amr_options_t   *gparms;
+    user_options_t  *user;
 
     /* Used locally */
     int mi, mj, a,b;
@@ -88,16 +93,28 @@ void run_program(fclaw_app_t* app)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     gparms = fclaw_forestclaw_get_options(app);
+    user = (user_options_t*) fclaw_app_get_user(app);
 
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
-    mi = gparms->mi;
-    mj = gparms->mj;
+    /* Expand domain to get replicated behavior */
+    gparms->periodic_x = 1;
+    gparms->periodic_y = 1;
+    if (user->replicate_factor > 0)
+    {
+        mi = user->replicate_factor;
+        mj = user->replicate_factor;
+    }
+    else
+    {
+        mi = gparms->mi;
+        mj = gparms->mj;
+    }
+
     a = gparms->periodic_x;
     b = gparms->periodic_y;
 
-    /* Expand domain to get replicated behavior */
     gparms->ax = 0;
     gparms->bx = mi;
     gparms->ay = 0;
