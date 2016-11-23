@@ -575,6 +575,9 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      fclaw2d_transform_data_t* transform_data);
 
 void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);
+void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain);
+void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain);
+
 void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain);
 
 

@@ -207,6 +207,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
 
     fclaw_global_infof("Regridding domain\n");
 
@@ -299,6 +300,11 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         fclaw2d_exchange_setup(*domain);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 #endif
+    }
+
+    if (vt.after_regrid != NULL)
+    {
+        vt.after_regrid(*domain);
     }
 
     /* Stop timer.  Be sure to use timers from new grid, if one was

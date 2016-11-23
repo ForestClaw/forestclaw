@@ -67,6 +67,8 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->regrid_average2coarse    = &fclaw2d_regrid_average2coarse;
     vt->regrid_interpolate2fine  = &fclaw2d_regrid_interpolate2fine;
 
+    vt->after_regrid             = NULL;
+
     vt->regrid_tag4refinement    = &fclaw2d_regrid_tag4refinement;
     vt->regrid_tag4coarsening    = &fclaw2d_regrid_tag4coarsening;
 
