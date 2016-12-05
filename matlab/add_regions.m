@@ -1,4 +1,4 @@
-function rhout = plot_regions(t)
+function rhout = add_regions(t)
 
 o = findobj(gcf,'Tag','region');
 if (~isempty(o))
