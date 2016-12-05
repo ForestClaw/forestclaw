@@ -25,31 +25,12 @@ if (PlotType == 1)
     w = sqrt(zmin/ep);
     th = linspace(0,2*pi,500);
     plot(w*cos(th),w*sin(th),'k','linewidth',2);
-    % axis([50,75,50,75])
-    % axis([0 100 0 100]);
-    
-    % Plot regions
-    clear hh
-    hh = plot_region([0,0],[100,100]);
-    set(hh,'linewidth',3,'color','b');
-    
-    clear hh;
-    if (t >= 3)
-        hh(1) = plot_region([52,52],[72,72]);
-        hh(2) = plot_region([75,-10],[95,10]);
-        set(hh,'linewidth',3,'color','r');
-    end
-    
-    clear hh;
-    if (t >= 3.4)
-        hh(1) = plot_region([57,57],[68,68]);
-        hh(2) = plot_region([83,-4],[92,4]);
-        set(hh,'linewidth',3,'color','w')
-    end
     
     add_gauges();
+    add_regions(t);
     
     hold off;
+    
     colorbar
 elseif (PlotType == 4)
     % Plot 1d solution
