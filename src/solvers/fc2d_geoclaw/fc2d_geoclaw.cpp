@@ -90,18 +90,6 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->write_header             = &fc2d_geoclaw_output_header_ascii;
     fclaw_vt->patch_write_file         = &fc2d_geoclaw_output_patch_ascii;
 
-#if 0
-    /* These will eventually have GeoClaw specific implementations */
-    vt->regrid_tag4coarsening   = &geoclaw_patch_tag4coarsening;
-    vt->fort_tag4coarsening      = &TAG4COARSENING;
-
-    vt->write_header             = &fclaw2d_output_header_ascii;
-    vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
-
-    vt->patch_write_file         = &fclaw2d_output_patch_ascii;
-    vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
-#endif
-
     /* diagnostic functions */
     fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
     fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
@@ -301,27 +289,6 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
                         &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
 
     fc2d_geoclaw_gauge_setup(domain);
-
-#if 0
-    int num = GEOCLAW_GAUGES_GETNUM(fname);
-    int restart = 0;
-
-    geoclaw_options->num_gauges = num;
-    geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
-
-    GEOCLAW_GAUGES_INIT(&restart, &gparms->meqn, &num,  geoclaw_options->gauges, fname);
-    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
-    {
-        geoclaw_gauge_t g = geoclaw_options->gauges[i];
-        sprintf(filename,"gauge%05d.txt",g.num);
-        fp = fopen(filename, "w");
-        fprintf(fp, "# gauge_id= %5d location=( %15.7e %15.7e ) num_eqn= %2d\n",
-                g.num, g.xc, g.yc, gparms->meqn+1);
-        fprintf(fp, "# Columns: level time h    hu    hv    eta\n");
-        fclose(fp);
-    }
-    fc2d_geoclaw_set_gauge_info(domain,geoclaw_options->gauges,num);
-#endif
 }
 
 void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
@@ -359,10 +326,6 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
         fclose(fp);
     }
 
-#if 0
-    fc2d_geoclaw_set_gauge_info(domain,geoclaw_options->gauges,num);
-#endif
-
     /* -----------------------------------------------------
        Set up block offsets and coordinate list for p4est
        search function
@@ -371,8 +334,12 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
         fclaw2d_domain_get_map_context(domain);
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
-    int *block_offsets = FCLAW_ALLOC(int, domain->num_blocks+1);
-    double *coordinates = FCLAW_ALLOC(double, 2*num);
+
+    gauge_info.block_offsets = sc_array_new_size(sizeof(int), domain->num_blocks+1);
+    gauge_info.coordinates = sc_array_new_size(2*sizeof(double), num);
+
+    int *block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
+    double *coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
 
     geoclaw_gauge_t *gauges = geoclaw_options->gauges;
 
@@ -440,9 +407,6 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
             coordinates[2*i+1] = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
         }
     }
-    gauge_info.block_offsets = sc_array_new_data((void*)block_offsets,sizeof(int),
-                                                 domain->num_blocks+1);
-    gauge_info.coordinates = sc_array_new_data((void*)coordinates, 2*sizeof(double), num);
 }
 
 
@@ -499,8 +463,6 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
 
 void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain)
 {
-    FCLAW_FREE(gauge_info.block_offsets->array);
-    FCLAW_FREE(gauge_info.coordinates->array);
     sc_array_destroy(gauge_info.block_offsets);
     sc_array_destroy(gauge_info.coordinates);
 }
@@ -549,32 +511,7 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
                               int this_block_idx,
                               int this_patch_idx)
 {
-#if 0
-    fc2d_geoclaw_options_t *geoclaw_options;
-    geoclaw_options = fc2d_geoclaw_get_options(domain);
-#endif
-
-    /* Dummy setup - use multiple libraries */
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-
-#if 0
-    sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
-    fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
-                                 gauge_info.coordinates, results);
-    for (int i = 0; i < geoclaw_options->num_gauges; ++i)
-    {
-        sc_array_t *results = sc_array_new_size(sizeof(int), geoclaw_options->num_gauges);
-        fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
-                                     gauge_info.coordinates, results);
-        for (int i = 0; i < geoclaw_options->num_gauges; ++i)
-        {
-            int index = geoclaw_options->gauges[i].location_in_results;
-            geoclaw_options->gauges[i].patchno = *((int *) sc_array_index_int(results, index));
-        }
-        sc_array_destroy(results);
-    }
-    sc_array_destroy(results);
-#endif
 }
 
 /* This should only be called when a new ClawPatch is created. */
@@ -603,34 +540,6 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     geoclaw_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux,&is_ghost,&nghost,&mint);
     GEOCLAW_UNSET_BLOCK();
-}
-
-/* This should only be called when a new ClawPatch is created. */
-void fc2d_geoclaw_set_capacity(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx)
-{
-#if 0
-    int mx,my,mbc,maux,mcapa;
-    double dx,dy,xlower,ylower;
-    double *aux, *area;
-    fc2d_geoclaw_options_t *clawopt;
-
-    clawopt = fc2d_geoclaw_get_options(domain);
-    mcapa = clawopt->mcapa;
-
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
-
-    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
-    FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
-
-    GEOCLAW_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
-                            &maux,aux);
-#endif
 }
 
 
@@ -769,10 +678,6 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-#if 0
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    q = cp->q_time_sync(time_interp);
-#endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
@@ -1139,14 +1044,6 @@ void fc2d_geoclaw_average_face(fclaw2d_domain_t *domain,
                                    &maux,auxcoarse,auxfine,&mcapa,&mbathy,
                                    &idir,&iface_coarse,&p4est_refineFactor,&refratio,
                                    &igrid,&manifold,&transform_data);
-#if 0
-    FCLAW2D_FORT_AVERAGE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,
-                        qcoarse,qfine,
-                        areacoarse, areafine,
-                        a_idir,a_iface_coarse,
-                        a_p4est_refineFactor,a_refratio,igrid,
-                        manifold, &transform_data);
-#endif
 }
 
 void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
@@ -1184,11 +1081,6 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
                                        &idir, &iside,
                                        &p4est_refineFactor,&refratio,&igrid,
                                        &transform_data);
-#if 0
-    FCLAW2D_FORT_INTERPOLATE_FACE_GHOST(m_mx,m_my,m_mbc,m_meqn,qcoarse,qfine,a_idir,a_iside,
-                           a_p4est_refineFactor,a_refratio,igrid,
-                           &transform_data);
-#endif
 }
 
 void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
@@ -1226,13 +1118,6 @@ void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
                                      &mcapa,&mbathy,&manifold,&coarse_corner,
                                      &transform_data);
 
-#if 0
-    FCLAW2D_FORT_AVERAGE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, a_refratio,
-                          qcoarse, qfine,
-                          areacoarse, areafine,
-                          manifold,
-                          a_coarse_corner,&transform_data);
-#endif
 }
 
 void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
@@ -1271,11 +1156,6 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                          auxcoarse,auxfine,&mbathy,
                                          &coarse_corner,&transform_data);
 
-#if 0
-    FCLAW2D_FORT_INTERPOLATE_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
-                             a_refratio, qcoarse, qfine,
-                             a_coarse_corner,&transform_data);
-#endif
 }
 
 void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
