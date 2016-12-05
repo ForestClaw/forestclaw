@@ -4,7 +4,8 @@ axis([-120 -60 -60 0])
 daspect([1 1 1]);
 axis on;
 
-caxis([-0.2 0.2]);
+m = min(abs([qmin,qmax]));
+caxis([-0.01 0.01]);
 
 showpatchborders;
 

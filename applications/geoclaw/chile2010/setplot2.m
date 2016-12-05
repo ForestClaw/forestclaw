@@ -9,11 +9,11 @@ PlotType = 1;    % type of plot to produce:
 			     % 3 = Schlieren
 			     % 4 = scatter plot of q vs. r
 
-mq = 1;                      % which component of q to plot
+mq = 4;                      % which component of q to plot
 UserVariable = 1;            % set to 1 to specify a user-defined variable
 UserVariableFile = 'bathy';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
-Manifold = 1;
+Manifold = 0;
 ReadBlockNumber = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;

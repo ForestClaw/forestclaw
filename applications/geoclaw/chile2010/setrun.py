@@ -44,7 +44,7 @@ def setrun(claw_pkg='geoclaw'):
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
     #------------------------------------------------------------------
-    
+
     #probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
 
 
@@ -97,8 +97,8 @@ def setrun(claw_pkg='geoclaw'):
     # Index of aux array corresponding to capacity function, if there is one:
     clawdata.capa_index = 2
 
-    
-    
+
+
     # -------------
     # Initial time:
     # -------------
@@ -110,7 +110,7 @@ def setrun(claw_pkg='geoclaw'):
     # Note: If restarting, you must also change the Makefile to set:
     #    RESTART = True
     # If restarting, t0 above should be from original run, and the
-    # restart_file 'fort.chkNNNNN' specified below should be in 
+    # restart_file 'fort.chkNNNNN' specified below should be in
     # the OUTDIR indicated in Makefile.
 
     clawdata.restart = False               # True to restart from prior results
@@ -141,9 +141,9 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_step_interval = 1
         clawdata.total_steps = 3
         clawdata.output_t0 = True
-        
 
-    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf' 
+
+    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -194,11 +194,11 @@ def setrun(claw_pkg='geoclaw'):
 
     # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
     clawdata.order = 2
-    
+
     # Use dimensional splitting? (not yet available for AMR)
     clawdata.dimensional_split = 'unsplit'
-    
-    # For unsplit method, transverse_waves can be 
+
+    # For unsplit method, transverse_waves can be
     #  0 or 'none'      ==> donor cell (only normal solver used)
     #  1 or 'increment' ==> corner transport of waves
     #  2 or 'all'       ==> corner transport of 2nd order corrections too
@@ -206,8 +206,8 @@ def setrun(claw_pkg='geoclaw'):
 
     # Number of waves in the Riemann solution:
     clawdata.num_waves = 3
-    
-    # List of limiters to use for each wave family:  
+
+    # List of limiters to use for each wave family:
     # Required:  len(limiter) == num_waves
     # Some options:
     #   0 or 'none'     ==> no limiter (Lax-Wendroff)
@@ -218,10 +218,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.limiter = ['mc', 'mc', 'mc']
 
     clawdata.use_fwaves = True    # True ==> use f-wave version of algorithms
-    
+
     # Source terms splitting:
     #   src_split == 0 or 'none'    ==> no source term (src routine never called)
-    #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used, 
+    #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used,
     #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,  not recommended.
     clawdata.source_split = 'godunov'
 
@@ -265,7 +265,7 @@ def setrun(claw_pkg='geoclaw'):
         pass
 
     elif clawdata.checkpt_style == 2:
-        # Specify a list of checkpoint times.  
+        # Specify a list of checkpoint times.
         clawdata.checkpt_times = [0.1,0.15]
 
     elif clawdata.checkpt_style == 3:
@@ -311,9 +311,9 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.clustering_cutoff = 0.700000
 
     # print info about each regridding up to this level:
-    amrdata.verbosity_regrid = 0  
+    amrdata.verbosity_regrid = 0
 
-    #  ----- For developers ----- 
+    #  ----- For developers -----
     # Toggle debugging print statements:
     amrdata.dprint = False      # print domain flags
     amrdata.eprint = False      # print err est flags
@@ -325,7 +325,7 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.sprint = False      # space/memory output
     amrdata.tprint = True       # time step reporting each level
     amrdata.uprint = False      # update/upbnd reporting
-    
+
     # More AMR parameters can be set -- see the defaults in pyclaw/data.py
 
     # ---------------
@@ -334,6 +334,10 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
+    # rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
+    # rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
+
+    # Increase AMR level
     rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
     rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
 
@@ -343,7 +347,7 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
-    
+
 
     return rundata
     # end of function setrun
@@ -363,7 +367,7 @@ def setgeo(rundata):
     except:
         print "*** Error, this rundata has no geo_data attribute"
         raise AttributeError("Missing geo_data attribute")
-       
+
     # == Physics ==
     geo_data.gravity = 9.81
     geo_data.coordinate_system = 2
@@ -425,4 +429,3 @@ if __name__ == '__main__':
     import sys
     rundata = setrun(*sys.argv[1:])
     rundata.write()
-
