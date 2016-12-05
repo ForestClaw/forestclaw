@@ -11,9 +11,7 @@ showpatchborders;
 
 hold on;
 add_gauges();
-
-hold on;
-plot_regions(t);
+add_regions(t);
 hold off;
 
 set(gca,'fontsize',16);
