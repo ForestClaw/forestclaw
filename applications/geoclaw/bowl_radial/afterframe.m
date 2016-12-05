@@ -47,6 +47,8 @@ if (PlotType == 1)
         set(hh,'linewidth',3,'color','w')
     end
     
+    add_gauges();
+    
     hold off;
     colorbar
 elseif (PlotType == 4)

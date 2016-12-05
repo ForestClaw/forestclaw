@@ -59,8 +59,8 @@ typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
-                                        const int* maux, double aux[], 
-                                        const fclaw_bool* is_ghost, const int* nghost, 
+                                        const int* maux, double aux[],
+                                        const fclaw_bool* is_ghost, const int* nghost,
                                         const int* mint);
 
 typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
@@ -159,6 +159,7 @@ void GEOCLAW_BC2(const int* meqn, const int* mbc,
 #define GEOCLAW_SET_MODULES   FCLAW_F77_FUNC(geoclaw_set_modules, \
                                              GEOCLAW_SET_MODULES)
 void GEOCLAW_SET_MODULES(const int* mwaves_in, const int* mcapa_in,
+                         const int* meqn_in, const int* maux_in,
                          const int mthlim_in[], const int method_in[],
                          const double *ax, const double *bx, const double *ay,
                          const double *by);
@@ -176,7 +177,7 @@ void GEOCLAW_SETAUX(const int* mbc,
                     const double* xlower, const double* ylower,
                     const double* dx, const double* dy,
                     const int* maux, double aux[],
-                    const fclaw_bool* is_ghost, const int* nghost, 
+                    const fclaw_bool* is_ghost, const int* nghost,
                     const int* mint);
 
 void BC2(const int* meqn, const int* mbc,
@@ -375,6 +376,24 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             double aux_fine[], const int* mbathy, const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
+
+void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
+
+#define GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(geoclaw_gauges_getnum, \
+                                             GEOCLAW_GAUGES_GETNUM)
+int GEOCLAW_GAUGES_GETNUM(char fname[]);
+
+#define GEOCLAW_GAUGES_INIT FCLAW_F77_FUNC(geoclaw_gauges_init,         \
+                                           GEOCLAW_GAUGES_INIT)
+void GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
+                         geoclaw_gauge_t gauges[], char fname[]);
+
+#define GEOCLAW_UPDATE_GAUGE FCLAW_F77_FUNC(geoclaw_update_gauge, \
+                                            GEOCLAW_UPDATE_GAUGE)
+void GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
+                           double* ylower,double* dx,double* dy,double q[],
+                           int* maux,double aux[],double* xc,double* yc,double var[],
+                           double* eta);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -554,6 +573,12 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      int refratio,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
+
+void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);
+void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain);
+void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain);
+
+void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain);
 
 
 #ifdef __cplusplus

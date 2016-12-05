@@ -12,7 +12,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_module.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/regions_module.f90 \
-	src/solvers/fc2d_geoclaw/amrlib_source/gauges_module.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/gauges_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/utility_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topo_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/qinit_module.f90 \
@@ -32,6 +32,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_gauges.f90  \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/quick_sort1.f \

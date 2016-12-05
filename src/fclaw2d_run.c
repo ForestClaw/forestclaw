@@ -171,7 +171,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
-            fclaw2d_diagnostics_run(*domain, init_flag);
+
 
             /* In case we have to reject this step */
             if (!gparms->use_fixed_dt)
@@ -287,6 +287,8 @@ void outstyle_1(fclaw2d_domain_t **domain)
             }
             // Add June 6
             fclaw2d_domain_set_time(*domain,t_curr);
+            fclaw2d_diagnostics_run(*domain, init_flag);
+            
             if (gparms->regrid_interval > 0)
             {
                 if (n_inner % gparms->regrid_interval == 0)

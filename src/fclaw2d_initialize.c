@@ -256,10 +256,17 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         }  /* Level loop (minlevel --> maxlevel) */
     }
 
-    if (gparms->init_ghostcell){
+    if (gparms->init_ghostcell)
+    {
         fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
+    }
+
+    /* New grid has been created, so we do any "aftergrid" functions */
+    if (vt.after_regrid != NULL)
+    {
+        vt.after_regrid(*domain);
     }
 
 

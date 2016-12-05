@@ -927,60 +927,6 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     return 1;
 }
 
-static void
-search_synchronize_parallel (fclaw2d_domain_t * domain, sc_array_t * results)
-{
-    int ip, now;
-    int num_points;
-    int mpiret;
-    int minp;
-    sc_array_t *procs, *mprocs;
-
-    FCLAW_ASSERT (domain != NULL);
-    FCLAW_ASSERT (results != NULL);
-    num_points = (int) results->elem_count;
-
-    /* prepare processor array */
-    procs = sc_array_new_size (sizeof (int), num_points);
-    for (ip = 0; ip < num_points; ++ip)
-    {
-        *(int *) sc_array_index_int (procs, ip) =
-            (*(int *) sc_array_index_int (results, ip) == -1 ?
-             domain->mpisize : domain->mpirank);
-    }
-
-    /* communicate */
-    mprocs = sc_array_new_size (sizeof (int), num_points);
-    mpiret =
-        sc_MPI_Allreduce (procs, mprocs, num_points, sc_MPI_INT, sc_MPI_MIN,
-                          domain->mpicomm);
-    SC_CHECK_MPI (mpiret);
-    sc_array_destroy (procs);
-
-    /* process results */
-    for (ip = 0; ip < num_points; ++ip)
-    {
-        /* the patch index found on this processor */
-        now = *(int *) sc_array_index_int (results, ip);
-        if (now != -1)
-        {
-            minp = *(int *) sc_array_index_int (mprocs, ip);
-            FCLAW_ASSERT (minp != domain->mpisize);
-
-            /* the point we found may be shared with other ranks */
-            if (minp != domain->mpirank)
-            {
-                /* remove matches for points also found on lower ranks */
-                FCLAW_ASSERT (minp < domain->mpirank);
-                *(int *) sc_array_index_int (results, ip) = -1;
-            }
-        }
-    }
-
-    /* tidy up memory */
-    sc_array_destroy (mprocs);
-}
-
 void
 fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                               sc_array_t * block_offsets,
@@ -1063,7 +1009,6 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     p4est->user_pointer = user_save;
 
     /* synchronize results in parallel */
-    search_synchronize_parallel (domain, results);
 
     /* tidy up memory */
     sc_array_destroy (points);

@@ -99,6 +99,8 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
                                                  int blockno,
                                                  int patchno);
 
+typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
+
 typedef int (*fclaw2d_regrid_tag4refinement_t)(fclaw2d_domain_t *domain,
                                               fclaw2d_patch_t *this_patch,
                                               int this_block_idx, int this_patch_idx,
@@ -289,6 +291,9 @@ typedef struct fclaw2d_vtable
 
     fclaw2d_regrid_interpolate2fine_t  regrid_interpolate2fine;
     fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
+
+
+    fclaw2d_after_regrid_t             after_regrid;
 
     fclaw2d_regrid_tag4refinement_t    regrid_tag4refinement;
     fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
