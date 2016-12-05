@@ -78,7 +78,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
                                  &clawopt->mthlim, clawopt->mwaves,
                                  "[geoclaw] Waves limiters (one entry per wave; " \
                                  "values 0-4) [NULL]");
-    // Add Coarsen criteria
+    /* Coarsen criteria */
     sc_options_add_double (opt, 0, "dry_tolerance_c", &clawopt->dry_tolerance_c, 1.0,
                            "[geoclaw] Coarsen criteria: Dry tolerance [1.0]");
 
@@ -96,6 +96,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     sc_options_add_int (opt, 0, "mbathy", &clawopt->mbathy, 1,
                         "[geoclaw] Location of bathymetry in aux array [1]");
+
     clawpkg->is_registered = 1;
     return NULL;
 }
@@ -110,6 +111,7 @@ fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t * clawopt)
     fclaw_options_convert_double_array (clawopt->speed_tolerance_c_string,
                                         &clawopt->speed_tolerance_c,
                                         clawopt->speed_tolerance_entries_c);
+
     return FCLAW_NOEXIT;
 }
 
@@ -183,6 +185,7 @@ fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
     fclaw_options_destroy_array (clawopt->speed_tolerance_c);
+    fclaw_options_destroy_array (clawopt->gauges);
 }
 
 static void

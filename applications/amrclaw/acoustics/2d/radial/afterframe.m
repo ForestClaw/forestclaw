@@ -1,11 +1,11 @@
 if (PlotType == 1)
   daspect([1 1 1]);
   rybcolormap;
-  showgridlines(1:2);
   showpatchborders;
+  setpatchborderprops('linewidth',1);
 
   caxis([-2 2]);
-  colorbar;
+  colorbar;  
 elseif (PlotType == 4)
   hold on;
   dir = './1drad/_output/';
@@ -22,10 +22,13 @@ elseif (PlotType == 4)
   set(lh,'fontsize',16);
   ylim([-2 3]);
 
+  plot([1 1],ylim,'k--');
+  
   hold off;
 end
 
 view(2);
+set(gca,'fontsize',16)
 
 prt = false;
 if (prt)

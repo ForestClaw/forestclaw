@@ -1,11 +1,11 @@
 
-""" 
+"""
 Set up the plot figures, axes, and items to be done for each frame.
 
 This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
-    
-""" 
+
+"""
 
 
 try:
@@ -18,18 +18,19 @@ except:
 #--------------------------
 def setplot(plotdata):
 #--------------------------
-    
-    """ 
+
+    """
     Specify what is to be plotted at each frame.
     Input:  plotdata, an instance of pyclaw.plotters.data.ClawPlotData.
     Output: a modified version of plotdata.
-    
-    """ 
+
+    """
 
 
     from clawpack.visclaw import colormaps, geoplot
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = "forestclaw"
 
     def set_drytol(current_data):
         # The drytol parameter is used in masking land and water and
@@ -48,7 +49,7 @@ def setplot(plotdata):
         from clawpack.visclaw import gaugetools
         gaugetools.plot_gauge_locations(current_data.plotdata, \
              gaugenos='all', format_string='ko', add_labels=True)
-    
+
 
     #-----------------------------------------
     # Figure for pcolor plot
@@ -259,7 +260,7 @@ def setplot(plotdata):
         eta = q[3,:]
         topo = eta - h
         return topo
-        
+
     plotitem.plot_var = gaugetopo
     plotitem.plotstyle = 'g-'
     def add_zeroline(current_data):
@@ -287,8 +288,8 @@ def setplot(plotdata):
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(plot_type='2d_patch')
     plotitem.amr_patch_bgcolor = ['#ffeeee', '#eeeeff', '#eeffee']
-    plotitem.amr_celledges_show = [1,1,0]   
-    plotitem.amr_patchedges_show = [1]     
+    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.amr_patchedges_show = [1]
 
     #-----------------------------------------
     # Scatter plot of surface for radially symmetric
@@ -317,18 +318,18 @@ def setplot(plotdata):
     plotitem.plotstyle = 'o'
     plotitem.amr_color=['b','r','g']
     plotaxes.afteraxes = "import pylab; pylab.legend(['Level 1','Level 2'])"
-    
+
 
     #-----------------------------------------
-    
+
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all'          # list of frames to print
-    plotdata.print_gaugenos = [4,5,104,105]  # list of gauges to print
-    plotdata.print_fignos = 'all'            # list of figures to print
+    plotdata.print_framenos = 'all' # list of frames to print
+    plotdata.print_gaugenos = [1,2,3,101,102,103]  # list of gauges to print
+    plotdata.print_fignos = [300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = True                    # create latex file of plots?
@@ -336,8 +337,6 @@ def setplot(plotdata):
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
     plotdata.format = 'ascii'                # Format of output
-    # plotdata.format = 'netcdf'             
+    # plotdata.format = 'netcdf'
 
     return plotdata
-
-    

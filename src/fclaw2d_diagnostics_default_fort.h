@@ -38,9 +38,9 @@ extern "C"
                                                   FCLAW2D_FORT_COMPUTE_ERROR)
 
 void FCLAW2D_FORT_COMPUTE_ERROR(int* blockno, int *mx, int *my, int *mbc, int *meqn,
-                                double *dx, double *dy, double *xlower,
-                                double *t,
-                                double *ylower, double q[], double error[]);
+                                double *dx, double *dy,
+                                double *xlower,double *ylower,
+                                double *t, double q[], double error[]);
 
 
 #ifdef __cplusplus

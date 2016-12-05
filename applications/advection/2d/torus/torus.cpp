@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "torus_common.h"
 #include "torus_user.h"
 
 #include <fclaw2d_forestclaw.h>
@@ -43,33 +42,18 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 1 = cart; 2 = torus; 3 = lat-long; 4 = annulus [2]");
+                        "[user] 0 = torus; 1 = twisted torus [0]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
+
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
 
-    fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
-                                   "-50 50", &user->latitude, 2,
-                                   "[user] Latitude range (degrees) [-50 50]");
-
-    fclaw_options_add_double_array(opt, 0, "longitude", &user->longitude_string,
-                                   "0 360", &user->longitude, 2,
-                                   "[user] Longitude range (degrees) [0 360]");
-
-    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
-                           "[user] Inner radius of annulus [0.4]");
-
     user->is_registered = 1;
     return NULL;
-}
-
-static fclaw_exit_type_t
-options_postprocess_user (fclaw_app_t * a, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-
-    return torus_options_postprocess (user);
 }
 
 static fclaw_exit_type_t
@@ -77,24 +61,23 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
 
-    return torus_options_check (user);
-}
+    if (user->example < 0 || user->example > 1)
+    {
+        fclaw_global_essentialf
+            ("Option --user:example must be 0 or 1\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
 
-static void
-options_destroy_user (fclaw_app_t * a, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-
-    torus_options_reset (user);
 }
 
 static const
 fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
-    options_postprocess_user,
+    NULL,
     options_check_user,
-    options_destroy_user
+    NULL,
 };
 
 static
@@ -108,6 +91,16 @@ void register_user_options (fclaw_app_t * app,
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+}
+
+const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
 }
 
 static
@@ -139,64 +132,16 @@ void run_program(fclaw_app_t* app)
     mi = gparms->mi;
     mj = gparms->mj;
     rotate[0] = pi*gparms->theta/180.0;
-    rotate[1] = pi*gparms->phi/180.0;
-    a = gparms->periodic_x;
-    b = gparms->periodic_y;
+    rotate[1] = 0;  /* Don't rotate through phi */
 
-    switch (user->example)
-    {
-    case 0:
-        FCLAW_ASSERT(mi == 1 && mj == 1);  /* assumes square domain; uses [ax,bx]x[ay,by] */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        cont = fclaw2d_map_new_nomap();
-        break;
-    case 1:
-        /* Cartesian [-1,1]x[-1,1] */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick, gparms->scale, gparms->shift, rotate);
-        break;
-    case 2:
-        /* torus */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,user->alpha);
-        break;
-    case 3:
-        /* Lat-long example */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_latlong(brick,gparms->scale,gparms->shift,
-                                       rotate,user->latitude,user->longitude,a,b);
-        break;
-    case 4:
-        /* Annulus */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_annulus(brick,gparms->scale,gparms->shift,
-                                       rotate,user->beta);
-        break;
+    a = 1;  /* Torus is periodic in both directions */
+    b = 1;
 
-    case 5:
-    case 6:
-        /* Duplicate initial conditions in each block */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
-        fclaw2d_map_destroy_brick(brick); /* We don't really need the brick */
-        cont = fclaw2d_map_new_nomap();
-        break;
-
-    case 7:
-        /* torus */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_twisted_torus(brick,gparms->scale,
-                                             gparms->shift,rotate,user->alpha);
-        break;
-
-    default:
-        SC_ABORT_NOT_REACHED ();
-    }
+    /* torus */
+    conn  = p4est_connectivity_new_brick(mi,mj,a,b);
+    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    cont  = fclaw2d_map_new_torus(brick,gparms->scale,gparms->shift,rotate,
+                                  user->alpha,user->example);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
@@ -240,10 +185,11 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_link_app (app);
 
     /* Register packages */
-    gparms = fclaw_forestclaw_register(app,"fclaw_options_ini");
-    glob = fclaw2d_global_new (gparms);
-
+    gparms = fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
+    fc2d_clawpack5_register(app,"fclaw_options.ini");
+
+    glob = fclaw2d_global_new (gparms);
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);

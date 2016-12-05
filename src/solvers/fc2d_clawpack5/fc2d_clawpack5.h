@@ -27,10 +27,14 @@
 #define FC2D_CLAWPACK5_H
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw_package.h>
 
 #include "fc2d_clawpack5_options.h"
+
+#include "clawpack5_user_fort.h"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -42,7 +46,7 @@ extern "C"
 
 
 typedef void (*fc2d_clawpack5_setprob_t)();
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
                                      const double* xlower, const double* ylower,
@@ -50,19 +54,19 @@ typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const double q[], const int* maux,
                                      const double aux[], const double* t,
                                      const double* dt, const int mthbc[]);
-//!!! Modified 2016/4/5
+
 typedef  void (*fc2d_clawpack5_qinit_t)(const int* meqn,const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         double q[], const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_clawpack5_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
                                          const int* mx, const int* my, const int* meqn,
                                          double q[], const double* xlower,
@@ -70,7 +74,7 @@ typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
                                          const double* dx, const double* dy,
                                          const double* t, const double* dt,
                                          const int* maux, double aux[]);
-//!!! Modified 2016/4/5
+
 typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
                                       const int* mbc, const int* mx,const int* my,
                                       const double* xlower, const double* ylower,
@@ -78,9 +82,9 @@ typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
                                       const int* maux, double aux[], const double* t,
                                       const double* dt);
 
-//!!! Add maux
+
 typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                      const int* mwaves, const int* maux, 
+                                      const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
@@ -91,7 +95,7 @@ typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* imp, const int*
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
-//!!!fwave --> wave
+
 typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
@@ -121,87 +125,20 @@ typedef struct fc2d_clawpack5_vtable
 } fc2d_clawpack5_vtable_t;
 
 
-void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* vt);
+void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t vt);
 
-void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
+void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                 fc2d_clawpack5_vtable_t* vt);
 
-#define CLAWPACK5_BC2 FCLAW_F77_FUNC(clawpack5_bc2,CLAWPACK5_BC2)
-void CLAWPACK5_BC2(const int* meqn, const int* mbc,
-                   const int* mx, const int* my,
-                   const double* xlower, const double* ylower,
-                   const double* dx, const double* dy,
-                   const double q[], const int* maux,
-                   const double aux[], const double* t,
-                   const double* dt, const int mthbc[]);
-
-/* --------------------------------------------------------------------
-   Classic routines
-   - These are provided only for convenience;  these files are not
-   compiled into the library, but will be provided by the user.
-   -------------------------------------------------------------------- */
-
-/* Macros for C/Fortran portability */
-#define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
-#define QINIT   FCLAW_F77_FUNC(qinit,QINIT)
-#define SETAUX  FCLAW_F77_FUNC(setaux,SETAUX)
-#define B4STEP2 FCLAW_F77_FUNC(b4step2,B4STEP2)
-#define SRC2    FCLAW_F77_FUNC(src2,SRC2)
-#define BC2     FCLAW_F77_FUNC(bc2,BC2)
-#define RPN2    FCLAW_F77_FUNC(rpn2,RPN2)
-#define RPT2    FCLAW_F77_FUNC(rpt2,RPT2)
-
-/* These will be converted to MACROS slowly ... */
-
-void SETPROB();
-
-void QINIT(const int* meqn,const int* mbc,
-           const int* mx, const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy,
-           double q[], const int* maux, double aux[]);
-
-void SETAUX(const int* mbc,
-            const int* mx, const int* my,
-            const double* xlower, const double* ylower,
-            const double* dx, const double* dy,
-            const int* maux, double aux[]);
-
-void BC2(const int* meqn, const int* mbc,
-         const int* mx, const int* my,
-         const double* xlower, const double* ylower,
-         const double* dx, const double* dy,
-         const double q[], const int* maux,
-         const double aux[], const double* t,
-         const double* dt, const int mthbc[]);
-
-void B4STEP2(const int* mbc,
-             const int* mx, const int* my, const int* meqn,
-             double q[], const double* xlower,
-             const double* ylower,
-             const double* dx, const double* dy,
-             const double* t, const double* dt,
-             const int* maux, double aux[]);
-
-void SRC2(const int* meqn,
-          const int* mbc, const int* mx,const int* my,
-          const double* xlower, const double* ylower,
-          const double* dx, const double* dy, double q[],
-          const int* maux, double aux[], const double* t,
-          const double* dt);
-
-/* Riemann solvers */
-void RPN2(const int* ixy,const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux, 
-          const int* mbc,const int* mx,
-          double ql[], double qr[], double auxl[], double auxr[],
-          double wave[], double s[],double amdq[], double apdq[]);
-
-void RPT2(const int* ixy, const int* imp, const int* maxm, const int* meqn,
-          const int* mwaves, const int* maux, const int* mbc,const int* mx,
-          double ql[], double qr[], double aux1[], double aux2[],
-          double aux3[],  double asdq[],
-          double bmasdq[], double bpasdq[]);
+#define CLAWPACK5_BC2_DEFAULT FCLAW_F77_FUNC(clawpack5_bc2_default, \
+                                             CLAWPACK5_BC2_DEFAULT)
+void CLAWPACK5_BC2_DEFAULT(const int* meqn, const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const double q[], const int* maux,
+                           const double aux[], const double* t,
+                           const double* dt, const int mthbc[]);
 
 /* --------------------------------------------------------------------
    Time stepping
@@ -221,6 +158,7 @@ void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             fc2d_clawpack5_rpt2_t rpt2,
                             fc2d_clawpack5_flux2_t flux2,
                             int block_corner_count[],int* ierror);
+
 #define CLAWPACK5_STEP2 FCLAW_F77_FUNC(clawpack5_step2,CLAWPACK5_STEP2)
 void CLAWPACK5_STEP2(const int* maxm, const int* meqn, const int* maux,
                             const int* mbc, const int* mx,
@@ -368,8 +306,7 @@ void  FC2D_CLAWPACK5_FORT_WRITE_FILE(char* matname1,
 
 #define FC2D_CLAWPACK5_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_header, \
                                                         FC2D_CLAWPACK5_FORT_WRITE_HEADER)
-void FC2D_CLAWPACK5_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                      double* time, int* meqn, int* ngrids);
+void FC2D_CLAWPACK5_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, int* maux,int* ngrids);
 
 
 #define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
@@ -398,8 +335,7 @@ void  FC2D_CLAWPACK5_FORT_GHOSTPACK(int *mx, int *my, int *mbc,
                                      int *meqn, int *mint,
                                      double qdata[], double area[],
                                      double qpack[], int *psize,
-                                     int *packmode, int *pack_layers,
-                                     int *ierror);
+                                    int *packmode, int *ierror);
 
 #define FC2D_CLAWPACK5_FORT_TIMEINTERP FCLAW_F77_FUNC (fc2d_clawpack5_fort_timeinterp, \
                                                        FC2D_CLAWPACK5_FORT_TIMEINTERP)
@@ -447,6 +383,9 @@ void fc2d_clawpack5_package_register(fclaw_app_t* app,
                                       fc2d_clawpack5_options_t* clawopt);
 
 int fc2d_clawpack5_get_package_id (void);
+
+void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
+                                        int iframe);
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
 

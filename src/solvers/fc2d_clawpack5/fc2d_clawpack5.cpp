@@ -37,16 +37,16 @@ static fc2d_clawpack5_vtable_t classic_vt;
 
 
 
-void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t* user_vt)
+void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
 {
-    classic_vt = *user_vt;
+    classic_vt = user_vt;
 }
 
-void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
-                                fc2d_clawpack5_vtable_t* vt)
+void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
+                                        fc2d_clawpack5_vtable_t* vt)
 {
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK5_BC2;
+    vt->bc2 = CLAWPACK5_BC2_DEFAULT;
     vt->qinit = NULL;
     vt->rpn2 = NULL;
     vt->rpt2 = NULL;
@@ -57,6 +57,19 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     vt->b4step2 = NULL;
     vt->src2 = NULL;
 
+    /* Default qinit functions */
+    fclaw_vt->patch_initialize         = &fc2d_clawpack5_qinit;
+    if (fclaw_vt->problem_setup == NULL)
+    {
+        /* This call shouldn't override a version-independent setting
+           for this function */
+        fclaw_vt->problem_setup        = &fc2d_clawpack5_setprob;
+    }
+    fclaw_vt->patch_setup              = &fc2d_clawpack5_setaux;
+    fclaw_vt->patch_physical_bc        = &fc2d_clawpack5_bc2;
+    fclaw_vt->patch_single_step_update = &fc2d_clawpack5_update;
+
+
     /* Forestclaw functions */
     fclaw_vt->fort_average2coarse    = &FC2D_CLAWPACK5_FORT_AVERAGE2COARSE;
     fclaw_vt->fort_interpolate2fine  = &FC2D_CLAWPACK5_FORT_INTERPOLATE2FINE;
@@ -65,7 +78,8 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
     /* output functions */
-    fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    fclaw_vt->write_header           = &fc2d_clawpack5_output_header_ascii;
+    // fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
     fclaw_vt->fort_write_file        = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
 
     /* diagnostic functions */
@@ -83,7 +97,7 @@ void fc2d_clawpack5_init_vtable(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     fclaw_vt->fort_ghostpack = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
-    
+
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
@@ -261,10 +275,10 @@ int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain)
 
 void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
 {
-    /* Assume that if we are here, then the user has a valid setprob */
-    FCLAW_ASSERT(classic_vt.setprob != NULL);
-
-    classic_vt.setprob();
+    if (classic_vt.setprob != NULL)
+    {
+        classic_vt.setprob();
+    }
 }
 
 
@@ -274,10 +288,27 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
                             int this_block_idx,
                             int this_patch_idx)
 {
-    FCLAW_ASSERT(classic_vt.setaux != NULL);
+    if (classic_vt.setaux == NULL)
+    {
+        /* For consistency, class_vt.patch_setup is set to
+           fc2d_clawpack5_setaux by default.  We
+           check here that the user has actually set a
+           SETAUX routine. If they haven't, we assume that
+           they didn't really want a setaux routine. */
+        return;
+    }
+
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        /* This is going to be removed at some point */
+        return;
+    }
+
+
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux;
+
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -454,18 +485,9 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-#if 0
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    q = cp->q_time_sync(time_interp);
-#endif
     fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
-    /*
-    classic_vt.bc2(q, aux, nrow, ncol ,meqn, maux, hx, hy, 
-                   level, time, xleft, xright, ybot, ytop, 
-                   &xlower, &ylower, xupper, yupper, 0,0,0);
-    */
     classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CLAWPACK5_UNSET_BLOCK();
@@ -520,20 +542,21 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    
+
     int ierror = 0;
     //fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
     //                                CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
     fc2d_clawpack5_flux2_t flux2 = CLAWPACK5_FLUX2;
+    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
     CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           classic_vt.rpn2, classic_vt.rpt2,flux2,
-                          cp->block_corner_count(), &ierror);
+                          block_corner_count, &ierror);
 
     FCLAW_ASSERT(ierror == 0);
-    
+
     //CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
     //                fm, fp, gm, gp, classic_vt.rpn2, classic_vt.rpt2);
     /* Accumulate fluxes needed for conservative fix-up */
@@ -581,4 +604,24 @@ double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
                              this_patch_idx,t,dt);
     }
     return maxcfl;
+}
+
+void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
+                                        int iframe)
+{
+    const amr_options_t *amropt;
+    const fc2d_clawpack5_options_t *clawpack_opt;
+    int meqn,maux,ngrids;
+    double time;
+
+    amropt = fclaw2d_forestclaw_get_options(domain);
+    clawpack_opt = fc2d_clawpack5_get_options(domain);
+
+    time = fclaw2d_domain_get_time(domain);
+    ngrids = fclaw2d_domain_get_num_patches(domain);
+
+    meqn = amropt->meqn;
+    maux = clawpack_opt->maux;
+
+    FC2D_CLAWPACK5_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);
 }

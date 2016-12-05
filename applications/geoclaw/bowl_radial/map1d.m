@@ -49,8 +49,8 @@
 
 function [r,q] = map1d(xgrid,ygrid,qgrid)
 
-xr = linspace(0,100,201);
-yr = linspace(0,100,201);
+xr = linspace(0,100,1001);
+yr = linspace(0,100,1001);
 
 q = interp2(xgrid,ygrid,qgrid,xr,yr,'*cubic',NaN);  % Interpolate to diagonal.
 

@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
+#include <p4est_search.h>
 #include <p4est_wrap.h>
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -827,4 +828,188 @@ fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
     fclaw2d_domain_iterate_adapted (old_domain, new_domain,
                                     fclaw2d_domain_list_adapted_callback,
                                     (void *) &log_priority);
+}
+
+typedef struct fclaw2d_search_data
+{
+    fclaw2d_domain_t *domain;
+    sc_array_t *coordinates;
+    sc_array_t *results;
+}
+fclaw2d_search_data_t;
+
+static int
+search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                 p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                 void *point)
+{
+    int ip, jb;
+    int earlier, now;
+    int *pentry;
+    double x, y;
+    double *xyentry;
+    fclaw2d_block_t *block;
+#ifdef FCLAW_ENABLE_DEBUG
+    fclaw2d_patch_t *patch;
+#endif
+    fclaw2d_search_data_t *sd = (fclaw2d_search_data_t *) p4est->user_pointer;
+    p4est_qcoord_t qh;
+
+    FCLAW_ASSERT (sd != NULL);
+    FCLAW_ASSERT (sd->domain != NULL);
+    FCLAW_ASSERT (sd->coordinates != NULL);
+    FCLAW_ASSERT (sd->results != NULL);
+    FCLAW_ASSERT (point != NULL);
+
+    /* access point data */
+    pentry = (int *) point;
+    jb = pentry[0];
+    if (jb != (int) which_tree)
+    {
+        /* this is the wrong tree entirely */
+        return 0;
+    }
+    ip = pentry[1];
+    xyentry = (double *) sc_array_index_int (sd->coordinates, ip);
+
+    /* compare quadrant coordinates with point coordinates */
+    qh = P4EST_QUADRANT_LEN (quadrant->level);
+    x = xyentry[0];
+    if (x < quadrant->x * fclaw2d_smallest_h ||
+        x > (quadrant->x + qh) * fclaw2d_smallest_h)
+    {
+        return 0;
+    }
+    y = xyentry[1];
+    if (y < quadrant->y * fclaw2d_smallest_h ||
+        y > (quadrant->y + qh) * fclaw2d_smallest_h)
+    {
+        return 0;
+    }
+    /* now we know that the point is contained in the search quadrant */
+
+    if (local_num < 0)
+    {
+        FCLAW_ASSERT (local_num == -1);
+        /* this is not a leaf */
+        return 1;
+    }
+    /* new we know that we have found the point in a leaf */
+
+    FCLAW_ASSERT (0 <= jb && jb < sd->domain->num_blocks);
+    block = sd->domain->blocks + jb;
+    FCLAW_ASSERT (block != NULL);
+    now = (int) local_num - block->num_patches_before;
+    FCLAW_ASSERT (0 <= now && now < block->num_patches);
+#ifdef FCLAW_ENABLE_DEBUG
+    patch = block->patches + now;
+    FCLAW_ASSERT (patch != NULL);
+#endif
+
+    /* do the check a second time with the patch data */
+    FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
+    FCLAW_ASSERT (y >= patch->ylower && y <= patch->yupper);
+
+    /* remember the smallest local quadrant number as result */
+    earlier = *(int *) sc_array_index_int (sd->results, ip);
+    FCLAW_ASSERT (-1 <= earlier && earlier < block->num_patches);
+    if (earlier >= 0)
+    {
+        now = SC_MIN (earlier, now);
+    }
+    if (now != earlier)
+    {
+        P4EST_ASSERT (earlier == -1 || now < earlier);
+        *(int *) sc_array_index_int (sd->results, ip) = now;
+    }
+
+    /* for leaves the return value is irrelevant */
+    return 1;
+}
+
+void
+fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
+                              sc_array_t * block_offsets,
+                              sc_array_t * coordinates, sc_array_t * results)
+{
+    int ip, jb;
+    int num_blocks;
+    int num_points;
+    int pbegin, pend;
+    int *pentry;
+    sc_array_t *points;
+
+    p4est_t *p4est;
+    p4est_wrap_t *wrap;
+    void *user_save;
+
+    fclaw2d_search_data_t search_data, *sd = &search_data;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (block_offsets != NULL);
+    FCLAW_ASSERT (coordinates != NULL);
+    FCLAW_ASSERT (results != NULL);
+
+    num_blocks = domain->num_blocks;
+    FCLAW_ASSERT (0 <= num_blocks);
+
+    FCLAW_ASSERT (block_offsets->elem_size == sizeof (int));
+    FCLAW_ASSERT (coordinates->elem_size == 2 * sizeof (double));
+    FCLAW_ASSERT (results->elem_size == sizeof (int));
+
+    FCLAW_ASSERT (num_blocks + 1 == (int) block_offsets->elem_count);
+    FCLAW_ASSERT (0 == *(int *) sc_array_index_int (block_offsets, 0));
+    num_points = *(int *) sc_array_index_int (block_offsets, num_blocks);
+
+    FCLAW_ASSERT (num_points == (int) coordinates->elem_count);
+    FCLAW_ASSERT (num_points == (int) results->elem_count);
+
+    /* prepare results array */
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        *(int *) sc_array_index_int (results, ip) = -1;
+    }
+
+    /* construct input set for p4est search */
+    points = sc_array_new_size (2 * sizeof (int), num_points);
+    pbegin = 0;
+    for (jb = 0; jb < num_blocks; ++jb)
+    {
+        pend = *(int *) sc_array_index_int (block_offsets, jb + 1);
+        FCLAW_ASSERT (pbegin <= pend);
+
+        /* managemant data used internal to the p4est search */
+        for (ip = pbegin; ip < pend; ++ip)
+        {
+            pentry = (int *) sc_array_index (points, ip);
+            pentry[0] = jb;
+            pentry[1] = ip;
+        }
+        pbegin = pend;
+    }
+    FCLAW_ASSERT (pbegin == num_points);
+
+    /* stash relevant information to pass to search */
+    sd->domain = domain;
+    sd->coordinates = coordinates;
+    sd->results = results;
+
+    /* process-local search through p4est */
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    p4est = wrap->p4est;
+    FCLAW_ASSERT (p4est != NULL);
+    FCLAW_ASSERT (p4est->connectivity != NULL);
+    FCLAW_ASSERT (p4est->connectivity->num_trees ==
+                  (p4est_topidx_t) num_blocks);
+    user_save = p4est->user_pointer;
+    p4est->user_pointer = sd;
+    p4est_search (p4est, NULL, search_point_fn, points);
+    p4est->user_pointer = user_save;
+
+    /* synchronize results in parallel */
+
+    /* tidy up memory */
+    sc_array_destroy (points);
 }

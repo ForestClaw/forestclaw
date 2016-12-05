@@ -217,13 +217,16 @@ typedef union {
 #if DEFINED_INTEL
 
 // x87 fpu
-#define getx87cr(x)    asm ("fnstcw %0" : "=m" (x));
-#define setx87cr(x)    asm ("fldcw %0"  : "=m" (x));
-#define getx87sr(x)    asm ("fnstsw %0" : "=m" (x));
+/* DAC (9/26/2016) : Changed 'asm' to '__asm__ volatile' so that macro expansion
+   passed -std=c99 -pedentic compiler flags */
+
+#define getx87cr(x)    __asm__ volatile ("fnstcw %0" : "=m" (x));
+#define setx87cr(x)    __asm__ volatile ("fldcw %0" : "=m" (x));
+#define getx87sr(x)    __asm__ volatile ("fnstsw %0" : "=m" (x));
 
 // SIMD, gcc with Intel Core 2 Duo uses SSE2(4)
-#define getmxcsr(x)    asm ("stmxcsr %0" : "=m" (x));
-#define setmxcsr(x)    asm ("ldmxcsr %0" : "=m" (x));
+#define getmxcsr(x)    __asm__ volatile ("stmxcsr %0" : "=m" (x));
+#define setmxcsr(x)    __asm__ volatile ("ldmxcsr %0" : "=m" (x));
 
 #endif  // DEFINED_INTEL
 

@@ -47,6 +47,8 @@ fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifie
         return 0;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 1;
+    case FCLAW2D_MAP_QUERY_IS_BRICK:
+        return 0;
     default:
         printf("\n");
         printf("fclaw2d_map_query_cubedsphere (fclaw2d_map.c) : Query id not "\

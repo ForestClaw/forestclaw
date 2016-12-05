@@ -42,13 +42,17 @@ typedef enum
 {
     FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
     FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED,
-    FCLAW2D_BUILD_FOR_UPDATE, 
+    FCLAW2D_BUILD_FOR_UPDATE,
     FCLAW2D_BUILD_COSTOM
 } fclaw2d_build_mode_t;
 
 
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
+
+void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
+void fclaw2d_clawpatch_delete_patch(void *cp);
+
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
@@ -109,15 +113,16 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha);
 
-void fclaw2d_clawpatch_setup_for_time_interpolation(fclaw2d_domain_t* domain,
-                                                    fclaw2d_patch_t* this_patch,
-                                                    const double alpha,
-                                                    const int psize);
-
 void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain);
 
 int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
+                                 fclaw2d_patch_t* this_patch);
 
 
 /* -----------------------------------------------------
@@ -135,6 +140,13 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
                              int this_block_idx,
                              int this_patch_idx,
                              void *user);
+
+void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int blockno,
+                                   int patchno,
+                                   void *user);
+
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *fine_patches,
@@ -201,7 +213,7 @@ void fclaw2d_clawpatch_initialize_after_regrid(fclaw2d_domain_t* domain,
    ---------------------------------------------------- */
 size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain);
 
-    void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
                                         fclaw2d_patch_t* this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         double *qdata, fclaw_bool time_interp);
@@ -220,10 +232,12 @@ void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
                                                 void **q);
 
 
+#if 0
 void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   fclaw2d_patch_t* this_patch,
                                   double *qpack, int time_interp,
                                   int packmode);
+#endif
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,

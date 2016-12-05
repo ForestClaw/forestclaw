@@ -2,29 +2,20 @@ setviews;
 daspect([1 1 1]);
 axis off;
 
-
 yrbcolormap;
 caxis([0 1]);
-showgridlines(1:2);
-showpatchborders(1:7);
-if (ShowUnderOverShoots == 1)
-    under_label = sprintf('%6.2e',qmin);
-    over_label = sprintf('1 + %6.2e',qmax-1);
-    colorbar_underover(under_label,over_label);
-end
 
-fprintf('%10s : %12.4e\n','qmin',qmin);
-fprintf('%10s : %12.4e\n','qmax',qmax);
-
-zoom(1.1^5);
-hidegridlines;
+showpatchborders;
+setpatchborderprops('linewidth',1);
+hidepatchborders(6);
+view(3);
 
 NoQuery = 0;
 prt = false;
 if (prt)
     filename = sprintf('sphere%4.4d.png',Frame);
-      disp(filename);
-      print('-dpng',filename);
+    disp(filename);
+    print('-dpng',filename);
 end;
 
 shg;

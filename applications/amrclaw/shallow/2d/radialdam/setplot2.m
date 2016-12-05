@@ -9,12 +9,12 @@ UserVariableFile = ' ';
 MaxFrames = 1000;
 MaxLevels = 30;
 Manifold = 0;
+ReadBlockNumber = 1;
 PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
-PlotGridEdges = zeros(1,MaxLevels); 
+PlotGridEdges = zeros(1,MaxLevels);
 
-% PlotType = 1;  % Pseudo-color plot
-PlotType = 4;  % Scatter plot (compare with rad1d)
+PlotType = 1;  % Pseudo-color plot
 
 MappedGrid = 0;
 
@@ -22,9 +22,9 @@ MappedGrid = 0;
 ContourValues = [];
 
 % for scatter plot (PlotType==4):
-  x0 = 0;
-  y0 = 0;
-  ScatterStyle = setplotstyle('ro','m*','cs','gp','ro','k*');
+x0 = 0;
+y0 = 0;
+UserMap1d = 1;
+ScatterStyle = setplotstyle('ro','m*','cs','gp','ro','k*');
 
 PlotParallelPartitions=0;
-

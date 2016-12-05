@@ -12,7 +12,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_module.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/regions_module.f90 \
-	src/solvers/fc2d_geoclaw/amrlib_source/gauges_module.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/gauges_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/utility_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topo_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/qinit_module.f90 \
@@ -32,6 +32,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_gauges.f90  \
 	src/solvers/fc2d_geoclaw/amrlib_source/opendatafile.f \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/quick_sort1.f \
@@ -51,13 +52,13 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate2fine_fort.f \
-	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \	
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics_fort.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp_fort.f
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 

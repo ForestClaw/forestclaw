@@ -15,10 +15,11 @@ c
 c
       do 150 i=1,mx
 	 xcell = xlower + (i-0.5d0)*dx
-	 if (xcell .lt. r0) then
-	     h = hin
+         ze = -(xcell**2)/10.d0
+	 if (ze .gt. -10) then
+	     h = 40.*exp(ze)
 	   else
-	     h = hout
+	     h = 0
 	   endif
 	 q(i,1) = h
 	 q(i,2) = 0.d0

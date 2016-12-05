@@ -26,8 +26,10 @@
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+
+#include "../all/clawpack_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -38,13 +40,23 @@ extern "C"
 #endif
 
 
-#define SETAUX_MANIFOLD FCLAW_F77_FUNC(setaux_manifold,SETAUX_MANIFOLD)
-void SETAUX_MANIFOLD(const int* mx, const int* my, const int* mbc,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy,
-                     const int* maux, double aux[],
-                     const int* blockno,
-                     double xd[], double yd[], double zd[],double area[]);
+typedef struct user_options
+{
+    int example;
+    double  revs_per_second;
+    int claw_version;
+    int is_registered;
+
+} user_options_t;
+
+
+#define SPHERE_SETPROB FCLAW_F77_FUNC(sphere_setprob, SPHERE_SETPROB)
+
+void SPHERE_SETPROB(const double *rps);
+
+const user_options_t* sphere_user_get_options(fclaw2d_domain_t* domain);
+
+void sphere_problem_setup(fclaw2d_domain_t* domain);
 
 void sphere_link_solvers(fclaw2d_domain_t *domain);
 

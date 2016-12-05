@@ -133,7 +133,7 @@ y_loop: do j=1,my
      !! Ignore the storm based refinement first
 
      !! Check that the grids is allowed to be coarsened or not
-     if (allowcoarsen(x_c,y_c,t,level)) then
+     if (allowcoarsen(x_c,y_c,t,clevel)) then
         if (q(1,i,j) > dry_tolerance_c) then
            eta = q(1,i,j) + aux(mbathy,i,j)
            if ( abs(eta - sea_level) < wave_tolerance_c) then

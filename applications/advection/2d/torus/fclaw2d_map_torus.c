@@ -74,7 +74,15 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
     /* blockno is ignored in the current torus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
     double alpha = cont->user_double[0];
-    MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
+    int example = cont->user_int[0];
+    if (example == 0)
+    {
+        MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
+    }
+    else if (example == 1)
+    {
+        MAPC2M_TWISTED_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
+    }
 
     rotate_map(cont,xp,yp,zp);
 }
@@ -84,7 +92,8 @@ fclaw2d_map_context_t *
                            const double scale[],
                            const double shift[],
                            const double rotate[],
-                           const double alpha)
+                           const double alpha,
+                           const int example)
 {
     fclaw2d_map_context_t *cont;
 
@@ -93,6 +102,7 @@ fclaw2d_map_context_t *
     cont->mapc2m = fclaw2d_map_c2m_torus;
 
     cont->user_double[0] = alpha;
+    cont->user_int[0] = example;
 
     set_scale(cont,scale);
     set_shift(cont,shift);

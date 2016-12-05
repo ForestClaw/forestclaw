@@ -3,7 +3,6 @@
 
       double precision xd, yd, zd, t
       double precision l, th, lp, Tfinal, kappa, pi
-      logical issphere, isdisk
 
       common /compi/ pi
 
@@ -13,13 +12,8 @@
 
       lp = l - 2*pi*t/Tfinal
 
-c     # Set kappa to zero to get solid body rotation
-      if (issphere()) then
-         psi = kappa*sin(lp)**2*cos(th)**2*cos(pi*t/Tfinal) -
-     &         2*pi*sin(th)/Tfinal
-      else if (isdisk()) then
-         psi = -2*pi*(xd**2 + yd**2)/Tfinal
-      endif
+      psi = kappa*sin(lp)**2*cos(th)**2*cos(pi*t/Tfinal) -
+     &      2*pi*sin(th)/Tfinal
 
 c     # Sign difference from Benchmark problem
       psi = -psi
@@ -27,48 +21,13 @@ c     # Sign difference from Benchmark problem
 
       end
 
-
-      subroutine get_vel(xp,yp,zp,vvec,t)
+      subroutine get_psi_vel(xd1,xd2,ds,vn,t)
       implicit none
 
-      double precision xp,yp,zp,vvec(3), t
-      double precision rsphere, get_rsphere
-      double precision kappa,Tfinal, th, l, lp, pi
-      double precision Tl(3), Tth(3), u, v
-      double precision cth, sth, cl, sl
-      integer m
+      double precision xd1(3),xd2(3), ds, vn, psi,t
 
-      common /compi/ pi
-
-      call get_wind_parms(kappa,Tfinal)
-
-      call map2polar(xp,yp,zp,l,th)
-
-      lp = l - 2*pi*t/Tfinal
-
-      cth = cos(th)
-      sth = sin(th)
-      cl = cos(l)
-      sl = sin(l)
-
-c     # Normalized basis vectors for spherical coordinates
-      Tl(1) = -sl
-      Tl(2) =  cl
-      Tl(3) = 0
-
-      Tth(1) = -sth*cl
-      Tth(2) = -sth*sl
-      Tth(3) = cth
-
-c     # Velocity of spherical coordinates
-      u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
-     &      2*pi*cth/Tfinal
-      v = kappa*sin(2*lp)*cth*cos(pi*t/Tfinal)
-
-c     # Get Cartesian components of the velocity vector
-      do m = 1,3
-         vvec(m) = u*Tl(m) + v*Tth(m)
-      enddo
+      vn = (psi(xd1(1),xd1(2),xd1(3),t) -
+     &      psi(xd2(1),xd2(2),xd2(3),t))/ds
 
       end
 
@@ -113,25 +72,5 @@ c     # Get Cartesian components of the velocity vector
 
       kappa = init_kappa_com
       tfinal = tfinal_com
-
-      end
-
-      subroutine set_vflag(vflag)
-      implicit none
-      integer vflag, vflag_com
-
-      common /comvel/ vflag_com
-
-      vflag_com = vflag
-
-      end
-
-      integer function get_vflag()
-      implicit none
-      integer vflag_com
-
-      common /comvel/ vflag_com
-
-      get_vflag = vflag_com
 
       end

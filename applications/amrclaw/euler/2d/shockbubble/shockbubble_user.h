@@ -26,8 +26,9 @@
 #ifndef SHOCKBUBBLE_USER_HPP
 #define SHOCKBUBBLE_USER_HPP
 
-#include <fclaw2d_clawpatch.h>
 #include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+#include "../rp/clawpack_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -47,6 +48,8 @@ typedef struct user_options
     double rhoin;
     double pinf;
 
+    int claw_version;
+
     int is_registered;
 } user_options_t;
 
@@ -58,37 +61,16 @@ void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0
 
 void shockbubble_problem_setup(fclaw2d_domain_t* domain);
 
+#if 0
 void shockbubble_patch_setup(fclaw2d_domain_t* domain,
                              fclaw2d_patch_t* this_patch,
                              int blockno,
                              int patchno);
-
-#define RPN2EU3 FCLAW_F77_FUNC(rpn2eu3,RPN2EU3)
-void RPN2EU3(const int* ixy, const int* maxm, const int* meqn,
-             const int* mwaves, const int* mbc,const int* mx,
-             double ql[], double qr[], double auxl[], double auxr[],
-             double wave[], double s[], double amdq[], double apdq[]);
-
-#define RPN2EU4 FCLAW_F77_FUNC(rpn2eu4,RPN2EU3)
-void RPN2EU4(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc,const int* mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
-
-#define RPN2EU5 FCLAW_F77_FUNC(rpn2eu5,RPN2EU3)
-void RPN2EU5(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc,const int* mx, double ql[], double qr[],
-             double auxl[], double auxr[], double wave[],
-             double s[], double amdq[], double apdq[]);
-
-#define RPT2EU5 FCLAW_F77_FUNC(rpt2eu5,RPT2EU3)
-void RPT2EU5(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-             const int* mbc, const int* mx, double ql[], double qr[],
-             double aux1[], double aux2[], double aux3[], const int* imp,
-             double dsdq[], double bmasdq[], double bpasdq[]);
+#endif
 
 void shockbubble_link_solvers(fclaw2d_domain_t *domain);
 
+user_options_t* shockbubble_user_get_options(fclaw2d_domain_t* domain);
 
 #ifdef __cplusplus
 #if 0

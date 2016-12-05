@@ -28,57 +28,84 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 
-#include <fc2d_clawpack46.h>
-
-static fclaw2d_vtable_t vt;
-static fc2d_clawpack46_vtable_t classic_claw;
+static fclaw2d_vtable_t fclaw2d_vt;
+static fc2d_clawpack46_vtable_t classic_claw46;
+static fc2d_clawpack5_vtable_t classic_claw5;
 
 void filament_link_solvers(fclaw2d_domain_t *domain)
 {
-    const amr_options_t* gparms;
-    fclaw2d_init_vtable(&vt);
-    fc2d_clawpack46_init_vtable(&vt,&classic_claw);
+    const user_options_t* user = filament_user_get_options(domain);
+    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
 
-    gparms = fclaw2d_forestclaw_get_options(domain);
+    fclaw2d_init_vtable(&fclaw2d_vt);
 
-    vt.problem_setup            = &fc2d_clawpack46_setprob;
-    classic_claw.setprob = &SETPROB;
-
-    if (gparms->manifold)
+    if (user->claw_version == 4)
     {
-        /* setaux_manifold has customized signature */
-        vt.patch_setup = &filament_patch_setup;
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
+
+        classic_claw46.setprob   = &SETPROB;
+        classic_claw46.qinit     = &CLAWPACK46_QINIT;
+        if (gparms->manifold)
+        {
+            fclaw2d_vt.patch_setup   = &filament_patch_setup_manifold;
+
+            classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+            classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+
+            if (user->example == 2)
+            {
+                /* Avoid tagging block corners in 5 patch example*/
+                fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+                fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+            }
+        }
+        else
+        {
+            classic_claw46.setaux    = &CLAWPACK46_SETAUX;  /* Used in non-manifold case */
+            classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV;
+            classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV;
+        }
+
+        fc2d_clawpack46_set_vtable(classic_claw46);
     }
-    else
+    else if (user->claw_version == 5)
     {
-        vt.patch_setup = &fc2d_clawpack46_setaux;
-        classic_claw.setaux = &SETAUX; /* Uses classic signature */
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+
+        classic_claw5.setprob   = &SETPROB;
+        classic_claw5.qinit     = &CLAWPACK5_QINIT;
+        if (gparms->manifold)
+        {
+            fclaw2d_vt.patch_setup  = &filament_patch_setup_manifold;
+            classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+            classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+
+            if (user->example == 2)
+            {
+                /* Avoid tagging block corners in 5 patch example*/
+                fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+                fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+            }
+        }
+        else
+        {
+            classic_claw5.setaux    = &CLAWPACK5_SETAUX;   /* Used in non-manifold case */
+            classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV;
+            classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV;
+        }
+
+        fc2d_clawpack5_set_vtable(classic_claw5);
     }
-
-    vt.patch_initialize         = &fc2d_clawpack46_qinit;
-    classic_claw.qinit = &QINIT;
-
-    vt.patch_physical_bc        = &fc2d_clawpack46_bc2;
-
-#if 0
-    /* Don't use these without debugging it first ... */
-    vt.fort_tag4refinement = &TAG4REFINEMENT_DQ;
-    vt.fort_tag4coarsening = &TAG4COARSENING_DQ;
-#endif
-
-    vt.patch_single_step_update = &fc2d_clawpack46_update;
-    classic_claw.rpn2 = &RPN2;
-    classic_claw.rpt2 = &RPT2;
-
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_clawpack46_set_vtable(&classic_claw);
+    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void filament_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
+void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx)
 {
+    const user_options_t* user = filament_user_get_options(domain);
+
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
@@ -90,10 +117,20 @@ void filament_patch_setup(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fc2d_clawpack46_define_auxarray(domain,this_patch);
-
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-
-    SETAUX_MANIFOLD(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&maux,
-                    aux,&this_block_idx,xd,yd,zd,area);
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_define_auxarray(domain,this_patch);
+        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                               &dx,&dy,&maux,aux,&this_block_idx,
+                               xd,yd,zd,area);
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_define_auxarray(domain,this_patch);
+        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                              &dx,&dy,&maux,aux,&this_block_idx,
+                              xd,yd,zd,area);
+    }
 }

@@ -23,54 +23,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "no_solver_user.H"
+#include "no_solver_user.h"
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
-
-typedef struct user_options
-{
-    int example;
-    double alpha;
-
-    int is_registered;
-
-} user_options_t;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
     user_options_t* user = (user_options_t*) package;
 
-    /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "0 nomap (use [ax,bx]x[ay,by]; "   \
-                        "1 cart; 2 5-patch square [0]");
-
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
-                           "Ratio of outer square to inner square [0.4]");
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                           "Clawpack_version (4 or 5) [5]");
 
     user->is_registered = 1;
     return NULL;
 }
 
-static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t* user = (user_options_t*) package;
-    if (user->example < 0 || user->example > 4) {
-        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
-}
-
-
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register_user,
     NULL,
-    options_check_user,
+    NULL,
     NULL
 };
 
@@ -85,6 +58,18 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
+const user_options_t* no_solver_user_get_options(fclaw2d_domain_t* domain)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(domain);
+
+    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
+
+    return (user_options_t*) user;
+}
+
+
+
 void run_program(fclaw_app_t* app,
                  user_options_t* user)
 {
@@ -97,46 +82,12 @@ void run_program(fclaw_app_t* app,
 
     amr_options_t            *gparms;
 
-    /* Used locally */
-    double pi = M_PI;
-    double rotate[2];
-
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     gparms = fclaw_forestclaw_get_options(app);
 
-    rotate[0] = pi*gparms->theta/180.0;
-    rotate[1] = pi*gparms->phi/180.0;
-
-    switch (user->example) {
-    case 0:
-        /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_nomap ();
-        break;
-    case 1:
-        /* Map unit square to disk using mapc2m_disk.f */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_cart (gparms->scale, gparms->shift,
-                                     rotate);
-        break;
-    case 2:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
-                                          rotate,user->alpha);
-        break;
-    case 3:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_pillowdisk (gparms->scale,gparms->shift,
-                                           rotate);
-        break;
-    case 4:
-        conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_pillowdisk5 (gparms->scale,gparms->shift,
-                                            rotate,user->alpha);
-        break;
-    default:
-        SC_ABORT_NOT_REACHED ();
-    }
+    /* Don't use a mapping.  [ax,ay]x[ay,by] will be used instead */
+    conn = p4est_connectivity_new_unitsquare();
+    cont = fclaw2d_map_new_nomap ();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
@@ -148,14 +99,14 @@ void run_program(fclaw_app_t* app,
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    init_domain_data(domain);
+    fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
     no_solver_linker(domain);
 
-    amrinit(&domain);
-    amrrun(&domain);  /* Nothing should happen */
-    amrreset(&domain);
+    fclaw2d_initialize(&domain);
+    fclaw2d_run(&domain);  /* Nothing should happen */
+    fclaw2d_finalize(&domain);
 
     fclaw2d_map_destroy(cont);    /* This destroys the brick as well */
 }
@@ -182,6 +133,9 @@ main (int argc, char **argv)
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);
+
+    /* I won't need this as soon as the clawpatch functions are virtualized */
+    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);

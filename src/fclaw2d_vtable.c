@@ -57,6 +57,7 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     /* Problem setup */
     vt->problem_setup = NULL;
     vt->patch_setup = NULL;
+    vt->ghostpatch_setup = NULL;
 
     /* Diagnostics */
     vt->run_user_diagnostics      = NULL;
@@ -65,6 +66,8 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     /* Defaults for regridding */
     vt->regrid_average2coarse    = &fclaw2d_regrid_average2coarse;
     vt->regrid_interpolate2fine  = &fclaw2d_regrid_interpolate2fine;
+
+    vt->after_regrid             = NULL;
 
     vt->regrid_tag4refinement    = &fclaw2d_regrid_tag4refinement;
     vt->regrid_tag4coarsening    = &fclaw2d_regrid_tag4coarsening;

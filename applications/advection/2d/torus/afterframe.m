@@ -3,85 +3,36 @@ setviews;
 global map isflat;
 
 alpha = 0.4;
-s = 1e-2;    
-if strcmp(map,'nomap') || strcmp(map,'brick')
-    % axis([-1 1 -1 1]);
-    axis([0 1 0 1])
-    % axis image;
-else
-    if strcmp(map,'cart')
-        alim = [-1 1];
-    elseif strcmp(map,'latlong')
-        alim = [-1 1];
-    else
-        alim = [-1-alpha,1+alpha];
-    end
-    alim = alim + [-s s];
-    axis([alim alim]);
-    daspect([1 1 1]);
-    view(vtop)
-end
+s = 1e-2;
+alim = [-1-alpha,1+alpha];
+alim = alim + [-s s];
+axis([alim alim]);
+daspect([1 1 1]);
+view(vtop)
+
 if PlotParallelPartitions ~= 1
     yrbcolormap;
 end
-showpatchborders(1:10);
+
 if (mq == 2)
     % plotting error
     qc = max(abs([qmin,qmax]));
     caxis([-qc,qc]);
     fprintf('%6s %12s\n\n','qmax',qmax);
     daspect([1,1,1]);
-    rybcolormap
-    delete(get(gca,'title'))
-else
-    caxis([0,1])
-    qlo = 0;
-    qhi = 1;
-    under_label = sprintf('0 - %7.1e',qlo-qmin);
-    over_label = sprintf('1 + %7.1e',qmax-qhi);
-    fprintf('%6s %12s\n','qmin',under_label);
-    fprintf('%6s %12s\n\n','qmax',over_label);
-
-    if (ShowUnderOverShoots)
-        qlo = 0;
-        qhi = 1;
-        colorbar_underover(under_label,over_label);
-    end
-    daspect([1,1,1]);
 end
 
-if (isflat)
-    u0 = 1;
-    v0 = 1;
-    r0 = 0.2;
-    revs_per_sec = 0.5;
-    cloc = [0.5, 0.5] + revs_per_sec*[u0,v0]*t;
-    th = linspace(0,2*pi,500);
-    hold on;
-    xs = rem(r0*cos(th) + cloc(1),1);
-    ys = rem(r0*sin(th) + cloc(2),1);
-    if (Frame < 10)
-        plot(xs,ys,'k.','markersize',10);
-    else
-        plot(xs,ys,'k-','linewidth',3);
-    end
-    delete(get(gca,'title'));
-    axis([0.2 0.8 0.2 0.8])   
-    axis([0 1 0 1])
-    hidepatchborders;
-    set(gca,'fontsize',16,'box','on');
-    qm = max([abs(qmax),abs(qmin)]);
-    showpatchborders;
-    caxis([-qm,qm]);
-    rybcolormap
-    hold off;
-    view(2);
-else
-    hold on;
-    R = 0.5;  % revs per second
-    alpha = 0.4;
-    period = 16;
-    [xp,yp,zp] = torus_soln(t,alpha,R,period);    % camlight;
+view(3);
+% camlight;
+showpatchborders;
+hold on;
+R = 0.5;  % revs per second
+alpha = 0.4;
+period = 16;
+meqn = size(amrdata(1).data,1);
+if (meqn == 2)
+    % assume we are doing the Gaussian problem with error
+    [xp,yp,zp] = torus_soln(t,alpha,R,period);
     plot3(xp,yp,zp,'k','linewidth',2);
     hold off;
     hidepatchborders;
@@ -90,8 +41,10 @@ else
     axis off
 end
 
+showpatchborders;
+setpatchborderprops('linewidth',1)
 
-
+view(vtop);
 
 %%
 cm = ...
@@ -106,7 +59,7 @@ cm = ...
     202	178	214;
     106	61	154;
     255	255	153;
-    177	89	40]/255;    
+    177	89	40]/255;
 
 
 %%

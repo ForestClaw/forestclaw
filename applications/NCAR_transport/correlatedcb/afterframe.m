@@ -3,12 +3,11 @@ daspect([1 1 1]);
 axis off;
 
 yrbcolormap;
-qlo = 0.1;
-qhi = 1.1;
-% showgridlines(1:4);
-showpatchborders(1:8);
+showpatchborders;
 setpatchborderprops(1:8,'linewidth',1);
-view([-51.5,0]);
+hidepatchborders(7);
+% hidepatchborders;
+view([65.5,12]);
 
 % showgridlines(3);
 

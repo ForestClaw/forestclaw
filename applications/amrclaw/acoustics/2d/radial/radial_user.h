@@ -26,8 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RADIAL_USER_H
 #define RADIAL_USER_H
 
-#include "fclaw2d_clawpatch.h"
-#include "fc2d_clawpack46.h"
+#include <fclaw2d_clawpatch.h>
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+
+#include "../rp/clawpack_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -45,6 +48,10 @@ typedef struct user_options
     double cc;
     double zz;
 
+    double alpha;
+
+    int claw_version;
+
     int is_registered;
 
 } user_options_t;
@@ -55,11 +62,30 @@ void radial_problem_setup(fclaw2d_domain_t* domain);
 void RADIAL_SETPROB(const double* rho, const double *bulk,
                     double* cc, double*zz);
 
+#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
+                                             USER5_SETAUX_MANIFOLD)
+
+void USER5_SETAUX_MANIFOLD(const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const int* maux, double aux[],
+                           double xnormals[], double ynormals[],
+                           double edgelengths[],
+                           double area[]);
+
+void radial_patch_setup(fclaw2d_domain_t *domain,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx);
+
+user_options_t* radial_user_get_options(fclaw2d_domain_t* domain);
+
 void radial_link_solvers(fclaw2d_domain_t *domain);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
