@@ -33,7 +33,7 @@ ContourValues = [];
 x0 = 0;
 y0 = 0;
 ScatterStyle = setplotstyle('b.','b.','b.','b.','b.','b.','r.','k.','m.');
-UserMap1d = 1;
+UserMap1d = 0;
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;

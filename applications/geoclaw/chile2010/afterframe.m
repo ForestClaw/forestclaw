@@ -14,6 +14,11 @@ add_gauges();
 add_regions(t);
 hold off;
 
+fprintf('\n');
+fprintf('qmin : %12.4e\n',qmin);
+fprintf('qmax : %12.4e\n',qmax);
+fprintf('\n');
+
 set(gca,'fontsize',16);
 
 NoQuery = 0;
