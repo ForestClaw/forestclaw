@@ -40,16 +40,8 @@ void slosh_link_solvers(fclaw2d_domain_t *domain)
     fc2d_geoclaw_init_vtables(&vt, &geoclaw);
 
     vt.patch_initialize         = &slosh_patch_initialize;
-    fclaw2d_set_vtable(domain,&vt);
+
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
-
-#if 0
-    /* Example of a function the user can set. */
-    vt->problem_setup            = &bowl_problem_setup; /* Written by the user */
-    geoclaw_vt->setprob          = NULL;   /* Must be of correct type */
-
-    /* etc ... */
-#endif
 
 }
 
@@ -65,7 +57,7 @@ void slosh_patch_initialize(fclaw2d_domain_t *domain,
     int mx,my,mbc,meqn, maux;
     double xlower,ylower,dx,dy;
     double *q, *aux;
-    
+
     // int minlevel, maxlevel;
     // minlevel = 4;
     // maxlevel = 4;
