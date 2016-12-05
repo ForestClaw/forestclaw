@@ -23,7 +23,6 @@ axis off
 shg;
 
 
-<<<<<<< HEAD
 NoQuery = 0;
 prt = false;
 if (prt)
@@ -42,8 +41,8 @@ if (prt)
 end
 
 %%
-prt = true;
-% NoQuery = 0;
+prt = false;
+NoQuery = 0;
 if (prt)
     MaxFrames = 41;
     axis([0 2 0 2]);

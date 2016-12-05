@@ -8,7 +8,7 @@
       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
       integer i,j
-      double precision xlow, ylow, w, xc,yc, q0
+      double precision xlow, ylow, w, xc,yc, q0, t0
 
       integer blockno, fc2d_clawpack46_get_block
 

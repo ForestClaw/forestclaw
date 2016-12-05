@@ -21,9 +21,9 @@ c
        blockno = fc2d_clawpack46_get_block()
 
        idisc_example = idisc
-       do 50 i=1-mbc,mx+mbc
+       do  i = 1-mbc,mx+mbc
           xclow = xlower + (i-1)*dx
-          do 20 j=1-mbc,my+mbc
+          do j = 1-mbc,my+mbc
              yclow = ylower + (j-1)*dy
 c            # set (xlow,ylow) to lower left corner of grid cell:
 
@@ -32,7 +32,7 @@ c            # set (xlow,ylow) to lower left corner of grid cell:
                 call cellave2(blockno,xclow,yclow,dx,dy,win)
 c               # win is now the fraction of the cell that lies inside the
 c               # circle
-                do m=1,meqn
+                do m = 1,meqn
                    q(i,j,m) = win*qin(m) + (1.d0-win)*qout(m)
                 enddo
                 idisc = 4
@@ -46,10 +46,10 @@ c               # circle
                    q(i,j,m) = win*qin(m) + (1.d0-win)*qout(m)
                 enddo
              endif
-   20     continue
+          enddo
 
 c         # behind shock:
-          do 30 j=1-mbc,my+mbc
+          do  j=1-mbc,my+mbc
              if (xclow .lt. 0.2d0) then
                 q(i,j,1) = rinf
                 q(i,j,2) = rinf*vinf
@@ -58,17 +58,17 @@ c         # behind shock:
                 if (meqn .eq. 5) then
                    q(i,j,5) = 1.d0
                 endif
-   30        continue
-          end if
+             endif
+          enddo
 c
           if (xclow .lt. 0.5d0 .and. meqn .eq. 5) then
 c            # to give two different values of tracer in bubble
 c            # for better visualization of motion:
-             do 40 j=1,my
+             do j=1,my
                 q(i,j,5) = 2.d0*q(i,j,5)
-   40        continue
+             enddo
           end if
+       enddo
 
-   50  continue
        return
        end
