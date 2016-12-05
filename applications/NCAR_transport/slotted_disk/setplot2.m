@@ -1,5 +1,6 @@
 
 OutputFlag = 'forestclaw'         % default value.
+OutputDir = './';
 ForestClaw = 1;
 
 PlotType = 1;                % type of plot to produce:
