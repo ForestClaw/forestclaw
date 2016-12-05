@@ -5,12 +5,15 @@ daspect([1 1 1]);
 axis on;
 
 m = min(abs([qmin,qmax]));
-caxis([-0.01 0.01]);
+caxis([-0.2 0.2]);
 
 showpatchborders;
 
 hold on;
 add_gauges();
+
+hold on;
+plot_regions(t);
 hold off;
 
 set(gca,'fontsize',16);

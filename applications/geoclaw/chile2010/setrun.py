@@ -334,12 +334,14 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
+
+    # Original levels
     # rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
     # rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
 
-    # Increase AMR level
-    rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
-    rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
+    # Decrease region numbering for ForestClaw
+    rundata.regiondata.regions.append([5, 5, 0., 10000., -85,-72,-38,-25])
+    rundata.regiondata.regions.append([5, 5, 8000., 26000., -90,-80,-30,-15])
 
     # ---------------
     # Gauges:
@@ -395,14 +397,27 @@ def setgeo(rundata):
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_path = os.path.join(scratch_dir, 'etopo10min120W60W60S0S.asc')
-    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
+
+    # Original code
+    # topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
+
+    # For ForestClaw
+    topo_data.topofiles.append([2, 0, 5, 0., 1.e10, topo_path])
+
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
     dtopo_path = os.path.join(scratch_dir, 'dtopo_usgs100227.tt3')
-    dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
+
+    # Original code
+    # dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
+
+    # Increase levels for Forestclaw
+    dtopo_data.dtopofiles.append([3,5,5,dtopo_path])
+
+
     dtopo_data.dt_max_dtopo = 0.2
 
 

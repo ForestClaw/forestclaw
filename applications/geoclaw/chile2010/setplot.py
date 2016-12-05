@@ -1,11 +1,11 @@
 
-""" 
+"""
 Set up the plot figures, axes, and items to be done for each frame.
 
 This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
-    
-""" 
+
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,19 +20,20 @@ except:
 #--------------------------
 def setplot(plotdata):
 #--------------------------
-    
-    """ 
+
+    """
     Specify what is to be plotted at each frame.
     Input:  plotdata, an instance of pyclaw.plotters.data.ClawPlotData.
     Output: a modified version of plotdata.
-    
-    """ 
+
+    """
 
 
     from clawpack.visclaw import colormaps, geoplot
     from numpy import linspace
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = "forestclaw"
 
 
     # To plot gauge locations on pcolor or contour plot, use this as
@@ -42,7 +43,7 @@ def setplot(plotdata):
         from clawpack.visclaw import gaugetools
         gaugetools.plot_gauge_locations(current_data.plotdata, \
              gaugenos='all', format_string='ko', add_labels=True)
-    
+
 
     #-----------------------------------------
     # Figure for surface
@@ -94,7 +95,7 @@ def setplot(plotdata):
     plotitem.contour_levels = linspace(-3000,-3000,1)
     plotitem.amr_contour_colors = ['y']  # color on each level
     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-    plotitem.amr_contour_show = [1,0,0]  
+    plotitem.amr_contour_show = [1,0,0]
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
 
@@ -127,13 +128,13 @@ def setplot(plotdata):
         eta = q[3,:]
         topo = eta - h
         return topo
-        
+
     plotitem.plot_var = gaugetopo
     plotitem.plotstyle = 'g-'
 
     def add_zeroline(current_data):
         from pylab import plot, legend, xticks, floor, axis, xlabel
-        t = current_data.t 
+        t = current_data.t
         gaugeno = current_data.gaugeno
 
         if gaugeno == 32412:
@@ -153,7 +154,7 @@ def setplot(plotdata):
 
 
     #-----------------------------------------
-    
+
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
@@ -170,4 +171,3 @@ def setplot(plotdata):
     plotdata.latex_makepdf = False           # also run pdflatex?
 
     return plotdata
-
