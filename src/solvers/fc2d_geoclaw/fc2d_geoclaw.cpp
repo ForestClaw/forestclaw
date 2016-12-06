@@ -304,6 +304,12 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
     int restart = 0;
 
     geoclaw_options->num_gauges = num;
+
+    if (num == 0)
+    {
+        return;
+    }
+    
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
 
     /* Read gauges file for the locations, etc. of all gauges */
@@ -330,10 +336,6 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
        Set up block offsets and coordinate list for p4est
        search function
        ----------------------------------------------------- */
-    if (geoclaw_options->num_gauges == 0)
-    {
-        return;
-    }
 
     fclaw2d_map_context_t* cont =
         fclaw2d_domain_get_map_context(domain);
@@ -342,7 +344,7 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
 
     gauge_info.block_offsets = sc_array_new_size(sizeof(int), domain->num_blocks+1);
     gauge_info.coordinates = sc_array_new_size(2*sizeof(double), num);
-
+    
     int *block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
     double *coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
 
