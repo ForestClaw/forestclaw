@@ -13,10 +13,10 @@ view([65.5,12]);
 setviews;
 % set(gcf,'visible','off');
 
-NoQuery = 0;
-prt = false;
+NoQuery = 1;
+prt = true;
 if (prt)
-  MaxFrames = 41;
+  MaxFrames = 10;  
   filename = framename(Frame,'sdisk000','png');
   fprintf('Printing file %s\n',filename);
   print('-dpng','-r600',filename);
