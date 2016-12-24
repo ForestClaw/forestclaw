@@ -2,6 +2,7 @@
 libclawpack5_generated_headers =
 libclawpack5_installed_headers = \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5.h \
+	src/solvers/fc2d_clawpack5/clawpack5_user_fort.h \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.h
 
 libclawpack5_compiled_sources = \
