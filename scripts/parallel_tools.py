@@ -113,7 +113,11 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
     maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
     proc0   = int(config.get('Run','proc').partition('#')[0].strip())
-    tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
+    try:
+        tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
+    except:
+        pass
+
 
     # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
     njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
@@ -137,6 +141,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     except:
         ranks_per_node = 32
 
+    # ---------------- Start with problem-specific code ---------------------
     if problem is 'advection':
         # Supply a baseline dt and associated grid resolution so we can scale the
         # time step appropriately for different resolutions.
@@ -187,6 +192,33 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         except:
             pass
 
+    elif problem is 'slotted_disk':
+        initial_dt   = float(config.get('Run','initial_dt').partition('#')[0].strip())
+        # smooth_level0  = maxlevel0-1   # Smooth at all levels
+        smooth_level0    = float(config.get('Run','smooth-level').partition('#')[0].strip())
+        nout0 = int(config.get('Run','nout').partition('#')[0].strip())
+        nstep0 = int(config.get('Run','nstep').partition('#')[0].strip())
+        tfinal0 = initial_dt*nout0
+
+        # Beta : adapt proc count
+        try:
+            num_grids_per_proc = int(config.get('Run','num_grids_per_proc').partition('#')[0].strip())
+            adapt_proc_count = True
+        except:
+            adapt_proc_count = False
+
+        use_fixed_dt = True
+        outstyle = 3
+        duplicate = False
+
+        # number of time steps
+        try:
+            coeff_A      = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
+            coeff_B      = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
+        except:
+            pass
+
+    # ---------------- Done with problem-specific code ---------------------
 
     try:
         verbosity = config.get('Run','verbosity').partition('#')[0].strip()
@@ -229,6 +261,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     # Other inputs needed by the user
     # ----------------------------------------
 
+    # ---------------- Start of problem-specific code ---------------------
     if problem is 'advection':
         # Figure out dt needed for first run in this series
         eff_res0 = mx0*2**minlevel0
@@ -239,6 +272,8 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
         if use_maxlevel:
             steps_coarse = steps_coarse0*2**(maxlevel0-minlevel0)
+        else:
+            steps_coarse = steps_coarse0
 
         tol = 3e-15
         if abs(steps_coarse - np.round(steps_coarse0)) > tol:
@@ -255,6 +290,12 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         smooth_level0  = 0
         steps_coarse0 = nout0
         dt0 = tfinal0/steps_coarse0   # coarse grid time step
+    elif problem is 'slotted_disk':
+        steps_coarse0 = nout0
+        dt0 = initial_dt
+        pass
+
+    # ---------------- Done with problem-specific code ---------------------
 
 
     # ----------------------------------------
@@ -307,6 +348,9 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
 
     if problem is 'shockbubble':
         smooth_level.fill(smooth_level0)
+
+    if problem is 'slotted_disk':
+        smooth_level = maxlevel-1
 
 
     nout_uniform = steps_coarse*2**(maxlevel-minlevel)  # Number of fine grid steps
