@@ -1,34 +1,35 @@
 
-""" 
+"""
 Set up the plot figures, axes, and items to be done for each frame.
 
 This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
-    
-""" 
+
+"""
 
 import numpy
 a = 1.
 sigma = 0.5
 h0 = 0.1
 grav = 9.81
-omega = numpy.sqrt(2.*grav*h0) / a 
+omega = numpy.sqrt(2.*grav*h0) / a
 
 #--------------------------
 def setplot(plotdata):
 #--------------------------
-    
-    """ 
+
+    """
     Specify what is to be plotted at each frame.
     Input:  plotdata, an instance of pyclaw.plotters.data.ClawPlotData.
     Output: a modified version of plotdata.
-    
-    """ 
+
+    """
 
 
     from clawpack.visclaw import colormaps, geoplot
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = "forestclaw"
 
     def set_drytol(current_data):
         # The drytol parameter is used in masking land and water and
@@ -79,7 +80,7 @@ def setplot(plotdata):
     plotitem.contour_levels = linspace(-.1, 0.5, 20)
     plotitem.amr_contour_colors = ['k']  # color on each level
     plotitem.kwargs = {'linestyles':'solid'}
-    plotitem.amr_contour_show = [1]  
+    plotitem.amr_contour_show = [1]
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
     plotitem.show = True
@@ -150,12 +151,12 @@ def setplot(plotdata):
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(plot_type='2d_patch')
     plotitem.amr_patch_bgcolor = ['#ffeeee', '#eeeeff', '#eeffee']
-    plotitem.amr_celledges_show = [1,1,0]   
+    plotitem.amr_celledges_show = [1,1,0]
     plotitem.amr_patchedges_show = [1]
 
 
     #-----------------------------------------
-    
+
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
@@ -172,5 +173,3 @@ def setplot(plotdata):
     plotdata.latex_makepdf = False           # also run pdflatex?
 
     return plotdata
-
-    
