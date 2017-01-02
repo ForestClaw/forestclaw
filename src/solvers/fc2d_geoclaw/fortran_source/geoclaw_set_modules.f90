@@ -53,6 +53,4 @@ SUBROUTINE geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in, mthlim_in,
   CALL set_storm()                  ! Set storm parameters
   CALL setup_variable_friction()    ! Set variable friction parameters
 
-  
-
 END SUBROUTINE geoclaw_set_modules
