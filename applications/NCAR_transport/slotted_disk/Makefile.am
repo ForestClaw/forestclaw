@@ -18,6 +18,8 @@ applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/NCAR_transport/slotted_disk/user_5.0/tag4refinement.f \
 	applications/NCAR_transport/slotted_disk/user_4.6/tag4coarsening.f \
 	applications/NCAR_transport/slotted_disk/user_5.0/tag4coarsening.f \
+	applications/advection/2d/all/clawpack_user.h \
+	applications/NCAR_transport/all/transport_user.h \
 	applications/NCAR_transport/all/velocity_wind.f \
 	applications/NCAR_transport/all/gaussian.f \
 	applications/NCAR_transport/all/user46_b4step2_manifold.f \
