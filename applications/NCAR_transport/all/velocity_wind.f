@@ -10,7 +10,7 @@
 
       call map2polar(xd,yd,zd,l,th)
 
-      lp = l - 2*pi*t/Tfinal
+      lp = l - 2*pi*t/tfinal
 
       psi = kappa*sin(lp)**2*cos(th)**2*cos(pi*t/Tfinal) -
      &      2*pi*sin(th)/Tfinal
@@ -58,7 +58,8 @@ c     # Sign difference from Benchmark problem
       common /comwind/ init_kappa_com, tfinal_com
 
       init_kappa_com = kappa
-      tfinal_com = tfinal
+c     tfinal_com = tfinal
+      tfinal_com = 5.0
 
       end
 
