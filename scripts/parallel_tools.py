@@ -482,6 +482,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             ini_file.write("    subcycle = F\n")
 
 
+        ini_file.write("    init_ghostcell = F\n")
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
