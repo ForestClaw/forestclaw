@@ -149,7 +149,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
 /* --------------------------------------------------------------------------
    Public interface
    -------------------------------------------------------------------------- */
-/* This is called by rebuild_domain */
+/* This is called whenever a new domain is created (initialize, regrid) */
 void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
                             fclaw2d_timer_names_t running)
 {
@@ -209,11 +209,18 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_start (&ddata->timers[running]);
+    }
+
     /* Do some some work that we hope to hide by communication above.  */
     set_indirect_data(domain,ind);
 
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
+
+    /* No timer is running here */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     build_ghost_patches(domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
@@ -221,6 +228,11 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
     /* ---------------------------------------------------------
        Receive ghost patch meta data from send initiated above.
        ------------------------------------------------------- */
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_stop (&ddata->timers[running]);
+    }
+
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     fclaw2d_domain_indirect_end(domain,ind);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);

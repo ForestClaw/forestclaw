@@ -292,14 +292,8 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
     }
     else
     {
-#if 0
         /* We updated all the ghost cells when leaving advance, so don't need to do
            it here */
-        /* Set up ghost patches. No parallel communication is done here */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
-        fclaw2d_exchange_setup(*domain);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
-#endif
     }
 
     if (vt.after_regrid != NULL)
