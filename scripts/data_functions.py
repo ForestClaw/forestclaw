@@ -62,6 +62,16 @@ def fraction_regrid(job,mx=None,proc=None,level=None,all=None):
 
     return v, fmt_int
 
+def fraction_build(job,mx=None,proc=None,level=None,all=None):
+
+    gb = job["ghostpatch_build"]
+    w = job["walltime"]
+    v = gb/w
+
+    fmt_int = False
+
+    return v, fmt_int
+
 
 def fraction_init(job,mx=None,proc=None,level=None,all=None):
 
@@ -357,9 +367,11 @@ def dof_per_second(job,mx=None,proc=None,level=None,all=None):
 
 def rate(job,mx=None,proc=None,level=None,all=None):
     # Same as dof_per_second, above.
+    mi = job["mi"]
+    mj = job["mj"]
 
     w = job["walltime"]
-    a = job["advance_steps"]
+    a = job["advance_steps"]   # total steps per proc
     v = a*mx**2*proc/w
 
     fmt_int = False

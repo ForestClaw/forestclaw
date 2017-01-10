@@ -239,6 +239,12 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     except:
         weightedp = False
 
+    try:
+        gparea = config.get('Run','ghost_patch_pack_area').partition('#')[0].strip()
+        gparea = gparea in ['T','True','1']
+    except:
+        gparea = True
+
     # Advance one step?
     try:
         ol = config.get('Run','advance-one-step').partition('#')[0].strip()
@@ -373,7 +379,8 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
     num_advances = adapt_factor*nout_uniform*num_grids_total
     t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
-    eff_res = mx*(2**maxlevel)*mi0
+    # eff_res = mx*(2**maxlevel)*mi0
+    eff_res = np.round(np.sqrt((mx*2**maxlevel)**2*mi0*mj0))
 
     # ------------------------------------------
     # Start creating files.
@@ -491,6 +498,12 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         else:
             ini_file.write("    weighted_partition = F\n")
 
+
+        if gparea:
+            ini_file.write("    ghost_patch_pack_area = T\n")
+        else:
+            ini_file.write("    ghost_patch_pack_area = F\n")
+
         ini_file.write("\n")
 
         # Other things which should not be set of timing runs
@@ -524,7 +537,11 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             proc_file.write("#@ comment = \"%s example : eff. resolution = %d x %d\"\n" % \
                             (execname.capitalize(),eff_res[i],eff_res[i]))
             proc_file.write("#@ error = %s_%05d.o$(jobid)\n" % (execname,p))
-            proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % (execname,p))
+            if problem == 'slotted_disk':
+                proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % ('slotted-disk',p))
+            else:
+                proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % (execname,p))
+
             proc_file.write("\n")
             proc_file.write("#@ environment = COPY_ALL\n")
             trun = np.min([60**2,1.1*t[i]])  # Keep jobs under 1 hour
@@ -702,6 +719,7 @@ def compile_results(results_dir=None,results_file='results.out',
                          'LOCAL',
                          'COMM',
                          'PARTITION',
+                         'GHOSTPATCH_BUILD',
                          'GHOSTFILL_STEP1',
                          'GHOSTFILL_STEP2',
                          'GHOSTFILL_STEP3',
@@ -750,7 +768,7 @@ def compile_results(results_dir=None,results_file='results.out',
     # -----------------------
     float_list = ('init','advance','ghostfill','regrid','patch_comm',
                   'adapt','partition','cfl','walltime',
-                  'gf_copy','local','comm','partition','step1',
+                  'gf_copy','local','comm','partition','gbuild','step1',
                   'step2','step3', 'copy',
                   'interp','average','l. ratio','r. ratio')
     float_width = 12*len(float_list)
@@ -1095,14 +1113,15 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["local"]           = row[24]
                         job["comm"]            = row[25]
                         job["partition"]       = row[26]
-                        job["step1"]           = row[27]
-                        job["step2"]           = row[28]
-                        job["step3"]           = row[29]
-                        job["copy"]            = row[30]
-                        job["interp"]          = row[31]
-                        job["average"]         = row[32]
-                        job["local_ratio"]     = row[33]
-                        job["remote_ratio"]    = row[34]
+                        job["ghostpatch_build"]= row[27]
+                        job["step1"]           = row[28]
+                        job["step2"]           = row[29]
+                        job["step3"]           = row[30]
+                        job["copy"]            = row[31]
+                        job["interp"]          = row[32]
+                        job["average"]         = row[33]
+                        job["local_ratio"]     = row[34]
+                        job["remote_ratio"]    = row[35]
 
                     jobs[m][p][l] = job
 
@@ -1142,7 +1161,7 @@ def print_jobs(jobs,val2plot,fmt_int=False):
                         d = job[val2plot]
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
-                        pdb.set_trace()
+                        pdb.set_traceg()
                         sys.exit()
                 else:
                     import types
@@ -1309,7 +1328,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
         ax.set_ylabel("Cost per grid",fontsize=16)
 
         if len(gpplist) > 1:
-            ranks_per_node = 32
+            ranks_per_node = -1    # Set to -1 to get single curve through all data
             gpp = np.array(gpplist)
             y = np.array(ylist)
             z = zip(gpp,y,proclist)
