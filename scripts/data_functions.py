@@ -215,9 +215,9 @@ def fraction_ghostcomm2(job,mx=None,proc=None,level=None,all=None):
 def fraction_step1(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s1 = job["step1"]
-    v = (s1)/(g+gc)
+    v = (s1)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -225,9 +225,9 @@ def fraction_step1(job,mx=None,proc=None,level=None,all=None):
 def fraction_step2(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s2 = job["step2"]
-    v = (s2)/(g+gc)
+    v = (s2)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -235,9 +235,9 @@ def fraction_step2(job,mx=None,proc=None,level=None,all=None):
 def fraction_step3(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s3 = job["step3"]
-    v = (s3)/(g+gc)
+    v = (s3)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -249,6 +249,7 @@ def fraction_ghostfill_totals(job,mx=None,proc=None,level=None,all=None):
     s1 = job["step1"]
     s2 = job["step2"]
     s3 = job["step3"]
+    gb = job["ghostpatch_build"]   # included in ghostfill, but not in s1, s2 or s3.
     v = (gc + s1+s2+s3)/(gf+gc)
     fmt_int = False
 
@@ -258,6 +259,7 @@ def fraction_ghostfill_unaccounted(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
     gf = job["ghostfill"]
+    gb = job["ghostpatch_build"]
     s1 = job["step1"]
     s2 = job["step2"]
     s3 = job["step3"]
