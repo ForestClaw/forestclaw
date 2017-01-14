@@ -674,6 +674,9 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         /* -------------------------------------------------------------
            Loop over ghost patches to find indirect neighbors and do
            any necessary face exchanges.
+
+           Note : There is no special timer for this call, but checks
+           show that ghostfill-(step1+step2+step3+comm) << 1
            ------------------------------------------------------------- */
         fclaw2d_face_neighbor_ghost(domain,minlevel,maxlevel,time_interp);
 

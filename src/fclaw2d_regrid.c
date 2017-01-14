@@ -268,6 +268,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
         /* Need a new timer */
         ddata = fclaw2d_domain_get_data(*domain);
 
+        /* This includes timers for building patches and (exclusive) communication */
         fclaw2d_exchange_setup(*domain,FCLAW2D_TIMER_REGRID);
 
         /* Get new neighbor information.  This is used to short circuit

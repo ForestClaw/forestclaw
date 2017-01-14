@@ -153,6 +153,7 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
 void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
                             fclaw2d_timer_names_t running)
 {
+    /* Time spend in build here is negligible and is included in regrid */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
@@ -220,7 +221,6 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
 
-    /* No timer is running here */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     build_ghost_patches(domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
