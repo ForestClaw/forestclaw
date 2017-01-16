@@ -55,7 +55,7 @@ extern "C" {
      fpu (but not the SIMD unit, nor the ppc)
      * imprecision of interrupts from system software
      */
-  void fhdl ( int sig, siginfo_t *sip, ucontext_t *scp ) ;
+  void fhdl ( int sig, struct siginfo_t *sip, struct ucontext_t *scp ) ;
 
 #ifdef __cplusplus
 }
