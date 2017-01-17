@@ -374,7 +374,7 @@ def rate(job,mx=None,proc=None,level=None,all=None):
 
     w = job["walltime"]
     a = job["advance_steps"]   # total steps per proc
-    v = a*mx**2*proc/w
+    v = a*mx**2/w
 
     fmt_int = False
     return v, fmt_int
