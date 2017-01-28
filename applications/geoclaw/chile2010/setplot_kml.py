@@ -78,11 +78,12 @@ def setplot(plotdata):
     # Resolution (should be consistent with data)
     # Refinement levels : [2,6]; max level = 3; num_cells = [30,30]
     # rcl : resolution of the coarsest level in this figure
-    rcl = 1    # rcl*figsize = num_cells
     maxlevel = 5
     minlevel = 1
-    plotfigure.kml_figsize = [16.0,16.0]
-    plotfigure.kml_dpi = rcl*2**(maxlevel-minlevel)         # Resolve all three levels
+    mx = 16    # Gridsize
+    minres = mx*2**minlevel
+    plotfigure.kml_figsize = [minres,minres]
+    plotfigure.kml_dpi = 2**(maxlevel-minlevel)   # Resolve all three levels
     plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
 
 
