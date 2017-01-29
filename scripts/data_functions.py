@@ -13,6 +13,9 @@ def fraction_amr(job,mx=None,proc=None,level=None,all=None):
     c = job["cfl_comm"]
     v = (i+r+g+p+c)/w
 
+    # a = job["advance"]
+    # v = (w-a)/w
+
     fmt_int = False
 
     return v, fmt_int
@@ -59,6 +62,16 @@ def fraction_regrid(job,mx=None,proc=None,level=None,all=None):
 
     return v, fmt_int
 
+def fraction_build(job,mx=None,proc=None,level=None,all=None):
+
+    gb = job["ghostpatch_build"]
+    w = job["walltime"]
+    v = gb/w
+
+    fmt_int = False
+
+    return v, fmt_int
+
 
 def fraction_init(job,mx=None,proc=None,level=None,all=None):
 
@@ -92,6 +105,52 @@ def fraction_ghostfill(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v, fmt_int
+
+def fraction_copy(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    c = job["copy"]
+    v = c/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+def fraction_interp(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    i = job["interp"]
+    v = i/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+
+def fraction_average(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    a = job["average"];
+    v = a/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+def fraction_ghostcomm2(job,mx=None,proc=None,level=None,all=None):
+
+    gf = job["ghostfill"]
+    gc = job["ghostpatch_comm"]
+    v = gc/(gf+gc)
+
+    fmt_int = False
+
+    return v, fmt_int
+
+
 
 
 def fraction_advance(job,mx=None,proc=None,level=None,all=None):
@@ -156,9 +215,9 @@ def fraction_ghostcomm2(job,mx=None,proc=None,level=None,all=None):
 def fraction_step1(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s1 = job["step1"]
-    v = (s1)/(g+gc)
+    v = (s1)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -166,9 +225,9 @@ def fraction_step1(job,mx=None,proc=None,level=None,all=None):
 def fraction_step2(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s2 = job["step2"]
-    v = (s2)/(g+gc)
+    v = (s2)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -176,9 +235,9 @@ def fraction_step2(job,mx=None,proc=None,level=None,all=None):
 def fraction_step3(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
-    g = job["ghostfill"]
+    gf = job["ghostfill"]
     s3 = job["step3"]
-    v = (s3)/(g+gc)
+    v = (s3)/(gf+gc)
     fmt_int = False
 
     return v, fmt_int
@@ -190,6 +249,7 @@ def fraction_ghostfill_totals(job,mx=None,proc=None,level=None,all=None):
     s1 = job["step1"]
     s2 = job["step2"]
     s3 = job["step3"]
+    gb = job["ghostpatch_build"]   # included in ghostfill, but not in s1, s2 or s3.
     v = (gc + s1+s2+s3)/(gf+gc)
     fmt_int = False
 
@@ -199,6 +259,7 @@ def fraction_ghostfill_unaccounted(job,mx=None,proc=None,level=None,all=None):
 
     gc = job["ghostpatch_comm"]
     gf = job["ghostfill"]
+    gb = job["ghostpatch_build"]
     s1 = job["step1"]
     s2 = job["step2"]
     s3 = job["step3"]
@@ -305,3 +366,15 @@ def dof_per_second(job,mx=None,proc=None,level=None,all=None):
     fmt_int = False
 
     return v,fmt_int
+
+def rate(job,mx=None,proc=None,level=None,all=None):
+    # Same as dof_per_second, above.
+    mi = job["mi"]
+    mj = job["mj"]
+
+    w = job["walltime"]
+    a = job["advance_steps"]   # total steps per proc
+    v = a*mx**2/w
+
+    fmt_int = False
+    return v, fmt_int

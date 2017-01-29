@@ -8,7 +8,7 @@
       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
       integer i,j
-      double precision xlow, ylow, w, xc,yc, q0
+      double precision xlow, ylow, w, xc,yc, q0, t0
 
       integer blockno, fc2d_clawpack46_get_block
 
@@ -17,6 +17,7 @@
 
       blockno = fc2d_clawpack46_get_block()
 
+      t0 = 0.d0
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             if (example .eq. 0) then

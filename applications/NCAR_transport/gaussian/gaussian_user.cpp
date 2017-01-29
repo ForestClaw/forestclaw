@@ -94,6 +94,11 @@ void gaussian_patch_setup(fclaw2d_domain_t *domain,
     double *xp,*yp,*zp;
     const user_options_t* user = gaussian_user_get_options(domain);
 
+    if (fclaw2d_patch_is_ghost(this_patch))
+    {
+        return;
+    }
+
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 

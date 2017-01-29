@@ -7,6 +7,7 @@ bin_PROGRAMS += applications/amrclaw/acoustics/2d/interface/interface
 
 applications_amrclaw_acoustics_2d_interface_interface_SOURCES = \
 	applications/amrclaw/acoustics/2d/interface/interface_user.cpp \
+	applications/amrclaw/acoustics/2d/interface/interface_user.h \
 	applications/amrclaw/acoustics/2d/interface/interface.cpp \
 	applications/amrclaw/acoustics/2d/interface/p0.f \
 	applications/amrclaw/acoustics/2d/interface/fclaw2d_map_nomap.c \

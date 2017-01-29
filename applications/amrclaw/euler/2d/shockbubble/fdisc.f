@@ -10,6 +10,7 @@ c     =================================================
 
       integer blockno
       integer*8 cont, get_context
+      double precision f1,f2
 
 c
 c     # for computing cell averages for initial data that has a
@@ -23,7 +24,7 @@ c
       x = xc
       y = yc
 
-      go to (10,20) idisc
+      go to (10,20,30,40) idisc
 c
    10 continue
 c     # straight line through (x0,y0) with normal (alf,beta) pointing
@@ -35,6 +36,31 @@ c
    20 continue
 c     # circle of radius r0:
       fdisc = (x-x0)**2 + (y-y0)**2 - r0**2
-c
+      return
+
+   30 continue
+      f1 = (x-x0)**2 + (y-y0+0.5d0)**2 - r0**2
+      f2 = (x-x0)**2 + (y-y0-0.5d0)**2 - r0**2
+      if (f1 .lt. 0) then
+         fdisc = f1
+      elseif (f2 .lt. 0) then
+         fdisc = f2
+      else
+         fdisc = min(f1,f2)
+      endif
+      return
+
+   40 continue
+      f1 = (x-x0)**2 + (y-y0+0.5d0)**2 - (r0/sqrt(2.d0))**2
+      f2 = (x-x0)**2 + (y-y0-0.5d0)**2 - (r0/sqrt(2.d0))**2
+      if (f1 .lt. 0) then
+         fdisc = f1
+      elseif (f2 .lt. 0) then
+         fdisc = f2
+      else
+         fdisc = min(f1,f2)
+      endif
+
+
       return
       end

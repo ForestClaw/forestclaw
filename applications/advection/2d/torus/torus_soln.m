@@ -1,15 +1,15 @@
 % TORUS_SOLN returns location of solution on torus
 %
-% TORUS_SOLN(T,alpha,R) returns location of boundary of a disk as it is 
+% TORUS_SOLN(T,alpha,R) returns location of boundary of a disk as it is
 % is advected using a streamfunction
 %
 %    psi(theta,phi) = (2*pi*R)*alpha*(theta + pi + alpha*sin(theta+phi))
-% 
+%
 % where R is the desired number of resolutions per second and alpha is the
-% ratio of the smaller radius to the larger.  
+% ratio of the smaller radius to the larger.
 %
 % The initial "disk" is actually obtained by intersecting a sphere, located
-% at (1,0,r0), of r0 is the inner radius of the torus. 
+% at (1,0,r0), of r0 is the inner radius of the torus.
 
 function  [xpout,ypout,zpout] = torus_soln(T,alpha,R,period)
 
@@ -46,11 +46,16 @@ if (T > 0)
 
     f0 = [x0; y0; z0];
     opt.RelTol = 1e-12;
-    [~,pout] = ode45(@psi_rhs_simple,[0,T],f0,opt);
+    [~,pout] = ode45(@psi_rhs,[0,T],f0,opt);
 
     xp = pout(end,1:N_torus);
     yp = pout(end,(N_torus+1):(2*N_torus));
     zp = pout(end,(2*N_torus+1):end);
+
+    th = 2*pi*0.5*T;
+    xp = cos(th)*x0 + sin(th)*y0;
+    yp = sin(th)*x0 - cos(th)*y0;
+    zp = z0;
 else
     % Return initial conditions
     xp = x0;
@@ -126,9 +131,9 @@ while (1)
 
   xl = h(1,st_idx+1:st_idx+next_length);
   yl = h(2,st_idx+1:st_idx+next_length);
-  
+
   [x0,y0,z0] = mapc2m_torus(xl(:),yl(:));
-    
+
   xdata = [xdata; x0];
   ydata = [ydata; y0];
   zdata = [zdata; z0];
@@ -137,7 +142,7 @@ while (1)
     return
   end
 end
-  
+
 
 end
 
@@ -163,7 +168,7 @@ function fp = psi_rhs(t,f)
 
 global N_torus period_torus alpha_torus revs_per_second_torus;
 
-R = revs_per_second_torus;   
+R = revs_per_second_torus;
 N = N_torus;
 
 x = f(1:N)';
@@ -200,7 +205,7 @@ function fp = psi_rhs_simple(t,f)
 
 global N_torus period_torus alpha_torus revs_per_second_torus;
 
-R = revs_per_second_torus;   
+R = revs_per_second_torus;
 N = N_torus;
 
 x = f(1:N)';

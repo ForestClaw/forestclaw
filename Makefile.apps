@@ -20,24 +20,24 @@ endif
 #include applications/no_solver/Makefile.am
 
 # Test metric terms used for problems on manifolds
-include applications/metric/2d/all_mappings/Makefile.am
+# include applications/metric/2d/all_mappings/Makefile.am
 
 # Scalar advection on manifolds
-include applications/advection/2d/swirl/Makefile.am
-include applications/advection/2d/torus/Makefile.am
-include applications/advection/2d/torthem/Makefile.am
-include applications/advection/2d/annulus/Makefile.am
-include applications/advection/2d/latlong/Makefile.am
-include applications/advection/2d/replicated/Makefile.am
-include applications/advection/2d/hemisphere/Makefile.am
-include applications/advection/2d/filament/Makefile.am
-include applications/advection/2d/disk/Makefile.am
-include applications/advection/2d/sphere/Makefile.am
+# include applications/advection/2d/swirl/Makefile.am
+# include applications/advection/2d/torus/Makefile.am
+# include applications/advection/2d/torthem/Makefile.am
+# include applications/advection/2d/annulus/Makefile.am
+# include applications/advection/2d/latlong/Makefile.am
+# include applications/advection/2d/replicated/Makefile.am
+# include applications/advection/2d/hemisphere/Makefile.am
+# include applications/advection/2d/filament/Makefile.am
+# include applications/advection/2d/disk/Makefile.am
+# include applications/advection/2d/sphere/Makefile.am
 
 # NCAR Transport problems on the sphere
-include applications/NCAR_transport/gaussian/Makefile.am
+# include applications/NCAR_transport/gaussian/Makefile.am
 include applications/NCAR_transport/slotted_disk/Makefile.am
-include applications/NCAR_transport/correlatedcb/Makefile.am
+# include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # Euler example
 include applications/euler/2d/quadrants/Makefile.am
@@ -46,13 +46,13 @@ include applications/euler/2d/quadrants/Makefile.am
 # include applications/shallow/2d/sphere/Makefile.am
 
 # AMRClaw examples from Clawpack/AMRClaw
-include applications/amrclaw/acoustics/2d/interface/Makefile.am
-include applications/amrclaw/acoustics/2d/radial/Makefile.am
-include applications/amrclaw/advection/2d/swirl/Makefile.am
-include applications/amrclaw/burgers/2d/pwconst/Makefile.am
-include applications/amrclaw/shallow/2d/radialdam/Makefile.am
-include applications/amrclaw/euler/2d/quadrants/Makefile.am
-include applications/amrclaw/euler/2d/shockbubble/Makefile.am
+# include applications/amrclaw/acoustics/2d/interface/Makefile.am
+# include applications/amrclaw/acoustics/2d/radial/Makefile.am
+# include applications/amrclaw/advection/2d/swirl/Makefile.am
+# include applications/amrclaw/burgers/2d/pwconst/Makefile.am
+# include applications/amrclaw/shallow/2d/radialdam/Makefile.am
+# include applications/amrclaw/euler/2d/quadrants/Makefile.am
+# include applications/amrclaw/euler/2d/shockbubble/Makefile.am
 
 # GeoClaw examples
 if FCLAW_ENABLE_GEOCLAW

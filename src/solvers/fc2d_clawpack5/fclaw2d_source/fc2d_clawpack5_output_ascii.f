@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack5_fort_write_header(iframe, time, meqn, 
+      subroutine fc2d_clawpack5_fort_write_header(iframe, time, meqn,
      &                                            maux, ngrids)
       implicit none
 

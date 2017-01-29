@@ -135,13 +135,6 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
         fclaw2d_block_set_data(block,gparms->mthbc);
     }
 
-#if 0
-    /* Set up the parallel ghost patch data structure. */
-    fclaw_global_infof("  -- Setting up parallel ghost exchange ... \n");
-
-    fclaw2d_exchange_setup(new_domain);
-#endif
-
     fclaw_global_infof("Done\n");
 }
 

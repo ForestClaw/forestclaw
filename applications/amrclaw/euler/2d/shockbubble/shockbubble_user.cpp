@@ -109,5 +109,5 @@ void shockbubble_problem_setup(fclaw2d_domain_t* domain)
     const user_options_t* user = shockbubble_user_get_options(domain);
 
     SHOCKBUBBLE_SETPROB(&user->gamma, &user->x0, &user->y0, &user->r0,
-                        &user->rhoin, &user->pinf);
+                        &user->rhoin, &user->pinf, &user->idisc);
 }

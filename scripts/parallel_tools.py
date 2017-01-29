@@ -71,37 +71,36 @@ def compare_runs(execname,rerun,iframe):
                 subprocess.call(arg_list)
 
 
-def write_ini_files(input_file='create_run.ini'):
+def write_ini_files(input_file='create_run.ini',problem='advection'):
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
     config.read(input_file)
 
     scheduler     = config.get('Defaults','scheduler').partition('#')[0].strip()
 
-    execname      = config.get('Problem','execname').partition('#')[0].strip()
 
-    # This is for estimating total time.  Only time for the uniform calculation is
-    # estimated;  adaptive time is assumed to be much less.
-    time_per_grid = float(config.get('Problem','time_per_grid').partition('#')[0].strip())
-
-    # Supply a baseline dt and associated grid resolution so we can scale the
-    # time step appropriately for different resolutions.
-    dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
-    dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
-
-    # Fit to model
-    try:
-        coeff_A      = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
-        coeff_B      = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
-    except:
-        coeff_A = 1.0
-        coeff_B = 0
-
-    # Uniform or adaptive
+    # Example number
     try:
         example    = int(config.get('Defaults','example').partition('#')[0].strip())
     except:
         example = 0
 
+
+    # Name to use in Juqueen output file
+    execname      = config.get('Problem','execname').partition('#')[0].strip()
+
+    # Estimated time per grid
+    time_per_grid = float(config.get('Problem','time_per_grid').partition('#')[0].strip())
+
+    # Fit to model
+    try:
+        coeff_A = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
+        coeff_B = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
+    except:
+        coeff_A = 1.0
+        coeff_B = 0
+
+
+    # Brick dimensions
     try:
         mi0 = int(config.get('Run','mi').partition('#')[0].strip())
         mj0 = int(config.get('Run','mj').partition('#')[0].strip())
@@ -110,29 +109,125 @@ def write_ini_files(input_file='create_run.ini'):
         mj0 = 1
 
 
+    mx0     = int(config.get('Run', 'mx').partition('#')[0].strip())
+    minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
+    maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
+    proc0   = int(config.get('Run','proc').partition('#')[0].strip())
+    try:
+        tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
+    except:
+        pass
+
+
+    # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
+    njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
+
+    if minlevel0 == maxlevel0:
+        mode = 'uniform'
+
+    try:
+        # Set regrid here in case we want to regrid even in the
+        # uniform case
+        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
+    except:
+        regrid_interval = 1
+
+
+
+
+    # Ranks per node
     try:
         ranks_per_node = int(config.get('Run','ranks-per-node').partition('#')[0].strip())
     except:
         ranks_per_node = 32
 
-    # Duplicate problem
-    try:
-        d = config.get('Run','duplicate').partition('#')[0].strip()
-        duplicate  = d in ['T','True','1']
-    except:
-        duplicate = False
+    # ---------------- Start with problem-specific code ---------------------
+    if problem is 'advection':
+        # Supply a baseline dt and associated grid resolution so we can scale the
+        # time step appropriately for different resolutions.
+        dt_eff_res    = int(config.get('Problem','dt_eff_res').partition('#')[0].strip())
+        dt_fixed      = float(config.get('Problem','dt_fixed').partition('#')[0].strip())
 
-    try:
-        d = config.get('Run','adapt_proc_count').partition('#')[0].strip()
-        adapt_proc_count  = d in ['T','True','1']
-        fix_grids_per_proc = int(config.get('Run','adapt_proc_count').partition('#')[0].strip())
-    except:
+        # Replicated problem
+        try:
+            d = config.get('Run','duplicate').partition('#')[0].strip()
+            duplicate  = d in ['T','True','1']
+        except:
+            duplicate = False
+
+        # Uniform or adaptive
+        use_fixed_dt = True
+        outstyle = 3
+
+        # Beta : Adapt proc count
         adapt_proc_count = False
 
+    elif problem is 'shockbubble':
+        initial_dt   = float(config.get('Run','initial_dt').partition('#')[0].strip())
+        # smooth_level0  = maxlevel0-1   # Smooth at all levels
+        smooth_level0    = float(config.get('Run','smooth-level').partition('#')[0].strip())
+        try:
+            nout0 = int(config.get('Run','nout').partition('#')[0].strip())
+            tfinal0 = initial_dt*nout0
+        except:
+            nout0 = 1
 
+        # Beta : adapt proc count
+        try:
+            num_grids_per_proc = int(config.get('Run','num_grids_per_proc').partition('#')[0].strip())
+            adapt_proc_count = True
+        except:
+            adapt_proc_count = False
 
-    # Uniform or adaptive
+        use_fixed_dt = True
+        outstyle = 3
+        nstep0 = nout0
+        duplicate = False
+
+        # number of time steps
+        try:
+            coeff_C      = float(config.get('Problem','adapt_coeff_C').partition('#')[0].strip())
+            coeff_D      = float(config.get('Problem','adapt_coeff_D').partition('#')[0].strip())
+            # dt0  = float(config.get('Problem','dt_coarse_est').partition('#')[0].strip())
+        except:
+            pass
+
+    elif problem is 'slotted_disk':
+        initial_dt   = float(config.get('Run','initial_dt').partition('#')[0].strip())
+        # smooth_level0  = maxlevel0-1   # Smooth at all levels
+        smooth_level0    = float(config.get('Run','smooth-level').partition('#')[0].strip())
+        nout0 = int(config.get('Run','nout').partition('#')[0].strip())
+        nstep0 = int(config.get('Run','nstep').partition('#')[0].strip())
+        tfinal0 = initial_dt*nout0
+
+        # Beta : adapt proc count
+        try:
+            num_grids_per_proc = int(config.get('Run','num_grids_per_proc').partition('#')[0].strip())
+            adapt_proc_count = True
+        except:
+            adapt_proc_count = False
+
+        use_fixed_dt = True
+        outstyle = 3
+        duplicate = False
+
+        # number of time steps
+        try:
+            coeff_A      = float(config.get('Problem','adapt_coeff_A').partition('#')[0].strip())
+            coeff_B      = float(config.get('Problem','adapt_coeff_B').partition('#')[0].strip())
+        except:
+            pass
+
+    # ---------------- Done with problem-specific code ---------------------
+
+    try:
+        verbosity = config.get('Run','verbosity').partition('#')[0].strip()
+    except:
+        verbosity = 'essential'
+
+    # Mode : uniform or adaptive ?
     mode    = config.get('Run','mode').partition('#')[0].strip()
+
 
     # Subcycling (used only in adaptive case)
     sc = config.get('Run','subcycle').partition('#')[0].strip()
@@ -144,6 +239,11 @@ def write_ini_files(input_file='create_run.ini'):
     except:
         weightedp = False
 
+    try:
+        gparea = config.get('Run','ghost_patch_pack_area').partition('#')[0].strip()
+        gparea = gparea in ['T','True','1']
+    except:
+        gparea = True
 
     # Advance one step?
     try:
@@ -163,55 +263,45 @@ def write_ini_files(input_file='create_run.ini'):
     scaling = 'strong'   # Get rid of these eventually?
     scale_uniform = False
 
-    mx0     = int(config.get('Run', 'mx').partition('#')[0].strip())
-    minlevel0  = int(config.get('Run', 'minlevel').partition('#')[0].strip())
-    maxlevel0  = int(config.get('Run', 'maxlevel').partition('#')[0].strip())
-    proc0   = int(config.get('Run','proc').partition('#')[0].strip())
-    tfinal0 = float(config.get('Run','tfinal').partition('#')[0].strip())
-
-    # nbjobs : determines length of processor sequence, e.g. [1,4,16,64,...]
-    njobs   = int(config.get('Run','njobs').partition('#')[0].strip())
-
-    if minlevel0 == maxlevel0:
-        mode = 'uniform'
-
-    try:
-        # Set regrid here in case we want to regrid even in the
-        # uniform case
-        regrid_interval = int(config.get('Run','regrid_interval').partition('#')[0].strip())
-    except:
-
-        regrid_interval = 1
-
-
     # ----------------------------------------
     # Other inputs needed by the user
     # ----------------------------------------
 
-    # Figure out dt needed for first run in this series
-    eff_res0 = mx0*2**minlevel0
+    # ---------------- Start of problem-specific code ---------------------
+    if problem is 'advection':
+        # Figure out dt needed for first run in this series
+        eff_res0 = mx0*2**minlevel0
 
-    dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
+        dt0 = dt_fixed/(float(eff_res0)/float(dt_eff_res))
 
-    tol = 3e-15
-    if use_maxlevel:
-        nout0 = tfinal0/(dt0/2**(maxlevel0-minlevel0))
-    else:
-        nout0 = tfinal0/dt0
+        steps_coarse0 = tfinal0/dt0
 
-    if abs(nout0 - np.round(nout0)) > tol:
-        print "nout is not an integer; nout = %12.4e\n" % (nout0-np.round(nout0))
-        sys.exit()
-    nout0 = int(nout0)
+        if use_maxlevel:
+            steps_coarse = steps_coarse0*2**(maxlevel0-minlevel0)
+        else:
+            steps_coarse = steps_coarse0
 
-    nstep0 = nout0/tfinal0
-    nstep0 = nout0
-    if abs(nstep0 - np.round(nstep0)) > tol:
-        print "nstep is not an integer; nstep = %12.4f; nout = %12.4f\n" % (nstep0,nout0)
-        print "Setting nstep to nout"
-        nstep0 = int(nout0)
-    else:
-        nstep0 = int(nstep0)
+        tol = 3e-15
+        if abs(steps_coarse - np.round(steps_coarse0)) > tol:
+            print "steps_coarse is not an integer; nout = %12.4e\n" % \
+                (steps_coarse0-np.round(steps_coarse0))
+            sys.exit()
+            steps_coarse = int(steps_coarse0)
+
+        nout0 = steps_coarse0  # Used for outstyle == 3
+        nstep0 = nout0  # Only output final time step.
+        initial_dt = dt0
+
+    elif problem is 'shockbubble':
+        smooth_level0  = 0
+        steps_coarse0 = nout0
+        dt0 = tfinal0/steps_coarse0   # coarse grid time step
+    elif problem is 'slotted_disk':
+        steps_coarse0 = nout0
+        dt0 = initial_dt
+        pass
+
+    # ---------------- Done with problem-specific code ---------------------
 
 
     # ----------------------------------------
@@ -225,6 +315,10 @@ def write_ini_files(input_file='create_run.ini'):
 
     R = np.arange(0,njobs)
 
+    if mode == 'adapt':
+        adapt_factor = np.exp(coeff_B*maxlevel0 + coeff_A)
+    else:
+        adapt_factor = np.ones(R.shape)
 
     mx       = np.empty(R.shape)
     nout     = np.empty(R.shape)
@@ -235,12 +329,14 @@ def write_ini_files(input_file='create_run.ini'):
     dt       = np.empty(R.shape)
     mi       = np.empty(R.shape)
     mj       = np.empty(R.shape)
-
+    smooth_level  = np.empty(R.shape)
+    steps_coarse  = np.empty(R.shape)
 
     # These are fixed for all possible runs.
     mx.fill(mx0)
-    nout.fill(nout0)
+    nout.fill(nout0)   # set to 1 in shockbubble problem
     nstep.fill(nstep0)
+    steps_coarse.fill(steps_coarse0)
 
     # minlevel is fixed
     minlevel.fill(minlevel0)
@@ -253,33 +349,38 @@ def write_ini_files(input_file='create_run.ini'):
     tfinal.fill(tfinal0)
     dt.fill(dt0)    # Coarse grid dt; is scaled to finer levels.
 
+    if problem is 'advection':
+        smooth_level = maxlevel-1
 
-    if mode == 'adapt':
-        adapt_factor = coeff_A*np.exp(coeff_B*maxlevel)
-    else:
-        adapt_factor = np.ones(R.shape)
+    if problem is 'shockbubble':
+        smooth_level.fill(smooth_level0)
 
+    if problem is 'slotted_disk':
+        smooth_level = maxlevel-1
+
+
+    nout_uniform = steps_coarse*2**(maxlevel-minlevel)  # Number of fine grid steps
+    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
 
     if adapt_proc_count:
-        G = num_grids_per_proc
-        procs = 16*np.round(adapt_factor*4**maxlevel/G/16)
+        # Doesn't work yet
+        proc0 = np.ceil(np.exp(coeff_B*maxlevel0 + coeff_A)*num_grids_total/num_grids_per_proc)
+        f = 4*np.exp(coeff_B)
+        procs = proc0*f**R
     else:
         procs = proc0*4**R     # Key idea : Run on different processors
 
-    print procs
-
-    nout_uniform = nout*2**(maxlevel-minlevel)  # Number of fine grid steps
-    num_grids_total = mi0*mj0*(4**maxlevel)  # total on all procs, all blocks
     if not duplicate:
-        grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+        # grids_per_proc = adapt_factor*mi0*mj0*(4**maxlevel)/procs
+        grids_per_proc = adapt_factor*num_grids_total/procs
     else:
         grids_per_proc = adapt_factor*(4**maxlevel)/(procs/procs[0])
-
 
     num_advances = adapt_factor*nout_uniform*num_grids_total
     t = (num_advances*time_per_grid)/procs  # Assuming ideal scaling
 
-    eff_res = mx*(2**maxlevel)*mi0
+    # eff_res = mx*(2**maxlevel)*mi0
+    eff_res = np.round(np.sqrt((mx*2**maxlevel)**2*mi0*mj0))
 
     # ------------------------------------------
     # Start creating files.
@@ -326,7 +427,7 @@ def write_ini_files(input_file='create_run.ini'):
             level_inc = 0
 
         prt_tuple = (p,mx[i],minlevel[i]+level_inc,maxlevel[i]+level_inc,
-                     nout[i],nstep[i],dt[i],
+                     steps_coarse[i],nstep[i],dt[i],
                      tfinal[i],eff_res[i], grids_per_proc[i],t[i])
 
         # Print to console and jobs file
@@ -354,18 +455,20 @@ def write_ini_files(input_file='create_run.ini'):
         ini_file.write("    maxlevel = %d\n" % maxlevel[i])
 
         ini_file.write("    regrid_interval = %d\n" % regrid_interval)
-        if regrid_interval > 0:
-            ini_file.write("    smooth-refine = T\n")
-            ini_file.write("    smooth-level = %d\n" % (maxlevel[i]-1))
+        ini_file.write("    smooth-level = %d\n" % (smooth_level[i]))
 
         ini_file.write("\n")
         ini_file.write("    tfinal = %16.8e\n" % tfinal[i])
-        ini_file.write("    use_fixed_dt = T\n")
-        ini_file.write("    initial_dt = %20.16e\n" % dt[i])
+        if use_fixed_dt:
+            ini_file.write("    use_fixed_dt = T\n")
+        else:
+            ini_file.write("    use_fixed_dt = F\n")
+
+        ini_file.write("    initial_dt = %20.16e\n" % initial_dt)
         ini_file.write("\n")
-        ini_file.write("    outstyle = 3\n")
+        ini_file.write("    outstyle = %d\n" % outstyle)
         ini_file.write("    nout = %d\n" % nout[i])
-        ini_file.write("    nstep = %d\n" % nstep[i])
+        ini_file.write("    nstep = %d\n" % nstep[i])  # Not used if outstyle == 1
         if mode == 'adapt':
             if subcycle:
                 ini_file.write("    subcycle = T\n")
@@ -386,8 +489,7 @@ def write_ini_files(input_file='create_run.ini'):
             ini_file.write("    subcycle = F\n")
 
 
-
-
+        ini_file.write("    init_ghostcell = F\n")
         ini_file.write("\n")
 
         ini_file.write("# Subcycling\n");
@@ -396,11 +498,17 @@ def write_ini_files(input_file='create_run.ini'):
         else:
             ini_file.write("    weighted_partition = F\n")
 
+
+        if gparea:
+            ini_file.write("    ghost_patch_pack_area = T\n")
+        else:
+            ini_file.write("    ghost_patch_pack_area = F\n")
+
         ini_file.write("\n")
 
         # Other things which should not be set of timing runs
         ini_file.write("# File and console IO\n")
-        ini_file.write("    verbosity = essential\n")
+        ini_file.write("    verbosity = %s\n" % verbosity)
         ini_file.write("    serialout = F\n")
         ini_file.write("    vtkout = 0\n")
         ini_file.write("    tikzout = F\n")
@@ -429,7 +537,11 @@ def write_ini_files(input_file='create_run.ini'):
             proc_file.write("#@ comment = \"%s example : eff. resolution = %d x %d\"\n" % \
                             (execname.capitalize(),eff_res[i],eff_res[i]))
             proc_file.write("#@ error = %s_%05d.o$(jobid)\n" % (execname,p))
-            proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % (execname,p))
+            if problem == 'slotted_disk':
+                proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % ('slotted-disk',p))
+            else:
+                proc_file.write("#@ output = %s_%05d.o$(jobid)\n" % (execname,p))
+
             proc_file.write("\n")
             proc_file.write("#@ environment = COPY_ALL\n")
             trun = np.min([60**2,1.1*t[i]])  # Keep jobs under 1 hour
@@ -594,7 +706,6 @@ def compile_results(results_dir=None,results_file='results.out',
         results_dir = os.getcwd()
 
     # Stuff to grep for
-<<<<<<< Updated upstream
     stats_list_float = [ 'INIT',
                          'ADVANCE$',
                          'GHOSTFILL$',
@@ -608,9 +719,13 @@ def compile_results(results_dir=None,results_file='results.out',
                          'LOCAL',
                          'COMM',
                          'PARTITION',
+                         'GHOSTPATCH_BUILD',
                          'GHOSTFILL_STEP1',
                          'GHOSTFILL_STEP2',
                          'GHOSTFILL_STEP3',
+                         'GHOSTFILL_COPY',
+                         'GHOSTFILL_INTERP',
+                         'GHOSTFILL_AVERAGE',
                          'LOCAL_BOUNDARY_RATIO',
                          'REMOTE_BOUNDARY_RATIO']
 
@@ -653,24 +768,12 @@ def compile_results(results_dir=None,results_file='results.out',
     # -----------------------
     float_list = ('init','advance','ghostfill','regrid','patch_comm',
                   'adapt','partition','cfl','walltime',
-                  'gf_copy','local','comm','partition','step1',
-                  'step2','step3', 'l. ratio','r. ratio')
+                  'gf_copy','local','comm','partition','gbuild','step1',
+                  'step2','step3', 'copy',
+                  'interp','average','l. ratio','r. ratio')
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
-=======
-    stats_list = [ 'INIT',
-                   'ADVANCE$',
-                   'GHOSTFILL$',
-                   'REGRID$',
-                   'GHOSTPATCH_COMM',
-                   'ADAPT_COMM',
-                   'PARTITION_COMM',
-                   'CFL_COMM',
-                   'WALLTIME',
-                   'ADVANCE_STEPS_COUNTER',
-                   'NEIGHBOR_SEARCH']
->>>>>>> Stashed changes
 
     # Compile data to this file
     line_len = option_width + int_width + float_width
@@ -680,13 +783,6 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile = open(results_file,'w')
     resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
-<<<<<<< Updated upstream
-=======
-    fstr = "# %6s%8s%6s%6s%6s%8s%12s" + "%12s"*11 + "\n"
-    resultsfile.write(fstr % ('jobid','p','mx','min','max','nout','tfinal','init',
-                              'Advance','Ghostfill','Regrid','Ghost_comm','adapt',
-                              'partition','cfl','wall','adv._steps','neighbor_search'))
->>>>>>> Stashed changes
 
     resultsfile.write("# " + header_str + "\n")
 
@@ -719,9 +815,9 @@ def compile_results(results_dir=None,results_file='results.out',
                     found_bad_file = True
                     break
 
-            if found_bad_file:
-                print "Skipping file %s (time exceeded)" % f
-                continue
+            #if found_bad_file:
+            #    print "Skipping file %s (time exceeded)" % f
+            #    continue
 
             # jobid
             resultsfile.write("  ")   # Make up for "# " added as comments above
@@ -910,7 +1006,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                     mx1.extend(data[:,2])       # Check below
                     levels1.extend(data[:,6])   # Check  below
 
-
     t = zip(mx1,procs1,levels1)  # All possible combos
 
     # Create array of all (procs/levels).  Not every combo will have data.
@@ -990,7 +1085,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["rundir"]          = rundir
                         job["jobid"]           = row[0]
                         job["procs"]           = row[1]
-<<<<<<< Updated upstream
                         job["mx"]              = row[2]   # Used above in computing m
                         job["mi"]              = row[3]
                         job["mj"]              = row[4]
@@ -1019,30 +1113,15 @@ def read_results_files(dir_list, subdir = None, results_in = None,
                         job["local"]           = row[24]
                         job["comm"]            = row[25]
                         job["partition"]       = row[26]
-                        job["step1"]           = row[27]
-                        job["step2"]           = row[28]
-                        job["step3"]           = row[29]
-                        job["local_ratio"]     = row[30]
-                        job["remote_ratio"]    = row[31]
-
-=======
-                        job["mx"]              = row[2]
-                        job["minlevel"]        = row[3]
-                        job["maxlevel"]        = row[4]
-                        job["nout"]            = row[5]
-                        job["tfinal"]          = row[6]
-                        job["init"]            = row[7]
-                        job["advance"]         = row[8]
-                        job["ghostfill"]       = row[9]
-                        job["regrid"]          = row[10]
-                        job["ghostpatch_comm"] = row[11]
-                        job["adapt_comm"]      = row[12]
-                        job["partition_comm"]  = row[13]
-                        job["cfl_comm"]        = row[14]
-                        job["walltime"]        = row[15]
-                        job["advance_steps"]   = row[16]
-                        job["neighbor_search"]   = row[17]
->>>>>>> Stashed changes
+                        job["ghostpatch_build"]= row[27]
+                        job["step1"]           = row[28]
+                        job["step2"]           = row[29]
+                        job["step3"]           = row[30]
+                        job["copy"]            = row[31]
+                        job["interp"]          = row[32]
+                        job["average"]         = row[33]
+                        job["local_ratio"]     = row[34]
+                        job["remote_ratio"]    = row[35]
 
                     jobs[m][p][l] = job
 
@@ -1082,7 +1161,7 @@ def print_jobs(jobs,val2plot,fmt_int=False):
                         d = job[val2plot]
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
-                        pdb.set_trace()
+                        pdb.set_traceg()
                         sys.exit()
                 else:
                     import types
@@ -1147,7 +1226,8 @@ def plot_results(jobs,start_point,val2plot='walltime',
     # Or we can set the colormap explicitly.
     cmap = sns.color_palette("Set1",10)
     cm = [cmap[i] for i in [0,5,1,4,2,7,3]]
-    ax.set_color_cycle(cm)
+    from cycler import cycler
+    ax.set_prop_cycle(cycler('color',cm))
 
 
     markers = {}
@@ -1248,6 +1328,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
         ax.set_ylabel("Cost per grid",fontsize=16)
 
         if len(gpplist) > 1:
+            ranks_per_node = -1    # Set to -1 to get single curve through all data
             gpp = np.array(gpplist)
             y = np.array(ylist)
             z = zip(gpp,y,proclist)
@@ -1256,16 +1337,16 @@ def plot_results(jobs,start_point,val2plot='walltime',
             proclist = np.array([x[2] for x in z if x[0] > 1]).astype(int)
 
             z = zip(gpp,y,proclist)
-            gpp1 = np.array([t[0] for t in z if t[2] <= 16])
-            y1   = np.array([t[1] for t in z if t[2] <= 16])
+            gpp1 = np.array([t[0] for t in z if t[2] <= ranks_per_node])
+            y1   = np.array([t[1] for t in z if t[2] <= ranks_per_node])
 
-            if len(gpp1) > 2:
+            if len(gpp1) > 1:
                 xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
                 ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
                 plt.plot(xs,ys,'k--')
 
-            gpp2 = np.array([t[0] for t in z if t[2] > 16])
-            y2   = np.array([t[1] for t in z if t[2] > 16])
+            gpp2 = np.array([t[0] for t in z if t[2] > ranks_per_node])
+            y2   = np.array([t[1] for t in z if t[2] > ranks_per_node])
             if len(gpp2) > 1:
                 xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
                 ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
@@ -1274,7 +1355,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
             plt.draw()
 
     else:
-<<<<<<< Updated upstream
         if scaling == 'resolution':
             levels = list(set([x[2] for x in tlist]))
             ax.xaxis.set_major_locator(plt.FixedLocator(levels))
@@ -1282,20 +1362,6 @@ def plot_results(jobs,start_point,val2plot='walltime',
             l1 = np.min(levels)
             l2 = np.max(levels)
             plt.xlim([l1-0.5,l2+0.5])
-=======
-        ax.xaxis.set_major_locator(plt.FixedLocator(procs))
-        ax.set_xlabel("Processor count",fontsize=16)
-        p1 = np.log(np.min(procs))/np.log(4)
-        p2 = np.log(np.max(procs))/np.log(4)
-        plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
-
-    if efficiency:
-        ax.set_yscale('linear')
-        plt.ylim([0,110])
-        plt.grid(b=True,which='major')
-        # plt.grid(b=True,which='minor')
-        # plt.minorticks_on()
->>>>>>> Stashed changes
 
         else:
             ax.xaxis.set_major_locator(plt.FixedLocator(procs))

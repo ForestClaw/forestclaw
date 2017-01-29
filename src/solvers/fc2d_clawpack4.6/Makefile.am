@@ -2,6 +2,7 @@
 libclawpack4_6_generated_headers =
 libclawpack4_6_installed_headers = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h \
+	src/solvers/fc2d_clawpack4.6/clawpack46_user_fort.h \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h
 
 libclawpack4_6_compiled_sources = \

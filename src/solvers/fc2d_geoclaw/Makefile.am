@@ -28,7 +28,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/riemann_source/rpt2_geoclaw.f \
 	src/solvers/fc2d_geoclaw/riemann_source/geoclaw_riemann_utils.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules.f90 \
-	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2_wrap.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2_wrap.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_limiter.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_block.f \

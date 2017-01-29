@@ -10,6 +10,12 @@
       integer i,j,m
       double precision xc,yc, qexact
 
+      integer ex_comm, example
+      common /comm_example/ ex_comm
+
+      example = ex_comm
+
+
 c     # Assume a single field variable only
       do j = 1,my
          yc = ylower + (j-0.5)*dy

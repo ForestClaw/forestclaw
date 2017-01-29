@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/advection/2d/torthem/torthem \
 
 applications_advection_2d_torthem_torthem_SOURCES = \
 	applications/advection/2d/torthem/torthem.c \
+	applications/advection/2d/torthem/torus_common.h \
 	applications/advection/2d/torthem/torus_common.c
 
 applications_advection_2d_torthem_torthem_CPPFLAGS = \

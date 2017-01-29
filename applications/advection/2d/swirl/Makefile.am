@@ -1,8 +1,5 @@
 ## Makefile.am in applications/advection/2d/swirl
 
-# A single hash comment like this one WILL show up in the Makefile.
-## A double hash comment like this one will NOT be copied to the Makefile.
-
 bin_PROGRAMS += applications/advection/2d/swirl/swirl
 
 applications_advection_2d_swirl_swirl_SOURCES = \
@@ -13,6 +10,7 @@ applications_advection_2d_swirl_swirl_SOURCES = \
 	applications/advection/2d/swirl/psi.f \
 	applications/advection/2d/swirl/setprob.f \
 	applications/advection/2d/all/clawpack46_setaux.f \
+	applications/advection/2d/all/clawpack_user.h \
 	applications/advection/2d/all/clawpack5_setaux.f90 \
 	applications/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/advection/2d/all/clawpack46_rpt2adv.f \

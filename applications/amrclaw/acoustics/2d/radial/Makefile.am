@@ -7,6 +7,7 @@ bin_PROGRAMS += applications/amrclaw/acoustics/2d/radial/radial
 
 applications_amrclaw_acoustics_2d_radial_radial_SOURCES = \
 	applications/amrclaw/acoustics/2d/radial/radial_user.cpp \
+	applications/amrclaw/acoustics/2d/radial/radial_user.h \
 	applications/amrclaw/acoustics/2d/radial/radial.cpp \
 	applications/amrclaw/acoustics/2d/radial/fclaw2d_map_nomap.c \
 	applications/amrclaw/acoustics/2d/radial/fclaw2d_map_pillowdisk5.c \
@@ -17,6 +18,7 @@ applications_amrclaw_acoustics_2d_radial_radial_SOURCES = \
 	applications/amrclaw/acoustics/2d/radial/user_5.0/tag4coarsening.f90 \
 	applications/amrclaw/acoustics/2d/radial/user_5.0/setaux.f90 \
 	applications/amrclaw/acoustics/2d/rp/rpn2ac.f \
+	applications/amrclaw/acoustics/2d/rp/clawpack_user.h \
 	applications/amrclaw/acoustics/2d/rp/rpt2ac.f \
 	applications/amrclaw/acoustics/2d/rp/rpn2_acoustics.f90 \
 	applications/amrclaw/acoustics/2d/rp/rpt2_acoustics.f90 \
