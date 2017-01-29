@@ -34,7 +34,7 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,
   REAL(kind=8), INTENT(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
   integer, intent(in) :: nghost, mint
   INTEGER, INTENT(in) :: is_ghost_in
-  LOGICAL :: is_ghost
+  LOGICAL*1 :: is_ghost
 
   !! Locals
   INTEGER :: ii,jj,m, iint,jint
@@ -159,14 +159,9 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,
         !!write(*,444)ii,jj,aux(1,ii,jj)
 444     FORMAT("in setaux ",2i4,e12.5)
 
-        IF (is_ghost) THEN
-           WRITE(6,*) 'is_ghost'
-           WRITE(6,*) nghost
-        END IF
         IF (is_ghost .AND. ghost_invalid(ii,jj,mx,my,nghost,mint)) THEN
            CYCLE
         ENDIF
-        IF (is_ghost) WRITE(6,*) 'done'
 
 
         !! Set lat-long cell info
