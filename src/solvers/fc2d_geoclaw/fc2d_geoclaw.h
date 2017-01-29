@@ -60,7 +60,7 @@ typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         const int* maux, double aux[],
-                                        const fclaw_bool* is_ghost, const int* nghost,
+                                        const int* is_ghost, const int* nghost,
                                         const int* mint);
 
 typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
@@ -177,7 +177,7 @@ void GEOCLAW_SETAUX(const int* mbc,
                     const double* xlower, const double* ylower,
                     const double* dx, const double* dy,
                     const int* maux, double aux[],
-                    const fclaw_bool* is_ghost, const int* nghost,
+                    const int* is_ghost, const int* nghost,
                     const int* mint);
 
 void BC2(const int* meqn, const int* mbc,

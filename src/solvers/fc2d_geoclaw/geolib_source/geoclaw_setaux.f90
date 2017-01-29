@@ -1,5 +1,5 @@
 !
-SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,mint)
+SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,mint)
   !!     ============================================
   !!
   !!     # set auxiliary arrays
@@ -33,14 +33,18 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,min
   REAL(kind=8), INTENT(in) :: xlow,ylow,dx,dy
   REAL(kind=8), INTENT(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
   integer, intent(in) :: nghost, mint
-  logical*1, intent(in) :: is_ghost
+  INTEGER, INTENT(in) :: is_ghost_in
+  LOGICAL :: is_ghost
 
   !! Locals
   INTEGER :: ii,jj,m, iint,jint
   REAL(kind=8) :: x,y,xm,ym,xp,yp,topo_integral
   CHARACTER(len=*), PARAMETER :: aux_format = "(2i4,4d15.3)"
   INTEGER :: skipcount,iaux,ilo,jlo
-  logical ghost_invalid
+  LOGICAL ghost_invalid
+
+  is_ghost = is_ghost_in .ne. 0
+
 
   !! Lat-Long coordinate system in use, check input variables
   IF (coordinate_system == 2) THEN
@@ -151,13 +155,20 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,min
         x = 0.5d0*(xm+xp)
 
 
+
         !!write(*,444)ii,jj,aux(1,ii,jj)
 444     FORMAT("in setaux ",2i4,e12.5)
 
-        if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
-          cycle
-        endif
-        
+        IF (is_ghost) THEN
+           WRITE(6,*) 'is_ghost'
+           WRITE(6,*) nghost
+        END IF
+        IF (is_ghost .AND. ghost_invalid(ii,jj,mx,my,nghost,mint)) THEN
+           CYCLE
+        ENDIF
+        IF (is_ghost) WRITE(6,*) 'done'
+
+
         !! Set lat-long cell info
         IF (coordinate_system == 2) THEN
            aux(2,ii,jj) = deg2rad * earth_radius**2 * (SIN(yp * deg2rad) - SIN(ym * deg2rad)) / dy
@@ -179,6 +190,7 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,min
            CYCLE  ! new system copies bathy where possible
         ENDIF
 #endif
+
 
 
         !! Use input topography files if available
@@ -243,6 +255,7 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,min
                              ,is_ghost,nghost,mint)
   ENDIF
 
+
   !! Output for debugging to fort.23
   IF (.FALSE.) THEN
      PRINT *,'Writing out aux arrays'
@@ -263,7 +276,7 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost,nghost,min
 
 END SUBROUTINE geoclaw_setaux
 
-logical function ghost_invalid(i,j,mx,my,nghost,mint)
+LOGICAL FUNCTION ghost_invalid(i,j,mx,my,nghost,mint)
   implicit none
   integer, intent(in) :: i,j,nghost,mint,mx,my
   logical :: inner, outer
@@ -273,7 +286,6 @@ logical function ghost_invalid(i,j,mx,my,nghost,mint)
 
   outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
           (j .lt. 1-nghost) .or. (j .gt. my+nghost)
-  
+
   ghost_invalid = (inner .or. outer)
 end function ghost_invalid
-

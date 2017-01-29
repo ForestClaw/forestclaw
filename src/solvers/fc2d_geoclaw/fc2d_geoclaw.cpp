@@ -309,7 +309,7 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
     {
         return;
     }
-    
+
     geoclaw_options->gauges = FCLAW_ALLOC(geoclaw_gauge_t,num);
 
     /* Read gauges file for the locations, etc. of all gauges */
@@ -344,7 +344,7 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
 
     gauge_info.block_offsets = sc_array_new_size(sizeof(int), domain->num_blocks+1);
     gauge_info.coordinates = sc_array_new_size(2*sizeof(double), num);
-    
+
     int *block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
     double *coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
 
@@ -489,12 +489,12 @@ void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain)
 
     /* Locate each gauge in the new mesh */
     int num = geoclaw_options->num_gauges;
-    
+
     if (num == 0)
     {
         return;
     }
-    
+
     sc_array_t *results = sc_array_new_size(sizeof(int), num);
     fclaw2d_domain_search_points(domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
@@ -543,7 +543,7 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux;
 
-    fclaw_bool is_ghost = fclaw2d_patch_is_ghost(this_patch);
+    int is_ghost = 0;
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
