@@ -75,12 +75,13 @@ def setplot(plotdata):
     plotfigure.kml_xlimits = [-120,-60]
     plotfigure.kml_ylimits = [-60, 0.0];
 
-    # Resolution (should be consistent with data)
-    # Refinement levels : [2,6]; max level = 3; num_cells = [30,30]
-    # rcl : resolution of the coarsest level in this figure
-    rcl = 1    # rcl*figsize = num_cells
-    plotfigure.kml_figsize = [30.0,30.0]
-    plotfigure.kml_dpi = rcl*2*6         # Resolve all three levels
+    # Resolution (should be consistent with data resolution)
+    maxlevel = 5
+    minlevel = 1
+    mx = 16                    # Gridsize
+    minres = mx*2**minlevel
+    plotfigure.kml_figsize = [minres,minres]
+    plotfigure.kml_dpi = 2**(maxlevel-minlevel)   # Resolve all three levels
     plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
 
 
@@ -190,7 +191,7 @@ def setplot(plotdata):
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = 'all'         # list of frames to print
-    plotdata.print_gaugenos = 'all'          # list of gauges to print
+    plotdata.print_gaugenos =  'all'          # list of gauges to print
     plotdata.print_fignos = 'all'           # list of figures to print
     plotdata.html = False                     # create html files of plots?
     plotdata.html_movie = None                     # create html files of plots?

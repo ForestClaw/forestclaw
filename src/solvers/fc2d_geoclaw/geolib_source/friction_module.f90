@@ -1,7 +1,7 @@
 ! ==============================================================================
 !  Variable friction module
 !
-!    This module contains storage and routines for dealing with variable 
+!    This module contains storage and routines for dealing with variable
 !    friction fields in GeoClaw.
 !
 !    If variable_friction > 0 then the data located here will override the basic
@@ -12,7 +12,7 @@
 !      region based
 !      depth based
 !      constant value from geoclaw_module
-!    
+!
 ! ==============================================================================
 
 module friction_module
@@ -116,7 +116,7 @@ contains
     end subroutine setup_variable_friction
 
     ! ==========================================================================
-    !  set_friction_field - 
+    !  set_friction_field -
     ! ==========================================================================
     subroutine set_friction_field(mx, my, num_ghost, num_aux, xlower, ylower, &
                                   dx, dy, aux, is_ghost, nghost, mint)
@@ -135,8 +135,9 @@ contains
         ! Locals
         integer :: m,i,j,k
         real(kind=8) :: x, y
-        logical*1, intent(in) :: is_ghost
-        integer, intent(in) :: nghost, mint
+        LOGICAL*1, INTENT(in) :: is_ghost
+        INTEGER, INTENT(in) :: nghost, mint
+
 
         if (variable_friction) then
             ! Set region based coefficients
@@ -145,7 +146,7 @@ contains
                     do j=1 - num_ghost, my + num_ghost
                         if (is_ghost .and. ghost_invalid(i,j,mx,my,nghost,mint)) then
                             cycle
-                        endif                        
+                        endif
                         x = xlower + (i-0.5d0) * dx
                         y = ylower + (j-0.5d0) * dy
                         if (friction_regions(m)%lower(1) < x .and.   &
@@ -174,7 +175,7 @@ contains
         end if
 
     end subroutine set_friction_field
-    
+
     logical function ghost_invalid(i,j,mx,my,nghost,mint)
         implicit none
         integer, intent(in) :: i,j,nghost,mint,mx,my
@@ -185,7 +186,7 @@ contains
 
         outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
                 (j .lt. 1-nghost) .or. (j .gt. my+nghost)
-  
+
         ghost_invalid = (inner .or. outer)
     end function ghost_invalid
 
@@ -195,7 +196,7 @@ contains
     !    coefficients.
     ! ==========================================================================
     type(friction_file_type) function read_friction_file(path, file_type) result(file)
-        
+
         implicit none
 
         ! Path to file to be read in
@@ -206,11 +207,11 @@ contains
         integer, parameter :: unit = 24
 !         real(kind=8), parameter :: missing_value = huge(1.d0)
         integer :: ios, missing
-        
+
         ! Open file for reading
         open(unit=unit, file=path, iostat=ios, status="unknown",   &
                 action="read", form='formatted')
-        if ( ios /= 0 ) then 
+        if ( ios /= 0 ) then
             print *,"*** Error *** Could not open friction file ",path
             stop
         endif
@@ -221,7 +222,7 @@ contains
             ! Assumes a uniform rectangular grid of data values.
             case(1)
                 stop "Unimplemented file type for friction files."
-            
+
             ! ================================================================
             ! ASCII file with header followed by z data
             ! (progressing from upper left corner across rows, then down)
@@ -269,11 +270,11 @@ contains
 !                             enddo
 !                         enddo
                 end select
-            
+
             case default
                 stop "Unimplemented file type for friction files."
         end select
-        
+
     end function read_friction_file
 
 end module friction_module

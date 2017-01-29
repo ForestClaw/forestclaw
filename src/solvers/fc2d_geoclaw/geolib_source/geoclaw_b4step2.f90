@@ -40,6 +40,8 @@ SUBROUTINE geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
   INTEGER :: index,i,j,k,dummy
   REAL(kind=8) :: h,u,v
 
+  INTEGER :: is_ghost, mint, nghost
+
   !! Check for NaNs in the solution
   CALL check4nans(meqn,mbc,mx,my,q,t,1)
 
@@ -56,7 +58,11 @@ SUBROUTINE geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
      !! topo arrays might have been updated by dtopo more recently than
      !! aux arrays were set unless at least 1 step taken on all levels
      aux(1,:,:) = NEEDS_TO_BE_SET ! new system checks this val before setting
-     CALL geoclaw_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
+
+     is_ghost = 0
+     nghost = mbc    !! won't be used, if is_ghost = 0
+     mint = 2*mbc    !! not used
+     CALL geoclaw_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux,is_ghost,nghost,mint)
   ENDIF
 
   !! Set wind and pressure aux variables for this grid
