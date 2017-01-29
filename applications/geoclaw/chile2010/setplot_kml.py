@@ -75,12 +75,10 @@ def setplot(plotdata):
     plotfigure.kml_xlimits = [-120,-60]
     plotfigure.kml_ylimits = [-60, 0.0];
 
-    # Resolution (should be consistent with data)
-    # Refinement levels : [2,6]; max level = 3; num_cells = [30,30]
-    # rcl : resolution of the coarsest level in this figure
+    # Resolution (should be consistent with data resolution)
     maxlevel = 5
     minlevel = 1
-    mx = 16    # Gridsize
+    mx = 16                    # Gridsize
     minres = mx*2**minlevel
     plotfigure.kml_figsize = [minres,minres]
     plotfigure.kml_dpi = 2**(maxlevel-minlevel)   # Resolve all three levels

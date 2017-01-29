@@ -543,7 +543,7 @@ void fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux;
 
-    int is_ghost = 0;
+    int is_ghost = fclaw2d_patch_is_ghost(this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -633,6 +633,7 @@ void fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
     geoclaw_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
     GEOCLAW_UNSET_BLOCK();
+
 }
 
 
@@ -708,6 +709,7 @@ void fc2d_geoclaw_bc2(fclaw2d_domain *domain,
     geoclaw_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     GEOCLAW_UNSET_BLOCK();
+
 }
 
 
@@ -775,7 +777,6 @@ double fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
         /* Accumulate fluxes */
     }
 
-
     delete [] fp;
     delete [] fm;
     delete [] gp;
@@ -814,6 +815,7 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                           this_block_idx,
                           this_patch_idx,t,dt);
     }
+
     return maxcfl;
 }
 
