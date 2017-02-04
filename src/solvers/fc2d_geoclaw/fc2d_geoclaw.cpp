@@ -604,7 +604,7 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    TOPO_UPDATE(&t);
+    GEOCLAW_TOPO_UPDATE(&t);
     geoclaw_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
     GEOCLAW_UNSET_BLOCK();

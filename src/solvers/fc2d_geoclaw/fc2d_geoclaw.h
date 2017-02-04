@@ -395,9 +395,9 @@ void GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
                            int* maux,double aux[],double* xc,double* yc,double var[],
                            double* eta);
 
-#define TOPO_UPDATE FCLAW_F77_FUNC(topo_update, \
-                                   TOPO_UPDATE)
-void TOPO_UPDATE (double* t);
+#define GEOCLAW_TOPO_UPDATE FCLAW_F77_FUNC(geoclaw_topo_update, \
+                                           GEOCLAW_TOPO_UPDATE)
+void GEOCLAW_TOPO_UPDATE (double* t);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
