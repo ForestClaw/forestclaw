@@ -604,7 +604,6 @@ void fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
     fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
 
     GEOCLAW_SET_BLOCK(&this_block_idx);
-    GEOCLAW_TOPO_UPDATE(&t);
     geoclaw_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
     GEOCLAW_UNSET_BLOCK();
@@ -796,6 +795,9 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
 {
     const fc2d_geoclaw_options_t* geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(domain);
+
+    GEOCLAW_TOPO_UPDATE(&t);
+
     if (geoclaw_vt.b4step2 != NULL)
     {
         fc2d_geoclaw_b4step2(domain,
