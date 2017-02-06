@@ -94,7 +94,7 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_average_corner     = &FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
     fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
 
-    fclaw_vt->fort_ghostpack          = &FC2D_CLAWPACK46_FORT_GHOSTPACK;
+    fclaw_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK46_FORT_GHOSTPACK_QAREA;
 
     fclaw_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 }

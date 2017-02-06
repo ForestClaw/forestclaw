@@ -329,13 +329,13 @@ void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meq
                                             double *dx, double *dy, double area[],
                                             double error[], double error_norm[]);
 
-#define FC2D_CLAWPACK5_FORT_GHOSTPACK FCLAW_F77_FUNC(fc2d_clawpack5_fort_ghostpack, \
-                                                     FC2D_CLAWPACK5_FORT_GHOSTPACK)
-void  FC2D_CLAWPACK5_FORT_GHOSTPACK(int *mx, int *my, int *mbc,
-                                     int *meqn, int *mint,
-                                     double qdata[], double area[],
-                                     double qpack[], int *psize,
-                                    int *packmode, int *ierror);
+#define FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA FCLAW_F77_FUNC(fc2d_clawpack5_fort_ghostpack_qarea, \
+                                                           FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA)
+void  FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA(int *mx, int *my, int *mbc,
+                                          int *meqn, int *mint,
+                                          double qdata[], double area[],
+                                          double qpack[], int *psize,
+                                          int *packmode, int *ierror);
 
 #define FC2D_CLAWPACK5_FORT_TIMEINTERP FCLAW_F77_FUNC (fc2d_clawpack5_fort_timeinterp, \
                                                        FC2D_CLAWPACK5_FORT_TIMEINTERP)
