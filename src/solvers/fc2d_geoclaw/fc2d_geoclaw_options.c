@@ -53,6 +53,9 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     clawopt = &clawpkg->clawopt;
 
     FCLAW_ASSERT (clawopt != NULL);
+    //clawopt->gparms = NULL; /* Note: 2017/2/6 keeps it until we know how to set this! */
+    clawopt->gparms = fclaw_forestclaw_get_options(app);
+    FCLAW_ASSERT (clawopt->gparms != NULL);
 
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
@@ -97,6 +100,9 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mbathy", &clawopt->mbathy, 1,
                         "[geoclaw] Location of bathymetry in aux array [1]");
 
+    sc_options_add_bool (opt, 0, "ghost_patch_pack_aux", &clawopt->ghost_patch_pack_aux,1,
+                         "Pack aux. variables for parallel comm. of ghost patches [T]");
+ 
     clawpkg->is_registered = 1;
     return NULL;
 }
@@ -129,7 +135,10 @@ options_postprocess (fclaw_app_t * app, void *package, void *registered)
 
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
-
+    if (clawopt->ghost_patch_pack_aux)
+    {
+        clawopt->gparms->ghost_patch_pack_numextrafields = clawopt->maux;
+    }
     return fc2d_geoclaw_postprocess (clawopt);
 }
 

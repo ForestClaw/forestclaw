@@ -61,11 +61,10 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 
     fclaw2d_init_vtable(fclaw_vt);
 
-    fclaw_vt->problem_setup      =  &fc2d_geoclaw_setprob;  /* This function calls ... */
+    fclaw_vt->problem_setup      = &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
 
     fclaw_vt->patch_setup        = &fc2d_geoclaw_patch_setup;
-    fclaw_vt->ghostpatch_setup   = &fc2d_geoclaw_patch_setup;
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
 
     fclaw_vt->patch_initialize   = &fc2d_geoclaw_qinit;
@@ -109,7 +108,11 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     // fclaw_vt->fort_average_corner     = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
     // fclaw_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
-    fclaw_vt->fort_ghostpack  = &FC2D_CLAWPACK5_FORT_GHOSTPACK;
+    /* Ghost Patch*/
+    fclaw_vt->fort_ghostpack_qarea   = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
+    fclaw_vt->ghostpatch_setup       = &fc2d_geoclaw_patch_setup;
+    fclaw_vt->ghostpack_extra        = &fc2d_geoclaw_ghostpack_extra;
+
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 
     /* Update gauges */
@@ -287,7 +290,6 @@ void fc2d_geoclaw_setup(fclaw2d_domain_t *domain)
                         &gparms->meqn, &geoclaw_options->maux,
                         geoclaw_options->mthlim, geoclaw_options->method,
                         &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
-
     fc2d_geoclaw_gauge_setup(domain);
 }
 
@@ -530,6 +532,19 @@ void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
                               int this_patch_idx)
 {
     fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+}
+
+void fc2d_geoclaw_ghostpatch_setup(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx)
+{
+    fc2d_geoclaw_options_t* geoclaw_options;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
+
+    if(geoclaw_options->ghost_patch_pack_aux == 0){
+        fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    }
 }
 
 /* This should only be called when a new ClawPatch is created. */
@@ -1209,7 +1224,6 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                      int this_block_idx, int this_patch_idx,
                                      int iframe,int patch_num,int level)
 {
-    fclaw2d_vtable_t vt;
     const fc2d_geoclaw_options_t *geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(domain);
 
@@ -1217,7 +1231,6 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
     int mbathy=geoclaw_options->mbathy;
     double xlower,ylower,dx,dy;
     double *q,*aux;
-    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -1228,4 +1241,27 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
     FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
                                  &dx,&dy,q,aux,&iframe,&patch_num,&level,
                                  &this_block_idx,&domain->mpirank);
+}
+
+void fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *this_patch,
+                                  int mint,
+                                  double *auxpack,
+                                  int auxsize, int packmode, 
+                                  int ierror)
+{
+    const fc2d_geoclaw_options_t *geoclaw_options;
+    geoclaw_options = fc2d_geoclaw_get_options(domain);
+
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux;
+
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);    
+
+    FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
+                                   &mint,aux,auxpack,&auxsize,
+                                   &packmode,&ierror);
 }

@@ -286,6 +286,25 @@ int FC2D_GEOCLAW_GET_BLOCK();
                                               GEOCLAW_UNSET_BLOCK)
 void GEOCLAW_UNSET_BLOCK();
 
+#define GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(geoclaw_gauges_getnum, \
+                                             GEOCLAW_GAUGES_GETNUM)
+int GEOCLAW_GAUGES_GETNUM(char fname[]);
+
+#define GEOCLAW_GAUGES_INIT FCLAW_F77_FUNC(geoclaw_gauges_init,         \
+                                           GEOCLAW_GAUGES_INIT)
+void GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
+                         geoclaw_gauge_t gauges[], char fname[]);
+
+#define GEOCLAW_UPDATE_GAUGE FCLAW_F77_FUNC(geoclaw_update_gauge, \
+                                            GEOCLAW_UPDATE_GAUGE)
+void GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
+                           double* ylower,double* dx,double* dy,double q[],
+                           int* maux,double aux[],double* xc,double* yc,double var[],
+                           double* eta);
+
+#define GEOCLAW_TOPO_UPDATE FCLAW_F77_FUNC(geoclaw_topo_update, \
+                                           GEOCLAW_TOPO_UPDATE)
+void GEOCLAW_TOPO_UPDATE (double* t);
 /************************ Regridding ******************************/
 #define FC2D_GEOCLAW_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fc2d_geoclaw_fort_tag4refinement, \
                                                         FC2D_GEOCLAW_FORT_TAG4REFINEMENT)
@@ -377,27 +396,13 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                             fclaw2d_transform_data_t** transform_cptr);
 
 
-void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
 
-#define GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(geoclaw_gauges_getnum, \
-                                             GEOCLAW_GAUGES_GETNUM)
-int GEOCLAW_GAUGES_GETNUM(char fname[]);
-
-#define GEOCLAW_GAUGES_INIT FCLAW_F77_FUNC(geoclaw_gauges_init,         \
-                                           GEOCLAW_GAUGES_INIT)
-void GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
-                         geoclaw_gauge_t gauges[], char fname[]);
-
-#define GEOCLAW_UPDATE_GAUGE FCLAW_F77_FUNC(geoclaw_update_gauge, \
-                                            GEOCLAW_UPDATE_GAUGE)
-void GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
-                           double* ylower,double* dx,double* dy,double q[],
-                           int* maux,double aux[],double* xc,double* yc,double var[],
-                           double* eta);
-
-#define GEOCLAW_TOPO_UPDATE FCLAW_F77_FUNC(geoclaw_topo_update, \
-                                           GEOCLAW_TOPO_UPDATE)
-void GEOCLAW_TOPO_UPDATE (double* t);
+#define FC2D_GEOCLAW_FORT_GHOSTPACKAUX FCLAW_F77_FUNC(fc2d_geoclaw_fort_ghostpackaux, \
+                                                     FC2D_GEOCLAW_FORT_GHOSTPACKAUX)
+void  FC2D_GEOCLAW_FORT_GHOSTPACKAUX(int *mx, int *my, int *mbc,
+                                     int *maux, int *mint,
+                                     double auxdata[], double auxpack[], 
+                                     int *auxsize, int *packmode, int *ierror);
 /***************************** MINIMAL API ******************************/
 
 void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
@@ -578,6 +583,14 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
 
+void  fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
+                                   fclaw2d_patch_t *this_patch,
+                                   int mint,
+                                   double *auxpack,
+                                   int auxsize, 
+                                   int packmode, int ierror);
+
+void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
 void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);
 void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain);
 void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain);

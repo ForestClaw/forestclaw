@@ -55,10 +55,11 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate2fine_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average2coarse_fort.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_ghostpackaux.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_qarea.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
 
