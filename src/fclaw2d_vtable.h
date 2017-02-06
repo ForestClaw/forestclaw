@@ -143,7 +143,7 @@ typedef void (*fclaw2d_diagnostics_compute_error_t)(fclaw2d_domain_t *domain,
                                                     double *error);
 
 typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int *mbc,
-                                             int *meqn,
+                                             int* meqn,
                                              double *dx, double *dy, double *xlower,
                                              double *ylower, double *t, double q[],
                                              double error[]);
@@ -250,17 +250,23 @@ typedef void (*fclaw2d_fort_interpolate_corner_t)(const int* mx, const int* my, 
                                                   double neighbor_q[], const int* a_corner,
                                                   fclaw2d_transform_data_t** transform_cptr);
 
-typedef void (*fclaw2d_fort_ghostpack_t)(int *mx, int *my, int *mbc,
-                                       int *meqn, int *mint,
-                                       double qdata[], double area[],
-                                       double qpack[], int *psize,
-                                       int *packmode, int *ierror);
+typedef void (*fclaw2d_fort_ghostpack_qarea_t)(int *mx, int *my, int *mbc,
+                                               int *meqn, int *mint,
+                                               double qdata[], double area[],
+                                               double qpack[], int *psize,
+                                               int *packmode, int *ierror);
+
+typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int mint,
+                                          double qpack[], int extrasize,
+                                          int packmode, int ierror);
 
 typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
-                                        const int *meqn, const int* psize,
-                                        double qcurr[], double qlast[],
-                                        double qinterp[],const double* alpha,
-                                        const int* ierror);
+                                          const int *meqn, const int* psize,
+                                          double qcurr[], double qlast[],
+                                          double qinterp[],const double* alpha,
+                                          const int* ierror);
 
 typedef struct fclaw2d_vtable
 {
@@ -335,7 +341,9 @@ typedef struct fclaw2d_vtable
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
     fclaw2d_fort_interpolate_corner_t   fort_interpolate_corner;
 
-    fclaw2d_fort_ghostpack_t fort_ghostpack;
+    /*ghost patch functions*/
+    fclaw2d_fort_ghostpack_qarea_t fort_ghostpack_qarea;
+    fclaw2d_ghostpack_extra_t ghostpack_extra;
 
     fclaw2d_fort_timeinterp_t fort_timeinterp;
 

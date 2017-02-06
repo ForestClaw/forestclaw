@@ -405,7 +405,6 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
         }
     }
 
-    vt = fclaw2d_get_vtable(domain);
     if (vt.ghostpatch_setup != NULL)
     {
         vt.ghostpatch_setup(domain,this_patch,blockno,patchno);
@@ -427,18 +426,18 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     int mbc = gparms->mbc;
     int meqn = gparms->meqn;
     int refratio = gparms->refratio;
-    int w = gparms->interp_stencil_width;
 
     int mint = refratio*mbc;
-    int nghost = w/2;
-    FCLAW_ASSERT(mint + nghost >= w);  /* Make sure we pack enough to do interpolation stencils */
+    int nghost = mbc;
 
     int wg = (2*nghost + mx)*(2*nghost + my);  /* Whole grid     */
     int hole = (mx - 2*mint)*(my - 2*mint);    /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
 
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
-    size_t psize = (wg - hole)*(meqn + packarea);
+    int packextra = gparms->ghost_patch_pack_numextrafields;
+    int nfields = meqn + packarea + packextra;
+    size_t psize = (wg - hole)*nfields;
     FCLAW_ASSERT(psize > 0);
 
     return psize*sizeof(double);
@@ -449,6 +448,8 @@ void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
                                            void** q)
 {
     /* Create contiguous block for data and area */
+    fclaw2d_vtable_t vt;
+    vt = fclaw2d_get_vtable(domain);
     int msize = fclaw2d_clawpatch_ghost_packsize(domain);
     *q = (void*) FCLAW_ALLOC(double,msize);
     FCLAW_ASSERT(*q != NULL);
@@ -486,28 +487,32 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     int my = gparms->my;
     int mbc = gparms->mbc;
     int refratio = gparms->refratio;
-    int w = gparms->interp_stencil_width;
 
     int mint = mbc*refratio;   /* # interior cells needed for averaging */
-    int nghost = w/2;          /* # ghost values needed for interpolation */
-    FCLAW_ASSERT(mint + nghost >= w);
+    int nghost = mbc;          /* # ghost values needed for interpolation */
 
     /* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
     int wg = (2*nghost + mx)*(2*nghost + my);
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
-
-    int psize = (wg - hole)*(meqn + packarea);
+ 
+    int psize = (wg - hole)*(meqn + packarea + gparms->ghost_patch_pack_numextrafields);
     FCLAW_ASSERT(psize > 0);
 #if 0
     double *q = q_time_sync(time_interp);
     double *area = m_area.dataPtr();  // Might be NULL
 #endif
+    int qareasize = (wg - hole)*(meqn + packarea);
+    vt.fort_ghostpack_qarea(&mx,&my,&mbc,&meqn,&mint,qthis,area,
+                            qpack,&qareasize,&packmode,&ierror);
+    FCLAW_ASSERT(ierror == 0);
+    if (vt.ghostpack_extra != NULL)
+    {
+      qpack += qareasize;
+      int extrasize = psize - qareasize;
+      vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,ierror);
+    }
 
-    vt.fort_ghostpack(&mx,&my,&mbc,&meqn, &mint, qthis,area,
-                        qpack,&psize,&packmode,&ierror);
-
-    /* FCLAW_ASSERT(ierror == 0); */
     if (ierror > 0)
     {
         fclaw_global_essentialf("ghost_pack (fclaw2d_clawpatch.cpp) : ierror = %d\n",ierror);

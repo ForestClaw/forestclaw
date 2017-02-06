@@ -183,6 +183,9 @@ struct amr_options
     int mpi_debug;
     int ghost_patch_pack_area;
 
+    /* Ghost patch */
+    int ghost_patch_pack_numextrafields;
+
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
     int serialout;              /**< Allow for serial output.  WARNING:

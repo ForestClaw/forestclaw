@@ -84,7 +84,6 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
     vt->average_corner       = fclaw2d_clawpatch_average_corner;
     vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 
-
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
 #if 0

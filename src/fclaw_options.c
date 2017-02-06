@@ -368,6 +368,9 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_bool (opt, 0, "weighted_partition", &amropt->weighted_partition, 0,
                            "Weight grids when partitioning [F]");
 
+    sc_options_add_int (opt, 0, "ghost_patch_pack_numextrafields", &amropt->ghost_patch_pack_numextrafields,
+                        0, "Number of extra fields to pack[0]");
+
     /* ---------------------- Control execution -------------------------- */
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,
                          "Trap floating point exceptions [T]");
