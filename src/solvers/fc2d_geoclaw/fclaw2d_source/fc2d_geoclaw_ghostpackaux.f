@@ -12,6 +12,7 @@
      &          unpackarea = 3)
 
       integer i,j,mq,k, ibc,jbc, kfinal
+      integer nghost
       logical packdata
 
       ierror = 0
@@ -25,12 +26,13 @@
 
       packdata = packmode .eq. packq .or. packmode .eq. packarea
 
+      nghost = 2
       k = 1
 
       do mq = 1,maux
 c        # Face 0
-         do j = 0,my-mint
-            do ibc = 0,mint
+         do j = 1-nghost,my-mint
+            do ibc = 1-nghost,mint
                if (packdata) then
                   auxpack(k) = auxdata(mq,ibc,j)
                else
@@ -41,8 +43,8 @@ c        # Face 0
          enddo
 
 c        # Face 2
-         do jbc = 0,mint
-            do i = mint+1,mx+1
+         do jbc = 1-nghost,mint
+            do i = mint+1,mx+nghost
                if (packdata) then
                   auxpack(k) = auxdata(mq,i,jbc)
                else
@@ -53,8 +55,8 @@ c        # Face 2
          enddo
 
 c        # Face 1
-         do j = mint+1,my+1
-            do ibc = mx-mint+1,mx+1
+         do j = mint+1,my+nghost
+            do ibc = mx-mint+1,mx+nghost
                if (packdata) then
                   auxpack(k) = auxdata(mq,ibc,j)
                else
@@ -65,8 +67,8 @@ c        # Face 1
          enddo
 
 c        # Face 3
-         do jbc = my-mint+1,my+1
-            do i = 0,mx-mint
+         do jbc = my-mint+1,my+nghost
+            do i = 1-nghost,mx-mint
                if (packdata) then
                   auxpack(k) = auxdata(mq,i,jbc)
                else
