@@ -588,7 +588,7 @@ void  fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
                                    int mint,
                                    double *auxpack,
                                    int auxsize, 
-                                   int packmode, int ierror);
+                                   int packmode, int* ierror);
 
 void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
 void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);

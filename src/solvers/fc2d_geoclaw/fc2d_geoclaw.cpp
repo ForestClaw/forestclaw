@@ -1248,20 +1248,23 @@ void fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
                                   int mint,
                                   double *auxpack,
                                   int auxsize, int packmode, 
-                                  int ierror)
+                                  int* ierror)
 {
     const fc2d_geoclaw_options_t *geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(domain);
 
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux;
+  
+    if (geoclaw_options->ghost_patch_pack_aux)
+    {
+        int mx,my,mbc,maux;
+        double xlower,ylower,dx,dy;
+        double *aux;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);    
-
-    FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
+        fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+        fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
+        FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
                                    &mint,aux,auxpack,&auxsize,
-                                   &packmode,&ierror);
+                                   &packmode,ierror);  
+    }
 }
