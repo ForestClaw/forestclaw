@@ -260,7 +260,7 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
                                           fclaw2d_patch_t *this_patch,
                                           int mint,
                                           double qpack[], int extrasize,
-                                          int packmode, int ierror);
+                                          int packmode, int* ierror);
 
 typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                           const int *meqn, const int* psize,

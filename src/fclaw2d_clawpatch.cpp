@@ -510,7 +510,8 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     {
       qpack += qareasize;
       int extrasize = psize - qareasize;
-      vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,ierror);
+      vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,&ierror);
+      FCLAW_ASSERT(ierror == 0);
     }
 
     if (ierror > 0)
