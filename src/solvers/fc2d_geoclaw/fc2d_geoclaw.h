@@ -401,7 +401,7 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
                                                      FC2D_GEOCLAW_FORT_GHOSTPACKAUX)
 void  FC2D_GEOCLAW_FORT_GHOSTPACKAUX(int *mx, int *my, int *mbc,
                                      int *maux, int *mint,
-                                     double auxdata[], double auxpack[], 
+                                     double auxdata[], double auxpack[],
                                      int *auxsize, int *packmode, int *ierror);
 /***************************** MINIMAL API ******************************/
 
@@ -583,12 +583,12 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
 
-void  fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *this_patch,
-                                   int mint,
-                                   double *auxpack,
-                                   int auxsize, 
-                                   int packmode, int* ierror);
+void  fc2d_geoclaw_ghostpack_aux(fclaw2d_domain_t *domain,
+                                 fclaw2d_patch_t *this_patch,
+                                 int mint,
+                                 double *auxpack,
+                                 int auxsize,
+                                 int packmode, int* ierror);
 
 void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
 void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);

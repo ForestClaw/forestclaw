@@ -111,7 +111,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     /* Ghost Patch*/
     fclaw_vt->fort_ghostpack_qarea   = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
     fclaw_vt->ghostpatch_setup       = &fc2d_geoclaw_patch_setup;
-    fclaw_vt->ghostpack_extra        = &fc2d_geoclaw_ghostpack_extra;
+    fclaw_vt->ghostpack_extra        = &fc2d_geoclaw_ghostpack_aux;
 
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 
@@ -542,8 +542,13 @@ void fc2d_geoclaw_ghostpatch_setup(fclaw2d_domain_t *domain,
     fc2d_geoclaw_options_t* geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(domain);
 
-    if(geoclaw_options->ghost_patch_pack_aux == 0){
+    if (!geoclaw_options->ghost_patch_pack_aux)
+    {
         fc2d_geoclaw_setaux(domain,this_patch,this_block_idx,this_patch_idx);
+    }
+    else
+    {
+        /* the aux array data has been packed and transferred as MPI messages */
     }
 }
 
@@ -1243,28 +1248,21 @@ void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
                                  &this_block_idx,&domain->mpirank);
 }
 
-void fc2d_geoclaw_ghostpack_extra(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int mint,
-                                  double *auxpack,
-                                  int auxsize, int packmode, 
-                                  int* ierror)
+void fc2d_geoclaw_ghostpack_aux(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *this_patch,
+                                int mint,
+                                double *auxpack,
+                                int auxsize, int packmode,
+                                int* ierror)
 {
-    const fc2d_geoclaw_options_t *geoclaw_options;
-    geoclaw_options = fc2d_geoclaw_get_options(domain);
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux;
 
-  
-    if (geoclaw_options->ghost_patch_pack_aux)
-    {
-        int mx,my,mbc,maux;
-        double xlower,ylower,dx,dy;
-        double *aux;
-
-        fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-        fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
-        FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
+    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+    fc2d_geoclaw_aux_data(domain,this_patch,&aux,&maux);
+    FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
                                    &mint,aux,auxpack,&auxsize,
-                                   &packmode,ierror);  
-    }
+                                   &packmode,ierror);
 }

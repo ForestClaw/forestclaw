@@ -495,7 +495,7 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     int wg = (2*nghost + mx)*(2*nghost + my);
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
- 
+
     int psize = (wg - hole)*(meqn + packarea + gparms->ghost_patch_pack_numextrafields);
     FCLAW_ASSERT(psize > 0);
 #if 0
@@ -506,10 +506,11 @@ void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
     vt.fort_ghostpack_qarea(&mx,&my,&mbc,&meqn,&mint,qthis,area,
                             qpack,&qareasize,&packmode,&ierror);
     FCLAW_ASSERT(ierror == 0);
-    if (vt.ghostpack_extra != NULL)
+    if (gparms->ghost_patch_pack_extra)
     {
       qpack += qareasize;
       int extrasize = psize - qareasize;
+      FCLAW_ASSERT(vt.ghostpack_extra != NULL);
       vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,&ierror);
       FCLAW_ASSERT(ierror == 0);
     }

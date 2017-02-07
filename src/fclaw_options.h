@@ -181,9 +181,10 @@ struct amr_options
 
     /* Parallel options */
     int mpi_debug;
-    int ghost_patch_pack_area;
 
-    /* Ghost patch */
+    /* Parallel ghost patch comm. */
+    int ghost_patch_pack_area;
+    int ghost_patch_pack_extra;
     int ghost_patch_pack_numextrafields;
 
     /* Output and console IO */
