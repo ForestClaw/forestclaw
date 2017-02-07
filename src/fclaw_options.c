@@ -27,8 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_mpi.h>
 
-#include "fp_exception_glibc_extension.h"
-
 
 typedef struct fclaw_options_general
 {
