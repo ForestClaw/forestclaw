@@ -477,8 +477,14 @@ void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr)
 
 void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain)
 {
-    sc_array_destroy(gauge_info.block_offsets);
-    sc_array_destroy(gauge_info.coordinates);
+    if (gauge_info.block_offsets != NULL)
+    {
+        sc_array_destroy(gauge_info.block_offsets);
+    }
+    if (gauge_info.coordinates != NULL)
+    {
+        sc_array_destroy(gauge_info.coordinates);
+    }
 }
 
 
@@ -830,6 +836,7 @@ double fc2d_geoclaw_update(fclaw2d_domain_t *domain,
                                        this_patch,
                                        this_block_idx,
                                        this_patch_idx,t,dt);
+
     if (geoclaw_options->src_term > 0)
     {
         fc2d_geoclaw_src2(domain,
