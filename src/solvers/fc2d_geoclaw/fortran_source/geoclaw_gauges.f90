@@ -1,4 +1,18 @@
-integer function geoclaw_gauges_getnum(fname)
+MODULE fclaw_gauges
+  USE iso_c_binding
+  TYPE,BIND(C) :: gauge_type
+     INTEGER:: blockno
+     INTEGER:: patchno
+     INTEGER:: location_in_results
+     DOUBLE PRECISION :: xc, yc, t1, t2
+     INTEGER num;
+     !! DOUBLE PRECISION, POINTER :: buffer
+  END TYPE gauge_type
+
+END MODULE fclaw_gauges
+
+
+INTEGER FUNCTION geoclaw_gauges_getnum(fname)
 
     implicit none
 
@@ -22,16 +36,11 @@ integer function geoclaw_gauges_getnum(fname)
     close(iunit)
 end function
 
+
+
 SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
-    implicit none
-    type gauge_type
-      integer:: blockno
-      integer:: patchno
-      integer:: location_in_results
-      double precision :: xc, yc, t1, t2
-      integer num;
-      !! DOUBLE PRECISION, POINTER :: buffer
-    end type gauge_type
+  USE fclaw_gauges
+  IMPLICIT NONE
 
     ! Input
     character(len=12), intent(in), optional :: fname
@@ -39,7 +48,7 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
     integer, intent(in) :: meqn, num_gauges
     integer :: num_gauges_not_use
 
-    type(gauge_type), dimension(num_gauges) :: gauges
+    TYPE(gauge_type), DIMENSION(num_gauges) :: gauges
 
     ! Locals
     integer :: i, ipos, idigit, OUTGAUGEUNIT
