@@ -62,6 +62,9 @@ extern "C"
 #endif
 #endif
 
+typedef struct patch_vt
+
+
 typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_domain_t * domain, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
 
@@ -125,6 +128,19 @@ int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
 void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
                                           fclaw2d_patch_t* this_patch,
                                           int icorner, int block_corner_count);
+
+
+typedef struct fclaw2d_patch_vtable
+{
+    /*
+      fclaw2d_vtable.c:    vt->copy_face            = fclaw2d_clawpatch_copy_face;
+      fclaw2d_vtable.c:    vt->average_face         = fclaw2d_clawpatch_average_face;
+      fclaw2d_vtable.c:    vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
+      fclaw2d_vtable.c:    vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
+      fclaw2d_vtable.c:    vt->average_corner       = fclaw2d_clawpatch_average_corner;
+      fclaw2d_vtable.c:    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
+    */
+} fclaw2d_patch_vtable_t;
 
 
 /* -----------------------------------------------------

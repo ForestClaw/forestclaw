@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 
+static fclaw2d_patch_vtable_t patch_vt;
+
 static
 void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                           fclaw2d_patch_t* this_patch,
@@ -614,15 +616,16 @@ void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
    Ghost cell exchange operations
    ---------------------------------------------------------------- */
 #if 0
-/* This is work towards extracting the clawpatch */
-fclaw2d_clawpatch_set_vtable_entries(fclaw2d_vtable_t vt)
+
+/* OR .... This is work towards extracting the clawpatch */
+fclaw2d_clawpatch_init_vtable(fclaw2d_patch_vtable_t *patch_vt)
 {
-    vt->copy_face            = fclaw2d_clawpatch_copy_face;
-    vt->average_face         = fclaw2d_clawpatch_average_face;
-    vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
-    vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
-    vt->average_corner       = fclaw2d_clawpatch_average_corner;
-    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
+    patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;
+    patch_vt->average_face         = fclaw2d_clawpatch_average_face;
+    patch_vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
+    patch_vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
+    patch_vt->average_corner       = fclaw2d_clawpatch_average_corner;
+    patch_vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 }
 #endif
 
