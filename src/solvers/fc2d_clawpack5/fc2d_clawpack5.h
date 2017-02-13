@@ -128,7 +128,8 @@ typedef struct fc2d_clawpack5_vtable
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t vt);
 
 void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                fc2d_clawpack5_vtable_t* vt);
+                                        fclaw2d_patch_vtable_t *patch_vt,
+                                        fc2d_clawpack5_vtable_t* vt);
 
 #define CLAWPACK5_BC2_DEFAULT FCLAW_F77_FUNC(clawpack5_bc2_default, \
                                              CLAWPACK5_BC2_DEFAULT)

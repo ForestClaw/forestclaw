@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static fclaw2d_vtable_t fclaw2d_vt;
+static fclaw2d_patch_vtable_t patch_vt;
+
 static fc2d_clawpack46_vtable_t classic_claw46;
 static fc2d_clawpack5_vtable_t classic_claw5;
 
@@ -57,7 +59,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&patch_vt,&classic_claw5);
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         classic_claw5.setaux    = &CLAWPACK5_SETAUX;
@@ -69,6 +71,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     }
 
     fclaw2d_set_vtable(domain,&fclaw2d_vt);
+    fclaw2d_set_patch_vtable(domain, &patch_vt);
 }
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)

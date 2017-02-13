@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 
-static fclaw2d_patch_vtable_t patch_vt;
-
 static
 void clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                           fclaw2d_patch_t* this_patch,
@@ -615,19 +613,21 @@ void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
 /* ----------------------------------------------------------------
    Ghost cell exchange operations
    ---------------------------------------------------------------- */
-#if 0
+
 
 /* OR .... This is work towards extracting the clawpatch */
-fclaw2d_clawpatch_init_vtable(fclaw2d_patch_vtable_t *patch_vt)
+void fclaw2d_clawpatch_init_vtable(fclaw2d_patch_vtable_t *patch_vt)
 {
     patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;
     patch_vt->average_face         = fclaw2d_clawpatch_average_face;
     patch_vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
+
+#if 0
     patch_vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
     patch_vt->average_corner       = fclaw2d_clawpatch_average_corner;
     patch_vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
-}
 #endif
+}
 
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,

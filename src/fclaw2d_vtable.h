@@ -159,7 +159,7 @@ typedef double (*fclaw2d_fort_compute_patch_area_t)(int *mx, int* my, int*mbc, d
 typedef void (*fclaw2d_fort_conservation_check_t)(int *mx, int *my, int* mbc, int* meqn,
                                                   double *dx, double *dy,
                                                   double* area, double *q, double* sum);
-
+#if 0
 typedef void (*fclaw2d_patch_copy_face_t)(fclaw2d_domain_t *domain,
                                                 fclaw2d_patch_t *this_patch,
                                                 fclaw2d_patch_t *neighbor_patch,
@@ -188,7 +188,7 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(fclaw2d_domain_t *domain,
                                                   fclaw_bool a_time_interp,
                                                   int igrid,
                                                   fclaw2d_transform_data_t* transform_data);
-
+#endif
 typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *this_patch,
                                                   fclaw2d_patch_t *corner_patch,
@@ -211,7 +211,7 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_domain_t* domain,
                                                     int refratio,
                                                     fclaw_bool a_time_interp,
                                                     fclaw2d_transform_data_t* transform_data);
-
+#if 1
 typedef void (*fclaw2d_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, const int* meqn,
                                          double qthis[],double qneighbor[], const int* a_idir,
                                          fclaw2d_transform_data_t** transform_cptr);
@@ -233,7 +233,7 @@ typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, co
                                                 const int* refratio, const int* igrid,
                                                 fclaw2d_transform_data_t** transform_cptr);
 
-
+#endif
 typedef void (*fclaw2d_fort_copy_corner_t)(const int* mx, const int* my, const int* mbc,
                                      const int* meqn, double this_q[],double neighbor_q[],
                                      const int* a_corner,fclaw2d_transform_data_t** transform_cptr);
@@ -323,13 +323,13 @@ typedef struct fclaw2d_vtable
     fclaw2d_fort_conservation_check_t    fort_conservation_check;
 
     /* ghost filling functions */
-    fclaw2d_patch_copy_face_t    copy_face;
+    //fclaw2d_patch_copy_face_t    copy_face;
     fclaw2d_fort_copy_face_t     fort_copy_face;
 
-    fclaw2d_patch_average_face_t    average_face;
+    //fclaw2d_patch_average_face_t    average_face;
     fclaw2d_fort_average_face_t     fort_average_face;
 
-    fclaw2d_patch_interpolate_face_t    interpolate_face;
+    //fclaw2d_patch_interpolate_face_t    interpolate_face;
     fclaw2d_fort_interpolate_face_t     fort_interpolate_face;
 
     fclaw2d_patch_copy_corner_t  copy_corner;
@@ -351,14 +351,11 @@ typedef struct fclaw2d_vtable
 } fclaw2d_vtable_t;
 
 
-void
-    fclaw2d_init_vtable(fclaw2d_vtable_t *vt);
+void fclaw2d_init_vtable(fclaw2d_vtable_t *vt);
 
-void
-fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt);
+void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt);
 
-fclaw2d_vtable_t
-fclaw2d_get_vtable(fclaw2d_domain_t *domain);
+fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t *domain);
 
 
 #ifdef __cplusplus

@@ -239,6 +239,8 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   int packmode);
 #endif
 
+void fclaw2d_clawpatch_init_vtable(fclaw2d_patch_vtable_t *patch_vt);
+
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,
                                    fclaw2d_patch_t *neighbor_patch,
@@ -293,6 +295,35 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_domain_t* domain,
                                           fclaw_bool a_time_interp,
                                           fclaw2d_transform_data_t* transform_data);
 
+typedef void (*fclaw2d_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, const int* meqn,
+                                         double qthis[],double qneighbor[], const int* a_idir,
+                                         fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_average_face_t)(const int* mx, const int* my, const int* mbc,
+                                                const int* meqn,
+                                                double qcoarse[],double qfine[],
+                                                double areacoarse[], double areafine[],
+                                                const int* idir, const int* iside,
+                                                const int* num_neighbors,
+                                                const int* refratio, const int* igrid,
+                                                const int* manifold, fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, const int* mbc,
+                                                const int* meqn,
+                                                double qcoarse[],double qfine[],
+                                                const int* idir, const int* iside,
+                                                const int* num_neighbors,
+                                                const int* refratio, const int* igrid,
+                                                fclaw2d_transform_data_t** transform_cptr);
+
+typedef struct fclaw2d_clawpatch_vtable
+{
+    /* ghost filling functions */
+    fclaw2d_fort_copy_face_t          fort_copy_face;
+    fclaw2d_fort_average_face_t       fort_average_face;
+    fclaw2d_fort_interpolate_face_t   fort_interpolate_face;
+
+} fclaw2d_clawpatch_vtable_t;
 
 
 #ifdef __cplusplus

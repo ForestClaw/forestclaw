@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int s_clawpack5_package_id = -1;
 
 static fc2d_clawpack5_vtable_t classic_vt;
-
+static fclaw2d_patch_vtable_t patch_vt;
+static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 
 
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
@@ -42,20 +43,24 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
     classic_vt = user_vt;
 }
 
+/* This is called from the user application. */
 void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                        fc2d_clawpack5_vtable_t* vt)
+                                        fclaw2d_patch_vtable_t *patch_vt,
+                                        fc2d_clawpack5_vtable_t *claw5_vt)
 {
+    fclaw2d_clawpatch_init_vtable(patch_vt);
+
     /* Required functions  - error if NULL*/
-    vt->bc2 = CLAWPACK5_BC2_DEFAULT;
-    vt->qinit = NULL;
-    vt->rpn2 = NULL;
-    vt->rpt2 = NULL;
+    claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;
+    claw5_vt->qinit = NULL;
+    claw5_vt->rpn2 = NULL;
+    claw5_vt->rpt2 = NULL;
 
     /* Optional functions - call only if non-NULL */
-    vt->setprob = NULL;
-    vt->setaux = NULL;
-    vt->b4step2 = NULL;
-    vt->src2 = NULL;
+    claw5_vt->setprob = NULL;
+    claw5_vt->setaux = NULL;
+    claw5_vt->b4step2 = NULL;
+    claw5_vt->src2 = NULL;
 
     /* Default qinit functions */
     fclaw_vt->patch_initialize         = &fc2d_clawpack5_qinit;
@@ -88,8 +93,8 @@ void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
-    fclaw_vt->fort_copy_face   = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    fclaw_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    fclaw_vt->fort_copy_face        = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+    fclaw_vt->fort_average_face     = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
     fclaw_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
 
     fclaw_vt->fort_copy_corner = &FC2D_CLAWPACK5_FORT_COPY_CORNER;

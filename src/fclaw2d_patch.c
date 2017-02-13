@@ -262,3 +262,16 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
         this_patch->user = NULL;
     }
 }
+
+void fclaw2d_set_patch_vtable(fclaw2d_domain_t* domain, fclaw2d_patch_vtable_t *patch_vt)
+{
+    fclaw2d_domain_attribute_add (domain,"patch_vtable",patch_vt);
+}
+
+fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
+{
+    fclaw2d_patch_vtable_t *patch_vt;
+    patch_vt = (fclaw2d_patch_vtable_t*) fclaw2d_domain_attribute_access(domain,"patch_vtable",NULL);
+    FCLAW_ASSERT(patch_vt != NULL);
+    return *patch_vt;
+}
