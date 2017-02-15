@@ -96,8 +96,8 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
         patchno = i;
 
         fclaw2d_patch_data_new(domain,ghost_patch);
-        fclaw2d_clawpatch_build_ghost(domain,ghost_patch,blockno,
-                                      patchno,(void*) &build_mode);
+        fclaw2d_patch_build_ghost(domain,ghost_patch,blockno,
+                                  patchno,(void*) &build_mode);
     }
 }
 
@@ -140,8 +140,8 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_clawpatch_ghost_unpack(domain, ghost_patch, blockno,
-                                           patchno, q, unpack_to_timeinterp_patch);
+            fclaw2d_patch_ghost_unpack(domain, ghost_patch, blockno,
+                                       patchno, q, unpack_to_timeinterp_patch);
         }
     }
 }
@@ -157,7 +157,7 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
-    size_t data_size =  fclaw2d_clawpatch_ghost_packsize(domain);
+    size_t data_size =  fclaw2d_patch_ghost_packsize(domain);
     fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by fclaw2d_initialize or fclaw2d_regrid
@@ -185,8 +185,8 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
             {
                 /* Copy q and area into one contingous block */
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                fclaw2d_clawpatch_ghost_pack_location(domain,this_patch,
-                                                      &e->patch_data[zz++]);
+                fclaw2d_patch_local_ghost_alloc(domain,this_patch,
+                                                &e->patch_data[zz++]);
             }
         }
     }
@@ -266,8 +266,8 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    fclaw2d_clawpatch_ghost_free_pack_location(*domain,
-                                                               &e_old->patch_data[zz++]);
+                    fclaw2d_patch_local_ghost_free(*domain,
+                                                   &e_old->patch_data[zz++]);
                 }
             }
         }
@@ -320,9 +320,9 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
                 int pack_time_interp = time_interp && level == minlevel-1;
 
                 /* Pack q and area into one contingous block */
-                fclaw2d_clawpatch_ghost_pack(domain,this_patch,
-                                             (double*) e->patch_data[zz++],
-                                             pack_time_interp);
+                fclaw2d_patch_ghost_pack(domain,this_patch,
+                                         (double*) e->patch_data[zz++],
+                                         pack_time_interp);
             }
         }
     }

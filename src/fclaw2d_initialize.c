@@ -47,7 +47,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     fclaw2d_patch_data_new(domain,this_patch);
@@ -56,9 +56,8 @@ void cb_initialize (fclaw2d_domain_t *domain,
                             this_patch_idx,
                             (void*) &build_mode);
 
-    vt = fclaw2d_get_vtable(domain);
-    FCLAW_ASSERT(vt.patch_initialize != NULL);
-    vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
+    FCLAW_ASSERT(patch_vt.patch_initialize != NULL);
+    patch_vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 

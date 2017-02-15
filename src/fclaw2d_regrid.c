@@ -42,13 +42,13 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                       int this_patch_idx,
                                       void *user)
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_patch_vtable_t patch_vt;
     int refine_patch, maxlevel, level;
     const amr_options_t* gparms;
 
     int domain_init = *((int*) user);
 
-    vt = fclaw2d_get_vtable(domain);
+    patch_vt = fclaw2d_get_patch_vtable(domain);
     gparms = get_domain_parms(domain);
 
     maxlevel = gparms->maxlevel;
@@ -57,7 +57,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     if (level < maxlevel)
     {
         refine_patch  =
-            vt.regrid_tag4refinement(domain,this_patch,this_block_idx,
+            patch_vt.regrid_tag4refinement(domain,this_patch,this_block_idx,
                                     this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
@@ -74,8 +74,7 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                               void *user)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
 
     int minlevel = gparms->minlevel;
 
@@ -84,8 +83,8 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
     if (level > minlevel)
     {
         int family_coarsened = 1;
-        family_coarsened = vt.regrid_tag4coarsening(domain,&fine_patches[0],
-                                                  blockno, fine0_patchno);
+        family_coarsened = patch_vt.regrid_tag4coarsening(domain,&fine_patches[0],
+                                                          blockno, fine0_patchno);
         if (family_coarsened == 1)
         {
             int igrid;
@@ -113,8 +112,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                   int new_patchno,
                                   void *user)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(new_domain);
+
+    fclaw2d_patch_vtable_t patch_vt;
+    patch_vt = fclaw2d_get_patch_vtable(new_domain);
 
     int domain_init = *((int*) user);
 
@@ -144,7 +144,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                     fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
-                vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
+                patch_vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
             }
         }
 
@@ -153,8 +153,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int coarse_patchno = old_patchno;
             int fine_patchno = new_patchno;
 
-            vt.regrid_interpolate2fine(new_domain,coarse_patch,fine_siblings,
-                                      blockno,coarse_patchno,fine_patchno);
+            patch_vt.regrid_interpolate2fine(new_domain,coarse_patch,fine_siblings,
+                                             blockno,coarse_patchno,fine_patchno);
         }
         fclaw2d_patch_data_delete(old_domain,coarse_patch);
     }
@@ -180,8 +180,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                           build_mode);
 
         /* Average the solution. Does this need to be customizable? */
-        vt.regrid_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                blockno,coarse_patchno, fine_patchno);
+        patch_vt.regrid_average2coarse(new_domain,fine_siblings,coarse_patch,
+                                       blockno,coarse_patchno, fine_patchno);
 
         int i;
         for(i = 0; i < 4; i++)

@@ -41,8 +41,8 @@ cb_serial_output (fclaw2d_domain_t * domain,
                   int this_block_idx, int this_patch_idx,
                   void *user)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    fclaw2d_patch_vtable_t patch_vt;
+    patch_vt = fclaw2d_get_patch_vtable(domain);
 
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
@@ -56,7 +56,7 @@ cb_serial_output (fclaw2d_domain_t * domain,
        to have access? */
     int level = this_patch->level;
 
-    vt.patch_write_file(domain, this_patch, this_block_idx,
+    patch_vt.patch_write_file(domain, this_patch, this_block_idx,
                         this_patch_idx, iframe, (int) patch_num,
                         level);
 }
@@ -64,8 +64,8 @@ cb_serial_output (fclaw2d_domain_t * domain,
 static
 void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    fclaw2d_patch_vtable_t patch_vt;
+    patch_vt = fclaw2d_get_patch_vtable(domain);
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
@@ -74,7 +74,7 @@ void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 
     if (domain->mpirank == 0)
     {
-        vt.write_header(domain,iframe);
+        patch_vt.write_header(domain,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */

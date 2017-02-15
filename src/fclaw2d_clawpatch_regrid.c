@@ -33,7 +33,7 @@ int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                   int blockno, int patchno,
                                   int initflag)
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
@@ -44,15 +44,13 @@ int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     amropt = get_domain_parms(domain);
     refine_threshold = amropt->refine_threshold;
 
-    vt = fclaw2d_get_vtable(domain);
-
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    vt.fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+    clawpatch_vt.fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                            &blockno, q,&refine_threshold,
                            &initflag,&tag_patch);
     return tag_patch;
@@ -63,7 +61,7 @@ int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                                   int blockno,
                                   int patchno)
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
 
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -79,8 +77,6 @@ int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
 
     coarsen_threshold = amropt->coarsen_threshold;
 
-    vt = fclaw2d_get_vtable(domain);
-
     fclaw2d_clawpatch_grid_data(domain,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
@@ -90,7 +86,7 @@ int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
     }
 
     tag_patch = 0;
-    vt.fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+    clawpatch_vt.fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                            &blockno, q[0],q[1],q[2],q[3],
                            &coarsen_threshold,&tag_patch);
     return tag_patch == 1;
@@ -108,7 +104,7 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
                                      int fine0_patchno)
 
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int mx,my,mbc,meqn;
     double *qcoarse,*qfine;
     double *areacoarse,*areafine;
@@ -117,8 +113,6 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
 
     const amr_options_t* gparms;
     fclaw2d_patch_t* fine_patch;
-
-    vt = fclaw2d_get_vtable(domain);
 
     gparms = get_domain_parms(domain);
     mx = gparms->mx;
@@ -142,7 +136,7 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
                                           &xd,&yd,&zd,&areafine);
         }
 
-        vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+        clawpatch_vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
                                  areacoarse, areafine, &igrid,
                                  &gparms->manifold);
 
@@ -161,7 +155,7 @@ void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
                                    int coarse_patchno)
 
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     const amr_options_t* gparms;
     int mx,my, mbc, meqn;
     double *qcoarse, *qfine;
@@ -169,8 +163,6 @@ void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
     double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
     fclaw2d_patch_t *fine_patch;
-
-    vt = fclaw2d_get_vtable(domain);
 
     gparms = get_domain_parms(domain);
     mx = gparms->mx;
@@ -193,7 +185,7 @@ void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
                                           &xd,&yd,&zd,&areafine);
         }
 
-        vt.fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+        clawpatch_vt.fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
                                areacoarse, areafine, &igrid,
                                &gparms->manifold);
 

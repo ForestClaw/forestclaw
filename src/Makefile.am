@@ -87,8 +87,8 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output.c \
 	src/fclaw2d_update_single_step.c \
 	src/fclaw2d_run.c \
-	src/fclaw2d_diagnostics.c \
-	src/fclaw2d_regrid_default.c \
+	src/fclaw2d_clawpatch_diagonostics.c \
+	src/fclaw2d_clawpatch_regrid.c \
 	src/fclaw2d_output_ascii.c \
 	src/fclaw2d_diagnostics_default.c \
 	src/fclaw2d_metric_default.c \

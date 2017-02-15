@@ -127,6 +127,61 @@ void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
                                           fclaw2d_patch_t* this_patch,
                                           int icorner, int block_corner_count);
 
+void fclaw2d_patch_ghost_pack(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              double *patch_data,
+                              int time_interp);
+
+void fclaw2d_patch_ghost_unpack(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t* this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                double *qdata, fclaw_bool time_interp);
+
+void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno,
+                               void *user);
+
+size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain);
+
+void fclaw2d_patch_local_ghost_alloc(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch,
+                                     void** q);
+
+void fclaw2d_patch_local_ghost_free(fclaw2d_domain_t* domain,
+                                    void **q);
+
+typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx);
+
+typedef void (*fclaw2d_ghostpatch_setup_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx);
+
+typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx);
+
+typedef void (*fclaw2d_patch_physical_bc_t)(fclaw2d_domain_t *domain,
+                                            fclaw2d_patch_t *this_patch,
+                                            int this_block_idx,
+                                            int this_patch_idx,
+                                            double t,
+                                            double dt,
+                                            fclaw_bool *intersects_bc,
+                                            fclaw_bool time_interp);
+
+typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
+                                                     fclaw2d_patch_t *this_patch,
+                                                     int this_block_idx,
+                                                     int this_patch_idx,
+                                                     double t,
+                                                     double dt);
 
 typedef void (*fclaw2d_patch_copy_face_t)(fclaw2d_domain_t *domain,
                                                 fclaw2d_patch_t *this_patch,
@@ -157,7 +212,6 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(fclaw2d_domain_t *domain,
                                                   int igrid,
                                                   fclaw2d_transform_data_t* transform_data);
 
-#if 0
 typedef void (*fclaw2d_patch_copy_corner_t)(fclaw2d_domain_t *domain,
                                                   fclaw2d_patch_t *this_patch,
                                                   fclaw2d_patch_t *corner_patch,
@@ -180,8 +234,70 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_domain_t* domain,
                                                     int refratio,
                                                     fclaw_bool a_time_interp,
                                                     fclaw2d_transform_data_t* transform_data);
-#endif
+
+typedef int (*fclaw2d_regrid_tag4refinement_t)(fclaw2d_domain_t *domain,
+                                              fclaw2d_patch_t *this_patch,
+                                              int this_block_idx, int this_patch_idx,
+                                              int initflag);
+
+typedef int (*fclaw2d_regrid_tag4coarsening_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *this_patch,
+                                               int this_blockno,
+                                               int this_patchno);
+
+typedef void (*fclaw2d_regrid_interpolate2fine_t)(fclaw2d_domain_t* domain,
+                                                 fclaw2d_patch_t *coarse_patch,
+                                                 fclaw2d_patch_t* fine_patches,
+                                                 int this_blockno, int coarse_patchno,
+                                                 int fine_patchno);
+
+typedef void (*fclaw2d_regrid_average2coarse_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *fine_siblings,
+                                               fclaw2d_patch_t *coarse_patch,
+                                               int blockno, int fine_patchno,
+                                               int coarse_patchno);
+
+typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
+                                             int iframe);
+
+typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           int iframe,int patch_num,
+                                           int level);
+
+typedef void (*fclaw2d_patch_ghost_pack_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *this_patch,
+                                              double *patch_data,
+                                              int time_interp);
+
+typedef void (*fclaw2d_patch_ghost_unpack_t)(fclaw2d_domain_t* domain,
+                                             fclaw2d_patch_t* this_patch,
+                                             int this_block_idx, int this_patch_idx,
+                                             double *qdata, fclaw_bool time_interp);
+
+typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_domain_t *domain,
+                                            fclaw2d_patch_t *this_patch,
+                                            int blockno,
+                                            int patchno,
+                                            void *user);
+
+typedef size_t (*fclaw2d_patch_ghost_packsize_t)(fclaw2d_domain_t* domain);
                                                     
+typedef void (*fclaw2d_patch_local_ghost_alloc_t)(fclaw2d_domain_t* domain,
+                                                 fclaw2d_patch_t* this_patch,
+                                                 void** q);
+
+typedef void (*fclaw2d_patch_local_ghost_free_t)(fclaw2d_domain_t* domain,
+                                                 void **q);
+
+typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int mint,
+                                          double qpack[], int extrasize,
+                                          int packmode, int* ierror);
+
 typedef struct fclaw2d_patch_vtable
 {
     /*
@@ -192,17 +308,41 @@ typedef struct fclaw2d_patch_vtable
       fclaw2d_vtable.c:    vt->average_corner       = fclaw2d_clawpatch_average_corner;
       fclaw2d_vtable.c:    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
     */
+
+    fclaw2d_patch_setup_t              patch_setup;
+    fclaw2d_ghostpatch_setup_t         ghostpatch_setup;
+    fclaw2d_patch_initialize_t         patch_initialize;
+    fclaw2d_patch_physical_bc_t        patch_physical_bc;
+    fclaw2d_patch_single_step_update_t patch_single_step_update;
+
+    /* regridding functions */
+    fclaw2d_regrid_tag4refinement_t    regrid_tag4refinement;
+    fclaw2d_regrid_tag4coarsening_t    regrid_tag4coarsening;
+    fclaw2d_regrid_average2coarse_t    regrid_average2coarse;
+    fclaw2d_regrid_interpolate2fine_t  regrid_interpolate2fine;
+
+    /* ghost filling functions */
     fclaw2d_patch_copy_face_t           copy_face;
     fclaw2d_patch_average_face_t        average_face;
     fclaw2d_patch_interpolate_face_t    interpolate_face;
-#if 0
+
     fclaw2d_patch_copy_corner_t         copy_corner;
     fclaw2d_patch_average_corner_t      average_corner;
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
-#endif
+
+    /* output functions */
+    fclaw2d_patch_write_header_t       write_header;
+    fclaw2d_patch_write_file_t         patch_write_file;
+
+    fclaw2d_patch_ghost_pack_t         ghost_pack;
+    fclaw2d_patch_ghost_unpack_t       ghost_unpack;
+    fclaw2d_patch_build_ghost_t        build_ghost;
+    fclaw2d_patch_ghost_packsize_t     ghost_packsize;
+    fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
+    fclaw2d_patch_local_ghost_free_t   local_ghost_free;
+    fclaw2d_ghostpack_extra_t          ghostpack_extra;
 } fclaw2d_patch_vtable_t;
 
-//void fclaw2d_init_patch_vtable(fclaw2d_patch_vtable_t *vt);
 void fclaw2d_set_patch_vtable(fclaw2d_domain_t* domain, fclaw2d_patch_vtable_t *vt);
 fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t *domain);
 

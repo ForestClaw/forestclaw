@@ -48,55 +48,19 @@ void fclaw2d_init_vtable(fclaw2d_vtable_t *vt)
       Functions below here depend on q and could be solver specific
       ------------------------------------------------------------- */
 
-    /* These must be redefined by the solver and user */
-    vt->patch_initialize = NULL;
-    vt->patch_physical_bc = NULL;
-    vt->patch_single_step_update = NULL;
-
     /* These may be redefined by the user */
     /* Problem setup */
     vt->problem_setup = NULL;
-    vt->patch_setup = NULL;
-    vt->ghostpatch_setup = NULL;
 
     /* Diagnostics */
     vt->run_user_diagnostics      = NULL;
     vt->compute_patch_error       = &fclaw2d_diagnostics_compute_patch_error;
 
     /* Defaults for regridding */
-    vt->regrid_average2coarse    = &fclaw2d_regrid_average2coarse;
-    vt->regrid_interpolate2fine  = &fclaw2d_regrid_interpolate2fine;
-
     vt->after_regrid             = NULL;
-
-    vt->regrid_tag4refinement    = &fclaw2d_regrid_tag4refinement;
-    vt->regrid_tag4coarsening    = &fclaw2d_regrid_tag4coarsening;
-
-    /* Defaults for writing output */
-    vt->write_header             = &fclaw2d_output_header_ascii;
-    vt->patch_write_file         = &fclaw2d_output_patch_ascii;
-
-    /* Ghost filling - solver specific */
-    // vt->copy_face            = fclaw2d_clawpatch_copy_face;
-    // vt->average_face         = fclaw2d_clawpatch_average_face;
-    // vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
-    vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
-    vt->average_corner       = fclaw2d_clawpatch_average_corner;
-    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 
     /* Fortran files that do the work */
     vt->fort_compute_patch_error  = NULL;  /* must be set by the user */
-#if 0
-    vt->fort_write_header        = &FCLAW2D_FORT_WRITE_HEADER;
-    vt->fort_write_file          = &FCLAW2D_FORT_WRITE_FILE;
-#endif
-
-#if 0
-    vt->fort_average2coarse      = &FCLAW2D_FORT_AVERAGE2COARSE;
-    vt->fort_interpolate2fine    = &FCLAW2D_FORT_INTERPOLATE2FINE;
-    vt->fort_tag4refinement      = &FCLAW2D_FORT_TAG4REFINEMENT;
-    vt->fort_tag4coarsening      = &FCLAW2D_FORT_TAG4COARSENING;
-#endif
 }
 
 void fclaw2d_set_vtable(fclaw2d_domain_t* domain, fclaw2d_vtable_t *vt)

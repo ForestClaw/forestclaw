@@ -130,7 +130,8 @@ typedef struct fc2d_clawpack46_vtable
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t vt);
 
 void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                         fc2d_clawpack46_vtable_t* vt);
+                                         fclaw2d_patch_vtable_t *patch_vt,
+                                         fc2d_clawpack46_vtable_t* claw_vt);
 
 #define CLAWPACK46_BC2_DEFAULT FCLAW_F77_FUNC(clawpack46_bc2_default,CLAWPACK46_BC2_DEFAULT)
 void CLAWPACK46_BC2_DEFAULT(const int* maxmx, const int* maxmy, const int* meqn,

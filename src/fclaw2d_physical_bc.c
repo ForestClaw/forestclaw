@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "forestclaw2d.h"
 #include "fclaw2d_physical_bc.h"
-#include "fclaw2d_vtable.h"
+//#include "fclaw2d_vtable.h"
 #include "fclaw2d_domain.h"
 
 void fclaw2d_physical_bc_default(fclaw2d_domain_t *domain,
@@ -48,8 +48,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
                                 int this_patch_idx,
                                 void *user)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_physical_time_info_t *t_info;
 
     t_info = (fclaw2d_physical_time_info_t*) user;
@@ -58,13 +57,13 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
     double dt = 1e20;
     fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,intersects_bc);
 
-    vt.patch_physical_bc(domain,
-                         this_patch,
-                         this_block_idx,
-                         this_patch_idx,
-                         t_info->level_time,dt,
-                         intersects_bc,
-                         t_info->time_interp);
+    patch_vt.patch_physical_bc(domain,
+                               this_patch,
+                               this_block_idx,
+                               this_patch_idx,
+                               t_info->level_time,dt,
+                               intersects_bc,
+                               t_info->time_interp);
 }
 
 /* This is needed by other routines, so we don't set it to static. */

@@ -69,7 +69,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_domain.h>
@@ -188,12 +187,6 @@ void average2ghost(fclaw2d_domain_t *domain,
     parallel_mode.cb_fill = cb_corner_fill;
     patch_iterator(domain, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
-
-#if 0
-    /* Used in time interpolation */
-    int y = parallel_mode.e_info.has_fine_grid_neighbor;
-    fclaw2d_clawpatch_set_finegrid_neighbors(domain,this_patch,y);
-#endif
 
     if (read_parallel_patches)
     {
@@ -496,12 +489,6 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 #if 0
     /* uncomment this if debugging ghost cell interpolation */
     fclaw_global_essentialf("WARNING : compute_slopes set to average\n");
-#endif
-
-#if 0
-    /* For debugging */
-    fclaw2d_clawpatch_set_boundary_to_nan(domain,minlevel,maxlevel,
-                                          time_interp);
 #endif
 
     /* ---------------------------------------------------------

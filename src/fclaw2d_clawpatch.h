@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 
+#include <fclaw2d_regrid_default.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -46,9 +48,12 @@ typedef enum
     FCLAW2D_BUILD_COSTOM
 } fclaw2d_build_mode_t;
 
+typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
+
 
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
+fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain);
 
 void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
 void fclaw2d_clawpatch_delete_patch(void *cp);
@@ -224,11 +229,11 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_domain_t *domain,
                                   double *patch_data,
                                   int time_interp);
 
-void fclaw2d_clawpatch_ghost_pack_location(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_local_ghost_alloc(fclaw2d_domain_t* domain,
                                            fclaw2d_patch_t* this_patch,
                                            void **q);
 
-void fclaw2d_clawpatch_ghost_free_pack_location(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_local_ghost_free(fclaw2d_domain_t* domain,
                                                 void **q);
 
 
@@ -239,7 +244,7 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   int packmode);
 #endif
 
-void fclaw2d_clawpatch_init_vtable(fclaw2d_patch_vtable_t *patch_vt);
+void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt);
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,
@@ -316,15 +321,61 @@ typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, co
                                                 const int* refratio, const int* igrid,
                                                 fclaw2d_transform_data_t** transform_cptr);
 
-typedef struct fclaw2d_clawpatch_vtable
+typedef void (*fclaw2d_fort_copy_corner_t)(const int* mx, const int* my, const int* mbc,
+                                     const int* meqn, double this_q[],double neighbor_q[],
+                                     const int* a_corner,fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_average_corner_t)(const int* mx, const int* my, const int* mbc,
+                                        const int* meqn, const int* a_refratio,
+                                        double qcoarse[], double qfine[],
+                                        double areacoarse[], double areafine[],
+                                        const int* manifold,
+                                        const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mbc,
+                                                  const int* meqn, const int* a_refratio, double this_q[],
+                                                  double neighbor_q[], const int* a_corner,
+                                                  fclaw2d_transform_data_t** transform_cptr);
+
+typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
+                                          const int *meqn, const int* psize,
+                                          double qcurr[], double qlast[],
+                                          double qinterp[],const double* alpha,
+                                          const int* ierror);
+
+typedef void (*fclaw2d_fort_ghostpack_qarea_t)(int *mx, int *my, int *mbc,
+                                               int *meqn, int *mint,
+                                               double qdata[], double area[],
+                                               double qpack[], int *psize,
+                                               int *packmode, int *ierror);
+
+struct fclaw2d_clawpatch_vtable
 {
     /* ghost filling functions */
-    fclaw2d_fort_copy_face_t          fort_copy_face;
-    fclaw2d_fort_average_face_t       fort_average_face;
-    fclaw2d_fort_interpolate_face_t   fort_interpolate_face;
+    fclaw2d_fort_average2coarse_t      fort_average2coarse;
+    fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
+    fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
+    fclaw2d_fort_tag4coarsening_t      fort_tag4coarsening;
+    
+    /* ghost filling functions */
+    fclaw2d_fort_copy_face_t           fort_copy_face;
+    fclaw2d_fort_average_face_t        fort_average_face;
+    fclaw2d_fort_interpolate_face_t    fort_interpolate_face;
+    fclaw2d_fort_copy_corner_t         fort_copy_corner;
+    fclaw2d_fort_average_corner_t      fort_average_corner;
+    fclaw2d_fort_interpolate_corner_t  fort_interpolate_corner;
 
-} fclaw2d_clawpatch_vtable_t;
+    /* output functions */
+    fclaw2d_fort_write_header_t        fort_write_header;
+    fclaw2d_fort_write_file_t          fort_write_file;
 
+    fclaw2d_fort_timeinterp_t          fort_timeinterp;
+
+    /* ghost patch functions */
+    fclaw2d_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
+};
+
+void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt);
 
 #ifdef __cplusplus
 #if 0

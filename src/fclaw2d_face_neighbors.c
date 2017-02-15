@@ -189,7 +189,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
-    //fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;

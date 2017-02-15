@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_update_single_step.h>
-#include <fclaw2d_vtable.h>
 
 static fclaw2d_patch_iterator_t patch_iterator;
 
@@ -38,16 +37,14 @@ static
                         void *user)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_vtable_t vt;
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     double maxcfl;
-
-    vt = fclaw2d_get_vtable(domain);
 
     single_step_data_t *ss_data = (single_step_data_t *) user;
 
     double dt = ss_data->dt;
     double t = ss_data->t;
-    maxcfl = vt.patch_single_step_update(domain,this_patch,
+    maxcfl = patch_vt.patch_single_step_update(domain,this_patch,
                                          this_block_idx,
                                          this_patch_idx,t,dt);
 

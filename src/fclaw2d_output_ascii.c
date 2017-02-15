@@ -34,7 +34,7 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
                                  int iframe)
 {
     const amr_options_t *amropt;
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int meqn,ngrids;
     double time;
     char matname1[11];
@@ -50,8 +50,7 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
 
     meqn = amropt->meqn;
 
-    vt = fclaw2d_get_vtable(domain);
-    vt.fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
+    clawpatch_vt.fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
 }
 
 
@@ -60,12 +59,11 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
                                int this_block_idx, int this_patch_idx,
                                int iframe,int patch_num,int level)
 {
-    fclaw2d_vtable_t vt;
+    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
     char fname[11];
-    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -73,7 +71,7 @@ void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     sprintf(fname,"fort.q%04d",iframe);
-    vt.fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+    clawpatch_vt.fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
                        &patch_num,&level,&this_block_idx,
                        &domain->mpirank);
 }

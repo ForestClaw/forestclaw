@@ -275,3 +275,58 @@ fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
     FCLAW_ASSERT(patch_vt != NULL);
     return *patch_vt;
 }
+
+void fclaw2d_patch_ghost_pack(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              double *patch_data,
+                              int time_interp)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.ghost_pack(domain, 
+                        this_patch,
+                        patch_data,
+                        time_interp);
+}
+
+void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int blockno,
+                               int patchno,
+                               void *user)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.build_ghost(domain,this_patch,blockno,
+                         patchno,(void*) user);
+}
+
+void fclaw2d_patch_ghost_unpack(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t* this_patch,
+                                int this_block_idx,
+                                int this_patch_idx,
+                                double *qdata, fclaw_bool time_interp)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.ghost_unpack(domain, this_patch, this_block_idx, 
+                          this_patch_idx, qdata, time_interp);
+}
+
+size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    return patch_vt.ghost_packsize(domain);
+}
+
+void fclaw2d_patch_local_ghost_alloc(fclaw2d_domain_t* domain,
+                                     fclaw2d_patch_t* this_patch,
+                                     void** q)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.local_ghost_alloc(domain, this_patch, q);
+}
+
+void fclaw2d_patch_local_ghost_free(fclaw2d_domain_t* domain,
+                                    void **q)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.local_ghost_free(domain, q);
+}
