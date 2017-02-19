@@ -28,6 +28,7 @@ def setplot(plotdata):
     from numpy import linspace
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = "forestclaw"
 
     plotdata.verbose = False
 
@@ -81,10 +82,10 @@ def setplot(plotdata):
     # Choose a figure size that matches the coarse grid resolution.
     # Set the dpi so that figsize*dpi = finest level effective resolution.
 
-    # If amr refinement ratios set to [2,4,4,4]; max_level = 5
-    # figsize*dpi = [54,19]*2*4**2 = [1728,608]
-    plotfigure.kml_figsize = [54,19]
-    plotfigure.kml_dpi = 32
+    # If amr refinement ratios set to [0,6]; max_level = 6
+    # figsize*dpi = [17,6]*8*2**6 = [8704,3072]
+    plotfigure.kml_figsize = [34,12]
+    plotfigure.kml_dpi = 8*2**4
 
     # --------------------------------------------------
 
@@ -217,11 +218,12 @@ def setplot(plotdata):
     # e.g., via pyclaw.plotters.frametools.printframes:
 
     plotdata.parallel = True
-    plotdata.printfigs = True               # print figures
+    plotdata.printfigs = True              # print figures
     plotdata.print_format = 'png'           # file format
-    plotdata.print_framenos = range(130,361)         # list of frames to print
+    plotdata.print_framenos = 'all'         # list of frames to print
     plotdata.print_gaugenos = 'all'         # list of gauges to print
-    plotdata.print_fignos = [2,300]         # list of figures to print
+    plotdata.print_fignos = [1,300]         # list of figures to print
+    plotdata.overwrite = True
 
     plotdata.html = False                     # create html files of plots?
     plotdata.html_movie = False                     # create html files of plots?

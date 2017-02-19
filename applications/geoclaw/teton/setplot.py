@@ -33,6 +33,7 @@ def setplot(plotdata):
     from numpy import linspace
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = "forestclaw"
 
 
     #to plot gauge locations on pcolor or contour, use this as
@@ -90,7 +91,7 @@ def setplot(plotdata):
                                                  1.0:dark_blue})
     # Water
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = geoplot.surface
+    plotitem.plot_var = geoplot.depth
     plotitem.pcolor_cmap = flooding_colormap
     plotitem.pcolor_cmin = 0
     plotitem.pcolor_cmax = 30

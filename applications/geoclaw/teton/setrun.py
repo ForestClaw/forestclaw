@@ -294,10 +294,12 @@ def setrun(claw_pkg='geoclaw'):
     # -----------------------------------------------
     amrdata = rundata.amrdata
 
-    amrdata.amr_levels_max = 5    # Set to 3 for best results
-    amrdata.refinement_ratios_x = [2,4,4,4]
-    amrdata.refinement_ratios_y = [2,4,4,4]
-    amrdata.refinement_ratios_t = [2,4,4,4]
+    maxlevel = 6
+
+    amrdata.amr_levels_max = maxlevel    # Set to 3 for best results
+    amrdata.refinement_ratios_x = [2]*7
+    amrdata.refinement_ratios_y = [2]*7
+    amrdata.refinement_ratios_t = [2]*7
     # rundata.tol = -1
     # rundata.tolsp = 0.001
 
@@ -333,7 +335,7 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
 
     # Region containing initial reservoir
-    regions.append([4,4, 0, 1.e10,-111.7,-111.24,43.83, 43.9881])
+    regions.append([7,7, 0, 1.e10,-111.7,-111.24,43.83, 43.9881])
 
     # Box containing gauge location locations
     import tools
@@ -345,10 +347,10 @@ def setrun(claw_pkg='geoclaw'):
                                                      clawdata.lower,
                                                      clawdata.upper)
 
-    regions.append([5,5,0, 1e10, region_lower[0],region_upper[0],region_lower[1],region_upper[1]])
+    regions.append([maxlevel,maxlevel,0, 1e10, region_lower[0],region_upper[0],region_lower[1],region_upper[1]])
 
     # Computational domain.  With exception of region above, don't go beyond level 4
-    regions.append([1,4,0, 1e10, clawdata.lower[0],clawdata.upper[0],clawdata.lower[1],clawdata.upper[1]])
+    regions.append([0,5,0, 1e10, clawdata.lower[0],clawdata.upper[0],clawdata.lower[1],clawdata.upper[1]])
 
     # -------------------------------------------------------
     # INL Gauges
@@ -370,7 +372,7 @@ def setrun(claw_pkg='geoclaw'):
     # Start at SW corner; build gauges in counter-clockwise order in a
     # square around the region [xll,xur].
 
-    m = 20  # Gauge spacing along one edge (m=4 --> edge divided into four sections)
+    m = 2  # Gauge spacing along one edge (m=4 --> edge divided into four sections)
     gauge_counter = 100
 
     # South West corner of power plant

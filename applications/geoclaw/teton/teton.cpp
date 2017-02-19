@@ -111,7 +111,7 @@ void run_program(fclaw_app_t* app)
         break;
 
     case 1:
-        /* Square brick domain */
+        /* Rectangular brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_nomap_brick(brick);

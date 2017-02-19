@@ -46,6 +46,14 @@ typedef struct user_options
 
 void teton_link_solvers(fclaw2d_domain_t *domain);
 
+#define TETON_QINIT   FCLAW_F77_FUNC(teton_qinit,TETON_QINIT)
+void TETON_QINIT(const int* meqn,const int* mbc,
+                 const int* mx, const int* my,
+                 const double* xlower, const double* ylower,
+                 const double* dx, const double* dy,
+                 double q[], const int* maux, double aux[]);
+
+
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
