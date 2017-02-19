@@ -93,83 +93,81 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 
 c     # Create map :
       do mq = 1,meqn
-        if (idir .eq. 0) then
+         if (idir .eq. 0) then
 
 c           # this ensures that we get 'hanging' corners
             if (iface_coarse .eq. 0) then
-              ic = 1
+               ic = 1
             elseif (iface_coarse .eq. 1) then
-              ic = mx
+               ic = mx
             endif
 
             do jc = 1,mx
-              i1 = ic
-              j1 = jc
-              call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &              transform_ptr)
-              skip_this_grid = .false.
-              do m = 0,r2-1
-                if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
-     &            then
-                  skip_this_grid = .true.
-                  exit
-                endif
-              enddo
-              if (.not. skip_this_grid) then
-                if (mq .eq. 1) then
-                ! Calculate surface elevation eta using dry limiting
-                  do iii = -1, 1
-                    do jjj = -1, 1
-                      h = qcoarse(1,ic+iii,jc+jjj)
-                      b = aux_coarse(mbathy,ic+iii,jc+jjj)
-                      if (h < dry_tolerance) then
-                        etabarc(iii,jjj) = sea_level
-                      else
-                        etabarc(iii,jjj) = h + b                 
-                      endif
-                    enddo
-                  enddo
+               i1 = ic
+               j1 = jc
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+     &               transform_ptr)
+               skip_this_grid = .false.
+               do m = 0,r2-1
+                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+     &                  then
+                     skip_this_grid = .true.
+                     exit
+                  endif
+               enddo
+               if (.not. skip_this_grid) then
+                  if (mq .eq. 1) then
+!                    ! Calculate surface elevation eta using dry limiting
+                     do ii = -1, 1
+                        do jj = -1, 1
+                           h = qcoarse(1,ic+ii,jc+jj)
+                           b = aux_coarse(mbathy,ic+ii,jc+jj)
+                           if (h < dry_tolerance) then
+                              etabarc(ii,jj) = sea_level
+                           else
+                              etabarc(ii,jj) = h + b
+                           endif
+                        enddo
+                     enddo
 
-                  qc = etabarc(0,0)
+                     qc = etabarc(0,0)
 
-                  sl = qc - etabarc(-1,0)
-                  sr = etabarc(1,0) - qc
-                  gradx = compute_slopes(sl,sr,mth)
+                     sl = qc - etabarc(-1,0)
+                     sr = etabarc(1,0) - qc
+                     gradx = compute_slopes(sl,sr,mth)
 
-                  sl = qc - etabarc(0,-1)
-                  sr = etabarc(0,1) - qc
-                  grady = compute_slopes(sl,sr,mth)
-                  do m = 0,rr2-1
-                     iff = i2(0) + df(1,m)
-                     jff = j2(0) + df(2,m)
-                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &                       -aux_fine(mbathy,iff,jff)
-                     qfine(mq,iff,jff) = value
-                  enddo                  
-                else
-                  qc = qcoarse(mq,ic,jc)
+                     sl = qc - etabarc(0,-1)
+                     sr = etabarc(0,1) - qc
+                     grady = compute_slopes(sl,sr,mth)
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &                        -aux_fine(mbathy,iff,jff)
+                        qfine(mq,iff,jff) = max(value,0.0)
+                     enddo
+                  else
+                     qc = qcoarse(mq,ic,jc)
 
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
+                     sl = (qc - qcoarse(mq,ic-1,jc))
+                     sr = (qcoarse(mq,ic+1,jc) - qc)
+                     gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
-                  grady = compute_slopes(sl,sr,mth)
+                     sl = (qc - qcoarse(mq,ic,jc-1))
+                     sr = (qcoarse(mq,ic,jc+1) - qc)
+                     grady = compute_slopes(sl,sr,mth)
 
-                  do m = 0,rr2-1
-                    iff = i2(0) + df(1,m)
-                    jff = j2(0) + df(2,m)
-                    value = qc + gradx*shiftx(m) + grady*shifty(m)   
-                    qfine(mq,iff,jff) = value
-                  enddo
-                endif
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+                        qfine(mq,iff,jff) = value
+                     enddo
+                  endif
 c-----------------------------------------------------------------------------
-              endif
+               endif
             enddo
-
-
-         else ! other direction
+         else                           ! other direction
             if (iface_coarse .eq. 2) then
                jc = 1
             elseif (iface_coarse .eq. 3) then
@@ -177,9 +175,9 @@ c-----------------------------------------------------------------------------
             endif
 
             do ic = 1,mx
-    1         i1 = ic
-              j1 = jc
-              call fclaw2d_transform_face_half(i1,j1,i2,j2,
+    1          i1 = ic
+               j1 = jc
+               call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
 c              # ---------------------------------------------
 c              # Two 'half-size' neighbors will be passed into
@@ -189,65 +187,65 @@ c              # passed in.  We skip those ghost cells that will
 c              # have to be filled in by the other half-size
 c              # grid.
 c              # ---------------------------------------------
-              skip_this_grid = .false.
-              do m = 0,r2-1
-                if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
-     &            then
-                    skip_this_grid = .true.
-                    exit
-                endif
-              enddo
+               skip_this_grid = .false.
+               do m = 0,r2-1
+                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+     &                  then
+                     skip_this_grid = .true.
+                     exit
+                  endif
+               enddo
 
-              if (.not. skip_this_grid) then
-               ! Calculate surface elevation eta using dry limiting
-                if (mq .eq. 1) then
-                  do iii = -1, 1
-                    do jjj = -1, 1
-                      h = qcoarse(1,ic+iii,jc+jjj)
-                      b = aux_coarse(mbathy,ic+iii,jc+jjj)
-                      if (h < dry_tolerance) then
-                        etabarc(iii,jjj) = sea_level
-                      else
-                        etabarc(iii,jjj) = h + b
-                      endif
-                    enddo
-                  enddo
+               if (.not. skip_this_grid) then
+!                 Calculate surface elevation eta using dry limiting
+                  if (mq .eq. 1) then
+                     do ii = -1, 1
+                        do jj = -1, 1
+                           h = qcoarse(1,ic+ii,jc+jj)
+                           b = aux_coarse(mbathy,ic+ii,jc+jj)
+                           if (h < dry_tolerance) then
+                              etabarc(ii,jj) = sea_level
+                           else
+                              etabarc(ii,jj) = h + b
+                           endif
+                        enddo
+                     enddo
 
-                  qc = etabarc(0,0)
+                     qc = etabarc(0,0)
 
-                  sl = qc - etabarc(-1,0)
-                  sr = etabarc(1,0) - qc
-                  gradx = compute_slopes(sl,sr,mth)
+                     sl = qc - etabarc(-1,0)
+                     sr = etabarc(1,0) - qc
+                     gradx = compute_slopes(sl,sr,mth)
 
-                  sl = qc - etabarc(0,-1)
-                  sr = etabarc(0,1) - qc
-                  grady = compute_slopes(sl,sr,mth)
+                     sl = qc - etabarc(0,-1)
+                     sr = etabarc(0,1) - qc
+                     grady = compute_slopes(sl,sr,mth)
 
-                  do m = 0,rr2-1
-                    iff = i2(0) + df(1,m)
-                    jff = j2(0) + df(2,m)
-                    value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &                         - aux_fine(mbathy,iff,jff)
-                    qfine(mq,iff,jff) = value
-                  enddo
-                else
-                  qc = qcoarse(mq,ic,jc)
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &                        - aux_fine(mbathy,iff,jff)
+                        qfine(mq,iff,jff) = max(value,0.0)
+                     enddo
+                  else
+                     qc = qcoarse(mq,ic,jc)
 
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
+                     sl = (qc - qcoarse(mq,ic-1,jc))
+                     sr = (qcoarse(mq,ic+1,jc) - qc)
+                     gradx = compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
-                  grady = compute_slopes(sl,sr,mth)
-                  do m = 0,rr2-1
-                    iff = i2(0) + df(1,m)
-                    jff = j2(0) + df(2,m)
-                    value = qc + gradx*shiftx(m) + grady*shifty(m)
-                    qfine(mq,iff,jff) = value
-                  enddo
-                endif
-              endif                     !! Don't skip this grid
+                     sl = (qc - qcoarse(mq,ic,jc-1))
+                     sr = (qcoarse(mq,ic,jc+1) - qc)
+                     grady = compute_slopes(sl,sr,mth)
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+                        qfine(mq,iff,jff) = value
+                     enddo
+                  endif
+               endif                    !! Don't skip this grid
             enddo                       !! i loop
          endif                          !! end idir branch
       enddo                             !! endo mq loop
@@ -275,7 +273,6 @@ c              # ---------------------------------------------
       double precision compute_slopes, value
 
       double precision etabarc(-1:1, -1:1), h, b
-      integer iii,jjj
 
 c     # This should be refratio*refratio.
       integer i1,j1,m, r2
@@ -340,54 +337,55 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
      &      transform_ptr)
 
       do mq = 1,meqn
-        if (mq .eq. 1) then
-          do iii = -1, 1
-            do jjj = -1, 1
-              h = qcoarse(1,ic+iii,jc+jjj)
-              b = aux_coarse(mbathy,ic+iii,jc+jjj)
-                if (h < dry_tolerance) then
-                  etabarc(iii,jjj) = sea_level
-                else
-                  etabarc(iii,jjj) = h + b
-                endif
+         if (mq .eq. 1) then
+            do ii = -1, 1
+               do jj = -1, 1
+                  h = qcoarse(1,ic+ii,jc+jj)
+                  b = aux_coarse(mbathy,ic+ii,jc+jj)
+                  if (h < dry_tolerance) then
+                     etabarc(ii,jj) = sea_level
+                  else
+                     etabarc(ii,jj) = h + b
+                  endif
+               enddo
             enddo
-          enddo
 
-          qc = etabarc(0,0)
+            qc = etabarc(0,0)
 
-          sl = qc - etabarc(-1,0)
-          sr = etabarc(1,0) - qc
-          gradx = compute_slopes(sl,sr,mth)
+            sl = qc - etabarc(-1,0)
+            sr = etabarc(1,0) - qc
+            gradx = compute_slopes(sl,sr,mth)
 
-          sl = qc - etabarc(0,-1)
-          sr = etabarc(0,1) - qc
-          grady = compute_slopes(sl,sr,mth)
-          qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
+            sl = qc - etabarc(0,-1)
+            sr = etabarc(0,1) - qc
+            grady = compute_slopes(sl,sr,mth)
 
-          do m = 0,rr2-1
-            iff = i2(0) + df(1,m)
-            jff = j2(0) + df(2,m)
-            value = qc + gradx*shiftx(m) + grady*shifty(m)
-     &              - aux_fine(mbathy,iff,jff)
-            qfine(mq,iff,jff) = value
-          enddo  
-        else
-          qc = qcoarse(mq,ic,jc)
+!!            qc = qcoarse(mq,ic,jc) + aux_coarse(mbathy,ic,jc)
 
-          sl = (qc - qcoarse(mq,ic-1,jc))
-          sr = (qcoarse(mq,ic+1,jc) - qc)
-          gradx = compute_slopes(sl,sr,mth)
+            do m = 0,rr2-1
+               iff = i2(0) + df(1,m)
+               jff = j2(0) + df(2,m)
+               value = qc + gradx*shiftx(m) + grady*shifty(m)
+     &               - aux_fine(mbathy,iff,jff)
+               qfine(mq,iff,jff) = max(value,0.0)
+            enddo
+         else
+            qc = qcoarse(mq,ic,jc)
 
-          sl = (qc - qcoarse(mq,ic,jc-1))
-          sr = (qcoarse(mq,ic,jc+1) - qc)
-          grady = compute_slopes(sl,sr,mth)
-          do m = 0,rr2-1
-            iff = i2(0) + df(1,m)
-            jff = j2(0) + df(2,m)
-            value = qc + gradx*shiftx(m) + grady*shifty(m)
-            qfine(mq,iff,jff) = value
-          enddo          
-        endif
+            sl = (qc - qcoarse(mq,ic-1,jc))
+            sr = (qcoarse(mq,ic+1,jc) - qc)
+            gradx = compute_slopes(sl,sr,mth)
+
+            sl = (qc - qcoarse(mq,ic,jc-1))
+            sr = (qcoarse(mq,ic,jc+1) - qc)
+            grady = compute_slopes(sl,sr,mth)
+            do m = 0,rr2-1
+               iff = i2(0) + df(1,m)
+               jff = j2(0) + df(2,m)
+               value = qc + gradx*shiftx(m) + grady*shifty(m)
+               qfine(mq,iff,jff) = value
+            enddo
+         endif
 
       enddo
 
