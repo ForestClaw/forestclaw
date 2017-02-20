@@ -140,7 +140,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
             fclaw2d_patch_data_new(new_domain,fine_patch);
-            fclaw2d_clawpatch_build(new_domain,fine_patch,blockno,
+            fclaw2d_patch_build(new_domain,fine_patch,blockno,
                                     fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
@@ -175,9 +175,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_data_new(new_domain,coarse_patch);
 
         /* Area (and possibly other things) should be averaged to coarse grid. */
-        fclaw2d_clawpatch_build_from_fine(new_domain,fine_siblings,coarse_patch,
-                                          blockno,coarse_patchno,fine_patchno,
-                                          build_mode);
+        fclaw2d_patch_build_from_fine(new_domain,fine_siblings,coarse_patch,
+                                      blockno,coarse_patchno,fine_patchno,
+                                      build_mode);
 
         /* Average the solution. Does this need to be customizable? */
         patch_vt.regrid_average2coarse(new_domain,fine_siblings,coarse_patch,

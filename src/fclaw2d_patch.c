@@ -365,3 +365,35 @@ size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     return patch_vt.partition_packsize(domain);
 }
+
+void fclaw2d_patch_build(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno,
+                             int patchno,
+                             void *user)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.patch_build(domain,
+                         this_patch,
+                         blockno,
+                         patchno,
+                         user);
+}
+
+void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
+                                       fclaw2d_patch_t *fine_patches,
+                                       fclaw2d_patch_t *coarse_patch,
+                                       int blockno,
+                                       int coarse_patchno,
+                                       int fine0_patchno,
+                                       fclaw2d_build_mode_t build_mode)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.patch_build_from_fine(domain,
+                                   fine_patches,
+                                   coarse_patch,
+                                   blockno,
+                                   coarse_patchno,
+                                   fine0_patchno,
+                                   build_mode);
+}              
