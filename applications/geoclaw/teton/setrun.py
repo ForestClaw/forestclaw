@@ -335,7 +335,7 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
 
     # Region containing initial reservoir
-    regions.append([7,7, 0, 1.e10,-111.7,-111.24,43.83, 43.9881])
+    regions.append([7,7, 0, 1.e10,-111.7,-111.24,43.857, 43.9881])
 
     # Box containing gauge location locations
     import tools

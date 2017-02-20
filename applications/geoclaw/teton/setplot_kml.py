@@ -83,9 +83,11 @@ def setplot(plotdata):
     # Set the dpi so that figsize*dpi = finest level effective resolution.
 
     # If amr refinement ratios set to [0,6]; max_level = 6
-    # figsize*dpi = [17,6]*8*2**6 = [8704,3072]
-    plotfigure.kml_figsize = [34,12]
-    plotfigure.kml_dpi = 8*2**4
+    # figsize*dpi = [2,1]*16*2**6 = [2048,1024]
+    minlevel = 0
+    maxlevel = 6
+    plotfigure.kml_figsize = [32,16]
+    plotfigure.kml_dpi = 64
 
     # --------------------------------------------------
 
@@ -218,12 +220,13 @@ def setplot(plotdata):
     # e.g., via pyclaw.plotters.frametools.printframes:
 
     plotdata.parallel = True
-    plotdata.printfigs = True              # print figures
     plotdata.print_format = 'png'           # file format
-    plotdata.print_framenos = 'all'         # list of frames to print
+    plotdata.print_framenos = range(0,5);         # list of frames to print
     plotdata.print_gaugenos = 'all'         # list of gauges to print
     plotdata.print_fignos = [1,300]         # list of figures to print
-    plotdata.overwrite = True
+
+    plotdata.printfigs = False              # print figures
+    plotdata.overwrite = False
 
     plotdata.html = False                     # create html files of plots?
     plotdata.html_movie = False                     # create html files of plots?
