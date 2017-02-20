@@ -221,12 +221,12 @@ def setplot(plotdata):
 
     plotdata.parallel = True
     plotdata.print_format = 'png'           # file format
-    plotdata.print_framenos = range(0,5);         # list of frames to print
+    plotdata.print_framenos = range(0,10)         # list of frames to print
     plotdata.print_gaugenos = 'all'         # list of gauges to print
     plotdata.print_fignos = [1,300]         # list of figures to print
 
-    plotdata.printfigs = False              # print figures
-    plotdata.overwrite = False
+    plotdata.printfigs = True              # print figures
+    plotdata.overwrite = True
 
     plotdata.html = False                     # create html files of plots?
     plotdata.html_movie = False                     # create html files of plots?

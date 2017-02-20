@@ -65,7 +65,7 @@ fprintf('\n');
 
 % ForestClaw
 minlevel = 0;
-maxlevel = 6;
+maxlevel = 7;
 mx0 = 16;
 mx = mi*mx0*2^minlevel;
 my = mj*mx0*2^minlevel;
