@@ -40,14 +40,6 @@ extern "C"
 #endif
 #endif
 
-typedef enum
-{
-    FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
-    FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED,
-    FCLAW2D_BUILD_FOR_UPDATE,
-    FCLAW2D_BUILD_COSTOM
-} fclaw2d_build_mode_t;
-
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
 

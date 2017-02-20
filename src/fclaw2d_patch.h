@@ -62,6 +62,13 @@ extern "C"
 #endif
 #endif
 
+typedef enum
+{
+    FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
+    FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED,
+    FCLAW2D_BUILD_FOR_UPDATE,
+    FCLAW2D_BUILD_COSTOM
+} fclaw2d_build_mode_t;
 
 typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_domain_t * domain, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
