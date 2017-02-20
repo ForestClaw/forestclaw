@@ -374,7 +374,6 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
         number_of_gauges_set = 0;
-        // numgaugeset = 0;
         block_offsets[0] = 0;
         for (nb = 0; nb < domain->num_blocks; nb++)
         {
@@ -393,11 +392,9 @@ void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain)
                     coordinates[2*ng] = mi*(x - xll);
                     coordinates[2*ng+1] = mj*(y - yll);
                     gauges[i].location_in_results = ng;
-                    // numblockgauge++;
                     number_of_gauges_set++;
                 }
             }
-            /* block_offsets[nb+1] = numblockgauge; */
             block_offsets[nb+1] = number_of_gauges_set;
         }
     }
