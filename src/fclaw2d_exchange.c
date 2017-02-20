@@ -64,7 +64,7 @@ void set_indirect_data(fclaw2d_domain_t* domain,
 }
 
 static
-void build_ghost_patches(fclaw2d_domain_t* domain)
+void build_remote_ghost_patches(fclaw2d_domain_t* domain)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -95,13 +95,13 @@ void build_ghost_patches(fclaw2d_domain_t* domain)
         patchno = i;
 
         fclaw2d_patch_data_new(domain,ghost_patch);
-        fclaw2d_patch_build_ghost(domain,ghost_patch,blockno,
-                                  patchno,(void*) &build_mode);
+        fclaw2d_patch_build_remote_ghost(domain,ghost_patch,blockno,
+                                         patchno,(void*) &build_mode);
     }
 }
 
 static
-void delete_ghost_patches(fclaw2d_domain_t* domain)
+void delete_remote_ghost_patches(fclaw2d_domain_t* domain)
 {
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
@@ -113,7 +113,7 @@ void delete_ghost_patches(fclaw2d_domain_t* domain)
 
 
 static void
-unpack_ghost_patches(fclaw2d_domain_t* domain,
+unpack_remote_ghost_patches(fclaw2d_domain_t* domain,
                      fclaw2d_domain_exchange_t *e,
                      int minlevel,
                      int maxlevel,
@@ -139,8 +139,8 @@ unpack_ghost_patches(fclaw2d_domain_t* domain,
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_patch_ghost_unpack(domain, ghost_patch, blockno,
-                                       patchno, q, unpack_to_timeinterp_patch);
+            fclaw2d_patch_unpack_remote_ghost(domain, ghost_patch, blockno,
+                                              patchno, q, unpack_to_timeinterp_patch);
         }
     }
 }
@@ -184,7 +184,7 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
             {
                 /* Copy q and area into one contingous block */
                 fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                fclaw2d_patch_local_ghost_alloc(domain,this_patch,
+                fclaw2d_patch_alloc_local_ghost(domain,this_patch,
                                                 &e->patch_data[zz++]);
             }
         }
@@ -221,7 +221,7 @@ void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
        filled later with q data and the area, if we are on a manifold */
 
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
-    build_ghost_patches(domain);
+    build_remote_ghost_patches(domain);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* ---------------------------------------------------------
@@ -265,7 +265,7 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    fclaw2d_patch_local_ghost_free(*domain,
+                    fclaw2d_patch_free_local_ghost(*domain,
                                                    &e_old->patch_data[zz++]);
                 }
             }
@@ -273,7 +273,7 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
     }
 
     /* Delete ghost patches from remote neighboring patches */
-    delete_ghost_patches(*domain);
+    delete_remote_ghost_patches(*domain);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 
     /* Destroy indirect data needed to communicate between ghost patches
@@ -319,9 +319,9 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
                 int pack_time_interp = time_interp && level == minlevel-1;
 
                 /* Pack q and area into one contingous block */
-                fclaw2d_patch_ghost_pack(domain,this_patch,
-                                         (double*) e->patch_data[zz++],
-                                         pack_time_interp);
+                fclaw2d_patch_pack_local_ghost(domain,this_patch,
+                                               (double*) e->patch_data[zz++],
+                                                pack_time_interp);
             }
         }
     }
@@ -389,7 +389,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
-    unpack_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
+    unpack_remote_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */
     ++ddata->count_ghost_exchange;

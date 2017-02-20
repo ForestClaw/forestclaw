@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_domain.h>
-#include <fclaw2d_clawpatch.h>
 
 struct fclaw2d_patch_data
 {
@@ -236,13 +235,14 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
                             fclaw2d_patch_t* this_patch)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
 
     /* Initialize user data */
     fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
     this_patch->user = (void *) pdata;
 
     /* create new user data */
-    pdata->user_patch = fclaw2d_clawpatch_new_patch();
+    pdata->user_patch = patch_vt.patch_new();
     ++ddata->count_set_clawpatch;
     pdata->neighbors_set = 0;
 }
@@ -250,12 +250,13 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
 void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
                                fclaw2d_patch_t *this_patch)
 {
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
     if (pdata != NULL)
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-        fclaw2d_clawpatch_delete_patch(pdata->user_patch);
+        patch_vt.patch_delete(pdata->user_patch);
         ++ddata->count_delete_clawpatch;
 
         FCLAW2D_FREE(pdata);
@@ -276,7 +277,7 @@ fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
     return *patch_vt;
 }
 
-void fclaw2d_patch_ghost_pack(fclaw2d_domain_t *domain,
+void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               double *patch_data,
                               int time_interp)
@@ -288,7 +289,7 @@ void fclaw2d_patch_ghost_pack(fclaw2d_domain_t *domain,
                         time_interp);
 }
 
-void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int blockno,
                                int patchno,
@@ -299,11 +300,11 @@ void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
                          patchno,(void*) user);
 }
 
-void fclaw2d_patch_ghost_unpack(fclaw2d_domain_t* domain,
-                                fclaw2d_patch_t* this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                double *qdata, fclaw_bool time_interp)
+void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
+                                       fclaw2d_patch_t* this_patch,
+                                       int this_block_idx,
+                                       int this_patch_idx,
+                                       double *qdata, fclaw_bool time_interp)
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     patch_vt.ghost_unpack(domain, this_patch, this_block_idx, 
@@ -316,7 +317,7 @@ size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain)
     return patch_vt.ghost_packsize(domain);
 }
 
-void fclaw2d_patch_local_ghost_alloc(fclaw2d_domain_t* domain,
+void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t* this_patch,
                                      void** q)
 {
@@ -324,7 +325,7 @@ void fclaw2d_patch_local_ghost_alloc(fclaw2d_domain_t* domain,
     patch_vt.local_ghost_alloc(domain, this_patch, q);
 }
 
-void fclaw2d_patch_local_ghost_free(fclaw2d_domain_t* domain,
+void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
                                     void **q)
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);

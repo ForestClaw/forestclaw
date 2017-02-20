@@ -410,9 +410,9 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
         }
     }
     patch_vt = fclaw2d_get_patch_vtable(domain);
-    if (patch_vt.ghostpatch_setup != NULL)
+    if (patch_vt.patch_setup_ghost != NULL)
     {
-        patch_vt.ghostpatch_setup(domain,this_patch,blockno,patchno);
+        patch_vt.patch_setup_ghost(domain,this_patch,blockno,patchno);
     }
 }
 
@@ -633,8 +633,10 @@ void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
 
     /* These may be redefined by the user */
     /* Problem setup */
+    patch_vt->patch_new = fclaw2d_clawpatch_new_patch;
+    patch_vt->patch_delete = fclaw2d_clawpatch_delete_patch;
     patch_vt->patch_setup = NULL;
-    patch_vt->ghostpatch_setup = NULL;
+    patch_vt->patch_setup_ghost = NULL;
     
     /* Ghost filling - solver specific */
     patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;

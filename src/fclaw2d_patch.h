@@ -134,17 +134,17 @@ void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
                                           fclaw2d_patch_t* this_patch,
                                           int icorner, int block_corner_count);
 
-void fclaw2d_patch_ghost_pack(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              double *patch_data,
-                              int time_interp);
+void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    double *patch_data,
+                                    int time_interp);
 
-void fclaw2d_patch_ghost_unpack(fclaw2d_domain_t* domain,
+void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch,
                                 int this_block_idx, int this_patch_idx,
                                 double *qdata, fclaw_bool time_interp);
 
-void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int blockno,
                                int patchno,
@@ -152,19 +152,23 @@ void fclaw2d_patch_build_ghost(fclaw2d_domain_t *domain,
 
 size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain);
 
-void fclaw2d_patch_local_ghost_alloc(fclaw2d_domain_t* domain,
+void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t* this_patch,
                                      void** q);
 
-void fclaw2d_patch_local_ghost_free(fclaw2d_domain_t* domain,
+void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
                                     void **q);
+
+typedef void* (*fclaw2d_patch_new_t)();
+
+typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
 
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx);
 
-typedef void (*fclaw2d_ghostpatch_setup_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_setup_ghost_t)(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx);
@@ -307,17 +311,10 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
 
 typedef struct fclaw2d_patch_vtable
 {
-    /*
-      fclaw2d_vtable.c:    vt->copy_face            = fclaw2d_clawpatch_copy_face;
-      fclaw2d_vtable.c:    vt->average_face         = fclaw2d_clawpatch_average_face;
-      fclaw2d_vtable.c:    vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
-      fclaw2d_vtable.c:    vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
-      fclaw2d_vtable.c:    vt->average_corner       = fclaw2d_clawpatch_average_corner;
-      fclaw2d_vtable.c:    vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
-    */
-
+    fclaw2d_patch_new_t                patch_new;
+    fclaw2d_patch_delete_t             patch_delete;
     fclaw2d_patch_setup_t              patch_setup;
-    fclaw2d_ghostpatch_setup_t         ghostpatch_setup;
+    fclaw2d_patch_setup_ghost_t        patch_setup_ghost;
     fclaw2d_patch_initialize_t         patch_initialize;
     fclaw2d_patch_physical_bc_t        patch_physical_bc;
     fclaw2d_patch_single_step_update_t patch_single_step_update;

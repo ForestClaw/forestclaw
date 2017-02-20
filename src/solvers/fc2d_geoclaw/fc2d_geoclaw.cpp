@@ -110,7 +110,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
 
     /* Ghost Patch*/
     fclaw_vt->fort_ghostpack_qarea   = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
-    fclaw_vt->ghostpatch_setup       = &fc2d_geoclaw_patch_setup;
+    fclaw_vt->patch_setup_ghost      = &fc2d_geoclaw_patch_setup;
     fclaw_vt->ghostpack_extra        = &fc2d_geoclaw_ghostpack_aux;
 
     fclaw_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
