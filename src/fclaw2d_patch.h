@@ -159,6 +159,21 @@ void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
 void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
                                     void **q);
 
+
+void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx,
+                                     void *user);
+
+void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx,
+                                     void *user);
+
+size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain);
+
 typedef void* (*fclaw2d_patch_new_t)();
 
 typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
@@ -309,6 +324,20 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
                                           double qpack[], int extrasize,
                                           int packmode, int* ierror);
 
+typedef void (*fclaw2d_patch_partition_pack_t)(fclaw2d_domain_t *domain,
+                                               fclaw2d_patch_t *this_patch,
+                                               int this_block_idx,
+                                               int this_patch_idx,
+                                               void *user);
+
+typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_domain_t *domain,
+                                           fclaw2d_patch_t *this_patch,
+                                           int this_block_idx,
+                                           int this_patch_idx,
+                                           void *user);
+
+typedef size_t (*fclaw2d_patch_partition_packsize_t)(fclaw2d_domain_t* domain);
+
 typedef struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
@@ -345,6 +374,11 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
     fclaw2d_ghostpack_extra_t          ghostpack_extra;
+
+    /* partitioning */
+    fclaw2d_patch_partition_pack_t     partition_pack;
+    fclaw2d_patch_partition_unpack_t   partition_unpack;
+    fclaw2d_patch_partition_packsize_t partition_packsize;
 } fclaw2d_patch_vtable_t;
 
 void fclaw2d_set_patch_vtable(fclaw2d_domain_t* domain, fclaw2d_patch_vtable_t *vt);

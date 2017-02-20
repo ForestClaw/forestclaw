@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_vtable.h>
@@ -58,8 +57,8 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
     {
         /* We need to rebuild the patch from scratch. 'user' contains
            the packed data received from remote processor. */
-        cb_fclaw2d_clawpatch_partition_unpack(new_domain,new_patch,
-                                              blockno,new_patchno,user);
+        cb_fclaw2d_patch_partition_unpack(new_domain,new_patch,
+                                          blockno,new_patchno,user);
     }
 }
 
@@ -82,7 +81,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
-    size_t data_size = fclaw2d_clawpatch_partition_packsize(*domain);
+    size_t data_size = fclaw2d_patch_partition_packsize(*domain);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
@@ -91,7 +90,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
     /* For all (patch i) { pack its numerical data into patch_data[i] }
        Does all the data in every patch need to be copied?  */
     fclaw2d_domain_iterate_patches(*domain,
-                                   cb_fclaw2d_clawpatch_partition_pack,
+                                   cb_fclaw2d_patch_partition_pack,
                                    (void *) patch_data);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 

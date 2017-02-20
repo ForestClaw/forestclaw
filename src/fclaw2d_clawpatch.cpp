@@ -573,7 +573,7 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
     return size*sizeof(double);
 }
 
-void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *this_patch,
                                          int this_block_idx,
                                          int this_patch_idx,
@@ -589,7 +589,7 @@ void cb_fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
     cp->partition_pack(patch_data);
 }
 
-void cb_fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx,
@@ -666,6 +666,11 @@ void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
     patch_vt->local_ghost_alloc = &fclaw2d_clawpatch_local_ghost_alloc;
     patch_vt->local_ghost_free  = &fclaw2d_clawpatch_local_ghost_free;
     patch_vt->ghostpack_extra   = NULL;
+
+    /* partitioning */
+    patch_vt->partition_pack    = &fclaw2d_clawpatch_partition_pack;
+    patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
+    patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
 }
 

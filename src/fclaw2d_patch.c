@@ -331,3 +331,37 @@ void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     patch_vt.local_ghost_free(domain, q);
 }
+
+void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx,
+                                     void *user)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.partition_pack(domain,
+                            this_patch,
+                            this_block_idx,
+                            this_patch_idx,
+                            user);
+}
+
+void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
+                                     fclaw2d_patch_t *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx,
+                                     void *user)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.partition_unpack(domain,
+                            this_patch,
+                            this_block_idx,
+                            this_patch_idx,
+                            user);
+}
+
+size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    return patch_vt.partition_packsize(domain);
+}
