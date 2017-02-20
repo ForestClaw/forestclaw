@@ -30,7 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 
-#include <fclaw2d_regrid_default.h>
+#include <fclaw2d_clawpatch_regrid.h>
+#include <fclaw2d_clawpatch_output_ascii.h>
 
 #ifdef __cplusplus
 extern "C"

@@ -26,9 +26,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_output_ascii.h \
+	src/fclaw2d_clawpatch_output_ascii.h \
 	src/fclaw2d_output_ascii_fort.h \
-	src/fclaw2d_regrid_default.h \
+	src/fclaw2d_clawpatch_regrid.h \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
@@ -89,7 +89,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_run.c \
 	src/fclaw2d_clawpatch_diagonostics.c \
 	src/fclaw2d_clawpatch_regrid.c \
-	src/fclaw2d_output_ascii.c \
+	src/fclaw2d_clawpatch_output_ascii.c \
 	src/fclaw2d_diagnostics_default.c \
 	src/fclaw2d_metric_default.c \
 	src/fp_exception_glibc_extension.c \

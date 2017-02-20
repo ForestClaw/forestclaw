@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_forestclaw.h"
 #include "fclaw2d_convenience.h"
 #include "fclaw2d_vtable.h"
+#include "fclaw2d_output.h"
 
 #ifdef __cplusplus
 extern "C"

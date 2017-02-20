@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_regrid_default.h>
 #include <fclaw2d_clawpatch.h>
 
 /* Initialize any settings that can be set here */

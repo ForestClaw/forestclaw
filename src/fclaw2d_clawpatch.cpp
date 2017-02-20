@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map_query.h>
 
 #include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_regrid_default.h>
+#include <fclaw2d_clawpatch_regrid.h>
 
 static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 

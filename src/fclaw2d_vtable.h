@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 #include <fclaw2d_defs.h>
 
-#include <fclaw2d_output.h>
-#include <fclaw2d_output_ascii.h>
 #include <fclaw2d_metric_default.h>
 #include <fclaw2d_diagnostics_default.h>
 #include <fclaw2d_transform.h>
