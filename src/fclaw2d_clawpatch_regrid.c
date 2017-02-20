@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_metric_default_fort.h>
 
-int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   int blockno, int patchno,
                                   int initflag)
@@ -56,7 +56,7 @@ int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *fine_patches,
                                   int blockno,
                                   int patchno)
@@ -97,7 +97,7 @@ int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
    Callback routine for tagging
    ----------------------------------------------------------------- */
 
-void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_regrid_interpolate2fine(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t *coarse_patch,
                                      fclaw2d_patch_t* fine_patches,
                                      int this_blockno, int coarse_patchno,
@@ -148,7 +148,7 @@ void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
    something like "average from fine" routine which handles more generic
    things, including area averaging, and maybe something to do with averaging
    stuff in aux arrays. */
-void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_regrid_average2coarse(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *fine_patches,
                                    fclaw2d_patch_t *coarse_patch,
                                    int blockno, int fine0_patchno,

@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_REGRID_DEFAULT_H
-#define FCLAW2D_REGRID_DEFAULT_H
+#ifndef FCLAW2D_OUTPUT_ASCII_H
+#define FCLAW2D_OUTPUT_ASCII_H
 
-#include <forestclaw2d.h>
-#include <fclaw2d_regrid_default_fort.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_output_ascii_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,26 +37,13 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno,
-                                  int initflag);
+void fclaw2d_clawpatch_output_header_ascii(fclaw2d_domain_t* domain,
+                                           int iframe);
 
-int fclaw2d_regrid_tag4coarsening(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno);
-
-void fclaw2d_regrid_average2coarse(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_siblings,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int fine_patchno,
-                                   int coarse_patchno);
-
-void fclaw2d_regrid_interpolate2fine(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t *coarse_patch,
-                                     fclaw2d_patch_t* fine_patch,
-                                     int this_blockno, int coarse_patchno,
-                                     int fine_patchno);
+void fclaw2d_clawpatch_output_patch_ascii(fclaw2d_domain_t *domain,
+                                		  fclaw2d_patch_t *this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          int iframe,int num,int level);
 
 #ifdef __cplusplus
 #if 0

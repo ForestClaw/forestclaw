@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 
-void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_output_header_ascii(fclaw2d_domain_t* domain,
                                  int iframe)
 {
     const amr_options_t *amropt;
@@ -54,7 +54,7 @@ void fclaw2d_output_header_ascii(fclaw2d_domain_t* domain,
 }
 
 
-void fclaw2d_output_patch_ascii(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_output_patch_ascii(fclaw2d_domain_t *domain,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx, int this_patch_idx,
                                int iframe,int patch_num,int level)
