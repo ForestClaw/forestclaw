@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_advance.h>
 #include <fclaw2d_regrid.h>
@@ -57,13 +56,7 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-#if 0
-    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
-
-    /* Copy most current time step data to grid data. (m_griddata <== m_griddata_last) */
-    this_cp->restore_step();
-#endif
-    fclaw2d_clawpatch_restore_step(domain,this_patch);
+    fclaw2d_patch_restore_step(domain,this_patch);
 }
 
 static
@@ -79,14 +72,7 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-#if 0
-    ClawPatch *this_cp = fclaw2d_clawpatch_get_cp(this_patch);
-
-    /* Copy grid data (m_griddata) on each patch to temporary storage
-       (m_griddata_tmp <== m_griddata); */
-    this_cp->save_step();
-#endif
-    fclaw2d_clawpatch_save_step(domain,this_patch);
+    fclaw2d_patch_save_step(domain,this_patch);
 }
 
 static

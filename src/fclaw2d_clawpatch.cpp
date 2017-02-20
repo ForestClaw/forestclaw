@@ -639,6 +639,8 @@ void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
     patch_vt->patch_setup_ghost = NULL;
     patch_vt->patch_build = &fclaw2d_clawpatch_build;
     patch_vt->patch_build_from_fine = &fclaw2d_clawpatch_build_from_fine;
+    patch_vt->patch_restore_step = &fclaw2d_clawpatch_restore_step;
+    patch_vt->patch_save_step = &fclaw2d_clawpatch_save_step;
     
     /* Ghost filling - solver specific */
     patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;

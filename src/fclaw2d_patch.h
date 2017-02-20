@@ -188,6 +188,12 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode);
 
+void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch);
+
+void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
+                             fclaw2d_patch_t* this_patch);
+
 typedef void* (*fclaw2d_patch_new_t)();
 
 typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
@@ -366,6 +372,13 @@ typedef void (*fclaw2d_patch_build_from_fine_t)(fclaw2d_domain_t *domain,
                                                 int fine0_patchno,
                                                 fclaw2d_build_mode_t build_mode);
 
+
+typedef void (*fclaw2d_patch_restore_step_t)(fclaw2d_domain_t* domain,
+                                             fclaw2d_patch_t* this_patch);
+
+typedef void (*fclaw2d_patch_save_step_t)(fclaw2d_domain_t* domain,
+                                          fclaw2d_patch_t* this_patch);
+
 typedef struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
@@ -377,6 +390,8 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_single_step_update_t patch_single_step_update;
     fclaw2d_patch_build_t              patch_build;
     fclaw2d_patch_build_from_fine_t    patch_build_from_fine;
+    fclaw2d_patch_restore_step_t       patch_restore_step;
+    fclaw2d_patch_save_step_t          patch_save_step;
 
     /* regridding functions */
     fclaw2d_regrid_tag4refinement_t    regrid_tag4refinement;

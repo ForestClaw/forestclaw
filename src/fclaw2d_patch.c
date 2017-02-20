@@ -396,4 +396,19 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
                                    coarse_patchno,
                                    fine0_patchno,
                                    build_mode);
-}              
+}            
+
+void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.patch_restore_step(domain, this_patch);
+}
+
+/* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
+void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
+                             fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.patch_save_step(domain, this_patch);
+}  
