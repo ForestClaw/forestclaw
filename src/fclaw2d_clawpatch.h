@@ -42,6 +42,7 @@ extern "C"
 #endif
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
+typedef struct fclaw2d_clawpatch fclaw2d_clawpatch_t;
 
 
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);

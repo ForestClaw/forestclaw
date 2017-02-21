@@ -147,6 +147,8 @@ public :
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
 
+    fclaw2d_clawpatch_t *clawp;
+
 protected :
 
     /* Solution data */
@@ -193,6 +195,35 @@ protected :
     /* This is an opaque pointer */
     fclaw_package_data_t *m_package_data_ptr;
 
+};
+
+struct fclaw2d_clawpatch
+{
+  int meqn;
+
+  int mx;
+  int my;
+  int mbc;
+
+  double dx;
+  double dy;
+  double xlower;
+  double ylower;
+  double xupper;
+  double yupper;
+
+  int manifold;
+  int blockno;
+
+  FArrayBox griddata;
+    
+  FArrayBox xp;
+  FArrayBox yp;
+  FArrayBox zp;
+
+  FArrayBox xd;
+  FArrayBox yd;
+  FArrayBox zd;
 };
 
 ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);

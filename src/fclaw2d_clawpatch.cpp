@@ -72,12 +72,14 @@ fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain
 void* fclaw2d_clawpatch_new_patch()
 {
     ClawPatch *cp = new ClawPatch();
+    cp->clawp = FCLAW_ALLOC(fclaw2d_clawpatch_t, 1);
     return (void*) cp;
 }
 
 void fclaw2d_clawpatch_delete_patch(void *cp)
 {
     FCLAW_ASSERT(cp != NULL);
+    // FCLAW_FREE((fclaw2d_clawpatch_t*) ((ClawPatch*)cp)->clawp);
     delete (ClawPatch*) cp;
 }
 
@@ -88,6 +90,13 @@ ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 {
     ClawPatch *cp = (ClawPatch*) fclaw2d_patch_get_user_patch(this_patch);
     return cp;
+}
+
+fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_clawp(fclaw2d_patch_t* this_patch)
+
+{
+    ClawPatch *cp = (ClawPatch*) fclaw2d_patch_get_user_patch(this_patch);
+    return cp->clawp;
 }
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
@@ -311,6 +320,121 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     /* We are getting closer to getting rid the class ClawPatch */
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->define(domain,this_patch,blockno,build_mode);
+
+    fclaw2d_clawpatch_t* clawp = fclaw2d_clawpatch_get_clawp(this_patch);
+
+    const amr_options_t *gparms = get_domain_parms(domain);
+    clawp->mx = gparms->mx;
+    clawp->my = gparms->my;
+    clawp->mbc = gparms->mbc;
+    clawp->blockno = blockno;
+    clawp->meqn = gparms->meqn;
+
+#if 0
+    for (int icorner=0; icorner < 4; icorner++)
+    {
+        fclaw2d_patch_set_block_corner_count(domain,this_patch,icorner,0);
+    }
+#endif
+    fclaw2d_map_context_t* cont =
+        fclaw2d_domain_get_map_context(domain);
+
+    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+
+    clawp->manifold = gparms->manifold;
+
+    if (clawp->manifold)
+    {
+        clawp->xlower = this_patch->xlower;
+        clawp->ylower = this_patch->ylower;
+        clawp->xupper = this_patch->xupper;
+        clawp->yupper = this_patch->yupper;
+    }
+    else
+    {
+        double ax = gparms->ax;
+        double bx = gparms->bx;
+        double ay = gparms->ay;
+        double by = gparms->by;
+
+        double xl = this_patch->xlower;
+        double yl = this_patch->ylower;
+        double xu = this_patch->xupper;
+        double yu = this_patch->yupper;
+        double xlower,ylower;
+        double xupper,yupper;
+
+        if (is_brick)
+        {
+            double z;
+            /* Scale to [0,1]x[0,1], based on blockno */
+            fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlower,&ylower,&z);
+            fclaw2d_map_c2m_nomap_brick(cont,blockno,xu,yu,&xupper,&yupper,&z);
+        }
+        else
+        {
+            xlower = xl;
+            ylower = yl;
+            xupper = xu;
+            yupper = yu;
+        }
+
+        clawp->xlower = ax + (bx - ax)*xlower;
+        clawp->xupper = ax + (bx - ax)*xupper;
+        clawp->ylower = ay + (by - ay)*ylower;
+        clawp->yupper = ay + (by - ay)*yupper;
+    }
+
+    clawp->dx = (clawp->xupper - clawp->xlower)/clawp->mx;
+    clawp->dy = (clawp->yupper - clawp->ylower)/clawp->my;
+
+    int ll[SpaceDim];
+    int ur[SpaceDim];
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
+        ll[idir] = 1-clawp->mbc;
+    }
+    ur[0] = clawp->mx + clawp->mbc;
+    ur[1] = clawp->my + clawp->mbc;
+    Box box(ll,ur);
+
+    // This will destroy any existing memory n m_griddata.
+    clawp->griddata.define(box, clawp->meqn);
+#if 0
+    if (gparms->subcycle)
+    {
+        m_griddata_time_interpolated.define(box, m_meqn);
+    }
+    if (gparms->compute_error)
+    {
+        m_griderror.define(box,m_meqn);
+    }
+
+    // Set up storage for metric terms, if needed.
+    if (gparms->manifold)
+    {
+        setup_area_storage();
+        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        {
+            /* Don't need any more manifold info for ghost patches */
+            if (build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+            {
+                setup_metric_storage();
+            }
+        }
+    }
+
+
+    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
+
+    if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
+    {
+        return;
+    }
+
+    m_griddata_last.define(box, m_meqn);
+    m_griddata_save.define(box, m_meqn);
+#endif
 
 }
 
