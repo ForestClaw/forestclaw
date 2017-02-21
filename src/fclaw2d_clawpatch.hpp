@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>
 
+class fclaw2d_clawpatch_t;
+
 
 class ClawPatch
 {
@@ -197,8 +199,9 @@ protected :
 
 };
 
-struct fclaw2d_clawpatch
+struct fclaw2d_clawpatch_t
 {
+public:
   int meqn;
 
   int mx;
@@ -216,7 +219,7 @@ struct fclaw2d_clawpatch
   int blockno;
 
   FArrayBox griddata;
-    
+
   FArrayBox xp;
   FArrayBox yp;
   FArrayBox zp;

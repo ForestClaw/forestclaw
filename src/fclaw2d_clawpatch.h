@@ -42,7 +42,7 @@ extern "C"
 #endif
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
-typedef struct fclaw2d_clawpatch fclaw2d_clawpatch_t;
+// typedef struct fclaw2d_clawpatch fclaw2d_clawpatch_t;
 
 
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
@@ -350,7 +350,7 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
     fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
     fclaw2d_fort_tag4coarsening_t      fort_tag4coarsening;
-    
+
     /* ghost filling functions */
     fclaw2d_fort_copy_face_t           fort_copy_face;
     fclaw2d_fort_average_face_t        fort_average_face;

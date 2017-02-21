@@ -72,14 +72,14 @@ fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain
 void* fclaw2d_clawpatch_new_patch()
 {
     ClawPatch *cp = new ClawPatch();
-    cp->clawp = FCLAW_ALLOC(fclaw2d_clawpatch_t, 1);
+    cp->clawp = new fclaw2d_clawpatch_t();
     return (void*) cp;
 }
 
 void fclaw2d_clawpatch_delete_patch(void *cp)
 {
     FCLAW_ASSERT(cp != NULL);
-    // FCLAW_FREE((fclaw2d_clawpatch_t*) ((ClawPatch*)cp)->clawp);
+    delete ((ClawPatch*)cp)->clawp;
     delete (ClawPatch*) cp;
 }
 
@@ -95,7 +95,7 @@ ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_clawp(fclaw2d_patch_t* this_patch)
 
 {
-    ClawPatch *cp = (ClawPatch*) fclaw2d_patch_get_user_patch(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->clawp;
 }
 
@@ -750,7 +750,7 @@ void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt)
 /* OR .... This is work towards extracting the clawpatch */
 void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
 {
-    /* These must be redefined by the solver and user */ 
+    /* These must be redefined by the solver and user */
     patch_vt->patch_initialize = NULL;
     patch_vt->patch_physical_bc = NULL;
     patch_vt->patch_single_step_update = NULL;
@@ -765,7 +765,7 @@ void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
     patch_vt->patch_build_from_fine = &fclaw2d_clawpatch_build_from_fine;
     patch_vt->patch_restore_step = &fclaw2d_clawpatch_restore_step;
     patch_vt->patch_save_step = &fclaw2d_clawpatch_save_step;
-    
+
     /* Ghost filling - solver specific */
     patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;
     patch_vt->average_face         = fclaw2d_clawpatch_average_face;
