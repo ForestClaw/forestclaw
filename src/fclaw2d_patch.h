@@ -338,12 +338,6 @@ typedef void (*fclaw2d_patch_local_ghost_alloc_t)(fclaw2d_domain_t* domain,
 typedef void (*fclaw2d_patch_local_ghost_free_t)(fclaw2d_domain_t* domain,
                                                  void **q);
 
-typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
-                                          fclaw2d_patch_t *this_patch,
-                                          int mint,
-                                          double qpack[], int extrasize,
-                                          int packmode, int* ierror);
-
 typedef void (*fclaw2d_patch_partition_pack_t)(fclaw2d_domain_t *domain,
                                                fclaw2d_patch_t *this_patch,
                                                int this_block_idx,
@@ -418,7 +412,6 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_ghost_packsize_t     ghost_packsize;
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
-    fclaw2d_ghostpack_extra_t          ghostpack_extra;
 
     /* partitioning */
     fclaw2d_patch_partition_pack_t     partition_pack;

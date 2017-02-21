@@ -653,8 +653,8 @@ void ghost_comm(fclaw2d_domain_t* domain,
     {
       qpack += qareasize;
       int extrasize = psize - qareasize;
-      FCLAW_ASSERT(patch_vt.ghostpack_extra != NULL);
-      patch_vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,&ierror);
+      FCLAW_ASSERT(clawpatch_vt.ghostpack_extra != NULL);
+      clawpatch_vt.ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,&ierror);
       FCLAW_ASSERT(ierror == 0);
     }
 
@@ -802,7 +802,6 @@ void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
     patch_vt->ghost_packsize    = &fclaw2d_clawpatch_ghost_packsize;
     patch_vt->local_ghost_alloc = &fclaw2d_clawpatch_local_ghost_alloc;
     patch_vt->local_ghost_free  = &fclaw2d_clawpatch_local_ghost_free;
-    patch_vt->ghostpack_extra   = NULL;
 
     /* partitioning */
     patch_vt->partition_pack    = &fclaw2d_clawpatch_partition_pack;

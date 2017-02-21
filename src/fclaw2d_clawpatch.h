@@ -343,6 +343,12 @@ typedef void (*fclaw2d_fort_ghostpack_qarea_t)(int *mx, int *my, int *mbc,
                                                double qpack[], int *psize,
                                                int *packmode, int *ierror);
 
+typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
+                                          fclaw2d_patch_t *this_patch,
+                                          int mint,
+                                          double qpack[], int extrasize,
+                                          int packmode, int* ierror);
+
 struct fclaw2d_clawpatch_vtable
 {
     /* ghost filling functions */
@@ -367,6 +373,7 @@ struct fclaw2d_clawpatch_vtable
 
     /* ghost patch functions */
     fclaw2d_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
+    fclaw2d_ghostpack_extra_t          ghostpack_extra;
 };
 
 void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt);
