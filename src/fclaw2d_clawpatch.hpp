@@ -36,41 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>
 
-class fclaw2d_clawpatch_t;
-
 
 class fclaw2d_clawpatch_t
 {
 public :
-
-    fclaw2d_clawpatch_t();
-    ~fclaw2d_clawpatch_t();
-
-    void define(fclaw2d_domain_t* domain,
-                fclaw2d_patch_t* this_patch,
-                int a_blockno,
-                fclaw2d_build_mode_t build_mode);
-
-#if 0
-    void copyFrom(fclaw2d_clawpatch_t *a_cp);
-#endif
-
-    void save_step();
-    void save_current_step();
-    void restore_step();
-
-    void ghost_comm(double *qpack, int time_interp, int packmode);
-    void partition_pack(double* qdata);
-    void partition_unpack(double *qdata);
-
-    void setup_area_storage();
-    void setup_metric_storage();
-
-    // void reset_after_time_interpolation();
-    double* q_time_sync(fclaw_bool time_interp);
-
-    FArrayBox newGrid();
-
     Box dataBox();  /* Box containing data pointer q */
     Box areaBox();  /* Box containing area */
     Box edgeBox();  /* Box containing edge based values */
@@ -93,63 +62,13 @@ public :
                                            fclaw_bool a_time_interp);
 
     // ----------------------------------------------------------------
-    // Mapped grids
-    // ----------------------------------------------------------------
-
-    void setup_manifold(const int& a_level,
-                        const amr_options_t *gparms,
-                        fclaw2d_build_mode_t build_mode);
-
-    // ----------------------------------------------------------------
     // Miscellaneous
     // ----------------------------------------------------------------
-
-    int size();
-
-    // ----------------------------------------------------------------
-    // Access functions
-    // ----------------------------------------------------------------
-    // double mx();
-    // double my();
-    // double mbc();
-    // double meqn();
-
-    // double dx();
-    // double dy();
-
-    // double *xp();
-    // double *yp();
-    // double *zp();
-    // double *xd();
-    // double *yd();
-    // double *zd();
-
-    // double *area();
-
-    // double *xface_normals();
-    // double *yface_normals();
-    // double *xface_tangents();
-    // double *yface_tangents();
-    // double *surf_normals();
-    // double *curvature();
-    // double *edge_lengths();
-
-    // double xlower();
-    // double ylower();
-    // double xupper();
-    // double yupper();
-
-    // double* q();
-    // double* q_last();
-    // double* q_timeinterp();
-    // double* error();
 
     void* clawpack_patch_data(int id);
 
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
-
-    // fclaw2d_clawpatch_t *clawp;
 
     /* Solution data */
     int meqn;                    /* also in amr_options_t */
@@ -196,37 +115,7 @@ public :
     fclaw_package_data_t *package_data_ptr;
 
 };
-#if 0
-struct fclaw2d_clawpatch_t
-{
-public:
-  int meqn;
 
-  int mx;
-  int my;
-  int mbc;
-
-  double dx;
-  double dy;
-  double xlower;
-  double ylower;
-  double xupper;
-  double yupper;
-
-  int manifold;
-  int blockno;
-
-  FArrayBox griddata;
-
-  FArrayBox xp;
-  FArrayBox yp;
-  FArrayBox zp;
-
-  FArrayBox xd;
-  FArrayBox yd;
-  FArrayBox zd;
-};
-#endif
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

@@ -515,7 +515,6 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                              double dt)
 {
     fc2d_clawpack46_options_t* clawpack_options;
-    fclaw2d_clawpatch_t *cp;
     int level;
     double *qold, *aux;
     int mx, my, meqn, maux, mbc;
@@ -526,13 +525,11 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
 
     clawpack_options = fc2d_clawpack46_get_options(domain);
 
-    cp = fclaw2d_clawpatch_get_cp(this_patch);
-
     level = this_patch->level;
 
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
-    cp->save_current_step();  // Save for time interpolation
+    fclaw2d_clawpatch_save_current_step(domain, this_patch);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
