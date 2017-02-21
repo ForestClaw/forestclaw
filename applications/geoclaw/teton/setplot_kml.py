@@ -84,10 +84,14 @@ def setplot(plotdata):
 
     # If amr refinement ratios set to [0,6]; max_level = 6
     # figsize*dpi = [2,1]*16*2**6 = [2048,1024]
+    mx = 32
+    mi = 2
+    mj = 1
     minlevel = 0
-    maxlevel = 6
-    plotfigure.kml_figsize = [32,16]
-    plotfigure.kml_dpi = 64
+    maxlevel = 4
+    p = 1
+    plotfigure.kml_figsize = [32,16]  #[mx*2**p*mi,mx*2**p*mj]
+    plotfigure.kml_dpi = 32
 
     # --------------------------------------------------
 
@@ -151,7 +155,7 @@ def setplot(plotdata):
 
     # --------------------------------------------------
 
-    plotfigure.kml_tile_images = True    # Tile images for faster loading.  Requires GDAL [False]
+    plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
 
     # Color axis : transparency below 0.1*(cmax-cmin)
     cmin = 0
@@ -221,7 +225,7 @@ def setplot(plotdata):
 
     plotdata.parallel = True
     plotdata.print_format = 'png'           # file format
-    plotdata.print_framenos = range(0,10)         # list of frames to print
+    plotdata.print_framenos = 'all'         # list of frames to print
     plotdata.print_gaugenos = 'all'         # list of gauges to print
     plotdata.print_fignos = [1,300]         # list of figures to print
 
