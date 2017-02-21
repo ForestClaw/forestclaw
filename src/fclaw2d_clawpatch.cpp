@@ -53,12 +53,12 @@ void clawpatch_metric_setup(fclaw2d_domain_t* domain,
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
-    ClawPatch::app = app;
+    fclaw2d_clawpatch_t::app = app;
 }
 
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 {
-    ClawPatch::global = global;
+    fclaw2d_clawpatch_t::global = global;
 }
 
 fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain)
@@ -71,71 +71,71 @@ fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain
    ---------------------------------------------------------- */
 void* fclaw2d_clawpatch_new_patch()
 {
-    ClawPatch *cp = new ClawPatch();
-    cp->clawp = new fclaw2d_clawpatch_t();
+    fclaw2d_clawpatch_t *cp = new fclaw2d_clawpatch_t();
+    // cp->clawp = new fclaw2d_clawpatch_t();
     return (void*) cp;
 }
 
 void fclaw2d_clawpatch_delete_patch(void *cp)
 {
     FCLAW_ASSERT(cp != NULL);
-    delete ((ClawPatch*)cp)->clawp;
-    delete (ClawPatch*) cp;
+    // delete ((fclaw2d_clawpatch_t*)cp)->clawp;
+    delete (fclaw2d_clawpatch_t*) cp;
 }
 
 
 /* We also have a fclaw2d_patch_get_cp(this_patch) */
-ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
+fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
-    ClawPatch *cp = (ClawPatch*) fclaw2d_patch_get_user_patch(this_patch);
+    fclaw2d_clawpatch_t *cp = (fclaw2d_clawpatch_t*) fclaw2d_patch_get_user_patch(this_patch);
     return cp;
 }
-
+#if 0
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_clawp(fclaw2d_patch_t* this_patch)
 
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->clawp;
 }
-
+#endif
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *mx = cp->mx();
-    *my = cp->my();
-    *mbc = cp->mbc();
-    *xlower = cp->xlower();
-    *ylower = cp->ylower();
-    *dx = cp->dx();
-    *dy = cp->dy();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *mx = cp->mx;
+    *my = cp->my;
+    *mbc = cp->mbc;
+    *xlower = cp->xlower;
+    *ylower = cp->ylower;
+    *dx = cp->dx;
+    *dy = cp->dy;
 }
 
 void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *q = cp->q();
-    *meqn = cp->meqn();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *q = cp->griddata.dataPtr();
+    *meqn = cp->meqn;
 }
 
 double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->q();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->griddata.dataPtr();
 }
 
 double* fclaw2d_clawpatch_get_error(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->error();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->griderror.dataPtr();
 }
 
 
@@ -181,10 +181,10 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
 
     /* Store time interpolated data that will be use in coarse grid
        exchanges */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    double *qlast = cp->q_last();
-    double *qcurr = cp->q();
-    double *qinterp = cp->q_timeinterp();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    double *qlast = cp->griddata_last.dataPtr();
+    double *qcurr = cp->griddata.dataPtr();
+    double *qinterp = cp->griddata_time_interpolated.dataPtr();
 
     int ierror;
 
@@ -206,16 +206,16 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      double **q, int* meqn)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     *q = cp->q_time_sync(time_interp);
-    *meqn = cp->meqn();
+    *meqn = cp->meqn;
 }
 
 double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
                                          fclaw2d_patch_t* this_patch,
                                          int time_interp)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     return cp->q_time_sync(time_interp);
 }
 
@@ -225,7 +225,7 @@ double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
 void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
                                          fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->save_current_step();
 }
 
@@ -233,7 +233,7 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
 void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->restore_step();
 }
 
@@ -241,7 +241,7 @@ void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
 void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->save_step();
 }
 
@@ -273,14 +273,14 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
                                    double **xd, double **yd, double **zd,
                                    double **area)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *xp = cp->xp();
-    *yp = cp->yp();
-    *zp = cp->zp();
-    *xd = cp->xd();
-    *yd = cp->yd();
-    *zd = cp->zd();
-    *area = cp->area();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *xp = cp->xp.dataPtr();
+    *yp = cp->yp.dataPtr();
+    *zp = cp->zp.dataPtr();
+    *xd = cp->xd.dataPtr();
+    *yd = cp->yd.dataPtr();
+    *zd = cp->zd.dataPtr();
+    *area = cp->area.dataPtr();
 }
 
 void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
@@ -291,21 +291,21 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
                                     double **edgelengths, double **curvature)
 {
     /* or just call the member functions? */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    *xnormals    = cp->xface_normals();
-    *ynormals    = cp->yface_normals();
-    *xtangents   = cp->xface_tangents();
-    *ytangents   = cp->yface_tangents();
-    *surfnormals = cp->surf_normals();
-    *curvature   = cp->curvature();
-    *edgelengths = cp->edge_lengths();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    *xnormals    = cp->xface_normals.dataPtr();
+    *ynormals    = cp->yface_normals.dataPtr();
+    *xtangents   = cp->xface_tangents.dataPtr();
+    *ytangents   = cp->yface_tangents.dataPtr();
+    *surfnormals = cp->surf_normals.dataPtr();
+    *curvature   = cp->curvature.dataPtr();
+    *edgelengths = cp->edge_lengths.dataPtr();
 }
 
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    return cp->area();
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    return cp->area.dataPtr();
 }
 
 /* ------------------------------------------------------------------
@@ -317,10 +317,10 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               int blockno, int patchno,
                               fclaw2d_build_mode_t build_mode)
 {
-    /* We are getting closer to getting rid the class ClawPatch */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    /* We are getting closer to getting rid the class fclaw2d_clawpatch_t */
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     cp->define(domain,this_patch,blockno,build_mode);
-
+#if 0
     fclaw2d_clawpatch_t* clawp = fclaw2d_clawpatch_get_clawp(this_patch);
 
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -425,7 +425,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     }
 
 
-    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
+    fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,m_package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -435,7 +435,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     m_griddata_last.define(box, m_meqn);
     m_griddata_save.define(box, m_meqn);
 #endif
-
+#endif
 }
 
 
@@ -707,7 +707,7 @@ void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
     FCLAW_ASSERT(cp != NULL);
 
     cp->partition_pack(patch_data);
@@ -730,7 +730,7 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
                             this_patch_idx,(void*) &build_mode);
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
 
     /* Time interp is false, since we only partition when all grids
        are time synchronized */
@@ -970,26 +970,26 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_domain_t* domain,
 
 
 /* ----------------------------------------------------------------
-   ClawPatch member functions (previous in ClawPatch.cpp)
+   fclaw2d_clawpatch_t member functions (previous in fclaw2d_clawpatch_t.cpp)
    ---------------------------------------------------------------- */
 
-fclaw_app_t *ClawPatch::app;
-fclaw2d_global_t *ClawPatch::global;
+fclaw_app_t *fclaw2d_clawpatch_t::app;
+fclaw2d_global_t *fclaw2d_clawpatch_t::global;
 
-ClawPatch::ClawPatch()
+fclaw2d_clawpatch_t::fclaw2d_clawpatch_t()
 {
-    m_package_data_ptr = fclaw_package_data_new();
+    package_data_ptr = fclaw_package_data_new();
 }
 
-ClawPatch::~ClawPatch()
+fclaw2d_clawpatch_t::~fclaw2d_clawpatch_t()
 {
-    fclaw_package_patch_data_destroy(ClawPatch::app,
-                                     m_package_data_ptr);
+    fclaw_package_patch_data_destroy(fclaw2d_clawpatch_t::app,
+                                     package_data_ptr);
 
-    fclaw_package_data_destroy(m_package_data_ptr);
+    fclaw_package_data_destroy(package_data_ptr);
 }
 
-void ClawPatch::define(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_t::define(fclaw2d_domain_t* domain,
                        fclaw2d_patch_t* this_patch,
                        int blockno,
                        fclaw2d_build_mode_t build_mode)
@@ -997,11 +997,11 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
-    m_mx = gparms->mx;
-    m_my = gparms->my;
-    m_mbc = gparms->mbc;
-    m_blockno = blockno;
-    m_meqn = gparms->meqn;
+    mx = gparms->mx;
+    my = gparms->my;
+    mbc = gparms->mbc;
+    blockno = blockno;
+    meqn = gparms->meqn;
     for (int icorner=0; icorner < 4; icorner++)
     {
         fclaw2d_patch_set_block_corner_count(domain,this_patch,icorner,0);
@@ -1012,14 +1012,14 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
-    m_manifold = gparms->manifold;
+    manifold = gparms->manifold;
 
-    if (m_manifold)
+    if (manifold)
     {
-        m_xlower = this_patch->xlower;
-        m_ylower = this_patch->ylower;
-        m_xupper = this_patch->xupper;
-        m_yupper = this_patch->yupper;
+        xlower = this_patch->xlower;
+        ylower = this_patch->ylower;
+        xupper = this_patch->xupper;
+        yupper = this_patch->yupper;
     }
     else
     {
@@ -1032,8 +1032,6 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
         double yl = this_patch->ylower;
         double xu = this_patch->xupper;
         double yu = this_patch->yupper;
-        double xlower,ylower;
-        double xupper,yupper;
 
         if (is_brick)
         {
@@ -1050,34 +1048,34 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
             yupper = yu;
         }
 
-        m_xlower = ax + (bx - ax)*xlower;
-        m_xupper = ax + (bx - ax)*xupper;
-        m_ylower = ay + (by - ay)*ylower;
-        m_yupper = ay + (by - ay)*yupper;
+        xlower = ax + (bx - ax)*xlower;
+        xupper = ax + (bx - ax)*xupper;
+        ylower = ay + (by - ay)*ylower;
+        yupper = ay + (by - ay)*yupper;
     }
 
-    m_dx = (m_xupper - m_xlower)/m_mx;
-    m_dy = (m_yupper - m_ylower)/m_my;
+    dx = (xupper - xlower)/mx;
+    dy = (yupper - ylower)/my;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
     for (int idir = 0; idir < SpaceDim; idir++)
     {
-        ll[idir] = 1-m_mbc;
+        ll[idir] = 1-mbc;
     }
-    ur[0] = m_mx + m_mbc;
-    ur[1] = m_my + m_mbc;
+    ur[0] = mx + mbc;
+    ur[1] = my + mbc;
     Box box(ll,ur);
 
-    // This will destroy any existing memory n m_griddata.
-    m_griddata.define(box, m_meqn);
+    // This will destroy any existing memory n griddata.
+    griddata.define(box, meqn);
     if (gparms->subcycle)
     {
-        m_griddata_time_interpolated.define(box, m_meqn);
+        griddata_time_interpolated.define(box, meqn);
     }
     if (gparms->compute_error)
     {
-        m_griderror.define(box,m_meqn);
+        griderror.define(box,meqn);
     }
 
     // Set up storage for metric terms, if needed.
@@ -1095,56 +1093,55 @@ void ClawPatch::define(fclaw2d_domain_t* domain,
     }
 
 
-    fclaw_package_patch_data_new(ClawPatch::app,m_package_data_ptr);
+    fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
         return;
     }
 
-    m_griddata_last.define(box, m_meqn);
-    m_griddata_save.define(box, m_meqn);
+    griddata_last.define(box, meqn);
+    griddata_save.define(box, meqn);
 
 }
 
 #if 0
-void ClawPatch::copyFrom(ClawPatch *a_cp)
+void fclaw2d_clawpatch_t::copyFrom(fclaw2d_clawpatch_t *a_cp)
 {
     m_griddata = a_cp->m_griddata;
 }
-#endif
+
 
 // This is used by level_step.
-double* ClawPatch::q()
+double* fclaw2d_clawpatch_t::q()
 {
     return m_griddata.dataPtr();
 }
 
-double* ClawPatch::q_last()
+double* fclaw2d_clawpatch_t::q_last()
 {
     return m_griddata_last.dataPtr();
 }
 
-double* ClawPatch::q_timeinterp()
+double* fclaw2d_clawpatch_t::q_timeinterp()
 {
     return m_griddata_time_interpolated.dataPtr();
 }
 
 // This is used by level_step.
-double* ClawPatch::error()
+double* fclaw2d_clawpatch_t::error()
 {
     return m_griderror.dataPtr();
 }
 
-int ClawPatch::size()
+int fclaw2d_clawpatch_t::size()
 {
     /* Use this to create new data */
     return m_griddata.size();
 }
-
-
+#endif
 #if 0
-FArrayBox ClawPatch::newGrid()
+FArrayBox fclaw2d_clawpatch_t::newGrid()
 {
     /* Create a grid based on the size of the existing grids */
     Box b = m_griddata.box();
@@ -1155,152 +1152,151 @@ FArrayBox ClawPatch::newGrid()
 }
 #endif
 
-Box ClawPatch::dataBox()
+Box fclaw2d_clawpatch_t::dataBox()
 {
-    return m_griddata.box();
+    return griddata.box();
 }
 
-Box ClawPatch::areaBox()
+Box fclaw2d_clawpatch_t::areaBox()
 {
-    return m_area.box();
+    return area.box();
 }
 
-Box ClawPatch::edgeBox()
+Box fclaw2d_clawpatch_t::edgeBox()
 {
-    return m_edge_lengths.box();
+    return edge_lengths.box();
 }
 
-Box ClawPatch::nodeBox()
+Box fclaw2d_clawpatch_t::nodeBox()
 {
-    return m_xp.box();
+    return xp.box();
 }
 
 
 /* Return a pointer to either time interpolated data or regular grid data */
-double* ClawPatch::q_time_sync(fclaw_bool time_interp)
+double* fclaw2d_clawpatch_t::q_time_sync(fclaw_bool time_interp)
 {
     if (time_interp)
-        return m_griddata_time_interpolated.dataPtr();
+        return griddata_time_interpolated.dataPtr();
     else
-        return m_griddata.dataPtr();
+        return griddata.dataPtr();
 }
-
-double ClawPatch::mx()
+#if 0
+double fclaw2d_clawpatch_t::mx()
 {
-    return m_mx;
+    return mx;
 }
-double ClawPatch::my()
+double fclaw2d_clawpatch_t::my()
 {
     return m_my;
 }
-double ClawPatch::mbc()
+double fclaw2d_clawpatch_t::mbc()
 {
     return m_mbc;
 }
-double ClawPatch::meqn()
+double fclaw2d_clawpatch_t::meqn()
 {
     return m_meqn;
 }
 
-double ClawPatch::dx()
+double fclaw2d_clawpatch_t::dx()
 {
     return m_dx;
 }
 
-double ClawPatch::dy()
+double fclaw2d_clawpatch_t::dy()
 {
     return m_dy;
 }
 
-double ClawPatch::xlower()
+double fclaw2d_clawpatch_t::xlower()
 {
     return m_xlower;
 }
 
-double ClawPatch::ylower()
+double fclaw2d_clawpatch_t::ylower()
 {
     return m_ylower;
 }
 
-double ClawPatch::xupper()
+double fclaw2d_clawpatch_t::xupper()
 {
     return m_xupper;
 }
 
-double ClawPatch::yupper()
+double fclaw2d_clawpatch_t::yupper()
 {
     return m_yupper;
 }
 
-double* ClawPatch::xp()
+double* fclaw2d_clawpatch_t::xp()
 {
     return m_xp.dataPtr();
 }
 
-double* ClawPatch::yp()
+double* fclaw2d_clawpatch_t::yp()
 {
     return m_yp.dataPtr();
 }
-double* ClawPatch::zp()
+double* fclaw2d_clawpatch_t::zp()
 {
     return m_zp.dataPtr();
 }
-
-double* ClawPatch::xd()
+double* fclaw2d_clawpatch_t::xd()
 {
     return m_xd.dataPtr();
 }
-double* ClawPatch::yd()
+double* fclaw2d_clawpatch_t::yd()
 {
     return m_yd.dataPtr();
 }
-double* ClawPatch::zd()
+double* fclaw2d_clawpatch_t::zd()
 {
     return m_zd.dataPtr();
 }
-
-double* ClawPatch::area()
+double* fclaw2d_clawpatch_t::area()
 {
     return m_area.dataPtr();
 }
 
-double* ClawPatch::xface_normals()
+double* fclaw2d_clawpatch_t::xface_normals()
 {
     return m_xface_normals.dataPtr();
 }
 
-double* ClawPatch::yface_normals()
+double* fclaw2d_clawpatch_t::yface_normals()
 {
     return m_yface_normals.dataPtr();
 }
 
-double* ClawPatch::xface_tangents()
+double* fclaw2d_clawpatch_t::xface_tangents()
 {
     return m_xface_tangents.dataPtr();
 }
 
-double* ClawPatch::yface_tangents()
+double* fclaw2d_clawpatch_t::yface_tangents()
 {
     return m_yface_tangents.dataPtr();
 }
 
-double* ClawPatch::surf_normals()
+double* fclaw2d_clawpatch_t::surf_normals()
 {
     return m_surf_normals.dataPtr();
 }
 
-double* ClawPatch::edge_lengths()
+double* fclaw2d_clawpatch_t::edge_lengths()
 {
     return m_edge_lengths.dataPtr();
 }
-
-double* ClawPatch::curvature()
+#endif
+#if 0
+double* fclaw2d_clawpatch_t::curvature()
 {
     return m_curvature.dataPtr();
 }
 
-#if 0
-int* ClawPatch::block_corner_count()
+
+int* fclaw2d_clawpatch_t::block_corner_count()
 {
     return &m_block_corner_count[0];
 }
@@ -1311,105 +1307,105 @@ int* ClawPatch::block_corner_count()
    ---------------------------------------------------*/
 // Wave propagation algorithms
 
-void* ClawPatch::clawpack_patch_data(int id)
+void* fclaw2d_clawpatch_t::clawpack_patch_data(int id)
 {
-    return fclaw_package_get_data(m_package_data_ptr,id);
+    return fclaw_package_get_data(package_data_ptr,id);
 }
 
 /* ----------------------------------------------------------------
    Time stepping routines
    ---------------------------------------------------------------- */
 
-void ClawPatch::save_current_step()
+void fclaw2d_clawpatch_t::save_current_step()
 {
-    m_griddata_last = m_griddata; /* Needed for time interpolation */
+    griddata_last = griddata; /* Needed for time interpolation */
 }
 
-void ClawPatch::save_step()
+void fclaw2d_clawpatch_t::save_step()
 {
-    m_griddata_save = m_griddata;  /* Save in case we have to retake a time step */
+    griddata_save = griddata;  /* Save in case we have to retake a time step */
 }
 
-void ClawPatch::restore_step()
+void fclaw2d_clawpatch_t::restore_step()
 {
-    m_griddata = m_griddata_save;
+    griddata = griddata_save;
 }
 
-void ClawPatch::partition_pack(double *q)
+void fclaw2d_clawpatch_t::partition_pack(double *q)
 {
-    m_griddata.copyToMemory(q);
+    griddata.copyToMemory(q);
 }
 
-void ClawPatch::partition_unpack(double *q)
+void fclaw2d_clawpatch_t::partition_unpack(double *q)
 {
     /* We only copy to griddata, since all levels are time
        synchronized  when repartitioning */
-    m_griddata.copyFromMemory(q);
+    griddata.copyFromMemory(q);
 }
 
 /* ----------------------------------------------------------------
    Special case : Pillow grid ghost exchanges/average/interpolate
    ---------------------------------------------------------------- */
 
-void ClawPatch::mb_exchange_block_corner_ghost(const int& a_corner,
-                                               ClawPatch *cp_corner,
-                                               int time_interp)
+void fclaw2d_clawpatch_t::mb_exchange_block_corner_ghost(const int& a_corner,
+                                                         fclaw2d_clawpatch_t *cp_corner,
+                                                         int time_interp)
 {
     double *qthis = q_time_sync(time_interp);
-    double *qcorner = cp_corner->m_griddata.dataPtr();
+    double *qcorner = cp_corner->griddata.dataPtr();
 
 
-    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn, qthis, qcorner,
-                                    a_corner, m_blockno);
+    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(mx, my, mbc, meqn, qthis, qcorner,
+                                    a_corner, blockno);
 
 }
 
 // internal corners only a block boundaries.
-void ClawPatch::mb_average_block_corner_ghost(const int& a_coarse_corner,
+void fclaw2d_clawpatch_t::mb_average_block_corner_ghost(const int& a_coarse_corner,
                                               const int& a_refratio,
-                                              ClawPatch *cp_corner,
+                                              fclaw2d_clawpatch_t *cp_corner,
                                               fclaw_bool a_time_interp)
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
     double *qcoarse = q_time_sync(a_time_interp);
 
 
-    double *areacoarse = this->m_area.dataPtr();
-    double *areafine = cp_corner->m_area.dataPtr();
-    double *qfine = cp_corner->m_griddata.dataPtr();
+    double *areacoarse = this->area.dataPtr();
+    double *areafine = cp_corner->area.dataPtr();
+    double *qfine = cp_corner->griddata.dataPtr();
 
-    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(m_mx,m_my,m_mbc,m_meqn,
-                                  a_refratio,qcoarse,qfine,
-                                  areacoarse,areafine,
-                                  a_coarse_corner,m_blockno);
+    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(mx,my,mbc,meqn,
+                                               a_refratio,qcoarse,qfine,
+                                               areacoarse,areafine,
+                                               a_coarse_corner,blockno);
 }
 
 
-void ClawPatch::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
-                                                  const int& a_refratio,
-                                                  ClawPatch *cp_corner,
-                                                  fclaw_bool a_time_interp)
+void fclaw2d_clawpatch_t::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
+                                                            const int& a_refratio,
+                                                            fclaw2d_clawpatch_t *cp_corner,
+                                                            fclaw_bool a_time_interp)
 
 {
     double *qcoarse = q_time_sync(a_time_interp);
 
     /* qcorner is the finer level. */
-    double *qfine = cp_corner->m_griddata.dataPtr();
+    double *qfine = cp_corner->griddata.dataPtr();
 
-    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(m_mx, m_my, m_mbc, m_meqn,
-                                      a_refratio, qcoarse, qfine,
-                                      a_coarse_corner, m_blockno);
+    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(mx, my, mbc, meqn,
+                                                   a_refratio, qcoarse, qfine,
+                                                   a_coarse_corner, blockno);
 }
 
 /* ----------------------------------------------------------------
    Mapped grids
    ---------------------------------------------------------------- */
 
-void ClawPatch::setup_area_storage()
+void fclaw2d_clawpatch_t::setup_area_storage()
 {
-    int mx = m_mx;
-    int my = m_my;
-    int mbc = m_mbc;
+    // int mx = mx;
+    // int my = m_my;
+    // int mbc = m_mbc;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -1421,10 +1417,10 @@ void ClawPatch::setup_area_storage()
     ur[1] = my + mbc + 1;
 
     Box box_p(ll,ur);
-    m_area.define(box_p,1);
+    area.define(box_p,1);
 }
 
-void ClawPatch::setup_metric_storage()
+void fclaw2d_clawpatch_t::setup_metric_storage()
 {
     /* 24 additional field variables needed for all metric terms
        xp,yp,zp           : 3
@@ -1439,9 +1435,9 @@ void ClawPatch::setup_metric_storage()
 
        We should come up with a way to store only what is needed */
 
-    int mx = m_mx;
-    int my = m_my;
-    int mbc = m_mbc;
+    // int mx = mx;
+    // int my = m_my;
+    // int mbc = m_mbc;
 
     int ll[SpaceDim];
     int ur[SpaceDim];
@@ -1455,11 +1451,11 @@ void ClawPatch::setup_metric_storage()
     Box box_p(ll,ur);   /* Store cell centered values here */
 
     /* Mesh cell centers of physical mesh */
-    m_xp.define(box_p,1);
-    m_yp.define(box_p,1);
-    m_zp.define(box_p,1);
-    m_surf_normals.define(box_p,3);
-    m_curvature.define(box_p,1);
+    xp.define(box_p,1);
+    yp.define(box_p,1);
+    zp.define(box_p,1);
+    surf_normals.define(box_p,3);
+    curvature.define(box_p,1);
 
     /* Node centered values */
     for (int idir = 0; idir < SpaceDim; idir++)
@@ -1470,14 +1466,14 @@ void ClawPatch::setup_metric_storage()
     ur[1] = my + mbc + 2;
     Box box_d(ll,ur);
 
-    m_xd.define(box_d,1);
-    m_yd.define(box_d,1);
-    m_zd.define(box_d,1);
+    xd.define(box_d,1);
+    yd.define(box_d,1);
+    zd.define(box_d,1);
 
     /* Face centered values */
-    m_xface_normals.define(box_d,3);
-    m_yface_normals.define(box_d,3);
-    m_xface_tangents.define(box_d,3);
-    m_yface_tangents.define(box_d,3);
-    m_edge_lengths.define(box_d,2);
+    xface_normals.define(box_d,3);
+    yface_normals.define(box_d,3);
+    xface_tangents.define(box_d,3);
+    yface_tangents.define(box_d,3);
+    edge_lengths.define(box_d,2);
 }

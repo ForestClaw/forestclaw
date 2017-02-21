@@ -39,12 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class fclaw2d_clawpatch_t;
 
 
-class ClawPatch
+class fclaw2d_clawpatch_t
 {
 public :
 
-    ClawPatch();
-    ~ClawPatch();
+    fclaw2d_clawpatch_t();
+    ~fclaw2d_clawpatch_t();
 
     void define(fclaw2d_domain_t* domain,
                 fclaw2d_patch_t* this_patch,
@@ -52,7 +52,7 @@ public :
                 fclaw2d_build_mode_t build_mode);
 
 #if 0
-    void copyFrom(ClawPatch *a_cp);
+    void copyFrom(fclaw2d_clawpatch_t *a_cp);
 #endif
 
     void save_step();
@@ -81,15 +81,15 @@ public :
        ---------------------------------------------------------------- */
 
     void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        ClawPatch *a_neighbor_cp,
+                                        fclaw2d_clawpatch_t *a_neighbor_cp,
                                         int time_interp);
 
     void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       ClawPatch *cp_fine,
+                                       fclaw2d_clawpatch_t *cp_fine,
                                        fclaw_bool a_time_interp);
 
     void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           ClawPatch *cp_fine,
+                                           fclaw2d_clawpatch_t *cp_fine,
                                            fclaw_bool a_time_interp);
 
     // ----------------------------------------------------------------
@@ -109,96 +109,94 @@ public :
     // ----------------------------------------------------------------
     // Access functions
     // ----------------------------------------------------------------
-    double mx();
-    double my();
-    double mbc();
-    double meqn();
+    // double mx();
+    // double my();
+    // double mbc();
+    // double meqn();
 
-    double dx();
-    double dy();
+    // double dx();
+    // double dy();
 
-    double *xp();
-    double *yp();
-    double *zp();
-    double *xd();
-    double *yd();
-    double *zd();
+    // double *xp();
+    // double *yp();
+    // double *zp();
+    // double *xd();
+    // double *yd();
+    // double *zd();
 
-    double *area();
+    // double *area();
 
-    double *xface_normals();
-    double *yface_normals();
-    double *xface_tangents();
-    double *yface_tangents();
-    double *surf_normals();
-    double *curvature();
-    double *edge_lengths();
+    // double *xface_normals();
+    // double *yface_normals();
+    // double *xface_tangents();
+    // double *yface_tangents();
+    // double *surf_normals();
+    // double *curvature();
+    // double *edge_lengths();
 
-    double xlower();
-    double ylower();
-    double xupper();
-    double yupper();
+    // double xlower();
+    // double ylower();
+    // double xupper();
+    // double yupper();
 
-    double* q();
-    double* q_last();
-    double* q_timeinterp();
-    double* error();
+    // double* q();
+    // double* q_last();
+    // double* q_timeinterp();
+    // double* error();
 
     void* clawpack_patch_data(int id);
 
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
 
-    fclaw2d_clawpatch_t *clawp;
-
-protected :
+    // fclaw2d_clawpatch_t *clawp;
 
     /* Solution data */
-    int m_meqn;                    /* also in amr_options_t */
-    FArrayBox m_griddata;
-    FArrayBox m_griddata_last;
-    FArrayBox m_griddata_save;
-    FArrayBox m_griddata_time_interpolated;
-    FArrayBox m_griderror;
+    int meqn;                    /* also in amr_options_t */
+    FArrayBox griddata;
+    FArrayBox griddata_last;
+    FArrayBox griddata_save;
+    FArrayBox griddata_time_interpolated;
+    FArrayBox griderror;
 
     /* Grid info */
-    int m_mx;           /* also in amr_options_t */
-    int m_my;           /* also in amr_options_t */
-    int m_mbc;          /* also in amr_options_t */
+    int mx;           /* also in amr_options_t */
+    int my;           /* also in amr_options_t */
+    int mbc;          /* also in amr_options_t */
 
-    double m_dx;
-    double m_dy;
-    double m_xlower;
-    double m_ylower;
-    double m_xupper;
-    double m_yupper;
+    double dx;
+    double dy;
+    double xlower;
+    double ylower;
+    double xupper;
+    double yupper;
 
-    fclaw_bool m_manifold;    /* also in amr_options_t */
-    int m_blockno;
+    fclaw_bool manifold;    /* also in amr_options_t */
+    int blockno;
 
-    FArrayBox m_xp;
-    FArrayBox m_yp;
-    FArrayBox m_zp;
+    FArrayBox xp;
+    FArrayBox yp;
+    FArrayBox zp;
 
-    FArrayBox m_xd;
-    FArrayBox m_yd;
-    FArrayBox m_zd;
+    FArrayBox xd;
+    FArrayBox yd;
+    FArrayBox zd;
 
-    FArrayBox m_xface_normals;
-    FArrayBox m_yface_normals;
-    FArrayBox m_xface_tangents;
-    FArrayBox m_yface_tangents;
-    FArrayBox m_surf_normals;
-    FArrayBox m_edge_lengths;
+    FArrayBox xface_normals;
+    FArrayBox yface_normals;
+    FArrayBox xface_tangents;
+    FArrayBox yface_tangents;
+    FArrayBox surf_normals;
+    FArrayBox edge_lengths;
 
-    FArrayBox m_area;
-    FArrayBox m_curvature;  // ???
+    FArrayBox area;
+    FArrayBox curvature;  // ???
 
     /* This is an opaque pointer */
-    fclaw_package_data_t *m_package_data_ptr;
+    fclaw_package_data_t *package_data_ptr;
 
 };
-
+#if 0
 struct fclaw2d_clawpatch_t
 {
 public:
@@ -228,7 +226,7 @@ public:
   FArrayBox yd;
   FArrayBox zd;
 };
-
-ClawPatch* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
+#endif
+fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

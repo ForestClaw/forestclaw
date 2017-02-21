@@ -106,7 +106,7 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
 }
 
 
-/* Patch data is stored in each ClawPatch */
+/* Patch data is stored in each fclaw2d_clawpatch_t */
 struct patch_aux_data
 {
     FArrayBox auxarray;
@@ -123,7 +123,7 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
 }
 
 static patch_aux_data*
-get_patch_data(ClawPatch *cp)
+get_patch_data(fclaw2d_clawpatch_t *cp)
 {
     patch_aux_data *wp =
         (patch_aux_data*) cp->clawpack_patch_data(s_clawpack46_package_id);
@@ -207,7 +207,7 @@ int fc2d_clawpack46_get_package_id (void)
 }
 
 static void
-fc2d_clawpack46_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
+fc2d_clawpack46_define_auxarray_cp (fclaw2d_domain_t* domain, fclaw2d_clawpatch_t *cp)
 {
     int maux;
     fc2d_clawpack46_options_t *clawpack_options;
@@ -238,13 +238,13 @@ fc2d_clawpack46_define_auxarray_cp (fclaw2d_domain_t* domain, ClawPatch *cp)
 void fc2d_clawpack46_define_auxarray (fclaw2d_domain_t* domain,
                                       fclaw2d_patch_t* this_patch)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp (this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
     fc2d_clawpack46_define_auxarray_cp (domain, cp);
 }
 
 static void
 fc2d_clawpack46_get_auxarray_cp (fclaw2d_domain_t* domain,
-                                 ClawPatch *cp, double **aux, int* maux)
+                                 fclaw2d_clawpatch_t *cp, double **aux, int* maux)
 {
     fc2d_clawpack46_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack46_get_options(domain);
@@ -258,7 +258,7 @@ void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp (this_patch);
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
     fc2d_clawpack46_get_auxarray_cp (domain,cp,aux,maux);
 }
 
@@ -283,7 +283,7 @@ void fc2d_clawpack46_setprob(fclaw2d_domain_t *domain)
 }
 
 
-/* This should only be called when a new ClawPatch is created. */
+/* This should only be called when a new fclaw2d_clawpatch_t is created. */
 void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
@@ -324,7 +324,7 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     CLAWPACK46_UNSET_BLOCK();
 }
 
-/* This should only be called when a new ClawPatch is created. */
+/* This should only be called when a new fclaw2d_clawpatch_t is created. */
 void fc2d_clawpack46_set_capacity(fclaw2d_domain_t *domain,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
@@ -515,7 +515,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
                              double dt)
 {
     fc2d_clawpack46_options_t* clawpack_options;
-    ClawPatch *cp;
+    fclaw2d_clawpatch_t *cp;
     int level;
     double *qold, *aux;
     int mx, my, meqn, maux, mbc;
