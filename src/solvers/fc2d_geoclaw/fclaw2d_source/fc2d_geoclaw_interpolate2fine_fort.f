@@ -43,19 +43,18 @@ c        # First loop over quadrant (i1,i2)x(j1,j2) of the coarse grid
                ic = i + ic_add
                jc = j + jc_add
                ! Calculate surface elevation eta using dry limiting
-               do ii = -1, 1
-                  do jj = -1, 1
-                     h = qcoarse(1,ic+ii,jc+jj)
-                     b = aux_coarse(mbathy,ic+ii,jc+jj)
-                     if (h < dry_tolerance) then
-                        etabarc(ii,jj) = sea_level
-                     else
-                        etabarc(ii,jj) = h + b
-                     endif
-                  enddo
-               enddo
-c--------------start interpolation
                if (mq .eq. 1) then
+                  do ii = -1, 1
+                     do jj = -1, 1
+                        h = qcoarse(1,ic+ii,jc+jj)
+                        b = aux_coarse(mbathy,ic+ii,jc+jj)
+                        if (h < dry_tolerance) then
+                           etabarc(ii,jj) = sea_level
+                        else
+                           etabarc(ii,jj) = h + b
+                        endif
+                     enddo
+                  enddo
 c                 # Interpolate sea surface height rather than just the
 c                 # water column height.
                   qc = etabarc(0,0)
@@ -77,7 +76,7 @@ c                 # Fill in fine grid values from coarse grid cell (ic,jc)
                         jf = (j-1)*refratio + jj
                         qf = qc + shiftx*gradx + shifty*grady -
      &                        aux_fine(mbathy,iff,jf)
-                        qfine(mq,iff,jf) = qf
+                        qfine(mq,iff,jf) = max(qf,0.0)
                      enddo
                   enddo
                else
