@@ -458,7 +458,6 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
                              void *user)
 {
     fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -473,7 +472,8 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
 
     /* This routine is used for patches that will be updated, and so need
        everything */
-
+#if 0
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     if (patch_vt.patch_setup != NULL)
     {
         /* The setup routine should check to see if this is a ghost patch and
@@ -481,6 +481,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
            needed (beyond what is needed for averaging) */
         patch_vt.patch_setup(domain,this_patch,blockno,patchno);
     }
+#endif
 }
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
@@ -491,7 +492,6 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode)
 {
-    fclaw2d_patch_vtable_t patch_vt;
 
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -506,8 +506,12 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
         clawpatch_metric_setup(domain,coarse_patch,blockno,
                                        coarse_patchno);
     }
-
+#if 0
+    /* move to fclaw2d_patch.c */
+    fclaw2d_patch_vtable_t patch_vt;
     patch_vt = fclaw2d_get_patch_vtable(domain);
+
+
     if (patch_vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
         /* We might want to distinguish between new fine grid patches, and
@@ -516,6 +520,7 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
            Something like a general "build from fine" routine might be needed */
         patch_vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
     }
+#endif
 }
 
 void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
@@ -525,7 +530,6 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
                                    void *user)
 {
     fclaw2d_vtable_t vt;
-    fclaw2d_patch_vtable_t patch_vt;
     vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
@@ -540,11 +544,16 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
             vt.metric_compute_area(domain,this_patch,blockno,patchno);
         }
     }
+
+#if 0
+    // move to patch
+    fclaw2d_patch_vtable_t patch_vt;
     patch_vt = fclaw2d_get_patch_vtable(domain);
     if (patch_vt.patch_setup_ghost != NULL)
     {
         patch_vt.patch_setup_ghost(domain,this_patch,blockno,patchno);
     }
+#endif
 }
 
 /* --------------------------------------------------------------
@@ -729,13 +738,6 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
-
-    /* Create new data in 'user' pointer */
-    fclaw2d_patch_data_new(domain,this_patch);
-
-    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_clawpatch_build(domain,this_patch,this_block_idx,
-                            this_patch_idx,(void*) &build_mode);
 
     fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
 
