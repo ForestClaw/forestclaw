@@ -189,7 +189,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
@@ -309,17 +308,17 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         if (interpolate_to_neighbor && !remote_neighbor)
                         {
                             /* interpolate to igrid */
-                            patch_vt.interpolate_face(domain,this_patch,fine_patch,idir,
-                                                iface,p4est_refineFactor,refratio,
-                                                time_interp,igrid,&transform_data);
+                            fclaw2d_patch_interpolate_face(domain,this_patch,fine_patch,idir,
+                                                           iface,p4est_refineFactor,refratio,
+                                                           time_interp,igrid,&transform_data);
                         }
                         else if (average_from_neighbor)
                         {
                             /* average from igrid */
-                            patch_vt.average_face(domain,coarse_patch,fine_patch,idir,
-                                            iface,p4est_refineFactor,
-                                            refratio,time_interp,igrid,
-                                            &transform_data);
+                            fclaw2d_patch_average_face(domain,coarse_patch,fine_patch,idir,
+                                                       iface,p4est_refineFactor,
+                                                       refratio,time_interp,igrid,
+                                                       &transform_data);
                         }
                     }
                 }
@@ -328,8 +327,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                     /* Copy to same size patch */
                     fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
                     transform_data.neighbor_patch = neighbor_patch;
-                    patch_vt.copy_face(domain,this_patch,neighbor_patch,iface,
-                                        time_interp,&transform_data);
+                    fclaw2d_patch_copy_face(domain,this_patch,neighbor_patch,iface,
+                                            time_interp,&transform_data);
 
                     /* We also need to copy _to_ the remote neighbor; switch contexts, but
                        use ClawPatches that are only in scope here, to avoid
@@ -340,8 +339,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                         /* Create a new transform so we don't mess up the original one */
                         int this_iface = iface_neighbor;
 
-                        patch_vt.copy_face(domain,neighbor_patch,this_patch,this_iface,
-                                            time_interp,&transform_data_finegrid);
+                        fclaw2d_patch_copy_face(domain,neighbor_patch,this_patch,this_iface,
+                                                time_interp,&transform_data_finegrid);
                     }
                 }
             }
@@ -359,18 +358,18 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 		if (average_from_neighbor)
                 {
 		    /* Average from 'this' grid (fine grid) to remote grid (coarse grid) */
-                    patch_vt.average_face(domain,coarse_patch,fine_patch,idir_coarse,iface_coarse,
-                                    p4est_refineFactor,refratio,
-                                    time_interp,igrid,&transform_data_finegrid);
+                    fclaw2d_patch_average_face(domain,coarse_patch,fine_patch,idir_coarse,iface_coarse,
+                                               p4est_refineFactor,refratio,
+                                               time_interp,igrid,&transform_data_finegrid);
                 }
                 else if (interpolate_to_neighbor)
                 {
                     /* Interpolate from remote neighbor to 'this' patch (the finer grid */
-                    patch_vt.interpolate_face(domain,coarse_patch,fine_patch,
-                                        idir_coarse,iface_coarse,
-                                        p4est_refineFactor,refratio,
-                                        time_interp,
-                                        igrid,&transform_data_finegrid);
+                    fclaw2d_patch_interpolate_face(domain,coarse_patch,fine_patch,
+                                                   idir_coarse,iface_coarse,
+                                                   p4est_refineFactor,refratio,
+                                                   time_interp,
+                                                   igrid,&transform_data_finegrid);
                 }
             }
         }  /* End of interior face */
@@ -383,8 +382,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                                  int maxlevel,
                                  int time_interp)
 {
-    //fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     const amr_options_t *gparms = get_domain_parms(domain);
     int refratio = gparms->refratio;
@@ -468,8 +466,8 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                     /* Copy from same size neighbor */
                     fclaw2d_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
                     transform_data.neighbor_patch = neighbor_patch;
-                    patch_vt.copy_face(domain,this_ghost_patch,neighbor_patch,iface,
-                                        use_timeinterp_patch,&transform_data);
+                    fclaw2d_patch_copy_face(domain,this_ghost_patch,neighbor_patch,iface,
+                                            use_timeinterp_patch,&transform_data);
 
                     ++ddata->count_multiproc_corner;
                 }
@@ -484,10 +482,10 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
                             fclaw2d_patch_t *fine_patch =
                                 &domain->ghost_patches[rpatchno[igrid]];
                             transform_data.neighbor_patch = fine_patch;
-                            patch_vt.average_face(domain,coarse_patch,fine_patch,
-                                            idir,iface,p4est_refineFactor,
-                                            refratio,use_timeinterp_patch,
-                                            igrid,&transform_data);
+                            fclaw2d_patch_average_face(domain,coarse_patch,fine_patch,
+                                                       idir,iface,p4est_refineFactor,
+                                                       refratio,use_timeinterp_patch,
+                                                       igrid,&transform_data);
                         }
                     }
                     ++ddata->count_multiproc_corner;

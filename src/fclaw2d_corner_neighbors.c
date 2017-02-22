@@ -323,8 +323,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    //fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
@@ -444,24 +442,24 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t* fine_patch = corner_patch;
                             /* Interpolate 'this_cp' (coarse grid) to 'corner_cp' (fine grid)
                                'icorner' is the coarse grid corner. */
-                            patch_vt.interpolate_corner(domain,coarse_patch,fine_patch,
-                                                  icorner,refratio,time_interp,
-                                                  &transform_data);
+                            fclaw2d_patch_interpolate_corner(domain,coarse_patch,fine_patch,
+                                                             icorner,refratio,time_interp,
+                                                             &transform_data);
                         }
                         else if (average_from_neighbor)
                         {
                             /* average 'corner_cp' (fine grid) to 'this_cp' (coarse grid) */
                             fclaw2d_patch_t* coarse_patch = this_patch;
                             fclaw2d_patch_t* fine_patch = corner_patch;
-                            patch_vt.average_corner(domain,coarse_patch,fine_patch,icorner,
-                                              refratio,time_interp,&transform_data);
+                            fclaw2d_patch_average_corner(domain,coarse_patch,fine_patch,icorner,
+                                                         refratio,time_interp,&transform_data);
                         }
                     }
                     else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
-                        patch_vt.copy_corner(domain,this_patch,corner_patch,
-                                             icorner,
-                                             time_interp,&transform_data);
+                        fclaw2d_patch_copy_corner(domain,this_patch,corner_patch,
+                                                  icorner,
+                                                  time_interp,&transform_data);
                     }
                 }
                 else /* is_block_corner && ispillowsphere */
@@ -509,9 +507,9 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         /* Interpolate from remote patch (coarse grid) to
                            'this' patch (fine grid) */
                         int coarse_icorner = transform_data_finegrid.icorner;
-                        patch_vt.interpolate_corner(domain,coarse_patch,fine_patch,
-                                              coarse_icorner,refratio,time_interp,
-                                              &transform_data_finegrid);
+                        fclaw2d_patch_interpolate_corner(domain,coarse_patch,fine_patch,
+                                                         coarse_icorner,refratio,time_interp,
+                                                         &transform_data_finegrid);
 
                     }
                     else

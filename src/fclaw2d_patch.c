@@ -444,3 +444,93 @@ void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     patch_vt.patch_save_step(domain, this_patch);
 }  
+
+void fclaw2d_patch_interpolate_face(fclaw2d_domain_t *domain,
+                                    fclaw2d_patch_t *coarse_patch,
+                                    fclaw2d_patch_t *fine_patch,
+                                    int idir,
+                                    int iside,
+                                    int p4est_refineFactor,
+                                    int refratio,
+                                    fclaw_bool time_interp,
+                                    int igrid,
+                                    fclaw2d_transform_data_t* transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.interpolate_face(domain,coarse_patch,fine_patch,idir,
+                              iside,p4est_refineFactor,refratio,
+                              time_interp,igrid,transform_data);
+}
+
+void fclaw2d_patch_average_face(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *coarse_patch,
+                                fclaw2d_patch_t *fine_patch,
+                                int idir,
+                                int iface_coarse,
+                                int p4est_refineFactor,
+                                int refratio,
+                                fclaw_bool time_interp,
+                                int igrid,
+                                fclaw2d_transform_data_t* transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.average_face(domain,coarse_patch,fine_patch,idir,
+                          iface_coarse,p4est_refineFactor,
+                          refratio,time_interp,igrid,
+                          transform_data);
+}
+
+void fclaw2d_patch_copy_face(fclaw2d_domain_t *domain,
+                             fclaw2d_patch_t *this_patch,
+                             fclaw2d_patch_t *neighbor_patch,
+                             int iface,
+                             int time_interp,
+                             fclaw2d_transform_data_t *transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.copy_face(domain,this_patch,neighbor_patch,iface,
+                       time_interp,transform_data);
+
+}
+
+void fclaw2d_patch_copy_corner(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               fclaw2d_patch_t *corner_patch,
+                               int icorner,
+                               int time_interp,
+                               fclaw2d_transform_data_t *transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.copy_corner(domain,this_patch,corner_patch,
+                         icorner,time_interp,transform_data);
+}
+
+void fclaw2d_patch_average_corner(fclaw2d_domain_t *domain,
+                                  fclaw2d_patch_t *coarse_patch,
+                                  fclaw2d_patch_t *fine_patch,
+                                  int coarse_corner,
+                                  int refratio,
+                                  fclaw_bool time_interp,
+                                  fclaw2d_transform_data_t* transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.average_corner(domain,coarse_patch,fine_patch,coarse_corner,
+                            refratio,time_interp,transform_data);
+}
+
+
+void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
+                                      fclaw2d_patch_t* coarse_patch,
+                                      fclaw2d_patch_t* fine_patch,
+                                      int coarse_corner,
+                                      int refratio,
+                                      fclaw_bool time_interp,
+                                      fclaw2d_transform_data_t* transform_data)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.interpolate_corner(domain,coarse_patch,fine_patch,
+                                coarse_corner,refratio,time_interp,
+                                transform_data);
+}
+
+
