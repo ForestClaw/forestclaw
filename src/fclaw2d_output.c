@@ -57,8 +57,8 @@ cb_serial_output (fclaw2d_domain_t * domain,
     int level = this_patch->level;
 
     patch_vt.patch_write_file(domain, this_patch, this_block_idx,
-                        this_patch_idx, iframe, (int) patch_num,
-                        level);
+                              this_patch_idx, iframe, (int) patch_num,
+                              level);
 }
 
 static

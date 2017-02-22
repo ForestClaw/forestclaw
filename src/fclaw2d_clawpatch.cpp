@@ -56,7 +56,9 @@ void metric_setup(fclaw2d_domain_t* domain,
                   fclaw2d_patch_t* this_patch,
                   int blockno,
                   int patchno);
-static double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
+
+static 
+double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
@@ -617,7 +619,6 @@ void ghost_comm(fclaw2d_domain_t* domain,
     double *qthis;
     double *area;
     const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
 
     int ierror;
 
@@ -730,10 +731,10 @@ void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
 }
 
 void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           void *user)
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx,
+                                        int this_patch_idx,
+                                        void *user)
 {
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
@@ -754,59 +755,62 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt)
 {
     clawpatch_vt = user_vt;
+#if 1    
+    fclaw2d_set_patch_vtable(user_vt.patch_vt);
+#endif
 }
 
 /* OR .... This is work towards extracting the clawpatch */
-void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt)
+void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_clawpatch_vtable_t *clawpatch_vt)
 {
     /* These must be redefined by the solver and user */
-    patch_vt->patch_initialize = NULL;
-    patch_vt->patch_physical_bc = NULL;
-    patch_vt->patch_single_step_update = NULL;
+    clawpatch_vt->patch_vt.patch_initialize         = NULL;
+    clawpatch_vt->patch_vt.patch_physical_bc        = NULL;
+    clawpatch_vt->patch_vt.patch_single_step_update = NULL;
 
     /* These may be redefined by the user */
     /* Problem setup */
-    patch_vt->patch_new = fclaw2d_clawpatch_new_patch;
-    patch_vt->patch_delete = fclaw2d_clawpatch_delete_patch;
-    patch_vt->patch_setup = NULL;
-    patch_vt->patch_setup_ghost = NULL;
-    patch_vt->patch_build = &fclaw2d_clawpatch_build;
-    patch_vt->patch_build_from_fine = &fclaw2d_clawpatch_build_from_fine;
-    patch_vt->patch_restore_step = &fclaw2d_clawpatch_restore_step;
-    patch_vt->patch_save_step = &fclaw2d_clawpatch_save_step;
+    clawpatch_vt->patch_vt.patch_new             = fclaw2d_clawpatch_new_patch;
+    clawpatch_vt->patch_vt.patch_delete          = fclaw2d_clawpatch_delete_patch;
+    clawpatch_vt->patch_vt.patch_setup           = NULL;
+    clawpatch_vt->patch_vt.patch_setup_ghost     = NULL;
+    clawpatch_vt->patch_vt.patch_build           = &fclaw2d_clawpatch_build;
+    clawpatch_vt->patch_vt.patch_build_from_fine = &fclaw2d_clawpatch_build_from_fine;
+    clawpatch_vt->patch_vt.patch_restore_step    = &fclaw2d_clawpatch_restore_step;
+    clawpatch_vt->patch_vt.patch_save_step       = &fclaw2d_clawpatch_save_step;
 
     /* Ghost filling - solver specific */
-    patch_vt->copy_face            = fclaw2d_clawpatch_copy_face;
-    patch_vt->average_face         = fclaw2d_clawpatch_average_face;
-    patch_vt->interpolate_face     = fclaw2d_clawpatch_interpolate_face;
+    clawpatch_vt->patch_vt.copy_face            = fclaw2d_clawpatch_copy_face;
+    clawpatch_vt->patch_vt.average_face         = fclaw2d_clawpatch_average_face;
+    clawpatch_vt->patch_vt.interpolate_face     = fclaw2d_clawpatch_interpolate_face;
 
-    patch_vt->copy_corner          = fclaw2d_clawpatch_copy_corner;
-    patch_vt->average_corner       = fclaw2d_clawpatch_average_corner;
-    patch_vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
+    clawpatch_vt->patch_vt.copy_corner          = fclaw2d_clawpatch_copy_corner;
+    clawpatch_vt->patch_vt.average_corner       = fclaw2d_clawpatch_average_corner;
+    clawpatch_vt->patch_vt.interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 
     /* ghost filling functions */
-    patch_vt->regrid_tag4refinement    = &fclaw2d_clawpatch_regrid_tag4refinement;
-    patch_vt->regrid_tag4coarsening    = &fclaw2d_clawpatch_regrid_tag4coarsening;
+    clawpatch_vt->patch_vt.regrid_tag4refinement    = &fclaw2d_clawpatch_regrid_tag4refinement;
+    clawpatch_vt->patch_vt.regrid_tag4coarsening    = &fclaw2d_clawpatch_regrid_tag4coarsening;
 
-    patch_vt->regrid_average2coarse    = &fclaw2d_clawpatch_regrid_average2coarse;
-    patch_vt->regrid_interpolate2fine  = &fclaw2d_clawpatch_regrid_interpolate2fine;
+    clawpatch_vt->patch_vt.regrid_average2coarse    = &fclaw2d_clawpatch_regrid_average2coarse;
+    clawpatch_vt->patch_vt.regrid_interpolate2fine  = &fclaw2d_clawpatch_regrid_interpolate2fine;
 
     /* Defaults for writing output */
-    patch_vt->write_header             = &fclaw2d_clawpatch_output_header_ascii;
-    patch_vt->patch_write_file         = &fclaw2d_clawpatch_output_patch_ascii;
+    clawpatch_vt->patch_vt.write_header             = &fclaw2d_clawpatch_output_header_ascii;
+    clawpatch_vt->patch_vt.patch_write_file         = &fclaw2d_clawpatch_output_patch_ascii;
 
     /* ghost patch */
-    patch_vt->ghost_pack        = &fclaw2d_clawpatch_ghost_pack;
-    patch_vt->ghost_unpack      = &fclaw2d_clawpatch_ghost_unpack;
-    patch_vt->build_ghost       = &fclaw2d_clawpatch_build_ghost;
-    patch_vt->ghost_packsize    = &fclaw2d_clawpatch_ghost_packsize;
-    patch_vt->local_ghost_alloc = &fclaw2d_clawpatch_local_ghost_alloc;
-    patch_vt->local_ghost_free  = &fclaw2d_clawpatch_local_ghost_free;
+    clawpatch_vt->patch_vt.ghost_pack        = &fclaw2d_clawpatch_ghost_pack;
+    clawpatch_vt->patch_vt.ghost_unpack      = &fclaw2d_clawpatch_ghost_unpack;
+    clawpatch_vt->patch_vt.build_ghost       = &fclaw2d_clawpatch_build_ghost;
+    clawpatch_vt->patch_vt.ghost_packsize    = &fclaw2d_clawpatch_ghost_packsize;
+    clawpatch_vt->patch_vt.local_ghost_alloc = &fclaw2d_clawpatch_local_ghost_alloc;
+    clawpatch_vt->patch_vt.local_ghost_free  = &fclaw2d_clawpatch_local_ghost_free;
 
     /* partitioning */
-    patch_vt->partition_pack    = &fclaw2d_clawpatch_partition_pack;
-    patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
-    patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
+    clawpatch_vt->patch_vt.partition_pack    = &fclaw2d_clawpatch_partition_pack;
+    clawpatch_vt->patch_vt.partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
+    clawpatch_vt->patch_vt.partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
 }
 

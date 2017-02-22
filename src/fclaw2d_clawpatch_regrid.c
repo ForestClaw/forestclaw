@@ -186,8 +186,8 @@ void fclaw2d_clawpatch_regrid_average2coarse(fclaw2d_domain_t *domain,
         }
 
         clawpatch_vt.fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                               areacoarse, areafine, &igrid,
-                               &gparms->manifold);
+                                         areacoarse, areafine, &igrid,
+                                         &gparms->manifold);
 
     }
 }

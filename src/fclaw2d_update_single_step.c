@@ -45,8 +45,8 @@ static
     double dt = ss_data->dt;
     double t = ss_data->t;
     maxcfl = patch_vt.patch_single_step_update(domain,this_patch,
-                                         this_block_idx,
-                                         this_patch_idx,t,dt);
+                                               this_block_idx,
+                                               this_patch_idx,t,dt);
 
     ddata->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);

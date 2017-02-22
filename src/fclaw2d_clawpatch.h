@@ -238,7 +238,7 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   int packmode);
 #endif
 
-void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_patch_vtable_t *patch_vt);
+void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_clawpatch_vtable_t *clawpatch_vt);
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,
@@ -351,6 +351,8 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
 
 struct fclaw2d_clawpatch_vtable
 {
+    fclaw2d_patch_vtable_t             patch_vt;
+
     /* ghost filling functions */
     fclaw2d_fort_average2coarse_t      fort_average2coarse;
     fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;

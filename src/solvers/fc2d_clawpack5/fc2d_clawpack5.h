@@ -113,6 +113,8 @@ typedef void (*fc2d_clawpack5_fluxfun_t)(const int* meqn, double q[], double aux
 
 typedef struct fc2d_clawpack5_vtable
 {
+    fclaw2d_clawpatch_vtable_t  clawpatch_vt;
+
     fc2d_clawpack5_setprob_t setprob;
     fc2d_clawpack5_bc2_t bc2;
     fc2d_clawpack5_qinit_t qinit;
@@ -128,7 +130,6 @@ typedef struct fc2d_clawpack5_vtable
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t vt);
 
 void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                        fclaw2d_patch_vtable_t *patch_vt,
                                         fc2d_clawpack5_vtable_t* vt);
 
 #define CLAWPACK5_BC2_DEFAULT FCLAW_F77_FUNC(clawpack5_bc2_default, \

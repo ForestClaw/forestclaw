@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_domain.h>
 
+static fclaw2d_patch_vtable_t patch_vt;
+
 struct fclaw2d_patch_data
 {
     fclaw2d_patch_relation_t face_neighbors[4];
@@ -264,17 +266,21 @@ void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
     }
 }
 
+#if 0
 void fclaw2d_set_patch_vtable(fclaw2d_domain_t* domain, fclaw2d_patch_vtable_t *patch_vt)
 {
     fclaw2d_domain_attribute_add (domain,"patch_vtable",patch_vt);
 }
+#endif
+
+void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt)
+{
+    patch_vt = user_vt;
+}
 
 fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
 {
-    fclaw2d_patch_vtable_t *patch_vt;
-    patch_vt = (fclaw2d_patch_vtable_t*) fclaw2d_domain_attribute_access(domain,"patch_vtable",NULL);
-    FCLAW_ASSERT(patch_vt != NULL);
-    return *patch_vt;
+    return patch_vt;
 }
 
 void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
@@ -533,4 +539,47 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                 transform_data);
 }
 
+int fclaw2d_patch_regrid_tag4refinement(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno, int patchno,
+                                      int initflag)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    return patch_vt.regrid_tag4refinement(domain,this_patch,blockno,
+                                   patchno, initflag);
+}
 
+int fclaw2d_patch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                                      fclaw2d_patch_t *fine_patches,
+                                      int blockno,
+                                      int patchno)
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    return patch_vt.regrid_tag4coarsening(domain,fine_patches, 
+                                   blockno, patchno);
+}
+
+void fclaw2d_patch_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+                                             fclaw2d_patch_t* coarse_patch,
+                                             fclaw2d_patch_t* fine_patches,
+                                             int this_blockno, int coarse_patchno,
+                                             int fine0_patchno)
+
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.regrid_interpolate2fine(domain,coarse_patch,fine_patches,
+                                     this_blockno,coarse_patchno,
+                                     fine0_patchno);
+}
+
+void fclaw2d_patch_regrid_average2coarse(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *fine_patches,
+                                         fclaw2d_patch_t *coarse_patch,
+                                         int blockno, int fine0_patchno,
+                                         int coarse_patchno)
+
+{
+    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
+    patch_vt.regrid_average2coarse(domain,fine_patches,coarse_patch,
+                                   blockno,fine0_patchno,coarse_patchno);
+}
