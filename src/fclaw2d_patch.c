@@ -533,43 +533,43 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                 transform_data);
 }
 
-int fclaw2d_patch_regrid_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno, int patchno,
                                       int initflag)
 {
-    return patch_vt()->regrid_tag4refinement(domain,this_patch,blockno,
+    return patch_vt()->patch_tag4refinement(domain,this_patch,blockno,
                                    patchno, initflag);
 }
 
-int fclaw2d_patch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno,
                                       int patchno)
 {
-    return patch_vt()->regrid_tag4coarsening(domain,fine_patches,
+    return patch_vt()->patch_tag4coarsening(domain,fine_patches,
                                    blockno, patchno);
 }
 
-void fclaw2d_patch_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* coarse_patch,
                                              fclaw2d_patch_t* fine_patches,
                                              int this_blockno, int coarse_patchno,
                                              int fine0_patchno)
 
 {
-    patch_vt()->regrid_interpolate2fine(domain,coarse_patch,fine_patches,
+    patch_vt()->patch_interpolate2fine(domain,coarse_patch,fine_patches,
                                      this_blockno,coarse_patchno,
                                      fine0_patchno);
 }
 
-void fclaw2d_patch_regrid_average2coarse(fclaw2d_domain_t *domain,
+void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *fine_patches,
                                          fclaw2d_patch_t *coarse_patch,
                                          int blockno, int fine0_patchno,
                                          int coarse_patchno)
 
 {
-    patch_vt()->regrid_average2coarse(domain,fine_patches,coarse_patch,
+    patch_vt()->patch_average2coarse(domain,fine_patches,coarse_patch,
                                    blockno,fine0_patchno,coarse_patchno);
 }

@@ -801,11 +801,11 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 
     /* ghost filling functions */
-    patch_vt->regrid_tag4refinement    = &fclaw2d_clawpatch_regrid_tag4refinement;
-    patch_vt->regrid_tag4coarsening    = &fclaw2d_clawpatch_regrid_tag4coarsening;
+    patch_vt->patch_tag4refinement    = &fclaw2d_clawpatch_tag4refinement;
+    patch_vt->patch_tag4coarsening    = &fclaw2d_clawpatch_tag4coarsening;
 
-    patch_vt->regrid_average2coarse    = &fclaw2d_clawpatch_regrid_average2coarse;
-    patch_vt->regrid_interpolate2fine  = &fclaw2d_clawpatch_regrid_interpolate2fine;
+    patch_vt->patch_average2coarse    = &fclaw2d_clawpatch_average2coarse;
+    patch_vt->patch_interpolate2fine  = &fclaw2d_clawpatch_interpolate2fine;
 
     /* Defaults for writing output */
     patch_vt->write_header             = &fclaw2d_clawpatch_output_header_ascii;

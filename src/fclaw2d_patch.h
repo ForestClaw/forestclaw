@@ -246,23 +246,23 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                       fclaw_bool time_interp,
                                       fclaw2d_transform_data_t* transform_data);
 
-int fclaw2d_patch_regrid_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno, int patchno,
                                       int initflag);
 
-int fclaw2d_patch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno,
                                       int patchno);
 
-void fclaw2d_patch_regrid_interpolate2fine(fclaw2d_domain_t* domain,
+void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* coarse_patch,
                                              fclaw2d_patch_t* fine_patches,
                                              int this_blockno, int coarse_patchno,
                                              int fine0_patchno);
 
-void fclaw2d_patch_regrid_average2coarse(fclaw2d_domain_t *domain,
+void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *fine_patches,
                                          fclaw2d_patch_t *coarse_patch,
                                          int blockno, int fine0_patchno,
@@ -355,23 +355,23 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_domain_t* domain,
                                                     fclaw_bool a_time_interp,
                                                     fclaw2d_transform_data_t* transform_data);
 
-typedef int (*fclaw2d_regrid_tag4refinement_t)(fclaw2d_domain_t *domain,
+typedef int (*fclaw2d_patch_tag4refinement_t)(fclaw2d_domain_t *domain,
                                               fclaw2d_patch_t *this_patch,
                                               int this_block_idx, int this_patch_idx,
                                               int initflag);
 
-typedef int (*fclaw2d_regrid_tag4coarsening_t)(fclaw2d_domain_t *domain,
+typedef int (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
                                                fclaw2d_patch_t *this_patch,
                                                int this_blockno,
                                                int this_patchno);
 
-typedef void (*fclaw2d_regrid_interpolate2fine_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_domain_t* domain,
                                                  fclaw2d_patch_t *coarse_patch,
                                                  fclaw2d_patch_t* fine_patches,
                                                  int this_blockno, int coarse_patchno,
                                                  int fine_patchno);
 
-typedef void (*fclaw2d_regrid_average2coarse_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_domain_t *domain,
                                                fclaw2d_patch_t *fine_siblings,
                                                fclaw2d_patch_t *coarse_patch,
                                                int blockno, int fine_patchno,
@@ -462,10 +462,10 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_save_step_t          patch_save_step;
 
     /* regridding functions */
-    fclaw2d_regrid_tag4refinement_t    regrid_tag4refinement;
-    fclaw2d_regrid_tag4coarsening_t    regrid_tag4coarsening;
-    fclaw2d_regrid_average2coarse_t    regrid_average2coarse;
-    fclaw2d_regrid_interpolate2fine_t  regrid_interpolate2fine;
+    fclaw2d_patch_tag4refinement_t    patch_tag4refinement;
+    fclaw2d_patch_tag4coarsening_t    patch_tag4coarsening;
+    fclaw2d_patch_average2coarse_t    patch_average2coarse;
+    fclaw2d_patch_interpolate2fine_t  patch_interpolate2fine;
 
     /* ghost filling functions */
     fclaw2d_patch_copy_face_t           copy_face;
