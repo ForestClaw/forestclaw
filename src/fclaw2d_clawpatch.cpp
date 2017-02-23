@@ -122,7 +122,7 @@ fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch)
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
 
 {
-    return fclaw2d_clawpatch_get_cp(this_patch);
+    return clawpatch_data(this_patch);
 }
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
@@ -759,6 +759,9 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     /* Defaults for writing output */
     patch_vt->write_header             = &fclaw2d_clawpatch_output_ascii_header;
     patch_vt->patch_write_file         = &fclaw2d_clawpatch_output_ascii;
+
+    /* Time interpolation functions */
+    patch_vt->setup_timeinterp         = &fclaw2d_clawpatch_setup_timeinterp;
 
     /* ghost patch */
     patch_vt->ghost_pack        = &fclaw2d_clawpatch_ghost_pack;
