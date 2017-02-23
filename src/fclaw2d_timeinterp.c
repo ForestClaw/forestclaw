@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_patch.h>
 
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
@@ -36,7 +36,7 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
     if (fclaw2d_patch_has_finegrid_neighbors(this_patch))
     {
         double alpha = *((double*) user);
-        fclaw2d_clawpatch_setup_timeinterp(domain,this_patch,alpha);
+        fclaw2d_patch_setup_timeinterp(domain,this_patch,alpha);
     }
 }
 

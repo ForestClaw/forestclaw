@@ -268,6 +268,11 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                          int blockno, int fine0_patchno,
                                          int coarse_patchno);
 
+void fclaw2d_patch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    double alpha);
+
+
 typedef void* (*fclaw2d_patch_new_t)();
 
 typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
@@ -440,6 +445,10 @@ typedef void (*fclaw2d_patch_build_from_fine_t)(fclaw2d_domain_t *domain,
                                                 int fine0_patchno,
                                                 fclaw2d_build_mode_t build_mode);
 
+typedef void (*fclaw2d_patch_setup_timeinterp_t)(fclaw2d_domain_t* domain,
+                                                  fclaw2d_patch_t *this_patch,
+                                                  double alpha);
+
 
 typedef void (*fclaw2d_patch_restore_step_t)(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* this_patch);
@@ -480,6 +489,10 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_write_header_t       write_header;
     fclaw2d_patch_write_file_t         patch_write_file;
 
+    /* Time interpolation */
+    fclaw2d_patch_setup_timeinterp_t   setup_timeinterp;
+
+    /* Ghost packing functions (for parallel use) */
     fclaw2d_patch_ghost_pack_t         ghost_pack;
     fclaw2d_patch_ghost_unpack_t       ghost_unpack;
     fclaw2d_patch_build_ghost_t        build_ghost;

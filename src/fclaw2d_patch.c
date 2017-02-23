@@ -573,3 +573,11 @@ void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
     patch_vt()->patch_average2coarse(domain,fine_patches,coarse_patch,
                                    blockno,fine0_patchno,coarse_patchno);
 }
+
+
+void fclaw2d_patch_setup_timeinterp(fclaw2d_domain_t* domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    double alpha)
+{
+    patch_vt()->setup_timeinterp(domain,this_patch,alpha);
+}
