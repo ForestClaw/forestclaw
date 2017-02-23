@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_domain.h>
 
-static fclaw2d_patch_vtable_t patch_vt;
-
 struct fclaw2d_patch_data
 {
     fclaw2d_patch_relation_t face_neighbors[4];
@@ -49,6 +47,16 @@ fclaw2d_patch_data_t*
 fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
 {
     return (fclaw2d_patch_data_t *) patch->user;
+}
+
+
+static fclaw2d_patch_vtable_t s_patch_vt;
+
+static
+fclaw2d_patch_vtable_t* patch_vt()
+{
+    FCLAW_ASSERT(s_patch_vt.defaults_set == 1);
+    return &s_patch_vt;
 }
 
 void*
@@ -237,14 +245,13 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
                             fclaw2d_patch_t* this_patch)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
 
     /* Initialize user data */
     fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
     this_patch->user = (void *) pdata;
 
     /* create new user data */
-    pdata->user_patch = patch_vt.patch_new();
+    pdata->user_patch = patch_vt()->patch_new();
     ++ddata->count_set_clawpatch;
     pdata->neighbors_set = 0;
 }
@@ -252,13 +259,12 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
 void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
                                fclaw2d_patch_t *this_patch)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
     if (pdata != NULL)
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-        patch_vt.patch_delete(pdata->user_patch);
+        patch_vt()->patch_delete(pdata->user_patch);
         ++ddata->count_delete_clawpatch;
 
         FCLAW2D_FREE(pdata);
@@ -271,22 +277,24 @@ void fclaw2d_set_patch_vtable(fclaw2d_domain_t* domain, fclaw2d_patch_vtable_t *
 {
     fclaw2d_domain_attribute_add (domain,"patch_vtable",patch_vt);
 }
-#endif
 
 void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt)
 {
-    patch_vt = user_vt;
+    s_patch_vt = user_vt;
 }
+#endif
+
 
 fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
 {
-    return patch_vt;
+    return s_patch_vt;
 }
+
 
 /* Nice access functions */
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 {
-    return &patch_vt;
+    return &s_patch_vt;
 }
 
 void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
@@ -294,8 +302,7 @@ void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                               double *patch_data,
                               int time_interp)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.ghost_pack(domain,
+    patch_vt()->ghost_pack(domain,
                         this_patch,
                         patch_data,
                         time_interp);
@@ -307,12 +314,11 @@ void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
                                        int patchno,
                                        void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.build_ghost(domain,this_patch,blockno,
+    patch_vt()->build_ghost(domain,this_patch,blockno,
                          patchno,(void*) user);
-    if (patch_vt.patch_setup_ghost != NULL)
+    if (patch_vt()->patch_setup_ghost != NULL)
     {
-        patch_vt.patch_setup_ghost(domain,this_patch,blockno,patchno);
+        patch_vt()->patch_setup_ghost(domain,this_patch,blockno,patchno);
     }
 }
 
@@ -322,30 +328,26 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
                                        int this_patch_idx,
                                        double *qdata, fclaw_bool time_interp)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.ghost_unpack(domain, this_patch, this_block_idx,
+    patch_vt()->ghost_unpack(domain, this_patch, this_block_idx,
                           this_patch_idx, qdata, time_interp);
 }
 
 size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    return patch_vt.ghost_packsize(domain);
+    return patch_vt()->ghost_packsize(domain);
 }
 
 void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
                                      fclaw2d_patch_t* this_patch,
                                      void** q)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.local_ghost_alloc(domain, this_patch, q);
+    patch_vt()->local_ghost_alloc(domain, this_patch, q);
 }
 
 void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
                                     void **q)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.local_ghost_free(domain, q);
+    patch_vt()->local_ghost_free(domain, q);
 }
 
 void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
@@ -354,8 +356,7 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
                                      int this_patch_idx,
                                      void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.partition_pack(domain,
+    patch_vt()->partition_pack(domain,
                             this_patch,
                             this_block_idx,
                             this_patch_idx,
@@ -368,8 +369,6 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
                                      int this_patch_idx,
                                      void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-
     /* Create new data in 'user' pointer */
     fclaw2d_patch_data_new(domain,this_patch);
 
@@ -378,7 +377,7 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
                         this_patch_idx,(void*) &build_mode);
 
     /* This copied q data from memory */
-    patch_vt.partition_unpack(domain,
+    patch_vt()->partition_unpack(domain,
                               this_patch,
                               this_block_idx,
                               this_patch_idx,
@@ -387,8 +386,7 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    return patch_vt.partition_packsize(domain);
+    return patch_vt()->partition_packsize(domain);
 }
 
 void fclaw2d_patch_build(fclaw2d_domain_t *domain,
@@ -397,19 +395,18 @@ void fclaw2d_patch_build(fclaw2d_domain_t *domain,
                              int patchno,
                              void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.patch_build(domain,
+    patch_vt()->patch_build(domain,
                          this_patch,
                          blockno,
                          patchno,
                          user);
 #if 1
-    if (patch_vt.patch_setup != NULL)
+    if (patch_vt()->patch_setup != NULL)
     {
         /* The setup routine should check to see if this is a ghost patch and
            optimize accordingly.  For example, interior data is not generally
            needed (beyond what is needed for averaging) */
-        patch_vt.patch_setup(domain,this_patch,blockno,patchno);
+        patch_vt()->patch_setup(domain,this_patch,blockno,patchno);
     }
 #endif
 }
@@ -422,8 +419,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.patch_build_from_fine(domain,
+    patch_vt()->patch_build_from_fine(domain,
                                    fine_patches,
                                    coarse_patch,
                                    blockno,
@@ -431,13 +427,13 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
                                    fine0_patchno,
                                    build_mode);
 #if 1
-    if (patch_vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    if (patch_vt()->patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
         /* We might want to distinguish between new fine grid patches, and
            new coarse grid patches.  In the latter case, we might just average
            aux array info, for example, rather than recreate it from scratch.
            Something like a general "build from fine" routine might be needed */
-        patch_vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
+        patch_vt()->patch_setup(domain,coarse_patch,blockno,coarse_patchno);
     }
 #endif
 }
@@ -445,16 +441,14 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
 void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.patch_restore_step(domain, this_patch);
+    patch_vt()->patch_restore_step(domain, this_patch);
 }
 
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
 void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
                              fclaw2d_patch_t* this_patch)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.patch_save_step(domain, this_patch);
+    patch_vt()->patch_save_step(domain, this_patch);
 }
 
 void fclaw2d_patch_interpolate_face(fclaw2d_domain_t *domain,
@@ -468,8 +462,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_domain_t *domain,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.interpolate_face(domain,coarse_patch,fine_patch,idir,
+    patch_vt()->interpolate_face(domain,coarse_patch,fine_patch,idir,
                               iside,p4est_refineFactor,refratio,
                               time_interp,igrid,transform_data);
 }
@@ -485,8 +478,7 @@ void fclaw2d_patch_average_face(fclaw2d_domain_t *domain,
                                 int igrid,
                                 fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.average_face(domain,coarse_patch,fine_patch,idir,
+    patch_vt()->average_face(domain,coarse_patch,fine_patch,idir,
                           iface_coarse,p4est_refineFactor,
                           refratio,time_interp,igrid,
                           transform_data);
@@ -499,8 +491,7 @@ void fclaw2d_patch_copy_face(fclaw2d_domain_t *domain,
                              int time_interp,
                              fclaw2d_transform_data_t *transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.copy_face(domain,this_patch,neighbor_patch,iface,
+    patch_vt()->copy_face(domain,this_patch,neighbor_patch,iface,
                        time_interp,transform_data);
 
 }
@@ -512,8 +503,7 @@ void fclaw2d_patch_copy_corner(fclaw2d_domain_t *domain,
                                int time_interp,
                                fclaw2d_transform_data_t *transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.copy_corner(domain,this_patch,corner_patch,
+    patch_vt()->copy_corner(domain,this_patch,corner_patch,
                          icorner,time_interp,transform_data);
 }
 
@@ -525,8 +515,7 @@ void fclaw2d_patch_average_corner(fclaw2d_domain_t *domain,
                                   fclaw_bool time_interp,
                                   fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.average_corner(domain,coarse_patch,fine_patch,coarse_corner,
+    patch_vt()->average_corner(domain,coarse_patch,fine_patch,coarse_corner,
                             refratio,time_interp,transform_data);
 }
 
@@ -539,8 +528,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                       fclaw_bool time_interp,
                                       fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.interpolate_corner(domain,coarse_patch,fine_patch,
+    patch_vt()->interpolate_corner(domain,coarse_patch,fine_patch,
                                 coarse_corner,refratio,time_interp,
                                 transform_data);
 }
@@ -550,8 +538,7 @@ int fclaw2d_patch_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                       int blockno, int patchno,
                                       int initflag)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    return patch_vt.regrid_tag4refinement(domain,this_patch,blockno,
+    return patch_vt()->regrid_tag4refinement(domain,this_patch,blockno,
                                    patchno, initflag);
 }
 
@@ -560,8 +547,7 @@ int fclaw2d_patch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                                       int blockno,
                                       int patchno)
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    return patch_vt.regrid_tag4coarsening(domain,fine_patches,
+    return patch_vt()->regrid_tag4coarsening(domain,fine_patches,
                                    blockno, patchno);
 }
 
@@ -572,8 +558,7 @@ void fclaw2d_patch_regrid_interpolate2fine(fclaw2d_domain_t* domain,
                                              int fine0_patchno)
 
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.regrid_interpolate2fine(domain,coarse_patch,fine_patches,
+    patch_vt()->regrid_interpolate2fine(domain,coarse_patch,fine_patches,
                                      this_blockno,coarse_patchno,
                                      fine0_patchno);
 }
@@ -585,7 +570,6 @@ void fclaw2d_patch_regrid_average2coarse(fclaw2d_domain_t *domain,
                                          int coarse_patchno)
 
 {
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.regrid_average2coarse(domain,fine_patches,coarse_patch,
+    patch_vt()->regrid_average2coarse(domain,fine_patches,coarse_patch,
                                    blockno,fine0_patchno,coarse_patchno);
 }

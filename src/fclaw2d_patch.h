@@ -491,6 +491,9 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_partition_pack_t     partition_pack;
     fclaw2d_patch_partition_unpack_t   partition_unpack;
     fclaw2d_patch_partition_packsize_t partition_packsize;
+
+    int defaults_set;
+
 } fclaw2d_patch_vtable_t;
 
 void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt);
