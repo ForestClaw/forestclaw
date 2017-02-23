@@ -33,7 +33,6 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_domain_t *domain,
                                   int blockno, int patchno,
                                   int initflag)
 {
-    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
@@ -50,9 +49,9 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt.fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                           &blockno, q,&refine_threshold,
-                           &initflag,&tag_patch);
+    fclaw2d_clawpatch_vt()->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                                &blockno, q,&refine_threshold,
+                                                &initflag,&tag_patch);
     return tag_patch;
 }
 
@@ -61,8 +60,6 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_domain_t *domain,
                                   int blockno,
                                   int patchno)
 {
-    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
-
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q[4];
@@ -86,9 +83,9 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_domain_t *domain,
     }
 
     tag_patch = 0;
-    clawpatch_vt.fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                           &blockno, q[0],q[1],q[2],q[3],
-                           &coarsen_threshold,&tag_patch);
+    fclaw2d_clawpatch_vt()->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                                &blockno, q[0],q[1],q[2],q[3],
+                                                &coarsen_threshold,&tag_patch);
     return tag_patch == 1;
 }
 
@@ -104,7 +101,6 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
                                      int fine0_patchno)
 
 {
-    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     int mx,my,mbc,meqn;
     double *qcoarse,*qfine;
     double *areacoarse,*areafine;
@@ -136,9 +132,9 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
                                           &xd,&yd,&zd,&areafine);
         }
 
-        clawpatch_vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                 areacoarse, areafine, &igrid,
-                                 &gparms->manifold);
+        fclaw2d_clawpatch_vt()->fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                                      areacoarse, areafine, &igrid,
+                                                      &gparms->manifold);
 
     }
 }
@@ -155,7 +151,6 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_domain_t *domain,
                                    int coarse_patchno)
 
 {
-    fclaw2d_clawpatch_vtable_t clawpatch_vt = fclaw2d_clawpatch_get_vtable(domain);
     const amr_options_t* gparms;
     int mx,my, mbc, meqn;
     double *qcoarse, *qfine;
@@ -185,9 +180,9 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_domain_t *domain,
                                           &xd,&yd,&zd,&areafine);
         }
 
-        clawpatch_vt.fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                         areacoarse, areafine, &igrid,
-                                         &gparms->manifold);
+        fclaw2d_clawpatch_vt()->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                                    areacoarse, areafine, &igrid,
+                                                    &gparms->manifold);
 
     }
 }
