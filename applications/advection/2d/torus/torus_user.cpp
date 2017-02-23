@@ -44,7 +44,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.patch_setup   = &torus_patch_setup;
+        fclaw2d_patch_vt()->patch_setup   = &torus_patch_setup;
 
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         classic_claw46.setaux    = &TORUS46_SETAUX;  /* Not really a mapped setaux */
@@ -54,12 +54,12 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
         if (user->example == 1)
         {
             /* Accuracy problem : Used divided differences for tagging */
-            fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+            fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+            fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
             /* Write out error */
-            fclaw2d_vt.fort_write_header   = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_vt.patch_write_file    = &torus_output_write_file;
+            fclaw2d_clawpatch_vt()->fort_write_header   = &TORUS_FORT_WRITE_HEADER;
+            fclaw2d_patch_vt()->patch_write_file    = &torus_output_write_file;
         }
 
         fc2d_clawpack46_set_vtable(classic_claw46);
@@ -68,7 +68,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.patch_setup   = &torus_patch_setup;
+        fclaw2d_patch_vt()->patch_setup   = &torus_patch_setup;
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         classic_claw5.setaux    = &TORUS5_SETAUX;
@@ -78,12 +78,12 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
         if (user->example == 1)
         {
             /* Accuracy problem : Used divided differences for tagging */
-            fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+            fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+            fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
             /* Write out error */
-            fclaw2d_vt.fort_write_header      = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_vt.patch_write_file    = &torus_output_write_file;
+            fclaw2d_clawpatch_vt()->fort_write_header      = &TORUS_FORT_WRITE_HEADER;
+            fclaw2d_patch_vt()->patch_write_file    = &torus_output_write_file;
         }
 
         fc2d_clawpack5_set_vtable(classic_claw5);

@@ -47,7 +47,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
         classic_claw46.qinit     = &CLAWPACK46_QINIT;
         if (gparms->manifold)
         {
-            classic_claw46.clawpatch_vt.patch_vt.patch_setup   = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->patch_setup   = &filament_patch_setup_manifold;
 
             classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
             classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
@@ -55,8 +55,8 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
             if (user->example == 2)
             {
                 /* Avoid tagging block corners in 5 patch example*/
-                classic_claw46.clawpatch_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-                classic_claw46.clawpatch_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+                fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+                fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
             }
         }
         else
@@ -76,15 +76,15 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         if (gparms->manifold)
         {
-            classic_claw5.clawpatch_vt.patch_vt.patch_setup  = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->patch_setup  = &filament_patch_setup_manifold;
             classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
             classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
             if (user->example == 2)
             {
                 /* Avoid tagging block corners in 5 patch example*/
-                classic_claw5.clawpatch_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-                classic_claw5.clawpatch_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+                fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+                fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
             }
         }
         else

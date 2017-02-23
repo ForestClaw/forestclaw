@@ -46,7 +46,8 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
 
-        fclaw2d_vt.patch_setup = &annulus_patch_setup;
+        fclaw2d_patch_vt()->patch_setup = &annulus_patch_setup;
+        // classic_claw46.clawpatch()->patch_setup = &annulus_patch_setup;
 
         classic_claw46.qinit   = &CLAWPACK46_QINIT;
         classic_claw46.rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
@@ -59,7 +60,7 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
 
-        fclaw2d_vt.patch_setup  = &annulus_patch_setup;
+        fclaw2d_patch_vt()->patch_setup  = &annulus_patch_setup;
 
         classic_claw5.qinit     = &CLAWPACK5_QINIT;
         classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
