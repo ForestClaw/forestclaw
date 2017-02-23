@@ -404,7 +404,7 @@ typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_domain_t *domain,
                                             void *user);
 
 typedef size_t (*fclaw2d_patch_ghost_packsize_t)(fclaw2d_domain_t* domain);
-                                                    
+
 typedef void (*fclaw2d_patch_local_ghost_alloc_t)(fclaw2d_domain_t* domain,
                                                  fclaw2d_patch_t* this_patch,
                                                  void** q);
@@ -495,6 +495,8 @@ typedef struct fclaw2d_patch_vtable
 
 void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt);
 fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t *domain);
+
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
 
 
 /* -----------------------------------------------------

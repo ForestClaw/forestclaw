@@ -114,7 +114,7 @@ typedef void (*fc2d_clawpack46_fluxfun_t)(const int* meqn, double q[], double au
 
 typedef struct fc2d_clawpack46_vtable
 {
-    fclaw2d_clawpatch_vtable_t  clawpatch_vt;
+    // fclaw2d_clawpatch_vtable_t  clawpatch_vt;
 
     /* Fortran routines */
     fc2d_clawpack46_setprob_t   setprob;

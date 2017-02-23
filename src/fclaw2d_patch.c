@@ -283,13 +283,19 @@ fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
     return patch_vt;
 }
 
+/* Nice access functions */
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
+{
+    return &patch_vt;
+}
+
 void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               double *patch_data,
                               int time_interp)
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.ghost_pack(domain, 
+    patch_vt.ghost_pack(domain,
                         this_patch,
                         patch_data,
                         time_interp);
@@ -317,7 +323,7 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
                                        double *qdata, fclaw_bool time_interp)
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    patch_vt.ghost_unpack(domain, this_patch, this_block_idx, 
+    patch_vt.ghost_unpack(domain, this_patch, this_block_idx,
                           this_patch_idx, qdata, time_interp);
 }
 
@@ -434,7 +440,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
         patch_vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
     }
 #endif
-}            
+}
 
 void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* this_patch)
@@ -449,7 +455,7 @@ void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     patch_vt.patch_save_step(domain, this_patch);
-}  
+}
 
 void fclaw2d_patch_interpolate_face(fclaw2d_domain_t *domain,
                                     fclaw2d_patch_t *coarse_patch,
@@ -555,7 +561,7 @@ int fclaw2d_patch_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                                       int patchno)
 {
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    return patch_vt.regrid_tag4coarsening(domain,fine_patches, 
+    return patch_vt.regrid_tag4coarsening(domain,fine_patches,
                                    blockno, patchno);
 }
 

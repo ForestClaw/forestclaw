@@ -34,22 +34,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int s_clawpack46_package_id = -1;
 
 static fc2d_clawpack46_vtable_t classic_vt;
-static fclaw2d_clawpatch_vtable_t clawpatch_vt;
+// static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 
 
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 {
     classic_vt = user_vt;
-    fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
+    // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
 }
 
 void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                          fc2d_clawpack46_vtable_t* claw_vt)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = &claw_vt->clawpatch_vt;
-    fclaw2d_clawpatch_init_vtable_defaults(clawpatch_vt);
-    
-    fclaw2d_patch_vtable_t* patch_vt = &clawpatch_vt->patch_vt;
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+    // fclaw2d_clawpatch_init_vtable_defaults();
+
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
 
     /* Required functions  - error if NULL */
     claw_vt->bc2 = CLAWPACK46_BC2_DEFAULT;

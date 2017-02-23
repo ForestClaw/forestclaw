@@ -238,7 +238,7 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   int packmode);
 #endif
 
-void fclaw2d_clawpatch_init_vtable_defaults(fclaw2d_clawpatch_vtable_t *clawpatch_vt);
+void fclaw2d_clawpatch_init_vtable_defaults();
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,
@@ -349,9 +349,11 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
                                           double qpack[], int extrasize,
                                           int packmode, int* ierror);
 
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
+
 struct fclaw2d_clawpatch_vtable
 {
-    fclaw2d_patch_vtable_t             patch_vt;
+    // fclaw2d_patch_vtable_t             patch_vt;
 
     /* ghost filling functions */
     fclaw2d_fort_average2coarse_t      fort_average2coarse;
@@ -376,6 +378,8 @@ struct fclaw2d_clawpatch_vtable
     /* ghost patch functions */
     fclaw2d_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
     fclaw2d_ghostpack_extra_t          ghostpack_extra;
+
+    int defaults_set;
 };
 
 void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt);
