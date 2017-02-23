@@ -24,19 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_metric_default.h>
+#include <fclaw2d_clawpatch.hpp>
+
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_metric.h>
-
-#include <fclaw2d_timeinterp.h>
-#include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_neighbors_fort.h>
-#include <fclaw2d_metric_default_fort.h>
-#include <fclaw2d_map_query.h>
 
-#include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_clawpatch_regrid.h>
 
+/* Store virtual table for all clawpatch routines */
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
 static
@@ -66,11 +61,6 @@ void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
     fclaw2d_clawpatch_init_vtable_defaults();
 }
 
-void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
-{
-    fclaw2d_clawpatch_t::global = global;
-}
-
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt()
 {
@@ -78,10 +68,12 @@ fclaw2d_clawpatch_vtable_t* clawpatch_vt()
     return &s_clawpatch_vt;
 }
 
-fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain)
+
+void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 {
-    return s_clawpatch_vt;
+    fclaw2d_clawpatch_t::global = global;
 }
+
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
 {
@@ -343,7 +335,6 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
 {
     /* We are getting closer to getting rid the class fclaw2d_clawpatch_t */
     fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    // cp->define(domain,this_patch,blockno,build_mode);
 
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -481,19 +472,6 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
         vt.metric_compute_area(domain,this_patch,blockno,patchno);
         metric_setup(domain,this_patch,blockno,patchno);
     }
-
-    /* This routine is used for patches that will be updated, and so need
-       everything */
-#if 0
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
-    if (patch_vt.patch_setup != NULL)
-    {
-        /* The setup routine should check to see if this is a ghost patch and
-           optimize accordingly.  For example, interior data is not generally
-           needed (beyond what is needed for averaging) */
-        patch_vt.patch_setup(domain,this_patch,blockno,patchno);
-    }
-#endif
 }
 
 void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
@@ -518,21 +496,6 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
         metric_setup(domain,coarse_patch,blockno,
                                        coarse_patchno);
     }
-#if 0
-    /* move to fclaw2d_patch.c */
-    fclaw2d_patch_vtable_t patch_vt;
-    patch_vt = fclaw2d_get_patch_vtable(domain);
-
-
-    if (patch_vt.patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-    {
-        /* We might want to distinguish between new fine grid patches, and
-           new coarse grid patches.  In the latter case, we might just average
-           aux array info, for example, rather than recreate it from scratch.
-           Something like a general "build from fine" routine might be needed */
-        patch_vt.patch_setup(domain,coarse_patch,blockno,coarse_patchno);
-    }
-#endif
 }
 
 void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
@@ -556,16 +519,6 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
             vt.metric_compute_area(domain,this_patch,blockno,patchno);
         }
     }
-
-#if 0
-    // move to patch
-    fclaw2d_patch_vtable_t patch_vt;
-    patch_vt = fclaw2d_get_patch_vtable(domain);
-    if (patch_vt.patch_setup_ghost != NULL)
-    {
-        patch_vt.patch_setup_ghost(domain,this_patch,blockno,patchno);
-    }
-#endif
 }
 
 /* --------------------------------------------------------------
@@ -652,10 +605,7 @@ void ghost_comm(fclaw2d_domain_t* domain,
 
     int psize = (wg - hole)*(meqn + packarea + gparms->ghost_patch_pack_numextrafields);
     FCLAW_ASSERT(psize > 0);
-#if 0
-    double *q = q_time_sync(time_interp);
-    double *area = m_area.dataPtr();  // Might be NULL
-#endif
+
     int qareasize = (wg - hole)*(meqn + packarea);
     clawpatch_vt()->fort_ghostpack_qarea(&mx,&my,&mbc,&meqn,&mint,qthis,area,
                                       qpack,&qareasize,&packmode,&ierror);
@@ -758,18 +708,10 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
 }
 
 /* ----------------------------------------------------------------
-   Ghost cell exchange operations
+   Set defaults for clawpatch virtual table
    ---------------------------------------------------------------- */
 
 
-#if 0
-void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt)
-{
-    s_clawpatch_vt = user_vt;
-}
-#endif
-
-/* OR .... This is work towards extracting the clawpatch */
 void fclaw2d_clawpatch_init_vtable_defaults()
 {
 
@@ -800,7 +742,7 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->average_corner       = fclaw2d_clawpatch_average_corner;
     patch_vt->interpolate_corner   = fclaw2d_clawpatch_interpolate_corner;
 
-    /* ghost filling functions */
+    /* Regridding  functions */
     patch_vt->patch_tag4refinement    = &fclaw2d_clawpatch_tag4refinement;
     patch_vt->patch_tag4coarsening    = &fclaw2d_clawpatch_tag4coarsening;
 
@@ -808,8 +750,8 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->patch_interpolate2fine  = &fclaw2d_clawpatch_interpolate2fine;
 
     /* Defaults for writing output */
-    patch_vt->write_header             = &fclaw2d_clawpatch_output_header_ascii;
-    patch_vt->patch_write_file         = &fclaw2d_clawpatch_output_patch_ascii;
+    patch_vt->write_header             = &fclaw2d_clawpatch_output_ascii_header;
+    patch_vt->patch_write_file         = &fclaw2d_clawpatch_output_ascii;
 
     /* ghost patch */
     patch_vt->ghost_pack        = &fclaw2d_clawpatch_ghost_pack;
