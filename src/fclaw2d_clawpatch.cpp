@@ -58,13 +58,6 @@ fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch);
 static
 double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 
-void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
-{
-    fclaw2d_clawpatch_t::app = app;
-    fclaw2d_clawpatch_init_vtable_defaults();
-}
-
-
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt()
 {
@@ -72,12 +65,16 @@ fclaw2d_clawpatch_vtable_t* clawpatch_vt()
     return &s_clawpatch_vt;
 }
 
+void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
+{
+    fclaw2d_clawpatch_t::app = app;
+    fclaw2d_clawpatch_init_vtable_defaults();
+}
 
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 {
     fclaw2d_clawpatch_t::global = global;
 }
-
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
 {
@@ -776,7 +773,8 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
-    clawpatch_vt()->defaults_set = 1;
+    patch_vt->defaults_set = 1;
+    s_clawpatch_vt.defaults_set = 1;
 }
 
 

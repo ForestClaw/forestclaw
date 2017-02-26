@@ -8,7 +8,7 @@ include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
 
 if FCLAW_ENABLE_GEOCLAW
-#include src/solvers/fc2d_geoclaw/Makefile.am
+include src/solvers/fc2d_geoclaw/Makefile.am
 endif
 
 # ----------------------------------
@@ -56,8 +56,8 @@ include applications/advection/2d/filament/Makefile.am
 
 # GeoClaw examples
 if FCLAW_ENABLE_GEOCLAW
-#include applications/geoclaw/bowl_radial/Makefile.am
-#include applications/geoclaw/bowl_slosh/Makefile.am
+include applications/geoclaw/bowl_radial/Makefile.am
+include applications/geoclaw/bowl_slosh/Makefile.am
 #include applications/geoclaw/flat_bathymetry/Makefile.am
-#include applications/geoclaw/chile2010/Makefile.am
+include applications/geoclaw/chile2010/Makefile.am
 endif
