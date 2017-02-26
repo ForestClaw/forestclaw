@@ -129,7 +129,7 @@ void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *doamin,
                               fc2d_geoclaw_vtable_t* geoclaw_vt);
 #endif
 
-void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t* vt);
+void fc2d_geoclaw_init_vtables();
 
 void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *doamin,
                               fclaw2d_vtable_t *vt);

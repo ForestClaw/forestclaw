@@ -57,7 +57,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
 
 /* This is provided as a convencience to the user, and is
    called by the user app */
-void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt)
+void fc2d_geoclaw_init_vtables()
 {
 
     /* vt         : Functions required by ForestClaw
@@ -65,8 +65,9 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt)
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();
     fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     
-    fclaw2d_init_vtable(fclaw_vt);
+    fclaw2d_init_vtable();
 
     fclaw_vt->problem_setup      = &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
@@ -135,13 +136,13 @@ void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
     fclaw2d_set_vtable(domain,vt);
 }
 #endif
-
+#if 0
 void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
                               fclaw2d_vtable_t *vt)
 {
     fclaw2d_set_vtable(domain,vt);
 }
-
+#endif
 /* Patch data is stored in each fclaw2d_clawpatch_t */
 struct patch_aux_data
 {
@@ -898,7 +899,6 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       int blockno, int patchno)
 
 {
-    fclaw2d_vtable_t vt;
     const amr_options_t *amropt;
     fc2d_geoclaw_options_t* geoclaw_options;
 
@@ -918,8 +918,6 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
     mbathy = geoclaw_options->mbathy;
     //coarsen_threshold = amropt->coarsen_threshold;
     t = fclaw2d_domain_get_time(domain);
-
-    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -954,7 +952,6 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
                                    int fine0_patchno)
 
 {
-    fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor,mbathy;
     double *qcoarse,*qfine,*auxcoarse,*auxfine;
     // double *areacoarse,*areafine;
@@ -964,8 +961,6 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
     const amr_options_t* gparms;
     const fc2d_geoclaw_options_t*  geoclaw_options;
     fclaw2d_patch_t* fine_patch;
-
-    vt = fclaw2d_get_vtable(domain);
 
     gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);
@@ -1014,7 +1009,6 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
                                  int coarse_patchno)
 
 {
-    fclaw2d_vtable_t vt;
     int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor,mbathy;
     double *qcoarse,*qfine,*auxcoarse,*auxfine;
     // double *areacoarse,*areafine;
@@ -1025,8 +1019,6 @@ void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
     const fc2d_geoclaw_options_t*  geoclaw_options;
 
     fclaw2d_patch_t* fine_patch;
-
-    vt = fclaw2d_get_vtable(domain);
 
     gparms = get_domain_parms(domain);
     geoclaw_options = fc2d_geoclaw_get_options(domain);

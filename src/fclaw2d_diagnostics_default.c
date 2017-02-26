@@ -40,9 +40,7 @@ void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *q;
     double t;
-    fclaw2d_vtable_t vt;
-
-    vt = fclaw2d_get_vtable(domain);
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -51,7 +49,7 @@ void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    FCLAW_ASSERT(vt.fort_compute_patch_error != NULL);
-    vt.fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
-                                &xlower,&ylower, &t, q, error);
+    FCLAW_ASSERT(fclaw2d_vt()->fort_compute_patch_error != NULL);
+    fclaw2d_vt()->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
+                                           &xlower,&ylower, &t, q, error);
 }

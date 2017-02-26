@@ -40,7 +40,7 @@ void chile2010_link_solvers(fclaw2d_domain_t *domain)
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
 #endif 
 
-	fc2d_geoclaw_init_vtables(&vt);
-    fc2d_geoclaw_set_vtables(domain,&vt);
+	fc2d_geoclaw_init_vtables();
+    fclaw2d_set_vtable();
 
 }

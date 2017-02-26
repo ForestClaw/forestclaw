@@ -156,7 +156,7 @@ void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
                                int blockno,
                                int patchno)
 {
-    fclaw2d_vtable_t vt;
+    // fclaw2d_vtable_t vt;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     double *xp,*yp,*zp;
@@ -170,8 +170,8 @@ void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     /* Compute centers and corners of mesh cell */
-    vt = fclaw2d_get_vtable(domain);
-    vt.fort_setup_mesh(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
+    // vt = fclaw2d_get_vtable(domain);
+    fclaw2d_vt()->fort_setup_mesh(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
                        xp,yp,zp,xd,yd,zd);
 
 }
@@ -181,7 +181,7 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
                                     int blockno,
                                     int patchno)
 {
-    fclaw2d_vtable_t vt;
+    // fclaw2d_vtable_t vt;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     double *xp,*yp,*zp;
@@ -204,25 +204,25 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
                                    &surfnormals,&edgelengths,
                                    &curvature);
 
-    vt = fclaw2d_get_vtable(domain);
+    // vt = fclaw2d_get_vtable(domain);
 
     /* The user could set these to NULL to avoid doing these computations ... */
 
-    if (vt.fort_compute_normals != NULL)
+    if (fclaw2d_vt()->fort_compute_normals != NULL)
     {
-        vt.fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+        fclaw2d_vt()->fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
                                 xnormals,ynormals);
     }
 
-    if (vt.fort_compute_tangents != NULL)
+    if (fclaw2d_vt()->fort_compute_tangents != NULL)
     {
-        vt.fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
+        fclaw2d_vt()->fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
                                  edgelengths);
     }
 
-    if (vt.fort_compute_surf_normals != NULL)
+    if (fclaw2d_vt()->fort_compute_surf_normals != NULL)
     {
-        vt.fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
+        fclaw2d_vt()->fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
                                      curvature, surfnormals, area);
     }
 

@@ -69,7 +69,7 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 {
     int time_interp = 0;
     char basename[BUFSIZ];
-    const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
+    // const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = get_domain_parms(*domain);
 
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
@@ -100,9 +100,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
 
     /* User defined problem setup */
-    if (vt.problem_setup != NULL)
+    if (fclaw2d_vt()->problem_setup != NULL)
     {
-        vt.problem_setup(*domain);
+        fclaw2d_vt()->problem_setup(*domain);
     }
 
     /* set specific refinement strategy */
@@ -262,9 +262,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
     }
 
     /* New grid has been created, so we do any "aftergrid" functions */
-    if (vt.after_regrid != NULL)
+    if (fclaw2d_vt()->after_regrid != NULL)
     {
-        vt.after_regrid(*domain);
+        fclaw2d_vt()->after_regrid(*domain);
     }
 
 

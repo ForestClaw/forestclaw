@@ -61,9 +61,8 @@ void cb_diagnostics_compute_sum(fclaw2d_domain_t *domain,
     double *q;
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy;
-    fclaw2d_vtable_t vt;
-
-    vt = fclaw2d_get_vtable(domain);
+    
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -71,7 +70,7 @@ void cb_diagnostics_compute_sum(fclaw2d_domain_t *domain,
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    vt.fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy, area, q,sum);
+    fclaw2d_vt()->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy, area, q,sum);
 #if 0
     FCLAW2D_FORT_CONSERVATION_CHECK(&mx, &my, &mbc, &meqn, &dx,&dy, area, q,sum);
 #endif
@@ -145,15 +144,14 @@ void cb_diagnostics_patch_area(fclaw2d_domain_t *domain,
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
     double *area;
-    fclaw2d_vtable_t vt;
-
-    vt = fclaw2d_get_vtable(domain);
+    
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
-    *sum += vt.fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    *sum += fclaw2d_vt()->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 #if 0
     *sum += FCLAW2D_FORT_COMPUTE_PATCH_AREA(&mx,&my,&mbc,&dx,&dy,area);
 #endif
@@ -222,9 +220,8 @@ void cb_diagnostics_compute_error(fclaw2d_domain_t *domain,
     double *q;
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy;
-    fclaw2d_vtable_t vt;
-
-    vt = fclaw2d_get_vtable(domain);
+    
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -234,11 +231,11 @@ void cb_diagnostics_compute_error(fclaw2d_domain_t *domain,
 
     error = fclaw2d_clawpatch_get_error(domain,this_patch);
 
-    vt.compute_patch_error(domain,this_patch,this_block_idx,this_patch_idx,
+    fclaw2d_vt()->compute_patch_error(domain,this_patch,this_block_idx,this_patch_idx,
                            error);
 
     /* Accumulate sums and maximums needed to compute errors */
-    vt.fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
+    fclaw2d_vt()->fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
                                error, error_data->local_error);
 #if 0
     FCLAW2D_FORT_COMPUTE_ERROR_NORM(&mx, &my, &mbc, &meqn, &dx,&dy, area,
@@ -330,7 +327,7 @@ void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag)
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     const amr_options_t *gparms = get_domain_parms(domain);
-    fclaw2d_vtable_t vt;
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     if (gparms->compute_error)
     {
@@ -348,11 +345,9 @@ void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag)
            function, but it is supplied here to be nice */
         double t = fclaw2d_domain_get_time(domain);
 
-        vt = fclaw2d_get_vtable(domain);
-
-        if (vt.run_user_diagnostics != NULL)
+        if (fclaw2d_vt()->run_user_diagnostics != NULL)
         {
-            vt.run_user_diagnostics(domain,t);
+            fclaw2d_vt()->run_user_diagnostics(domain,t);
         }
     }
 

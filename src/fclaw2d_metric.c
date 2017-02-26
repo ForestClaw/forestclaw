@@ -58,9 +58,9 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
 
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    // fclaw2d_vtable_t vt;
+    // vt = fclaw2d_get_vtable(domain);
 
     /* Use either exact or approximate method */
-    vt.metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
+    fclaw2d_vt()->metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
 }

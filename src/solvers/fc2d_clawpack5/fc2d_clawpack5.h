@@ -133,7 +133,7 @@ void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                         fc2d_clawpack5_vtable_t* vt);
 #endif
 
-void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt);
+void fc2d_clawpack5_set_vtable_defaults();
 
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt();
 

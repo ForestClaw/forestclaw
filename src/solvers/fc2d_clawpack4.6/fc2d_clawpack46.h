@@ -134,7 +134,7 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                          fc2d_clawpack46_vtable_t* claw_vt);
 #endif 
 
-void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt);
+void fc2d_clawpack46_set_vtable_defaults();
 
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt();
 

@@ -38,13 +38,13 @@ void slosh_link_solvers(fclaw2d_domain_t *domain)
     /* These are set by GeoClaw for convenience, but the user
        can set these with customized functions, if desired. */
     // fc2d_geoclaw_init_vtables(&vt, &geoclaw);
-    fc2d_geoclaw_init_vtables(&vt);
+    fc2d_geoclaw_init_vtables();
     
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
     patch_vt->patch_initialize         = &slosh_patch_initialize;
 
     // fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
-    fc2d_geoclaw_set_vtables(domain,&vt);
+    fclaw2d_set_vtable();
 
 }
 
@@ -64,7 +64,6 @@ void slosh_patch_initialize(fclaw2d_domain_t *domain,
     // int minlevel, maxlevel;
     // minlevel = 4;
     // maxlevel = 4;
-    vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);

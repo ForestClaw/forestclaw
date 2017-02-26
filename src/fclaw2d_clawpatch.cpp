@@ -279,9 +279,6 @@ void metric_setup(fclaw2d_domain_t* domain,
                   int blockno,
                   int patchno)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
     /* vt.patch_manifold_setup_mesh(...) */
     fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
 
@@ -467,7 +464,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
                              int patchno,
                              void *user)
 {
-    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -476,7 +473,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
 
     if (gparms->manifold)
     {
-        vt.metric_compute_area(domain,this_patch,blockno,patchno);
+        fclaw2d_vt()->metric_compute_area(domain,this_patch,blockno,patchno);
         metric_setup(domain,this_patch,blockno,patchno);
     }
 }
@@ -511,8 +508,7 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
                                    int patchno,
                                    void *user)
 {
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
+    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -523,7 +519,7 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
     {
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
-            vt.metric_compute_area(domain,this_patch,blockno,patchno);
+            fclaw2d_vt()->metric_compute_area(domain,this_patch,blockno,patchno);
         }
     }
 }
