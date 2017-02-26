@@ -34,8 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static fclaw2d_vtable_t fclaw2d_vt;
 
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
+// static fc2d_clawpack46_vtable_t classic_claw46;
+// static fc2d_clawpack5_vtable_t classic_claw5;
 
 void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
@@ -46,27 +46,29 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
+        // fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
+        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt);
 
-        classic_claw46.qinit     = &CLAWPACK46_QINIT;
-        classic_claw46.setaux    = &CLAWPACK46_SETAUX;
-        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV;
-        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV;
-        classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
+        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
+        fc2d_clawpack46_vt()->setaux    = &CLAWPACK46_SETAUX;
+        fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV;
+        fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV;
+        fc2d_clawpack46_vt()->b4step2   = &CLAWPACK46_B4STEP2;
 
-        fc2d_clawpack46_set_vtable(classic_claw46);
+        // fc2d_clawpack46_set_vtable(classic_claw46);
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
+        // fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
+        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt);
 
-        classic_claw5.qinit     = &CLAWPACK5_QINIT;
-        classic_claw5.setaux    = &CLAWPACK5_SETAUX;
-        classic_claw5.b4step2   = &CLAWPACK5_B4STEP2;
-        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV;
-        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV;
+        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
+        fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;
+        fc2d_clawpack5_vt()->b4step2   = &CLAWPACK5_B4STEP2;
+        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
+        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
 
-        fc2d_clawpack5_set_vtable(classic_claw5);
+        // fc2d_clawpack5_set_vtable(classic_claw5);
     }
 
     fclaw2d_set_vtable(domain,&fclaw2d_vt);

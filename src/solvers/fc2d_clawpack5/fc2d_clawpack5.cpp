@@ -36,18 +36,24 @@ static int s_clawpack5_package_id = -1;
 static fc2d_clawpack5_vtable_t classic_vt;
 // static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
+{
+    return &classic_vt;
+}
 
+#if 0
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
 {
     classic_vt = user_vt;
 }
+#endif 
 
 /* This is called from the user application. */
-void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                        fc2d_clawpack5_vtable_t *claw5_vt)
+void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fc2d_clawpack5_vtable_t* claw5_vt = fc2d_clawpack5_vt();
 
     /* Required functions  - error if NULL*/
     claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;

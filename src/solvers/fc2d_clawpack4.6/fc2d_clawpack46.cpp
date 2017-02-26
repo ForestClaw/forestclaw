@@ -37,31 +37,38 @@ static fc2d_clawpack46_vtable_t classic_vt;
 // static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 
 
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
+{
+    return &classic_vt;
+}
+
+#if 0
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 {
     classic_vt = user_vt;
     // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
 }
+#endif 
 
-void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                         fc2d_clawpack46_vtable_t* claw_vt)
+void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     // fclaw2d_clawpatch_init_vtable_defaults();
 
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fc2d_clawpack46_vtable_t* claw46_vt = fc2d_clawpack46_vt();
 
     /* Required functions  - error if NULL */
-    claw_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
-    claw_vt->qinit = NULL;
-    claw_vt->rpn2 = NULL;
-    claw_vt->rpt2 = NULL;
+    claw46_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
+    claw46_vt->qinit = NULL;
+    claw46_vt->rpn2 = NULL;
+    claw46_vt->rpt2 = NULL;
 
     /* Optional functions - call only if non-NULL */
-    claw_vt->setprob = NULL;
-    claw_vt->setaux = NULL;
-    claw_vt->b4step2 = NULL;
-    claw_vt->src2 = NULL;
+    claw46_vt->setprob = NULL;
+    claw46_vt->setaux = NULL;
+    claw46_vt->b4step2 = NULL;
+    claw46_vt->src2 = NULL;
 
     /* Default qinit functions */
     patch_vt->patch_initialize         = &fc2d_clawpack46_qinit;

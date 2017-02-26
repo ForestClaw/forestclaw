@@ -50,16 +50,21 @@ typedef struct fc2d_geoclaw_gauge_info
 
 static fc2d_geoclaw_gauge_info_t gauge_info;
 
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
+{
+    return &geoclaw_vt;
+}
+
 /* This is provided as a convencience to the user, and is
    called by the user app */
-void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
-                               fc2d_geoclaw_vtable_t* geoclaw_vt)
+void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt)
 {
 
     /* vt         : Functions required by ForestClaw
        geoclaw_vt : Specific to GeoClaw (or ClawPack) */
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();
+    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
     
     fclaw2d_init_vtable(fclaw_vt);
 
@@ -121,7 +126,7 @@ void fc2d_geoclaw_init_vtables(fclaw2d_vtable_t *fclaw_vt,
     fclaw_vt->run_user_diagnostics = &fc2d_geoclaw_update_gauges;
 }
 
-
+#if 0
 void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
                               fclaw2d_vtable_t *vt,
                               fc2d_geoclaw_vtable_t* geoclaw)
@@ -129,7 +134,13 @@ void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
     geoclaw_vt = *geoclaw;
     fclaw2d_set_vtable(domain,vt);
 }
+#endif
 
+void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *domain,
+                              fclaw2d_vtable_t *vt)
+{
+    fclaw2d_set_vtable(domain,vt);
+}
 
 /* Patch data is stored in each fclaw2d_clawpatch_t */
 struct patch_aux_data
