@@ -59,6 +59,13 @@ fclaw2d_patch_vtable_t* patch_vt()
     return &s_patch_vt;
 }
 
+/* Nice access functions */
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
+{
+    // FCLAW_ASSERT(s_patch_vt.defaults_set == 1);
+    return &s_patch_vt;
+}
+
 void*
 fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch)
 
@@ -290,13 +297,6 @@ fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t* domain)
     return s_patch_vt;
 }
 
-
-/* Nice access functions */
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
-{
-    return &s_patch_vt;
-}
-
 void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               double *patch_data,
@@ -315,7 +315,7 @@ void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
                                        void *user)
 {
     patch_vt()->build_ghost(domain,this_patch,blockno,
-                         patchno,(void*) user);
+                            patchno,(void*) user);
     if (patch_vt()->patch_setup_ghost != NULL)
     {
         patch_vt()->patch_setup_ghost(domain,this_patch,blockno,patchno);

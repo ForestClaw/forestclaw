@@ -51,10 +51,10 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
 /* This is called from the user application. */
 void fc2d_clawpack5_set_vtable_defaults()
 {
+    fclaw2d_vtable_t*               fclaw_vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t*         patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-    fclaw2d_vtable_t* fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    fc2d_clawpack5_vtable_t* claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*        claw5_vt = fc2d_clawpack5_vt();
 
     /* Required functions  - error if NULL*/
     claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;
@@ -88,28 +88,28 @@ void fc2d_clawpack5_set_vtable_defaults()
     clawpatch_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
     /* output functions */
-    patch_vt->write_header           = &fc2d_clawpack5_output_header_ascii;
-    // fclaw_vt->fort_write_header      = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
-    clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+    patch_vt->write_header                = &fc2d_clawpack5_output_header_ascii;
+    // fclaw_vt->fort_write_header        = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
+    clawpatch_vt->fort_write_file         = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
 
     /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
-    fclaw_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
-    fclaw_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
+    fclaw_vt->fort_compute_error_norm     = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    fclaw_vt->fort_compute_patch_area     = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
+    fclaw_vt->fort_conservation_check     = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
-    clawpatch_vt->fort_copy_face        = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    clawpatch_vt->fort_average_face     = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
-    clawpatch_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
+    clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK5_FORT_COPY_FACE;
+    clawpatch_vt->fort_average_face       = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
+    clawpatch_vt->fort_interpolate_face   = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
 
     clawpatch_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     clawpatch_vt->fort_average_corner     = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
     clawpatch_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
-    clawpatch_vt->ghostpack_extra      = NULL;
-    clawpatch_vt->fort_ghostpack_qarea = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
+    clawpatch_vt->ghostpack_extra         = NULL;
+    clawpatch_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
 
-    clawpatch_vt->fort_timeinterp = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
+    clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
 /* Patch data is stored in each fclaw2d_clawpatch_t */

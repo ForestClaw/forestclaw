@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_geoclaw.h>
 
 
-static fclaw2d_vtable_t vt;
+// static fclaw2d_vtable_t vt;
 // static fc2d_geoclaw_vtable_t geoclaw;
 
 void slosh_link_solvers(fclaw2d_domain_t *domain)
@@ -41,7 +41,7 @@ void slosh_link_solvers(fclaw2d_domain_t *domain)
     fc2d_geoclaw_init_vtables();
     
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->patch_initialize         = &slosh_patch_initialize;
+    patch_vt->patch_initialize       = &slosh_patch_initialize;
 
     // fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
     fclaw2d_set_vtable();

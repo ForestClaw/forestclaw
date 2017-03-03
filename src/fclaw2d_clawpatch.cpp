@@ -61,9 +61,18 @@ double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt()
 {
-    FCLAW_ASSERT(s_clawpatch_vt.defaults_set);
+    // FCLAW_ASSERT(s_clawpatch_vt.defaults_set);
     return &s_clawpatch_vt;
 }
+
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
+{
+    /* This isn't a great check, since we never the 'set_defaults' to anything initially.  It is
+       probably just getting called every time in this function */
+    // FCLAW_ASSERT(s_clawpatch_vt.defaults_set);
+    return &s_clawpatch_vt;
+}
+
 
 void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
 {
@@ -75,15 +84,6 @@ void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 {
     fclaw2d_clawpatch_t::global = global;
 }
-
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
-{
-    /* This isn't a great check, since we never the 'set_defaults' to anything initially.  It is
-       probably just getting called every time in this function */
-    FCLAW_ASSERT(s_clawpatch_vt.defaults_set);
-    return &s_clawpatch_vt;
-}
-
 
 /* ------------------------------------------------------------
    Solution access functions
@@ -770,7 +770,7 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
     patch_vt->defaults_set = 1;
-    s_clawpatch_vt.defaults_set = 1;
+    // s_clawpatch_vt.defaults_set = 1;
 }
 
 
@@ -825,8 +825,8 @@ void fclaw2d_clawpatch_average_face(fclaw2d_domain_t *domain,
 
     int manifold = gparms->manifold;
     clawpatch_vt()->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
-                         &idir,&iface_coarse, &p4est_refineFactor, &refratio,
-                         &igrid,&manifold,&transform_data);
+                                      &idir,&iface_coarse, &p4est_refineFactor, &refratio,
+                                      &igrid,&manifold,&transform_data);
 
 
 }
@@ -854,7 +854,7 @@ void fclaw2d_clawpatch_interpolate_face(fclaw2d_domain_t *domain,
     mbc = gparms->mbc;
 
     clawpatch_vt()->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iside,
-                             &p4est_refineFactor,&refratio,&igrid,&transform_data);
+                                          &p4est_refineFactor,&refratio,&igrid,&transform_data);
 }
 
 

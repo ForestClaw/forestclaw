@@ -85,14 +85,14 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
 
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
     fclaw2d_patch_relation_t neighbor_type =
-        fclaw2d_patch_face_neighbors(domain,
-                                     this_block_idx,
-                                     this_patch_idx,
-                                     iface,
-                                     rproc,
-                                     &rblockno,
-                                     rpatchno,
-                                     &rfaceno);
+    fclaw2d_patch_face_neighbors(domain,
+                                 this_block_idx,
+                                 this_patch_idx,
+                                 iface,
+                                 rproc,
+                                 &rblockno,
+                                 rpatchno,
+                                 &rfaceno);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 
 
@@ -525,14 +525,14 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
         int rfaceno;
 
         fclaw2d_patch_relation_t neighbor_type =
-            fclaw2d_patch_face_neighbors(domain,
-                                         blockno,
-                                         patchno,
-                                         iface,
-                                         rproc,
-                                         &rblockno,
-                                         rpatchno,
-                                         &rfaceno);
+        fclaw2d_patch_face_neighbors(domain,
+                                     blockno,
+                                     patchno,
+                                     iface,
+                                     rproc,
+                                     &rblockno,
+                                     rpatchno,
+                                     &rfaceno);
 
         fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
     }
@@ -546,15 +546,15 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
         fclaw2d_patch_relation_t neighbor_type;
 
         int has_corner_neighbor =
-            fclaw2d_patch_corner_neighbors(domain,
-                                           blockno,
-                                           patchno,
-                                           icorner,
-                                           &rproc_corner,
-                                           &cornerblockno,
-                                           &cornerpatchno,
-                                           &rcornerno,
-                                           &neighbor_type);
+        fclaw2d_patch_corner_neighbors(domain,
+                                       blockno,
+                                       patchno,
+                                       icorner,
+                                       &rproc_corner,
+                                       &cornerblockno,
+                                       &cornerpatchno,
+                                       &rcornerno,
+                                       &neighbor_type);
 
         fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
         if (!has_corner_neighbor)

@@ -42,12 +42,9 @@ extern "C"
 #endif
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
-// typedef struct fclaw2d_clawpatch fclaw2d_clawpatch_t;
-
 
 void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
 void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
-fclaw2d_clawpatch_vtable_t fclaw2d_clawpatch_get_vtable(fclaw2d_domain_t* domain);
 
 void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
 void fclaw2d_clawpatch_delete_patch(void *cp);
@@ -349,8 +346,6 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
                                           double qpack[], int extrasize,
                                           int packmode, int* ierror);
 
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
-
 struct fclaw2d_clawpatch_vtable
 {
     // fclaw2d_patch_vtable_t             patch_vt;
@@ -382,7 +377,7 @@ struct fclaw2d_clawpatch_vtable
     int defaults_set;
 };
 
-void fclaw2d_clawpatch_set_vtable(const fclaw2d_clawpatch_vtable_t user_vt);
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 #ifdef __cplusplus
 #if 0

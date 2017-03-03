@@ -140,15 +140,15 @@ void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                                     int time_interp);
 
 void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
-                                fclaw2d_patch_t* this_patch,
-                                int this_block_idx, int this_patch_idx,
-                                double *qdata, fclaw_bool time_interp);
+                                       fclaw2d_patch_t* this_patch,
+                                       int this_block_idx, int this_patch_idx,
+                                       double *qdata, fclaw_bool time_interp);
 
 void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int blockno,
-                               int patchno,
-                               void *user);
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno,
+                                      int patchno,
+                                      void *user);
 
 size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain);
 
@@ -175,21 +175,21 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
 size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain);
 
 void fclaw2d_patch_build(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int blockno,
-                             int patchno,
-                             void *user);
+                         fclaw2d_patch_t *this_patch,
+                         int blockno,
+                         int patchno,
+                         void *user);
 
 void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *fine_patches,
-                                       fclaw2d_patch_t *coarse_patch,
-                                       int blockno,
-                                       int coarse_patchno,
-                                       int fine0_patchno,
-                                       fclaw2d_build_mode_t build_mode);
+                                   fclaw2d_patch_t *fine_patches,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno,
+                                   int coarse_patchno,
+                                   int fine0_patchno,
+                                   fclaw2d_build_mode_t build_mode);
 
 void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch);
+                                fclaw2d_patch_t* this_patch);
 
 void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
                              fclaw2d_patch_t* this_patch);
@@ -257,10 +257,10 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                       int patchno);
 
 void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
-                                             fclaw2d_patch_t* coarse_patch,
-                                             fclaw2d_patch_t* fine_patches,
-                                             int this_blockno, int coarse_patchno,
-                                             int fine0_patchno);
+                                    fclaw2d_patch_t* coarse_patch,
+                                    fclaw2d_patch_t* fine_patches,
+                                    int this_blockno, int coarse_patchno,
+                                    int fine0_patchno);
 
 void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *fine_patches,
@@ -511,7 +511,6 @@ typedef struct fclaw2d_patch_vtable
 
 void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt);
 fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t *domain);
-
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
 
 

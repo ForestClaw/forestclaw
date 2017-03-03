@@ -39,11 +39,11 @@ void fclaw2d_init_vtable()
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
       ------------------------------------------------------------- */
-    vt.metric_setup_mesh        = &fclaw2d_metric_setup_mesh;
-    vt.fort_setup_mesh          = &FCLAW2D_FORT_SETUP_MESH;
+    vt.metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
+    vt.fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
 
-    vt.metric_compute_area      = &fclaw2d_metric_compute_area;
-    vt.metric_area_set_ghost    = &fclaw2d_metric_area_set_ghost;
+    vt.metric_compute_area        = &fclaw2d_metric_compute_area;
+    vt.metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
 
     vt.metric_compute_normals     = &fclaw2d_metric_compute_normals;
     vt.fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
@@ -56,14 +56,14 @@ void fclaw2d_init_vtable()
 
     /* These may be redefined by the user */
     /* Problem setup */
-    vt.problem_setup = NULL;
+    vt.problem_setup             = NULL;
 
     /* Diagnostics */
     vt.run_user_diagnostics      = NULL;
     vt.compute_patch_error       = &fclaw2d_diagnostics_compute_patch_error;
 
     /* Defaults for regridding */
-    vt.after_regrid             = NULL;
+    vt.after_regrid              = NULL;
 
     /* Fortran files that do the work */
     vt.fort_compute_patch_error  = NULL;  /* must be set by the user */
