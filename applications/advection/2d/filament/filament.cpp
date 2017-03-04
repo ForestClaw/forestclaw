@@ -220,6 +220,15 @@ main (int argc, char **argv)
 
   fclaw2d_clawpatch_link_app(app);
 
+  if (user->claw_version == 4)
+  {
+    fc2d_clawpack46_set_vtable_defaults();
+  }
+  else if (user->claw_version == 5)
+  {
+    fc2d_clawpack5_set_vtable_defaults();
+  }
+
   if (!retval & !vexit)
   {
       run_program(app);

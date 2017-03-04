@@ -56,6 +56,9 @@ void fc2d_clawpack5_set_vtable_defaults()
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     fc2d_clawpack5_vtable_t*        claw5_vt = fc2d_clawpack5_vt();
 
+    fclaw2d_init_vtable();
+    fclaw2d_clawpatch_init_vtable_defaults();
+
     /* Required functions  - error if NULL*/
     claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;
     claw5_vt->qinit = NULL;

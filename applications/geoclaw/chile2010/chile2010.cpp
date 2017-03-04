@@ -170,8 +170,8 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-
     fclaw2d_clawpatch_link_app(app);
+    fc2d_geoclaw_init_vtables();
 
     /* Run the program */
 

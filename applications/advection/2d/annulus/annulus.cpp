@@ -177,6 +177,15 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_set_vtable_defaults();
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_set_vtable_defaults();
+    }
+
     if (!retval & !vexit)
     {
         run_program(app);

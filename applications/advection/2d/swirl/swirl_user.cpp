@@ -41,12 +41,11 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t* user = swirl_user_get_options(domain);
 
-    fclaw2d_init_vtable();
     fclaw2d_vt()->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults();
+        // fc2d_clawpack46_set_vtable_defaults();
 
         fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
         fc2d_clawpack46_vt()->setaux    = &CLAWPACK46_SETAUX;
@@ -58,7 +57,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults();
+        // fc2d_clawpack5_set_vtable_defaults();
 
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
         fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;

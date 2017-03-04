@@ -59,7 +59,6 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
    called by the user app */
 void fc2d_geoclaw_init_vtables()
 {
-
     /* vt         : Functions required by ForestClaw
        geoclaw_vt : Specific to GeoClaw (or ClawPack) */
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -68,6 +67,7 @@ void fc2d_geoclaw_init_vtables()
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     
     fclaw2d_init_vtable();
+    fclaw2d_clawpatch_init_vtable_defaults();
 
     fclaw_vt->problem_setup      = &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */

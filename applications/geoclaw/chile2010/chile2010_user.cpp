@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_geoclaw.h>
 
 
-static fclaw2d_vtable_t vt;
+// static fclaw2d_vtable_t vt;
 // static fc2d_geoclaw_vtable_t geoclaw;
 
 void chile2010_link_solvers(fclaw2d_domain_t *domain)
@@ -40,7 +40,7 @@ void chile2010_link_solvers(fclaw2d_domain_t *domain)
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
 #endif 
 
-	fc2d_geoclaw_init_vtables();
+	// fc2d_geoclaw_init_vtables();
     fclaw2d_set_vtable();
 
 }

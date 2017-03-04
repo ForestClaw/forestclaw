@@ -41,13 +41,13 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  annulus_user_get_options(domain);
 
-    fclaw2d_init_vtable();
+    // fclaw2d_init_vtable();
     fclaw2d_vt()->problem_setup       = &annulus_problem_setup;
 
     if (user->claw_version == 4)
     {
         // fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-        fc2d_clawpack46_set_vtable_defaults();
+        // fc2d_clawpack46_set_vtable_defaults();
 
         fclaw2d_patch_vt()->patch_setup = &annulus_patch_setup;
         // classic_claw46.clawpatch()->patch_setup = &annulus_patch_setup;
@@ -62,7 +62,7 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
     else if (user->claw_version == 5)
     {
         // fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-        fc2d_clawpack5_set_vtable_defaults();
+        // fc2d_clawpack5_set_vtable_defaults();
 
         fclaw2d_patch_vt()->patch_setup  = &annulus_patch_setup;
 

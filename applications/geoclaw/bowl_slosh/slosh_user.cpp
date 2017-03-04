@@ -38,7 +38,7 @@ void slosh_link_solvers(fclaw2d_domain_t *domain)
     /* These are set by GeoClaw for convenience, but the user
        can set these with customized functions, if desired. */
     // fc2d_geoclaw_init_vtables(&vt, &geoclaw);
-    fc2d_geoclaw_init_vtables();
+    // fc2d_geoclaw_init_vtables();
     
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
     patch_vt->patch_initialize       = &slosh_patch_initialize;

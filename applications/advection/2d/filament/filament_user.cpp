@@ -40,13 +40,13 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     const user_options_t* user = filament_user_get_options(domain);
     const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
 
-    fclaw2d_init_vtable();
+    // fclaw2d_init_vtable();
 
     if (user->claw_version == 4)
     {
         // fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-        fc2d_clawpack46_set_vtable_defaults();
-
+        // fc2d_clawpack46_set_vtable_defaults();
+        
         fc2d_clawpack46_vt()->setprob   = &SETPROB;
         fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
         if (gparms->manifold)
@@ -75,7 +75,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     else if (user->claw_version == 5)
     {
         // fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-        fc2d_clawpack5_set_vtable_defaults();
+        // fc2d_clawpack5_set_vtable_defaults();
 
         fc2d_clawpack5_vt()->setprob   = &SETPROB;
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;

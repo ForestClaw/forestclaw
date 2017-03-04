@@ -40,9 +40,8 @@ void bowl_link_solvers(fclaw2d_domain_t *domain)
 #if 0
     fc2d_geoclaw_init_vtables(&vt, &geoclaw);
     fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
-#endif 
-
-    fc2d_geoclaw_init_vtables();
+#endif
+    
     fclaw2d_set_vtable();
 
 #if 0
