@@ -109,6 +109,7 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app (domain,app);
+    fc2d_geoclaw_init_vtables();
     slosh_link_solvers(domain);
 
     /* ---------------------------------------------------------------
@@ -149,7 +150,6 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     fclaw2d_clawpatch_link_app(app);
-    fc2d_geoclaw_init_vtables();
 
     /* Run the program */
 

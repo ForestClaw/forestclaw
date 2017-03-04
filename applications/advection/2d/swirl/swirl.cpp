@@ -92,6 +92,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_map_context_t    *cont = NULL;
 
     amr_options_t            *gparms;
+    user_options_t           *user;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
@@ -112,6 +113,17 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app (domain,app);
+
+    user = (user_options_t*) fclaw_app_get_user(app);
+    if (user->claw_version == 4)
+    {
+      fc2d_clawpack46_set_vtable_defaults();
+    }
+    else if (user->claw_version == 5)
+    {
+      fc2d_clawpack5_set_vtable_defaults();
+    }
+
     swirl_link_solvers(domain);
 
     /* ---------------------------------------------------------------
@@ -153,15 +165,6 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     fclaw2d_clawpatch_link_app(app);
-
-    if (user->claw_version == 4)
-    {
-      fc2d_clawpack46_set_vtable_defaults();
-    }
-    else if (user->claw_version == 5)
-    {
-      fc2d_clawpack5_set_vtable_defaults();
-    }
 
     /* Run the program */
 

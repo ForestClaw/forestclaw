@@ -175,6 +175,15 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app(domain,app);
 
+    if (user->claw_version == 4)
+    {
+      fc2d_clawpack46_set_vtable_defaults();
+    }
+    else if (user->claw_version == 5)
+    {
+      fc2d_clawpack5_set_vtable_defaults();
+    }
+
     filament_link_solvers(domain);
 
     fclaw2d_initialize(&domain);
@@ -220,14 +229,6 @@ main (int argc, char **argv)
 
   fclaw2d_clawpatch_link_app(app);
 
-  if (user->claw_version == 4)
-  {
-    fc2d_clawpack46_set_vtable_defaults();
-  }
-  else if (user->claw_version == 5)
-  {
-    fc2d_clawpack5_set_vtable_defaults();
-  }
 
   if (!retval & !vexit)
   {
