@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_mpi.h>
 
+#ifdef FCLAW_HAVE_FENV_H
+#include <fenv.h>
+#endif
 
 typedef struct fclaw_options_general
 {

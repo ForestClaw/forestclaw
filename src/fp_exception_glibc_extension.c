@@ -62,6 +62,10 @@ To compile it under Linux, execute:
 
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
 
+#ifdef FCLAW_HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
 #ifdef LINUX
 /* BEGIN quote
 http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.html
@@ -244,6 +248,7 @@ static const char *fe_code_name[] = {
   "FPE_UNKNOWN"
 };
 
+#if 0
 /* SAMPLE ALTERNATE FP EXCEPTION HANDLER
 
    The sample handler just reports information about the
@@ -309,7 +314,7 @@ fhdl ( int sig, siginfo_t *sip, ucontext_t *scp )
 
   abort();
 }
-
+#endif
 
 #if 0
 int main (int argc, char **argv)
