@@ -48,7 +48,7 @@ typedef struct user_options
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
 void SWIRL_SETPROB(double* tperiod);
 
-void swirl_link_solvers(fclaw2d_domain_t *domain);
+void swirl_link_solvers(fclaw2d_global_t *glob);
 
 void swirl_problem_setup(fclaw2d_domain_t* domain);
 
@@ -57,7 +57,8 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx);
 
-const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_user_get_options_old(fclaw2d_domain_t* domain);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();

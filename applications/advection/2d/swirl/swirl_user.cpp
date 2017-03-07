@@ -37,9 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // static fc2d_clawpack46_vtable_t classic_claw46;
 // static fc2d_clawpack5_vtable_t classic_claw5;
 
-void swirl_link_solvers(fclaw2d_domain_t *domain)
+void swirl_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = swirl_user_get_options(domain);
+    const user_options_t* user = swirl_user_get_options(glob);
 
     fclaw2d_vt()->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
@@ -73,7 +73,7 @@ void swirl_link_solvers(fclaw2d_domain_t *domain)
 
 void swirl_problem_setup(fclaw2d_domain_t* domain)
 {
-    const user_options_t* user = swirl_user_get_options(domain);
+    const user_options_t* user = swirl_user_get_options_old(domain);
 
     double period = user->period;
     SWIRL_SETPROB(&period);

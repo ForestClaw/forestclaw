@@ -32,7 +32,7 @@ const int NumCorners = FCLAW2D_NUM_CORNERS;
 const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
 
 fclaw2d_global_t *
-fclaw2d_global_new (fclaw_options_t * gparms)
+fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain)
 {
     fclaw2d_global_t *glob;
 
@@ -51,6 +51,11 @@ fclaw2d_global_new (fclaw_options_t * gparms)
     glob->pkgs = fclaw_package_container_new ();
 
     fclaw2d_clawpatch_link_global (glob);
+
+    glob->domain = domain;
+    glob->mpicomm = domain->mpicomm;
+    glob->mpisize = domain->mpisize;
+    glob->mpirank = domain->mpirank;
 
     return glob;
 }
@@ -76,4 +81,12 @@ fclaw2d_global_get_container (fclaw2d_global_t * glob)
     FCLAW_ASSERT (glob->pkgs != NULL);
 
     return glob->pkgs;
+}
+
+fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob)
+{
+    fclaw_app_t* app;
+    app = fclaw2d_domain_get_app(glob->domain);
+
+    return app;
 }

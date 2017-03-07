@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GLOBAL_H
 #define FCLAW2D_GLOBAL_H
 
+#include <forestclaw2d.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 
@@ -56,9 +57,32 @@ extern const int NumSiblings;
 
 typedef struct fclaw2d_global
 {
+
+#if 0
+    int count_set_clawpatch, count_delete_clawpatch;
+    int count_amr_advance, count_ghost_exchange, count_amr_regrid;
+    int count_amr_new_domain;
+    int count_single_step;
+    int count_multiproc_corner;
+    int count_grids_per_proc;
+    int count_grids_remote_boundary;
+    int count_grids_local_boundary;
+    int is_latest_domain;
+    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
+
+    /* Time at start of each subcycled time step */
+    double curr_time;
+#endif
+	sc_MPI_Comm mpicomm;
+    int mpisize;              /**< Size of communicator. */
+    int mpirank;              /**< Rank of this process in \b mpicomm. */
+
     int gparms_owned;                   /**< Did we allocate \a gparms? */
     fclaw_options_t *gparms;            /**< Option values for forestclaw. */
+ 
     fclaw_package_container_t *pkgs;    /**< Solver packages for internal use. */
+ 
+    fclaw2d_domain_t *domain;
 }
 fclaw2d_global_t;
 
@@ -66,7 +90,7 @@ fclaw2d_global_t;
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.
  *                              If NULL, we allocate gparms ourselves.
  */
-fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms);
+fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
 
 /** Free a global structures and all members. */
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
@@ -74,6 +98,8 @@ void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 /** Access the package container from the global type. */
 fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
                                                          glob);
+
+fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

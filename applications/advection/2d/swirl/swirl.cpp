@@ -71,9 +71,15 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain)
+const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob)
+{
+    return swirl_user_get_options_old(glob->domain);
+}
+
+const user_options_t* swirl_user_get_options_old(fclaw2d_domain_t* domain)
 {
     fclaw_app_t* app;
+    // app = fclaw2d_global_get_app(glob);
     app = fclaw2d_domain_get_app(domain);
 
     const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
@@ -81,22 +87,13 @@ const user_options_t* swirl_user_get_options(fclaw2d_domain_t* domain)
     return (user_options_t*) user;
 }
 
-
-void run_program(fclaw_app_t* app)
+static
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
 {
-    sc_MPI_Comm            mpicomm;
-
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t	       *domain;
+    fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
-
-    amr_options_t            *gparms;
-    user_options_t           *user;
-
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-
-    gparms = fclaw_forestclaw_get_options(app);
 
     /* Map unit square to disk using mapc2m_disk.f */
 
@@ -106,13 +103,20 @@ void run_program(fclaw_app_t* app)
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    return domain;
+}
+
+static
+void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
+{
+    user_options_t           *user;     
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(domain);
-    fclaw2d_domain_set_app (domain,app);
+    fclaw2d_domain_data_new(glob->domain);
+    fclaw2d_domain_set_app (glob->domain,app);
 
     user = (user_options_t*) fclaw_app_get_user(app);
     if (user->claw_version == 4)
@@ -124,17 +128,18 @@ void run_program(fclaw_app_t* app)
       fc2d_clawpack5_set_vtable_defaults();
     }
 
-    swirl_link_solvers(domain);
+    swirl_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
 
-    fclaw2d_initialize(&domain);
-    fclaw2d_run(&domain);
-    fclaw2d_finalize(&domain);
-    /* This has to be in this scope */
+    fclaw2d_initialize(&glob->domain);
+    fclaw2d_run(&glob->domain);
+    
+    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(glob->domain);
     fclaw2d_map_destroy(cont);
+    fclaw2d_finalize(&glob->domain);
 }
 
 int
@@ -147,6 +152,11 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
     user_options_t              suser, *user = &suser;
+    amr_options_t               *gparms;
+
+    fclaw2d_global_t         *glob;
+    fclaw2d_domain_t         *domain;
+    sc_MPI_Comm mpicomm;
 
     int retval;
 
@@ -165,14 +175,20 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     fclaw2d_clawpatch_link_app(app);
+    
+    /* at this point gparms is valid */
+    gparms = fclaw_forestclaw_get_options(app);
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+    domain = create_domain(mpicomm, gparms);
+    glob = fclaw2d_global_new (gparms, domain);
 
     /* Run the program */
-
     if (!retval & !vexit)
     {
-        run_program(app);
+        run_program(glob, app);
     }
-
+    
+    fclaw2d_global_destroy(glob);
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 
