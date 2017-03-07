@@ -276,8 +276,8 @@ fc2d_geoclaw_get_auxarray_cp (fclaw2d_domain_t* domain,
 }
 
 void fc2d_geoclaw_aux_data(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux)
+                           fclaw2d_patch_t *this_patch,
+                           double **aux, int* maux)
 {
     fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
     fc2d_geoclaw_get_auxarray_cp (domain,cp,aux,maux);

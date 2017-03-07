@@ -438,7 +438,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
         }
     }
 
-
+    // fc2d_clawpack46_define_auxarray (domain, this_patch);
     fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,cp->package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)

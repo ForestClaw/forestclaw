@@ -115,13 +115,6 @@ void fc2d_clawpack5_set_vtable_defaults()
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
 }
 
-/* Patch data is stored in each fclaw2d_clawpatch_t */
-struct patch_aux_data
-{
-    FArrayBox auxarray;
-    int maux;
-};
-
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain)
 {
     int id;
@@ -130,6 +123,13 @@ fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain)
     id = fc2d_clawpack5_get_package_id();
     return (fc2d_clawpack5_options_t*) fclaw_package_get_options(app,id);
 }
+
+/* Patch data is stored in each fclaw2d_clawpatch_t */
+struct patch_aux_data
+{
+    FArrayBox auxarray;
+    int maux;
+};
 
 static patch_aux_data*
 get_patch_data(fclaw2d_clawpatch_t *cp)
@@ -178,7 +178,6 @@ void fc2d_clawpack5_package_register(fclaw_app_t* app,
                                          &clawpack5_patch_vtable);
     s_clawpack5_package_id = id;
 }
-#endif
 
 void
 fc2d_clawpack5_register_vtable (fclaw_package_container_t * pkg_container,
@@ -190,6 +189,7 @@ fc2d_clawpack5_register_vtable (fclaw_package_container_t * pkg_container,
       fclaw_package_container_add (pkg_container, clawopt,
                                    &clawpack5_patch_vtable);
 }
+#endif
 
 void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile)
 {
@@ -271,18 +271,6 @@ void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
     fc2d_clawpack5_get_auxarray_cp (domain,cp,aux,maux);
 }
 
-void fc2d_clawpack5_maux(fclaw2d_domain_t* domain,int* maux)
-{
-    *maux = fc2d_clawpack5_get_maux(domain);
-}
-
-int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain)
-{
-    fc2d_clawpack5_options_t *clawpack_options;
-    clawpack_options = fc2d_clawpack5_get_options(domain);
-    return clawpack_options->maux;
-}
-
 void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
 {
     if (classic_vt.setprob != NULL)
@@ -290,7 +278,6 @@ void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
         classic_vt.setprob();
     }
 }
-
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */
 void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,

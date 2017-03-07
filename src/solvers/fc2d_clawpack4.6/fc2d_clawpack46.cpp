@@ -115,14 +115,6 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 }
 
-
-/* Patch data is stored in each fclaw2d_clawpatch_t */
-struct patch_aux_data
-{
-    FArrayBox auxarray;
-    int maux;
-};
-
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
 {
     int id;
@@ -131,6 +123,14 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
     id = fc2d_clawpack46_get_package_id();
     return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
 }
+
+
+/* Patch data is stored in each fclaw2d_clawpatch_t */
+struct patch_aux_data
+{
+    FArrayBox auxarray;
+    int maux;
+};
 
 static patch_aux_data*
 get_patch_data(fclaw2d_clawpatch_t *cp)
@@ -161,36 +161,9 @@ static const fclaw_package_vtable_t clawpack46_patch_vtable = {
     patch_data_delete
 };
 
-
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-#if 0
-void fc2d_clawpack46_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack46_options_t *clawopt)
-{
-    int id;
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    /* Register packages */
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack46_patch_vtable);
-    s_clawpack46_package_id = id;
-}
-#endif
-
-void
-fc2d_clawpack46_register_vtable (fclaw_package_container_t * pkg_container,
-                                 fc2d_clawpack46_options_t * clawopt)
-{
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    s_clawpack46_package_id =
-      fclaw_package_container_add (pkg_container, clawopt,
-                                   &clawpack46_patch_vtable);
-}
 
 void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
 {
@@ -243,6 +216,9 @@ fc2d_clawpack46_define_auxarray_cp (fclaw2d_domain_t* domain, fclaw2d_clawpatch_
     patch_aux_data *clawpack_patch_data = get_patch_data(cp);
     clawpack_patch_data->auxarray.define(box,maux);
     clawpack_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
+
+    // cp->maux = maux;
+    // cp->aux.define(box,maux);
 }
 
 void fc2d_clawpack46_define_auxarray (fclaw2d_domain_t* domain,
@@ -252,6 +228,7 @@ void fc2d_clawpack46_define_auxarray (fclaw2d_domain_t* domain,
     fc2d_clawpack46_define_auxarray_cp (domain, cp);
 }
 
+#if 1
 static void
 fc2d_clawpack46_get_auxarray_cp (fclaw2d_domain_t* domain,
                                  fclaw2d_clawpatch_t *cp, double **aux, int* maux)
@@ -263,25 +240,18 @@ fc2d_clawpack46_get_auxarray_cp (fclaw2d_domain_t* domain,
     patch_aux_data *clawpack_patch_data = get_patch_data(cp);
     *aux = clawpack_patch_data->auxarray.dataPtr();
 }
+#endif
 
 void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
     fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
+#if 0
+    *maux = cp->maux;
+    *aux = cp->aux.dataPtr();
+#endif
     fc2d_clawpack46_get_auxarray_cp (domain,cp,aux,maux);
-}
-
-void fc2d_clawpack46_maux(fclaw2d_domain_t* domain,int* maux)
-{
-    *maux = fc2d_clawpack46_get_maux(domain);
-}
-
-int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain)
-{
-    fc2d_clawpack46_options_t *clawpack_options;
-    clawpack_options = fc2d_clawpack46_get_options(domain);
-    return clawpack_options->maux;
 }
 
 void fc2d_clawpack46_setprob(fclaw2d_domain_t *domain)
