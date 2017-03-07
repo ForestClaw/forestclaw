@@ -42,7 +42,7 @@ extern "C"
 #endif
 
 
-typedef void (*fc2d_clawpack46_setprob_t)();
+typedef void (*fc2d_clawpack46_setprob_t)(void);
 
 typedef void (*fc2d_clawpack46_bc2_t)(const int* maxmx, const int* maxmy,
                                       const int* meqn, const int* mbc,
@@ -134,9 +134,9 @@ void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                          fc2d_clawpack46_vtable_t* claw_vt);
 #endif 
 
-void fc2d_clawpack46_set_vtable_defaults();
+void fc2d_clawpack46_set_vtable_defaults(void);
 
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt();
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
 
 #define CLAWPACK46_BC2_DEFAULT FCLAW_F77_FUNC(clawpack46_bc2_default,CLAWPACK46_BC2_DEFAULT)
 void CLAWPACK46_BC2_DEFAULT(const int* maxmx, const int* maxmy, const int* meqn,
@@ -403,7 +403,7 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc2d_clawpack46_setprob(fclaw2d_domain_t* domain);
+    fc2d_clawpack46_setprob(fclaw2d_global_t* glob);
 
 void
     fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,

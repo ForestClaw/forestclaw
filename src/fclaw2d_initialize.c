@@ -103,7 +103,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     /* User defined problem setup */
     if (fclaw2d_vt()->problem_setup != NULL)
     {
-        fclaw2d_vt()->problem_setup(*domain);
+        fclaw2d_vt()->problem_setup(glob);
     }
 
     /* set specific refinement strategy */

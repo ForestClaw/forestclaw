@@ -283,7 +283,7 @@ int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain)
     return clawpack_options->maux;
 }
 
-void fc2d_clawpack5_setprob(fclaw2d_domain_t *domain)
+void fc2d_clawpack5_setprob(fclaw2d_global_t *glob)
 {
     if (classic_vt.setprob != NULL)
     {

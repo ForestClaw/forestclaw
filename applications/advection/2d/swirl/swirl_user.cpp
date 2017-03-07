@@ -71,9 +71,9 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_set_vtable();
 }
 
-void swirl_problem_setup(fclaw2d_domain_t* domain)
+void swirl_problem_setup(fclaw2d_global_t* glob)
 {
-    const user_options_t* user = swirl_user_get_options_old(domain);
+    const user_options_t* user = swirl_user_get_options(glob);
 
     double period = user->period;
     SWIRL_SETPROB(&period);

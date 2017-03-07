@@ -26,13 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include <forestclaw2d.h>
 #include <fclaw_base.h>
 #include <fclaw2d_defs.h>
 
 #include <fclaw2d_metric_default.h>
 #include <fclaw2d_diagnostics_default.h>
 #include <fclaw2d_transform.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,7 +43,7 @@ extern "C"
 #endif
 
 
-typedef void (*fclaw2d_problem_setup_t)(fclaw2d_domain_t *domain);
+typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
 
 typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_domain_t *domain,
                                             fclaw2d_patch_t *this_patch,

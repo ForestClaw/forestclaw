@@ -26,10 +26,10 @@
 #ifndef FC2D_CLAWPACK5_H
 #define FC2D_CLAWPACK5_H
 
-#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw_package.h>
+#include <fclaw2d_global.h>
 
 #include "fc2d_clawpack5_options.h"
 
@@ -45,7 +45,7 @@ extern "C"
 #endif
 
 
-typedef void (*fc2d_clawpack5_setprob_t)();
+typedef void (*fc2d_clawpack5_setprob_t)(void);
 
 typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
@@ -400,7 +400,7 @@ fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc2d_clawpack5_setprob(fclaw2d_domain_t* domain);
+    fc2d_clawpack5_setprob(fclaw2d_global_t* glob);
 
 void
     fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
