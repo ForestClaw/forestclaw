@@ -64,6 +64,10 @@ void cb_initialize (fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Public interface
    ----------------------------------------------------------------- */
+void fclaw2d_initialize_hello (fclaw2d_global_t* glob)
+{
+    fclaw2d_initialize (&glob->domain);
+}
 
 void fclaw2d_initialize (fclaw2d_domain_t **domain)
 {
