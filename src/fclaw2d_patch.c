@@ -55,7 +55,7 @@ static fclaw2d_patch_vtable_t s_patch_vt;
 static
 fclaw2d_patch_vtable_t* patch_vt()
 {
-    FCLAW_ASSERT(s_patch_vt.defaults_set == 1);
+    FCLAW_ASSERT(s_patch_vt.defaults_set != 0);
     return &s_patch_vt;
 }
 
