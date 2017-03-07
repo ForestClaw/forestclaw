@@ -83,7 +83,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double alpha);
 
 
-void filament_link_solvers(fclaw2d_domain_t *domain);
+void filament_link_solvers(fclaw2d_global_t *glob);
 
 void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *this_patch,

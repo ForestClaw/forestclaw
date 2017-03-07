@@ -35,10 +35,11 @@ static fc2d_clawpack46_vtable_t classic_claw46;
 static fc2d_clawpack5_vtable_t classic_claw5;
 #endif 
 
-void filament_link_solvers(fclaw2d_domain_t *domain)
+void filament_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = filament_user_get_options(domain);
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(domain);
+    fclaw2d_domain_t** domain = &glob->domain;
+    const user_options_t* user = filament_user_get_options(*domain);
+    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(*domain);
 
     // fclaw2d_init_vtable();
 

@@ -104,32 +104,16 @@ const user_options_t* filament_user_get_options(fclaw2d_domain_t* domain)
     return (user_options_t*) user;
 }
 
-
 static
-void run_program(fclaw_app_t* app)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms, user_options_t* user)
 {
-    sc_MPI_Comm            mpicomm;
-
     /* Mapped, multi-block domain */
-    p4est_connectivity_t       *conn = NULL;
-    fclaw2d_domain_t	       *domain;
-    fclaw2d_map_context_t      *cont = NULL, *brick = NULL;
-
-    amr_options_t              *gparms;
-    user_options_t             *user;
-
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-
-    gparms = fclaw_forestclaw_get_options(app);
-    user = (user_options_t*) fclaw_app_get_user(app);
-
-    /* ---------------------------------------------------------------
-       Domain geometry
-       -------------------------------------------------------------- */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t         *domain;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    
     int mi, mj;
     double rotate[2];
-
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
     rotate[0] = 0;
     rotate[1] = 0;
@@ -163,17 +147,29 @@ void run_program(fclaw_app_t* app)
     default:
         SC_ABORT_NOT_REACHED ();
     }
-
+    
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    
+    return domain;    
+}
+
+static
+void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
+{
+    fclaw2d_domain_t           **domain = &glob->domain;
+    fclaw2d_map_context_t      *cont;
+    user_options_t             *user;
+
+    user = (user_options_t*) fclaw_app_get_user(app);
+
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(domain);
-    fclaw2d_domain_set_app(domain,app);
+    fclaw2d_domain_data_new(*domain);
+    fclaw2d_domain_set_app(*domain,app);
 
     if (user->claw_version == 4)
     {
@@ -184,13 +180,14 @@ void run_program(fclaw_app_t* app)
       fc2d_clawpack5_set_vtable_defaults();
     }
 
-    filament_link_solvers(domain);
+    filament_link_solvers(glob);
 
-    fclaw2d_initialize(&domain);
-    fclaw2d_run(&domain);
-    fclaw2d_finalize(&domain);
+    fclaw2d_initialize(glob);
+    fclaw2d_run(glob);
 
+    cont = fclaw2d_domain_get_map_context(*domain);
     fclaw2d_map_destroy(cont);
+    fclaw2d_finalize(domain);
 }
 
 
@@ -206,6 +203,10 @@ main (int argc, char **argv)
   sc_options_t     *options;
   amr_options_t    *gparms;
   user_options_t   suser_options, *user = &suser_options;
+
+  sc_MPI_Comm mpicomm;
+  fclaw2d_domain_t* domain;
+  fclaw2d_global_t* glob;
 
   int retval;
 
@@ -229,12 +230,16 @@ main (int argc, char **argv)
 
   fclaw2d_clawpatch_link_app(app);
 
+  mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+  domain = create_domain(mpicomm, gparms, user);
+  glob = fclaw2d_global_new (gparms, domain);
 
   if (!retval & !vexit)
   {
-      run_program(app);
+      run_program(glob, app);
   }
 
+  fclaw2d_global_destroy(glob);
   fclaw_forestclaw_destroy(app);
   fclaw_app_destroy (app);
 
