@@ -62,9 +62,12 @@ fclaw_package_data_t* fclaw_package_data_new()
 
 void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data)
 {
-    FCLAW_ASSERT(pkg_data != NULL);
-    FCLAW_FREE(pkg_data);
-    pkg_data = NULL;
+    if (pkg_data != NULL)
+    {
+      FCLAW_FREE(pkg_data);
+      pkg_data = NULL;
+    }
+    // FCLAW_ASSERT(pkg_data != NULL);
 }
 
 fclaw_package_container_t *
@@ -166,7 +169,14 @@ void
         {
             pkg = pkg_container->pkgs[i];
             FCLAW_ASSERT(pkg != NULL);
-            data_container->data[i] = (void*) pkg->vt.new_patch_data();
+            if (pkg->vt.new_patch_data != NULL)
+            {
+              data_container->data[i] = (void*) pkg->vt.new_patch_data();
+            }
+            else
+            {
+              data_container->data[i] = NULL;
+            }
         }
         data_container->count = pkg_container->count;
     }
@@ -189,7 +199,10 @@ void
         {
             pkg = pkg_container->pkgs[i];
             FCLAW_ASSERT(pkg != NULL);
-            pkg->vt.destroy_patch_data(data_container->data[i]);
+            if (pkg->vt.destroy_patch_data != NULL)
+            {
+              pkg->vt.destroy_patch_data(data_container->data[i]);
+            }
         }
     }
 }

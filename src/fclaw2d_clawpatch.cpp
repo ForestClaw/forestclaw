@@ -137,6 +137,16 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
     *dy = cp->dy;
 }
 
+void fclaw2d_clawpatch_aux_data(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t *this_patch,
+                                double **aux, int* maux)
+{
+    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
+
+    *maux = cp->maux;
+    *aux = cp->aux.dataPtr();
+}
+
 void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn)
@@ -346,6 +356,8 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     cp->mbc = gparms->mbc;
     cp->blockno = blockno;
     cp->meqn = gparms->meqn;
+    cp->maux = gparms->maux;
+
     for (int icorner=0; icorner < 4; icorner++)
     {
         fclaw2d_patch_set_block_corner_count(domain,this_patch,icorner,0);
@@ -424,6 +436,10 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
         cp->griderror.define(box,cp->meqn);
     }
 
+    if (gparms->maux > 0)
+    {
+      cp->aux.define(box,cp->maux);
+    }
     // Set up storage for metric terms, if needed.
     if (gparms->manifold)
     {
@@ -438,7 +454,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
         }
     }
 
-    // fc2d_clawpack46_define_auxarray (domain, this_patch);
+    // fc2d_clawpack46_define_auxaray (domain, this_patch);
     fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,cp->package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)

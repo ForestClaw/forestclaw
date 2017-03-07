@@ -156,6 +156,10 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
+    amr_options_t* gparms;
+    gparms = fclaw_forestclaw_get_options(app);
+    gparms->maux = clawopt->maux;
+    
     return fc2d_clawpack46_check (clawopt);
 }
 

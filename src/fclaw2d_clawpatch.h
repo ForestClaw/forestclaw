@@ -77,6 +77,10 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn);
 
+void fclaw2d_clawpatch_aux_data(fclaw2d_domain_t* domain,
+                                fclaw2d_patch_t *this_patch,
+                                double **aux, int* maux);
+
 double *fclaw2d_clawpatch_get_q(fclaw2d_domain_t* domain,
                                 fclaw2d_patch_t* this_patch);
 
