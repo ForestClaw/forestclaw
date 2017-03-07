@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_REGRID_H
 #define FCLAW2D_REGRID_H
 
-#include "forestclaw2d.h"
-#include <fclaw2d_regrid_default_fort.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -58,7 +57,7 @@ void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain);
 
 
 
-void fclaw2d_regrid(fclaw2d_domain_t **domain);
+void fclaw2d_regrid(fclaw2d_global_t *glob);
 
 
 #ifdef __cplusplus

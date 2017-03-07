@@ -44,9 +44,11 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 {
     int refine_patch, maxlevel, level;
     const amr_options_t* gparms;
-    int domain_init = *((int*) user);
 
-    gparms = get_domain_parms(domain);
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    int domain_init = *((int*) g->user);
+
+    gparms = g->glob->gparms;
 
     maxlevel = gparms->maxlevel;
     level = this_patch->level;
@@ -198,8 +200,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
-void fclaw2d_regrid(fclaw2d_domain_t **domain)
+void fclaw2d_regrid(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
+
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
     // fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
@@ -213,7 +217,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
                                     (void*) NULL);
 
     int domain_init = 0;
-    fclaw2d_domain_iterate_patches(*domain, cb_fclaw2d_regrid_tag4refinement,
+    fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);

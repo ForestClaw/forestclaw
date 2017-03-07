@@ -86,8 +86,9 @@ void save_time_step(fclaw2d_domain_t *domain)
    Output style 1
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
-static void outstyle_0(fclaw2d_domain_t **domain)
+static void outstyle_0(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
     int iframe;
 
     iframe = 0;
@@ -117,15 +118,16 @@ static void outstyle_0(fclaw2d_domain_t **domain)
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
 static
-void outstyle_1(fclaw2d_domain_t **domain)
+void outstyle_1(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
     int iframe = 0;
 
     fclaw2d_output_frame(*domain,iframe);
 
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
 
     double final_time = gparms->tfinal;
     int nout = gparms->nout;
@@ -280,7 +282,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
                 if (n_inner % gparms->regrid_interval == 0)
                 {
                     fclaw_global_infof("regridding at step %d\n",n);
-                    fclaw2d_regrid(domain);
+                    fclaw2d_regrid(glob);
                 }
             }
         }
@@ -293,15 +295,17 @@ void outstyle_1(fclaw2d_domain_t **domain)
 }
 
 #if 0
-static void outstyle_2(fclaw2d_domain_t **domain)
+static void outstyle_2(fclaw2d_global_t *glob)
 {
+    // fclaw2d_domain_t** domain = &glob->domain;
     // Output time at specific time steps.
 }
 #endif
 
 static
-void outstyle_3(fclaw2d_domain_t **domain)
+void outstyle_3(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
     int init_flag = 1;
@@ -312,7 +316,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
     fclaw2d_output_frame(*domain,iframe);
 
 
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
     double initial_dt = gparms->initial_dt;
 
     double t0 = 0;
@@ -415,7 +419,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
             if (n % nregrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
-                fclaw2d_regrid(domain);
+                fclaw2d_regrid(glob);
             }
         }
 
@@ -430,8 +434,9 @@ void outstyle_3(fclaw2d_domain_t **domain)
 
 
 static
-void outstyle_4(fclaw2d_domain_t **domain)
+void outstyle_4(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
 #if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 #endif
@@ -443,7 +448,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
     fclaw2d_diagnostics_run(*domain,init_flag);
     init_flag = 0;
 
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
@@ -482,7 +487,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
 
-                fclaw2d_regrid(domain);
+                fclaw2d_regrid(glob);
             }
         }
         else
@@ -503,27 +508,27 @@ void outstyle_4(fclaw2d_domain_t **domain)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_run(fclaw2d_domain_t **domain)
+void fclaw2d_run(fclaw2d_global_t *glob)
 {
 
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
 
     switch (gparms->outstyle)
     {
     case 0:
-        outstyle_0(domain);
+        outstyle_0(glob);
         break;
     case 1:
-        outstyle_1(domain);
+        outstyle_1(glob);
         break;
     case 2:
         fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);
         exit(0);
     case 3:
-        outstyle_3(domain);
+        outstyle_3(glob);
         break;
     case 4:
-        outstyle_4(domain);
+        outstyle_4(glob);
         break;
     default:
         fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);

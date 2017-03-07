@@ -64,17 +64,14 @@ void cb_initialize (fclaw2d_domain_t *domain,
 /* -----------------------------------------------------------------
    Public interface
    ----------------------------------------------------------------- */
-void fclaw2d_initialize_hello (fclaw2d_global_t* glob)
+void fclaw2d_initialize(fclaw2d_global_t *glob)
 {
-    fclaw2d_initialize (&glob->domain);
-}
+    fclaw2d_domain_t** domain = &glob->domain;
 
-void fclaw2d_initialize (fclaw2d_domain_t **domain)
-{
     int time_interp = 0;
     char basename[BUFSIZ];
     // const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
 
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
 
@@ -127,8 +124,8 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
 
     /* Initialize patches on uniformly refined level minlevel */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-    fclaw2d_domain_iterate_level(*domain, minlevel, cb_initialize,
-                                 (void *) NULL);
+    fclaw2d_global_iterate_level(glob, minlevel, cb_initialize,
+                                 NULL);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
     /* Set up ghost patches */
@@ -176,9 +173,9 @@ void fclaw2d_initialize (fclaw2d_domain_t **domain)
         for (level = minlevel; level < maxlevel; level++)
         {
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
-            fclaw2d_domain_iterate_level(*domain, level,
+            fclaw2d_global_iterate_level(glob, level,
                                          cb_fclaw2d_regrid_tag4refinement,
-                                         (void *) &domain_init);
+                                         &domain_init);
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
             // Construct new domain based on tagged patches.
