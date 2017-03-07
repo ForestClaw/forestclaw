@@ -90,3 +90,21 @@ fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob)
 
     return app;
 }
+
+void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+                                   fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_level(glob->domain, level, pcb, &g);
+}
+
+void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+                                     fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_patches(glob->domain, pcb, &g);
+}

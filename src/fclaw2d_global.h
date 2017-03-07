@@ -86,6 +86,12 @@ typedef struct fclaw2d_global
 }
 fclaw2d_global_t;
 
+typedef struct fclaw2d_global_iterate
+{
+    fclaw2d_global_t* glob;
+    void* user;
+}fclaw2d_global_iterate_t;
+
 /** Allocate a new global structure.
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.
  *                              If NULL, we allocate gparms ourselves.
@@ -100,6 +106,12 @@ fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
                                                          glob);
 
 fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob);
+
+void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+                                   fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+                                     fclaw2d_patch_callback_t pcb, void *user);
 
 #ifdef __cplusplus
 #if 0
