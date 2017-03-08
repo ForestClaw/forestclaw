@@ -537,7 +537,7 @@ void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain)
 }
 
 
-void fc2d_geoclaw_setprob(fclaw2d_domain_t *domain)
+void fc2d_geoclaw_setprob(fclaw2d_global_t *glob)
 {
     if (geoclaw_vt.setprob != NULL)
     {

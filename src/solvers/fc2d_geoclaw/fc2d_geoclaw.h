@@ -446,7 +446,7 @@ fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_domain_t *domain);
 void fc2d_geoclaw_setup(fclaw2d_domain_t *domain);
 
 void
-    fc2d_geoclaw_setprob(fclaw2d_domain_t* domain);
+    fc2d_geoclaw_setprob(fclaw2d_global_t* glob);
 
 void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
