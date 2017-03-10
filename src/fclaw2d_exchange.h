@@ -40,7 +40,7 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
                             fclaw2d_timer_names_t running);
 
 void fclaw2d_exchange_delete(fclaw2d_domain_t** domain);

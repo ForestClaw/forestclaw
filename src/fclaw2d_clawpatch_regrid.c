@@ -28,20 +28,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_metric_default_fort.h>
 
-int fclaw2d_clawpatch_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int blockno, int patchno,
                                   int initflag)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+    const amr_options_t *gparms;
+    gparms = glob->gparms;
+
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
     int tag_patch;
     double refine_threshold;
-    const amr_options_t *amropt;
 
-    amropt = get_domain_parms(domain);
-    refine_threshold = amropt->refine_threshold;
+    refine_threshold = gparms->refine_threshold;
 
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -55,11 +57,15 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch;
 }
 
-int fclaw2d_clawpatch_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *fine_patches,
                                   int blockno,
                                   int patchno)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+    const amr_options_t *gparms;
+    gparms = glob->gparms;
+
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q[4];
@@ -69,10 +75,7 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_domain_t *domain,
 
     patch0 = &fine_patches[0];
 
-    const amr_options_t *amropt;
-    amropt = get_domain_parms(domain);
-
-    coarsen_threshold = amropt->coarsen_threshold;
+    coarsen_threshold = gparms->coarsen_threshold;
 
     fclaw2d_clawpatch_grid_data(domain,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);

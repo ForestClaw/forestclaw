@@ -246,12 +246,12 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                       fclaw_bool time_interp,
                                       fclaw2d_transform_data_t* transform_data);
 
-int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno, int patchno,
                                       int initflag);
 
-int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno,
                                       int patchno);
@@ -360,12 +360,12 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_domain_t* domain,
                                                     fclaw_bool a_time_interp,
                                                     fclaw2d_transform_data_t* transform_data);
 
-typedef int (*fclaw2d_patch_tag4refinement_t)(fclaw2d_domain_t *domain,
+typedef int (*fclaw2d_patch_tag4refinement_t)(fclaw2d_global_t *glob,
                                               fclaw2d_patch_t *this_patch,
                                               int this_block_idx, int this_patch_idx,
                                               int initflag);
 
-typedef int (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_domain_t *domain,
+typedef int (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_global_t *glob,
                                                fclaw2d_patch_t *this_patch,
                                                int this_blockno,
                                                int this_patchno);

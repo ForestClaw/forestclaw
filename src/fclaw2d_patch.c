@@ -533,21 +533,21 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                 transform_data);
 }
 
-int fclaw2d_patch_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno, int patchno,
                                       int initflag)
 {
-    return patch_vt()->patch_tag4refinement(domain,this_patch,blockno,
+    return patch_vt()->patch_tag4refinement(glob,this_patch,blockno,
                                    patchno, initflag);
 }
 
-int fclaw2d_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno,
                                       int patchno)
 {
-    return patch_vt()->patch_tag4coarsening(domain,fine_patches,
+    return patch_vt()->patch_tag4coarsening(glob,fine_patches,
                                    blockno, patchno);
 }
 

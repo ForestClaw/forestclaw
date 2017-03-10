@@ -187,7 +187,7 @@ void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
 
     cont = fclaw2d_domain_get_map_context(*domain);
     fclaw2d_map_destroy(cont);
-    fclaw2d_finalize(domain);
+    fclaw2d_finalize(glob);
 }
 
 

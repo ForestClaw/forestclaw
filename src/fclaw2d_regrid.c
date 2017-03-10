@@ -56,8 +56,8 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     if (level < maxlevel)
     {
         refine_patch  =
-            fclaw2d_patch_tag4refinement(domain,this_patch,this_block_idx,
-                                    this_patch_idx, domain_init);
+            fclaw2d_patch_tag4refinement(g->glob,this_patch,this_block_idx,
+                                         this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
             fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
@@ -72,7 +72,10 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                               int blockno, int fine0_patchno,
                               void *user)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t* gparms;
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+
+    gparms = g->glob->gparms;
 
     int minlevel = gparms->minlevel;
 
@@ -81,7 +84,7 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
     if (level > minlevel)
     {
         int family_coarsened = 1;
-        family_coarsened = fclaw2d_patch_tag4coarsening(domain,&fine_patches[0],
+        family_coarsened = fclaw2d_patch_tag4coarsening(g->glob,&fine_patches[0],
                                                         blockno, fine0_patchno);
         if (family_coarsened == 1)
         {
@@ -110,10 +113,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                   int new_patchno,
                                   void *user)
 {
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    int domain_init = *((int*) g->user);
 
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(new_domain);
-
-    int domain_init = *((int*) user);
 
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
@@ -213,7 +216,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
-    fclaw2d_domain_iterate_families(*domain, cb_regrid_tag4coarsening,
+    fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                     (void*) NULL);
 
     int domain_init = 0;
@@ -235,7 +238,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     {
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        fclaw2d_domain_setup(*domain,new_domain);
+        fclaw2d_domain_setup(glob, new_domain);
         ddata = fclaw2d_domain_get_data(new_domain);
     }
 
@@ -249,18 +252,18 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
         /* Average to new coarse grids and interpolate to new fine grids */
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-        fclaw2d_domain_iterate_adapted(*domain, new_domain,
+        fclaw2d_global_iterate_adapted(glob, new_domain,
                                        cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
         /* free memory associated with old domain */
-        fclaw2d_domain_reset(domain);
+        fclaw2d_domain_reset(glob);
         *domain = new_domain;
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(domain, -1,FCLAW2D_TIMER_REGRID);
+        fclaw2d_partition_domain(glob, -1,FCLAW2D_TIMER_REGRID);
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
@@ -268,7 +271,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         ddata = fclaw2d_domain_get_data(*domain);
 
         /* This includes timers for building patches and (exclusive) communication */
-        fclaw2d_exchange_setup(*domain,FCLAW2D_TIMER_REGRID);
+        fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_REGRID);
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */

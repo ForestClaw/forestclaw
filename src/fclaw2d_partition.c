@@ -67,16 +67,18 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* Question : Do all patches on this processor get packed? */
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
+void fclaw2d_partition_domain(fclaw2d_global_t* glob,
+                              int mode,
                               fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
 
     char basename[BUFSIZ];
 
     /* will need to access the subcyle switch */
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
@@ -111,7 +113,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
     if (have_new_partition)
     {
         /* Do this part so we can get a pointer to the new data */
-        fclaw2d_domain_setup(*domain, domain_partitioned);
+        fclaw2d_domain_setup(glob, domain_partitioned);
         ddata = fclaw2d_domain_get_data(domain_partitioned);
     }
 
@@ -136,7 +138,7 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
                                            (void*) patch_data);
 
         /* then the old domain is no longer necessary */
-        fclaw2d_domain_reset(domain);
+        fclaw2d_domain_reset(glob);
         *domain = domain_partitioned;
         domain_partitioned = NULL;
 

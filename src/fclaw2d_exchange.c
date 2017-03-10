@@ -149,9 +149,10 @@ unpack_remote_ghost_patches(fclaw2d_domain_t* domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* This is called whenever a new domain is created (initialize, regrid) */
-void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
                             fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_t* domain = glob->domain;
     /* Time spend in build here is negligible and is included in regrid */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);

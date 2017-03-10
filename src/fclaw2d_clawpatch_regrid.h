@@ -37,12 +37,12 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_clawpatch_tag4refinement(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int blockno, int patchno,
                                   int initflag);
 
-int fclaw2d_clawpatch_tag4coarsening(fclaw2d_domain_t *domain,
+int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int blockno, int patchno);
 

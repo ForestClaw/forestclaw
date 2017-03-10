@@ -31,12 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_finalize(fclaw2d_domain_t **domain)
+void fclaw2d_finalize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const amr_options_t *gparms = glob->gparms;
 
     fclaw_global_essentialf("Finalizing run\n");
-    fclaw2d_domain_barrier (*domain);
+    fclaw2d_domain_barrier (glob->domain);
 
     if (gparms->report_timing)
     {
@@ -44,7 +44,7 @@ void fclaw2d_finalize(fclaw2d_domain_t **domain)
         {
             /* Only call this if we have taken time steps.  For time-independent problems, we
                probably need a different report (no "amr_advance_steps") */
-            fclaw2d_timer_report(*domain);
+            fclaw2d_timer_report(glob->domain);
         }
         else
         {
@@ -52,5 +52,5 @@ void fclaw2d_finalize(fclaw2d_domain_t **domain)
         }
     }
 
-    fclaw2d_domain_reset(domain);
+    fclaw2d_domain_reset(glob);
 }

@@ -113,6 +113,12 @@ void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
 void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
                                      fclaw2d_patch_callback_t pcb, void *user);
 
+void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
+                                      fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* new_domain,
+                                     fclaw2d_match_callback_t mcb, void *user);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

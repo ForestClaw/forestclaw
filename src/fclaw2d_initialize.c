@@ -120,7 +120,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
        ------------------------------------------------ */
 
     /* Get an initial domain */
-    fclaw2d_domain_setup(NULL,*domain);
+    fclaw2d_domain_setup(glob,*domain);
 
     /* Initialize patches on uniformly refined level minlevel */
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
@@ -129,7 +129,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
     /* Set up ghost patches */
-    fclaw2d_exchange_setup(*domain,FCLAW2D_TIMER_INIT);
+    fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
 
     /* This is normally called from regrid */
     fclaw2d_regrid_set_neighbor_types(*domain);
@@ -188,7 +188,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
             if (have_new_refinement)
             {
                 /* Have to get a new ddata */
-                fclaw2d_domain_setup(*domain,new_domain);
+                fclaw2d_domain_setup(glob,new_domain);
                 ddata = fclaw2d_domain_get_data(new_domain);
             }
 
@@ -202,14 +202,14 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 /* Re-initialize new grids.   Ghost cell values needed for
                    interpolation have already been set by initialization */
                 fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-                fclaw2d_domain_iterate_adapted(*domain, new_domain,
+                fclaw2d_global_iterate_adapted(glob, new_domain,
                                                cb_fclaw2d_regrid_repopulate,
                                                (void *) &domain_init);
 
                 fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
                 // free all memory associated with old domain
-                fclaw2d_domain_reset(domain);
+                fclaw2d_domain_reset(glob);
                 *domain = new_domain;
                 new_domain = NULL;
 
@@ -233,14 +233,14 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
                 /* Repartition domain to new processors.   Second arg is the
                    mode for VTK output */
-                fclaw2d_partition_domain(domain,level,FCLAW2D_TIMER_INIT);
+                fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
 
                 /* Need a new timer */
                 ddata = fclaw2d_domain_get_data(*domain);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
                    each time we add a new level. */
-                fclaw2d_exchange_setup(*domain,FCLAW2D_TIMER_INIT);
+                fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
 
                 /* This is normally called from regrid, once the initial domain
                    has been set up */

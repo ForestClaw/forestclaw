@@ -102,14 +102,15 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 }
 
 
-void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
+void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain)
 {
-    const amr_options_t *gparms;
+    const amr_options_t *gparms = glob->gparms;
+    fclaw2d_domain_t *old_domain = glob->domain;
     double t;
     int i;
 
-    if (old_domain == NULL)
+    if (old_domain == new_domain)
     {
         fclaw_global_infof("Building initial domain\n");
         t = 0;
@@ -122,8 +123,6 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
         fclaw2d_domain_data_new(new_domain);
         fclaw2d_domain_data_copy(old_domain,new_domain);
     }
-
-    gparms = get_domain_parms(new_domain);
 
     fclaw2d_block_data_new(new_domain);
 
@@ -139,8 +138,9 @@ void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
 }
 
 
-void fclaw2d_domain_reset(fclaw2d_domain_t** domain)
+void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
     int i, j;
 

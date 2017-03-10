@@ -26,12 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DOMAIN_H
 #define FCLAW2D_DOMAIN_H
 
-#include <forestclaw2d.h>
 #include <fclaw_timer.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_patch.h>
-
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -70,10 +69,10 @@ void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
 void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
                               fclaw2d_domain_t *new_domain);
 
-void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
+void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain);
 
-void fclaw2d_domain_reset(fclaw2d_domain_t** domain);
+void fclaw2d_domain_reset(fclaw2d_global_t* glob);
 
 
 /* ----------------------------------------------------
