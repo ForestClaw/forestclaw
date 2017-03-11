@@ -48,6 +48,44 @@ extern "C"
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
    ---------------------------------------------------------------------------------- */
+
+#define FCLAW2D_CLAWPATCH_FORT_ERROR FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_error, \
+                                                    FCLAW2D_CLAWPATCH_FORT_ERROR)
+
+void FCLAW2D_CLAWPATCH_FORT_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                                  double *dx, double *dy, double *xlower,
+                                  double *ylower, double *t, double q[],
+                                  double error[]);
+
+
+/* Not obvious that the user would want to generalize the conservation routine,
+   so they are not in a 'default' file.*/
+#define FCLAW2D_CLAWPATCH_FORT_CONSCHECK FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_conscheck, \
+                                                        FCLAW2D_CLAWPATCH_FORT_CONSCHECK)
+
+void FCLAW2D_CLAWPATCH_FORT_CONSCHECK(int *mx, int *my, int* mbc, int* meqn,
+                                      double *dx, double *dy,
+                                      double* area, double *q, double* sum);
+
+/* These are only needed if the user has not supplied their own routine to compute
+   the area of the entire domain. Not obvious taht the user would want to
+   generalize these routines. */
+#define FCLAW2D_CLAWPATCH_FORT_AREA FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_area, \
+                                                   FCLAW2D_CLAWPATCH_FORT_AREA)
+
+double FCLAW2D_CLAWPATCH_FORT_AREA(int *mx, int* my, int*mbc, double* dx,
+                                   double* dy, double area[]);
+
+
+#define FCLAW2D_CLAWPATCH_FORT_NORM FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_norm, \
+                                                   FCLAW2D_CLAWPATCH_FORT_NORM)
+
+void FCLAW2D_CLAWPATCH_FORT_NORM(int *mx, int *my, int *mbc, int *meqn,
+                                 double *dx, double *dy, double area[],
+                                 double error[], double error_norm[]);
+
+
+#if 0
 typedef void (*fclaw2d_fort_exchange_face_ghost_t)(int* mx, int* my, int* mbc, int* meqn,
                                                    double qthis[], double qneighbor[],
                                                    int* iface,
@@ -76,7 +114,6 @@ void FCLAW2D_FORT_EXCHANGE_CORNER_GHOST(int* mx, int* my, int* mbc, int* meqn,
                                         fclaw2d_transform_data_t** transform_cptr);
 
 
-#if 0
 #define FCLAW2D_FORT_AVERAGE_FACE_GHOST FCLAW_F77_FUNC(fclaw2d_fort_average_face_ghost, \
                                                        FCLAW2D_FORT_AVERAGE_FACE_GHOST)
 void FCLAW2D_FORT_AVERAGE_FACE_GHOST(int* mx, int* my, int* mbc, int* meqn,

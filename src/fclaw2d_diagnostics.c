@@ -51,18 +51,18 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
 
-void fclaw2d_diagnostics_initialize(fclaw2d_domain_t *domain,
-                                    void* gather_accumulator)
+void* fclaw2d_diagnostics_initialize(fclaw2d_domain_t *domain, int init_flag)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-    int init_flag = 1;
 
-    vt.init_diagnostics(domain,gather_accumulator);
+    /* Return an error accumulator */
+    return vt.init_diagnostics(domain,init_flag);
 }
 
 void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
+                                int init_flag,
                                 void* gather_accumulator)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
@@ -75,7 +75,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
     fclaw2d_domain_iterate_patches(domain, cb_fclaw2d_patch_compute_diagnostics,
                                    gather_accumulator);
 
-    vt.gather_diagnostics(domain,init_flag, gather_accumulator);
+    vt.gather_diagnostics(domain,gather_accumulator);
 
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 

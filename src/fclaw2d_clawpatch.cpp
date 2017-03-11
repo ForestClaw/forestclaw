@@ -771,6 +771,8 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->compute_error     = &fclaw2d_clawpatch_compute_error;
     patch_vt->compute_norm      = &fclaw2d_clawpatch_compute_error_norm;
 
+
+
     patch_vt->defaults_set = 1;
     // s_clawpatch_vt.defaults_set = 1;
 }

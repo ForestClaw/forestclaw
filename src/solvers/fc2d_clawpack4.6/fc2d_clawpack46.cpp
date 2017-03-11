@@ -48,7 +48,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
     classic_vt = user_vt;
     // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
 }
-#endif 
+#endif
 
 void fc2d_clawpack46_set_vtable_defaults()
 {
@@ -96,9 +96,10 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
     /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm   = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    fclaw_vt->fort_compute_patch_area   = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    fclaw_vt->fort_conservation_check   = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_compute_error        = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR;
+    clawpatch_vt->fort_compute_error_norm   = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area   = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check   = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;

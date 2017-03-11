@@ -67,12 +67,10 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
 
 typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
 
-typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_domain_t *domain, int init_flag,
+typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_domain_t *domain,
                                              void* gather_accumulator);
 
-typedef void (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain, int init_flag,
-                                                 void* gather_accumulator);
-
+typedef void* (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain)
 
 typedef struct fclaw2d_vtable
 {
@@ -82,7 +80,8 @@ typedef struct fclaw2d_vtable
     fclaw2d_after_regrid_t               after_regrid;
 
     /* diagnostic functions */
-    fclaw2d_diagnostics_initialize       init_diagnostics;
+    fclaw2d_diagnostics_accumulator_t    gather_accumulator;
+    fclaw2d_diagnostics_initialize_t     init_diagnostics;
     fclaw2d_diagnostics_gather_t         gather_diagnostics;
 
     /* Building patches, including functions to create metric terms */
