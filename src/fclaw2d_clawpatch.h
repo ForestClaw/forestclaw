@@ -346,15 +346,39 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
                                           double qpack[], int extrasize,
                                           int packmode, int* ierror);
 
+/* Diagnostic functions */
+
+typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int *mbc,
+                                             int* meqn,
+                                             double *dx, double *dy, double *xlower,
+                                             double *ylower, double *t, double q[],
+                                             double error[]);
+
+
+typedef double (*fclaw2d_fort_compute_patch_area_t)(int *mx, int* my, int*mbc, double* dx,
+                                                    double* dy, double area[]);
+
+typedef void (*fclaw2d_fort_compute_error_norm_t)(int *mx, int *my, int *mbc,
+                                                    int *meqn,
+                                                    double *dx, double *dy, double *area,
+                                                    double *error, double* error_norm);
+
+typedef void (*fclaw2d_fort_compute_conservation_t)(int *mx, int *my, int* mbc, int* meqn,
+                                                      double *dx, double *dy,
+                                                      double* area, double *q, double* sum);
+
+
+void fclaw2d_clawpatch_error(fclaw2d_domain_t *domain, int init_flag);
+
+
+
 struct fclaw2d_clawpatch_vtable
 {
-    // fclaw2d_patch_vtable_t             patch_vt;
-
-    /* ghost filling functions */
-    fclaw2d_fort_average2coarse_t      fort_average2coarse;
-    fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
+    /* regridding functions */
     fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
     fclaw2d_fort_tag4coarsening_t      fort_tag4coarsening;
+    fclaw2d_fort_average2coarse_t      fort_average2coarse;
+    fclaw2d_fort_interpolate2fine_t    fort_interpolate2fine;
 
     /* ghost filling functions */
     fclaw2d_fort_copy_face_t           fort_copy_face;
@@ -368,11 +392,18 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_fort_write_header_t        fort_write_header;
     fclaw2d_fort_write_file_t          fort_write_file;
 
+    /* Time interpolation functions */
     fclaw2d_fort_timeinterp_t          fort_timeinterp;
 
     /* ghost patch functions */
     fclaw2d_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
     fclaw2d_ghostpack_extra_t          ghostpack_extra;
+
+    /* diagnostic functions */
+    fclaw2d_fort_compute_error_t        fort_compute_error;
+    fclaw2d_fort_compute_error_norm_t   fort_compute_error_norm;
+    fclaw2d_fort_compute_patch_area_t   fort_compute_patch_area;
+    fclaw2d_fort_conservation_check_t   fort_conservation_check;
 
     int defaults_set;
 };

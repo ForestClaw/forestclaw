@@ -36,6 +36,24 @@ fclaw2d_vtable_t* fclaw2d_vt()
 /* Initialize any settings that can be set here */
 void fclaw2d_init_vtable()
 {
+
+    fclaw2d_vtable_t vt = fclaw2d_vt();
+
+    /* ------------------------------------------------------------
+      Functions below here depend on q and could be solver specific
+      ------------------------------------------------------------- */
+
+    /* These may be redefined by the user */
+    /* Problem setup */
+    vt.problem_setup             = NULL;
+
+    /* Defaults for regridding */
+    vt.after_regrid              = NULL;
+
+    /* Diagnostics */
+    vt.gather_diagnostics        = &fclaw2d_diagnostics_gather;
+    vt.init_diagnostics          = &fclaw2d_diagnostics_initialize;
+
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
       ------------------------------------------------------------- */
@@ -49,24 +67,6 @@ void fclaw2d_init_vtable()
     vt.fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
     vt.fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
     vt.fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
-
-    /* ------------------------------------------------------------
-      Functions below here depend on q and could be solver specific
-      ------------------------------------------------------------- */
-
-    /* These may be redefined by the user */
-    /* Problem setup */
-    vt.problem_setup             = NULL;
-
-    /* Diagnostics */
-    vt.run_user_diagnostics      = NULL;
-    vt.compute_patch_error       = &fclaw2d_diagnostics_compute_patch_error;
-
-    /* Defaults for regridding */
-    vt.after_regrid              = NULL;
-
-    /* Fortran files that do the work */
-    vt.fort_compute_patch_error  = NULL;  /* must be set by the user */
 }
 
 void fclaw2d_set_vtable()

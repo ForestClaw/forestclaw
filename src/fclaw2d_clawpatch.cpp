@@ -768,6 +768,9 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
+    patch_vt->compute_error     = &fclaw2d_clawpatch_compute_error;
+    patch_vt->compute_norm      = &fclaw2d_clawpatch_compute_error_norm;
+
     patch_vt->defaults_set = 1;
     // s_clawpatch_vt.defaults_set = 1;
 }
@@ -1048,7 +1051,7 @@ static void setup_area_storage(fclaw2d_clawpatch_t* cp)
     int mx = cp->mx;
     int my = cp->my;
     int mbc = cp->mbc;
-
+xf
     int ll[SpaceDim];
     int ur[SpaceDim];
     for (int idir = 0; idir < SpaceDim; idir++)

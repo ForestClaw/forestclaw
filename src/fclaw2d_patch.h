@@ -263,14 +263,19 @@ void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
                                     int fine0_patchno);
 
 void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *fine_patches,
-                                         fclaw2d_patch_t *coarse_patch,
-                                         int blockno, int fine0_patchno,
-                                         int coarse_patchno);
+                                  fclaw2d_patch_t *fine_patches,
+                                  fclaw2d_patch_t *coarse_patch,
+                                  int blockno, int fine0_patchno,
+                                  int coarse_patchno);
 
 void fclaw2d_patch_setup_timeinterp(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t *this_patch,
                                     double alpha);
+
+
+void fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
+                                       int this_block_idx, int this_patch_idx,
+                                       void* local_accumulator);
 
 
 typedef void* (*fclaw2d_patch_new_t)();
@@ -456,6 +461,13 @@ typedef void (*fclaw2d_patch_restore_step_t)(fclaw2d_domain_t* domain,
 typedef void (*fclaw2d_patch_save_step_t)(fclaw2d_domain_t* domain,
                                           fclaw2d_patch_t* this_patch);
 
+
+typedef void (*cb_fclaw2d_patch_compute_diagnostics_t)(fclaw2d_domain_t *domain,
+                                                      fclaw2d_patch_t *this_patch,
+                                                      int this_block_idx,
+                                                      int this_patch_idx,
+                                                      void* gather_accumulator);
+
 typedef struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
@@ -501,9 +513,12 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
 
     /* partitioning */
-    fclaw2d_patch_partition_pack_t     partition_pack;
-    fclaw2d_patch_partition_unpack_t   partition_unpack;
-    fclaw2d_patch_partition_packsize_t partition_packsize;
+    fclaw2d_patch_partition_pack_t       partition_pack;
+    fclaw2d_patch_partition_unpack_t     partition_unpack;
+    fclaw2d_patch_partition_packsize_t   partition_packsize;
+
+    /* diagnostics */
+    fclaw2d_patch_compute_diagnostics_t  compute_diagnostics;
 
     int defaults_set;
 
