@@ -44,7 +44,7 @@ enum
 /* This function is a bit overkill, but I put it here so the logic in both
    the corner fill and face fill are the same */
 static
-void get_face_type(fclaw2d_domain_t *domain,
+void get_face_type(fclaw2d_global_t *glob,
                    int iface,
                    fclaw_bool intersects_phys_bdry[],
                    fclaw_bool intersects_block[],
@@ -57,7 +57,7 @@ void get_face_type(fclaw2d_domain_t *domain,
 
 
 static
-void get_face_neighbors(fclaw2d_domain_t *domain,
+void get_face_neighbors(fclaw2d_global_t *glob,
                         int this_block_idx,
                         int this_patch_idx,
                         int iface,
@@ -70,6 +70,8 @@ void get_face_neighbors(fclaw2d_domain_t *domain,
                         int ftransform[],
                         fclaw2d_transform_data_t* ftransform_finegrid)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
@@ -210,7 +212,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool intersects_phys_bdry[NumFaces];
     fclaw_bool intersects_block[NumFaces];
 
-    fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,
+    fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_phys_bdry);
 
     fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
@@ -235,7 +237,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
         fclaw_bool is_block_face;
         fclaw_bool is_interior_face;
-        get_face_type(domain,
+        get_face_type(s->glob,
                       iface,
                       intersects_phys_bdry,
                       intersects_block,
@@ -264,7 +266,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             transform_data_finegrid.block_iface = -1;
 
             /* transform_data.block_iface = iface; */
-            get_face_neighbors(domain,
+            get_face_neighbors(s->glob,
                                this_block_idx,
                                this_patch_idx,
                                iface,
@@ -379,14 +381,15 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 }
 
 
-void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
                                  int minlevel,
                                  int maxlevel,
                                  int time_interp)
 {
+    fclaw2d_domain_t *domain = glob->domain;
 
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int refratio = gparms->refratio;
 
     int rproc[2];
@@ -567,10 +570,12 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
     fclaw2d_patch_neighbors_set(this_patch);
 }
 
-void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain)
+void fclaw2d_regrid_set_neighbor_types(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
-    fclaw2d_domain_iterate_patches(domain,cb_set_neighbor_types,(void*) NULL);
+    fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 }

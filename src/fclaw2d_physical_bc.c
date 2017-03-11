@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "fclaw2d_vtable.h"
 #include "fclaw2d_domain.h"
 
-void fclaw2d_physical_bc_default(fclaw2d_domain_t *domain,
+void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -57,7 +57,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 
     fclaw_bool intersects_bc[NumFaces];
     double dt = 1e20;
-    fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,intersects_bc);
+    fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
 
     patch_vt.patch_physical_bc(domain,
                                this_patch,
@@ -69,14 +69,14 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
+void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
                              int this_block_idx,
                              int this_patch_idx,
                              fclaw_bool *intersects_bdry)
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[NumFaces];
-    fclaw2d_patch_boundary_type(domain,this_block_idx,this_patch_idx,bdry);
+    fclaw2d_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
     for(i = 0; i < NumFaces; i++)
     {

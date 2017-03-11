@@ -243,8 +243,10 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     }
 }
 
-void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
+void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
 {
+    fclaw2d_domain_t** domain = &glob->domain;
+    
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
@@ -290,12 +292,14 @@ void fclaw2d_exchange_delete(fclaw2d_domain_t** domain)
    -------------------------------------------------------------- */
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
                                           fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
@@ -355,12 +359,14 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
 }
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,
                                         fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     if (running != FCLAW2D_TIMER_NONE)
     {

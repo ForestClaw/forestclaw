@@ -617,7 +617,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
         /* --------------------------------------------------------------
            Start send ...
            ------------------------------------------------------------*/
-        fclaw2d_exchange_ghost_patches_begin(domain,minlevel,maxlevel,time_interp,
+        fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                              FCLAW2D_TIMER_GHOSTFILL);
 
         /* --------------------------------------------------------------
@@ -673,7 +673,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
            Receive ghost patches ...
            ------------------------------------------------------------- */
 
-        fclaw2d_exchange_ghost_patches_end(domain,minlevel,maxlevel,time_interp,
+        fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
                                            FCLAW2D_TIMER_GHOSTFILL);
 
         /* -------------------------------------------------------------
@@ -683,7 +683,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
            Note : There is no special timer for this call, but checks
            show that ghostfill-(step1+step2+step3+comm) << 1
            ------------------------------------------------------------- */
-        fclaw2d_face_neighbor_ghost(domain,minlevel,maxlevel,time_interp);
+        fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
 
         /* -------------------------------------------------------------
            Repeat above, but now with parallel ghost cells.

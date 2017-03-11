@@ -52,7 +52,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
+void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
                              int this_block_idx,
                              int this_patch_idx,
                              fclaw_bool *intersects_bdry);
@@ -62,7 +62,7 @@ void fclaw2d_physical_set_bc(fclaw2d_global_t *glob,
                              double level_time,
                              int time_interp);
 
-void fclaw2d_physical_bc_default(fclaw2d_domain_t *domain,
+void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,

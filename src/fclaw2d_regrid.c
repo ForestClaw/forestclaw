@@ -275,7 +275,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */
-        fclaw2d_regrid_set_neighbor_types(*domain);
+        fclaw2d_regrid_set_neighbor_types(glob);
 
         /* Update ghost cells.  This is needed because we have new coarse or fine
            patches without valid ghost cells.   Time_interp = 0, since we only

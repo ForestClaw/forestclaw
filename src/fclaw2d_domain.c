@@ -164,7 +164,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 
     if (ddata->domain_exchange != NULL)
     {
-        fclaw2d_exchange_delete(domain);
+        fclaw2d_exchange_delete(glob);
     }
 
     /* Output memory discrepancy for the ClawPatch */

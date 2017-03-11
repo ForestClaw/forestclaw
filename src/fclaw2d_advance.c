@@ -49,11 +49,12 @@ typedef struct fclaw2d_level_data
 typedef fclaw2d_level_data_t fclaw2d_timestep_counters;
 
 static
-void initialize_timestep_counters(fclaw2d_domain_t* domain,
+void initialize_timestep_counters(fclaw2d_global_t* glob,
                                   fclaw2d_timestep_counters **ts_counter_ptr,
                                   double t_init, double dt)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_domain_t *domain = glob->domain;
+    const amr_options_t *gparms = glob->gparms;
     fclaw2d_timestep_counters *ts_counter;
     int level;
 
@@ -250,10 +251,10 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
 
-    const amr_options_t* gparms = get_domain_parms(domain);
+    const amr_options_t* gparms = glob->gparms;
     fclaw2d_timestep_counters *ts_counter;
 
-    initialize_timestep_counters(domain,&ts_counter,t_curr,dt);
+    initialize_timestep_counters(glob,&ts_counter,t_curr,dt);
 
     /* Advance all grids that are present somewhere (on any proc) */
     int minlevel = domain->global_minlevel;

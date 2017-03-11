@@ -43,15 +43,15 @@ extern "C"
 void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
                             fclaw2d_timer_names_t running);
 
-void fclaw2d_exchange_delete(fclaw2d_domain_t** domain);
+void fclaw2d_exchange_delete(fclaw2d_global_t* glob);
 
-void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
                                           fclaw2d_timer_names_t running);
 
-void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,

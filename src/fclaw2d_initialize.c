@@ -132,7 +132,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
 
     /* This is normally called from regrid */
-    fclaw2d_regrid_set_neighbor_types(*domain);
+    fclaw2d_regrid_set_neighbor_types(glob);
 
     /* We need a user option here to set ghost values after initialization */
     if (gparms->init_ghostcell){
@@ -244,7 +244,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
                 /* This is normally called from regrid, once the initial domain
                    has been set up */
-                fclaw2d_regrid_set_neighbor_types(*domain);
+                fclaw2d_regrid_set_neighbor_types(glob);
 
             }
             else

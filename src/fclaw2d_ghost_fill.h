@@ -92,7 +92,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
-void fclaw2d_face_neighbor_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
                                  int minlevel,
                                  int maxlevel,
                                  int time_interp);
