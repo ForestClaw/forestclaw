@@ -38,7 +38,7 @@ extern "C"
 #endif
 
 
-double fclaw2d_advance_all_levels (fclaw2d_domain_t * domain,double t, double dt);
+double fclaw2d_advance_all_levels (fclaw2d_global_t * glob,double t, double dt);
 
 
 #ifdef __cplusplus

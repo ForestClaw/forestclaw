@@ -57,7 +57,7 @@ void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
                              int this_patch_idx,
                              fclaw_bool *intersects_bdry);
 
-void fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
+void fclaw2d_physical_set_bc(fclaw2d_global_t *glob,
                              int level,
                              double level_time,
                              int time_interp);

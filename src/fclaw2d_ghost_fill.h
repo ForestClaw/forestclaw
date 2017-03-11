@@ -85,7 +85,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                   int this_patch_idx,
                   void *user);
 
-void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
+void fclaw2d_ghost_update(fclaw2d_global_t* glob,
                           int fine_level,
                           int coarse_level,
                           double sync_time,

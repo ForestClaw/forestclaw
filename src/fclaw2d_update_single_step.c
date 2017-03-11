@@ -36,11 +36,13 @@ static
                         int this_patch_idx,
                         void *user)
 {
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     double maxcfl;
 
-    single_step_data_t *ss_data = (single_step_data_t *) user;
+    single_step_data_t *ss_data = (single_step_data_t *) g->user;
 
     double dt = ss_data->dt;
     double t = ss_data->t;
@@ -66,7 +68,7 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
+double fclaw2d_update_single_step(fclaw2d_global_t *glob,
                                   int level,
                                   double t, double dt)
 {
@@ -79,13 +81,13 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
 
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
-    patch_iterator = &fclaw2d_domain_iterate_level_mthread;
+    patch_iterator = &fclaw2d_global_iterate_level_mthread;
 #else
-    patch_iterator = &fclaw2d_domain_iterate_level;
+    patch_iterator = &fclaw2d_global_iterate_level;
 #endif
 
     /* If there are not grids at this level, we return CFL = 0 */
-    patch_iterator(domain, level, cb_single_step,(void *) &ss_data);
+    patch_iterator(glob, level, cb_single_step,(void *) &ss_data);
 
     return ss_data.maxcfl;
 }

@@ -136,11 +136,11 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     /* We need a user option here to set ghost values after initialization */
     if (gparms->init_ghostcell){
-        fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
+        fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    fclaw2d_physical_set_bc(*domain,(*domain)->global_minlevel,
+    fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
                             0.0,time_interp);
 
     // VTK output during amrinit
@@ -257,7 +257,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     if (gparms->init_ghostcell)
     {
-        fclaw2d_ghost_update(*domain,(*domain)->global_minlevel,
+        fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }

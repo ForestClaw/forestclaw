@@ -204,7 +204,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                     }
                 }
             }
-            double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
+            double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
             ddata = fclaw2d_domain_get_data(*domain);
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
@@ -365,7 +365,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         /* Get current domain data since it may change during regrid */
         ddata = fclaw2d_domain_get_data(*domain);
 
-        double maxcfl_step = fclaw2d_advance_all_levels(*domain, t_curr,dt_step);
+        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
@@ -467,7 +467,7 @@ void outstyle_4(fclaw2d_global_t *glob)
 
         fclaw2d_diagnostics_run(*domain, init_flag);
 
-        fclaw2d_advance_all_levels(*domain, t_curr, dt_minlevel);
+        fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
 
         int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
                           gparms->maxlevel : gparms->minlevel;

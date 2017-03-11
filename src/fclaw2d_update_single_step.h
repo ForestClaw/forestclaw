@@ -51,7 +51,7 @@ struct single_step_data
 
 struct fclaw2d_level_time_data;
 
-double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
+double fclaw2d_update_single_step(fclaw2d_global_t *glob,
                                   int level,
                                   double t, double dt);
 

@@ -323,7 +323,9 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user; 
+
+    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
     fclaw_bool time_interp = filltype->time_interp;
     fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
     fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;

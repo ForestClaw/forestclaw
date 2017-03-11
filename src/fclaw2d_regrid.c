@@ -284,7 +284,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         int maxlevel = (*domain)->global_maxlevel;
         int time_interp = 0;
         double sync_time = fclaw2d_domain_get_time(*domain);
-        fclaw2d_ghost_update(*domain,
+        fclaw2d_ghost_update(glob,
                              minlevel,
                              maxlevel,
                              sync_time,

@@ -129,3 +129,13 @@ void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* 
                                    &g);
 }
 
+void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_level_mthread(glob->domain, level,
+                                         pcb, 
+                                         &g);
+}

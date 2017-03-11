@@ -120,19 +120,25 @@ static void cb_parallel_wrap(fclaw2d_domain_t* domain,
                                   int this_patch_idx,
                                   void *user)
 {
-    fclaw2d_ghost_fill_wrap_info_t w = *((fclaw2d_ghost_fill_wrap_info_t*) user);
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;  
+    
+    fclaw2d_ghost_fill_wrap_info_t w = *((fclaw2d_ghost_fill_wrap_info_t*) s->user);
     int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
     if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
         ((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
         w.ghost_mode == FCLAW2D_BOUNDARY_ALL)
     {
-        w.cb_fill(domain,this_patch,this_block_idx,this_patch_idx,w.user);
+        fclaw2d_global_iterate_t g;
+        g.glob = s->glob;
+        g.user = w.user;    
+        
+        w.cb_fill(domain,this_patch,this_block_idx,this_patch_idx,&g);
     }
 }
 
 
 static
-void copy2ghost(fclaw2d_domain_t *domain,
+void copy2ghost(fclaw2d_global_t *glob,
                 int level,
                 int time_interp,
                 int read_parallel_patches,
@@ -149,17 +155,17 @@ void copy2ghost(fclaw2d_domain_t *domain,
     parallel_mode.user = (void*) &e_info;
 
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(domain, level, cb_parallel_wrap,
-                   (void *) &parallel_mode);
+    patch_iterator(glob, level, cb_parallel_wrap,
+                         (void *) &parallel_mode);
     /* corner exchanges */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(domain, level, cb_parallel_wrap,
-                   (void *) &parallel_mode);
+    patch_iterator(glob, level, cb_parallel_wrap,
+                          (void *) &parallel_mode);
 }
 
 
 static
-void average2ghost(fclaw2d_domain_t *domain,
+void average2ghost(fclaw2d_global_t *glob,
                    int coarse_level,
                    int time_interp,
                    int read_parallel_patches,
@@ -180,12 +186,12 @@ void average2ghost(fclaw2d_domain_t *domain,
     parallel_mode.ghost_mode = ghost_mode;
 
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(domain, coarse_level,
+    patch_iterator(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(domain, coarse_level, cb_interface_wrap,
+    patch_iterator(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
     if (read_parallel_patches)
@@ -198,7 +204,7 @@ void average2ghost(fclaw2d_domain_t *domain,
 
         /* Face average */
         parallel_mode.cb_fill = cb_face_fill;
-        fclaw2d_domain_iterate_level(domain, fine_level,
+        fclaw2d_global_iterate_level(glob, fine_level,
                                      cb_interface_wrap, (void *) &parallel_mode);
 
         /* Corner average :
@@ -213,7 +219,7 @@ void average2ghost(fclaw2d_domain_t *domain,
 }
 
 static
-void interpolate2ghost(fclaw2d_domain_t *domain,
+void interpolate2ghost(fclaw2d_global_t *glob,
                        int coarse_level,
                        int time_interp,
                        int read_parallal_patches,
@@ -241,12 +247,12 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
 
     /* Face interpolate */
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(domain,coarse_level, cb_interface_wrap,
+    patch_iterator(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(domain,coarse_level, cb_interface_wrap,
+    patch_iterator(glob,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
     /* -----------------------------------------------------
        Second pass - Iterate over local fine grids, looking
@@ -261,18 +267,18 @@ void interpolate2ghost(fclaw2d_domain_t *domain,
     int fine_level = coarse_level + 1;
 
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_interface_wrap,
+    fclaw2d_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_domain_iterate_level(domain, fine_level, cb_interface_wrap,
+    fclaw2d_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 }
 
 
-void setphysical(fclaw2d_domain_t *domain,
+void setphysical(fclaw2d_global_t *glob,
                  int level,
                  double sync_time,
                  int time_interp,
@@ -288,7 +294,7 @@ void setphysical(fclaw2d_domain_t *domain,
     parallel_mode.user = (void*) &t_info;
 
     parallel_mode.cb_fill = cb_fclaw2d_physical_set_bc;
-    fclaw2d_domain_iterate_level(domain, level, cb_parallel_wrap,
+    fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
                                  (void *) &parallel_mode);
 }
 
@@ -327,13 +333,15 @@ void setphysical(fclaw2d_domain_t *domain,
    Loop over all levels
    ----------------------------------------------- */
 static
-    void copy_samelevel(fclaw2d_domain_t* domain,
+    void copy_samelevel(fclaw2d_global_t* glob,
                         int minlevel,
                         int maxlevel,
                         int time_interp,
                         int read_parallel_patches,
                         fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
     int level;
@@ -342,13 +350,13 @@ static
     for(level = maxlevel; level >= minlevel; level--)
     {
         int time_interp = 0;
-        copy2ghost(domain,level,time_interp,
+        copy2ghost(glob,level,time_interp,
                    read_parallel_patches,ghost_mode);
     }
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
-        copy2ghost(domain,time_interp_level,time_interp,
+        copy2ghost(glob,time_interp_level,time_interp,
                    read_parallel_patches,ghost_mode);
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
@@ -360,13 +368,15 @@ static
  * Fill in coarse grid ghost cells by averaging or copying  from neighboring fine grids.
  **/
 static
-void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
+void average_fine2coarse_ghost(fclaw2d_global_t *glob,
                                int mincoarse,
                                int maxcoarse,
                                int time_interp,
                                int read_parallel_patches,
                                fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_AVERAGE]);
 
@@ -377,7 +387,7 @@ void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
     {
         /* Don't do any time interpolation yet */
         int time_interp = 0;
-        average2ghost(domain,level,time_interp,
+        average2ghost(glob,level,time_interp,
                       read_parallel_patches,ghost_mode);
     }
     if (time_interp)
@@ -385,20 +395,22 @@ void average_fine2coarse_ghost(fclaw2d_domain_t *domain,
         /* Average fine grid to coarse time interpolated level.  Time interpolated
          faces need correct values.  */
         int time_interp_level = mincoarse-1;
-        average2ghost(domain,time_interp_level,time_interp,
+        average2ghost(glob,time_interp_level,time_interp,
                       read_parallel_patches,ghost_mode);
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_AVERAGE]);
 }
 
 static
-void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
+void interpolate_coarse2fine_ghost(fclaw2d_global_t* glob,
                                    int mincoarse,
                                    int maxcoarse,
                                    int time_interp,
                                    int read_parallel_patches,
                                    fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+    
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_INTERP]);
 
@@ -409,13 +421,13 @@ void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
     {
         /* No need to interpolate to coarse time-interpolated grids */
         int time_interp = 0;
-        interpolate2ghost(domain,level,time_interp,read_parallel_patches,ghost_mode);
+        interpolate2ghost(glob,level,time_interp,read_parallel_patches,ghost_mode);
     }
     if (time_interp)
     {
         /* interpolate from time interpolated level */
         int time_interp_level = mincoarse-1;
-        interpolate2ghost(domain,time_interp_level,time_interp,
+        interpolate2ghost(glob,time_interp_level,time_interp,
                           read_parallel_patches,ghost_mode);
     }
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_INTERP]);
@@ -423,13 +435,15 @@ void interpolate_coarse2fine_ghost(fclaw2d_domain_t* domain,
 
 
 static
-void fill_physical_ghost(fclaw2d_domain_t* domain,
+void fill_physical_ghost(fclaw2d_global_t* glob,
                          int minlevel,
                          int maxlevel,
                          double sync_time,
                          int time_interp,
                          fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTFILL_PHYSBC]);
 
@@ -438,12 +452,12 @@ void fill_physical_ghost(fclaw2d_domain_t* domain,
     for(level = maxlevel; level >= minlevel; level--)
     {
         int time_interp = 0;
-        setphysical(domain,level,sync_time,time_interp,ghost_mode);
+        setphysical(glob,level,sync_time,time_interp,ghost_mode);
     }
     if (time_interp)
     {
         int time_interp_level = minlevel-1;
-        setphysical(domain,
+        setphysical(glob,
                     time_interp_level,
                     sync_time,
                     time_interp,
@@ -471,13 +485,15 @@ void fill_physical_ghost(fclaw2d_domain_t* domain,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
+void fclaw2d_ghost_update(fclaw2d_global_t* glob,
                           int minlevel,
                           int maxlevel,
                           double sync_time,
                           int time_interp,
                           fclaw2d_timer_names_t running)
 {
+    fclaw2d_domain_t* domain = glob->domain;
+
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     if (running != FCLAW2D_TIMER_NONE) {
         fclaw2d_timer_stop (&ddata->timers[running]);
@@ -515,13 +531,14 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
-    patch_iterator = &fclaw2d_domain_iterate_level_mthread;
+    patch_iterator = &fclaw2d_global_iterate_level_mthread;
 #else
-    patch_iterator = &fclaw2d_domain_iterate_level;
+    patch_iterator = &fclaw2d_global_iterate_level;
 #endif
 
     if (domain->mpisize == 0)
     {
+#if 0
         /* This seems to be equivalent to the other branch of this loop when
            run on a single processor (but is about 20% faster on a
            single processor) */
@@ -529,31 +546,32 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
             FCLAW2D_BOUNDARY_ALL;
         int read_parallel_patches = 0;
 
-        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
                        read_parallel_patches,parallel_mode);
 
-        average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
+        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
 
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             mincoarse,
                             maxcoarse,
                             sync_time,
                             time_interp,
                             parallel_mode);
 
-        interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
+        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
                                       time_interp,read_parallel_patches,
                                       parallel_mode);
 
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             minlevel,
                             maxlevel,
                             sync_time,
                             time_interp,
                             parallel_mode);
+#endif
     }
     else
     {
@@ -572,11 +590,11 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
 
 
         /* Copy */
-        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
                        read_parallel_patches,parallel_mode);
 
         /* Average */
-        average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
+        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
@@ -587,7 +605,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            to a fine grid local patch. Note that we don't need to fill in
            ghost cells on the finest level grids, since these will never be
            used for interpolation. */
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             mincoarse,
                             maxcoarse,
                             sync_time,
@@ -610,18 +628,18 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
         /* Copy */
-        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
             read_parallel_patches,parallel_mode);
 
         /* Average */
-        average_fine2coarse_ghost(domain,mincoarse,maxcoarse,
+        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
             time_interp,
             read_parallel_patches,
             parallel_mode);
 
 
         /* Physical ghost */
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             mincoarse,
                             maxcoarse,
                             sync_time,
@@ -632,7 +650,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
            ghost regions filled in that overlap boundary patch */
 
         /* Interpolate */
-        interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
+        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
                                       time_interp,
                                       read_parallel_patches,
                                       parallel_mode);
@@ -642,7 +660,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         int maxfine = maxlevel;
 
         /* Physical ghost */
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             minfine,
                             maxfine,
                             sync_time,
@@ -676,15 +694,15 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         read_parallel_patches = 1;
 
         /* Copy */
-        copy_samelevel(domain,minlevel,maxlevel,time_interp,
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
             read_parallel_patches,parallel_mode);
 
         /* Average */
-        average_fine2coarse_ghost(domain,mincoarse,maxcoarse, time_interp,
+        average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
             read_parallel_patches,parallel_mode);
 
         /* Physical */
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             minlevel,
                             maxlevel,
                             sync_time,
@@ -692,7 +710,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
                             parallel_mode);
 
         /* Interpolate */
-        interpolate_coarse2fine_ghost(domain,mincoarse, maxcoarse,
+        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
                                       time_interp,read_parallel_patches,
                                       parallel_mode);
 
@@ -718,7 +736,7 @@ void fclaw2d_ghost_update(fclaw2d_domain_t* domain,
         */
 
         /* Physical */
-        fill_physical_ghost(domain,
+        fill_physical_ghost(glob,
                             minlevel,
                             maxlevel,
                             sync_time,

@@ -48,10 +48,12 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
                                 int this_patch_idx,
                                 void *user)
 {
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_physical_time_info_t *t_info;
 
-    t_info = (fclaw2d_physical_time_info_t*) user;
+    t_info = (fclaw2d_physical_time_info_t*) s->user;
 
     fclaw_bool intersects_bc[NumFaces];
     double dt = 1e20;
@@ -88,7 +90,7 @@ void fclaw2d_physical_get_bc(fclaw2d_domain_t *domain,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
+void fclaw2d_physical_set_bc(fclaw2d_global_t *glob,
                              int level,
                              double sync_time,
                              int time_interp)
@@ -96,7 +98,7 @@ void fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
     fclaw2d_physical_time_info_t t_info;
     t_info.level_time = sync_time;
     t_info.time_interp = time_interp;
-    fclaw2d_domain_iterate_level(domain, level,
+    fclaw2d_global_iterate_level(glob, level,
                                  cb_fclaw2d_physical_set_bc,
                                  (void *) &t_info);
 }

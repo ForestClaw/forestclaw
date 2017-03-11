@@ -70,7 +70,7 @@ typedef enum
     FCLAW2D_BUILD_COSTOM
 } fclaw2d_build_mode_t;
 
-typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_domain_t * domain, int level,
+typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_global_t * glob, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
 
 
