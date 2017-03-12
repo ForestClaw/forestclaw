@@ -140,8 +140,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
             fclaw2d_patch_data_new(new_domain,fine_patch);
-            fclaw2d_patch_build(new_domain,fine_patch,blockno,
-                                    fine_patchno,(void*) &build_mode);
+            /* used to pass in new_domain, but if we call like this, the old_domain is passed in */
+            fclaw2d_patch_build(g->glob,fine_patch,blockno,
+                                fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
                 patch_vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
@@ -175,13 +176,13 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_data_new(new_domain,coarse_patch);
 
         /* Area (and possibly other things) should be averaged to coarse grid. */
-        fclaw2d_patch_build_from_fine(new_domain,fine_siblings,coarse_patch,
+        fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
                                       blockno,coarse_patchno,fine_patchno,
-                                      build_mode);
+                                      build_mode);// new_domain
 
         /* Average the solution. Does this need to be customizable? */
         fclaw2d_patch_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                            blockno,coarse_patchno, fine_patchno);
+                                     blockno,coarse_patchno, fine_patchno);
 
         int i;
         for(i = 0; i < 4; i++)

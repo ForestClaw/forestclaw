@@ -331,15 +331,17 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
    Re-partition and rebuild new domains, or construct initial domain
  -------------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
                               fclaw2d_patch_t *this_patch,
                               int blockno, int patchno,
                               fclaw2d_build_mode_t build_mode)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     /* We are getting closer to getting rid the class fclaw2d_clawpatch_t */
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
     cp->mx = gparms->mx;
     cp->my = gparms->my;
@@ -348,7 +350,7 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
     cp->meqn = gparms->meqn;
     for (int icorner=0; icorner < 4; icorner++)
     {
-        fclaw2d_patch_set_block_corner_count(domain,this_patch,icorner,0);
+        fclaw2d_patch_set_block_corner_count(glob,this_patch,icorner,0);
     }
 
     fclaw2d_map_context_t* cont =
@@ -457,18 +459,18 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
    an "iterate_adapted" step, in which data in these patches is copied, averaged or
    interpolated. */
 
-void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int blockno,
                              int patchno,
                              void *user)
 {
-    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+    fclaw2d_domain_t *domain = glob->domain;
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
-    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
+    fclaw2d_clawpatch_define(glob,this_patch,blockno,patchno,build_mode);
 
     if (gparms->manifold)
     {
@@ -477,7 +479,7 @@ void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_global_t *glob,
                                        fclaw2d_patch_t *fine_patches,
                                        fclaw2d_patch_t *coarse_patch,
                                        int blockno,
@@ -485,10 +487,11 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode)
 {
+    fclaw2d_domain_t *domain = glob->domain;
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
-    fclaw2d_clawpatch_define(domain,coarse_patch,blockno,coarse_patchno,build_mode);
+    fclaw2d_clawpatch_define(glob,coarse_patch,blockno,coarse_patchno,build_mode);
 
     if (gparms->manifold)
     {
@@ -501,18 +504,18 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *this_patch,
                                    int blockno,
                                    int patchno,
                                    void *user)
 {
-    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+    fclaw2d_domain_t *domain = glob->domain;
 
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
-    fclaw2d_clawpatch_define(domain,this_patch,blockno,patchno,build_mode);
+    fclaw2d_clawpatch_define(glob,this_patch,blockno,patchno,build_mode);
 
     if (gparms->manifold)
     {

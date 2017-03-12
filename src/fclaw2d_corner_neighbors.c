@@ -353,7 +353,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = s->glob->gparms;
     fclaw2d_transform_data_t transform_data;
     transform_data.mx = gparms->mx;
     transform_data.my = gparms->my;
@@ -382,7 +382,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
         /* This needs to be set here;  otherwise external corners
            don't get set. */
-        fclaw2d_patch_set_block_corner_count(domain, this_patch,
+        fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                              icorner,block_corner_count);
 
         if (is_interior_corner)
@@ -412,7 +412,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 transform_data.transform,
                                 &transform_data_finegrid);
 
-            fclaw2d_patch_set_block_corner_count(domain, this_patch,
+            fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
             transform_data.is_block_corner = is_block_corner;
 

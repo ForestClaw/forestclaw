@@ -30,25 +30,24 @@ static fclaw2d_patch_iterator_t patch_iterator;
 
 
 static
-    void cb_single_step(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        void *user)
+void cb_single_step(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    void *user)
 {
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     double maxcfl;
 
     single_step_data_t *ss_data = (single_step_data_t *) g->user;
 
     double dt = ss_data->dt;
     double t = ss_data->t;
-    maxcfl = patch_vt.patch_single_step_update(domain,this_patch,
-                                               this_block_idx,
-                                               this_patch_idx,t,dt);
+    maxcfl = fclaw2d_patch_vt()->patch_single_step_update(g->glob,this_patch,
+                                                          this_block_idx,
+                                                          this_patch_idx,t,dt);
 
     ddata->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);

@@ -131,20 +131,20 @@ void fclaw2d_clawpatch_define(fclaw2d_domain_t* domain,
                               fclaw2d_build_mode_t build_mode);
 
 /* A callback for building the domain and repartitioning */
-void fclaw2d_clawpatch_build(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              void *user);
 
-void fclaw2d_clawpatch_build_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *this_patch,
                                    int blockno,
                                    int patchno,
                                    void *user);
 
 
-void fclaw2d_clawpatch_build_from_fine(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_build_from_fine(fclaw2d_global_t *glob,
                                        fclaw2d_patch_t *fine_patches,
                                        fclaw2d_patch_t *coarse_patch,
                                        int blockno,

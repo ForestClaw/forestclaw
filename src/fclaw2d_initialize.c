@@ -46,14 +46,16 @@ void cb_initialize (fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+
     fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     fclaw2d_patch_data_new(domain,this_patch);
-    fclaw2d_patch_build(domain,this_patch,
+    fclaw2d_patch_build(g->glob,this_patch,
                         this_block_idx,
                         this_patch_idx,
-                        (void*) &build_mode);
+                        &build_mode);
 
     FCLAW_ASSERT(patch_vt.patch_initialize != NULL);
     patch_vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);

@@ -452,13 +452,12 @@ void
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
-double
-    fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
+double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt);
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
@@ -469,13 +468,12 @@ double
                               double t,
                               double *rhs);
 
-double
-fc2d_clawpack46_update(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt);
+double fc2d_clawpack46_update(fclaw2d_global_t *glob,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              double t,
+                              double dt);
 
 #ifdef __cplusplus
 #if 0

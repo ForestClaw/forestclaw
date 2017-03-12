@@ -505,13 +505,14 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
 
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
+double fc2d_clawpack5_step2(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
                              double dt)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     fc2d_clawpack5_options_t* clawpack_options;
     int level;
     double *qold, *aux;
@@ -556,7 +557,7 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     //fc2d_clawpack5_flux2_t flux2 = clawpack_options->use_fwaves ?
     //                                CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
     fc2d_clawpack5_flux2_t flux2 = CLAWPACK5_FLUX2;
-    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
+    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
     CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
@@ -585,26 +586,28 @@ double fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
     return cflgrid;
 }
 
-double fc2d_clawpack5_update(fclaw2d_domain_t *domain,
+double fc2d_clawpack5_update(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double dt)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+    
     const fc2d_clawpack5_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack5_get_options(domain);
     if (classic_vt.b4step2 != NULL)
     {
         fc2d_clawpack5_b4step2(domain,
-                                this_patch,
-                                this_block_idx,
-                                this_patch_idx,t,dt);
+                               this_patch,
+                               this_block_idx,
+                               this_patch_idx,t,dt);
     }
-    double maxcfl = fc2d_clawpack5_step2(domain,
-                                          this_patch,
-                                          this_block_idx,
-                                          this_patch_idx,t,dt);
+    double maxcfl = fc2d_clawpack5_step2(glob,
+                                         this_patch,
+                                         this_block_idx,
+                                         this_patch_idx,t,dt);
     if (clawpack_options->src_term > 0)
     {
         fc2d_clawpack5_src2(domain,

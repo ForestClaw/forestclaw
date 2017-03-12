@@ -64,9 +64,10 @@ void set_indirect_data(fclaw2d_domain_t* domain,
 }
 
 static
-void build_remote_ghost_patches(fclaw2d_domain_t* domain)
+void build_remote_ghost_patches(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_domain_t *domain = glob->domain;
+    const amr_options_t *gparms = glob->gparms;
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);
@@ -95,7 +96,7 @@ void build_remote_ghost_patches(fclaw2d_domain_t* domain)
         patchno = i;
 
         fclaw2d_patch_data_new(domain,ghost_patch);
-        fclaw2d_patch_build_remote_ghost(domain,ghost_patch,blockno,
+        fclaw2d_patch_build_remote_ghost(glob,ghost_patch,blockno,
                                          patchno,(void*) &build_mode);
     }
 }
@@ -222,7 +223,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
        filled later with q data and the area, if we are on a manifold */
 
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
-    build_remote_ghost_patches(domain);
+    build_remote_ghost_patches(glob);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* ---------------------------------------------------------

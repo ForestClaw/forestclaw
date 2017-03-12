@@ -127,10 +127,10 @@ int fclaw2d_patch_has_finegrid_neighbors(fclaw2d_patch_t *patch);
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch);
 
-int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
+int* fclaw2d_patch_block_corner_count(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t* this_patch);
 
-void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
+void fclaw2d_patch_set_block_corner_count(fclaw2d_global_t *glob,
                                           fclaw2d_patch_t* this_patch,
                                           int icorner, int block_corner_count);
 
@@ -144,7 +144,7 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
                                        int this_block_idx, int this_patch_idx,
                                        double *qdata, fclaw_bool time_interp);
 
-void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
+void fclaw2d_patch_build_remote_ghost(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno,
@@ -174,13 +174,13 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain);
 
-void fclaw2d_patch_build(fclaw2d_domain_t *domain,
+void fclaw2d_patch_build(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int blockno,
                          int patchno,
                          void *user);
 
-void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
+void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *fine_patches,
                                    fclaw2d_patch_t *coarse_patch,
                                    int blockno,
@@ -282,7 +282,7 @@ typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
                                       int this_block_idx,
                                       int this_patch_idx);
 
-typedef void (*fclaw2d_patch_setup_ghost_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_setup_ghost_t)(fclaw2d_global_t *glob,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx);
@@ -301,7 +301,7 @@ typedef void (*fclaw2d_patch_physical_bc_t)(fclaw2d_domain_t *domain,
                                             fclaw_bool *intersects_bc,
                                             fclaw_bool time_interp);
 
-typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_domain_t *domain,
+typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_global_t *glob,
                                                      fclaw2d_patch_t *this_patch,
                                                      int this_block_idx,
                                                      int this_patch_idx,
@@ -402,7 +402,7 @@ typedef void (*fclaw2d_patch_ghost_unpack_t)(fclaw2d_domain_t* domain,
                                              int this_block_idx, int this_patch_idx,
                                              double *qdata, fclaw_bool time_interp);
 
-typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *this_patch,
                                             int blockno,
                                             int patchno,
@@ -431,13 +431,13 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_domain_t *domain,
 
 typedef size_t (*fclaw2d_patch_partition_packsize_t)(fclaw2d_domain_t* domain);
 
-typedef void (*fclaw2d_patch_build_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_build_t)(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno,
                                       int patchno,
                                       void *user);
 
-typedef void (*fclaw2d_patch_build_from_fine_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_build_from_fine_t)(fclaw2d_global_t *glob,
                                                 fclaw2d_patch_t *fine_patches,
                                                 fclaw2d_patch_t *coarse_patch,
                                                 int blockno,

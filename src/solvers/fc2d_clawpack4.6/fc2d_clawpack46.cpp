@@ -517,13 +517,14 @@ void fc2d_clawpack46_bc2(fclaw2d_domain *domain,
 
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
+double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
                              double dt)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     fc2d_clawpack46_options_t* clawpack_options;
     int level;
     double *qold, *aux;
@@ -562,7 +563,7 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     double* gm = new double[size];
 
     int ierror = 0;
-    int* block_corner_count = fclaw2d_patch_block_corner_count(domain,this_patch);
+    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
     fc2d_clawpack46_flux2_t flux2 = clawpack_options->use_fwaves ?
                                     CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
 
@@ -592,13 +593,15 @@ double fc2d_clawpack46_step2(fclaw2d_domain_t *domain,
     return cflgrid;
 }
 
-double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
+double fc2d_clawpack46_update(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double dt)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+    
     const fc2d_clawpack46_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack46_get_options(domain);
 
@@ -610,7 +613,7 @@ double fc2d_clawpack46_update(fclaw2d_domain_t *domain,
                                 this_patch_idx,t,dt);
     }
 
-    double maxcfl = fc2d_clawpack46_step2(domain,
+    double maxcfl = fc2d_clawpack46_step2(glob,
                                           this_patch,
                                           this_block_idx,
                                           this_patch_idx,t,dt);

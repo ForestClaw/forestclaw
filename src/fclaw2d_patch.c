@@ -196,14 +196,14 @@ fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
     return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
 }
 
-int* fclaw2d_patch_block_corner_count(fclaw2d_domain_t* domain,
+int* fclaw2d_patch_block_corner_count(fclaw2d_global_t* glob,
                                       fclaw2d_patch_t* this_patch)
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
     return pdata->block_corner_count;
 }
 
-void fclaw2d_patch_set_block_corner_count(fclaw2d_domain_t* domain,
+void fclaw2d_patch_set_block_corner_count(fclaw2d_global_t* glob,
                                           fclaw2d_patch_t* this_patch,
                                           int icorner, int block_corner_count)
 {
@@ -308,17 +308,17 @@ void fclaw2d_patch_pack_local_ghost(fclaw2d_domain_t *domain,
                         time_interp);
 }
 
-void fclaw2d_patch_build_remote_ghost(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int blockno,
-                                       int patchno,
-                                       void *user)
+void fclaw2d_patch_build_remote_ghost(fclaw2d_global_t *glob,
+                                      fclaw2d_patch_t *this_patch,
+                                      int blockno,
+                                      int patchno,
+                                      void *user)
 {
-    patch_vt()->build_ghost(domain,this_patch,blockno,
+    patch_vt()->build_ghost(glob,this_patch,blockno,
                             patchno,(void*) user);
     if (patch_vt()->patch_setup_ghost != NULL)
     {
-        patch_vt()->patch_setup_ghost(domain,this_patch,blockno,patchno);
+        patch_vt()->patch_setup_ghost(glob,this_patch,blockno,patchno);
     }
 }
 
@@ -329,7 +329,7 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_domain_t* domain,
                                        double *qdata, fclaw_bool time_interp)
 {
     patch_vt()->ghost_unpack(domain, this_patch, this_block_idx,
-                          this_patch_idx, qdata, time_interp);
+                             this_patch_idx, qdata, time_interp);
 }
 
 size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain)
@@ -364,24 +364,26 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
 }
 
 void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
-                                     fclaw2d_patch_t *this_patch,
-                                     int this_block_idx,
-                                     int this_patch_idx,
-                                     void *user)
+                                       fclaw2d_patch_t *this_patch,
+                                       int this_block_idx,
+                                       int this_patch_idx,
+                                       void *user)
 {
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+
     /* Create new data in 'user' pointer */
     fclaw2d_patch_data_new(domain,this_patch);
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_patch_build(domain,this_patch,this_block_idx,
+    fclaw2d_patch_build(g->glob,this_patch,this_block_idx,
                         this_patch_idx,(void*) &build_mode);
 
     /* This copied q data from memory */
     patch_vt()->partition_unpack(domain,
-                              this_patch,
-                              this_block_idx,
-                              this_patch_idx,
-                              user);
+                                 this_patch,
+                                 this_block_idx,
+                                 this_patch_idx,
+                                 user);
 }
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
@@ -389,43 +391,43 @@ size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
     return patch_vt()->partition_packsize(domain);
 }
 
-void fclaw2d_patch_build(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int blockno,
-                             int patchno,
-                             void *user)
+void fclaw2d_patch_build(fclaw2d_global_t *glob,
+                         fclaw2d_patch_t *this_patch,
+                         int blockno,
+                         int patchno,
+                         void *user)
 {
-    patch_vt()->patch_build(domain,
-                         this_patch,
-                         blockno,
-                         patchno,
-                         user);
+    patch_vt()->patch_build(glob,
+                            this_patch,
+                            blockno,
+                            patchno,
+                            user);
 #if 1
     if (patch_vt()->patch_setup != NULL)
     {
         /* The setup routine should check to see if this is a ghost patch and
            optimize accordingly.  For example, interior data is not generally
            needed (beyond what is needed for averaging) */
-        patch_vt()->patch_setup(domain,this_patch,blockno,patchno);
+        patch_vt()->patch_setup(glob->domain,this_patch,blockno,patchno);
     }
 #endif
 }
 
-void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *fine_patches,
-                                       fclaw2d_patch_t *coarse_patch,
-                                       int blockno,
-                                       int coarse_patchno,
-                                       int fine0_patchno,
-                                       fclaw2d_build_mode_t build_mode)
+void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
+                                   fclaw2d_patch_t *fine_patches,
+                                   fclaw2d_patch_t *coarse_patch,
+                                   int blockno,
+                                   int coarse_patchno,
+                                   int fine0_patchno,
+                                   fclaw2d_build_mode_t build_mode)
 {
-    patch_vt()->patch_build_from_fine(domain,
-                                   fine_patches,
-                                   coarse_patch,
-                                   blockno,
-                                   coarse_patchno,
-                                   fine0_patchno,
-                                   build_mode);
+    patch_vt()->patch_build_from_fine(glob,
+                                      fine_patches,
+                                      coarse_patch,
+                                      blockno,
+                                      coarse_patchno,
+                                      fine0_patchno,
+                                      build_mode);
 #if 1
     if (patch_vt()->patch_setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -433,7 +435,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_domain_t *domain,
            new coarse grid patches.  In the latter case, we might just average
            aux array info, for example, rather than recreate it from scratch.
            Something like a general "build from fine" routine might be needed */
-        patch_vt()->patch_setup(domain,coarse_patch,blockno,coarse_patchno);
+        patch_vt()->patch_setup(glob->domain,coarse_patch,blockno,coarse_patchno);
     }
 #endif
 }
