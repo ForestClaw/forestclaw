@@ -77,23 +77,19 @@ typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_global_t * glob, int level,
 /* Opaque pointer */
 typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
 
-void
-fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
-                       fclaw2d_patch_t* this_patch);
-void
-fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
-                          fclaw2d_patch_t *patch);
+void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
+                            fclaw2d_patch_t* this_patch);
 
-struct fclaw2d_patch_data*
-fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
+void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
+                               fclaw2d_patch_t *patch);
+
+struct fclaw2d_patch_data* fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
 
 
-void
-fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
-void*
-fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
+void* fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
 
 /* --------------------------------------------------------------
    Routines that return information about connectivity.
@@ -247,14 +243,14 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_domain_t* domain,
                                       fclaw2d_transform_data_t* transform_data);
 
 int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
-                                      fclaw2d_patch_t *this_patch,
-                                      int blockno, int patchno,
-                                      int initflag);
+                                 fclaw2d_patch_t *this_patch,
+                                 int blockno, int patchno,
+                                 int initflag);
 
 int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
-                                      fclaw2d_patch_t *fine_patches,
-                                      int blockno,
-                                      int patchno);
+                                 fclaw2d_patch_t *fine_patches,
+                                 int blockno,
+                                 int patchno);
 
 void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
                                     fclaw2d_patch_t* coarse_patch,

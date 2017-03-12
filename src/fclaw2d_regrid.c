@@ -139,8 +139,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
-            fclaw2d_patch_data_new(new_domain,fine_patch);
             /* used to pass in new_domain, but if we call like this, the old_domain is passed in */
+            fclaw2d_patch_data_new(g->glob,fine_patch);
             fclaw2d_patch_build(g->glob,fine_patch,blockno,
                                 fine_patchno,(void*) &build_mode);
             if (domain_init)
@@ -155,9 +155,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int fine_patchno = new_patchno;
 
             fclaw2d_patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
-                                                  blockno,coarse_patchno,fine_patchno);
+                                           blockno,coarse_patchno,fine_patchno);
         }
-        fclaw2d_patch_data_delete(old_domain,coarse_patch);
+        /* used to pass in old_domain */
+        fclaw2d_patch_data_delete(g->glob,coarse_patch);
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
@@ -173,8 +174,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
-        fclaw2d_patch_data_new(new_domain,coarse_patch);
-
+        
+        fclaw2d_patch_data_new(g->glob,coarse_patch);// new_domain
+        
         /* Area (and possibly other things) should be averaged to coarse grid. */
         fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
                                       blockno,coarse_patchno,fine_patchno,
@@ -188,7 +190,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         for(i = 0; i < 4; i++)
         {
             fclaw2d_patch_t* fine_patch = &fine_siblings[i];
-            fclaw2d_patch_data_delete(old_domain,fine_patch);
+            /* used to pass in old_domain */
+            fclaw2d_patch_data_delete(g->glob,fine_patch);
         }
     }
     else

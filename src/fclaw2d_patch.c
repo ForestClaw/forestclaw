@@ -212,9 +212,8 @@ void fclaw2d_patch_set_block_corner_count(fclaw2d_global_t* glob,
 }
 
 
-void
-fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
-                                      fclaw2d_patch_callback_t pcb, void *user)
+void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user)
 {
 #if (_OPENMP)
     int i, j;
@@ -248,9 +247,10 @@ fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
    how to do this.
    -------------------------------------------------------- */
 
-void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
+void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
 
     /* Initialize user data */
@@ -263,9 +263,10 @@ void fclaw2d_patch_data_new(fclaw2d_domain_t* domain,
     pdata->neighbors_set = 0;
 }
 
-void fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
+void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *this_patch)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
     if (pdata != NULL)
@@ -372,7 +373,7 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
     /* Create new data in 'user' pointer */
-    fclaw2d_patch_data_new(domain,this_patch);
+    fclaw2d_patch_data_new(g->glob,this_patch);
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
     fclaw2d_patch_build(g->glob,this_patch,this_block_idx,

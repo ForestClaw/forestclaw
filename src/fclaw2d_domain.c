@@ -154,7 +154,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
             /* This is here to delete any patches created during
                initialization, and not through regridding */
             fclaw2d_patch_t *patch = block->patches + j;
-            fclaw2d_patch_data_delete(*domain,patch);
+            fclaw2d_patch_data_delete(glob,patch);
         }
 
         FCLAW2D_FREE (bd);

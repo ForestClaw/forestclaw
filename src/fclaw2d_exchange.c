@@ -95,20 +95,21 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
            need to be passed in */
         patchno = i;
 
-        fclaw2d_patch_data_new(domain,ghost_patch);
+        fclaw2d_patch_data_new(glob,ghost_patch);
         fclaw2d_patch_build_remote_ghost(glob,ghost_patch,blockno,
                                          patchno,(void*) &build_mode);
     }
 }
 
 static
-void delete_remote_ghost_patches(fclaw2d_domain_t* domain)
+void delete_remote_ghost_patches(fclaw2d_global_t* glob)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-        fclaw2d_patch_data_delete(domain,ghost_patch);
+        fclaw2d_patch_data_delete(glob,ghost_patch);
     }
 }
 
@@ -277,7 +278,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
     }
 
     /* Delete ghost patches from remote neighboring patches */
-    delete_remote_ghost_patches(*domain);
+    delete_remote_ghost_patches(glob);
     fclaw2d_domain_free_after_exchange (*domain, e_old);
 
     /* Destroy indirect data needed to communicate between ghost patches
