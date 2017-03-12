@@ -26,11 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
-static fclaw2d_vtable_t vt;
+static fclaw2d_vtable_t s_vt;
 
 fclaw2d_vtable_t* fclaw2d_vt()
 {
-    return &vt;
+    return &s_vt;
 }
 
 /* Initialize any settings that can be set here */
@@ -50,28 +50,6 @@ void fclaw2d_init_vtable()
     /* Defaults for regridding */
     fclaw_vt->after_regrid              = NULL;
 
-#if 0
-    /* Diagnostics */
-
-    fclaw_vt->patch_init_diagnostics       = NULL;
-    fclaw_vt->patch_compute_diagnostics    = NULL;
-    fclaw_vt->patch_gather_diagnostics     = NULL;
-    fclaw_vt->patch_reset_diagnostics      = NULL;
-    fclaw_vt->patch_finalize_diagnostics   = NULL;
-
-    fclaw_vt->solver_init_diagnostics      = NULL;
-    fclaw_vt->solver_compute_diagnostics    = NULL;
-    fclaw_vt->solver_gather_diagnostics    = NULL;
-    fclaw_vt->solver_reset_diagnostics     = NULL;
-    fclaw_vt->solver_finalize_diagnostics  = NULL;
-
-    fclaw_vt->user_init_diagnostics       = NULL;
-    fclaw_vt->user_compute_diagnostics    = NULL;
-    fclaw_vt->user_gather_diagnostics     = NULL;
-    fclaw_vt->user_reset_diagnostics      = NULL;
-    fclaw_vt->user_finalize_diagnostics   = NULL;
-#endif
-
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
       ------------------------------------------------------------- */
@@ -87,6 +65,7 @@ void fclaw2d_init_vtable()
     fclaw_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 }
 
+#if 0
 void fclaw2d_set_vtable()
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
@@ -98,14 +77,5 @@ void fclaw2d_set_vtable()
     {
         fclaw_vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
     }
-}
-
-#if 0
-fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)
-{
-    fclaw2d_vtable_t *vt;
-    vt = (fclaw2d_vtable_t*) fclaw2d_domain_attribute_access(domain,"vtable",NULL);
-    FCLAW_ASSERT(vt != NULL);
-    return *vt;
 }
 #endif

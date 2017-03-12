@@ -768,22 +768,14 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
-    /* diagnostic functions */
+    /* diagnostic functions that apply to patches (error, conservation) */
     diag_vt->patch_init_diagnostics      = &fclaw2d_clawpatch_diagnostics_initialize;
     diag_vt->patch_compute_diagnostics   = &fclaw2d_clawpatch_diagnostics_compute;
     diag_vt->patch_gather_diagnostics    = &fclaw2d_clawpatch_diagnostics_gather;
     diag_vt->patch_reset_diagnostics     = &fclaw2d_clawpatch_diagnostics_reset;
     diag_vt->patch_finalize_diagnostics  = &fclaw2d_clawpatch_diagnostics_finalize;
 
-#if 0
-    patch_vt->compute_error     = &fclaw2d_clawpatch_compute_error;
-    patch_vt->compute_norm      = &fclaw2d_clawpatch_compute_error_norm;
-#endif
-
-
-
     patch_vt->defaults_set = 1;
-    // s_clawpatch_vt.defaults_set = 1;
 }
 
 
