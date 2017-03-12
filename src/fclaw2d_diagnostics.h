@@ -36,14 +36,27 @@ extern "C"
 #endif
 #endif
 
+typedef struct
+{
+    void* patch_accumulator;
+    void* solver_accumulator;
+    void* user_accumulator;
+} fclaw2d_diagnostics_accumulator_t;
+
+
+
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
-void fclaw2d_diagnostics_compute_error(fclaw2d_domain_t *domain, int init_flag)
-void fclaw2d_diagnostics_user(fclaw2d_domain_t *domain, int init_flag)
+void fclaw2d_diagnostics_initialize(fclaw2d_domain_t *domain,
+                                    fclaw2d_diagnostics_accumulator_t* acc);
 
-/* User diagnostics - need to rename */
-void fclaw2d_diagnostics_run(fclaw2d_domain_t *domain, int init_flag);
+void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
+                                fclaw2d_diagnostics_accumulator_t* acc,
+                                int init_flag);
+
+void fclaw2d_diagnostics_reset(fclaw2d_domain_t *domain,
+                               fclaw2d_diagnostics_accumulator_t* acc);
 
 
 

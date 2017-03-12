@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 #include <fclaw2d_metric_default.h>
-#include <fclaw2d_diagnostics_default.h>
+#include <fclaw2d_diagnostics.h>
 #include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
@@ -67,10 +67,20 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
 
 typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
 
-typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_domain_t *domain,
-                                             void* gather_accumulator);
 
-typedef void* (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain)
+/* Diagnostic information */
+typedef void (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain,
+                                                 void* acc);
+
+typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_domain_t *domain,
+                                             void* acc,
+                                             int init_flag);
+
+typedef void (*fclaw2d_diagnostics_reset_t)(fclaw2d_domain_t *domain,
+                                            void* acc);
+
+typedef void (*fclaw2d_diagnostics_finalize_t)(fclaw2d_domain_t *domain,
+                                               void* acc);
 
 typedef struct fclaw2d_vtable
 {
@@ -79,10 +89,23 @@ typedef struct fclaw2d_vtable
     /* regridding functions */
     fclaw2d_after_regrid_t               after_regrid;
 
-    /* diagnostic functions */
-    fclaw2d_diagnostics_accumulator_t    gather_accumulator;
-    fclaw2d_diagnostics_initialize_t     init_diagnostics;
-    fclaw2d_diagnostics_gather_t         gather_diagnostics;
+    /* patch diagnostic functions (error, conservation, area, etc) */
+    fclaw2d_diagnostics_initialize_t     patch_init_diagnostics;
+    fclaw2d_diagnostics_gather_t         patch_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          patch_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       patch_finalize_diagnostics;
+
+    /* solver diagnostic functions (gauges, fgmax, and so on) */
+    fclaw2d_diagnostics_initialize_t     solver_init_diagnostics;
+    fclaw2d_diagnostics_gather_t         solver_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          solver_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       solver_finalize_diagnostics;
+
+    /* user defined diagnostics */
+    fclaw2d_diagnostics_initialize_t     user_init_diagnostics;
+    fclaw2d_diagnostics_gather_t         user_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          user_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       user_finalize_diagnostics;
 
     /* Building patches, including functions to create metric terms */
     fclaw2d_metric_setup_mesh_t          metric_setup_mesh;    /* wrapper */

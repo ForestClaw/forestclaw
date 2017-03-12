@@ -714,6 +714,7 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_init_vtable_defaults()
 {
 
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     /* These must be redefined by the solver and user */
@@ -768,8 +769,16 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_unpack  = &fclaw2d_clawpatch_partition_unpack;
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
+    /* diagnostic functions */
+    fclaw_vt->patch_init_diagnostics      = &fclaw2d_clawpatch_diagnostics_initialize;
+    fclaw_vt->patch_gather_diagnostics    = &fclaw2d_clawpatch_diagnostics_gather;
+    fclaw_vt->patch_reset_diagnostics     = &fclaw2d_clawpatch_diagnostics_reset;
+    fclaw_vt->patch_finalize_diagnostics  = &fclaw2d_clawpatch_diagnostics_finalize;
+
+#if 0
     patch_vt->compute_error     = &fclaw2d_clawpatch_compute_error;
     patch_vt->compute_norm      = &fclaw2d_clawpatch_compute_error_norm;
+#endif
 
 
 
@@ -1053,7 +1062,7 @@ static void setup_area_storage(fclaw2d_clawpatch_t* cp)
     int mx = cp->mx;
     int my = cp->my;
     int mbc = cp->mbc;
-xf
+
     int ll[SpaceDim];
     int ur[SpaceDim];
     for (int idir = 0; idir < SpaceDim; idir++)

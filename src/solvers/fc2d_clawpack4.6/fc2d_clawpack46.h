@@ -345,13 +345,15 @@ double FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double
 
 
 
-#define FC2D_CLAWPACK46_COMPUTE_ERROR FCLAW_F77_FUNC(fc2d_clawpack46_compute_error, \
-                                                     FC2D_CLAWPACK46_COMPUTE_ERROR)
+#if 0
+#define FC2D_CLAWPACK46_FORT_COMPUTE_ERROR FCLAW_F77_FUNC(fc2d_clawpack46_fort_compute_error, \
+                                                     FC2D_CLAWPACK46_FORT_COMPUTE_ERROR)
 
-void FC2D_CLAWPACK46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
-                                   double *dx, double *dy, double *xlower,
-                                   double *ylower, double *t, double q[],
-                                   double error[]);
+void FC2D_CLAWPACK46_FORT_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                                        double *dx, double *dy, double *xlower,
+                                        double *ylower, double *t, double q[],
+                                        double error[]);
+#endif
 
 #define FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_clawpack46_fort_compute_error_norm, \
                                                               FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM)

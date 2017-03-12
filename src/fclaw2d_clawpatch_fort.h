@@ -60,6 +60,7 @@ void FCLAW2D_CLAWPATCH_FORT_ERROR(int* blockno, int *mx, int *my, int* mbc, int*
 
 /* Not obvious that the user would want to generalize the conservation routine,
    so they are not in a 'default' file.*/
+
 #define FCLAW2D_CLAWPATCH_FORT_CONSCHECK FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_conscheck, \
                                                         FCLAW2D_CLAWPATCH_FORT_CONSCHECK)
 

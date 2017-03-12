@@ -37,7 +37,7 @@ fclaw2d_vtable_t* fclaw2d_vt()
 void fclaw2d_init_vtable()
 {
 
-    fclaw2d_vtable_t vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
     /* ------------------------------------------------------------
       Functions below here depend on q and could be solver specific
@@ -45,40 +45,52 @@ void fclaw2d_init_vtable()
 
     /* These may be redefined by the user */
     /* Problem setup */
-    vt.problem_setup             = NULL;
+    fclaw_vt->problem_setup             = NULL;
 
     /* Defaults for regridding */
-    vt.after_regrid              = NULL;
+    fclaw_vt->after_regrid              = NULL;
 
     /* Diagnostics */
-    vt.gather_diagnostics        = &fclaw2d_diagnostics_gather;
-    vt.init_diagnostics          = &fclaw2d_diagnostics_initialize;
+    fclaw_vt->patch_init_diagnostics       = NULL;
+    fclaw_vt->patch_gather_diagnostics     = NULL;
+    fclaw_vt->patch_reset_diagnostics      = NULL;
+    fclaw_vt->patch_finalize_diagnostics   = NULL;
+
+    fclaw_vt->solver_init_diagnostics      = NULL;
+    fclaw_vt->solver_gather_diagnostics    = NULL;
+    fclaw_vt->solver_reset_diagnostics     = NULL;
+    fclaw_vt->solver_finalize_diagnostics  = NULL;
+
+    fclaw_vt->user_init_diagnostics       = NULL;
+    fclaw_vt->user_gather_diagnostics     = NULL;
+    fclaw_vt->user_reset_diagnostics      = NULL;
+    fclaw_vt->user_finalize_diagnostics   = NULL;
 
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
       ------------------------------------------------------------- */
-    vt.metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
-    vt.fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
+    fclaw_vt->metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
+    fclaw_vt->fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
 
-    vt.metric_compute_area        = &fclaw2d_metric_compute_area;
-    vt.metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
+    fclaw_vt->metric_compute_area        = &fclaw2d_metric_compute_area;
+    fclaw_vt->metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
 
-    vt.metric_compute_normals     = &fclaw2d_metric_compute_normals;
-    vt.fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
-    vt.fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
-    vt.fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+    fclaw_vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
+    fclaw_vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
+    fclaw_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
+    fclaw_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 }
 
 void fclaw2d_set_vtable()
 {
-    // fclaw2d_domain_attribute_add (domain,"vtable",vt);
-    if (vt.metric_compute_area == &fclaw2d_metric_compute_area)
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->metric_compute_area == &fclaw2d_metric_compute_area)
     {
-        vt.metric_area_set_ghost = &fclaw2d_metric_area_set_ghost;
+        fclaw_vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost;
     }
-    else if (vt.metric_compute_area == &fclaw2d_metric_compute_area_exact)
+    else if (fclaw_vt->metric_compute_area == &fclaw2d_metric_compute_area_exact)
     {
-        vt.metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
+        fclaw_vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
     }
 }
 

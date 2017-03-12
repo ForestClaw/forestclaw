@@ -348,27 +348,36 @@ typedef void (*fclaw2d_ghostpack_extra_t)(fclaw2d_domain_t *domain,
 
 /* Diagnostic functions */
 
-typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int *mbc,
-                                             int* meqn,
-                                             double *dx, double *dy, double *xlower,
-                                             double *ylower, double *t, double q[],
-                                             double error[]);
+typedef void (*fclaw2d_fort_error_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
+                                     double *dx, double *dy, double *xlower,
+                                     double *ylower, double *t, double q[],
+                                     double error[]);
+
+typedef void (*fclaw2d_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
+                                         double *dx, double *dy,
+                                         double area[], double q[], double sum[]);
+
+typedef double (*fclaw2d_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
+                                      double* dy, double area[]);
+
+typedef void (*fclaw2d_fort_norm_t)(int *mx, int *my, int *mbc,int *meqn,
+                                    double *dx, double *dy, double area[],
+                                    double error[], double error_norm[]);
 
 
-typedef double (*fclaw2d_fort_compute_patch_area_t)(int *mx, int* my, int*mbc, double* dx,
-                                                    double* dy, double area[]);
-
-typedef void (*fclaw2d_fort_compute_error_norm_t)(int *mx, int *my, int *mbc,
-                                                    int *meqn,
-                                                    double *dx, double *dy, double *area,
-                                                    double *error, double* error_norm);
-
-typedef void (*fclaw2d_fort_compute_conservation_t)(int *mx, int *my, int* mbc, int* meqn,
-                                                      double *dx, double *dy,
-                                                      double* area, double *q, double* sum);
 
 
-void fclaw2d_clawpatch_error(fclaw2d_domain_t *domain, int init_flag);
+void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
+                                              void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t *domain,
+                                          void* patch_acc, int init_flag);
+
+void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_domain_t *domain,
+                                         void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_domain_t *domain,
+                                            void* patch_acc);
 
 
 
@@ -400,10 +409,10 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_ghostpack_extra_t          ghostpack_extra;
 
     /* diagnostic functions */
-    fclaw2d_fort_compute_error_t        fort_compute_error;
-    fclaw2d_fort_compute_error_norm_t   fort_compute_error_norm;
-    fclaw2d_fort_compute_patch_area_t   fort_compute_patch_area;
-    fclaw2d_fort_conservation_check_t   fort_conservation_check;
+    fclaw2d_fort_error_t       fort_compute_patch_error;
+    fclaw2d_fort_conscheck_t   fort_conservation_check;
+    fclaw2d_fort_norm_t        fort_compute_error_norm;
+    fclaw2d_fort_area_t        fort_compute_patch_area;
 
     int defaults_set;
 };

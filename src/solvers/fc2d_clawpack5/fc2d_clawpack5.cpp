@@ -46,7 +46,7 @@ void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
 {
     classic_vt = user_vt;
 }
-#endif 
+#endif
 
 /* This is called from the user application. */
 void fc2d_clawpack5_set_vtable_defaults()
@@ -96,9 +96,10 @@ void fc2d_clawpack5_set_vtable_defaults()
     clawpatch_vt->fort_write_file         = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
 
     /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm     = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
-    fclaw_vt->fort_compute_patch_area     = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
-    fclaw_vt->fort_conservation_check     = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_compute_patch_error    = NULL;  /* User defined */
+    clawpatch_vt->fort_compute_error_norm     = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area     = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check     = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK5_FORT_COPY_FACE;

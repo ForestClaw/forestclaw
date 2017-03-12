@@ -34,6 +34,8 @@ extern "C"
 #endif
 #endif
 
+
+#if 0
 /* Not obvious that the user would want to generalize the conservation routine,
    so they are not in a 'default' file.*/
 #define FCLAW2D_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_fort_conservation_check, \
@@ -59,6 +61,8 @@ double FCLAW2D_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
 void FCLAW2D_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meqn,
                                      double *dx, double *dy, double area[],
                                      double error[], double error_norm[]);
+
+#endif
 
 #ifdef __cplusplus
 #if 0

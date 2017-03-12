@@ -37,12 +37,15 @@ extern "C"
 #endif
 #endif
 
+#if 0
 /* This calls FORT_COMPUTE_ERROR */
 void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
                                              fclaw2d_patch_t *this_patch,
                                              int this_block_idx,
                                              int this_patch_idx,
                                              double *error);
+
+#endif
 
 #ifdef __cplusplus
 #if 0

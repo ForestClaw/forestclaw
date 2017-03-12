@@ -581,10 +581,3 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_domain_t* domain,
 {
     patch_vt()->setup_timeinterp(domain,this_patch,alpha);
 }
-
-void cb_fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          void* reduce_accumulator)
-{
-    patch_vt()->compute_diagnostics(domain,this_patch,this_block_idx,this_patch_idx, reduce_accumulator);
-}

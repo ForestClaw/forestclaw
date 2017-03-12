@@ -49,10 +49,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_transform.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h \
-	src/fclaw2d_diagnostics_fort.h \
-	src/fclaw2d_diagnostics_default.h \
-	src/fclaw2d_diagnostics_default_fort.h
+	src/fclaw2d_diagnostics.h
 
 libforestclaw_internal_headers =
 
@@ -87,10 +84,10 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output.c \
 	src/fclaw2d_update_single_step.c \
 	src/fclaw2d_run.c \
-	src/fclaw2d_clawpatch_diagonostics.c \
+	src/fclaw2d_diagnostics.c \
+	src/fclaw2d_clawpatch_diagnostics.c \
 	src/fclaw2d_clawpatch_regrid.c \
 	src/fclaw2d_clawpatch_output_ascii.c \
-	src/fclaw2d_diagnostics_default.c \
 	src/fclaw2d_metric_default.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_domain.c \

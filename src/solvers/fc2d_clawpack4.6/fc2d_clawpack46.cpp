@@ -80,6 +80,7 @@ void fc2d_clawpack46_set_vtable_defaults()
            for this function */
         fclaw_vt->problem_setup         = &fc2d_clawpack46_setprob;
     }
+
     patch_vt->patch_setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
     patch_vt->patch_physical_bc         = &fc2d_clawpack46_bc2;
     patch_vt->patch_single_step_update  = &fc2d_clawpack46_update;
@@ -95,11 +96,10 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_write_header      = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
     clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
-    /* diagnostic functions */
-    clawpatch_vt->fort_compute_error        = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR;
-    clawpatch_vt->fort_compute_error_norm   = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    clawpatch_vt->fort_compute_patch_area   = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    clawpatch_vt->fort_conservation_check   = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
+    clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area    = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check    = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;
