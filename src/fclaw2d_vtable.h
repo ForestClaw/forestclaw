@@ -67,7 +67,7 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
 
 typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
 
-
+#if 0
 /* Diagnostic information */
 typedef void (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain,
                                                  void** acc);
@@ -84,6 +84,7 @@ typedef void (*fclaw2d_diagnostics_reset_t)(fclaw2d_domain_t *domain,
 
 typedef void (*fclaw2d_diagnostics_finalize_t)(fclaw2d_domain_t *domain,
                                                void** acc);
+#endif
 
 typedef struct fclaw2d_vtable
 {
@@ -92,6 +93,7 @@ typedef struct fclaw2d_vtable
     /* regridding functions */
     fclaw2d_after_regrid_t               after_regrid;
 
+#if 0
     /* patch diagnostic functions (error, conservation, area, etc) */
     fclaw2d_diagnostics_initialize_t     patch_init_diagnostics;
     fclaw2d_diagnostics_compute_t        patch_compute_diagnostics;
@@ -112,6 +114,7 @@ typedef struct fclaw2d_vtable
     fclaw2d_diagnostics_gather_t         user_gather_diagnostics;
     fclaw2d_diagnostics_reset_t          user_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       user_finalize_diagnostics;
+#endif
 
     /* Building patches, including functions to create metric terms */
     fclaw2d_metric_setup_mesh_t          metric_setup_mesh;    /* wrapper */

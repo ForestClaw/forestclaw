@@ -713,8 +713,7 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
 
 void fclaw2d_clawpatch_init_vtable_defaults()
 {
-
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     /* These must be redefined by the solver and user */
@@ -770,11 +769,11 @@ void fclaw2d_clawpatch_init_vtable_defaults()
     patch_vt->partition_packsize= &fclaw2d_clawpatch_partition_packsize;
 
     /* diagnostic functions */
-    fclaw_vt->patch_init_diagnostics      = &fclaw2d_clawpatch_diagnostics_initialize;
-    fclaw_vt->patch_compute_diagnostics   = &fclaw2d_clawpatch_diagnostics_compute;
-    fclaw_vt->patch_gather_diagnostics    = &fclaw2d_clawpatch_diagnostics_gather;
-    fclaw_vt->patch_reset_diagnostics     = &fclaw2d_clawpatch_diagnostics_reset;
-    fclaw_vt->patch_finalize_diagnostics  = &fclaw2d_clawpatch_diagnostics_finalize;
+    diag_vt->patch_init_diagnostics      = &fclaw2d_clawpatch_diagnostics_initialize;
+    diag_vt->patch_compute_diagnostics   = &fclaw2d_clawpatch_diagnostics_compute;
+    diag_vt->patch_gather_diagnostics    = &fclaw2d_clawpatch_diagnostics_gather;
+    diag_vt->patch_reset_diagnostics     = &fclaw2d_clawpatch_diagnostics_reset;
+    diag_vt->patch_finalize_diagnostics  = &fclaw2d_clawpatch_diagnostics_finalize;
 
 #if 0
     patch_vt->compute_error     = &fclaw2d_clawpatch_compute_error;

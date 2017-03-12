@@ -50,7 +50,9 @@ void fclaw2d_init_vtable()
     /* Defaults for regridding */
     fclaw_vt->after_regrid              = NULL;
 
+#if 0
     /* Diagnostics */
+
     fclaw_vt->patch_init_diagnostics       = NULL;
     fclaw_vt->patch_compute_diagnostics    = NULL;
     fclaw_vt->patch_gather_diagnostics     = NULL;
@@ -68,6 +70,7 @@ void fclaw2d_init_vtable()
     fclaw_vt->user_gather_diagnostics     = NULL;
     fclaw_vt->user_reset_diagnostics      = NULL;
     fclaw_vt->user_finalize_diagnostics   = NULL;
+#endif
 
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
