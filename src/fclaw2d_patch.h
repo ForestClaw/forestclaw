@@ -84,6 +84,25 @@ void
 fclaw2d_patch_data_delete(fclaw2d_domain_t* domain,
                           fclaw2d_patch_t *patch);
 
+void fclaw2d_patch_initialize(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx);
+
+void fclaw2d_patch_write_header(fclaw2d_domain_t* domain,
+                                int iframe);
+
+
+void fclaw2d_patch_physical_bc(fclaw2d_domain_t *domain,
+                               fclaw2d_patch_t *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               double t,
+                               double dt,
+                               fclaw_bool *intersects_bc,
+                               fclaw_bool time_interp);
+
+
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_data(fclaw2d_patch_t* patch);
 
@@ -277,6 +296,21 @@ void fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t
                                        int this_block_idx, int this_patch_idx,
                                        void* local_accumulator);
 
+void fclaw2d_patch_write_file(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              int iframe,int patch_num,
+                              int level);
+
+double fclaw2d_patch_single_step_update(fclaw2d_domain_t *domain,
+                                        fclaw2d_patch_t *this_patch,
+                                        int this_block_idx,
+                                        int this_patch_idx,
+                                        double t,
+                                        double dt);
+
+
 
 typedef void* (*fclaw2d_patch_new_t)();
 
@@ -466,21 +500,21 @@ typedef struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
     fclaw2d_patch_delete_t             patch_delete;
-    fclaw2d_patch_setup_t              patch_setup;
-    fclaw2d_patch_setup_ghost_t        patch_setup_ghost;
-    fclaw2d_patch_initialize_t         patch_initialize;
-    fclaw2d_patch_physical_bc_t        patch_physical_bc;
-    fclaw2d_patch_single_step_update_t patch_single_step_update;
-    fclaw2d_patch_build_t              patch_build;
-    fclaw2d_patch_build_from_fine_t    patch_build_from_fine;
-    fclaw2d_patch_restore_step_t       patch_restore_step;
-    fclaw2d_patch_save_step_t          patch_save_step;
+    fclaw2d_patch_setup_t              setup;
+    fclaw2d_patch_setup_ghost_t        setup_ghost;
+    fclaw2d_patch_initialize_t         initialize;
+    fclaw2d_patch_physical_bc_t        physical_bc;
+    fclaw2d_patch_single_step_update_t single_step_update;
+    fclaw2d_patch_build_t              build;
+    fclaw2d_patch_build_from_fine_t    build_from_fine;
+    fclaw2d_patch_restore_step_t       restore_step;
+    fclaw2d_patch_save_step_t          save_step;
 
     /* regridding functions */
-    fclaw2d_patch_tag4refinement_t    patch_tag4refinement;
-    fclaw2d_patch_tag4coarsening_t    patch_tag4coarsening;
-    fclaw2d_patch_average2coarse_t    patch_average2coarse;
-    fclaw2d_patch_interpolate2fine_t  patch_interpolate2fine;
+    fclaw2d_patch_tag4refinement_t     tag4refinement;
+    fclaw2d_patch_tag4coarsening_t     tag4coarsening;
+    fclaw2d_patch_average2coarse_t     average2coarse;
+    fclaw2d_patch_interpolate2fine_t   interpolate2fine;
 
     /* ghost filling functions */
     fclaw2d_patch_copy_face_t           copy_face;
@@ -493,7 +527,7 @@ typedef struct fclaw2d_patch_vtable
 
     /* output functions */
     fclaw2d_patch_write_header_t       write_header;
-    fclaw2d_patch_write_file_t         patch_write_file;
+    fclaw2d_patch_write_file_t         write_file;
 
     /* Time interpolation */
     fclaw2d_patch_setup_timeinterp_t   setup_timeinterp;
