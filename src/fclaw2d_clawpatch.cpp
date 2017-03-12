@@ -771,6 +771,7 @@ void fclaw2d_clawpatch_init_vtable_defaults()
 
     /* diagnostic functions */
     fclaw_vt->patch_init_diagnostics      = &fclaw2d_clawpatch_diagnostics_initialize;
+    fclaw_vt->patch_compute_diagnostics   = &fclaw2d_clawpatch_diagnostics_compute;
     fclaw_vt->patch_gather_diagnostics    = &fclaw2d_clawpatch_diagnostics_gather;
     fclaw_vt->patch_reset_diagnostics     = &fclaw2d_clawpatch_diagnostics_reset;
     fclaw_vt->patch_finalize_diagnostics  = &fclaw2d_clawpatch_diagnostics_finalize;

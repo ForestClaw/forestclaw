@@ -16,7 +16,6 @@ libforestclaw_installed_headers = \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_advance.h \
 	src/fclaw2d_farraybox.hpp \
-	src/fclaw2d_clawpatch.hpp \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_base.h \
@@ -26,9 +25,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_clawpatch_output_ascii.h \
 	src/fclaw2d_output_ascii_fort.h \
-	src/fclaw2d_clawpatch_regrid.h \
 	src/fclaw2d_regrid_default_fort.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
@@ -44,12 +41,15 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_partition.h \
 	src/fclaw2d_exchange.h \
 	src/fclaw2d_convenience.h \
-	src/fclaw2d_clawpatch.h \
 	src/fclaw2d_neighbors_fort.h \
 	src/fclaw2d_transform.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h
+	src/fclaw2d_diagnostics.h \
+	src/fclaw2d_clawpatch.h \
+	src/fclaw2d_clawpatch.hpp \
+	src/fclaw2d_clawpatch_output_ascii.h \
+	src/fclaw2d_clawpatch_regrid.h
 
 libforestclaw_internal_headers =
 
@@ -85,9 +85,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_update_single_step.c \
 	src/fclaw2d_run.c \
 	src/fclaw2d_diagnostics.c \
-	src/fclaw2d_clawpatch_diagnostics.c \
-	src/fclaw2d_clawpatch_regrid.c \
-	src/fclaw2d_clawpatch_output_ascii.c \
 	src/fclaw2d_metric_default.c \
 	src/fp_exception_glibc_extension.c \
 	src/fclaw2d_domain.c \
@@ -99,8 +96,11 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_finalize.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
-	src/fclaw2d_clawpatch.cpp \
 	src/fclaw2d_farraybox.cpp \
+	src/fclaw2d_clawpatch.cpp \
+	src/fclaw2d_clawpatch_diagnostics.c \
+	src/fclaw2d_clawpatch_regrid.c \
+	src/fclaw2d_clawpatch_output_ascii.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \

@@ -297,6 +297,7 @@ void outstyle_1(fclaw2d_domain_t **domain)
         iframe++;
         fclaw2d_output_frame(*domain,iframe);
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 #if 0
@@ -436,6 +437,7 @@ void outstyle_3(fclaw2d_domain_t **domain)
             fclaw2d_output_frame(*domain,iframe);
         }
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 
@@ -509,6 +511,7 @@ void outstyle_4(fclaw2d_domain_t **domain)
             fclaw2d_output_frame(*domain,iframe);
         }
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 

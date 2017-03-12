@@ -52,16 +52,19 @@ void fclaw2d_init_vtable()
 
     /* Diagnostics */
     fclaw_vt->patch_init_diagnostics       = NULL;
+    fclaw_vt->patch_compute_diagnostics    = NULL;
     fclaw_vt->patch_gather_diagnostics     = NULL;
     fclaw_vt->patch_reset_diagnostics      = NULL;
     fclaw_vt->patch_finalize_diagnostics   = NULL;
 
     fclaw_vt->solver_init_diagnostics      = NULL;
+    fclaw_vt->solver_compute_diagnostics    = NULL;
     fclaw_vt->solver_gather_diagnostics    = NULL;
     fclaw_vt->solver_reset_diagnostics     = NULL;
     fclaw_vt->solver_finalize_diagnostics  = NULL;
 
     fclaw_vt->user_init_diagnostics       = NULL;
+    fclaw_vt->user_compute_diagnostics    = NULL;
     fclaw_vt->user_gather_diagnostics     = NULL;
     fclaw_vt->user_reset_diagnostics      = NULL;
     fclaw_vt->user_finalize_diagnostics   = NULL;

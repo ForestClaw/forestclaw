@@ -58,8 +58,8 @@ void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
 void fclaw2d_diagnostics_reset(fclaw2d_domain_t *domain,
                                fclaw2d_diagnostics_accumulator_t* acc);
 
-
-
+void fclaw2d_diagnostics_finalize(fclaw2d_domain_t *domain,
+                                  fclaw2d_diagnostics_accumulator_t* acc);
 
 #ifdef __cplusplus
 #if 0

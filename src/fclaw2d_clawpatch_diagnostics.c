@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_diagnostics_fort.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_vtable.h>
 
@@ -45,7 +44,7 @@ typedef struct {
    Create and initialize a new accumulator
    ------------------------------------------------------------- */
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
-                                              void *acc_patch)
+                                              void **acc_patch)
 {
     const amr_options_t *gparms = get_domain_parms(domain);
 
@@ -62,7 +61,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
     error_data->mass0   = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->area = 0;
 
-    acc_patch = error_data;
+    *acc_patch = error_data;
 
 }
 
@@ -111,7 +110,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(domain,this_patch);  /* Might be null */
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
@@ -212,10 +211,12 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t* domain,
 }
 
 void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_domain_t* domain,
-                                            void* patch_acc)
+                                            void** patch_acc)
 {
-    error_info_t *error_data = (error_info_t*) patch_acc;
+    error_info_t *error_data = *((error_info_t**) patch_acc);
     FCLAW_FREE(error_data->mass);
     FCLAW_FREE(error_data->mass0);
     FCLAW_FREE(error_data->local_error);
+    FCLAW_FREE(error_data);
+    *patch_acc = NULL;
 }

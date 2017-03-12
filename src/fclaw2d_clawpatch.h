@@ -368,7 +368,10 @@ typedef void (*fclaw2d_fort_norm_t)(int *mx, int *my, int *mbc,int *meqn,
 
 
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
-                                              void* patch_acc);
+                                              void** patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_domain_t* domain,
+                                           void* patch_acc);
 
 void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t *domain,
                                           void* patch_acc, int init_flag);
@@ -377,7 +380,7 @@ void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_domain_t *domain,
                                          void* patch_acc);
 
 void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_domain_t *domain,
-                                            void* patch_acc);
+                                            void** patch_acc);
 
 
 
