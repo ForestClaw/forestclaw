@@ -71,17 +71,18 @@ void fc2d_clawpack5_set_vtable_defaults()
     claw5_vt->b4step2 = NULL;
     claw5_vt->src2 = NULL;
 
-    /* Default qinit functions */
-    patch_vt->patch_initialize         = &fc2d_clawpack5_qinit;
     if (fclaw_vt->problem_setup == NULL)
     {
         /* This call shouldn't override a version-independent setting
            for this function */
         fclaw_vt->problem_setup        = &fc2d_clawpack5_setprob;
     }
-    patch_vt->patch_setup              = &fc2d_clawpack5_setaux;
-    patch_vt->patch_physical_bc        = &fc2d_clawpack5_bc2;
-    patch_vt->patch_single_step_update = &fc2d_clawpack5_update;
+
+    /* Default patch functions */
+    patch_vt->initialize           = &fc2d_clawpack5_qinit;
+    patch_vt->setup                = &fc2d_clawpack5_setaux;
+    patch_vt->physical_bc          = &fc2d_clawpack5_bc2;
+    patch_vt->single_step_update   = &fc2d_clawpack5_update;
 
     /* Forestclaw functions */
     clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK5_FORT_AVERAGE2COARSE;
