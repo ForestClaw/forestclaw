@@ -38,6 +38,7 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user)
 {
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
 
@@ -57,8 +58,8 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
     {
         /* We need to rebuild the patch from scratch. 'user' contains
            the packed data received from remote processor. */
-        cb_fclaw2d_patch_partition_unpack(new_domain,new_patch,
-                                          blockno,new_patchno,user);
+        fclaw2d_patch_partition_unpack(g->glob,new_domain,new_patch,
+                                       blockno,new_patchno,g->user);
     }
 }
 

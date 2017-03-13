@@ -259,7 +259,7 @@ void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
 
     /* create new user data */
     pdata->user_patch = patch_vt()->patch_new();
-    ++ddata->count_set_clawpatch;
+    ++ddata->count_set_clawpatch; //this is now in cb_fclaw2d_regrid_repopulate 
     pdata->neighbors_set = 0;
 }
 
@@ -365,27 +365,33 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
                                g->user);
 }
 
-void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t *this_patch,
-                                       int this_block_idx,
-                                       int this_patch_idx,
-                                       void *user)
+void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
+                                    fclaw2d_domain_t *new_domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    void *user)
 {
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (glob->domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
 
     /* Create new data in 'user' pointer */
-    fclaw2d_patch_data_new(g->glob,this_patch);
+    fclaw2d_patch_data_new(glob,this_patch);
+    /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
+       but we really want to increment the new domain. This will be fixed! */
+    --ddata_old->count_set_clawpatch;
+    ++ddata_new->count_set_clawpatch;
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-    fclaw2d_patch_build(g->glob,this_patch,this_block_idx,
+    fclaw2d_patch_build(glob,this_patch,this_block_idx,
                         this_patch_idx,(void*) &build_mode);
 
     /* This copied q data from memory */
-    patch_vt()->partition_unpack(domain,
+    patch_vt()->partition_unpack(new_domain,
                                  this_patch,
                                  this_block_idx,
                                  this_patch_idx,
-                                 g->user);
+                                 user);
 }
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)

@@ -162,11 +162,12 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
                                      int this_patch_idx,
                                      void *user);
 
-void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
-                                     fclaw2d_patch_t *this_patch,
-                                     int this_block_idx,
-                                     int this_patch_idx,
-                                     void *user);
+void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
+                                    fclaw2d_domain_t *new_domain,
+                                    fclaw2d_patch_t *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    void *user);
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob);
 

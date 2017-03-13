@@ -141,6 +141,11 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int fine_patchno = new_patchno + i;
             /* used to pass in new_domain, but if we call like this, the old_domain is passed in */
             fclaw2d_patch_data_new(g->glob,fine_patch);
+            /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
+               but we really want to increment the new domain. This will be fixed! */
+            --ddata_old->count_set_clawpatch;
+            ++ddata_new->count_set_clawpatch;
+
             fclaw2d_patch_build(g->glob,fine_patch,blockno,
                                 fine_patchno,(void*) &build_mode);
             if (domain_init)
@@ -176,6 +181,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         int coarse_patchno = new_patchno;
         
         fclaw2d_patch_data_new(g->glob,coarse_patch);// new_domain
+        /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
+           but we really want to increment the new domain. This will be fixed! */
+        --ddata_old->count_set_clawpatch;
+        ++ddata_new->count_set_clawpatch;
         
         /* Area (and possibly other things) should be averaged to coarse grid. */
         fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
