@@ -33,10 +33,10 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     const user_options_t *user =  torus_user_get_options(domain);
 
     fclaw2d_vt()->problem_setup = &torus_problem_setup;
+    fclaw2d_patch_vt()->setup = &torus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        fclaw2d_patch_vt()->patch_setup                 = &torus_patch_setup;
         fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
 
         fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
@@ -52,7 +52,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
             /* Include error in output files */
             fclaw2d_clawpatch_vt()->fort_write_header   = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->patch_write_file        = &torus_output_write_file;
+            fclaw2d_patch_vt()->write_file        = &torus_output_write_file;
         }
 
     }
@@ -60,7 +60,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     {
         fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS5_COMPUTE_ERROR;
 
-        fclaw2d_patch_vt()->patch_setup   = &torus_patch_setup;
+        fclaw2d_patch_vt()->setup      = &torus_patch_setup;
 
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
         fc2d_clawpack5_vt()->setaux    = &TORUS5_SETAUX;
@@ -75,7 +75,7 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
             /* Write out error */
             fclaw2d_clawpatch_vt()->fort_write_header      = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->patch_write_file    = &torus_output_write_file;
+            fclaw2d_patch_vt()->write_file    = &torus_output_write_file;
         }
     }
 }
