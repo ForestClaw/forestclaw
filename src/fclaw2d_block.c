@@ -42,7 +42,7 @@ void fclaw2d_block_set_data(fclaw2d_block_t *block, const int mthbc[])
     }
 }
 
-void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
+void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
                                       fclaw2d_patch_t * patch,
                                       fclaw_bool *intersects_block)
 {

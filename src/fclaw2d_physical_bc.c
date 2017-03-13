@@ -59,7 +59,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
     double dt = 1e20;
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
 
-    patch_vt.patch_physical_bc(domain,
+    patch_vt.patch_physical_bc(s->glob,
                                this_patch,
                                this_block_idx,
                                this_patch_idx,

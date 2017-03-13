@@ -115,12 +115,14 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
 
 
 static void
-unpack_remote_ghost_patches(fclaw2d_domain_t* domain,
-                     fclaw2d_domain_exchange_t *e,
-                     int minlevel,
-                     int maxlevel,
-                     int time_interp)
+unpack_remote_ghost_patches(fclaw2d_global_t* glob,
+                            fclaw2d_domain_exchange_t *e,
+                            int minlevel,
+                            int maxlevel,
+                            int time_interp)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
@@ -141,7 +143,7 @@ unpack_remote_ghost_patches(fclaw2d_domain_t* domain,
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_patch_unpack_remote_ghost(domain, ghost_patch, blockno,
+            fclaw2d_patch_unpack_remote_ghost(glob, ghost_patch, blockno,
                                               patchno, q, unpack_to_timeinterp_patch);
         }
     }
@@ -326,9 +328,9 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                 int pack_time_interp = time_interp && level == minlevel-1;
 
                 /* Pack q and area into one contingous block */
-                fclaw2d_patch_pack_local_ghost(domain,this_patch,
+                fclaw2d_patch_pack_local_ghost(glob,this_patch,
                                                (double*) e->patch_data[zz++],
-                                                pack_time_interp);
+                                               pack_time_interp);
             }
         }
     }
@@ -398,7 +400,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
-    unpack_remote_ghost_patches(domain,e,minlevel,maxlevel,time_interp);
+    unpack_remote_ghost_patches(glob,e,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */
     ++ddata->count_ghost_exchange;

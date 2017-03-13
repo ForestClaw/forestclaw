@@ -451,7 +451,7 @@ double fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
 }
 
 
-void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
+void fc2d_clawpack5_bc2(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -460,6 +460,8 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
                          fclaw_bool intersects_phys_bdry[],
                          fclaw_bool time_interp)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     FCLAW_ASSERT(classic_vt.bc2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -495,7 +497,7 @@ void fc2d_clawpack5_bc2(fclaw2d_domain *domain,
       In this case, this boundary condition won't be used to update
       anything
     */
-    fclaw2d_clawpatch_timesync_data(domain,this_patch,time_interp,&q,&meqn);
+    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
