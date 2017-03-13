@@ -39,9 +39,10 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
     {
         fc2d_clawpack46_vt()->setprob   = &SETPROB;
         fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
+
         if (gparms->manifold)
         {
-            fclaw2d_patch_vt()->patch_setup   = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->setup   = &filament_patch_setup_manifold;
 
             fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
             fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
@@ -67,7 +68,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
         if (gparms->manifold)
         {
-            fclaw2d_patch_vt()->patch_setup  = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->setup  = &filament_patch_setup_manifold;
             fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
             fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
