@@ -83,15 +83,22 @@ torthem_init (torthem_t * torthem)
 
     /**************** CLAWPACK 4.6 OPTIONS *************/
 
-    clawopt->mwaves = 1;
+    clawopt->mwaves = 3;
+    clawopt->mthlim_string = "1 1 4";
+    clawopt->order_string = "2 2";
+    /* Plus more options */
 
     et = fc2d_clawpack46_postprocess (clawopt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 postprocess error");
     et = fc2d_clawpack46_check (clawopt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 check error");
 
-    fc2d_clawpack46_register_vtable (fclaw2d_global_get_container
-                                     (torthem->global), clawopt);
+    for(int i = 0; i < clawopt->mwaves; i++)
+    {
+        fclaw_global_essentialf("mthlim[%d] = %d\n",i,clawopt->mthlim[i]);
+    }
+
+    fc2d_clawpack46_set_vtable_defaults();
 
     /**************** TORUS OPTIONS *************/
 

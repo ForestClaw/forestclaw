@@ -23,33 +23,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_domain.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw2d_forestclaw.h>
 
-/* This can be replaced with a user defined routine;
-   Set vt.compute_patch_error in an appropriate <app>_user.cpp file */
-void fclaw2d_diagnostics_compute_patch_error(fclaw2d_domain_t *domain,
-                                             fclaw2d_patch_t *this_patch,
-                                             int this_block_idx,
-                                             int this_patch_idx,
-                                             double *error)
+
+void fclaw2d_after_regrid(fclaw2d_domain_t *domain)
 {
-    int mx, my, mbc, meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    double t;
-    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
+    if (fclaw2d_vt()->after_regrid != NULL)
+    {
+        fclaw2d_vt()->after_regrid(domain);
+    }
+}
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    t = fclaw2d_domain_get_time(domain);
-
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-
-    FCLAW_ASSERT(fclaw2d_vt()->fort_compute_patch_error != NULL);
-    fclaw2d_vt()->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
-                                           &xlower,&ylower, &t, q, error);
+void fclaw2d_problem_setup(fclaw2d_domain_t *domain)
+{
+    /* User defined problem setup */
+    if (fclaw2d_vt()->problem_setup != NULL)
+    {
+        fclaw2d_vt()->problem_setup(domain);
+    }
 }

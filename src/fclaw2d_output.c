@@ -23,14 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw2d_output.h>
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
-#include <fclaw_math.h>
-#include <fclaw_mpi.h>
-#include <fclaw_base.h>
 
 #include <fclaw2d_clawpatch.h>
 
@@ -41,9 +37,6 @@ cb_serial_output (fclaw2d_domain_t * domain,
                   int this_block_idx, int this_patch_idx,
                   void *user)
 {
-    fclaw2d_patch_vtable_t patch_vt;
-    patch_vt = fclaw2d_get_patch_vtable(domain);
-
     int iframe = *((int *) user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
@@ -56,17 +49,14 @@ cb_serial_output (fclaw2d_domain_t * domain,
        to have access? */
     int level = this_patch->level;
 
-    patch_vt.patch_write_file(domain, this_patch, this_block_idx,
-                              this_patch_idx, iframe, (int) patch_num,
-                              level);
+    fclaw2d_patch_write_file(domain, this_patch, this_block_idx,
+                             this_patch_idx, iframe, (int) patch_num,
+                             level);
 }
 
 static
 void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 {
-    fclaw2d_patch_vtable_t patch_vt;
-    patch_vt = fclaw2d_get_patch_vtable(domain);
-
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
@@ -74,7 +64,7 @@ void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 
     if (domain->mpirank == 0)
     {
-        patch_vt.write_header(domain,iframe);
+        fclaw2d_patch_write_header(domain,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */

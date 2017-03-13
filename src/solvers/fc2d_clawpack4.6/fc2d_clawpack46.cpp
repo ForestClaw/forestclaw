@@ -48,7 +48,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
     classic_vt = user_vt;
     // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
 }
-#endif 
+#endif
 
 void fc2d_clawpack46_set_vtable_defaults()
 {
@@ -73,16 +73,17 @@ void fc2d_clawpack46_set_vtable_defaults()
     claw46_vt->src2 = NULL;
 
     /* Default qinit functions */
-    patch_vt->patch_initialize         = &fc2d_clawpack46_qinit;
     if (fclaw_vt->problem_setup == NULL)
     {
         /* This call shouldn't override a version-independent setting
            for this function */
         fclaw_vt->problem_setup         = &fc2d_clawpack46_setprob;
     }
-    patch_vt->patch_setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
-    patch_vt->patch_physical_bc         = &fc2d_clawpack46_bc2;
-    patch_vt->patch_single_step_update  = &fc2d_clawpack46_update;
+
+    patch_vt->initialize          = &fc2d_clawpack46_qinit;
+    patch_vt->setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
+    patch_vt->physical_bc         = &fc2d_clawpack46_bc2;
+    patch_vt->single_step_update  = &fc2d_clawpack46_update;
 
     /* Forestclaw functions */
     clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
@@ -95,10 +96,10 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_write_header      = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
     clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
-    /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm   = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    fclaw_vt->fort_compute_patch_area   = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    fclaw_vt->fort_conservation_check   = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
+    clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area    = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check    = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;

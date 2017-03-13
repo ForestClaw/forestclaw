@@ -155,6 +155,8 @@ void run_program(fclaw_app_t* app)
 
     fclaw2d_domain_data_new(domain);
 
+    user = (user_options_t*) fclaw_app_get_user(app);
+
     if (user->claw_version == 4)
     {
       fc2d_clawpack46_set_vtable_defaults();
@@ -163,7 +165,7 @@ void run_program(fclaw_app_t* app)
     {
       fc2d_clawpack5_set_vtable_defaults();
     }
-    
+
     torus_link_solvers(domain);
 
     fclaw2d_initialize(&domain);
@@ -179,8 +181,8 @@ main (int argc, char **argv)
 {
     int first_arg;
     fclaw_app_t *app;
-    fclaw_options_t *gparms;
-    fclaw2d_global_t *glob;
+    // fclaw_options_t *gparms;
+    // fclaw2d_global_t *glob;
     fclaw_exit_type_t vexit;
 
     /* Options */
@@ -191,14 +193,13 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    fclaw2d_clawpatch_link_app (app);
 
     /* Register packages */
-    gparms = fclaw_forestclaw_register(app,"fclaw_options.ini");
+    fclaw_forestclaw_register(app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");
     fc2d_clawpack5_register(app,"fclaw_options.ini");
 
-    glob = fclaw2d_global_new (gparms);
+    // glob = fclaw2d_global_new (gparms);
 
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);
@@ -208,12 +209,14 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+    fclaw2d_clawpatch_link_app (app);
+
     if (!retval & !vexit)
     {
         run_program(app);
     }
 
-    fclaw2d_global_destroy (glob);
+    // fclaw2d_global_destroy (glob);
     fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 

@@ -135,13 +135,13 @@ void run_program(fclaw_app_t* app)
 
     if (user->claw_version == 4)
     {
-      fc2d_clawpack46_set_vtable_defaults();
+        fc2d_clawpack46_set_vtable_defaults();
     }
     else if (user->claw_version == 5)
     {
-      fc2d_clawpack5_set_vtable_defaults();
+        fc2d_clawpack5_set_vtable_defaults();
     }
-    
+
     annulus_link_solvers(domain);
 
     fclaw2d_initialize(&domain);

@@ -27,13 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_ghost_fill.h>
-#include <fclaw_timer.h>
-
-#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.h>
 
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
@@ -109,8 +104,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                   void *user)
 {
 
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(new_domain);
-
     int domain_init = *((int*) user);
 
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
@@ -139,7 +132,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                     fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
-                patch_vt.patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
+                fclaw2d_patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
             }
         }
 
@@ -202,7 +195,6 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
 {
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
-    // fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
 
     fclaw_global_infof("Regridding domain\n");
 
@@ -292,10 +284,7 @@ void fclaw2d_regrid(fclaw2d_domain_t **domain)
            it here */
     }
 
-    if (fclaw2d_vt()->after_regrid != NULL)
-    {
-        fclaw2d_vt()->after_regrid(*domain);
-    }
+    fclaw2d_after_regrid(*domain);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

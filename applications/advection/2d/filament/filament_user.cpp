@@ -28,13 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch.h>
 
-#if 0
-static fclaw2d_vtable_t fclaw2d_vt;
-
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
-#endif 
-
 void filament_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t* user = filament_user_get_options(domain);
@@ -44,14 +37,12 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
 
     if (user->claw_version == 4)
     {
-        // fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-        // fc2d_clawpack46_set_vtable_defaults();
-        
         fc2d_clawpack46_vt()->setprob   = &SETPROB;
         fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
+
         if (gparms->manifold)
         {
-            fclaw2d_patch_vt()->patch_setup   = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->setup   = &filament_patch_setup_manifold;
 
             fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
             fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
@@ -70,18 +61,14 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
             fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV;
         }
 
-        // fc2d_clawpack46_set_vtable(classic_claw46);
     }
     else if (user->claw_version == 5)
     {
-        // fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-        // fc2d_clawpack5_set_vtable_defaults();
-
         fc2d_clawpack5_vt()->setprob   = &SETPROB;
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
         if (gparms->manifold)
         {
-            fclaw2d_patch_vt()->patch_setup  = &filament_patch_setup_manifold;
+            fclaw2d_patch_vt()->setup  = &filament_patch_setup_manifold;
             fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
             fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
@@ -98,10 +85,7 @@ void filament_link_solvers(fclaw2d_domain_t *domain)
             fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
             fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
         }
-
-        // fc2d_clawpack5_set_vtable(classic_claw5);
     }
-    fclaw2d_set_vtable();
 }
 
 void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
