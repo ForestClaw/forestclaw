@@ -384,7 +384,7 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
                                  this_patch,
                                  this_block_idx,
                                  this_patch_idx,
-                                 user);
+                                 g->user);
 }
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)

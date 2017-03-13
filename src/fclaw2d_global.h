@@ -122,6 +122,11 @@ void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* 
 void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
                                            fclaw2d_patch_callback_t pcb, void *user);
 
+void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+                                         fclaw2d_domain_t * new_domain,
+                                         fclaw2d_transfer_callback_t tcb,
+                                         void *user);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

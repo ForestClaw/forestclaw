@@ -133,7 +133,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         /* New version? */
-        fclaw2d_domain_iterate_partitioned(*domain,domain_partitioned,
+        fclaw2d_global_iterate_partitioned(glob,domain_partitioned,
                                            cb_partition_transfer,
                                            (void*) patch_data);
 

@@ -139,3 +139,17 @@ void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
                                          pcb, 
                                          &g);
 }
+
+void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+                                         fclaw2d_domain_t * new_domain,
+                                         fclaw2d_transfer_callback_t tcb,
+                                         void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_partitioned (glob->domain,
+                                        new_domain,
+                                        tcb,
+                                        &g);
+}
