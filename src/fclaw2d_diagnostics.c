@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_vtable.h>
 
 static fclaw2d_diagnostics_vtable_t s_diag_vt;
 
@@ -86,12 +85,32 @@ void fclaw2d_diagnostics_vtable_init()
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
+static
+int run_diagnostics(fclaw2d_domain_t* domain)
+{
+    /* Check to see if we should be running any diagnostics */
+    const amr_options_t *gparms = get_domain_parms(domain);
+
+    int run_diag = gparms->conservation_check ||
+                   gparms->run_user_diagnostics ||
+                   gparms->compute_error;
+    return run_diag;
+
+}
+
+
 
 void fclaw2d_diagnostics_initialize(fclaw2d_domain_t *domain,
                                     fclaw2d_diagnostics_accumulator_t* acc)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
     const amr_options_t *gparms = get_domain_parms(domain);
+
+    int run_diag = run_diagnostics(domain);
+    if (!run_diag)
+    {
+        return;
+    }
 
     /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
@@ -120,6 +139,12 @@ void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+
+    int run_diag = run_diagnostics(domain);
+    if (!run_diag)
+    {
+        return;
+    }
 
 
     /* -----------------------------------------------------
@@ -178,6 +203,13 @@ void fclaw2d_diagnostics_reset(fclaw2d_domain_t *domain,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
+    int run_diag = run_diagnostics(domain);
+    if (!run_diag)
+    {
+        return;
+    }
+
+
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_reset_diagnostics != NULL)
@@ -203,6 +235,13 @@ void fclaw2d_diagnostics_finalize(fclaw2d_domain_t *domain,
     const amr_options_t *gparms = get_domain_parms(domain);
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+
+    int run_diag = run_diagnostics(domain);
+    if (!run_diag)
+    {
+        return;
+    }
+
 
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 

@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_vtable.h>
 
 /* -------------------------------------------------------------
    Compute errors (1-norm, 2-norm, inf-norm)
@@ -43,6 +42,7 @@ typedef struct {
 /* -------------------------------------------------------------
    Create and initialize a new accumulator
    ------------------------------------------------------------- */
+
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
                                               void **acc_patch)
 {
@@ -139,6 +139,9 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_domain_t* domain,
                                            void* patch_acc)
 {
+    const amr_options_t *gparms = get_domain_parms(domain);
+    int check = gparms->compute_error || gparms->conservation_check;
+    if (!check) return;
     fclaw2d_domain_iterate_patches(domain, cb_compute_diagnostics, patch_acc);
 }
 
@@ -156,14 +159,13 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t* domain,
 
     meqn = gparms->meqn;  /* clawpatch->meqn */
 
-    total_area = fclaw2d_domain_global_sum(domain, error_data->area);
-    FCLAW_ASSERT(total_area != 0);
-
-
     if (gparms->compute_error != 0)
     {
         double *error_norm;
         int m;
+
+        total_area = fclaw2d_domain_global_sum(domain, error_data->area);
+        FCLAW_ASSERT(total_area != 0);
 
         error_norm = FCLAW_ALLOC_ZERO(double,3*meqn);
         for (m = 0; m < meqn; m++)
