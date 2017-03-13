@@ -73,7 +73,6 @@ void fc2d_clawpack46_set_vtable_defaults()
     claw46_vt->src2 = NULL;
 
     /* Default qinit functions */
-    patch_vt->patch_initialize         = &fc2d_clawpack46_qinit;
     if (fclaw_vt->problem_setup == NULL)
     {
         /* This call shouldn't override a version-independent setting
@@ -81,9 +80,10 @@ void fc2d_clawpack46_set_vtable_defaults()
         fclaw_vt->problem_setup         = &fc2d_clawpack46_setprob;
     }
 
-    patch_vt->patch_setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
-    patch_vt->patch_physical_bc         = &fc2d_clawpack46_bc2;
-    patch_vt->patch_single_step_update  = &fc2d_clawpack46_update;
+    patch_vt->initialize          = &fc2d_clawpack46_qinit;
+    patch_vt->setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
+    patch_vt->physical_bc         = &fc2d_clawpack46_bc2;
+    patch_vt->single_step_update  = &fc2d_clawpack46_update;
 
     /* Forestclaw functions */
     clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
