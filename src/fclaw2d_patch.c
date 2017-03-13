@@ -357,11 +357,12 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
                                      int this_patch_idx,
                                      void *user)
 {
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     patch_vt()->partition_pack(domain,
-                            this_patch,
-                            this_block_idx,
-                            this_patch_idx,
-                            user);
+                               this_patch,
+                               this_block_idx,
+                               this_patch_idx,
+                               g->user);
 }
 
 void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
@@ -387,9 +388,9 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
                                  g->user);
 }
 
-size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain)
+size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)
 {
-    return patch_vt()->partition_packsize(domain);
+    return patch_vt()->partition_packsize(glob);
 }
 
 void fclaw2d_patch_build(fclaw2d_global_t *glob,

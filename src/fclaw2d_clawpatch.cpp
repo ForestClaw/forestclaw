@@ -665,9 +665,9 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_domain_t* domain,
    load balance the computation.
    -------------------------------------------------------*/
 
-size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
+size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -677,10 +677,10 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain)
 }
 
 void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *this_patch,
-                                         int this_block_idx,
-                                         int this_patch_idx,
-                                         void *user)
+                                      fclaw2d_patch_t *this_patch,
+                                      int this_block_idx,
+                                      int this_patch_idx,
+                                      void *user)
 {
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;

@@ -178,7 +178,7 @@ void fclaw2d_clawpatch_set_corners_to_nan(fclaw2d_domain_t* domain,
 /* -----------------------------------------------------
    Build/pack/size for partitioning
    ---------------------------------------------------- */
-size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_domain_t* domain);
+size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob);
 
 
 void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,

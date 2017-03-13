@@ -92,7 +92,7 @@ static void outstyle_0(fclaw2d_global_t *glob)
     int iframe;
 
     iframe = 0;
-    fclaw2d_output_frame(*domain,iframe);
+    fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
     fclaw2d_diagnostics_run(*domain,init_flag);
@@ -107,7 +107,7 @@ static void outstyle_0(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_run(domain);
 
     iframe++;
-    fclaw2d_output_frame(*domain,iframe);
+    fclaw2d_output_frame(glob,iframe);
 #endif
 
 }
@@ -125,7 +125,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
     int iframe = 0;
 
-    fclaw2d_output_frame(*domain,iframe);
+    fclaw2d_output_frame(glob,iframe);
 
     const amr_options_t *gparms = glob->gparms;
 
@@ -290,7 +290,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         /* Output file at every outer loop iteration */
         fclaw2d_domain_set_time(*domain,t_curr);
         iframe++;
-        fclaw2d_output_frame(*domain,iframe);
+        fclaw2d_output_frame(glob,iframe);
     }
 }
 
@@ -313,7 +313,7 @@ void outstyle_3(fclaw2d_global_t *glob)
     init_flag = 0;
 
     int iframe = 0;
-    fclaw2d_output_frame(*domain,iframe);
+    fclaw2d_output_frame(glob,iframe);
 
 
     const amr_options_t *gparms = glob->gparms;
@@ -427,7 +427,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         {
             fclaw2d_diagnostics_run(*domain, init_flag);  /* Includes conservation check */
             iframe++;
-            fclaw2d_output_frame(*domain,iframe);
+            fclaw2d_output_frame(glob,iframe);
         }
     }
 }
@@ -442,7 +442,7 @@ void outstyle_4(fclaw2d_global_t *glob)
 #endif
     /* Write out an initial time file */
     int iframe = 0;
-    fclaw2d_output_frame(*domain,iframe);
+    fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
     fclaw2d_diagnostics_run(*domain,init_flag);
@@ -498,7 +498,7 @@ void outstyle_4(fclaw2d_global_t *glob)
         if (n % nstep_inner == 0)
         {
             iframe++;
-            fclaw2d_output_frame(*domain,iframe);
+            fclaw2d_output_frame(glob,iframe);
         }
     }
 }

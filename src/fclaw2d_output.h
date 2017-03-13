@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
+void fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe);
 
 /* --------------------------------------------------------------------
  * Write a one-stop function that creates a big VTK file in parallel.
@@ -45,7 +45,7 @@ void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
  * Function will be refactored into our callback structure eventually.
  * -------------------------------------------------------------------- */
 
-void fclaw2d_output_write_vtk (fclaw2d_domain_t *domain, const char *basename);
+void fclaw2d_output_write_vtk (fclaw2d_global_t *glob, const char *basename);
 
 
 #ifdef __cplusplus

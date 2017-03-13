@@ -323,11 +323,11 @@ fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_output_write_vtk (fclaw2d_domain_t * domain, const char *basename)
+fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
-    const amr_options_t *gparms = get_domain_parms (domain);
+    const amr_options_t *gparms = glob->gparms;
 
-    (void) fclaw2d_vtk_write_file (domain, basename,
+    (void) fclaw2d_vtk_write_file (glob->domain, basename,
                                    gparms->mx, gparms->my, gparms->meqn,
                                    gparms->vtkspace, gparms->vtkwrite,
                                    fclaw2d_output_vtk_coordinate_cb,
@@ -335,8 +335,9 @@ fclaw2d_output_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 }
 
 void
-fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
+fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 {
+    fclaw2d_domain_t *domain = glob->domain;
     double time;
 
     time = fclaw2d_domain_get_time(domain);
@@ -347,7 +348,7 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
 
     /* Output VTK file while we're at it */
 
-    const amr_options_t *gparms = get_domain_parms (domain);
+    const amr_options_t *gparms = glob->gparms;
     if (gparms->vtkout & 2)
     {
         if (gparms->serialout)
@@ -372,7 +373,7 @@ fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe)
     {
         char basename[BUFSIZ];
         snprintf (basename, BUFSIZ, "%s_frame_%04d", gparms->prefix, iframe);
-        fclaw2d_output_write_vtk (domain, basename);
+        fclaw2d_output_write_vtk (glob, basename);
     }
 
     if (gparms->serialout)

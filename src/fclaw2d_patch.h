@@ -168,7 +168,7 @@ void cb_fclaw2d_patch_partition_unpack(fclaw2d_domain_t *domain,
                                      int this_patch_idx,
                                      void *user);
 
-size_t fclaw2d_patch_partition_packsize(fclaw2d_domain_t* domain);
+size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob);
 
 void fclaw2d_patch_build(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
@@ -425,7 +425,7 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_domain_t *domain,
                                            int this_patch_idx,
                                            void *user);
 
-typedef size_t (*fclaw2d_patch_partition_packsize_t)(fclaw2d_domain_t* domain);
+typedef size_t (*fclaw2d_patch_partition_packsize_t)(fclaw2d_global_t* glob);
 
 typedef void (*fclaw2d_patch_build_t)(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
