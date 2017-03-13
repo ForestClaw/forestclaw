@@ -1,0 +1,156 @@
+/*
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch_options.h>
+
+static void *
+fclaw2d_clawpatch_register(fclaw_app_t * a, void *package, sc_options_t * opt)
+{
+    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
+
+    /* allocated storage for this package's option values */
+    FCLAW_ASSERT (clawpatch_options != NULL);
+
+    sc_options_add_int (opt, 0, "mx", &clawpatch_options->mx, 8,
+                        "Number of grid cells per patch in x [8]");
+
+    sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
+                        "Number of grid cells per patch in y [8]");
+
+    sc_options_add_int (opt, 0, "maux", &clawpatch_options->maux, 0,
+                        "Number of auxilliary variables [0]");
+
+    sc_options_add_int (opt, 0, "mbc", &clawpatch_options->mbc, 2,
+                        "Number of ghost cells [2]");
+
+    /* we do not need to work with the return value */
+    clawpatch_options->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+fclaw2d_clawpatch_options_postprocess(fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* postprocess this package */
+    FCLAW_ASSERT (clawpatch_options != NULL);
+    FCLAW_ASSERT (clawpatch_options->is_registered);
+
+    /* Convert strings to arrays (no strings to process here) */
+
+    return FCLAW_NOEXIT;
+}
+
+static fclaw_exit_type_t
+fclaw2d_clawpatch_options_check(fclaw_app_t * app, void *package, void *registered)
+{
+    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+
+    if (clawpatch_options->mx != clawpatch_options->my)
+    {
+        fclaw_global_essentialf("Clawpatch error : mx != my\n");
+        return FCLAW_EXIT_ERROR;    }
+
+    if (2*clawpatch_options->mbc > clawpatch_options->mx)
+    {
+        fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
+        return FCLAW_EXIT_ERROR;
+    }
+
+    return FCLAW_NOEXIT;
+}
+
+static void
+fclaw2d_clawpatch_options_destroy (fclaw_app_t * a, void *package, void *registered)
+{
+    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* free this package */
+    FCLAW_ASSERT (clawpatch_options != NULL);
+    FCLAW_ASSERT (clawpatch_options->is_registered);
+
+    FCLAW_FREE (clawpatch_options);
+}
+
+static
+const fclaw_app_options_vtable_t options_vtable_general = {
+    fclaw2d_clawpatch_options_register,
+    fclaw2d_clawpatch_options_postprocess,
+    fclaw2d_clawpatch_options_check,
+    fclaw2d_clawpatch_options_destroy
+};
+
+fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw_app_t* app)
+{
+    fclaw2d_clawpatch_options_t*  clawpatch_options;
+    clawpatch_options = (amr_options_t*) fclaw_app_get_attribute(app,"clawpatch_options",NULL);
+    FCLAW_ASSERT(gparms != NULL);
+    return clawpatch_options;
+}
+
+fclaw_options_t *
+fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile)
+{
+    fclaw2d_clawpatch_options_t* clawpatch_options;
+    int id;
+
+    FCLAW_ASSERT (a != NULL);
+
+    /* Basic options for print out help message, current options, etc */
+    fclaw_app_options_register_core (a, configfile);
+
+    /* allocate storage for fclaw_options */
+    /* we will free it in the options_destroy callback */
+    clawpatch_options = FCLAW_ALLOC(clawpatch_options_t,1);
+
+    /* Could also pass in a section header (set to NULL for now) */
+    fclaw_app_options_register (a,"clawpach-options",
+                                configfile,
+                                &fclaw2d_clawpatch_vtable,
+                                clawpatch_option);
+
+    clawpatch_options = fclaw_options_register_general (app, configfile);
+
+    fclaw_app_set_attribute(app,"clawpatch-options",clawpatch_options);
+
+    /* Create a package container */
+    fclaw_package_container_new_app (app);
+
+    return gparms;
+}
