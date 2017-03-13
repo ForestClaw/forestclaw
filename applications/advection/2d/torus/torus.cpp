@@ -155,6 +155,15 @@ void run_program(fclaw_app_t* app)
 
     fclaw2d_domain_data_new(domain);
 
+    if (user->claw_version == 4)
+    {
+      fc2d_clawpack46_set_vtable_defaults();
+    }
+    else if (user->claw_version == 5)
+    {
+      fc2d_clawpack5_set_vtable_defaults();
+    }
+    
     torus_link_solvers(domain);
 
     fclaw2d_initialize(&domain);

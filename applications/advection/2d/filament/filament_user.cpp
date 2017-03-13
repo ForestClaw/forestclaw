@@ -124,7 +124,6 @@ void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_define_auxarray(domain,this_patch);
         fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                &dx,&dy,&maux,aux,&this_block_idx,
@@ -132,7 +131,6 @@ void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_define_auxarray(domain,this_patch);
         fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux,&this_block_idx,
