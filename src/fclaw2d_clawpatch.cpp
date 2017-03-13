@@ -179,14 +179,14 @@ size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain)
    Functions for handling time-interpolated data
    ------------------------------------------------ */
 
-void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha)
 {
     /* We use the pack size here to make sure we are setting
        everything correctly;  it isn't needed for memory
        allocation */
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int mx = gparms->mx;
     int my = gparms->my;
     int meqn = gparms->meqn;

@@ -33,10 +33,11 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
                           int patchno,
                           void *user)
 {
+    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t*) user;
     if (fclaw2d_patch_has_finegrid_neighbors(this_patch))
     {
-        double alpha = *((double*) user);
-        fclaw2d_patch_setup_timeinterp(domain,this_patch,alpha);
+        double alpha = *((double*) s->user);
+        fclaw2d_patch_setup_timeinterp(s->glob,this_patch,alpha);
     }
 }
 
@@ -46,10 +47,10 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
    via interpolating and averaging) ghost cell values.
    -------------------------------------------------------------------- */
 
-void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
+void fclaw2d_timeinterp(fclaw2d_global_t *glob,
                         int level,double alpha)
 {
     /* Store time interpolated data into m_griddata_time_sync. */
-    fclaw2d_domain_iterate_level(domain, level,cb_setup_time_interp,
-                                     (void *) &alpha);
+    fclaw2d_global_iterate_level(glob,level,cb_setup_time_interp,
+                                 (void *) &alpha);
 }

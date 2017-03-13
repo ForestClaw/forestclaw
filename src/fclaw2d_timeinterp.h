@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_TIMEINTERP_H
 
 #include "forestclaw2d.h"
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +37,7 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_timeinterp(fclaw2d_domain_t *domain,
+void fclaw2d_timeinterp(fclaw2d_global_t *glob,
                        int level, double alpha);
 
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \

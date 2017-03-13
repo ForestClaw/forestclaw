@@ -105,7 +105,7 @@ void fclaw2d_clawpatch_set_block_corner_count(fclaw2d_domain_t* domain,
                                               fclaw2d_patch_t* this_patch,
                                               int icorner, int block_corner_count);
 
-void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha);
 
