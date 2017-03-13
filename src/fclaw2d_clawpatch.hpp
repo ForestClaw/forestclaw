@@ -82,6 +82,7 @@ public :
     int mx;           /* also in amr_options_t */
     int my;           /* also in amr_options_t */
     int mbc;          /* also in amr_options_t */
+    int maux;
 
     double dx;
     double dy;
@@ -92,6 +93,8 @@ public :
 
     fclaw_bool manifold;    /* also in amr_options_t */
     int blockno;
+
+    FArrayBox aux;
 
     FArrayBox xp;
     FArrayBox yp;

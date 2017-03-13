@@ -278,6 +278,9 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations [1]");
 
+    sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
+                        "Number of auxilliary variables [0]");
+
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
 
