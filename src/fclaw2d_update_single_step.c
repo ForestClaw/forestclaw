@@ -37,16 +37,15 @@ static
                         void *user)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     double maxcfl;
 
     single_step_data_t *ss_data = (single_step_data_t *) user;
 
     double dt = ss_data->dt;
     double t = ss_data->t;
-    maxcfl = patch_vt.patch_single_step_update(domain,this_patch,
-                                               this_block_idx,
-                                               this_patch_idx,t,dt);
+    maxcfl = fclaw2d_patch_single_step_update(domain,this_patch,
+                                              this_block_idx,
+                                              this_patch_idx,t,dt);
 
     ddata->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);

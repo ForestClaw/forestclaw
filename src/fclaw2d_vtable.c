@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
-static fclaw2d_vtable_t s_vt;
-
 fclaw2d_vtable_t* fclaw2d_vt()
 {
+    /* Make this only visible to this function */
+    static fclaw2d_vtable_t s_vt;
     return &s_vt;
 }
 
@@ -64,18 +64,3 @@ void fclaw2d_init_vtable()
     fclaw_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
     fclaw_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 }
-
-#if 0
-void fclaw2d_set_vtable()
-{
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    if (fclaw_vt->metric_compute_area == &fclaw2d_metric_compute_area)
-    {
-        fclaw_vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost;
-    }
-    else if (fclaw_vt->metric_compute_area == &fclaw2d_metric_compute_area_exact)
-    {
-        fclaw_vt->metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
-    }
-}
-#endif

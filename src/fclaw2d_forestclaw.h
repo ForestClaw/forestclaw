@@ -79,6 +79,10 @@ void fclaw2d_initialize(fclaw2d_domain_t **domain);
 void fclaw2d_run(fclaw2d_domain_t **domain);
 void fclaw2d_finalize(fclaw2d_domain_t **domain);
 
+void fclaw2d_after_regrid(fclaw2d_domain_t *domain);
+void fclaw2d_problem_setup(fclaw2d_domain_t *domain);
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
