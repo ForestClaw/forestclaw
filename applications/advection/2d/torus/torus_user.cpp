@@ -28,28 +28,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include "fclaw2d_clawpatch.h"
 
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
-
-static fclaw2d_vtable_t fclaw2d_vt;
-
 void torus_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  torus_user_get_options(domain);
 
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &torus_problem_setup;
+    fclaw2d_vt()->problem_setup = &torus_problem_setup;
+    fclaw2d_patch_vt()->setup = &torus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
+        fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
 
-        fclaw2d_patch_vt()->patch_setup   = &torus_patch_setup;
-
-        classic_claw46.qinit     = &CLAWPACK46_QINIT;
-        classic_claw46.setaux    = &TORUS46_SETAUX;  /* Not really a mapped setaux */
-        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
+        fc2d_clawpack46_vt()->setaux    = &TORUS46_SETAUX;  /* Not really a mapped setaux */
+        fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
         if (user->example == 1)
         {
@@ -57,23 +50,19 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
             fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
             fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
-            /* Write out error */
+            /* Include error in output files */
             fclaw2d_clawpatch_vt()->fort_write_header   = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->patch_write_file    = &torus_output_write_file;
+            fclaw2d_patch_vt()->write_file        = &torus_output_write_file;
         }
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+        fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS5_COMPUTE_ERROR;
 
-        fclaw2d_patch_vt()->patch_setup   = &torus_patch_setup;
-
-        classic_claw5.qinit     = &CLAWPACK5_QINIT;
-        classic_claw5.setaux    = &TORUS5_SETAUX;
-        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
+        fc2d_clawpack5_vt()->setaux    = &TORUS5_SETAUX;
+        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
         if (user->example == 1)
         {
@@ -83,12 +72,9 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
 
             /* Write out error */
             fclaw2d_clawpatch_vt()->fort_write_header      = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->patch_write_file    = &torus_output_write_file;
+            fclaw2d_patch_vt()->write_file    = &torus_output_write_file;
         }
-
-        fc2d_clawpack5_set_vtable(classic_claw5);
     }
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
 void torus_problem_setup(fclaw2d_domain_t *domain)

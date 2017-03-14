@@ -48,7 +48,6 @@ void cb_initialize (fclaw2d_domain_t *domain,
 {
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
-    fclaw2d_patch_vtable_t patch_vt = fclaw2d_get_patch_vtable(domain);
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     fclaw2d_patch_data_new(g->glob,this_patch);
@@ -56,9 +55,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
                         this_block_idx,
                         this_patch_idx,
                         &build_mode);
-
-    FCLAW_ASSERT(patch_vt.patch_initialize != NULL);
-    patch_vt.patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -72,7 +69,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     int time_interp = 0;
     char basename[BUFSIZ];
-    // const fclaw2d_vtable_t vt = fclaw2d_get_vtable(*domain);
     const amr_options_t *gparms = glob->gparms;
 
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
@@ -103,10 +99,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
 
     /* User defined problem setup */
-    if (fclaw2d_vt()->problem_setup != NULL)
-    {
-        fclaw2d_vt()->problem_setup(glob);
-    }
+    fclaw2d_problem_setup(glob);
 
     /* set specific refinement strategy */
     fclaw2d_domain_set_refinement
@@ -264,12 +257,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                              time_interp,FCLAW2D_TIMER_INIT);
     }
 
-    /* New grid has been created, so we do any "aftergrid" functions */
-    if (fclaw2d_vt()->after_regrid != NULL)
-    {
-        fclaw2d_vt()->after_regrid(*domain);
-    }
-
+    fclaw2d_after_regrid(*domain);
 
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",

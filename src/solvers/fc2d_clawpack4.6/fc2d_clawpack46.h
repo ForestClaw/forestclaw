@@ -132,7 +132,7 @@ typedef struct fc2d_clawpack46_vtable
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t vt);
 void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
                                          fc2d_clawpack46_vtable_t* claw_vt);
-#endif 
+#endif
 
 void fc2d_clawpack46_set_vtable_defaults(void);
 
@@ -344,6 +344,16 @@ double FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double
                                               double* dy, double area[]);
 
 
+
+#if 0
+#define FC2D_CLAWPACK46_FORT_COMPUTE_ERROR FCLAW_F77_FUNC(fc2d_clawpack46_fort_compute_error, \
+                                                     FC2D_CLAWPACK46_FORT_COMPUTE_ERROR)
+
+void FC2D_CLAWPACK46_FORT_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                                        double *dx, double *dy, double *xlower,
+                                        double *ylower, double *t, double q[],
+                                        double error[]);
+#endif
 
 #define FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_clawpack46_fort_compute_error_norm, \
                                                               FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM)

@@ -88,14 +88,19 @@ void save_time_step(fclaw2d_domain_t *domain)
    -------------------------------------------------------------------------------- */
 static void outstyle_0(fclaw2d_global_t *glob)
 {
+
     fclaw2d_domain_t** domain = &glob->domain;
+
+    fclaw2d_diagnostics_accumulator_t acc;
+    fclaw2d_diagnostics_initialize(*domain,&acc);
+
     int iframe;
 
     iframe = 0;
     fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_run(*domain,init_flag);
+    fclaw2d_diagnostics_gather(*domain,&acc,init_flag);
     init_flag = 0;
 
     /* Here is where we might include a call to a static solver, for, say,
@@ -123,6 +128,9 @@ void outstyle_1(fclaw2d_global_t *glob)
     fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
+    fclaw2d_diagnostics_accumulator_t acc;
+    fclaw2d_diagnostics_initialize(*domain,&acc);
+
     int iframe = 0;
 
     fclaw2d_output_frame(glob,iframe);
@@ -137,7 +145,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
 
     int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_diagnostics_run(*domain,init_flag);
+    fclaw2d_diagnostics_gather(*domain,&acc,init_flag);
     init_flag = 0;
 
     double t0 = 0;
@@ -150,7 +158,7 @@ void outstyle_1(fclaw2d_global_t *glob)
     for(n = 0; n < nout; n++)
     {
         double tstart = t_curr;
-        // Add June 6
+
         fclaw2d_domain_set_time(*domain,t_curr);
         double tend = tstart + dt_outer;
         while (t_curr < tend)
@@ -206,6 +214,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
             double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
             ddata = fclaw2d_domain_get_data(*domain);
+
             fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
             fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_CFL_COMM]);
@@ -273,10 +282,10 @@ void outstyle_1(fclaw2d_global_t *glob)
                        not taken a small step */
                 }
             }
-            // Add June 6
             fclaw2d_domain_set_time(*domain,t_curr);
-            fclaw2d_diagnostics_run(*domain, init_flag);
-            
+
+            fclaw2d_diagnostics_gather(*domain, &acc, init_flag);
+
             if (gparms->regrid_interval > 0)
             {
                 if (n_inner % gparms->regrid_interval == 0)
@@ -292,6 +301,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 #if 0
@@ -308,8 +318,11 @@ void outstyle_3(fclaw2d_global_t *glob)
     fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
+    fclaw2d_diagnostics_accumulator_t acc;
+    fclaw2d_diagnostics_initialize(*domain,&acc);
+
     int init_flag = 1;
-    fclaw2d_diagnostics_run(*domain,init_flag);
+    fclaw2d_diagnostics_gather(*domain,&acc,init_flag);
     init_flag = 0;
 
     int iframe = 0;
@@ -425,11 +438,12 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_run(*domain, init_flag);  /* Includes conservation check */
+            fclaw2d_diagnostics_gather(*domain, &acc, init_flag);
             iframe++;
             fclaw2d_output_frame(glob,iframe);
         }
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 
@@ -440,12 +454,16 @@ void outstyle_4(fclaw2d_global_t *glob)
 #if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 #endif
+
+    fclaw2d_diagnostics_accumulator_t acc;
+    fclaw2d_diagnostics_initialize(*domain,&acc);
+
     /* Write out an initial time file */
     int iframe = 0;
     fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_run(*domain,init_flag);
+    fclaw2d_diagnostics_gather(*domain,&acc,init_flag);
     init_flag = 0;
 
     const amr_options_t *gparms = glob->gparms;
@@ -464,8 +482,6 @@ void outstyle_4(fclaw2d_global_t *glob)
 #if 0
         ddata = fclaw2d_domain_get_data(*domain);
 #endif
-
-        fclaw2d_diagnostics_run(*domain, init_flag);
 
         fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
 
@@ -497,10 +513,12 @@ void outstyle_4(fclaw2d_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
+            fclaw2d_diagnostics_gather(*domain, &acc, init_flag);
             iframe++;
             fclaw2d_output_frame(glob,iframe);
         }
     }
+    fclaw2d_diagnostics_finalize(*domain,&acc);
 }
 
 

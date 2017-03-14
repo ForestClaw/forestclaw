@@ -336,6 +336,16 @@ void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meq
                                             double *dx, double *dy, double area[],
                                             double error[], double error_norm[]);
 
+#if 0
+#define FC2D_CLAWPACK5_FORT_COMPUTE_ERROR FCLAW_F77_FUNC(fc2d_clawpack5_fort_compute_error, \
+                                                         FC2D_CLAWPACK5_FORT_COMPUTE_ERROR)
+
+void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR(int *mx, int *my, int *mbc, int *meqn,
+                                       double *dx, double *dy, double area[],
+                                       double error[], double error_norm[]);
+
+#endif
+
 #define FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA FCLAW_F77_FUNC(fc2d_clawpack5_fort_ghostpack_qarea, \
                                                            FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA)
 void  FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA(int *mx, int *my, int *mbc,

@@ -45,9 +45,9 @@ void cb_single_step(fclaw2d_domain_t *domain,
 
     double dt = ss_data->dt;
     double t = ss_data->t;
-    maxcfl = fclaw2d_patch_vt()->patch_single_step_update(g->glob,this_patch,
-                                                          this_block_idx,
-                                                          this_patch_idx,t,dt);
+    maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
+                                              this_block_idx,
+                                              this_patch_idx,t,dt);
 
     ddata->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);

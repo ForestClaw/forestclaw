@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 #include <fclaw2d_metric_default.h>
-#include <fclaw2d_diagnostics_default.h>
+#include <fclaw2d_diagnostics.h>
 #include <fclaw2d_transform.h>
 #include <fclaw2d_global.h>
 
@@ -67,34 +67,12 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
 
 typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
 
-typedef void (*fclaw2d_run_user_diagnostics_t)(fclaw2d_domain_t *domain, const double t);
-
-typedef void (*fclaw2d_diagnostics_compute_error_t)(fclaw2d_domain_t *domain,
-                                                    fclaw2d_patch_t *this_patch,
-                                                    int this_block_idx,
-                                                    int this_patch_idx,
-                                                    double *error);
-
-typedef void (*fclaw2d_fort_compute_error_t)(int* blockno, int *mx, int *my, int *mbc,
-                                             int* meqn,
-                                             double *dx, double *dy, double *xlower,
-                                             double *ylower, double *t, double q[],
-                                             double error[]);
-
-typedef void (*fclaw2d_fort_compute_error_norm_t)(int *mx, int *my, int *mbc,
-                                                  int *meqn,
-                                                  double *dx, double *dy, double *area,
-                                                  double *error, double* error_norm);
-
-typedef double (*fclaw2d_fort_compute_patch_area_t)(int *mx, int* my, int*mbc, double* dx,
-                                                    double* dy, double area[]);
-
-typedef void (*fclaw2d_fort_conservation_check_t)(int *mx, int *my, int* mbc, int* meqn,
-                                                  double *dx, double *dy,
-                                                  double* area, double *q, double* sum);
 typedef struct fclaw2d_vtable
 {
     fclaw2d_problem_setup_t              problem_setup;
+
+    /* regridding functions */
+    fclaw2d_after_regrid_t               after_regrid;
 
     /* Building patches, including functions to create metric terms */
     fclaw2d_metric_setup_mesh_t          metric_setup_mesh;    /* wrapper */
@@ -109,16 +87,6 @@ typedef struct fclaw2d_vtable
     fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
 
 
-    /* regridding functions */
-    fclaw2d_after_regrid_t               after_regrid;
-
-    /* diagnostic functions */
-    fclaw2d_run_user_diagnostics_t       run_user_diagnostics;
-    fclaw2d_diagnostics_compute_error_t  compute_patch_error;
-    fclaw2d_fort_compute_error_t         fort_compute_patch_error;
-    fclaw2d_fort_compute_error_norm_t    fort_compute_error_norm;
-    fclaw2d_fort_compute_patch_area_t    fort_compute_patch_area;
-    fclaw2d_fort_conservation_check_t    fort_conservation_check;
 } fclaw2d_vtable_t;
 
 
@@ -126,7 +94,7 @@ fclaw2d_vtable_t* fclaw2d_vt();
 
 void fclaw2d_init_vtable();
 
-void fclaw2d_set_vtable();
+// void fclaw2d_set_vtable();
 
 // fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t *domain);
 

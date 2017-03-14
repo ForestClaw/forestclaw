@@ -48,7 +48,7 @@ void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
     classic_vt = user_vt;
     // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
 }
-#endif 
+#endif
 
 void fc2d_clawpack46_set_vtable_defaults()
 {
@@ -73,16 +73,17 @@ void fc2d_clawpack46_set_vtable_defaults()
     claw46_vt->src2 = NULL;
 
     /* Default qinit functions */
-    patch_vt->patch_initialize         = &fc2d_clawpack46_qinit;
     if (fclaw_vt->problem_setup == NULL)
     {
         /* This call shouldn't override a version-independent setting
            for this function */
         fclaw_vt->problem_setup         = &fc2d_clawpack46_setprob;
     }
-    patch_vt->patch_setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
-    patch_vt->patch_physical_bc         = &fc2d_clawpack46_bc2;
-    patch_vt->patch_single_step_update  = &fc2d_clawpack46_update;
+
+    patch_vt->initialize          = &fc2d_clawpack46_qinit;
+    patch_vt->setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
+    patch_vt->physical_bc         = &fc2d_clawpack46_bc2;
+    patch_vt->single_step_update  = &fc2d_clawpack46_update;
 
     /* Forestclaw functions */
     clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
@@ -95,10 +96,10 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_write_header      = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
     clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
 
-    /* diagnostic functions */
-    fclaw_vt->fort_compute_error_norm   = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    fclaw_vt->fort_compute_patch_area   = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    fclaw_vt->fort_conservation_check   = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
+    clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area    = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check    = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;
@@ -115,14 +116,6 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 }
 
-
-/* Patch data is stored in each fclaw2d_clawpatch_t */
-struct patch_aux_data
-{
-    FArrayBox auxarray;
-    int maux;
-};
-
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
 {
     int id;
@@ -131,6 +124,14 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
     id = fc2d_clawpack46_get_package_id();
     return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
 }
+
+#if 0
+/* Patch data is stored in each fclaw2d_clawpatch_t */
+struct patch_aux_data
+{
+    // FArrayBox auxarray;
+    // int maux;
+};
 
 static patch_aux_data*
 get_patch_data(fclaw2d_clawpatch_t *cp)
@@ -155,42 +156,16 @@ patch_data_delete(void *data)
     FCLAW_ASSERT(pd != NULL);
     delete pd;
 }
+#endif
 
 static const fclaw_package_vtable_t clawpack46_patch_vtable = {
-    patch_data_new,
-    patch_data_delete
+    NULL, // patch_data_new
+    NULL //patch_data_delete
 };
-
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-#if 0
-void fc2d_clawpack46_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack46_options_t *clawopt)
-{
-    int id;
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    /* Register packages */
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack46_patch_vtable);
-    s_clawpack46_package_id = id;
-}
-#endif
-
-void
-fc2d_clawpack46_register_vtable (fclaw_package_container_t * pkg_container,
-                                 fc2d_clawpack46_options_t * clawopt)
-{
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    s_clawpack46_package_id =
-      fclaw_package_container_add (pkg_container, clawopt,
-                                   &clawpack46_patch_vtable);
-}
 
 void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
 {
@@ -216,72 +191,11 @@ int fc2d_clawpack46_get_package_id (void)
     return s_clawpack46_package_id;
 }
 
-static void
-fc2d_clawpack46_define_auxarray_cp (fclaw2d_domain_t* domain, fclaw2d_clawpatch_t *cp)
-{
-    int maux;
-    fc2d_clawpack46_options_t *clawpack_options;
-    const amr_options_t* gparms;
-    int mx,my,mbc;
-    int ll[2], ur[2];
-
-    gparms = get_domain_parms(domain);
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
-
-    clawpack_options = fc2d_clawpack46_get_options(domain);
-    maux = clawpack_options->maux;
-
-    /* Construct an index box to hold the aux array */
-    ll[0] = 1-mbc;
-    ll[1] = 1-mbc;
-    ur[0] = mx + mbc;
-    ur[1] = my + mbc;    Box box(ll,ur);
-
-    /* get solver specific data stored on this patch */
-    patch_aux_data *clawpack_patch_data = get_patch_data(cp);
-    clawpack_patch_data->auxarray.define(box,maux);
-    clawpack_patch_data->maux = maux; // set maux in solver specific patch data (for completeness)
-}
-
-void fc2d_clawpack46_define_auxarray (fclaw2d_domain_t* domain,
-                                      fclaw2d_patch_t* this_patch)
-{
-    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
-    fc2d_clawpack46_define_auxarray_cp (domain, cp);
-}
-
-static void
-fc2d_clawpack46_get_auxarray_cp (fclaw2d_domain_t* domain,
-                                 fclaw2d_clawpatch_t *cp, double **aux, int* maux)
-{
-    fc2d_clawpack46_options_t* clawpack_options;
-    clawpack_options = fc2d_clawpack46_get_options(domain);
-    *maux = clawpack_options->maux;
-
-    patch_aux_data *clawpack_patch_data = get_patch_data(cp);
-    *aux = clawpack_patch_data->auxarray.dataPtr();
-}
-
 void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
-    fclaw2d_clawpatch_t *cp = fclaw2d_clawpatch_get_cp (this_patch);
-    fc2d_clawpack46_get_auxarray_cp (domain,cp,aux,maux);
-}
-
-void fc2d_clawpack46_maux(fclaw2d_domain_t* domain,int* maux)
-{
-    *maux = fc2d_clawpack46_get_maux(domain);
-}
-
-int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain)
-{
-    fc2d_clawpack46_options_t *clawpack_options;
-    clawpack_options = fc2d_clawpack46_get_options(domain);
-    return clawpack_options->maux;
+    fclaw2d_clawpatch_aux_data(domain, this_patch, aux, maux);
 }
 
 void fc2d_clawpack46_setprob(fclaw2d_global_t *glob)
@@ -321,9 +235,7 @@ void fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack46_define_auxarray (domain,this_patch);
-
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -353,7 +265,7 @@ void fc2d_clawpack46_set_capacity(fclaw2d_domain_t *domain,
 
     area = fclaw2d_clawpatch_get_area(domain,this_patch);
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CLAWPACK46_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
@@ -375,7 +287,7 @@ void fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -404,7 +316,7 @@ void fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -432,7 +344,7 @@ void fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -480,7 +392,7 @@ void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -540,7 +452,7 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
 
     level = this_patch->level;
 
-    fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
 
     fclaw2d_clawpatch_save_current_step(domain, this_patch);
 

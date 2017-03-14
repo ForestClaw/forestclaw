@@ -26,29 +26,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 
-static fclaw2d_vtable_t vt;
-
 fclaw2d_vtable_t* fclaw2d_vt()
 {
-    return &vt;
+    /* Make this only visible to this function */
+    static fclaw2d_vtable_t s_vt;
+    return &s_vt;
 }
 
 /* Initialize any settings that can be set here */
 void fclaw2d_init_vtable()
 {
-    /* ------------------------------------------------------------
-      Metric functions - only loosely depend on solvers
-      ------------------------------------------------------------- */
-    vt.metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
-    vt.fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
 
-    vt.metric_compute_area        = &fclaw2d_metric_compute_area;
-    vt.metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
-
-    vt.metric_compute_normals     = &fclaw2d_metric_compute_normals;
-    vt.fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
-    vt.fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
-    vt.fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
     /* ------------------------------------------------------------
       Functions below here depend on q and could be solver specific
@@ -56,38 +45,22 @@ void fclaw2d_init_vtable()
 
     /* These may be redefined by the user */
     /* Problem setup */
-    vt.problem_setup             = NULL;
-
-    /* Diagnostics */
-    vt.run_user_diagnostics      = NULL;
-    vt.compute_patch_error       = &fclaw2d_diagnostics_compute_patch_error;
+    fclaw_vt->problem_setup             = NULL;
 
     /* Defaults for regridding */
-    vt.after_regrid              = NULL;
+    fclaw_vt->after_regrid              = NULL;
 
-    /* Fortran files that do the work */
-    vt.fort_compute_patch_error  = NULL;  /* must be set by the user */
-}
+    /* ------------------------------------------------------------
+      Metric functions - only loosely depend on solvers
+      ------------------------------------------------------------- */
+    fclaw_vt->metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
+    fclaw_vt->fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
 
-void fclaw2d_set_vtable()
-{
-    // fclaw2d_domain_attribute_add (domain,"vtable",vt);
-    if (vt.metric_compute_area == &fclaw2d_metric_compute_area)
-    {
-        vt.metric_area_set_ghost = &fclaw2d_metric_area_set_ghost;
-    }
-    else if (vt.metric_compute_area == &fclaw2d_metric_compute_area_exact)
-    {
-        vt.metric_area_set_ghost = &fclaw2d_metric_area_set_ghost_exact;
-    }
-}
+    fclaw_vt->metric_compute_area        = &fclaw2d_metric_compute_area;
+    fclaw_vt->metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
 
-#if 0
-fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t* domain)
-{
-    fclaw2d_vtable_t *vt;
-    vt = (fclaw2d_vtable_t*) fclaw2d_domain_attribute_access(domain,"vtable",NULL);
-    FCLAW_ASSERT(vt != NULL);
-    return *vt;
+    fclaw_vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
+    fclaw_vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
+    fclaw_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
+    fclaw_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 }
-#endif

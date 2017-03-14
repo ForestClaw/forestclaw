@@ -30,49 +30,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#if 0
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
-#endif
-
-// static fclaw2d_vtable_t fclaw2d_vt;
-
 void annulus_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t *user =  annulus_user_get_options(domain);
 
-    // fclaw2d_init_vtable();
-    fclaw2d_vt()->problem_setup       = &annulus_problem_setup;
+    fclaw2d_vt()->problem_setup  = &annulus_problem_setup;
+    fclaw2d_patch_vt()->setup    = &annulus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        // fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-        // fc2d_clawpack46_set_vtable_defaults();
-
-        fclaw2d_patch_vt()->patch_setup = &annulus_patch_setup;
-        // classic_claw46.clawpatch()->patch_setup = &annulus_patch_setup;
-
         fc2d_clawpack46_vt()->qinit   = &CLAWPACK46_QINIT;
         fc2d_clawpack46_vt()->rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
         fc2d_clawpack46_vt()->rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
-
-        // fc2d_clawpack46_set_vtable(classic_claw46);
-
     }
     else if (user->claw_version == 5)
     {
-        // fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-        // fc2d_clawpack5_set_vtable_defaults();
-
-        fclaw2d_patch_vt()->patch_setup  = &annulus_patch_setup;
-
         fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
         fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-
-        // fc2d_clawpack5_set_vtable(classic_claw5);
     }
-    fclaw2d_set_vtable();
 }
 
 
@@ -103,7 +79,6 @@ void annulus_patch_setup(fclaw2d_domain_t *domain,
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_define_auxarray(domain,this_patch);
         fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
 
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
@@ -111,7 +86,6 @@ void annulus_patch_setup(fclaw2d_domain_t *domain,
     }
     else if(user->claw_version == 5)
     {
-        fc2d_clawpack5_define_auxarray(domain,this_patch);
         fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
 
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,

@@ -133,6 +133,7 @@ struct amr_options
 
     /* Number of equations in the system of PDEs */
     int meqn;
+    int maux;
 
     const char *mthbc_string;
     int *mthbc;

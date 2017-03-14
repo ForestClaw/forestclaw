@@ -123,6 +123,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
 
     int d = ddata->count_grids_per_proc;
     ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
+    ddata->count_amr_advance = (d > 0) ? d : 1;   /* To avoid division by zero */
 
     double gpp = ddata->count_grids_per_proc/       ddata->count_amr_advance;
     double glb = ddata->count_grids_local_boundary/ ddata->count_amr_advance;
