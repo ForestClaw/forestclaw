@@ -394,12 +394,11 @@ void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
 
-void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile);
+// void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob);
+void fc2d_clawpack46_set_options (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt);
 
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t* clawopt);
-
-int fc2d_clawpack46_get_package_id (void);
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob);
 

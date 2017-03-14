@@ -70,17 +70,6 @@ static
 double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 
 
-
-void fclaw2d_clawpatch_link_app(fclaw_app_t* app)
-{
-    fclaw2d_clawpatch_t::app = app;
-}
-
-void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
-{
-    fclaw2d_clawpatch_t::global = global;
-}
-
 /* ------------------------------------------------------------
    Solution access functions
    ---------------------------------------------------------- */

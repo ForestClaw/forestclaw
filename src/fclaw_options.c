@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fp_exception_glibc_extension.h"
 
+static int s_forestclaw_package_id = -1;
 
 typedef struct fclaw_options_general
 {
@@ -44,19 +45,19 @@ fclaw_options_general_t;
 static void *
 options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 {
-    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+    amr_options_t *gparms = (amr_options_t *) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (opt != NULL);
 
     /* allocated storage for this package's option values */
-    FCLAW_ASSERT (general != NULL);
+    FCLAW_ASSERT (gparms != NULL);
 
-    fclaw_options_add_general (opt, general->amropt);
+    fclaw_options_add_general (opt, gparms);
 
     /* we do not need to work with the return value */
-    general->is_registered = 1;
+    gparms->is_registered = 1;
     return NULL;
 }
 
@@ -78,7 +79,7 @@ static fclaw_exit_type_t
 options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
 {
 
-    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+    amr_options_t *gparms = (amr_options_t *) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -87,11 +88,11 @@ options_postprocess_general (fclaw_app_t * a, void *package, void *registered)
     /* errors from the key-value options would have showed up in parsing */
 
     /* postprocess this package */
-    FCLAW_ASSERT (general != NULL);
-    FCLAW_ASSERT (general->is_registered);
+    FCLAW_ASSERT (gparms != NULL);
+    FCLAW_ASSERT (gparms->is_registered);
 
     /* Convert strings to arrays */
-    return fclaw_options_postprocess (general->amropt);
+    return fclaw_options_postprocess (gparms);
 }
 
 fclaw_exit_type_t
@@ -140,9 +141,9 @@ fclaw_options_check (fclaw_options_t * gparms)
 fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
-    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
+    amr_options_t *gparms = (amr_options_t *) package;
 
-    return fclaw_options_check (general->amropt);
+    return fclaw_options_check (gparms);
 }
 
 void
@@ -157,24 +158,19 @@ fclaw_options_reset (fclaw_options_t * amropt)
 static void
 options_destroy_general (fclaw_app_t * a, void *package, void *registered)
 {
-    fclaw_options_general_t *general = (fclaw_options_general_t *) package;
-    amr_options_t *amropt;
+    amr_options_t *amropt = (amr_options_t*) package;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
     /* free this package */
-    FCLAW_ASSERT (general != NULL);
-    FCLAW_ASSERT (general->is_registered);
+    FCLAW_ASSERT (amropt != NULL);
+    FCLAW_ASSERT (amropt->is_registered);
 
     /* Destroy option arrays created in postprocess */
-    amropt = general->amropt;
-
     fclaw_options_reset (amropt);
     FCLAW_FREE(amropt);
-
-    FCLAW_FREE (general);
 }
 
 static const fclaw_app_options_vtable_t options_vtable_general = {
@@ -184,9 +180,19 @@ static const fclaw_app_options_vtable_t options_vtable_general = {
     options_destroy_general
 };
 
-amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *configfile)
+void fclaw2d_forestclaw_set_options (fclaw2d_global_t *glob, amr_options_t* gparms)
 {
-    fclaw_options_general_t* general;
+    int id;
+
+    glob->gparms = gparms;
+    FCLAW_ASSERT(s_forestclaw_package_id == -1);
+    id = fclaw_package_container_add_pkg(glob,
+                                         gparms);
+    s_forestclaw_package_id = id;
+}
+
+amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a, const char *configfile)
+{
     amr_options_t* gparms;
     FCLAW_ASSERT (a != NULL);
 
@@ -196,15 +202,16 @@ amr_options_t* fclaw_options_register_general (fclaw_app_t * a, const char *conf
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
     gparms = FCLAW_ALLOC(amr_options_t,1);
-    general = FCLAW_ALLOC_ZERO (fclaw_options_general_t, 1);
-
-    general->amropt = gparms;
 
     /* Could also pass in a section header (set to NULL for now) */
     fclaw_app_options_register (a,NULL,
                                 configfile,
                                 &options_vtable_general,
-                                general);
+                                gparms);
+    
+    /* this is to retrieve the option key-value pair */
+    fclaw_app_set_attribute(a,"Options",gparms);
+
     return gparms;
 }
 
@@ -539,10 +546,10 @@ void fclaw_options_destroy_array(void* array)
    AMR access functions
    --------------------------------------------------------- */
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app)
+amr_options_t* fclaw_forestclaw_get_options(fclaw2d_global_t* glob)
 {
-    amr_options_t*  gparms;
-    gparms = (amr_options_t*) fclaw_app_get_attribute(app,"fclaw-options",NULL);
-    FCLAW_ASSERT(gparms != NULL);
-    return gparms;
+    amr_options_t *gp = (amr_options_t*) 
+            fclaw_package_get_options(glob, s_forestclaw_package_id);
+    FCLAW_ASSERT(glob->gparms == gp);
+    return gp;
 }

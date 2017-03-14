@@ -118,7 +118,7 @@ const fclaw_app_options_vtable_t fclaw2d_clawpatch_options_vtable = {
     clawpatch_options_check,
     clawpatch_options_destroy
 };
-
+#if 0
 fclaw2d_clawpatch_options_t *
 fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_global_t* glob)
 {
@@ -141,11 +141,42 @@ fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_glo
     fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
 
     FCLAW_ASSERT(s_clawpatch_package_id == -1);
-    id = fclaw_package_container_add_pkg_new(glob,
-                                             clawpatch_options);
+    id = fclaw_package_container_add_pkg(glob,
+                                         clawpatch_options);
     s_clawpatch_package_id = id;
 
     return clawpatch_options;
+}
+#endif
+
+fclaw2d_clawpatch_options_t *
+fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
+{
+    fclaw2d_clawpatch_options_t* clawpatch_options;
+
+    FCLAW_ASSERT (app != NULL);
+
+    /* allocate storage for fclaw_options */
+    /* we will free it in the options_destroy callback */
+    clawpatch_options = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
+
+    /* Could also pass in a section header (set to NULL for now) */
+    fclaw_app_options_register (app,"clawpatch",
+                                configfile,
+                                &fclaw2d_clawpatch_options_vtable,
+                                clawpatch_options);
+    fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
+    return clawpatch_options;
+}
+
+void fclaw2d_clawpatch_set_options (fclaw2d_global_t *glob, fclaw2d_clawpatch_options_t* clawpatch_options)
+{
+    int id;
+
+    FCLAW_ASSERT(s_clawpatch_package_id == -1);
+    id = fclaw_package_container_add_pkg(glob,
+                                         clawpatch_options);
+    s_clawpatch_package_id = id;
 }
 
 static
@@ -158,5 +189,5 @@ fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glo
 {
     int id = fclaw2d_clawpatch_get_package_id();
     return (fclaw2d_clawpatch_options_t*) 
-            fclaw_package_get_options_new(glob, id);
+            fclaw_package_get_options(glob, id);
 }

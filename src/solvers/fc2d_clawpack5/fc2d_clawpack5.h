@@ -388,12 +388,11 @@ void fc2d_clawpack5_aux_data(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
 
-void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile);
+// void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob);
+void fc2d_clawpack5_set_options (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt);
 
 void fc2d_clawpack5_package_register(fclaw_app_t* app,
                                       fc2d_clawpack5_options_t* clawopt);
-
-int fc2d_clawpack5_get_package_id (void);
 
 void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe);

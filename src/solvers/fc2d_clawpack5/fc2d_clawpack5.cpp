@@ -41,6 +41,12 @@ fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
     return &classic_vt;
 }
 
+static
+int fc2d_clawpack5_get_package_id (void)
+{
+    return s_clawpack5_package_id;
+}
+
 #if 0
 void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t user_vt)
 {
@@ -119,44 +125,15 @@ void fc2d_clawpack5_set_vtable_defaults()
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob)
 {
-    int id;
-    fclaw_app_t* app;
-    app = fclaw2d_domain_get_app(glob->domain);
-    id = fc2d_clawpack5_get_package_id();
-    return (fc2d_clawpack5_options_t*) fclaw_package_get_options(app,id);
+    int id = fc2d_clawpack5_get_package_id();
+    return (fc2d_clawpack5_options_t*) fclaw_package_get_options(glob,id);
 }
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
 #if 0
-void fc2d_clawpack5_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack5_options_t *clawopt)
-{
-    int id;
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack5_package_id == -1);
-
-    /* Register packages */
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack5_patch_vtable);
-    s_clawpack5_package_id = id;
-}
-
-void
-fc2d_clawpack5_register_vtable (fclaw_package_container_t * pkg_container,
-                                 fc2d_clawpack5_options_t * clawopt)
-{
-    FCLAW_ASSERT(s_clawpack5_package_id == -1);
-
-    s_clawpack5_package_id =
-      fclaw_package_container_add (pkg_container, clawopt,
-                                   &clawpack5_patch_vtable);
-}
-#endif
-
-void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile)
+void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob)
 {
     fc2d_clawpack5_options_t* clawopt;
     int id;
@@ -169,14 +146,21 @@ void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile)
     /* Don't register a package more than once */
     FCLAW_ASSERT(s_clawpack5_package_id == -1);
 
-    id = fclaw_package_container_add_pkg(app,clawopt);
+    id = fclaw_package_container_add_pkg(glob,clawopt);
 
     s_clawpack5_package_id = id;
 }
+#endif
 
-int fc2d_clawpack5_get_package_id (void)
+void fc2d_clawpack5_set_options (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt)
 {
-    return s_clawpack5_package_id;
+    int id; 
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack5_package_id == -1);
+
+    id = fclaw_package_container_add_pkg(glob,clawopt);
+
+    s_clawpack5_package_id = id;
 }
 
 void fc2d_clawpack5_aux_data(fclaw2d_global_t *glob,

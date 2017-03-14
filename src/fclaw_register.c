@@ -28,7 +28,7 @@
 #include <fclaw_package.h>
 
 /* Register the forestClaw package and options */
-
+#if 0
 fclaw_options_t *
 fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
 {
@@ -43,7 +43,16 @@ fclaw_forestclaw_register(fclaw_app_t* app, const char* configfile)
     return gparms;
 }
 
+void fclaw2d_clawpatch_set_options (fclaw2d_global_t *glob, amr_options_t* gparms)
+{
+    FCLAW_ASSERT(s_clawpatch_package_id == -1);
+    id = fclaw_package_container_add_pkg(glob,
+                                         clawpatch_options);
+    s_clawpatch_package_id = id;
+}
+
 void fclaw_forestclaw_destroy(fclaw_app_t* app)
 {
     fclaw_package_container_destroy_app (app);
 }
+#endif

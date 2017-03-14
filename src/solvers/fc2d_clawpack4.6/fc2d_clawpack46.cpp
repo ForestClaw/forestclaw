@@ -42,6 +42,12 @@ fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
     return &classic_vt;
 }
 
+static
+int fc2d_clawpack46_get_package_id (void)
+{
+    return s_clawpack46_package_id;
+}
+
 #if 0
 void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
 {
@@ -118,18 +124,15 @@ void fc2d_clawpack46_set_vtable_defaults()
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
 {
-    int id;
-    fclaw_app_t* app;
-    app = fclaw2d_domain_get_app(glob->domain);
-    id = fc2d_clawpack46_get_package_id();
-    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
+    int id = fc2d_clawpack46_get_package_id();
+    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(glob,id);
 }
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-
-void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
+#if 0
+void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob)
 {
     fc2d_clawpack46_options_t* clawopt;
     int id;
@@ -138,18 +141,24 @@ void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
     clawopt = fc2d_clawpack46_options_register(app,configfile);
 
     /* And the package */
-
     /* Don't register a package more than once */
     FCLAW_ASSERT(s_clawpack46_package_id == -1);
 
-    id = fclaw_package_container_add_pkg(app,clawopt);
+    id = fclaw_package_container_add_pkg(glob,clawopt);
 
     s_clawpack46_package_id = id;
 }
+#endif
 
-int fc2d_clawpack46_get_package_id (void)
+void fc2d_clawpack46_set_options (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
 {
-    return s_clawpack46_package_id;
+    int id; 
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+
+    id = fclaw_package_container_add_pkg(glob,clawopt);
+
+    s_clawpack46_package_id = id;
 }
 
 void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,

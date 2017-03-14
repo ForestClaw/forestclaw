@@ -217,6 +217,7 @@ double fclaw2d_domain_get_time(fclaw2d_global_t *glob)
     return ddata->curr_time;
 }
 
+#if 0
 const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
 {
     const amr_options_t *gparms;
@@ -226,6 +227,7 @@ const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
     gparms = fclaw_forestclaw_get_options(app);
     return gparms;
 }
+#endif
 
 void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
 {
@@ -235,11 +237,12 @@ void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
     return fclaw_app_get_user(app);
 }
 
-
+#if 0
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
     return fclaw2d_forestclaw_get_options(domain);
 }
+#endif
 
 fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_global_t* glob)
 {

@@ -158,6 +158,11 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
+    amr_options_t* gparms;
+    gparms = fclaw_app_get_attribute(app,"Options",NULL);
+    FCLAW_ASSERT (gparms != NULL);
+    gparms->maux = clawopt->maux;
+
     return fc2d_clawpack5_check (clawopt);
 }
 
@@ -207,6 +212,7 @@ fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
     clawpkg = FCLAW_ALLOC (fc2d_clawpack5_package_t, 1);
     fclaw_app_options_register (app, "clawpack5", configfile,
                                 &clawpack5_options_vtable, clawpkg);
+    fclaw_app_set_attribute(app,"clawpack5",clawpkg);
     return &clawpkg->clawopt;
 }
 

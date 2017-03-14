@@ -44,9 +44,6 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
-void fclaw2d_clawpatch_link_app (fclaw_app_t * app);
-void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global);
-
 void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
 void fclaw2d_clawpatch_delete_patch(void *cp);
 

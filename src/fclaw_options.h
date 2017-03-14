@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+struct fclaw2d_global;
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -50,10 +52,11 @@ fclaw_exit_type_t fclaw_options_postprocess (fclaw_options_t * amropt);
 fclaw_exit_type_t fclaw_options_check (fclaw_options_t * amropt);
 void fclaw_options_reset (fclaw_options_t * amropt);
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app);
+void fclaw2d_forestclaw_set_options (struct fclaw2d_global *glob, amr_options_t* gparms);
+amr_options_t* fclaw_forestclaw_get_options(struct fclaw2d_global *glob);
 
 
-amr_options_t* fclaw_options_register_general (fclaw_app_t * a,
+amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a,
                                      const char *configfile);
 
 
@@ -208,6 +211,8 @@ struct amr_options
 
     /* Advanced options */
     int interp_stencil_width;
+
+    int is_registered;
 };
 
 #ifdef __cplusplus

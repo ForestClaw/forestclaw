@@ -78,7 +78,7 @@ typedef struct fclaw2d_global
     int mpirank;              /**< Rank of this process in \b mpicomm. */
 
     int gparms_owned;                   /**< Did we allocate \a gparms? */
-    fclaw_options_t *gparms;            /**< Option values for forestclaw. */
+    amr_options_t *gparms;            /**< Option values for forestclaw. */
  
     fclaw_package_container_t *pkg_container;    /**< Solver packages for internal use. */
  
@@ -99,7 +99,7 @@ typedef struct fclaw2d_global_iterate
 //fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
 fclaw2d_global_t* fclaw2d_global_new ();
 void fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
-void fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms);
+// void fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms);
 
 /** Free a global structures and all members. */
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
