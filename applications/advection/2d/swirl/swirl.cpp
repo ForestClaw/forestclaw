@@ -111,7 +111,11 @@ static
 void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
 {
     user_options_t           *user;     
+    fclaw2d_clawpatch_options_t *clawpatchopt;
 
+
+    clawpatchopt = fclaw2d_clawpatch_get_options(glob);
+    printf("mx = %d\n", clawpatchopt->mx);
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
@@ -160,11 +164,14 @@ main (int argc, char **argv)
 
     int retval;
 
+    glob = fclaw2d_global_new();
+
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
     fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
     /* All libraries that might be needed should be registered here */
+    fclaw2d_clawpatch_register(glob,app,"fclaw_options.ini");
     fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
     fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
     register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
@@ -180,7 +187,9 @@ main (int argc, char **argv)
     gparms = fclaw_forestclaw_get_options(app);
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     domain = create_domain(mpicomm, gparms);
-    glob = fclaw2d_global_new (gparms, domain);
+    
+    fclaw2d_global_set_domain(glob, domain);
+    fclaw2d_global_set_gparms (glob, gparms);
 
     /* Run the program */
     if (!retval & !vexit)

@@ -49,7 +49,8 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_clawpatch.h \
 	src/fclaw2d_clawpatch.hpp \
 	src/fclaw2d_clawpatch_output_ascii.h \
-	src/fclaw2d_clawpatch_regrid.h
+	src/fclaw2d_clawpatch_regrid.h \
+	src/fclaw2d_clawpatch_options.h
 
 libforestclaw_internal_headers =
 
@@ -102,6 +103,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_clawpatch_diagnostics.c \
 	src/fclaw2d_clawpatch_regrid.c \
 	src/fclaw2d_clawpatch_output_ascii.c \
+	src/fclaw2d_clawpatch_options.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \

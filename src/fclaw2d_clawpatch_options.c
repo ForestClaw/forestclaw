@@ -25,14 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch_options.h>
+#include <fclaw_package.h>
+
+static int s_clawpatch_package_id = -1;
 
 static void *
-fclaw2d_clawpatch_register(fclaw_app_t * a, void *package, sc_options_t * opt)
+clawpatch_options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
 {
-    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) package;
+    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (optpkg != NULL);
     FCLAW_ASSERT (opt != NULL);
 
     /* allocated storage for this package's option values */
@@ -56,12 +59,12 @@ fclaw2d_clawpatch_register(fclaw_app_t * a, void *package, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-fclaw2d_clawpatch_options_postprocess(fclaw_app_t * a, void *package, void *registered)
+clawpatch_options_postprocess(fclaw_app_t * a, void *optpkg, void *registered)
 {
-    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (optpkg != NULL);
     FCLAW_ASSERT (registered == NULL);
 
     /* postprocess this package */
@@ -74,9 +77,9 @@ fclaw2d_clawpatch_options_postprocess(fclaw_app_t * a, void *package, void *regi
 }
 
 static fclaw_exit_type_t
-fclaw2d_clawpatch_options_check(fclaw_app_t * app, void *package, void *registered)
+clawpatch_options_check(fclaw_app_t * app, void *optpkg, void *registered)
 {
-    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) optpkg;
 
     if (clawpatch_options->mx != clawpatch_options->my)
     {
@@ -93,15 +96,15 @@ fclaw2d_clawpatch_options_check(fclaw_app_t * app, void *package, void *register
 }
 
 static void
-fclaw2d_clawpatch_options_destroy (fclaw_app_t * a, void *package, void *registered)
+clawpatch_options_destroy (fclaw_app_t * a, void *optpkg, void *registered)
 {
-    fclaw_options_general_t *clawpatch_options = (fclaw_options_general_t *) package;
+    fclaw2d_clawpatch_options_t *clawpatch_options = (fclaw2d_clawpatch_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (optpkg != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    /* free this package */
+    /* free this optpkg */
     FCLAW_ASSERT (clawpatch_options != NULL);
     FCLAW_ASSERT (clawpatch_options->is_registered);
 
@@ -109,48 +112,65 @@ fclaw2d_clawpatch_options_destroy (fclaw_app_t * a, void *package, void *registe
 }
 
 static
-const fclaw_app_options_vtable_t options_vtable_general = {
-    fclaw2d_clawpatch_options_register,
-    fclaw2d_clawpatch_options_postprocess,
-    fclaw2d_clawpatch_options_check,
-    fclaw2d_clawpatch_options_destroy
+const fclaw_app_options_vtable_t fclaw2d_clawpatch_options_vtable = {
+    clawpatch_options_register,
+    clawpatch_options_postprocess,
+    clawpatch_options_check,
+    clawpatch_options_destroy
 };
 
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw_app_t* app)
-{
-    fclaw2d_clawpatch_options_t*  clawpatch_options;
-    clawpatch_options = (amr_options_t*) fclaw_app_get_attribute(app,"clawpatch_options",NULL);
-    FCLAW_ASSERT(gparms != NULL);
-    return clawpatch_options;
-}
+// fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw_app_t* app)
+// {
+//     fclaw2d_clawpatch_options_t*  clawpatch_options;
+//     clawpatch_options = (fclaw2d_clawpatch_options_t*) fclaw_app_get_attribute(app,"clawpatch",NULL);
+//     FCLAW_ASSERT(clawpatch_options != NULL);
+//     return clawpatch_options;
+// }
 
-fclaw_options_t *
-fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile)
+static const fclaw_package_vtable_t clawpatch_vtable_notused = {
+    NULL, // patch_data_new
+    NULL //patch_data_delete
+};
+
+fclaw2d_clawpatch_options_t *
+fclaw2d_clawpatch_register(fclaw2d_global_t* glob, fclaw_app_t* app, const char* configfile)
 {
+    int id; 
+
     fclaw2d_clawpatch_options_t* clawpatch_options;
-    int id;
 
-    FCLAW_ASSERT (a != NULL);
-
-    /* Basic options for print out help message, current options, etc */
-    fclaw_app_options_register_core (a, configfile);
+    FCLAW_ASSERT (app != NULL);
 
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
-    clawpatch_options = FCLAW_ALLOC(clawpatch_options_t,1);
+    clawpatch_options = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
 
     /* Could also pass in a section header (set to NULL for now) */
-    fclaw_app_options_register (a,"clawpach-options",
+    fclaw_app_options_register (app,"clawpatch",
                                 configfile,
-                                &fclaw2d_clawpatch_vtable,
-                                clawpatch_option);
+                                &fclaw2d_clawpatch_options_vtable,
+                                clawpatch_options);
 
-    clawpatch_options = fclaw_options_register_general (app, configfile);
+    fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
 
-    fclaw_app_set_attribute(app,"clawpatch-options",clawpatch_options);
+    FCLAW_ASSERT(s_clawpatch_package_id == -1);
+    id = fclaw_package_container_add (glob->pkg_container, 
+                                      clawpatch_options,
+                                      &clawpatch_vtable_notused);
 
-    /* Create a package container */
-    fclaw_package_container_new_app (app);
+    s_clawpatch_package_id = id;
 
-    return gparms;
+    return clawpatch_options;
+}
+
+static
+int fclaw2d_clawpatch_get_package_id (void)
+{
+    return s_clawpatch_package_id;
+}
+
+fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob)
+{
+    int id = fclaw2d_clawpatch_get_package_id();
+    return (fclaw2d_clawpatch_options_t*) fclaw_package_get_options_new(glob->pkg_container, id);
 }

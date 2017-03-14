@@ -69,6 +69,10 @@ int fclaw_package_container_add_pkg(fclaw_app_t* app,
                                     void* opt,
                                     const fclaw_package_vtable_t *vtable);
 
+// int fclaw_package_container_add_pkg_new(fclaw2d_global_t* glob,
+//                                         void* opt,
+//                                         const fclaw_package_vtable_t *vtable);
+
 /* Storage in ClawPatch for data from each package */
 void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
 fclaw_package_data_t* fclaw_package_data_new();
@@ -85,6 +89,7 @@ void fclaw_package_patch_data_destroy(fclaw_app_t* app,
 void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
 
 void* fclaw_package_get_options(fclaw_app_t* app, int id);
+void* fclaw_package_get_options_new(fclaw_package_container_t * pkg_container, int id);
 
 
 #ifdef __cplusplus
