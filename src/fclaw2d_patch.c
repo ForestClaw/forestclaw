@@ -406,7 +406,7 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     /* This copied q data from memory */
     FCLAW_ASSERT(patch_vt()->partition_pack != NULL);
 
-    patch_vt()->partition_unpack(domain,
+    patch_vt()->partition_unpack(glob->domain,
                                  this_patch,
                                  this_block_idx,
                                  this_patch_idx,
@@ -426,11 +426,11 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
                          void *user)
 {
     FCLAW_ASSERT(patch_vt()->build != NULL);
-    patch_vt()->patch_build(glob,
-                            this_patch,
-                            blockno,
-                            patchno,
-                            user);
+    patch_vt()->build(glob,
+                      this_patch,
+                      blockno,
+                      patchno,
+                      user);
 
 
     if (patch_vt()->setup != NULL)
@@ -451,13 +451,13 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
                                    fclaw2d_build_mode_t build_mode)
 {
     FCLAW_ASSERT(patch_vt()->build_from_fine != NULL);
-    patch_vt()->patch_build_from_fine(glob,
-                                      fine_patches,
-                                      coarse_patch,
-                                      blockno,
-                                      coarse_patchno,
-                                      fine0_patchno,
-                                      build_mode);
+    patch_vt()->build_from_fine(glob,
+                                fine_patches,
+                                coarse_patch,
+                                blockno,
+                                coarse_patchno,
+                                fine0_patchno,
+                                build_mode);
 
     if (patch_vt()->setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -665,6 +665,6 @@ void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                fclaw_bool time_interp)
 {
     FCLAW_ASSERT(patch_vt()->physical_bc != NULL);
-    patch_vt()->physical_bc(domain,this_patch,this_block_idx,this_patch_idx,
+    patch_vt()->physical_bc(glob,this_patch,this_block_idx,this_patch_idx,
                             t,dt,intersects_bc,time_interp);
 }
