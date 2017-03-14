@@ -206,7 +206,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = s->glob->gparms;
     const int refratio = gparms->refratio;
 
     fclaw_bool intersects_phys_bdry[NumFaces];

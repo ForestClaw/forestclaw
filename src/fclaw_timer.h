@@ -47,7 +47,7 @@ extern "C"
 
     -- fclaw2d_time.h  references an fclaw2d_domain_t struct.
 */
-struct fclaw2d_domain;
+struct fclaw2d_global;
 
 typedef enum
 {
@@ -116,7 +116,7 @@ void
 
 /* Use keyword 'struct' to avoid circular dependencies */
 void
-    fclaw2d_timer_report(struct fclaw2d_domain* domain);
+    fclaw2d_timer_report(struct fclaw2d_global* glob);
 
 #ifdef __cplusplus
 #if 0

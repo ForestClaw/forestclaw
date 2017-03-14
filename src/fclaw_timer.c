@@ -83,9 +83,9 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
 }
 
 void
-fclaw2d_timer_report(fclaw2d_domain_t *domain)
+fclaw2d_timer_report(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
 
     sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
 
@@ -204,13 +204,13 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                    "FCLAW2D_TIMER_LOCAL");
 
 
-    sc_stats_compute (domain->mpicomm, FCLAW2D_TIMER_COUNT, stats);
+    sc_stats_compute (glob->mpicomm, FCLAW2D_TIMER_COUNT, stats);
 
     sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
                     stats, 1, 0);
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
-                          "regrid %d %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", glob->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
@@ -220,7 +220,7 @@ fclaw2d_timer_report(fclaw2d_domain_t *domain)
                           stats[FCLAW2D_TIMER_REGRID].average);
 
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
-                          "regrid %d %d %g\n", domain->mpisize,
+                          "regrid %d %d %g\n", glob->mpisize,
                           ddata->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,

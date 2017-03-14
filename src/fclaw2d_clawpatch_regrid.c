@@ -28,9 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_metric_default_fort.h>
 
 int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno,
-                                  int initflag)
+                                     fclaw2d_patch_t *this_patch,
+                                     int blockno, int patchno,
+                                     int initflag)
 {
     const amr_options_t *gparms = glob->gparms;
 
@@ -55,9 +55,9 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
 }
 
 int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *fine_patches,
-                                  int blockno,
-                                  int patchno)
+                                     fclaw2d_patch_t *fine_patches,
+                                     int blockno,
+                                     int patchno)
 {
     const amr_options_t *gparms = glob->gparms;
 

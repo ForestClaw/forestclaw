@@ -31,34 +31,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*
-    get_exchange_data(fclaw2d_domain_t* domain)
+    get_exchange_data(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     return ddata->domain_exchange;
 }
 
 /* Should these be access functions in domain?  */
 static
-void set_exchange_data(fclaw2d_domain_t* domain,
+void set_exchange_data(fclaw2d_global_t* glob,
                        fclaw2d_domain_exchange_t *e)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     ddata->domain_exchange = e;
 }
 
 static
 fclaw2d_domain_indirect_t*
-    get_indirect_data(fclaw2d_domain_t* domain)
+    get_indirect_data(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     return ddata->domain_indirect;
 }
 
 static
-void set_indirect_data(fclaw2d_domain_t* domain,
+void set_indirect_data(fclaw2d_global_t* glob,
                        fclaw2d_domain_indirect_t *ind)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     ddata->domain_indirect = ind;
 }
 
@@ -169,7 +169,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* Store e so we can retrieve it later */
-    set_exchange_data(domain,e);
+    set_exchange_data(glob,e);
 
     /* Store locations of on-proc boundary patches that will be communicated
        to neighboring remote procs.  The pointer stored in e->patch_data[]
@@ -219,7 +219,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     }
 
     /* Do some some work that we hope to hide by communication above.  */
-    set_indirect_data(domain,ind);
+    set_indirect_data(glob,ind);
 
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
@@ -254,7 +254,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* Free old parallel ghost patch data structure, must exist by construction. */
-    fclaw2d_domain_exchange_t *e_old = get_exchange_data(*domain);
+    fclaw2d_domain_exchange_t *e_old = get_exchange_data(glob);
 
     /* Free contiguous memory, if allocated.  If no memory was allocated
        (because we are not storing the area), nothing de-allocated. */
@@ -284,7 +284,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
 
     /* Destroy indirect data needed to communicate between ghost patches
        from different procs */
-    fclaw2d_domain_indirect_t* ind_old = get_indirect_data(*domain);
+    fclaw2d_domain_indirect_t* ind_old = get_indirect_data(glob);
     fclaw2d_domain_indirect_destroy(*domain,ind_old);
     fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 }
@@ -306,7 +306,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
-    fclaw2d_domain_exchange_t *e = get_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = get_exchange_data(glob);
 
     /* Pack local data into on-proc patches at the parallel boundary that
        will be shipped of to other processors. */
@@ -377,7 +377,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
     }
     fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 
-    fclaw2d_domain_exchange_t *e = get_exchange_data(domain);
+    fclaw2d_domain_exchange_t *e = get_exchange_data(glob);
 
     /* Exchange only over levels currently in use */
     if (time_interp)
