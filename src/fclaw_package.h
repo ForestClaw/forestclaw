@@ -78,7 +78,7 @@ int fclaw_package_container_add_pkg_new(struct fclaw2d_global* glob,
 /* Storage in ClawPatch for data from each package */
 void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
 fclaw_package_data_t* fclaw_package_data_new();
-
+  
 
 /* Create, destroy and add patch data for each package */
 void fclaw_package_patch_data_new(fclaw_app_t* app,

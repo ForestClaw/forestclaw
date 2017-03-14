@@ -133,7 +133,7 @@ static const fclaw_package_vtable_t clawpatch_vtable_notused = {
 };
 
 fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_register(fclaw2d_global_t* glob, fclaw_app_t* app, const char* configfile)
+fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_global_t* glob)
 {
     int id; 
 

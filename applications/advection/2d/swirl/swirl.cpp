@@ -59,21 +59,36 @@ static const fclaw_app_options_vtable_t options_vtable_user =
     NULL
 };
 
+static int s_user_package_id = -1;
+static const fclaw_package_vtable_t user_vtable_notused = {
+    NULL, // patch_data_new
+    NULL //patch_data_delete
+};
 
 static
 void register_user_options (fclaw_app_t * app,
                             const char *configfile,
-                            user_options_t* user)
+                            user_options_t* user,
+                            fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT (app != NULL);
 
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+
+    FCLAW_ASSERT(s_user_package_id == -1);
+    int id = fclaw_package_container_add_pkg_new(glob,
+                                             user,
+                                             &user_vtable_notused);
+    s_user_package_id = id;
 }
 
 const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob)
 {
-    return swirl_user_get_options_old(glob->domain);
+    int id = s_user_package_id;
+    return (user_options_t*) 
+            fclaw_package_get_options_new(glob, id);    
+    // return swirl_user_get_options_old(glob->domain);
 }
 
 const user_options_t* swirl_user_get_options_old(fclaw2d_domain_t* domain)
@@ -164,17 +179,17 @@ main (int argc, char **argv)
 
     int retval;
 
-    glob = fclaw2d_global_new();
-
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
+    glob = fclaw2d_global_new();
+    
     fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
 
     /* All libraries that might be needed should be registered here */
-    fclaw2d_clawpatch_register(glob,app,"fclaw_options.ini");
+    fclaw2d_clawpatch_register(app,"fclaw_options.ini",glob);
     fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
     fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
-    register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
+    register_user_options   (app,"fclaw_options.ini",user,glob);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
