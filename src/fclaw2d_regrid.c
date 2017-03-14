@@ -143,7 +143,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                 fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
-                fclaw2d_patch_initialize(new_domain,fine_patch,blockno,fine_patchno);
+                fclaw2d_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
             }
         }
 

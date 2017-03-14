@@ -384,15 +384,9 @@ void fc2d_clawpack5_register_vtable (fclaw_package_container_t *
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc2d_clawpack5_define_auxarray(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch);
-
-void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
+void fc2d_clawpack5_aux_data(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
-
-int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain);
-void fc2d_clawpack5_maux(fclaw2d_domain_t* domain, int* maux);
 
 void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile);
 
@@ -413,25 +407,25 @@ void
     fc2d_clawpack5_setprob(fclaw2d_global_t* glob);
 
 void
-    fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_setaux(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_set_capacity(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_qinit(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_b4step2(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
@@ -449,7 +443,7 @@ void
                         fclaw_bool time_interp);
 
 void
-    fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_src2(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,

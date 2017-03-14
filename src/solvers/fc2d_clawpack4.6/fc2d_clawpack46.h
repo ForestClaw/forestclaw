@@ -250,18 +250,18 @@ void FC2D_CLAWPACK46_FORT_TAG4COARSENING(const int* mx, const int* my,
 #define FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC(fc2d_clawpack46_fort_interpolate2fine, \
                                                 FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE)
 void FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
-                                   const int* mbc, const int* meqn,
-                                   double qcoarse[], double qfine[],
-                                   double areacoarse[], double areafine[],
-                                   const int* igrid, const int* manifold);
+                                           const int* mbc, const int* meqn,
+                                           double qcoarse[], double qfine[],
+                                           double areacoarse[], double areafine[],
+                                           const int* igrid, const int* manifold);
 
 #define FC2D_CLAWPACK46_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fc2d_clawpack46_fort_average2coarse, \
                                                 FC2D_CLAWPACK46_FORT_AVERAGE2COARSE)
 void FC2D_CLAWPACK46_FORT_AVERAGE2COARSE(const int* mx, const int* my,
-                                 const int* mbc, const int* meqn,
-                                 double qcoarse[],double qfine[],
-                                 double areacoarse[],double areafine[],
-                                 const int* igrid, const int* manifold);
+                                         const int* mbc, const int* meqn,
+                                         double qcoarse[],double qfine[],
+                                         double areacoarse[],double areafine[],
+                                         const int* igrid, const int* manifold);
 
 #define FC2D_CLAWPACK46_FORT_COPY_FACE FCLAW_F77_FUNC(fc2d_clawpack46_fort_copy_face, \
                                                      FC2D_CLAWPACK46_FORT_COPY_FACE)
@@ -390,15 +390,9 @@ void fc2d_clawpack46_register_vtable (fclaw_package_container_t *
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc2d_clawpack46_define_auxarray(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t* this_patch);
-
-void fc2d_clawpack46_aux_data(fclaw2d_domain_t* domain,
+void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
-
-int fc2d_clawpack46_get_maux(fclaw2d_domain_t* domain);
-void fc2d_clawpack46_maux(fclaw2d_domain_t* domain, int* maux);
 
 void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile);
 
@@ -416,25 +410,25 @@ void
     fc2d_clawpack46_setprob(fclaw2d_global_t* glob);
 
 void
-    fc2d_clawpack46_setaux(fclaw2d_domain_t *domain,
+    fc2d_clawpack46_setaux(fclaw2d_global_t* glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_clawpack46_set_capacity(fclaw2d_domain_t *domain,
+    fc2d_clawpack46_set_capacity(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_clawpack46_qinit(fclaw2d_domain_t *domain,
+    fc2d_clawpack46_qinit(fclaw2d_global_t* glob,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_clawpack46_b4step2(fclaw2d_domain_t *domain,
+    fc2d_clawpack46_b4step2(fclaw2d_global_t* glob,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
@@ -452,7 +446,7 @@ void
                         fclaw_bool time_interp);
 
 void
-    fc2d_clawpack46_src2(fclaw2d_domain_t *domain,
+    fc2d_clawpack46_src2(fclaw2d_global_t* glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,

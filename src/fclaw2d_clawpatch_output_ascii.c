@@ -51,7 +51,7 @@ void fclaw2d_clawpatch_output_ascii_header(fclaw2d_domain_t* domain,
 }
 
 
-void fclaw2d_clawpatch_output_ascii(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx, int this_patch_idx,
                                     int iframe,int patch_num,int level)
@@ -61,13 +61,13 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_domain_t *domain,
     double *q;
     char fname[11];
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
 
     sprintf(fname,"fort.q%04d",iframe);
     fclaw2d_clawpatch_vt()->fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
                                             &patch_num,&level,&this_block_idx,
-                                            &domain->mpirank);
+                                            &glob->domain->mpirank);
 }

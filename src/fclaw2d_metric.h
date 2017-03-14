@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+void fclaw2d_metric_average_area(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *fine_patches,
                                  fclaw2d_patch_t *coarse_patch,
                                  int blockno, int coarse_patchno,

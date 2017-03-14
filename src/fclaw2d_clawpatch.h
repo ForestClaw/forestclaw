@@ -50,7 +50,7 @@ void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
 void fclaw2d_clawpatch_delete_patch(void *cp);
 
 
-void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
@@ -77,7 +77,7 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn);
 
-void fclaw2d_clawpatch_aux_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
                                 double **aux, int* maux);
 
@@ -374,7 +374,7 @@ typedef void (*fclaw2d_fort_norm_t)(int *mx, int *my, int *mbc,int *meqn,
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
                                               void** patch_acc);
 
-void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc);
 
 void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t *domain,

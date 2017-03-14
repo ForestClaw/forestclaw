@@ -45,22 +45,22 @@ extern "C"
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
 
-typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *this_patch,
                                             int blockno,
                                             int patchno);
 
-typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_global_t *glob,
                                               fclaw2d_patch_t* this_patch,
                                               int blockno,
                                               int patchno);
 
-typedef void (*fclaw2d_metric_area_set_ghost_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_metric_area_set_ghost_t)(fclaw2d_global_t *glob,
                                                 fclaw2d_patch_t* this_patch,
                                                 int blockno,
                                                 int patchno);
 
-typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_global_t *glob,
                                                  fclaw2d_patch_t *this_patch,
                                                  int blockno,
                                                  int patchno);

@@ -83,7 +83,7 @@ void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
 void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch);
 
-void fclaw2d_patch_initialize(fclaw2d_domain_t *domain,
+void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx);
@@ -294,7 +294,7 @@ void fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t
                                        int this_block_idx, int this_patch_idx,
                                        void* local_accumulator);
 
-void fclaw2d_patch_write_file(fclaw2d_domain_t *domain,
+void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -314,7 +314,7 @@ typedef void* (*fclaw2d_patch_new_t)();
 
 typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
 
-typedef void (*fclaw2d_patch_setup_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_setup_t)(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx);
@@ -324,7 +324,7 @@ typedef void (*fclaw2d_patch_setup_ghost_t)(fclaw2d_global_t *glob,
                                            int this_block_idx,
                                            int this_patch_idx);
 
-typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_initialize_t)(fclaw2d_global_t *glob,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx);
@@ -422,7 +422,7 @@ typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_domain_t *domain,
 typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
                                              int iframe);
 
-typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_global_t *glob,
                                            fclaw2d_patch_t *this_patch,
                                            int this_block_idx,
                                            int this_patch_idx,

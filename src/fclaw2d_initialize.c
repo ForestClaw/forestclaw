@@ -55,7 +55,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
                         this_block_idx,
                         this_patch_idx,
                         &build_mode);
-    fclaw2d_patch_initialize(domain,this_patch,this_block_idx,this_patch_idx);
+    fclaw2d_patch_initialize(g->glob,this_patch,this_block_idx,this_patch_idx);
 }
 
 

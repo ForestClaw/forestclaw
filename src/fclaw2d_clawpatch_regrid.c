@@ -44,7 +44,7 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
 
     refine_threshold = gparms->refine_threshold;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
@@ -76,7 +76,7 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 
     coarsen_threshold = gparms->coarsen_threshold;
 
-    fclaw2d_clawpatch_grid_data(domain,patch0,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     for (igrid = 0; igrid < 4; igrid++)

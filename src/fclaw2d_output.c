@@ -37,7 +37,9 @@ cb_serial_output (fclaw2d_domain_t * domain,
                   int this_block_idx, int this_patch_idx,
                   void *user)
 {
-    int iframe = *((int *) user);
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+
+    int iframe = *((int *) s->user);
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
         domain->global_num_patches_before +
@@ -49,14 +51,16 @@ cb_serial_output (fclaw2d_domain_t * domain,
        to have access? */
     int level = this_patch->level;
 
-    fclaw2d_patch_write_file(domain, this_patch, this_block_idx,
+    fclaw2d_patch_write_file(s->glob, this_patch, this_block_idx,
                              this_patch_idx, iframe, (int) patch_num,
                              level);
 }
 
 static
-void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
+void fclaw2d_output_write_serial(fclaw2d_global_t* glob,int iframe)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
@@ -64,11 +68,11 @@ void fclaw2d_output_write_serial(fclaw2d_domain_t* domain,int iframe)
 
     if (domain->mpirank == 0)
     {
-        fclaw2d_patch_write_header(domain,iframe);
+        fclaw2d_patch_write_header(glob->domain,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */
-    fclaw2d_domain_iterate_patches (domain, cb_serial_output, (void *) &iframe);
+    fclaw2d_global_iterate_patches (glob, cb_serial_output, (void *) &iframe);
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
@@ -80,8 +84,10 @@ cb_tikz_output (fclaw2d_domain_t * domain,
                 int this_block_idx, int this_patch_idx,
                 void *user)
 {
-    FILE *fp = (FILE*) user;
-    const amr_options_t *gparms = get_domain_parms (domain);
+    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+
+    FILE *fp = (FILE*) s->user;
+    const amr_options_t *gparms = s->glob->gparms;
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
@@ -94,7 +100,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     int mx, my, mbc;
     double dx,dy;
     double xlower, ylower;
-    fclaw2d_clawpatch_grid_data(domain, this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(s->glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double ax,bx,ay,by,dxf,dyf;
@@ -133,15 +139,17 @@ cb_tikz_output (fclaw2d_domain_t * domain,
 
 
 static
-void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
+void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     char fname[20];
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
 
     /* Should be in gparms */
-    const amr_options_t *gparms = get_domain_parms (domain);
+    const amr_options_t *gparms = glob->gparms;
     double figsize[2];
     figsize[0] = gparms->tikz_figsize[0];   /* Inches */
     figsize[1] = gparms->tikz_figsize[1];   /* Inches */
@@ -182,7 +190,7 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
         if (domain->mpirank == i)
         {
             fp = fopen(fname,"a");
-            fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
+            fclaw2d_global_iterate_patches (glob, cb_tikz_output, (void *) fp);
             fclose(fp);
         }
         MPI_Barrier(MPI_COMM_WORLD);
@@ -224,21 +232,21 @@ void fclaw2d_output_write_tikz(fclaw2d_domain_t* domain,int iframe)
 
 
 static void
-fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
+fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                   fclaw2d_patch_t * this_patch,
                                   int this_block_idx, int this_patch_idx,
                                   char *a)
 {
-    const amr_options_t *gparms = get_domain_parms (domain);
+    const amr_options_t *gparms = glob->gparms;
     fclaw2d_map_context_t *cont;
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
 
 
-    cont = fclaw2d_domain_get_map_context(domain);
+    cont = fclaw2d_domain_get_map_context(glob->domain);
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
 #if 0
@@ -280,7 +288,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_domain_t * domain,
 
 
 static void
-fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
+fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
                              fclaw2d_patch_t * this_patch,
                              int this_block_idx, int this_patch_idx,
                              char *a)
@@ -289,9 +297,9 @@ fclaw2d_output_vtk_value_cb (fclaw2d_domain_t * domain,
     double xlower,ylower,dx,dy;
     int mx,my,mbc,meqn;
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -317,7 +325,7 @@ fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
     const amr_options_t *gparms = glob->gparms;
 
-    (void) fclaw2d_vtk_write_file (glob->domain, basename,
+    (void) fclaw2d_vtk_write_file (glob, basename,
                                    gparms->mx, gparms->my, gparms->meqn,
                                    gparms->vtkspace, gparms->vtkwrite,
                                    fclaw2d_output_vtk_coordinate_cb,
@@ -368,13 +376,13 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     if (gparms->serialout)
     {
-        fclaw2d_output_write_serial(domain, iframe);
+        fclaw2d_output_write_serial(glob, iframe);
     }
 
     if (gparms->tikzout)
     {
         fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
-        fclaw2d_output_write_tikz(domain,iframe);
+        fclaw2d_output_write_tikz(glob,iframe);
         fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
     }
 

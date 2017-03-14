@@ -281,13 +281,13 @@ void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
     }
 }
 
-void fclaw2d_patch_initialize(fclaw2d_domain_t *domain,
+void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx)
 {
     FCLAW_ASSERT(patch_vt()->initialize != NULL);
-    patch_vt()->initialize(domain,this_patch,this_block_idx,this_patch_idx);
+    patch_vt()->initialize(glob,this_patch,this_block_idx,this_patch_idx);
 }
 
 void fclaw2d_patch_pack_local_ghost(fclaw2d_global_t *glob,
@@ -438,7 +438,7 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
         /* The setup routine should check to see if this is a ghost patch and
            optimize accordingly.  For example, interior data is not generally
            needed (beyond what is needed for averaging) */
-        patch_vt()->setup(glob->domain,this_patch,blockno,patchno);
+        patch_vt()->setup(glob,this_patch,blockno,patchno);
     }
 }
 
@@ -465,7 +465,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
            new coarse grid patches.  In the latter case, we might just average
            aux array info, for example, rather than recreate it from scratch.
            Something like a general "build from fine" routine might be needed */
-        patch_vt()->setup(glob->domain,coarse_patch,blockno,coarse_patchno);
+        patch_vt()->setup(glob,coarse_patch,blockno,coarse_patchno);
     }
 }
 
@@ -635,7 +635,7 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_patch_write_file(fclaw2d_domain_t *domain,
+void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -644,7 +644,7 @@ void fclaw2d_patch_write_file(fclaw2d_domain_t *domain,
 {
     FCLAW_ASSERT(patch_vt()->write_file != NULL);
 
-    patch_vt()->write_file(domain,this_patch,this_block_idx,
+    patch_vt()->write_file(glob,this_patch,this_block_idx,
                            this_patch_idx,iframe,patch_num,level);
 }
 

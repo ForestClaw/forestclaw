@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_VTK_H
 
 #include <forestclaw2d.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -45,7 +46,7 @@ extern "C"
  *                      slowest.
  */
 typedef void
-    (*fclaw2d_vtk_patch_data_t) (fclaw2d_domain_t * domain,
+    (*fclaw2d_vtk_patch_data_t) (fclaw2d_global_t * glob,
                                  fclaw2d_patch_t * this_patch,
                                  int this_block_idx, int this_patch_idx,
                                  char *a);
@@ -59,7 +60,7 @@ typedef void
  * \return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
-int fclaw2d_vtk_write_file (fclaw2d_domain_t * domain, const char *basename,
+int fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
                             int mx, int my, int meqn,
                             double vtkspace, int vtkwrite,
                             fclaw2d_vtk_patch_data_t coordinate_cb,

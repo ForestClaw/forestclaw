@@ -219,11 +219,11 @@ int fc2d_clawpack5_get_package_id (void)
     return s_clawpack5_package_id;
 }
 
-void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
+void fc2d_clawpack5_aux_data(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux)
 {
-    fclaw2d_clawpatch_aux_data(domain, this_patch, aux, maux);
+    fclaw2d_clawpatch_aux_data(glob, this_patch, aux, maux);
 }
 
 void fc2d_clawpack5_setprob(fclaw2d_global_t *glob)
@@ -235,7 +235,7 @@ void fc2d_clawpack5_setprob(fclaw2d_global_t *glob)
 }
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */
-void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_setaux(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -262,9 +262,9 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
     double *aux;
 
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
@@ -273,7 +273,7 @@ void fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
 }
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */
-void fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_set_capacity(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
@@ -283,15 +283,15 @@ void fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
     double *aux, *area;
     fc2d_clawpack5_options_t *clawopt;
 
-    clawopt = fc2d_clawpack5_get_options(domain);
+    clawopt = fc2d_clawpack5_get_options(glob->domain);
     mcapa = clawopt->mcapa;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob->domain,this_patch);
 
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CLAWPACK5_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
@@ -299,7 +299,7 @@ void fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
 }
 
 
-void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_qinit(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
@@ -309,11 +309,11 @@ void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK5_SET_BLOCK(&this_block_idx);
@@ -322,7 +322,7 @@ void fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
     CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_b4step2(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -335,11 +335,11 @@ void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
@@ -347,7 +347,7 @@ void fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
     CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
+void fc2d_clawpack5_src2(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -360,11 +360,11 @@ void fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CLAWPACK5_SET_BLOCK(&this_block_idx);
     classic_vt.src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -407,10 +407,10 @@ void fc2d_clawpack5_bc2(fclaw2d_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(this_block);
@@ -469,11 +469,11 @@ double fc2d_clawpack5_step2(fclaw2d_global_t *glob,
 
     level = this_patch->level;
 
-    fclaw2d_clawpatch_aux_data(domain,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     fclaw2d_clawpatch_save_current_step(domain, this_patch);
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&qold,&meqn);
@@ -540,7 +540,7 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
     clawpack_options = fc2d_clawpack5_get_options(domain);
     if (classic_vt.b4step2 != NULL)
     {
-        fc2d_clawpack5_b4step2(domain,
+        fc2d_clawpack5_b4step2(glob,
                                this_patch,
                                this_block_idx,
                                this_patch_idx,t,dt);
@@ -551,7 +551,7 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
                                          this_patch_idx,t,dt);
     if (clawpack_options->src_term > 0)
     {
-        fc2d_clawpack5_src2(domain,
+        fc2d_clawpack5_src2(glob,
                              this_patch,
                              this_block_idx,
                              this_patch_idx,t,dt);

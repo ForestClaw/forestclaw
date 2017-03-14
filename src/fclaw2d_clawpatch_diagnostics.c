@@ -95,10 +95,12 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
-                            void *patch_acc)
+                            void* user) //void *patch_acc)
 {
-    error_info_t *error_data = (error_info_t*) patch_acc;
-    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+
+    error_info_t *error_data = (error_info_t*) s->user;//patch_acc;
+    const amr_options_t *gparms = s->glob->gparms;
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -107,7 +109,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy, t;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(s->glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     area = fclaw2d_clawpatch_get_area(domain,this_patch);  /* Might be null */
@@ -136,13 +138,13 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int check = gparms->compute_error || gparms->conservation_check;
     if (!check) return;
-    fclaw2d_domain_iterate_patches(domain, cb_compute_diagnostics, patch_acc);
+    fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
 }
 
 

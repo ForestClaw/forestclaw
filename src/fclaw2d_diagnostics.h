@@ -49,7 +49,7 @@ typedef struct
 typedef void (*fclaw2d_diagnostics_initialize_t)(fclaw2d_domain_t *domain,
                                                  void** acc);
 
-typedef void (*fclaw2d_diagnostics_compute_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_diagnostics_compute_t)(fclaw2d_global_t *glob,
                                               void* acc);
 
 typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_domain_t *domain,
@@ -97,7 +97,7 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 void fclaw2d_diagnostics_initialize(fclaw2d_domain_t *domain,
                                     fclaw2d_diagnostics_accumulator_t* acc);
 
-void fclaw2d_diagnostics_gather(fclaw2d_domain_t *domain,
+void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
                                 fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag);
 

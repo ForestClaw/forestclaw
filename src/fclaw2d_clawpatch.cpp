@@ -58,7 +58,7 @@ void ghost_comm(fclaw2d_global_t* glob,
                 int packmode);
 
 static
-void metric_setup(fclaw2d_domain_t* domain,
+void metric_setup(fclaw2d_global_t* glob,
                   fclaw2d_patch_t* this_patch,
                   int blockno,
                   int patchno);
@@ -117,7 +117,7 @@ fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch)
     return clawpatch_data(this_patch);
 }
 
-void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
@@ -133,7 +133,7 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_domain_t* domain,
     *dy = cp->dy;
 }
 
-void fclaw2d_clawpatch_aux_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
                                 double **aux, int* maux)
 {
@@ -279,16 +279,16 @@ void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
  ------------------------------------------------------------------ */
 
 static
-void metric_setup(fclaw2d_domain_t* domain,
+void metric_setup(fclaw2d_global_t* glob,
                   fclaw2d_patch_t* this_patch,
                   int blockno,
                   int patchno)
 {
     /* vt.patch_manifold_setup_mesh(...) */
-    fclaw2d_metric_setup_mesh(domain,this_patch,blockno,patchno);
+    fclaw2d_metric_setup_mesh(glob,this_patch,blockno,patchno);
 
     /* vt.patch_manifold_compute_normals(...) */
-    fclaw2d_metric_compute_normals(domain,this_patch,blockno,patchno);
+    fclaw2d_metric_compute_normals(glob,this_patch,blockno,patchno);
 }
 
 
@@ -477,8 +477,6 @@ void fclaw2d_clawpatch_build(fclaw2d_global_t *glob,
                              int patchno,
                              void *user)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = glob->gparms;
 
@@ -486,8 +484,8 @@ void fclaw2d_clawpatch_build(fclaw2d_global_t *glob,
 
     if (gparms->manifold)
     {
-        fclaw2d_vt()->metric_compute_area(domain,this_patch,blockno,patchno);
-        metric_setup(domain,this_patch,blockno,patchno);
+        fclaw2d_vt()->metric_compute_area(glob,this_patch,blockno,patchno);
+        metric_setup(glob,this_patch,blockno,patchno);
     }
 }
 
@@ -499,8 +497,6 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_global_t *glob,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     const amr_options_t *gparms = glob->gparms;
 
     fclaw2d_clawpatch_define(glob,coarse_patch,blockno,coarse_patchno,build_mode);
@@ -508,11 +504,10 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_global_t *glob,
     if (gparms->manifold)
     {
         /* Don't recompute the area, but rather average from finer areas */
-        fclaw2d_metric_average_area(domain,fine_patches,coarse_patch,
+        fclaw2d_metric_average_area(glob,fine_patches,coarse_patch,
                                     blockno, coarse_patchno, fine0_patchno);
 
-        metric_setup(domain,coarse_patch,blockno,
-                                       coarse_patchno);
+        metric_setup(glob,coarse_patch,blockno,coarse_patchno);
     }
 }
 
@@ -522,8 +517,6 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
                                    int patchno,
                                    void *user)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     const amr_options_t *gparms = glob->gparms;
 
@@ -533,7 +526,7 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
     {
         if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
         {
-            fclaw2d_vt()->metric_compute_area(domain,this_patch,blockno,patchno);
+            fclaw2d_vt()->metric_compute_area(glob,this_patch,blockno,patchno);
         }
     }
 }
