@@ -398,7 +398,7 @@ int fc2d_clawpack5_get_package_id (void);
 void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe);
 
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob);
 
 /* -------------------------------------------------------------------------
    Routines that won't change
@@ -462,7 +462,7 @@ double fc2d_clawpack5_step2(fclaw2d_global_t *glob,
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
+    fc2d_clawpack5_step2_rhs(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,

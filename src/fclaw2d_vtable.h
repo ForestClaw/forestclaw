@@ -94,10 +94,6 @@ fclaw2d_vtable_t* fclaw2d_vt();
 
 void fclaw2d_init_vtable();
 
-// void fclaw2d_set_vtable();
-
-// fclaw2d_vtable_t fclaw2d_get_vtable(fclaw2d_domain_t *domain);
-
 
 #ifdef __cplusplus
 #if 0

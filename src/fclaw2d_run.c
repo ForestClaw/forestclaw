@@ -158,11 +158,11 @@ void outstyle_1(fclaw2d_global_t *glob)
     {
         double tstart = t_curr;
 
-        fclaw2d_domain_set_time(*domain,t_curr);
+        fclaw2d_domain_set_time(glob,t_curr);
         double tend = tstart + dt_outer;
         while (t_curr < tend)
         {
-            // fclaw2d_domain_set_time(*domain,t_curr);
+            // fclaw2d_domain_set_time(glob,t_curr);
             /* Get current domain data since it may change during
                regrid. */
             ddata = fclaw2d_domain_get_data(*domain);
@@ -281,7 +281,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                        not taken a small step */
                 }
             }
-            fclaw2d_domain_set_time(*domain,t_curr);
+            fclaw2d_domain_set_time(glob,t_curr);
 
             fclaw2d_diagnostics_gather(glob, &acc, init_flag);
 
@@ -296,7 +296,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         }
 
         /* Output file at every outer loop iteration */
-        fclaw2d_domain_set_time(*domain,t_curr);
+        fclaw2d_domain_set_time(glob,t_curr);
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
@@ -333,7 +333,7 @@ void outstyle_3(fclaw2d_global_t *glob)
 
     double t0 = 0;
     double dt_minlevel = initial_dt;
-    fclaw2d_domain_set_time(*domain,t0);
+    fclaw2d_domain_set_time(glob,t0);
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
     int nregrid_interval = gparms->regrid_interval;
@@ -416,7 +416,7 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* We are happy with this time step */
         t_curr = tc;
-        fclaw2d_domain_set_time(*domain,t_curr);
+        fclaw2d_domain_set_time(glob,t_curr);
 
         /* New time step, which should give a cfl close to the desired cfl. */
         if (!gparms->use_fixed_dt)
@@ -449,7 +449,6 @@ void outstyle_3(fclaw2d_global_t *glob)
 static
 void outstyle_4(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
 #if 0
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 #endif
@@ -473,7 +472,7 @@ void outstyle_4(fclaw2d_global_t *glob)
 
     double t0 = 0;
     double t_curr = t0;
-    fclaw2d_domain_set_time(*domain,t_curr);
+    fclaw2d_domain_set_time(glob,t_curr);
     int n = 0;
     while (n < nstep_outer)
     {
@@ -494,7 +493,7 @@ void outstyle_4(fclaw2d_global_t *glob)
         t_curr += dt_minlevel;
         n++;
 
-        fclaw2d_domain_set_time(*domain,t_curr);
+        fclaw2d_domain_set_time(glob,t_curr);
 
         if (gparms->regrid_interval > 0)
         {

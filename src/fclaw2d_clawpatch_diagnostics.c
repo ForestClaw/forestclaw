@@ -120,7 +120,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     if (gparms->compute_error && clawpatch_vt->fort_compute_patch_error != NULL)
     {
         double *error;
-        t = fclaw2d_domain_get_time(domain);
+        t = fclaw2d_domain_get_time(s->glob);
         error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
 
         clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,

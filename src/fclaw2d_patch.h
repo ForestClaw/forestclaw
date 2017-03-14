@@ -289,11 +289,11 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     double alpha);
 
-
+#if 0
 void fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch,
                                        int this_block_idx, int this_patch_idx,
                                        void* local_accumulator);
-
+#endif 
 void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
@@ -548,7 +548,6 @@ typedef struct fclaw2d_patch_vtable
 } fclaw2d_patch_vtable_t;
 
 void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt);
-fclaw2d_patch_vtable_t fclaw2d_get_patch_vtable(fclaw2d_domain_t *domain);
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
 
 

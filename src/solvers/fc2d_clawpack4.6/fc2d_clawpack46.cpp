@@ -116,11 +116,11 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 }
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
 {
     int id;
     fclaw_app_t* app;
-    app = fclaw2d_domain_get_app(domain);
+    app = fclaw2d_domain_get_app(glob->domain);
     id = fc2d_clawpack46_get_package_id();
     return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
 }
@@ -257,7 +257,7 @@ void fc2d_clawpack46_set_capacity(fclaw2d_global_t *glob,
     double *aux, *area;
     fc2d_clawpack46_options_t *clawopt;
 
-    clawopt = fc2d_clawpack46_get_options(glob->domain);
+    clawopt = fc2d_clawpack46_get_options(glob);
     mcapa = clawopt->mcapa;
 
     fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
@@ -357,7 +357,7 @@ void fc2d_clawpack46_src2(fclaw2d_global_t *glob,
 
 
 /* Use this to return only the right hand side of the clawpack algorithm */
-double fc2d_clawpack46_step2_rhs(fclaw2d_domain_t *domain,
+double fc2d_clawpack46_step2_rhs(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -438,7 +438,6 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
                              double t,
                              double dt)
 {
-    fclaw2d_domain_t *domain = glob->domain;
     fc2d_clawpack46_options_t* clawpack_options;
     int level;
     double *qold, *aux;
@@ -448,7 +447,7 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(classic_vt.rpn2 != NULL);
     FCLAW_ASSERT(classic_vt.rpt2 != NULL);
 
-    clawpack_options = fc2d_clawpack46_get_options(domain);
+    clawpack_options = fc2d_clawpack46_get_options(glob);
 
     level = this_patch->level;
 
@@ -513,11 +512,9 @@ double fc2d_clawpack46_update(fclaw2d_global_t *glob,
                               int this_patch_idx,
                               double t,
                               double dt)
-{
-    fclaw2d_domain_t *domain = glob->domain;
-    
+{   
     const fc2d_clawpack46_options_t* clawpack_options;
-    clawpack_options = fc2d_clawpack46_get_options(domain);
+    clawpack_options = fc2d_clawpack46_get_options(glob);
 
     if (classic_vt.b4step2 != NULL)
     {

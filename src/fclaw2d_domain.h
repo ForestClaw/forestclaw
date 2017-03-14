@@ -97,10 +97,10 @@ fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
 
 /* time */
 void
-fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time);
+fclaw2d_domain_set_time(fclaw2d_global_t *glob, double time);
 
 double
-fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
+fclaw2d_domain_get_time(fclaw2d_global_t *glob);
 
 
 /* Mapping context */

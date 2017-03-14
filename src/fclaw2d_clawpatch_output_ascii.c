@@ -40,7 +40,7 @@ void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
     sprintf(matname1,"fort.q%04d",iframe);
     sprintf(matname2,"fort.t%04d",iframe);
 
-    time = fclaw2d_domain_get_time(glob->domain);
+    time = fclaw2d_domain_get_time(glob);
     ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
     meqn = amropt->meqn;

@@ -114,7 +114,7 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
     {
         fclaw_global_infof("Building initial domain\n");
         t = 0;
-        fclaw2d_domain_set_time(new_domain,t);
+        fclaw2d_domain_set_time(glob,t);//new_domain
 
     }
     else
@@ -205,15 +205,15 @@ int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
 }
 
 
-void fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time)
+void fclaw2d_domain_set_time(fclaw2d_global_t *glob, double time)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     ddata->curr_time = time;
 }
 
-double fclaw2d_domain_get_time(fclaw2d_domain_t *domain)
+double fclaw2d_domain_get_time(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     return ddata->curr_time;
 }
 

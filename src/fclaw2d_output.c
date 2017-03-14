@@ -338,7 +338,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
     fclaw2d_domain_t *domain = glob->domain;
     double time;
 
-    time = fclaw2d_domain_get_time(domain);
+    time = fclaw2d_domain_get_time(glob);
 
     /* Record output time */
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
