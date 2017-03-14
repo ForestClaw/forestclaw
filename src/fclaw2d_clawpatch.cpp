@@ -87,19 +87,15 @@ void fclaw2d_clawpatch_link_global (fclaw2d_global_t * global)
 void* fclaw2d_clawpatch_new_patch()
 {
     fclaw2d_clawpatch_t *cp = new fclaw2d_clawpatch_t;
-    cp->package_data_ptr = fclaw_package_data_new();
     return (void*) cp;
 }
 
-void fclaw2d_clawpatch_delete_patch(void *user_patch)
+void fclaw2d_clawpatch_delete_patch(void *patchcp)
 {
-    FCLAW_ASSERT(user_patch != NULL);
-    fclaw2d_clawpatch_t* cp = (fclaw2d_clawpatch_t*) user_patch;
-    fclaw_package_patch_data_destroy(fclaw2d_clawpatch_t::app,
-                                     cp->package_data_ptr);
-
-    fclaw_package_data_destroy(cp->package_data_ptr);
-    user_patch = NULL;
+    FCLAW_ASSERT(patchcp != NULL);
+    fclaw2d_clawpatch_t* cp = (fclaw2d_clawpatch_t*) patchcp;
+    delete cp;
+    patchcp = NULL;
 }
 
 /* Access clawpatch stored in patch->user_data */
@@ -451,9 +447,6 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
             }
         }
     }
-
-    // fc2d_clawpack46_define_auxaray (domain, this_patch);
-    fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,cp->package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -927,16 +920,6 @@ static double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp)
         return cp->griddata_time_interpolated.dataPtr();
     else
         return cp->griddata.dataPtr();
-}
-
-/* ----------------------------------------------------
-   Solver data and functions
-   ---------------------------------------------------*/
-// Wave propagation algorithms
-
-void* fclaw2d_clawpatch_t::clawpack_patch_data(int id)
-{
-    return fclaw_package_get_data(package_data_ptr,id);
 }
 
 /* ----------------------------------------------------------------

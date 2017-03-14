@@ -60,10 +60,6 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 };
 
 static int s_user_package_id = -1;
-static const fclaw_package_vtable_t user_vtable_notused = {
-    NULL, // patch_data_new
-    NULL //patch_data_delete
-};
 
 static
 void register_user_options (fclaw_app_t * app,
@@ -78,8 +74,7 @@ void register_user_options (fclaw_app_t * app,
 
     FCLAW_ASSERT(s_user_package_id == -1);
     int id = fclaw_package_container_add_pkg_new(glob,
-                                             user,
-                                             &user_vtable_notused);
+                                             user);
     s_user_package_id = id;
 }
 

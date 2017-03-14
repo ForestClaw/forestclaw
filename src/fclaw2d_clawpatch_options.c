@@ -155,8 +155,7 @@ fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_glo
 
     FCLAW_ASSERT(s_clawpatch_package_id == -1);
     id = fclaw_package_container_add_pkg_new(glob,
-                                             clawpatch_options,
-                                             &clawpatch_vtable_notused);
+                                             clawpatch_options);
     s_clawpatch_package_id = id;
 
     return clawpatch_options;

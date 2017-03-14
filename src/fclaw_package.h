@@ -72,8 +72,7 @@ int fclaw_package_container_add_pkg(fclaw_app_t* app,
                                     const fclaw_package_vtable_t *vtable);
 
 int fclaw_package_container_add_pkg_new(struct fclaw2d_global* glob,
-                                        void* opt,
-                                        const fclaw_package_vtable_t *vtable);
+                                        void* opt);
 
 /* Storage in ClawPatch for data from each package */
 void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
