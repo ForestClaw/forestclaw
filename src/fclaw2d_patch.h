@@ -88,7 +88,7 @@ void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               int this_block_idx,
                               int this_patch_idx);
 
-void fclaw2d_patch_write_header(fclaw2d_domain_t* domain,
+void fclaw2d_patch_write_header(fclaw2d_global_t* glob,
                                 int iframe);
 
 
@@ -419,7 +419,7 @@ typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_global_t *glob,
                                                int blockno, int fine_patchno,
                                                int coarse_patchno);
 
-typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_global_t* glob,
                                              int iframe);
 
 typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_global_t *glob,

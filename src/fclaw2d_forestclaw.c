@@ -26,11 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 
 
-void fclaw2d_after_regrid(fclaw2d_domain_t *domain)
+void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 {
     if (fclaw2d_vt()->after_regrid != NULL)
     {
-        fclaw2d_vt()->after_regrid(domain);
+        fclaw2d_vt()->after_regrid(glob);
     }
 }
 

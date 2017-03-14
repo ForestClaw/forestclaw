@@ -304,7 +304,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
            it here */
     }
 
-    fclaw2d_after_regrid(*domain);
+    fclaw2d_after_regrid(glob);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

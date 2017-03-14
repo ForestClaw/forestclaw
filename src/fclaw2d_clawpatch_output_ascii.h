@@ -37,7 +37,7 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_clawpatch_output_ascii_header(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
                                            int iframe);
 
 void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,

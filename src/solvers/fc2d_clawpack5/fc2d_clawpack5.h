@@ -395,7 +395,7 @@ void fc2d_clawpack5_package_register(fclaw_app_t* app,
 
 int fc2d_clawpack5_get_package_id (void);
 
-void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
+void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe);
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);

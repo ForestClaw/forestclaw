@@ -647,11 +647,11 @@ void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                            this_patch_idx,iframe,patch_num,level);
 }
 
-void fclaw2d_patch_write_header(fclaw2d_domain_t* domain,
+void fclaw2d_patch_write_header(fclaw2d_global_t* glob,
                                 int iframe)
 {
     FCLAW_ASSERT(patch_vt()->write_header != NULL);
-    patch_vt()->write_header(domain,iframe);
+    patch_vt()->write_header(glob,iframe);
 }
 
 void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,

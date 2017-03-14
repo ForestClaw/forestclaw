@@ -65,7 +65,7 @@ typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_global_t *glob,
                                                  int blockno,
                                                  int patchno);
 
-typedef void (*fclaw2d_after_regrid_t)(fclaw2d_domain_t *domain);
+typedef void (*fclaw2d_after_regrid_t)(fclaw2d_global_t *glob);
 
 typedef struct fclaw2d_vtable
 {

@@ -68,7 +68,7 @@ void fclaw2d_output_write_serial(fclaw2d_global_t* glob,int iframe)
 
     if (domain->mpirank == 0)
     {
-        fclaw2d_patch_write_header(glob->domain,iframe);
+        fclaw2d_patch_write_header(glob,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */

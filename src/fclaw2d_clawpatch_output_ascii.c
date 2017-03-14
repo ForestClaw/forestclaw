@@ -28,10 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 
-void fclaw2d_clawpatch_output_ascii_header(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
                                            int iframe)
 {
-    const amr_options_t *amropt;
+    const amr_options_t *amropt = glob->gparms;
     int meqn,ngrids;
     double time;
     char matname1[11];
@@ -40,10 +40,8 @@ void fclaw2d_clawpatch_output_ascii_header(fclaw2d_domain_t* domain,
     sprintf(matname1,"fort.q%04d",iframe);
     sprintf(matname2,"fort.t%04d",iframe);
 
-    amropt = fclaw2d_forestclaw_get_options(domain);
-
-    time = fclaw2d_domain_get_time(domain);
-    ngrids = fclaw2d_domain_get_num_patches(domain);
+    time = fclaw2d_domain_get_time(glob->domain);
+    ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
     meqn = amropt->meqn;
 
